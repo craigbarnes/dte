@@ -24,54 +24,60 @@ typedef enum {
     BYTE_OTHER,         // 0x80..0xFF
 } ByteType;
 
-#define ENTRY(x) [(x - 64)]
+static KeyCode decode_key_from_final_byte(uint8_t byte)
+{
+    switch (byte) {
+    case 'A': return KEY_UP;
+    case 'B': return KEY_DOWN;
+    case 'C': return KEY_RIGHT;
+    case 'D': return KEY_LEFT;
+    case 'E': return KEY_BEGIN; // (keypad '5')
+    case 'F': return KEY_END;
+    case 'H': return KEY_HOME;
+    case 'L': return KEY_INSERT;
+    case 'M': return KEY_ENTER;
+    case 'P': return KEY_F1;
+    case 'Q': return KEY_F2;
+    case 'R': return KEY_F3;
+    case 'S': return KEY_F4;
+    }
+    return KEY_NONE;
+}
 
-static const KeyCode final_byte_keys[] = {
-    ENTRY('A') = KEY_UP,
-    ENTRY('B') = KEY_DOWN,
-    ENTRY('C') = KEY_RIGHT,
-    ENTRY('D') = KEY_LEFT,
-    ENTRY('E') = KEY_BEGIN, // (keypad '5')
-    ENTRY('F') = KEY_END,
-    ENTRY('H') = KEY_HOME,
-    ENTRY('L') = KEY_INSERT,
-    ENTRY('M') = KEY_ENTER,
-    ENTRY('P') = KEY_F1,
-    ENTRY('Q') = KEY_F2,
-    ENTRY('R') = KEY_F3,
-    ENTRY('S') = KEY_F4,
-};
-
-static const KeyCode param_keys[] = {
-    [1] = KEY_HOME,
-    [2] = KEY_INSERT,
-    [3] = KEY_DELETE,
-    [4] = KEY_END,
-    [5] = KEY_PAGE_UP,
-    [6] = KEY_PAGE_DOWN,
-    [7] = KEY_HOME,
-    [8] = KEY_END,
-    [11] = KEY_F1,
-    [12] = KEY_F2,
-    [13] = KEY_F3,
-    [14] = KEY_F4,
-    [15] = KEY_F5,
-    [17] = KEY_F6,
-    [18] = KEY_F7,
-    [19] = KEY_F8,
-    [20] = KEY_F9,
-    [21] = KEY_F10,
-    [23] = KEY_F11,
-    [24] = KEY_F12,
-    [25] = KEY_F13,
-    [26] = KEY_F14,
-    [28] = KEY_F15,
-    [29] = KEY_F16,
-    [31] = KEY_F17,
-    [32] = KEY_F18,
-    [33] = KEY_F19,
-    [34] = KEY_F20,
-};
+static KeyCode decode_key_from_param(uint32_t param)
+{
+    switch (param) {
+    case 1: return KEY_HOME;
+    case 2: return KEY_INSERT;
+    case 3: return KEY_DELETE;
+    case 4: return KEY_END;
+    case 5: return KEY_PAGE_UP;
+    case 6: return KEY_PAGE_DOWN;
+    case 7: return KEY_HOME;
+    case 8: return KEY_END;
+    case 11: return KEY_F1;
+    case 12: return KEY_F2;
+    case 13: return KEY_F3;
+    case 14: return KEY_F4;
+    case 15: return KEY_F5;
+    case 17: return KEY_F6;
+    case 18: return KEY_F7;
+    case 19: return KEY_F8;
+    case 20: return KEY_F9;
+    case 21: return KEY_F10;
+    case 23: return KEY_F11;
+    case 24: return KEY_F12;
+    case 25: return KEY_F13;
+    case 26: return KEY_F14;
+    case 28: return KEY_F15;
+    case 29: return KEY_F16;
+    case 31: return KEY_F17;
+    case 32: return KEY_F18;
+    case 33: return KEY_F19;
+    case 34: return KEY_F20;
+    }
+    return KEY_NONE;
+}
 
 static KeyCode decode_kitty_special_key(uint32_t n)
 {
@@ -161,17 +167,6 @@ static KeyCode decode_extended_modifiers(uint32_t n)
     // Decode Meta and/or Alt as MOD_META and ignore Capslock/Numlock
     KeyCode mods = (n & 31) | ((n & 32) >> 4);
     return mods << KEYCODE_MODIFIER_OFFSET;
-}
-
-static KeyCode decode_key_from_param(uint32_t param)
-{
-    return (param < ARRAYLEN(param_keys)) ? param_keys[param] : 0;
-}
-
-static KeyCode decode_key_from_final_byte(uint8_t byte)
-{
-    byte -= 64;
-    return (byte < ARRAYLEN(final_byte_keys)) ? final_byte_keys[byte] : 0;
 }
 
 static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
