@@ -96,7 +96,7 @@ void free_blocks(Buffer *buffer) NONNULL_ARGS;
 bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes) NONNULL_ARGS;
 void buffer_update_syntax(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_setup(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
-void buffer_count_blocks_lines_and_bytes(const Buffer *buffer, uintmax_t counts[3]) NONNULL_ARGS;
+void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2]) NONNULL_ARGS;
 String dump_buffer(const Buffer *buffer) NONNULL_ARGS;
 
 #endif

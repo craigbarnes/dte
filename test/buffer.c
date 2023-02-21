@@ -114,26 +114,26 @@ static void test_buffer_insert_bytes(TestContext *ctx)
     EditorState *e = ctx->userdata;
     View *view = window_open_empty_buffer(e->window);
     const Buffer *buffer = view->buffer;
-    uintmax_t counts[3];
-    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    uintmax_t counts[2];
+    buffer_count_blocks_and_bytes(buffer, counts);
     EXPECT_EQ(counts[0], 1);
     EXPECT_EQ(counts[1], 0);
-    EXPECT_EQ(counts[2], 0);
+    EXPECT_EQ(buffer->nl, 0);
 
     buffer_insert_bytes(view, text, len);
-    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    buffer_count_blocks_and_bytes(buffer, counts);
     EXPECT_EQ(counts[0], 2);
-    EXPECT_EQ(counts[1], 9);
-    EXPECT_EQ(counts[2], len);
+    EXPECT_EQ(counts[1], len);
+    EXPECT_EQ(buffer->nl, 9);
 
     block_iter_goto_offset(&view->cursor, len / 2);
     EXPECT_EQ(view->cursor.offset, 300);
     buffer_insert_bytes(view, text, len);
     EXPECT_EQ(view->cursor.offset, 300);
-    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    buffer_count_blocks_and_bytes(buffer, counts);
     EXPECT_EQ(counts[0], 4);
-    EXPECT_EQ(counts[1], 18);
-    EXPECT_EQ(counts[2], len * 2);
+    EXPECT_EQ(counts[1], len * 2);
+    EXPECT_EQ(buffer->nl, 18);
 
     free(text);
     window_close_current_view(e->window);
