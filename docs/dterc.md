@@ -162,6 +162,12 @@ Alt:
 Shift:
 :   `S-left`
 
+Super:
+:   `s-left`
+
+Hyper:
+:   `H-left`
+
 The _key_ is bound in normal mode by default, unless one or more of the
 following flags are used:
 
@@ -875,6 +881,9 @@ below the cursor.
 
 Undo latest change.
 
+`-m`
+:   Move to the change, without undoing it
+
 ### **redo** [_choice_]
 
 Redo changes done by the [`undo`] command. If there are multiple
@@ -1222,6 +1231,9 @@ The _type_ argument can be one of:
 
 `set`
 :   Show [option values](#options)
+
+`setenv`
+:   Show environment variables, in terms of the [`setenv`] command
 
 `wsplit`
 :   Show [window dimensions][`wsplit`]
@@ -1587,6 +1599,7 @@ errors should be highlighted. Set to `""` to disable.
 [`scroll-pgup`]: #scroll-pgup
 [`search`]: #search
 [`set`]: #set
+[`setenv`]: #setenv
 [`show bind`]: #show
 [`show include`]: #show
 [`show macro`]: #show

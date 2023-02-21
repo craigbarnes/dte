@@ -463,6 +463,14 @@ Alt:
 Shift:
 \fBS\-left\fR
 .PP
+.TP
+Super:
+\fBs\-left\fR
+.PP
+.TP
+Hyper:
+\fBH\-left\fR
+.PP
 The \fIkey\fR is bound in normal mode by default, unless one or more of the
 following flags are used:
 .P
@@ -1391,6 +1399,10 @@ Move after the pasted text
 .RS
 Undo latest change.
 .P
+.TP
+\fB\-m\fR
+Move to the change, without undoing it
+.PP
 .RE
 \fBredo\fR [\fIchoice\fR]
 .RS
@@ -1839,6 +1851,10 @@ Show search history
 .TP
 \fBset\fR
 Show option values
+.PP
+.TP
+\fBsetenv\fR
+Show environment variables, in terms of the \fBsetenv\fR command
 .PP
 .TP
 \fBwsplit\fR
