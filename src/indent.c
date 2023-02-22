@@ -102,8 +102,18 @@ IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
 
 size_t get_indent_width(const LocalOptions *options, const StringView *line)
 {
-    IndentInfo info = get_indent_info(options, line);
-    return info.width;
+    const char *buf = line->data;
+    size_t width = 0;
+    for (size_t i = 0, n = line->length, tw = options->tab_width; i < n; i++) {
+        if (buf[i] == ' ') {
+            width++;
+        } else if (buf[i] == '\t') {
+            width = next_indent_width(width, tw);
+        } else {
+            break;
+        }
+    }
+    return width;
 }
 
 static ssize_t get_current_indent_bytes(const LocalOptions *options, const char *buf, size_t cursor_offset)
