@@ -439,9 +439,7 @@ static bool fileinfo_changed(const FileInfo *info, const struct stat *st)
 static bool save_unmodified_buffer(Buffer *buffer, const char *filename)
 {
     SaveUnmodifiedType type = buffer->options.save_unmodified;
-    if (type == SAVE_FULL) {
-        return false;
-    }
+    BUG_ON(type == SAVE_FULL);
 
     struct stat st;
     if (unlikely(stat(filename, &st) != 0)) {
@@ -485,9 +483,14 @@ bool save_buffer (
     bool crlf,
     bool write_bom
 ) {
+    SaveUnmodifiedType save_unmod = buffer->options.save_unmodified;
     if (
-        !buffer_modified(buffer)
+        save_unmod != SAVE_FULL
+        && !buffer_modified(buffer)
         && xstreq(filename, buffer->abs_filename)
+        && same_encoding(encoding, &buffer->encoding)
+        && crlf == buffer->crlf_newlines
+        && write_bom == buffer->bom
         && save_unmodified_buffer(buffer, filename)
     ) {
         return true;

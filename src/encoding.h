@@ -1,6 +1,7 @@
 #ifndef ENCODING_ENCODING_H
 #define ENCODING_ENCODING_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "util/macros.h"
 
@@ -30,6 +31,11 @@ typedef struct {
     const unsigned char bytes[4];
     unsigned int len;
 } ByteOrderMark;
+
+static inline bool same_encoding(const Encoding *a, const Encoding *b)
+{
+    return a->type == b->type && a->name == b->name;
+}
 
 Encoding encoding_from_type(EncodingType type);
 Encoding encoding_from_name(const char *name) NONNULL_ARGS;

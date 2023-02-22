@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include "encoding.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
