@@ -502,7 +502,7 @@ loop_break:;
     term_output_flush(&term->obuf);
     set_print_errors_to_stderr(true);
 
-    // Unlock files and add files to file history
+    // Unlock files and add to file history
     remove_frame(e, e->root_frame);
 
     if (load_and_save_history) {
