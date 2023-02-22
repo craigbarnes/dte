@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
+#include <strings.h>
 #include "block-iter.h"
 #include "options.h"
 #include "util/debug.h"
@@ -20,10 +22,29 @@ typedef struct {
     bool sane;
 } IndentInfo;
 
+// Divide `x` by `d`, to obtain the number of whole indent levels.
+// If `d` is a power of 2, shift right by `ffs(d) - 1` instead, to
+// avoid the expensive divide operation. This optimization applies
+// to widths of 1, 2, 4 and 8, which covers all of the sensible ones.
+static inline size_t indent_level(size_t x, size_t d)
+{
+    BUG_ON(d - 1 > 7);
+    return likely(IS_POWER_OF_2(d)) ? x >> (ffs(d) - 1) : x / d;
+}
+
+static inline size_t indent_remainder(size_t x, size_t m)
+{
+    BUG_ON(m - 1 > 7);
+    return likely(IS_POWER_OF_2(m)) ? x & (m - 1) : x % m;
+}
+
 static inline size_t next_indent_width(size_t x, size_t mul)
 {
-    BUG_ON(mul == 0);
-    BUG_ON(mul > INDENT_WIDTH_MAX);
+    BUG_ON(mul - 1 > 7);
+    if (likely(IS_POWER_OF_2(mul))) {
+        size_t mask = ~(mul - 1);
+        return (x & mask) + mul;
+    }
     return ((x + mul) / mul) * mul;
 }
 

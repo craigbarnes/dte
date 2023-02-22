@@ -52,6 +52,34 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_FALSE(info.sane);
 }
 
+static void test_indent_level(TestContext *ctx)
+{
+    EXPECT_EQ(indent_level(0, 2), 0);
+    EXPECT_EQ(indent_level(1, 2), 0);
+    EXPECT_EQ(indent_level(2, 2), 1);
+    EXPECT_EQ(indent_level(3, 2), 1);
+    EXPECT_EQ(indent_level(4, 2), 2);
+    EXPECT_EQ(indent_level(7, 8), 0);
+    EXPECT_EQ(indent_level(8, 8), 1);
+    EXPECT_EQ(indent_level(9, 8), 1);
+
+    EXPECT_EQ(indent_remainder(0, 2), 0);
+    EXPECT_EQ(indent_remainder(1, 2), 1);
+    EXPECT_EQ(indent_remainder(2, 2), 0);
+    EXPECT_EQ(indent_remainder(3, 2), 1);
+    EXPECT_EQ(indent_remainder(4, 2), 0);
+    EXPECT_EQ(indent_remainder(7, 8), 7);
+    EXPECT_EQ(indent_remainder(8, 8), 0);
+    EXPECT_EQ(indent_remainder(9, 8), 1);
+
+    for (size_t x = 0; x <= 17; x++) {
+        for (size_t m = 1; m <= 8; m++) {
+            EXPECT_EQ(indent_level(x, m), x / m);
+            EXPECT_EQ(indent_remainder(x, m), x % m);
+        }
+    }
+}
+
 static void test_next_indent_width(TestContext *ctx)
 {
     EXPECT_EQ(next_indent_width(0, 4), 4);
@@ -108,6 +136,7 @@ static void test_next_indent_width(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_get_indent_info),
+    TEST(test_indent_level),
     TEST(test_next_indent_width),
 };
 

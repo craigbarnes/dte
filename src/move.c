@@ -23,7 +23,7 @@ void move_to_preferred_x(View *view, long preferred_x)
 
     if (options->emulate_tab && view->preferred_x < line.length) {
         const size_t iw = options->indent_width;
-        const size_t ilevel = view->preferred_x / iw;
+        const size_t ilevel = indent_level(view->preferred_x, iw);
         for (size_t i = 0; i < line.length && line.data[i] == ' '; i++) {
             if (i + 1 == (ilevel + 1) * iw) {
                 // Force cursor to beginning of the indentation level

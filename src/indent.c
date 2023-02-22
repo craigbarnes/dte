@@ -1,4 +1,3 @@
-#include <string.h>
 #include <sys/types.h>
 #include "indent.h"
 #include "regexp.h"
@@ -17,9 +16,8 @@ char *make_indent(const LocalOptions *options, size_t width)
     }
 
     size_t tw = options->tab_width;
-    BUG_ON(tw == 0 || tw > TAB_WIDTH_MAX);
-    size_t ntabs = width / tw;
-    size_t nspaces = width % tw;
+    size_t ntabs = indent_level(width, tw);
+    size_t nspaces = indent_remainder(width, tw);
     size_t n = ntabs + nspaces;
     char *str = xmalloc(n + 1);
     memset(str + ntabs, ' ', nspaces);
@@ -91,12 +89,12 @@ IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
         } else {
             break;
         }
-        if (info.width % iw == 0 && info.sane) {
+        if (indent_remainder(info.width, iw) == 0 && info.sane) {
             info.sane = space_indent ? !tabs : !spaces;
         }
     }
 
-    info.level = info.width / iw;
+    info.level = indent_level(info.width, iw);
     info.wsonly = (pos == len);
     info.bytes = spaces + tabs;
     return info;
@@ -116,7 +114,7 @@ static ssize_t get_current_indent_bytes(const LocalOptions *options, const char 
     size_t iwidth = 0;
 
     for (size_t i = 0; i < cursor_offset; i++) {
-        if (iwidth % iw == 0) {
+        if (indent_remainder(iwidth, iw) == 0) {
             ibytes = 0;
             iwidth = 0;
         }
@@ -134,7 +132,7 @@ static ssize_t get_current_indent_bytes(const LocalOptions *options, const char 
         ibytes++;
     }
 
-    if (iwidth % iw) {
+    if (indent_remainder(iwidth, iw)) {
         // Cursor at middle of indentation level
         return -1;
     }
@@ -177,7 +175,7 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *curs
             // No full indentation level at cursor position
             return 0;
         }
-        if (iwidth % iw == 0) {
+        if (indent_remainder(iwidth, iw) == 0) {
             return i - cursor_offset + 1;
         }
     }
