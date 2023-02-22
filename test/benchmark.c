@@ -141,16 +141,49 @@ static void do_bench_get_indent_width(size_t iw)
     report(&start, iterations, "get_indent_width() <- %zu", iw);
 }
 
-static void bench_get_indent_width(void)
+static void do_bench_get_indent_info(size_t iw)
+{
+    const LocalOptions options = {
+        .expand_tab = true,
+        .indent_width = iw,
+        .tab_width = 8,
+    };
+
+    char buf[64];
+    size_t n = sizeof(buf);
+    StringView line = string_view(memset(buf, ' ', n), n);
+
+    unsigned int iterations = 30000;
+    unsigned int accum = 0;
+    IndentInfo info = {.width = 0};
+    struct timespec start;
+    get_time(&start);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        info = get_indent_info(&options, &line);
+        accum += info.width;
+    }
+
+    if (accum != (iterations * n)) {
+        fail("unexpected result in %s(): %u", __func__, accum);
+    }
+
+    report(&start, iterations, "get_indent_info() <- %zu", iw);
+}
+
+static void bench_get_indent(void)
 {
     for (unsigned int i = 1; i <= 8; i++) {
         do_bench_get_indent_width(i);
+    }
+    for (unsigned int i = 1; i <= 8; i++) {
+        do_bench_get_indent_info(i);
     }
 }
 
 int main(void)
 {
     bench_find_ft();
-    bench_get_indent_width();
+    bench_get_indent();
     return 0;
 }
