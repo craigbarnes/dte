@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #include "filetype.h"
+#include "indent.h"
 #include "util/arith.h"
 #include "util/macros.h"
 #include "util/str-util.h"
@@ -36,8 +37,11 @@ static void get_time(struct timespec *ts)
     }
 }
 
-static void timespec_subtract(struct timespec *lhs, struct timespec *rhs, struct timespec *res)
-{
+static void timespec_subtract (
+    const struct timespec *lhs,
+    const struct timespec *rhs,
+    struct timespec *res
+) {
     res->tv_sec = lhs->tv_sec - rhs->tv_sec;
     res->tv_nsec = lhs->tv_nsec - rhs->tv_nsec;
     if (res->tv_nsec < 0) {
@@ -64,10 +68,19 @@ static uintmax_t timespec_to_ns(struct timespec *ts)
     return ns;
 }
 
-static void print_result(const char *name, struct timespec *diff, unsigned int iters)
+PRINTF(3)
+static void report(const struct timespec *start, unsigned int iters, const char *fmt, ...)
 {
-    uintmax_t ns = timespec_to_ns(diff);
-    fprintf(stderr, "   BENCH  %-30s  %9ju ns/iter\n", name, ns / iters);
+    struct timespec end, diff;
+    get_time(&end);
+    timespec_subtract(&end, start, &diff);
+    uintmax_t ns = timespec_to_ns(&diff);
+    char name[64];
+    va_list ap;
+    va_start(ap, fmt);
+    xvsnprintf(name, sizeof name, fmt, ap);
+    va_end(ap);
+    fprintf(stderr, "   BENCH  %-24s  %9ju ns/iter\n", name, ns / iters);
 }
 
 static void do_bench_find_ft(const char *expected_ft, const char *filename)
@@ -82,19 +95,14 @@ static void do_bench_find_ft(const char *expected_ft, const char *filename)
     }
 
     unsigned int iterations = 300000;
-    struct timespec start, end, diff;
+    struct timespec start;
     get_time(&start);
 
     for (unsigned int i = 0; i < iterations; i++) {
         find_ft(&filetypes, filename, line);
     }
 
-    get_time(&end);
-    timespec_subtract(&end, &start, &diff);
-
-    char name[64];
-    xsnprintf(name, sizeof name, "find_ft() -> %s", expected_ft);
-    print_result(name, &diff, iterations);
+    report(&start, iterations, "find_ft() -> %s", expected_ft);
 }
 
 static void bench_find_ft(void)
@@ -105,8 +113,44 @@ static void bench_find_ft(void)
     do_bench_find_ft("config", "/etc/hosts");
 }
 
+static void do_bench_get_indent_width(size_t iw)
+{
+    const LocalOptions options = {
+        .expand_tab = true,
+        .indent_width = iw,
+        .tab_width = 8,
+    };
+
+    char buf[64];
+    size_t n = sizeof(buf);
+    StringView line = string_view(memset(buf, ' ', n), n);
+
+    unsigned int iterations = 30000;
+    unsigned int accum = 0;
+    struct timespec start;
+    get_time(&start);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        accum += get_indent_width(&options, &line);
+    }
+
+    if (accum != (iterations * n)) {
+        fail("unexpected result in %s(): %u", __func__, accum);
+    }
+
+    report(&start, iterations, "get_indent_width() <- %zu", iw);
+}
+
+static void bench_get_indent_width(void)
+{
+    for (unsigned int i = 1; i <= 8; i++) {
+        do_bench_get_indent_width(i);
+    }
+}
+
 int main(void)
 {
     bench_find_ft();
+    bench_get_indent_width();
     return 0;
 }
