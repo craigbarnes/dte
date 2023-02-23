@@ -191,15 +191,13 @@ build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/main.o: build/version.h
-build/editor.o: build/version.h
-src/editor.c: src/compat.h
-src/load-save.c: src/compat.h
-src/signals.c: src/compat.h
-src/util/fd.c: src/compat.h
-src/util/xmemmem.c: src/compat.h
-src/terminal/ioctl.c: src/compat.h
-src/compat.c: src/compat.h
-src/compat.h: build/feature.h
+build/editor.o: build/version.h build/feature.h
+build/load-save.o: build/feature.h
+build/signals.o: build/feature.h
+build/util/fd.o: build/feature.h
+build/util/xmemmem.o: build/feature.h
+build/terminal/ioctl.o: build/feature.h
+build/compat.o: build/feature.h
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
