@@ -1,4 +1,4 @@
-#include "../../build/feature.h" // Must be first include
+#include "compat.h"
 #include <string.h>
 #include "xmemmem.h"
 #include "debug.h"

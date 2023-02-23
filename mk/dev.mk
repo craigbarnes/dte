@@ -102,13 +102,14 @@ $(clang_tidy_targets): clang-tidy-%:
 	  sed '/^[0-9]\+ warnings generated\.$$/d' >&2
 
 clang-tidy-src/config.c: build/builtin-config.h
-clang-tidy-src/editor.c: build/version.h build/feature.h
+clang-tidy-src/editor.c: build/version.h src/compat.h
 clang-tidy-src/main.c: build/version.h
-clang-tidy-src/load-save.c: build/feature.h
-clang-tidy-src/signals.c: build/feature.h
-clang-tidy-src/util/fd.c: build/feature.h
-clang-tidy-src/util/xmemmem.c: build/feature.h
-clang-tidy-src/terminal/ioctl.c: build/feature.h
+clang-tidy-src/compat.c: src/compat.h
+clang-tidy-src/load-save.c: src/compat.h
+clang-tidy-src/signals.c: src/compat.h
+clang-tidy-src/util/fd.c: src/compat.h
+clang-tidy-src/util/xmemmem.c: src/compat.h
+clang-tidy-src/terminal/ioctl.c: src/compat.h
 clang-tidy-test/config.c: build/test/data.h
 
 

@@ -58,7 +58,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter bookmark buffer change cmdline commands \
-    convert compiler completion config copy ctags edit editor \
+    compat compiler completion config convert copy ctags edit editor \
     encoding error exec file-history file-option filetype frame history \
     indent load-save lock main misc mode move msg options regexp replace \
     screen screen-cmdline screen-status screen-tabbar screen-view \
@@ -185,18 +185,20 @@ $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
 $(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
+build/convert.o: build/convert.cflags
 build/builtin-config.h: build/builtin-config.mk
 build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
-build/editor.o: build/version.h build/feature.h
-build/main.o: build/version.h
-build/load-save.o: build/feature.h
-build/signals.o: build/feature.h
-build/util/fd.o: build/feature.h
-build/util/xmemmem.o: build/feature.h
-build/terminal/ioctl.o: build/feature.h
-build/convert.o: build/convert.cflags
+src/editor.c: build/version.h src/compat.h
+src/main.c: build/version.h
+src/load-save.c: src/compat.h
+src/signals.c: src/compat.h
+src/util/fd.c: src/compat.h
+src/util/xmemmem.c: src/compat.h
+src/terminal/ioctl.c: src/compat.h
+src/compat.c: src/compat.h
+src/compat.h: build/feature.h
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
