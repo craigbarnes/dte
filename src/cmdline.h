@@ -16,10 +16,8 @@ typedef struct {
     StringView escaped; // Middle part of `orig` (string to be replaced)
     StringView tail; // Suffix part of `orig` (after `escaped`)
     size_t head_len; // Length of prefix part of `orig` (before `escaped`)
-
     PointerArray completions; // Array of completion candidates
     size_t idx; // Index of currently selected completion
-
     bool add_space_after_single_match;
     bool tilde_expanded;
 } CompletionState;
