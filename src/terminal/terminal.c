@@ -128,6 +128,7 @@ UNITTEST {
 void term_init(Terminal *term, const char *name, const char *colorterm)
 {
     BUG_ON(name[0] == '\0');
+    LOG_INFO("TERM=%s", name);
 
     // Initialize defaults (without touching obuf or ibuf)
     term->color_type = TERM_8_COLOR;
@@ -168,10 +169,13 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
         LOG_INFO("using built-in terminal support for '%.*s'", n, root_name.data);
     }
 
-    const char *ct = colorterm;
-    if (ct && (streq(ct, "truecolor") || streq(ct, "24bit"))) {
-        term->color_type = TERM_TRUE_COLOR;
-        LOG_INFO("24-bit color support detected (COLORTERM=%s)", ct);
+    if (colorterm) {
+        if (streq(colorterm, "truecolor") || streq(colorterm, "24bit")) {
+            term->color_type = TERM_TRUE_COLOR;
+            LOG_INFO("24-bit color support detected (COLORTERM=%s)", colorterm);
+        } else if (colorterm[0] != '\0') {
+            LOG_WARNING("unknown $COLORTERM value: '%s'", colorterm);
+        }
     }
 
     if (term->color_type == TERM_TRUE_COLOR) {

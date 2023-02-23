@@ -44,5 +44,6 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
 LogLevel log_level_default(void);
 LogLevel log_level_from_str(const char *str);
 const char *log_level_to_str(LogLevel level);
+bool log_level_enabled(LogLevel level);
 
 #endif

@@ -109,11 +109,16 @@ bool log_close(void)
     return log_level == LOG_LEVEL_NONE || xclose(logfd) == 0;
 }
 
-void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
+bool log_level_enabled(LogLevel level)
 {
     BUG_ON(level <= LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_TRACE);
-    if (level > log_level) {
+    return level <= log_level;
+}
+
+void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
+{
+    if (!log_level_enabled(level)) {
         return;
     }
 

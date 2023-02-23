@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "block.h"
 #include "commands.h"
+#include "compiler.h"
 #include "config.h"
 #include "editor.h"
 #include "error.h"
@@ -270,6 +271,35 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
     return EX_OK;
 }
 
+static void log_config_counts(const EditorState *e)
+{
+    if (!log_level_enabled(LOG_LEVEL_INFO)) {
+        return;
+    }
+
+    size_t nbinds = 0;
+    for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
+        nbinds += e->modes[i].key_bindings.count;
+    }
+
+    size_t nerrorfmts = 0;
+    for (HashMapIter it = hashmap_iter(&e->compilers); hashmap_next(&it); ) {
+        const Compiler *compiler = it.entry->value;
+        nerrorfmts += compiler->error_formats.count;
+    }
+
+    LOG_INFO (
+        "binds=%zu aliases=%zu hi=%zu ft=%zu option=%zu errorfmt=%zu(%zu)",
+        nbinds,
+        e->aliases.count,
+        e->colors.other.count + NR_BC,
+        e->filetypes.count,
+        e->file_options.count,
+        e->compilers.count,
+        nerrorfmts
+    );
+}
+
 static const char copyright[] =
     "dte " VERSION "\n"
     "(C) 2013-2023 Craig Barnes\n"
@@ -413,6 +443,7 @@ loop_break:;
         read_normal_config(e, rc, flags);
     }
 
+    log_config_counts(e);
     update_all_syntax_colors(&e->syntaxes, &e->colors);
 
     Window *window = new_window(e);
