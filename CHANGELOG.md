@@ -18,6 +18,9 @@ v1.11.1 (not yet released)
   files.
 * Added rules for handling CDATA sections to the XML syntax highlighter.
 * Added auto-completion for command flags.
+* Changed built-in filetype detection so that a `dot_` filename prefix is
+  equivalent to a `.` prefix, or more specifically `dot_bashrc` is now
+  treated the same way as `.bashrc`.
 * Changed the [`default`] command in [`dte-syntax`] files to show an error
   if there are duplicate arguments.
 * [Removed][commit 0fe5e5f224e832a] the built-in `xsel` alias.

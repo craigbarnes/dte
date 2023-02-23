@@ -460,7 +460,7 @@ static bool save_unmodified_buffer(Buffer *buffer, const char *filename)
     BUG_ON(type != SAVE_TOUCH);
     struct timespec times[2];
     if (unlikely(clock_gettime(CLOCK_REALTIME, &times[0]) != 0)) {
-        LOG_ERRNO("aborting partial save; clock_getttime() failed");
+        LOG_ERRNO("aborting partial save; clock_gettime() failed");
         return false;
     }
 
