@@ -14,15 +14,26 @@ FNR == 1 {
     print FILENAME ":" FNR ": trailing whitespace"
 }
 
+FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"compat.h"/ {
+    h++
+    print FILENAME ":" FNR ": \"compat.h\" include not on line 1"
+}
+
+function plural(n) {
+    return (n == 1) ? "" : "s"
+}
+
 END {
-    status = 0
     if (t) {
-        print "Error: found " t " tab indent" (t == 1 ? "" : "s")
-        status = 1
+        print "Error: tab in indent on " t " line" plural(t)
     }
     if (w) {
-        print "Error: trailing whitespace on " w " line" (w == 1 ? "" : "s")
-        status = 1
+        print "Error: trailing whitespace on " w " line" plural(w)
     }
-    exit status
+    if (h) {
+        print "Error: " h " misplaced \"compat.h\" include" plural(h)
+    }
+    if (t + w + h != 0) {
+        exit 1
+    }
 }
