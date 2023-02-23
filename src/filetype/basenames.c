@@ -110,24 +110,24 @@ static const struct FileBasenameMap {
 
 static FileTypeEnum filetype_from_basename(StringView name)
 {
+    if (name.length >= ARRAYLEN(basenames[0].name)) {
+        return strview_equal_cstring(&name, "meson_options.txt") ? MESON : NONE;
+    }
+
+    size_t dotprefix = 0;
+    if (strview_has_prefix(&name, ".")) {
+        dotprefix = 1;
+    } else if (strview_has_prefix(&name, "dot_")) {
+        dotprefix = 4;
+    }
+
+    strview_remove_prefix(&name, dotprefix);
     if (name.length < 4) {
         return NONE;
     }
 
-    if (name.length >= ARRAYLEN(basenames[0].name)) {
-        if (strview_equal_cstring(&name, "meson_options.txt")) {
-            return MESON;
-        }
-        return NONE;
-    }
-
-    bool dot = (name.data[0] == '.');
-    if (dot) {
-        strview_remove_prefix(&name, 1);
-    }
-
     const struct FileBasenameMap *e = BSEARCH(&name, basenames, ft_compare);
-    if (e && (!dot || e->dotfile)) {
+    if (e && (dotprefix == 0 || e->dotfile)) {
         return e->filetype;
     }
 
