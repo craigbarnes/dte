@@ -26,6 +26,10 @@ git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
 check-aux: check-desktop-file check-appstream
 
+check-compat-header:
+	$(E) HDRCHK '*.c'
+	$(Q) $(AWK) -f tools/check-compat-header.awk $(all_sources)
+
 check-coccinelle:
 	$(Q) $(foreach sp, $(SPATCHFILES), \
 	  $(LOG) SPATCH $(sp); \
@@ -121,4 +125,4 @@ DEVMK := loaded
     dist distcheck dist-latest-release dist-all-releases \
     check-docs check-shell-scripts check-whitespace check-codespell \
     check-coccinelle check-aux check-desktop-file check-appstream \
-    git-hooks show-sizes clang-tidy $(clang_tidy_targets)
+    check-compat-header git-hooks show-sizes clang-tidy $(clang_tidy_targets)
