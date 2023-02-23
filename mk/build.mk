@@ -190,8 +190,9 @@ build/builtin-config.h: build/builtin-config.mk
 build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
-src/main.c: build/version.h
-src/editor.c: build/version.h src/compat.h
+build/main.o: build/version.h
+build/editor.o: build/version.h
+src/editor.c: src/compat.h
 src/load-save.c: src/compat.h
 src/signals.c: src/compat.h
 src/util/fd.c: src/compat.h
