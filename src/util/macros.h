@@ -279,7 +279,9 @@
     #define noreturn
 #endif
 
-#if __STDC_VERSION__ >= 201112L
+#if __STDC_VERSION__ > 202300L
+    #define HAS_STATIC_ASSERT 1
+#elif __STDC_VERSION__ >= 201112L
     #define static_assert(x) _Static_assert((x), #x)
     #define HAS_STATIC_ASSERT 1
 #elif GNUC_AT_LEAST(4, 6) || HAS_EXTENSION(c_static_assert)
