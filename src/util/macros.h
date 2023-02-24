@@ -261,14 +261,21 @@
 #define XSTRDUP XMALLOC NONNULL_ARGS
 #define NONNULL_ARGS_AND_RETURN RETURNS_NONNULL NONNULL_ARGS
 
+#if __STDC_VERSION__ > 202300L
+    #define ALIGNOF(t) alignof(t)
+#elif __STDC_VERSION__ >= 201112L
+    #define ALIGNOF(t) _Alignof(t)
+#elif GNUC_AT_LEAST(3, 0)
+    #define ALIGNOF(t) __alignof__(t)
+#else
+    #define ALIGNOF(t) MIN(sizeof(t), offsetof(struct{char c; t x;}, x))
+#endif
+
 #if __STDC_VERSION__ >= 201112L
-    #define alignof(t) _Alignof(t)
     #define noreturn _Noreturn
 #elif GNUC_AT_LEAST(3, 0)
-    #define alignof(t) __alignof__(t)
     #define noreturn __attribute__((__noreturn__))
 #else
-    #define alignof(t) MIN(sizeof(t), offsetof(struct{char c; t x;}, x))
     #define noreturn
 #endif
 

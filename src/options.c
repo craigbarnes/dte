@@ -504,12 +504,12 @@ UNITTEST {
         size_t alignment;
         size_t size;
     } map[] = {
-        [OPT_STR] = {alignof(const char*), sizeof(const char*)},
-        [OPT_UINT] = {alignof(unsigned int), sizeof(unsigned int)},
-        [OPT_ENUM] = {alignof(unsigned int), sizeof(unsigned int)},
-        [OPT_BOOL] = {alignof(bool), sizeof(bool)},
-        [OPT_FLAG] = {alignof(unsigned int), sizeof(unsigned int)},
-        [OPT_REGEX] = {alignof(const InternedRegexp*), sizeof(const InternedRegexp*)},
+        [OPT_STR] = {ALIGNOF(const char*), sizeof(const char*)},
+        [OPT_UINT] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
+        [OPT_ENUM] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
+        [OPT_BOOL] = {ALIGNOF(bool), sizeof(bool)},
+        [OPT_FLAG] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
+        [OPT_REGEX] = {ALIGNOF(const InternedRegexp*), sizeof(const InternedRegexp*)},
     };
 
     GlobalOptions gopts = {.tab_bar = true};
