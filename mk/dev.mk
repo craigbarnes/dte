@@ -8,6 +8,7 @@ GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 WSCHECK = $(AWK) -f tools/wscheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
+CLANGTIDY ?= clang-tidy
 SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
 SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
@@ -23,10 +24,10 @@ dist: dte-$(DISTVER).tar.gz
 dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
-clang-tidy: $(clang_tidy_targets)
+check-clang-tidy: $(clang_tidy_targets)
 check-source: check-whitespace check-codespell check-shell-scripts
 check-aux: check-desktop-file check-appstream
-check-all: check-source check-aux check distcheck clang-tidy
+check-all: check-source check-aux check distcheck check-clang-tidy
 
 check-coccinelle:
 	$(Q) $(foreach sp, $(SPATCHFILES), \
@@ -100,7 +101,7 @@ show-sizes:
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
-	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 2>&1 | \
+	$(Q) $(CLANGTIDY) -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 2>&1 | \
 	  sed '/^[0-9]\+ warnings generated\.$$/d' >&2
 
 clang-tidy-src/config.c: build/builtin-config.h
@@ -124,4 +125,5 @@ DEVMK := loaded
     check-all check-source check-docs check-shell-scripts \
     check-whitespace check-codespell check-coccinelle \
     check-aux check-desktop-file check-appstream \
-    git-hooks show-sizes clang-tidy $(clang_tidy_targets)
+    check-clang-tidy $(clang_tidy_targets) \
+    git-hooks show-sizes
