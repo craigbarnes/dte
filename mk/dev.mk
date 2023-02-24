@@ -74,7 +74,7 @@ $(RELEASE_DIST): dte-%.tar.gz:
 	$(Q) git archive --prefix='dte-$*/' -o '$@' 'v$*'
 
 dte-v%.tar.gz:
-	@echo 'ERROR: tarballs should be named "dte-*", not "dte-v*"'
+	@echo 'ERROR: tarballs should be named "dte-*", not "dte-v*"' >&2
 	@false
 
 dte-%.tar.gz:
