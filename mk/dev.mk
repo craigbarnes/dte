@@ -24,7 +24,9 @@ dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
+check-source: check-whitespace check-codespell check-shell-scripts
 check-aux: check-desktop-file check-appstream
+check-all: check-source check-aux check distcheck clang-tidy
 
 check-coccinelle:
 	$(Q) $(foreach sp, $(SPATCHFILES), \
@@ -119,6 +121,7 @@ DEVMK := loaded
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
-    check-docs check-shell-scripts check-whitespace check-codespell \
-    check-coccinelle check-aux check-desktop-file check-appstream \
+    check-all check-source check-docs check-shell-scripts \
+    check-whitespace check-codespell check-coccinelle \
+    check-aux check-desktop-file check-appstream \
     git-hooks show-sizes clang-tidy $(clang_tidy_targets)
