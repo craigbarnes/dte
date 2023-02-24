@@ -40,13 +40,11 @@ typedef struct View {
     size_t saved_cursor_offset;
 } View;
 
-enum {
-    // If View::sel_eo is set to this value it means the offset must
-    // be calculated from the cursor iterator. Otherwise the offset
-    // is precalculated and may not be the same as the cursor position
-    // (see search/replace code).
-    SEL_EO_RECALC = SSIZE_MAX
-};
+// If View::sel_eo is set to this value it means the offset must
+// be calculated from the cursor iterator. Otherwise the offset
+// is precalculated and may not be the same as the cursor position
+// (see search/replace code).
+#define SEL_EO_RECALC SSIZE_MAX
 
 static inline void view_reset_preferred_x(View *view)
 {
