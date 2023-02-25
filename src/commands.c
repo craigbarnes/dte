@@ -1628,33 +1628,11 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
 
     mode_t old_mode = buffer->file.mode;
     struct stat st;
-    if (stat(absolute, &st)) {
+    bool stat_ok = !stat(absolute, &st);
+    if (!stat_ok) {
         if (errno != ENOENT) {
             error_msg("stat failed for %s: %s", absolute, strerror(errno));
             goto error;
-        }
-        if (e->options.lock_files) {
-            if (absolute == buffer->abs_filename) {
-                if (!buffer->locked) {
-                    if (!lock_file(absolute)) {
-                        if (!force) {
-                            error_msg("Can't lock file %s", absolute);
-                            goto error;
-                        }
-                    } else {
-                        buffer->locked = true;
-                    }
-                }
-            } else {
-                if (!lock_file(absolute)) {
-                    if (!force) {
-                        error_msg("Can't lock file %s", absolute);
-                        goto error;
-                    }
-                } else {
-                    new_locked = true;
-                }
-            }
         }
     } else {
         if (
@@ -1672,34 +1650,37 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
             error_msg("Will not overwrite directory %s", absolute);
             goto error;
         }
-        if (e->options.lock_files) {
-            if (absolute == buffer->abs_filename) {
-                if (!buffer->locked) {
-                    if (!lock_file(absolute)) {
-                        if (!force) {
-                            error_msg("Can't lock file %s", absolute);
-                            goto error;
-                        }
-                    } else {
-                        buffer->locked = true;
-                    }
-                }
-            } else {
+    }
+
+    if (e->options.lock_files) {
+        if (absolute == buffer->abs_filename) {
+            if (!buffer->locked) {
                 if (!lock_file(absolute)) {
                     if (!force) {
                         error_msg("Can't lock file %s", absolute);
                         goto error;
                     }
                 } else {
-                    new_locked = true;
+                    buffer->locked = true;
                 }
             }
+        } else {
+            if (!lock_file(absolute)) {
+                if (!force) {
+                    error_msg("Can't lock file %s", absolute);
+                    goto error;
+                }
+            } else {
+                new_locked = true;
+            }
         }
+    }
+
+    if (stat_ok) {
         if (absolute != buffer->abs_filename && !force) {
             error_msg("Use -f to overwrite %s", absolute);
             goto error;
         }
-
         // Allow chmod 755 etc.
         buffer->file.mode = st.st_mode;
     }
