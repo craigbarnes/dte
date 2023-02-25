@@ -1049,6 +1049,26 @@ static void test_ulong_to_str(TestContext *ctx)
     EXPECT_STREQ(ulong_to_str(x + 1), "0");
 }
 
+static void test_buf_umax_to_str(TestContext *ctx)
+{
+    char buf[DECIMAL_STR_MAX(uintmax_t)];
+    EXPECT_EQ(buf_umax_to_str(0, buf), 1);
+    EXPECT_STREQ(buf, "0");
+    EXPECT_EQ(buf_umax_to_str(1, buf), 1);
+    EXPECT_STREQ(buf, "1");
+    EXPECT_EQ(buf_umax_to_str(9, buf), 1);
+    EXPECT_STREQ(buf, "9");
+    EXPECT_EQ(buf_umax_to_str(10, buf), 2);
+    EXPECT_STREQ(buf, "10");
+    EXPECT_EQ(buf_umax_to_str(1234567890ull, buf), 10);
+    EXPECT_STREQ(buf, "1234567890");
+    EXPECT_EQ(buf_umax_to_str(9087654321ull, buf), 10);
+    EXPECT_STREQ(buf, "9087654321");
+    static_assert(sizeof(buf) > 20);
+    EXPECT_EQ(buf_umax_to_str(18446744073709551615ull, buf), 20);
+    EXPECT_STREQ(buf, "18446744073709551615");
+}
+
 static void test_buf_uint_to_str(TestContext *ctx)
 {
     char buf[DECIMAL_STR_MAX(unsigned int)];
@@ -2584,6 +2604,7 @@ static const TestEntry tests[] = {
     TEST(test_umax_to_str),
     TEST(test_uint_to_str),
     TEST(test_ulong_to_str),
+    TEST(test_buf_umax_to_str),
     TEST(test_buf_uint_to_str),
     TEST(test_filemode_to_str),
     TEST(test_u_char_width),

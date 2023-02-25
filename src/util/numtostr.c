@@ -42,9 +42,7 @@ size_t buf_umax_to_str(uintmax_t x, char *buf)
     size_t i = ndigits;
     buf[i--] = '\0';
     do {
-        unsigned char digit = x % 10;
-        buf[i--] = '0' + digit;
-        x -= digit;
+        buf[i--] = (x % 10) + '0';
     } while (x /= 10);
     return ndigits;
 }
