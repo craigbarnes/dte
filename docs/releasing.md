@@ -31,14 +31,12 @@ dte Release Checklist
 
 6. Update [portable builds] in `CHANGELOG.md`
    1. `git checkout v${VER}`
-   2. `make CC=musl-gcc CFLAGS='-O2 -flto' LDFLAGS='-static -s'`
-   3. Check `./dte -V` output
-   4. `tar -czf "dte-${VER}-linux-$(uname -m).tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5`
-   5. Copy tarball to `public/dist/dte/` in [releases repo]
-   6. Run `make generate` in [releases repo]
-   7. Commit and push tarball and generated files to [releases repo]
-   8. `git checkout master`
-   9. Update URL for [portable builds] in `CHANGELOG.md`
+   2. `make portable`
+   3. Copy generated tarball to `public/dist/dte/` in [releases repo]
+   4. Run `make generate` in [releases repo]
+   5. Commit and push tarball and generated files to [releases repo]
+   6. `git checkout master`
+   7. Update URL for [portable builds] in `CHANGELOG.md`
 
 
 [releases repo]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/tree/master/public/dist/dte

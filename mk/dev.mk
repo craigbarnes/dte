@@ -9,6 +9,7 @@ WSCHECK = $(AWK) -f tools/wscheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
 CLANGTIDY ?= clang-tidy
+MUSLGCC ?= ccache musl-gcc
 SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
 SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
@@ -81,6 +82,13 @@ dte-%.tar.gz:
 	$(E) ARCHIVE $@
 	$(Q) git archive --prefix='dte-$*/' -o '$@' '$*'
 
+portable: private TARBALL = dte-$(VERSION)-$(shell uname -sm | tr 'A-Z ' a-z-).tar.gz
+portable: private MAKEFLAGS += --no-print-directory
+portable: $(man)
+	$(Q) $(MAKE) CC='$(MUSLGCC)' CFLAGS='-O2 -flto' LDFLAGS='-static -s' NO_CONFIG_MK=1
+	$(E) ARCHIVE '$(TARBALL)'
+	$(Q) tar -czf '$(TARBALL)' $(dte) $^
+
 $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
 	$(Q) cp $< $@
@@ -91,11 +99,11 @@ show-sizes: MAKEFLAGS += \
     DEBUG=0 USE_SANITIZER=
 
 show-sizes:
-	$(MAKE) dte=build/dte-dynamic
-	$(MAKE) dte=build/dte-static LDFLAGS=-static
-	$(MAKE) dte=build/dte-dynamic-tiny CFLAGS='-Os -pipe' LDFLAGS=-fwhole-program BUILTIN_SYNTAX_FILES=
-	-$(MAKE) dte=build/dte-musl-static CC=musl-gcc LDFLAGS=-static
-	-$(MAKE) dte=build/dte-musl-static-tiny CC=musl-gcc CFLAGS='-Os -pipe' LDFLAGS=-static ICONV_DISABLE=1 BUILTIN_SYNTAX_FILES=
+	$(MAKE) dte=build/dte-dynamic NO_CONFIG_MK=1
+	$(MAKE) dte=build/dte-static LDFLAGS=-static NO_CONFIG_MK=1
+	$(MAKE) dte=build/dte-dynamic-tiny CFLAGS='-Os -pipe' LDFLAGS=-fwhole-program BUILTIN_SYNTAX_FILES= NO_CONFIG_MK=1
+	-$(MAKE) dte=build/dte-musl-static CC='$(MUSLGCC)' LDFLAGS=-static NO_CONFIG_MK=1
+	-$(MAKE) dte=build/dte-musl-static-tiny CC='$(MUSLGCC)' CFLAGS='-Os -pipe' LDFLAGS=-static ICONV_DISABLE=1 BUILTIN_SYNTAX_FILES= NO_CONFIG_MK=1
 	@strip build/dte-*
 	@du -h build/dte-*
 
@@ -121,7 +129,7 @@ NON_PARALLEL_TARGETS += distcheck show-sizes
 DEVMK := loaded
 
 .PHONY: \
-    dist distcheck dist-latest-release dist-all-releases \
+    dist distcheck dist-latest-release dist-all-releases portable \
     check-all check-source check-docs check-shell-scripts \
     check-whitespace check-codespell check-coccinelle \
     check-aux check-desktop-file check-appstream \
