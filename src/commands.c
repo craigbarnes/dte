@@ -1,9 +1,11 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <glob.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 #include "commands.h"
 #include "bind.h"
@@ -1527,7 +1529,35 @@ static bool stat_changed(const FileInfo *file, const struct stat *st)
     // Don't compare st_mode because we allow chmod 755 etc.
     return st->st_mtime != file->mtime
         || st->st_dev != file->dev
-        || st->st_ino != file->ino;
+        || st->st_ino != file->ino
+        || st->st_size != file->size;
+}
+
+static bool save_unmodified_buffer(Buffer *buffer, const char *filename)
+{
+    SaveUnmodifiedType type = buffer->options.save_unmodified;
+    if (type == SAVE_NONE) {
+        LOG_INFO("buffer unchanged; leaving file untouched");
+        return true;
+    }
+
+    BUG_ON(type != SAVE_TOUCH);
+    struct timespec times[2];
+    if (unlikely(clock_gettime(CLOCK_REALTIME, &times[0]) != 0)) {
+        LOG_ERRNO("aborting partial save; clock_gettime() failed");
+        return false;
+    }
+
+    times[1] = times[0];
+    if (unlikely(utimensat(AT_FDCWD, filename, times, 0) != 0)) {
+        LOG_ERRNO("aborting partial save; utimensat() failed");
+        return false;
+    }
+
+    // TODO: Use full `timespec` instead of `time_t` for FileInfo::mtime
+    buffer->file.mtime = times[0].tv_sec;
+    LOG_INFO("buffer unchanged; mtime/atime updated");
+    return true;
 }
 
 static bool cmd_save(EditorState *e, const CommandArgs *a)
@@ -1683,6 +1713,23 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
         // Allow chmod 755 etc.
         buffer->file.mode = st.st_mode;
+    }
+
+    if (
+        stat_ok
+        && buffer->options.save_unmodified != SAVE_FULL
+        && !stat_changed(&buffer->file, &st)
+        && st.st_uid == buffer->file.uid
+        && st.st_gid == buffer->file.gid
+        && !buffer_modified(buffer)
+        && absolute == buffer->abs_filename
+        && encoding.name == buffer->encoding.name
+        && crlf == buffer->crlf_newlines
+        && bom == buffer->bom
+        && save_unmodified_buffer(buffer, absolute)
+    ) {
+        BUG_ON(new_locked);
+        return true;
     }
 
     if (!save_buffer(buffer, absolute, &encoding, crlf, bom)) {
