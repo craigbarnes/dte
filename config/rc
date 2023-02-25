@@ -24,7 +24,7 @@ alias git-grep 'compile -1s basic git grep -n'
 # ('R' = allow ANSI colors, 'S' = chop long lines)
 setenv LESS RS
 
-ft -f dte '/\.?dte/(config/)?(rc|((syntax|color|binding|compiler)/.*))$'
+ft -f dte '/(\.|dot_)?dte/(config/)?(rc|((syntax|color|binding|compiler)/.*))$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|/tmp/mutt(ng)?-'
 
 # Don't remember cursor position for git temporary files
