@@ -30,13 +30,14 @@ dte Release Checklist
 5. Update [AUR package]
 
 6. Update [portable builds] in `CHANGELOG.md`
-   1. `git checkout v${VER}`
-   2. `make portable`
-   3. Copy generated tarball to `public/dist/dte/` in [releases repo]
-   4. Run `make generate` in [releases repo]
-   5. Commit and push tarball and generated files to [releases repo]
-   6. `git checkout master`
-   7. Update URL for [portable builds] in `CHANGELOG.md`
+   1. Ensure [`musl-gcc`] is installed
+   2. `git checkout v${VER}`
+   3. `make portable`
+   4. Copy generated tarball to `public/dist/dte/` in [releases repo]
+   5. Run `make generate` in [releases repo]
+   6. Commit and push tarball and generated files to [releases repo]
+   7. `git checkout master`
+   8. Update URL for [portable builds] in `CHANGELOG.md`
 
 
 [releases repo]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/tree/master/public/dist/dte
@@ -45,3 +46,4 @@ dte Release Checklist
 [GitHub release]: https://github.com/craigbarnes/dte/releases
 [AUR package]: https://aur.archlinux.org/packages/dte/
 [portable builds]: https://gitlab.com/craigbarnes/dte/-/blob/master/CHANGELOG.md#portable-builds-for-linux
+[`musl-gcc`]: https://www.musl-libc.org/how.html
