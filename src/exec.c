@@ -108,14 +108,14 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
 
     Tag tag;
     size_t pos = 0;
-    const char *line = buf_next_line(str->buffer, &pos, str->len);
+    StringView line = buf_slice_next_line(str->buffer, &pos, str->len);
     if (pos == 0) {
         return;
     }
 
-    if (!parse_ctags_line(&tag, line, pos - 1)) {
+    if (!parse_ctags_line(&tag, line.data, line.length)) {
         // Treat line as simple tag name
-        tag_lookup(&e->tagfile, line, e->buffer->abs_filename, &e->messages);
+        tag_lookup(&e->tagfile, &line, e->buffer->abs_filename, &e->messages);
         goto activate;
     }
 

@@ -77,8 +77,9 @@ static void test_next_tag(TestContext *ctx)
     ssize_t len = read_file("test/data/ctags.txt", &buf);
     ASSERT_TRUE(len >= 64);
 
+    StringView prefix = STRING_VIEW("");
     Tag t;
-    for (size_t i = 0, pos = 0; next_tag(buf, len, &pos, "", false, &t); i++) {
+    for (size_t i = 0, pos = 0; next_tag(buf, len, &pos, &prefix, false, &t); i++) {
         IEXPECT_TRUE(strview_equal_cstring(&t.name, expected[i].name));
         IEXPECT_EQ(t.kind, expected[i].kind);
         IEXPECT_EQ(t.local, expected[i].local);
@@ -89,12 +90,13 @@ static void test_next_tag(TestContext *ctx)
 
     size_t pos = 0;
     t.name = string_view(NULL, 0);
-    EXPECT_TRUE(next_tag(buf, len, &pos, "hashmap_res", false, &t));
+    prefix = strview_from_cstring("hashmap_res");
+    EXPECT_TRUE(next_tag(buf, len, &pos, &prefix, false, &t));
     EXPECT_TRUE(strview_equal_cstring(&t.name, "hashmap_resize"));
     free_tag(&t);
-    EXPECT_FALSE(next_tag(buf, len, &pos, "hashmap_res", false, &t));
+    EXPECT_FALSE(next_tag(buf, len, &pos, &prefix, false, &t));
     pos = 0;
-    EXPECT_FALSE(next_tag(buf, len, &pos, "hashmap_res", true, &t));
+    EXPECT_FALSE(next_tag(buf, len, &pos, &prefix, true, &t));
 
     free(buf);
 }

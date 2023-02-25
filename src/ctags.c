@@ -124,20 +124,21 @@ bool next_tag (
     const char *buf,
     size_t buf_len,
     size_t *posp,
-    const char *prefix,
+    const StringView *prefix,
     bool exact,
     Tag *tag
 ) {
-    size_t pflen = strlen(prefix);
+    const char *p = prefix->data;
+    size_t plen = prefix->length;
     for (size_t pos = *posp; pos < buf_len; ) {
         StringView line = buf_slice_next_line(buf, &pos, buf_len);
         if (line.length == 0 || line.data[0] == '!') {
             continue;
         }
-        if (!strview_has_strn_prefix(&line, prefix, pflen)) {
+        if (!strview_has_strn_prefix(&line, p, plen)) {
             continue;
         }
-        if (exact && line.data[pflen] != '\t') {
+        if (exact && line.data[plen] != '\t') {
             continue;
         }
         if (!parse_ctags_line(tag, line.data, line.length)) {

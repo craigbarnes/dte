@@ -512,13 +512,16 @@ loop_break:;
         handle_normal_command(e, commands[i], false);
     }
 
-    if (tag && tag_lookup(&e->tagfile, tag, NULL, &e->messages)) {
-        activate_current_message(e);
-        if (dview && nr_commands == 0 && window->views.count > 1) {
-            // Close default/empty buffer, if `-t` jumped to a tag
-            // and no commands were executed via `-c`
-            remove_view(dview);
-            dview = NULL;
+    if (tag) {
+        StringView tag_sv = strview_from_cstring(tag);
+        if (tag_lookup(&e->tagfile, &tag_sv, NULL, &e->messages)) {
+            activate_current_message(e);
+            if (dview && nr_commands == 0 && window->views.count > 1) {
+                // Close default/empty buffer, if `-t` jumped to a tag
+                // and no commands were executed via `-c`
+                remove_view(dview);
+                dview = NULL;
+            }
         }
     }
 

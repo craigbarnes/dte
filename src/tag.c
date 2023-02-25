@@ -224,7 +224,7 @@ static const char *path_slice_relative(const char *filename, const StringView di
 static void tag_file_find_tags (
     const TagFile *tf,
     const char *filename,
-    const char *name,
+    const StringView *name,
     PointerArray *tags
 ) {
     Tag *t = xnew(Tag, 1);
@@ -274,7 +274,7 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     add_message(messages, m);
 }
 
-size_t tag_lookup(TagFile *tf, const char *name, const char *filename, MessageArray *messages)
+size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, MessageArray *messages)
 {
     clear_messages(messages);
     if (!load_tag_file(tf)) {
@@ -288,7 +288,7 @@ size_t tag_lookup(TagFile *tf, const char *name, const char *filename, MessageAr
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg("Tag '%s' not found", name);
+        error_msg("Tag '%.*s' not found", (int)name->length, name->data);
         return 0;
     }
 
@@ -302,7 +302,7 @@ size_t tag_lookup(TagFile *tf, const char *name, const char *filename, MessageAr
     return ntags;
 }
 
-void collect_tags(TagFile *tf, PointerArray *a, const char *prefix)
+void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
 {
     if (!load_tag_file(tf)) {
         return;

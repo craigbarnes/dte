@@ -2014,20 +2014,18 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    const char *name = a->args[0];
-    char *word = NULL;
-    if (!name) {
-        StringView w = view_get_word_under_cursor(e->view);
-        if (w.length == 0) {
+    StringView name;
+    if (a->args[0]) {
+        name = strview_from_cstring(a->args[0]);
+    } else {
+        name = view_get_word_under_cursor(e->view);
+        if (name.length == 0) {
             return false;
         }
-        word = xstrcut(w.data, w.length);
-        name = word;
     }
 
     const char *filename = e->buffer->abs_filename;
-    size_t ntags = tag_lookup(&e->tagfile, name, filename, &e->messages);
-    free(word);
+    size_t ntags = tag_lookup(&e->tagfile, &name, filename, &e->messages);
     activate_current_message_save(e);
     return (ntags > 0);
 }

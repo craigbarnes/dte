@@ -469,7 +469,9 @@ static void complete_tag(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0 && !cmdargs_has_flag(a, 'r')) {
-        collect_tags(&e->tagfile, &cs->completions, cs->parsed);
+        BUG_ON(!cs->parsed);
+        StringView prefix = strview_from_cstring(cs->parsed);
+        collect_tags(&e->tagfile, &cs->completions, &prefix);
     }
 }
 
