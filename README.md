@@ -16,6 +16,7 @@ Features
 * Unicode 15 compatible text rendering
 * Support for all xterm key combos (including [`modifyOtherKeys`])
 * Support for [kitty's keyboard protocol]
+* Support for terminal [synchronized updates][] (to eliminate screen tearing)
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to [compiler error]
@@ -137,6 +138,7 @@ Public License version 2 for more details.
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 [kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[synchronized updates]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [ctags]: https://ctags.io/
 [compiler error]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
