@@ -465,12 +465,7 @@ String dump_buffer(const Buffer *buffer)
         return buf;
     }
 
-    // Saved buffers are always regular files (see S_ISREG() in load_buffer())
     const FileInfo *file = &buffer->file;
-    if (unlikely((file->mode & S_IFMT) != S_IFREG)) {
-        LOG_DEBUG("not a regular file");
-    }
-
     unsigned int perms = file->mode & 07777;
     char modestr[12];
     char timestr[40];
