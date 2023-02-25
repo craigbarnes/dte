@@ -28,7 +28,6 @@
 #include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
-#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/fd.h"
