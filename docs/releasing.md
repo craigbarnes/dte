@@ -7,10 +7,10 @@ dte Release Checklist
    3. Update tarball name in `README.md`
    4. Hard code `VERSION` variable in `mk/build.mk` to release version
    5. Update `RELEASE_VERSIONS` in `mk/dev.mk`
-   5. Update `<releases>` in `dte.appdata.xml`
-   6. Remove `-g` from default `CFLAGS`
-   7. Check `make vars` output
-   8. `git commit -m "Prepare v${VER} release"`
+   6. Update `<releases>` in `dte.appdata.xml`
+   7. Remove `-g` from default `CFLAGS`
+   8. Check `make vars` output
+   9. `git commit -m "Prepare v${VER} release"`
 
 2. Tag and upload
    1. `git tag -s -m "Release v${VER}" v${VER} ${COMMIT}`

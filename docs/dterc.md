@@ -1565,7 +1565,6 @@ errors should be highlighted. Set to `""` to disable.
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
-[`xterm`]: https://invisible-island.net/xterm/
 [`ctags`]: https://ctags.io/
 
 [`alias`]: #alias
@@ -1587,7 +1586,6 @@ errors should be highlighted. Set to `""` to disable.
 [`insert`]: #insert
 [`left`]: #left
 [`macro`]: #macro
-[`message`]: #message
 [`msg`]: #msg
 [`open`]: #open
 [`option`]: #option
@@ -1595,8 +1593,6 @@ errors should be highlighted. Set to `""` to disable.
 [`pgup`]: #pgup
 [`right`]: #right
 [`save`]: #save
-[`scroll-pgdown`]: #scroll-pgdown
-[`scroll-pgup`]: #scroll-pgup
 [`search`]: #search
 [`set`]: #set
 [`setenv`]: #setenv
