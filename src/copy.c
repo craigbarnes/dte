@@ -9,9 +9,8 @@
 
 void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
 {
-    if (clip->buf) {
-        free(clip->buf);
-    }
+    BUG_ON(len && !buf);
+    free(clip->buf);
     clip->buf = buf;
     clip->len = len;
     clip->is_lines = is_lines;
@@ -28,19 +27,18 @@ void copy(Clipboard *clip, View *view, size_t len, bool is_lines)
 void cut(Clipboard *clip, View *view, size_t len, bool is_lines)
 {
     if (len) {
-        char *buf = block_iter_get_bytes(&view->cursor, len);
-        record_copy(clip, buf, len, is_lines);
+        copy(clip, view, len, is_lines);
         buffer_delete_bytes(view, len);
     }
 }
 
 void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after)
 {
-    if (!clip->buf) {
+    if (clip->len == 0) {
         return;
     }
 
-    BUG_ON(clip->len == 0);
+    BUG_ON(!clip->buf);
     if (!clip->is_lines || type == PASTE_LINES_INLINE) {
         insert_text(view, clip->buf, clip->len, move_after);
         return;
