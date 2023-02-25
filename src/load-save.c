@@ -18,6 +18,7 @@
 #include "util/log.h"
 #include "util/path.h"
 #include "util/str-util.h"
+#include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
@@ -155,9 +156,7 @@ static bool update_file_info(FileInfo *info, const struct stat *st)
         .uid = st->st_uid,
         .dev = st->st_dev,
         .ino = st->st_ino,
-        // TODO: use full `timespec` for `FileInfo::mtime` member and assign
-        // `st_mtim` instead of `st_mtime` (may require portability fallbacks)
-        .mtime = st->st_mtime,
+        .mtime = *get_stat_mtime(st),
     };
     return true;
 }

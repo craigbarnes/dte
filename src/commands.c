@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <time.h>
 #include <unistd.h>
 #include "commands.h"
 #include "bind.h"
@@ -59,6 +58,7 @@
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
+#include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 #include "vars.h"
@@ -1527,7 +1527,7 @@ static bool cmd_right(EditorState *e, const CommandArgs *a)
 static bool stat_changed(const FileInfo *file, const struct stat *st)
 {
     // Don't compare st_mode because we allow chmod 755 etc.
-    return st->st_mtime != file->mtime
+    return !timespecs_equal(get_stat_mtime(st), &file->mtime)
         || st->st_dev != file->dev
         || st->st_ino != file->ino
         || st->st_size != file->size;
@@ -1554,8 +1554,7 @@ static bool save_unmodified_buffer(Buffer *buffer, const char *filename)
         return false;
     }
 
-    // TODO: Use full `timespec` instead of `time_t` for FileInfo::mtime
-    buffer->file.mtime = times[0].tv_sec;
+    buffer->file.mtime = times[0];
     LOG_INFO("buffer unchanged; mtime/atime updated");
     return true;
 }

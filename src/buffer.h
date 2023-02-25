@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <time.h>
 #include "block-iter.h"
 #include "change.h"
 #include "encoding.h"
@@ -24,7 +25,7 @@ typedef struct {
     uid_t uid;
     gid_t gid;
     off_t size;
-    time_t mtime;
+    struct timespec mtime;
 } FileInfo;
 
 // A representation of a specific file, as it pertains to editing,

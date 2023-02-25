@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <time.h>
 #include "buffer.h"
 #include "editor.h"
 #include "file-option.h"
@@ -14,6 +13,7 @@
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
+#include "util/time-util.h"
 #include "util/xmalloc.h"
 
 void set_display_filename(Buffer *buffer, char *name)
@@ -396,17 +396,6 @@ void buffer_setup(EditorState *e, Buffer *buffer)
     sanity_check_local_options(&buffer->options);
 }
 
-static char *mtime_to_str(const time_t *mtime, char *buf, size_t bufsize)
-{
-    struct tm tm;
-    if (unlikely(!localtime_r(mtime, &tm))) {
-        return memcpy(buf, STRN("[error]") + 1);
-    }
-    size_t len = strftime(buf, bufsize, "%F %T %z", &tm);
-    BUG_ON(len == 0);
-    return buf;
-}
-
 void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
 {
     uintmax_t blocks = 0;
@@ -468,14 +457,17 @@ String dump_buffer(const Buffer *buffer)
     const FileInfo *file = &buffer->file;
     unsigned int perms = file->mode & 07777;
     char modestr[12];
-    char timestr[40];
+    char timestr[64];
+    if (!timespec_to_str(&file->mtime, timestr, sizeof(timestr))) {
+        memcpy(timestr, STRN("[error]") + 1);
+    }
 
     string_sprintf (
         &buf,
         "\nLast stat:\n----------\n\n"
         "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
         "     Path:", buffer->abs_filename,
-        " Modified:", mtime_to_str(&file->mtime, timestr, sizeof(timestr)),
+        " Modified:", timestr,
         "     Mode:", filemode_to_str(file->mode, modestr), perms,
         "     User:", (intmax_t)file->uid,
         "    Group:", (intmax_t)file->gid,
