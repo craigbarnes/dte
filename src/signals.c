@@ -22,7 +22,7 @@ static const int ignored_signals[] = {
 
 static const int default_signals[] = {
     SIGABRT, // Terminate (cleanup already done)
-    SIGCHLD, // Ignore (see also: wait(3))
+    SIGCHLD, // Ignore (see: wait(3))
     SIGURG,  // Ignore
     SIGTTIN, // Stop
     SIGTTOU, // Stop
@@ -41,6 +41,9 @@ static const int fatal_signals[] = {
     SIGVTALRM,
     SIGHUP,
     SIGTERM,
+#ifdef SIGPROF
+    SIGPROF,
+#endif
 #ifdef SIGEMT
     SIGEMT,
 #endif
@@ -124,10 +127,6 @@ static void do_sigaction(int sig, const struct sigaction *action)
  * state is restored to its original state."
  *
  * (https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html)
- *
- * Signal handlers not set by this function:
- * - SIGKILL, SIGSTOP (can't be caught or ignored)
- * - SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
  */
 void set_signal_handlers(void)
 {
