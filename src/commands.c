@@ -1656,6 +1656,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     }
 
     mode_t old_mode = buffer->file.mode;
+    bool hardlinks = false;
     struct stat st;
     bool stat_ok = !stat(absolute, &st);
     if (!stat_ok) {
@@ -1679,6 +1680,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
             error_msg("Will not overwrite directory %s", absolute);
             goto error;
         }
+        hardlinks = (st.st_nlink >= 2);
     }
 
     if (e->options.lock_files) {
@@ -1731,7 +1733,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    if (!save_buffer(buffer, absolute, &encoding, crlf, bom)) {
+    if (!save_buffer(buffer, absolute, &encoding, crlf, bom, hardlinks)) {
         goto error;
     }
 

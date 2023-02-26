@@ -354,7 +354,6 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
 
 static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_t buflen)
 {
-    buf[0] = '\0';
     if (str_has_prefix(filename, "/tmp/")) {
         // Don't use temporary file when saving file in /tmp because crontab
         // command doesn't like the file to be replaced
@@ -366,6 +365,7 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
     const int dlen = (int)dir.length;
     int n = snprintf(buf, buflen, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
     if (unlikely(n <= 0 || n >= buflen)) {
+        buf[0] = '\0';
         return -1;
     }
 
@@ -426,11 +426,18 @@ bool save_buffer (
     const char *filename,
     const Encoding *encoding,
     bool crlf,
-    bool write_bom
+    bool write_bom,
+    bool hardlinks
 ) {
-    // Try to use temporary file first (safer)
     char tmp[8192];
-    int fd = tmp_file(filename, &buffer->file, tmp, sizeof(tmp));
+    tmp[0] = '\0';
+    int fd = -1;
+    if (hardlinks) {
+        LOG_INFO("target file has hard links; writing in-place");
+    } else {
+        // Try to use temporary file (safer)
+        fd = tmp_file(filename, &buffer->file, tmp, sizeof(tmp));
+    }
 
     if (fd < 0) {
         // Overwrite the original file directly (if it exists).
