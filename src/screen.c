@@ -91,66 +91,47 @@ void mask_color(TermColor *color, const TermColor *over)
     }
 }
 
-static void print_separator(Window *window, void *ud)
+void restore_cursor(EditorState *e)
 {
-    Terminal *term = ud;
-    TermOutputBuffer *obuf = &term->obuf;
-    if (window->x + window->w == term->width) {
-        return;
+    unsigned int x, y;
+    switch (e->input_mode) {
+    case INPUT_NORMAL:
+        x = e->window->edit_x + e->view->cx_display - e->view->vx;
+        y = e->window->edit_y + e->view->cy - e->view->vy;
+        break;
+    case INPUT_COMMAND:
+    case INPUT_SEARCH:
+        x = e->cmdline_x;
+        y = e->terminal.height - 1;
+        break;
+    default:
+        BUG("unhandled input mode");
     }
-    for (int y = 0, h = window->h; y < h; y++) {
-        term_move_cursor(obuf, window->x + window->w, window->y + y);
-        term_add_byte(obuf, '|');
-    }
+    term_move_cursor(&e->terminal.obuf, x, y);
 }
 
-void update_separators(Terminal *term, const ColorScheme *colors, const Frame *frame)
+static void clear_update_tabbar(Window *window, void* UNUSED_ARG(data))
 {
-    set_builtin_color(term, colors, BC_STATUSLINE);
-    frame_for_each_window(frame, print_separator, term);
+    window->update_tabbar = false;
 }
 
-void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *window, bool force)
+void end_update(EditorState *e)
 {
-    const View *view = window->view;
-    size_t lines = view->buffer->nl;
-    int x = window->x;
+    Terminal *term = &e->terminal;
+    restore_cursor(e);
+    term_show_cursor(term);
+    term_end_sync_update(term);
+    term_output_flush(&term->obuf);
 
-    calculate_line_numbers(window);
-    long first = view->vy + 1;
-    long last = MIN(view->vy + window->edit_h, lines);
+    e->buffer->changed_line_min = LONG_MAX;
+    e->buffer->changed_line_max = -1;
+    frame_for_each_window(e->root_frame, clear_update_tabbar, NULL);
+}
 
-    if (
-        !force
-        && window->line_numbers.first == first
-        && window->line_numbers.last == last
-    ) {
-        return;
-    }
-
-    window->line_numbers.first = first;
-    window->line_numbers.last = last;
-
-    TermOutputBuffer *obuf = &term->obuf;
-    char buf[DECIMAL_STR_MAX(unsigned long) + 1];
-    size_t width = window->line_numbers.width;
-    BUG_ON(width > sizeof(buf));
-    BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
-    term_output_reset(term, window->x, window->w, 0);
-    set_builtin_color(term, colors, BC_LINENUMBER);
-
-    for (int y = 0, h = window->edit_h, edit_y = window->edit_y; y < h; y++) {
-        unsigned long line = view->vy + y + 1;
-        memset(buf, ' ', width);
-        if (line <= lines) {
-            size_t i = width - 2;
-            do {
-                buf[i--] = (line % 10) + '0';
-            } while (line /= 10);
-        }
-        term_move_cursor(obuf, x, edit_y + y);
-        term_add_bytes(obuf, buf, width);
-    }
+void start_update(Terminal *term)
+{
+    term_begin_sync_update(term);
+    term_hide_cursor(term);
 }
 
 void update_window_sizes(Terminal *term, Frame *frame)

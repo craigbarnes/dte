@@ -5,6 +5,7 @@
 #include "editor.h"
 #include "error.h"
 #include "regexp.h"
+#include "screen.h"
 #include "selection.h"
 #include "util/debug.h"
 #include "util/string.h"

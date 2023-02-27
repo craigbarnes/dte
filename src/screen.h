@@ -16,14 +16,15 @@
 
 // screen.c
 void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);
-void update_separators(Terminal *term, const ColorScheme *colors, const Frame *frame);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
-void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *window, bool force);
 void update_cursor_style(EditorState *e);
 void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color);
 void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEnum c);
 void mask_color(TermColor *color, const TermColor *over);
+void start_update(Terminal *term);
+void end_update(EditorState *e);
+void restore_cursor(EditorState *e);
 
 // screen-cmdline.c
 void update_command_line(EditorState *e);
@@ -37,5 +38,13 @@ void update_status_line(const Window *window);
 
 // screen-view.c
 void update_range(EditorState *e, const View *view, long y1, long y2);
+
+// screen-window.c
+void update_all_windows(EditorState *e);
+void update_buffer_windows(EditorState *e, const Buffer *buffer);
+
+// screen-prompt.c
+char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
+char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 
 #endif

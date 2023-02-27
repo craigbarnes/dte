@@ -61,8 +61,8 @@ editor_objects := $(call prefix-obj, build/, \
     compat compiler completion config convert copy ctags edit editor \
     encoding error exec file-history file-option filetype frame history \
     indent load-save lock main misc mode move msg options regexp replace \
-    screen screen-cmdline screen-status screen-tabbar screen-view \
-    search selection shift show signals spawn status tag vars view window ) \
+    search selection shift show signals spawn status tag vars view window \
+    $(addprefix screen-, cmdline prompt status tabbar view window) screen ) \
     $(command_objects) \
     $(editorconfig_objects) \
     $(syntax_objects) \

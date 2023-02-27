@@ -34,6 +34,7 @@
 #include "msg.h"
 #include "regexp.h"
 #include "replace.h"
+#include "screen.h"
 #include "search.h"
 #include "selection.h"
 #include "shift.h"
