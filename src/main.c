@@ -18,6 +18,7 @@
 #include "history.h"
 #include "load-save.h"
 #include "move.h"
+#include "screen.h"
 #include "search.h"
 #include "signals.h"
 #include "syntax/state.h"

@@ -14,7 +14,16 @@
 #include "view.h"
 #include "window.h"
 
+typedef struct {
+    bool is_modified;
+    unsigned long id;
+    long cy;
+    long vx;
+    long vy;
+} ScreenState;
+
 // screen.c
+void update_screen(EditorState *e, const ScreenState *s);
 void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
@@ -24,6 +33,7 @@ void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEn
 void mask_color(TermColor *color, const TermColor *over);
 void start_update(Terminal *term);
 void end_update(EditorState *e);
+void normal_update(EditorState *e);
 void restore_cursor(EditorState *e);
 
 // screen-cmdline.c

@@ -113,7 +113,6 @@ static inline CommandRunner cmdrunner_for_mode(EditorState *e, InputMode mode, b
 EditorState *init_editor_state(void) RETURNS_NONNULL;
 void free_editor_state(EditorState *e) NONNULL_ARGS;
 void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
-void normal_update(EditorState *e) NONNULL_ARGS;
 int main_loop(EditorState *e) NONNULL_ARGS WARN_UNUSED_RESULT;
 void ui_start(EditorState *e) NONNULL_ARGS;
 void ui_end(EditorState *e) NONNULL_ARGS;
