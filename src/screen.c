@@ -26,7 +26,7 @@ void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEn
     set_color(term, colors, &colors->builtin[c]);
 }
 
-void update_cursor_style(EditorState *e)
+static void update_cursor_style(EditorState *e)
 {
     CursorInputMode mode;
     switch (e->input_mode) {

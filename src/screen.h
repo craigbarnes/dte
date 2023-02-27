@@ -27,7 +27,6 @@ void update_screen(EditorState *e, const ScreenState *s);
 void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
-void update_cursor_style(EditorState *e);
 void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color);
 void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEnum c);
 void mask_color(TermColor *color, const TermColor *over);
