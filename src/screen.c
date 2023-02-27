@@ -55,11 +55,10 @@ static void update_cursor_style(EditorState *e)
         style.color = def.color;
     }
 
+    e->cursor_style_changed = false;
     if (!same_cursor(&style, &e->terminal.obuf.cursor_style)) {
         term_set_cursor_style(&e->terminal, style);
     }
-
-    e->cursor_style_changed = false;
 }
 
 void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title)
