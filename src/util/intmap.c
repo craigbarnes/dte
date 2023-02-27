@@ -219,8 +219,8 @@ static void intmap_clear(IntMap *map, FreeFunction free_value)
     }
 
     size_t len = map->mask + 1;
-    memset(map->entries, 0, len * sizeof(*map->entries));
     map->count = 0;
+    memset(map->entries, 0, len * sizeof(*map->entries));
 }
 
 void intmap_free(IntMap *map, FreeFunction free_value)

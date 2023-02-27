@@ -13,8 +13,8 @@ static COLD void string_grow(String *s, size_t min_alloc)
         alloc = (alloc * 3 + 2) / 2;
     }
     alloc = round_size_to_next_multiple(alloc, 16);
-    xrenew(s->buffer, alloc);
     s->alloc = alloc;
+    xrenew(s->buffer, alloc);
 }
 
 char *string_reserve_space(String *s, size_t more)
@@ -74,8 +74,9 @@ void string_append_buf(String *s, const char *ptr, size_t len)
     if (len == 0) {
         return;
     }
-    memcpy(string_reserve_space(s, len), ptr, len);
+    char *reserved = string_reserve_space(s, len);
     s->len += len;
+    memcpy(reserved, ptr, len);
 }
 
 void string_append_memset(String *s, unsigned char byte, size_t len)
@@ -83,8 +84,9 @@ void string_append_memset(String *s, unsigned char byte, size_t len)
     if (len == 0) {
         return;
     }
-    memset(string_reserve_space(s, len), byte, len);
+    char *reserved = string_reserve_space(s, len);
     s->len += len;
+    memset(reserved, byte, len);
 }
 
 VPRINTF(2)
@@ -110,18 +112,18 @@ void string_sprintf(String *s, const char *fmt, ...)
     va_end(ap);
 }
 
-static void null_terminate(String *s)
+static char *null_terminate(String *s)
 {
     string_reserve_space(s, 1);
     s->buffer[s->len] = '\0';
+    return s->buffer;
 }
 
 char *string_steal_cstring(String *s)
 {
-    null_terminate(s);
-    char *b = s->buffer;
+    char *buf = null_terminate(s);
     *s = (String) STRING_INIT;
-    return b;
+    return buf;
 }
 
 char *string_clone_cstring(const String *s)
@@ -144,13 +146,13 @@ char *string_clone_cstring(const String *s)
  */
 const char *string_borrow_cstring(String *s)
 {
-    null_terminate(s);
-    return s->buffer;
+    return null_terminate(s);
 }
 
 void string_remove(String *s, size_t pos, size_t len)
 {
-    BUG_ON(pos + len > s->len);
-    memmove(s->buffer + pos, s->buffer + pos + len, s->len - pos - len);
+    size_t oldlen = s->len;
+    BUG_ON(pos + len > oldlen);
     s->len -= len;
+    memmove(s->buffer + pos, s->buffer + pos + len, oldlen - pos - len);
 }

@@ -185,8 +185,8 @@ void move_eof(View *view)
 void move_to_line(View *view, size_t line)
 {
     BUG_ON(line == 0);
-    block_iter_goto_line(&view->cursor, line - 1);
     view->center_on_scroll = true;
+    block_iter_goto_line(&view->cursor, line - 1);
 }
 
 void move_to_column(View *view, size_t column)

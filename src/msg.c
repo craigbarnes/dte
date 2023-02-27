@@ -79,8 +79,8 @@ bool activate_current_message_save(EditorState *e)
 
 void clear_messages(MessageArray *msgs)
 {
-    ptr_array_free_cb(&msgs->array, FREE_FUNC(free_message));
     msgs->pos = 0;
+    ptr_array_free_cb(&msgs->array, FREE_FUNC(free_message));
 }
 
 String dump_messages(const MessageArray *messages)

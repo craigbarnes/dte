@@ -50,14 +50,14 @@ static void set_text(CommandLine *c, const char *text)
 {
     string_clear(&c->buf);
     const size_t text_len = strlen(text);
-    string_append_buf(&c->buf, text, text_len);
     c->pos = text_len;
+    string_append_buf(&c->buf, text, text_len);
 }
 
 void cmdline_set_text(CommandLine *c, const char *text)
 {
-    set_text(c, text);
     c->search_pos = NULL;
+    set_text(c, text);
 }
 
 static bool cmd_bol(EditorState *e, const CommandArgs *a)

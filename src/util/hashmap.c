@@ -234,8 +234,8 @@ void hashmap_clear(HashMap *map, FreeFunction free_value)
 
     BUG_ON(count != map->count);
     size_t len = map->mask + 1;
-    memset(map->entries, 0, len * sizeof(*map->entries));
     map->count = 0;
+    memset(map->entries, 0, len * sizeof(*map->entries));
 }
 
 void hashmap_free(HashMap *map, FreeFunction free_value)
