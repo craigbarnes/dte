@@ -43,3 +43,12 @@ func(...)
 +   lhs = rhs;
 +   tail(a1, a2, a3);
 }
+
+@@
+identifier tail =~ "mem(set|cpy|move)";
+expression dest, a2, a3;
+@@
+
+- tail(dest, a2, a3);
+- return dest;
++ return tail(dest, a2, a3);
