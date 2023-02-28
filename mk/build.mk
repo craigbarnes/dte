@@ -54,7 +54,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color cursor input ioctl key linux mode osc52 output parse rxvt \
-    terminal )
+    style terminal )
 
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter bookmark buffer change cmdline commands \

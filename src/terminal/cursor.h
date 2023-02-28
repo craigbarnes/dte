@@ -1,5 +1,5 @@
-#ifndef CURSOR_H
-#define CURSOR_H
+#ifndef TERMINAL_CURSOR_H
+#define TERMINAL_CURSOR_H
 
 #include <stdbool.h>
 #include <stdint.h>

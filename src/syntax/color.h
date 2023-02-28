@@ -1,7 +1,7 @@
 #ifndef SYNTAX_COLOR_H
 #define SYNTAX_COLOR_H
 
-#include "terminal/color.h"
+#include "terminal/style.h"
 #include "util/hashmap.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"

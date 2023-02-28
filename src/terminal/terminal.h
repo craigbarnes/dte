@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include "color.h"
 #include "key.h"
+#include "style.h"
 #include "util/macros.h"
 
 enum {

@@ -7,6 +7,7 @@
 #include "terminal/output.h"
 #include "terminal/parse.h"
 #include "terminal/rxvt.h"
+#include "terminal/style.h"
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/str-util.h"
