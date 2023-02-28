@@ -280,8 +280,8 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
     }
 
     if (streq(dir, "-")) {
-        dir = getenv("OLDPWD");
-        if (!dir || dir[0] == '\0') {
+        dir = xgetenv("OLDPWD");
+        if (!dir) {
             return error_msg("OLDPWD not set");
         }
     }

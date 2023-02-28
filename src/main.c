@@ -386,8 +386,8 @@ int main(int argc, char *argv[])
 
 loop_break:;
 
-    const char *term_name = getenv("TERM");
-    if (!term_name || term_name[0] == '\0') {
+    const char *term_name = xgetenv("TERM");
+    if (!term_name) {
         fputs("Error: $TERM not set\n", stderr);
         // This is considered a "usage" error, because the program
         // must be started from a properly configured terminal

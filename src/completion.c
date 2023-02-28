@@ -270,8 +270,7 @@ static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
     CompletionState *cs = &e->cmdline.completion;
     collect_files(e, cs, COLLECT_DIRS_ONLY);
     if (str_has_prefix("-", cs->parsed)) {
-        const char *oldpwd = getenv("OLDPWD");
-        if (likely(oldpwd && oldpwd[0] != '\0')) {
+        if (likely(xgetenv("OLDPWD"))) {
             ptr_array_append(&cs->completions, xstrdup("-"));
         }
     }

@@ -30,7 +30,7 @@ static pid_t editor_pid;
 void init_file_locks_context(const char *fallback_dir, pid_t pid)
 {
     BUG_ON(file_locks);
-    const char *dir = getenv("XDG_RUNTIME_DIR");
+    const char *dir = xgetenv("XDG_RUNTIME_DIR");
     if (!dir) {
         LOG_INFO("$XDG_RUNTIME_DIR not set");
         dir = fallback_dir;
