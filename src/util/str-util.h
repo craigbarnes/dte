@@ -28,6 +28,19 @@ static inline bool mem_equal(const void *s1, const void *s2, size_t n)
     return memcmp(s1, s2, n) == 0;
 }
 
+static inline bool str_is_null_or_empty(const char *str)
+{
+    return !str || str[0] == '\0';
+}
+
+// Like getenv(3) but with `const char*` return type and also returning
+// NULL for empty strings
+static inline const char *xgetenv(const char *name)
+{
+    const char *val = getenv(name);
+    return str_is_null_or_empty(val) ? NULL : val;
+}
+
 PURE NONNULL_ARGS
 static inline bool str_has_prefix(const char *str, const char *prefix)
 {

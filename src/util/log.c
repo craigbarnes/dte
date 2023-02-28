@@ -68,7 +68,7 @@ const char *log_level_to_str(LogLevel level)
     return log_level_map[level].name;
 }
 
-LogLevel log_open(const char *filename, LogLevel level)
+LogLevel log_open(const char *filename, LogLevel level, bool use_color)
 {
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
@@ -94,7 +94,7 @@ LogLevel log_open(const char *filename, LogLevel level)
         return LOG_LEVEL_NONE;
     }
 
-    if (!isatty(fd)) {
+    if (!use_color || !isatty(fd)) {
         dim[0] = '\0';
         sgr0[0] = '\0';
     }

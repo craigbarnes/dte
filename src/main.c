@@ -246,7 +246,10 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
         return EX_USAGE;
     }
 
-    LogLevel got_level = log_open(filename, req_level);
+    // https://no-color.org/
+    const char *no_color = xgetenv("NO_COLOR");
+
+    LogLevel got_level = log_open(filename, req_level, !no_color);
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
         fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", filename, err);
@@ -261,6 +264,10 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
     }
 
     LOG_INFO("logging to '%s' (level: %s)", filename, got_level_str);
+
+    if (no_color) {
+        LOG_INFO("log colors disabled ($NO_COLOR)");
+    }
 
     struct utsname u;
     if (likely(uname(&u) >= 0)) {

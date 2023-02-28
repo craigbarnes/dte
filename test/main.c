@@ -77,7 +77,7 @@ static void test_init(TestContext *ctx)
     ASSERT_EQ(unsetenv("COLORTERM"), 0);
 
     LogLevel lvl = LOG_LEVEL_WARNING;
-    ASSERT_EQ(log_open("build/test/log.txt", lvl), lvl);
+    ASSERT_EQ(log_open("build/test/log.txt", lvl, false), lvl);
     LOG_CRITICAL("%s: testing LOG_CRITICAL()", __func__);
     LOG_ERROR("%s: testing LOG_ERROR()", __func__);
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
