@@ -1,5 +1,39 @@
 require c-comment
 
+syntax .coccinelle-meta
+
+state decl code
+    char -b A-Za-z_ ident
+    char '"' string
+    char / maybe-comment
+    str @@ END meta-header
+    eat this
+
+state string
+    char '"' decl string
+    eat this
+
+state maybe-comment comment
+    char / line-comment
+    char * .c-comment:decl
+    recolor code 1
+    noeat decl
+
+state line-comment comment
+    char "\n" decl
+    eat this
+
+state ident
+    char -b a-zA-Z0-9_ this
+    inlist keyword decl
+    noeat decl
+
+list keyword \
+    fresh identifier metavariable field parameter type statement \
+    declaration initialiser initializer local global idexpression \
+    expression constant format assignment binary unary operator \
+    position any symbol typedef attribute declarer iterator
+
 syntax coccinelle
 
 state line-start code
@@ -31,23 +65,7 @@ state maybe-meta-header code
 
 state meta-header
     recolor meta-header
-    noeat meta-decl
-
-state meta-decl
-    char -b A-Za-z_ ident
-    str @@ code meta-header
-    eat this
-
-state ident
-    char -b a-zA-Z0-9_ this
-    inlist meta-keyword meta-decl
-    noeat meta-decl
-
-list meta-keyword \
-    fresh identifier metavariable field parameter type statement \
-    declaration initialiser initializer local global idexpression \
-    expression constant format assignment binary unary operator \
-    position any symbol typedef attribute declarer iterator
+    noeat .coccinelle-meta:code
 
 default keyword meta-keyword
 default diff.header meta-header
