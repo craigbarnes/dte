@@ -10,6 +10,8 @@ v1.11.1 (not yet released)
   the Num Lock and/or Caps Lock modifiers were in effect in terminals
   supporting the [kitty keyboard protocol].
 * Fixed an issue in the build system causing `make distcheck` to fail.
+* Fixed the [`save`] command, to avoid breaking hard links when writing
+  to existing files.
 * Added a [`show setenv`][`show`] sub-command.
 * Added an `-m` flag to the [`undo`] command, to allow moving to the last
   change without undoing it.
