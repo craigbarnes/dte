@@ -45,18 +45,13 @@ const char *cursor_type_to_str(TermCursorType type)
     return cursor_types[type];
 }
 
-const char *cursor_color_to_str(int32_t color)
+const char *cursor_color_to_str(int32_t c)
 {
-    BUG_ON(color <= COLOR_INVALID);
-    if (color == COLOR_KEEP || color == COLOR_DEFAULT) {
-        return cursor_colors[color + 2];
-    }
-
-    BUG_ON(!(color & COLOR_FLAG_RGB));
+    BUG_ON(!(c == COLOR_KEEP || c == COLOR_DEFAULT || c & COLOR_FLAG_RGB));
     static char buf[8];
-    buf[0] = '#';
-    hex_encode_u24_fixed(buf + 1, color);
-    buf[7] = '\0';
+    size_t n = color_to_str(buf, c);
+    BUG_ON(n < 4 || n >= sizeof(buf));
+    buf[n] = '\0';
     return buf;
 }
 

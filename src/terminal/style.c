@@ -158,7 +158,7 @@ void collect_colors_and_attributes(PointerArray *a, const char *prefix)
     }
 }
 
-static size_t append_color(char *buf, int32_t color)
+size_t color_to_str(char *buf, int32_t color)
 {
     if (color < 16) {
         BUG_ON(color <= COLOR_INVALID);
@@ -179,10 +179,10 @@ static size_t append_color(char *buf, int32_t color)
 const char *term_color_to_string(const TermColor *color)
 {
     static char buf[128];
-    size_t pos = append_color(buf, color->fg);
+    size_t pos = color_to_str(buf, color->fg);
     if (color->bg != COLOR_DEFAULT || (color->attr & ATTR_KEEP) != 0) {
         buf[pos++] = ' ';
-        pos += append_color(buf + pos, color->bg);
+        pos += color_to_str(buf + pos, color->bg);
     }
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
         if (color->attr & (1U << i)) {
