@@ -593,7 +593,7 @@ statically-linked with [musl] libc and require nothing of the host
 system except a somewhat recent kernel.
 
 * [`dte-master-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dte/dte-master-linux-x86_64.tar.gz)
-* [`dte-1.11-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dist/dte/dte-1.11-linux-x86_64.tar.gz)
+* [`dte-1.11.1-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1-linux-x86_64.tar.gz)
 
 *Note*: only `x86_64` builds are available for now. Feel free to open an
 [issue] if you need builds for other architectures.
