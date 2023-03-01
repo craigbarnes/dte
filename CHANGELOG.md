@@ -1,17 +1,13 @@
 Releases
 ========
 
-v1.11.1 (not yet released)
---------------------------
+v1.11.1 (latest release)
+------------------------
 
-**Changes:**
+Released on 2023-03-01.
 
-* Fixed a bug that was causing key bindings to not work properly when
-  the Num Lock and/or Caps Lock modifiers were in effect in terminals
-  supporting the [kitty keyboard protocol].
-* Fixed an issue in the build system causing `make distcheck` to fail.
-* Fixed the [`save`] command, to avoid breaking hard links when writing
-  to existing files.
+**Additions:**
+
 * Added a [`show setenv`][`show`] sub-command.
 * Added an `-m` flag to the [`undo`] command, to allow moving to the last
   change without undoing it.
@@ -20,6 +16,18 @@ v1.11.1 (not yet released)
   files.
 * Added rules for handling CDATA sections to the XML syntax highlighter.
 * Added auto-completion for command flags.
+
+**Fixes:**
+
+* Fixed a bug that was causing key bindings to not work properly when
+  the Num Lock and/or Caps Lock modifiers were in effect in terminals
+  supporting the [kitty keyboard protocol].
+* Fixed the [`save`] command, to avoid breaking hard links when writing
+  to existing files.
+* Fixed an issue in the build system causing `make distcheck` to fail.
+
+**Other changes:**
+
 * Changed built-in filetype detection so that a `dot_` filename prefix is
   equivalent to a `.` prefix, or more specifically `dot_bashrc` is now
   treated the same way as `.bashrc`.
@@ -27,8 +35,13 @@ v1.11.1 (not yet released)
   if there are duplicate arguments.
 * [Removed][commit 0fe5e5f224e832a] the built-in `xsel` alias.
 
-v1.11 (latest release)
-----------------------
+**Downloads:**
+
+* [dte-1.11.1.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1.tar.gz)
+* [dte-1.11.1.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1.tar.gz.sig)
+
+v1.11
+-----
 
 Released on 2023-01-21.
 

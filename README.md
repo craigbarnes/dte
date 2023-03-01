@@ -62,9 +62,9 @@ installed:
 
 ...then download and unpack the latest release tarball:
 
-    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.11.tar.gz
-    tar -xzf dte-1.11.tar.gz
-    cd dte-1.11
+    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1.tar.gz
+    tar -xzf dte-1.11.1.tar.gz
+    cd dte-1.11.1
 
 ...and compile and install:
 
