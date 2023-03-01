@@ -198,6 +198,7 @@ build/util/fd.o: build/feature.h
 build/util/xmemmem.o: build/feature.h
 build/terminal/ioctl.o: build/feature.h
 build/compat.o: build/feature.h
+src/compat.h: build/feature.h
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
