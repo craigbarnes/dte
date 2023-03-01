@@ -1,8 +1,8 @@
 CC ?= gcc
-CFLAGS ?= -O2
+CFLAGS ?= -g -O2
 LDFLAGS ?=
 AWK = awk
-VERSION = 1.11.1
+VERSION = $(shell mk/version.sh 1.11.1)
 
 # These options are used unconditionally, since they've been supported
 # by GCC since at least the minimum required version (GCC 4.6).
