@@ -1,5 +1,5 @@
-#ifndef EDITORCONFIG_H
-#define EDITORCONFIG_H
+#ifndef EDITORCONFIG_EDITORCONFIG_H
+#define EDITORCONFIG_EDITORCONFIG_H
 
 #include <stdbool.h>
 #include "util/macros.h"

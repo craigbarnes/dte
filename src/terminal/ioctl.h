@@ -1,5 +1,5 @@
-#ifndef TERMINAL_WINSIZE_H
-#define TERMINAL_WINSIZE_H
+#ifndef TERMINAL_IOCTL_H
+#define TERMINAL_IOCTL_H
 
 #include <stdbool.h>
 #include "util/macros.h"

@@ -1,5 +1,5 @@
-#ifndef ENCODING_CONVERT_H
-#define ENCODING_CONVERT_H
+#ifndef CONVERT_H
+#define CONVERT_H
 
 #include <stdbool.h>
 #include <sys/types.h>
