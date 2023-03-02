@@ -6,6 +6,7 @@ RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
 DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 WSCHECK = $(AWK) -f tools/wscheck.awk
+HCHECK = $(AWK) -f tools/hdrcheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
 CLANGTIDY ?= clang-tidy
@@ -26,7 +27,7 @@ dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 check-clang-tidy: $(clang_tidy_targets)
-check-source: check-whitespace check-codespell check-shell-scripts
+check-source: check-whitespace check-headers check-codespell check-shell-scripts
 check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
 
@@ -42,6 +43,9 @@ check-shell-scripts:
 
 check-whitespace:
 	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2
+
+check-headers:
+	$(Q) $(HCHECK) $$(git ls-files -- '**.[ch]') >&2
 
 check-codespell:
 	$(E) CODESPL '*.md $(filter-out %.md, $(DOCFILES))'
@@ -131,7 +135,7 @@ DEVMK := loaded
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases portable \
     check-all check-source check-docs check-shell-scripts \
-    check-whitespace check-codespell check-coccinelle \
+    check-whitespace check-headers check-codespell check-coccinelle \
     check-aux check-desktop-file check-appstream \
     check-clang-tidy $(clang_tidy_targets) \
     git-hooks show-sizes
