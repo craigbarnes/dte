@@ -11,6 +11,7 @@ jobs:
             - uses: actions/checkout@v3
             - run: brew install make
             - run: gmake check V=1 DEBUG=3 WERROR=1
+            - run: gmake bench CFLAGS=-O3
 
     linux:
         permissions:
@@ -27,4 +28,5 @@ jobs:
             - uses: github/codeql-action/init@v2
               with: {languages: cpp, queries: +security-and-quality}
             - run: make check V=1 DEBUG=3 WERROR=1
+            - run: make bench CFLAGS=-O3
             - uses: github/codeql-action/analyze@v2
