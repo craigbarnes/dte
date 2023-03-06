@@ -29,21 +29,11 @@ void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEn
 static void update_cursor_style(EditorState *e)
 {
     CursorInputMode mode;
-    switch (e->input_mode) {
-    case INPUT_NORMAL:
-        if (e->buffer->options.overwrite) {
-            mode = CURSOR_MODE_OVERWRITE;
-        } else {
-            mode = CURSOR_MODE_INSERT;
-        }
-        break;
-    case INPUT_COMMAND:
-    case INPUT_SEARCH:
+    if (e->input_mode == INPUT_NORMAL) {
+        bool overwrite = e->buffer->options.overwrite;
+        mode = overwrite ? CURSOR_MODE_OVERWRITE : CURSOR_MODE_INSERT;
+    } else {
         mode = CURSOR_MODE_CMDLINE;
-        break;
-    default:
-        BUG("unhandled input mode");
-        return;
     }
 
     TermCursorStyle style = e->cursor_styles[mode];
