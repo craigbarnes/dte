@@ -26,7 +26,7 @@ alias git-changes 'compile -1s gitdiff $DTE_HOME/scripts/git-changes.sh'
 ```
 
 *Note:* the above examples assume you've copied the scripts in
-question to `$DTE_HOME/scripts/`.
+question to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 
 
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
