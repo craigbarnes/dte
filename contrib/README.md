@@ -1,10 +1,10 @@
 dte Contributed Scripts
 =======================
 
-This directory contains various example scripts that are intended to
-be used in conjunction with the [`exec`] command. Feel free to send
-pull requests adding new scripts here. Using `sh` or `awk` as the
-script interpreter is a plus (for portability reasons), although
+This directory contains various example scripts that are intended to be
+used in conjunction with the [`exec`] and [`compile`] commands. Feel
+free to send pull requests adding new scripts here. Using `sh` or `awk`
+as the script interpreter is a plus (for portability reasons), although
 it's not a strict requirement.
 
 Usage Examples
@@ -14,7 +14,7 @@ Bind Alt+h to open the `*.h` file matching the current `*.c` file
 (or vice versa):
 
 ```sh
-bind M-h 'exec-open -s $DTE_HOME/scripts/open-c-header.sh $FILE'
+bind M-h 'exec -s -o open $DTE_HOME/scripts/open-c-header.sh $FILE'
 ```
 
 Create an [`alias`] that jumps to the locations of all unstaged
@@ -30,4 +30,5 @@ question to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 
 
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
+[`compile`]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
 [`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
