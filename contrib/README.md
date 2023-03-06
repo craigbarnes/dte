@@ -13,13 +13,17 @@ Usage Examples
 Bind Alt+h to open the `*.h` file matching the current `*.c` file
 (or vice versa):
 
-    bind M-h 'exec-open -s $DTE_HOME/scripts/open-c-header.sh $FILE'
+```sh
+bind M-h 'exec-open -s $DTE_HOME/scripts/open-c-header.sh $FILE'
+```
 
 Create an [`alias`] that jumps to the locations of all unstaged
 changes made to the git working tree:
 
-    errorfmt gitdiff '^([^:]+): [+-]([0-9]+).*' file line
-    alias git-changes 'compile -1s gitdiff $DTE_HOME/scripts/git-changes.sh'
+```sh
+errorfmt gitdiff '^([^:]+): [+-]([0-9]+).*' file line
+alias git-changes 'compile -1s gitdiff $DTE_HOME/scripts/git-changes.sh'
+```
 
 *Note:* the above examples assume you've copied the scripts in
 question to `$DTE_HOME/scripts/`.
