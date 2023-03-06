@@ -31,6 +31,13 @@ Create an [`alias`] that jumps to the longest line in the current buffer:
 alias longest-line 'unselect; eval awk -f $DTE_HOME/scripts/longest-line.awk'
 ```
 
+Bind Ctrl+o to run a customized `fzf` file picker (see the comments in
+the script for more details):
+
+```sh
+bind C-o 'eval $DTE_HOME/scripts/fzf.sh'
+```
+
 *Note:* the above examples assume you've copied the scripts in question
 to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 
