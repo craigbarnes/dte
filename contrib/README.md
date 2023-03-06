@@ -25,14 +25,14 @@ errorfmt gitdiff '^([^:]+): [+-]([0-9]+).*' file line
 alias git-changes 'compile -1s gitdiff $DTE_HOME/scripts/git-changes.sh'
 ```
 
-Jump to the longest line in the current buffer:
+Create an [`alias`] that jumps to the longest line in the current buffer:
 
 ```sh
-unselect; exec -s -i buffer -o eval awk -f $DTE_HOME/scripts/longest-line.awk
+alias longest-line 'unselect; eval awk -f $DTE_HOME/scripts/longest-line.awk'
 ```
 
-*Note:* the above examples assume you've copied the scripts in
-question to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
+*Note:* the above examples assume you've copied the scripts in question
+to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 
 
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
