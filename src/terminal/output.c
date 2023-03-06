@@ -413,8 +413,9 @@ void term_set_color(Terminal *term, const TermColor *color)
     TermOutputBuffer *obuf = &term->obuf;
     term_add_literal(obuf, "\033[0");
 
+    unsigned int ncv_attributes = term->ncv_attributes;
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
-        if (attr_is_set(color, attr_map[i].attr, term->ncv_attributes)) {
+        if (attr_is_set(color, attr_map[i].attr, ncv_attributes)) {
             term_add_byte(obuf, ';');
             term_add_byte(obuf, attr_map[i].code);
         }
