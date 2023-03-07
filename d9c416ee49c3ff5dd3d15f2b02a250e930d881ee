@@ -1,0 +1,7 @@
+The example mentioned here should have been:
+
+    git-grep example
+    exec -i msg -o msg fzf --sync --bind 'start:pos('$MSGPOS')'
+
+In particular, the use of the `--sync` flag is necessary for reliable
+functioning of the `start:pos()` hook.
