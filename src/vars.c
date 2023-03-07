@@ -64,6 +64,11 @@ static char *expand_lineno(const EditorState *e)
     return e->view ? xstrdup(umax_to_str(e->view->cy + 1)) : NULL;
 }
 
+static char *expand_msgpos(const EditorState *e)
+{
+    return xstrdup(umax_to_str(e->messages.pos + 1));
+}
+
 static char *expand_word(const EditorState *e)
 {
     if (!e->view) {
@@ -89,6 +94,7 @@ static const BuiltinVar normal_vars[] = {
     {"FILEDIR", expand_file_dir},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
+    {"MSGPOS", expand_msgpos},
     {"RFILE", expand_rfile},
     {"WORD", expand_word},
 };

@@ -164,6 +164,11 @@ static void test_parse_command_arg(TestContext *ctx)
     EXPECT_TRUE(str_has_suffix(arg, "/test/DTE_HOME"));
     free(arg);
 
+    // Built-in $MSGPOS var (expands to "1" by default)
+    arg = parse_command_arg(&runner, STRN("$MSGPOS"), false);
+    EXPECT_STREQ(arg, "1");
+    free(arg);
+
     // Environment var (via getenv(3))
     arg = parse_command_arg(&runner, STRN("$DTE_VERSION"), false);
     EXPECT_STREQ(arg, e->version);
