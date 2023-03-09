@@ -109,7 +109,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     Tag tag;
     size_t pos = 0;
     StringView line = buf_slice_next_line(str->buffer, &pos, str->len);
-    if (pos == 0) {
+    if (line.length == 0) {
         return;
     }
 
