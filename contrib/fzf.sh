@@ -22,7 +22,7 @@ fzf \
     }
 
     NR == 1 {
-        key = $1
+        cmd = cmds[$1]
         next
     }
 
@@ -32,6 +32,6 @@ fzf \
     }
 
     {
-        print gencmd(cmds[key], $0)
+        print gencmd(cmd, $0)
     }
 '
