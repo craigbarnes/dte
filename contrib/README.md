@@ -28,7 +28,7 @@ alias git-changes 'compile -1s gitdiff $DTE_HOME/scripts/git-changes.sh'
 Create an [`alias`] that jumps to the longest line in the current buffer:
 
 ```sh
-alias longest-line 'unselect; eval awk -f $DTE_HOME/scripts/longest-line.awk'
+alias longest-line 'unselect; exec -s -i buffer -o eval awk -f $DTE_HOME/scripts/longest-line.awk'
 ```
 
 Bind Ctrl+o to run a customized `fzf` file picker and open the selected files
