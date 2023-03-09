@@ -35,7 +35,7 @@ Bind Ctrl+o to run a customized `fzf` file picker and open the selected files
 (see the comments in the script for additional details):
 
 ```sh
-bind C-o 'eval $DTE_HOME/scripts/fzf.sh'
+bind C-o 'exec -o eval $DTE_HOME/scripts/fzf.sh'
 ```
 
 Create an [`alias`] that jumps to the tag under the cursor, or opens an
