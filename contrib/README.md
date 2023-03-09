@@ -38,6 +38,13 @@ Bind Ctrl+o to run a customized `fzf` file picker and open the selected files
 bind C-o 'eval $DTE_HOME/scripts/fzf.sh'
 ```
 
+Create an [`alias`] that jumps to the tag under the cursor, or opens an
+`fzf` menu if there are multiple matching tags:
+
+```sh
+alias xtag 'exec -s -o eval -e errmsg $DTE_HOME/scripts/xtag.sh $WORD'
+```
+
 *Note:* the above examples assume you've copied the scripts in question
 to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 
