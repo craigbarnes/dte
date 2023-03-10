@@ -11,6 +11,7 @@
 #include "screen.h"
 #include "status.h"
 #include "terminal/output.h"
+#include "util/arith.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/intern.h"
@@ -745,7 +746,7 @@ bool toggle_option_values (
     for (size_t i = 0; i < count; i++) {
         if (desc_parse(desc, values[i], &parsed_values[i])) {
             if (desc_equals(desc, ptr, parsed_values[i])) {
-                current = i + 1;
+                current = i;
             }
         } else {
             error = true;
@@ -753,7 +754,7 @@ bool toggle_option_values (
     }
 
     if (!error) {
-        size_t i = current % count;
+        size_t i = size_increment_wrapped(current, count);
         desc_set(e, desc, ptr, global, parsed_values[i]);
         if (verbose) {
             const char *prefix = (global && desc->local) ? "[global] " : "";
