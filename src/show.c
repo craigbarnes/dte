@@ -520,13 +520,25 @@ static const ShowHandler show_handlers[] = {
     {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
 
+static const ShowHandler *lookup_show_handler(const char *name)
+{
+    const ShowHandler *handler = BSEARCH(name, show_handlers, vstrcmp);
+    return handler;
+}
+
 UNITTEST {
     CHECK_BSEARCH_ARRAY(show_handlers, name, strcmp);
+    BUG_ON(!lookup_show_handler("alias"));
+    BUG_ON(!lookup_show_handler("set"));
+    BUG_ON(!lookup_show_handler("wsplit"));
+    BUG_ON(lookup_show_handler("alia"));
+    BUG_ON(lookup_show_handler("sete"));
+    BUG_ON(lookup_show_handler(""));
 }
 
 bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
-    const ShowHandler *handler = BSEARCH(type, show_handlers, vstrcmp);
+    const ShowHandler *handler = lookup_show_handler(type);
     if (!handler) {
         return error_msg("invalid argument: '%s'", type);
     }
@@ -551,7 +563,7 @@ void collect_show_subcommands(PointerArray *a, const char *prefix)
 
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix)
 {
-    const ShowHandler *handler = BSEARCH(name, show_handlers, vstrcmp);
+    const ShowHandler *handler = lookup_show_handler(name);
     if (handler && handler->complete_arg) {
         handler->complete_arg(e, a, arg_prefix);
     }
