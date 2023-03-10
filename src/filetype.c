@@ -331,3 +331,22 @@ void free_filetypes(PointerArray *filetypes)
 {
     ptr_array_free_cb(filetypes, FREE_FUNC(free_filetype_entry));
 }
+
+bool is_valid_filetype_name_sv(const StringView *name)
+{
+    const char *data = name->data;
+    const size_t len = name->length;
+    if (unlikely(len == 0 || len > 63 || data[0] == '-')) {
+        return false;
+    }
+
+    const AsciiCharType mask = ASCII_SPACE | ASCII_CNTRL;
+    for (size_t i = 0; i < len; i++) {
+        unsigned char ch = data[i];
+        if (unlikely(ascii_test(ch, mask) || ch == '/')) {
+            return false;
+        }
+    }
+
+    return true;
+}

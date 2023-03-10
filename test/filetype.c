@@ -14,6 +14,7 @@ static void test_is_valid_filetype_name(TestContext *ctx)
     EXPECT_FALSE(is_valid_filetype_name("abc xyz"));
     EXPECT_FALSE(is_valid_filetype_name("abc\txyz"));
     EXPECT_FALSE(is_valid_filetype_name("xyz "));
+    EXPECT_FALSE(is_valid_filetype_name("foo\n"));
 
     char str[65];
     size_t n = sizeof(str) - 1;
@@ -21,10 +22,17 @@ static void test_is_valid_filetype_name(TestContext *ctx)
     str[n] = '\0';
     ASSERT_EQ(strlen(str), 64);
     EXPECT_FALSE(is_valid_filetype_name(str));
-
     str[n - 1] = '\0';
     ASSERT_EQ(strlen(str), 63);
     EXPECT_TRUE(is_valid_filetype_name(str));
+
+    StringView filetype = STRING_VIEW("zero\0\0");
+    EXPECT_EQ(filetype.length, 6);
+    EXPECT_FALSE(is_valid_filetype_name_sv(&filetype));
+    filetype.length--;
+    EXPECT_FALSE(is_valid_filetype_name_sv(&filetype));
+    filetype.length--;
+    EXPECT_TRUE(is_valid_filetype_name_sv(&filetype));
 }
 
 static void test_find_ft_filename(TestContext *ctx)

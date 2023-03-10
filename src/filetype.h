@@ -18,11 +18,12 @@ typedef enum {
     FT_FILENAME,
 } FileDetectionType;
 
-PURE
+bool is_valid_filetype_name_sv(const StringView *name) PURE NONNULL_ARGS;
+
 static inline bool is_valid_filetype_name(const char *name)
 {
-    size_t n = strcspn(name, " \t/");
-    return n > 0 && n < 64 && name[n] == '\0' && name[0] != '-';
+    const StringView sv = strview_from_cstring(name);
+    return is_valid_filetype_name_sv(&sv);
 }
 
 bool add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type) NONNULL_ARGS WARN_UNUSED_RESULT;
