@@ -181,11 +181,11 @@ static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
 
 static bool ft_match(const UserFileTypeEntry *ft, const StringView sv)
 {
-    if (ft_uses_regex(ft->type)) {
-        return ft_regex_match(ft, sv);
-    }
-    return ft_str_match(ft, sv);
+    FileDetectionType t = ft->type;
+    return ft_uses_regex(t) ? ft_regex_match(ft, sv) : ft_str_match(ft, sv);
 }
+
+typedef FileTypeEnum (*FileTypeLookupFunc)(const StringView sv);
 
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line)
 {
@@ -200,29 +200,35 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
     // The order of elements in this array determines the order of
     // precedence for the lookup() functions (but note that changing
     // the initializer below makes no difference to the array order)
-    const struct {
-        StringView sv;
-        FileTypeEnum (*lookup)(const StringView sv);
-    } table[] = {
-        [FT_INTERPRETER] = {interpreter, filetype_from_interpreter},
-        [FT_BASENAME] = {base, filetype_from_basename},
-        [FT_CONTENT] = {line, filetype_from_signature},
-        [FT_EXTENSION] = {ext, filetype_from_extension},
-        [FT_FILENAME] = {path, filetype_from_dir_prefix},
+    static const FileTypeLookupFunc funcs[] = {
+        [FT_INTERPRETER] = filetype_from_interpreter,
+        [FT_BASENAME] = filetype_from_basename,
+        [FT_CONTENT] = filetype_from_signature,
+        [FT_EXTENSION] = filetype_from_extension,
+        [FT_FILENAME] = filetype_from_dir_prefix,
+    };
+
+    const StringView params[] = {
+        [FT_INTERPRETER] = interpreter,
+        [FT_BASENAME] = base,
+        [FT_CONTENT] = line,
+        [FT_EXTENSION] = ext,
+        [FT_FILENAME] = path,
     };
 
     // Search user `ft` entries
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
-        if (ft_match(ft, table[ft->type].sv)) {
+        if (ft_match(ft, params[ft->type])) {
             return ft->name;
         }
     }
 
     // Search built-in lookup tables
-    for (FileDetectionType i = 0; i < ARRAYLEN(table); i++) {
-        BUG_ON(!table[i].lookup);
-        FileTypeEnum ft = table[i].lookup(table[i].sv);
+    static_assert(ARRAYLEN(funcs) == ARRAYLEN(params));
+    for (FileDetectionType i = 0; i < ARRAYLEN(funcs); i++) {
+        BUG_ON(!funcs[i]);
+        FileTypeEnum ft = funcs[i](params[i]);
         if (ft != NONE) {
             return builtin_filetype_names[ft];
         }
