@@ -6,6 +6,7 @@
 #include "editor.h"
 #include "editorconfig/editorconfig.h"
 #include "error.h"
+#include "filetype.h"
 #include "options.h"
 #include "regexp.h"
 #include "util/debug.h"
@@ -13,13 +14,15 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
+typedef union {
+    const char *filetype; // Interned
+    const InternedRegexp *filename;
+} FileTypeOrFileName;
+
 typedef struct {
     FileOptionType type;
     char **strs;
-    union {
-        const char *filetype; // Interned
-        const InternedRegexp *filename;
-    } u;
+    FileTypeOrFileName u;
 } FileOption;
 
 static void set_options(EditorState *e, char **args)
@@ -116,29 +119,27 @@ void set_file_options(EditorState *e, Buffer *buffer)
 bool add_file_options(PointerArray *file_options, FileOptionType type, StringView str, char **strs, size_t nstrs)
 {
     size_t len = str.length;
-    if (unlikely(len == 0)) {
-        const char *desc = (type == FOPTS_FILETYPE) ? "filetype" : "pattern";
-        return error_msg("can't add option with empty %s", desc);
+    FileTypeOrFileName u;
+    if (type == FOPTS_FILETYPE) {
+        if (unlikely(!is_valid_filetype_name_sv(&str))) {
+            return error_msg("invalid filetype name: '%.*s'", (int)len, str.data);
+        }
+        u.filetype = mem_intern(str.data, len);
+    } else {
+        BUG_ON(type != FOPTS_FILENAME);
+        if (unlikely(len == 0)) {
+            return error_msg("can't add option with empty pattern");
+        }
+        char *pat = xstrcut(str.data, len);
+        u.filename = regexp_intern(pat);
+        free(pat);
+        if (unlikely(!u.filename)) {
+            return false;
+        }
     }
 
     FileOption *opt = xnew(FileOption, 1);
-    if (type == FOPTS_FILETYPE) {
-        opt->u.filetype = mem_intern(str.data, len);
-        goto append;
-    }
-
-    BUG_ON(type != FOPTS_FILENAME);
-    char *pat = xstrcut(str.data, len);
-    opt->u.filename = regexp_intern(pat);
-    free(pat);
-    if (unlikely(!opt->u.filename)) {
-        // TODO: allocate `opt` *after* checking regexp_intern() return
-        // value, to obviate the need for this free()
-        free(opt);
-        return false;
-    }
-
-append:
+    opt->u = u;
     opt->type = type;
     opt->strs = copy_string_array(strs, nstrs);
     ptr_array_append(file_options, opt);

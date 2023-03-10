@@ -47,7 +47,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"open /dev/null", "not a regular file"},
         {"option c auto-indent true syntax", "missing option value"},
         {"option c filetype c", "filetype cannot be set via option command"},
-        {"option , auto-indent true", "empty filetype"},
+        {"option , auto-indent true", "invalid filetype"},
         {"option -r '' auto-indent true", "empty pattern"},
         {"paste -ac", "mutually exclusive"},
         {"quit xyz", "not a valid integer"},
