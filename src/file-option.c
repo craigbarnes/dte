@@ -9,6 +9,7 @@
 #include "options.h"
 #include "regexp.h"
 #include "util/debug.h"
+#include "util/intern.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -16,8 +17,8 @@ typedef struct {
     FileOptionType type;
     char **strs;
     union {
-        char *filetype;
-        CachedRegexp *filename;
+        const char *filetype; // Interned
+        const InternedRegexp *filename;
     } u;
 } FileOption;
 
@@ -91,7 +92,8 @@ void set_file_options(EditorState *e, Buffer *buffer)
     for (size_t i = 0, n = e->file_options.count; i < n; i++) {
         const FileOption *opt = e->file_options.ptrs[i];
         if (opt->type == FOPTS_FILETYPE) {
-            if (streq(opt->u.filetype, buffer->options.filetype)) {
+            // Note: comparing pointers (to interned strings)
+            if (opt->u.filetype == buffer->options.filetype) {
                 set_options(e, opt->strs);
             }
             continue;
@@ -121,20 +123,17 @@ bool add_file_options(PointerArray *file_options, FileOptionType type, StringVie
 
     FileOption *opt = xnew(FileOption, 1);
     if (type == FOPTS_FILETYPE) {
-        opt->u.filetype = xstrcut(str.data, len);
+        opt->u.filetype = mem_intern(str.data, len);
         goto append;
     }
 
     BUG_ON(type != FOPTS_FILENAME);
-    CachedRegexp *r = xmalloc(sizeof(*r) + len + 1);
-    memcpy(r->str, str.data, len);
-    r->str[len] = '\0';
-    opt->u.filename = r;
-
-    int err = regcomp(&r->re, r->str, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
-    if (unlikely(err)) {
-        regexp_error_msg(&r->re, r->str, err);
-        free(r);
+    char *pat = xstrcut(str.data, len);
+    opt->u.filename = regexp_intern(pat);
+    free(pat);
+    if (unlikely(!opt->u.filename)) {
+        // TODO: allocate `opt` *after* checking regexp_intern() return
+        // value, to obviate the need for this free()
         free(opt);
         return false;
     }
@@ -177,12 +176,6 @@ void dump_file_options(const PointerArray *file_options, String *buf)
 
 static void free_file_option(FileOption *opt)
 {
-    if (opt->type == FOPTS_FILENAME) {
-        free_cached_regexp(opt->u.filename);
-    } else {
-        BUG_ON(opt->type != FOPTS_FILETYPE);
-        free(opt->u.filetype);
-    }
     free_string_array(opt->strs);
     free(opt);
 }
