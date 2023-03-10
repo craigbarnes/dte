@@ -91,15 +91,12 @@ static inline StringView get_delim(const char *buf, size_t *posp, size_t size, i
     size_t pos = *posp;
     BUG_ON(pos >= size);
     size_t len = size - pos;
-    size_t delim_len = 0;
-    const char *ptr = buf + pos;
-    const char *found = memchr(ptr, delim, len);
-    if (found) {
-        len = (size_t)(found - ptr);
-        delim_len = 1;
-    }
+    const char *start = buf + pos;
+    const char *found = memchr(start, delim, len);
+    len = found ? (size_t)(found - start) : len;
+    size_t delim_len = found ? 1 : 0;
     *posp += len + delim_len;
-    return string_view(ptr, len);
+    return string_view(start, len);
 }
 
 NONNULL_ARGS
