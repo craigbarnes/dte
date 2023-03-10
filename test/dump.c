@@ -14,21 +14,19 @@
 #include "util/str-util.h"
 
 static const struct {
-    const char name[10];
-    bool check_parse;
+    const char name[9];
     bool check_name;
-    String (*dump)(EditorState *e);
 } handlers[] = {
-    {"alias", true, true, dump_normal_aliases},
-    {"bind", true, true, dump_all_bindings},
-    {"cursor", true, true, dump_cursors},
-    {"errorfmt", true, true, dump_compilers},
-    {"ft", true, true, do_dump_filetypes},
-    {"hi", true, true, do_dump_hl_colors},
-    {"include", false, false, do_dump_builtin_configs},
-    {"option", true, false, dump_options_and_fileopts},
-    {"set", true, true, do_dump_options},
-    {"wsplit", false, false, dump_frames},
+    {"alias", true},
+    {"bind", true},
+    {"cursor", true},
+    {"errorfmt", true},
+    {"ft", true},
+    {"hi", true},
+    {"include", false},
+    {"option", false},
+    {"set", true},
+    {"wsplit", false},
 };
 
 static void test_dump_handlers(TestContext *ctx)
@@ -39,14 +37,16 @@ static void test_dump_handlers(TestContext *ctx)
     ASSERT_NONNULL(cmds);
 
     for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
-        String str = handlers[i].dump(e);
-        size_t pos = 0;
-        while (pos < str.len) {
-            bool check_parse = handlers[i].check_parse;
+        const ShowHandler *handler = lookup_show_handler(handlers[i].name);
+        ASSERT_NONNULL(handler);
+        ASSERT_NONNULL(handler->dump);
+        String str = handler->dump(e);
+        for (size_t pos = 0, len = str.len; pos < len; ) {
+            bool check_parse = !!(handler->flags & SHOW_DTERC);
             bool check_name = handlers[i].check_name;
             EXPECT_TRUE(!check_name || check_parse);
 
-            const char *line = buf_next_line(str.buffer, &pos, str.len);
+            const char *line = buf_next_line(str.buffer, &pos, len);
             ASSERT_NONNULL(line);
             if (line[0] == '\0' || line[0] == '#' || !check_parse) {
                 continue;

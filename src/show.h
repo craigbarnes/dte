@@ -7,21 +7,25 @@
 #include "util/ptr-array.h"
 #include "util/string.h"
 
+typedef enum {
+    SHOW_DTERC = 0x1, // Use "dte" filetype (and syntax highlighter)
+    SHOW_LASTLINE = 0x2, // Move cursor to last line (e.g. most recent history entry)
+    SHOW_MSGLINE = 0x4, // Move cursor to line containing current message
+} ShowHandlerFlags;
+
+typedef struct {
+    const char name[11];
+    uint8_t flags; // ShowHandlerFlags
+    String (*dump)(EditorState *e);
+    bool (*show)(EditorState *e, const char *name, bool cmdline);
+    void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
+} ShowHandler;
+
 bool show(EditorState *e, const char *type, const char *key, bool cflag) NONNULL_ARG(1, 2) WARN_UNUSED_RESULT;
 void collect_show_subcommands(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix) NONNULL_ARGS;
-
-String dump_all_bindings(EditorState *e);
-String dump_command_history(EditorState *e);
-String dump_compilers(EditorState *e);
-String dump_cursors(EditorState *e);
-String dump_frames(EditorState *e);
-String dump_normal_aliases(EditorState *e);
-String dump_options_and_fileopts(EditorState *e);
-String dump_search_history(EditorState *e);
-String do_dump_builtin_configs(EditorState *e);
-String do_dump_filetypes(EditorState *e);
-String do_dump_hl_colors(EditorState *e);
-String do_dump_options(EditorState *e);
+const ShowHandler *lookup_show_handler(const char *name) NONNULL_ARGS;
+String dump_command_history(EditorState *e) NONNULL_ARGS;
+String dump_search_history(EditorState *e) NONNULL_ARGS;
 
 #endif

@@ -38,20 +38,6 @@
 
 extern char **environ;
 
-typedef enum {
-    DTERC = 0x1, // Use "dte" filetype (and syntax highlighter)
-    LASTLINE = 0x2, // Move cursor to last line (e.g. most recent history entry)
-    MSGLINE = 0x4, // Move cursor to line containing current message
-} ShowHandlerFlags;
-
-typedef struct {
-    const char name[11];
-    uint8_t flags; // ShowHandlerFlags
-    String (*dump)(EditorState *e);
-    bool (*show)(EditorState *e, const char *name, bool cmdline);
-    void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
-} ShowHandler;
-
 static void open_temporary_buffer (
     EditorState *e,
     const char *text,
@@ -67,14 +53,14 @@ static void open_temporary_buffer (
     set_display_filename(buffer, xasprintf("(%s %s)", cmd, cmd_arg));
     buffer_set_encoding(buffer, encoding_from_type(UTF8), e->options.utf8_bom);
 
-    if (flags & LASTLINE) {
+    if (flags & SHOW_LASTLINE) {
         block_iter_eof(&view->cursor);
         block_iter_prev_line(&view->cursor);
-    } else if ((flags & MSGLINE) && e->messages.array.count > 0) {
+    } else if ((flags & SHOW_MSGLINE) && e->messages.array.count > 0) {
         block_iter_goto_line(&view->cursor, e->messages.pos);
     }
 
-    if (flags & DTERC) {
+    if (flags & SHOW_DTERC) {
         buffer->options.filetype = str_intern("dte");
         set_file_options(e, buffer);
         buffer_update_syntax(e, buffer);
@@ -241,7 +227,7 @@ static bool show_builtin(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, sv.data, sv.length);
     } else {
-        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, DTERC);
+        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, SHOW_DTERC);
     }
 
     return true;
@@ -260,7 +246,7 @@ static bool show_compiler(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, DTERC);
+        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, SHOW_DTERC);
     }
 
     string_free(&str);
@@ -360,7 +346,7 @@ static int alias_cmp(const void *ap, const void *bp)
     return strcmp(a->name, b->name);
 }
 
-String dump_normal_aliases(EditorState *e)
+static String dump_normal_aliases(EditorState *e)
 {
     const size_t count = e->aliases.count;
     if (unlikely(count == 0)) {
@@ -399,7 +385,7 @@ String dump_normal_aliases(EditorState *e)
     return buf;
 }
 
-String dump_all_bindings(EditorState *e)
+static String dump_all_bindings(EditorState *e)
 {
     static const char flags[][4] = {
         [INPUT_NORMAL] = "",
@@ -418,14 +404,14 @@ String dump_all_bindings(EditorState *e)
     return buf;
 }
 
-String dump_frames(EditorState *e)
+static String dump_frames(EditorState *e)
 {
     String str = string_new(4096);
     dump_frame(e->root_frame, 0, &str);
     return str;
 }
 
-String dump_compilers(EditorState *e)
+static String dump_compilers(EditorState *e)
 {
     String buf = string_new(4096);
     for (HashMapIter it = hashmap_iter(&e->compilers); hashmap_next(&it); ) {
@@ -437,7 +423,7 @@ String dump_compilers(EditorState *e)
     return buf;
 }
 
-String dump_cursors(EditorState *e)
+static String dump_cursors(EditorState *e)
 {
     String buf = string_new(128);
     for (CursorInputMode m = 0; m < ARRAYLEN(e->cursor_styles); m++) {
@@ -454,13 +440,13 @@ String dump_cursors(EditorState *e)
 }
 
 // Dump option values only
-String do_dump_options(EditorState *e)
+static String do_dump_options(EditorState *e)
 {
     return dump_options(&e->options, &e->buffer->options);
 }
 
 // Dump option values and FileOption entries
-String dump_options_and_fileopts(EditorState *e)
+static String dump_options_and_fileopts(EditorState *e)
 {
     String str = do_dump_options(e);
     string_append_literal(&str, "\n\n");
@@ -468,17 +454,17 @@ String dump_options_and_fileopts(EditorState *e)
     return str;
 }
 
-String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))
+static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))
 {
     return dump_builtin_configs();
 }
 
-String do_dump_hl_colors(EditorState *e)
+static String do_dump_hl_colors(EditorState *e)
 {
     return dump_hl_colors(&e->colors);
 }
 
-String do_dump_filetypes(EditorState *e)
+static String do_dump_filetypes(EditorState *e)
 {
     return dump_filetypes(&e->filetypes);
 }
@@ -497,6 +483,13 @@ static String do_dump_buffer(EditorState *e)
 {
     return dump_buffer(e->buffer);
 }
+
+// Shorter aliases for ShowHandlerFlags
+enum {
+    DTERC = SHOW_DTERC,
+    LASTLINE = SHOW_LASTLINE,
+    MSGLINE = SHOW_MSGLINE,
+};
 
 static const ShowHandler show_handlers[] = {
     {"alias", DTERC, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
@@ -520,7 +513,7 @@ static const ShowHandler show_handlers[] = {
     {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
 
-static const ShowHandler *lookup_show_handler(const char *name)
+const ShowHandler *lookup_show_handler(const char *name)
 {
     const ShowHandler *handler = BSEARCH(name, show_handlers, vstrcmp);
     return handler;
