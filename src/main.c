@@ -544,7 +544,7 @@ loop_break:;
     set_print_errors_to_stderr(true);
 
     // Unlock files and add to file history
-    remove_frame(e, e->root_frame);
+    frame_remove(e, e->root_frame);
 
     if (load_and_save_history) {
         history_save(&e->command_history);

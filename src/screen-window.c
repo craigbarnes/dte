@@ -25,7 +25,7 @@ static void update_line_numbers(Terminal *term, const ColorScheme *colors, Windo
     size_t lines = view->buffer->nl;
     int x = window->x;
 
-    calculate_line_numbers(window);
+    window_calculate_line_numbers(window);
     long first = view->vy + 1;
     long last = MIN(view->vy + window->edit_h, lines);
 

@@ -125,7 +125,7 @@ void start_update(Terminal *term)
 
 void update_window_sizes(Terminal *term, Frame *frame)
 {
-    set_frame_size(frame, term->width, term->height - 1);
+    frame_set_size(frame, term->width, term->height - 1);
     update_window_coordinates(frame);
 }
 
@@ -181,7 +181,7 @@ void update_screen(EditorState *e, const ScreenState *s)
             buffer_mark_lines_changed(buffer, s->cy, view->cy);
         }
         if (s->is_modified != buffer_modified(buffer)) {
-            mark_buffer_tabbars_changed(buffer);
+            buffer_mark_tabbars_changed(buffer);
         }
     } else {
         e->window->update_tabbar = true;

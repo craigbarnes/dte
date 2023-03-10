@@ -1759,7 +1759,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         update_short_filename(buffer, &e->home_dir);
 
         // Filename change is not detected (only buffer_modified() change)
-        mark_buffer_tabbars_changed(buffer);
+        buffer_mark_tabbars_changed(buffer);
     }
     if (!old_mode && streq(buffer->options.filetype, "none")) {
         // New file and most likely user has not changed the filetype
@@ -2067,7 +2067,7 @@ static bool cmd_title(EditorState *e, const CommandArgs *a)
         return error_msg("saved buffers can't be retitled");
     }
     set_display_filename(buffer, xstrdup(a->args[0]));
-    mark_buffer_tabbars_changed(buffer);
+    buffer_mark_tabbars_changed(buffer);
     return true;
 }
 
@@ -2181,10 +2181,10 @@ static bool cmd_wflip(EditorState *e, const CommandArgs *a)
 static bool cmd_wnext(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    e->window = next_window(e->window);
+    e->window = window_next(e->window);
     set_view(e->window->view);
     mark_everything_changed(e);
-    debug_frame(e->root_frame);
+    frame_debug(e->root_frame);
     return true;
 }
 
@@ -2209,10 +2209,10 @@ static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 static bool cmd_wprev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    e->window = prev_window(e->window);
+    e->window = window_next(e->window);
     set_view(e->window->view);
     mark_everything_changed(e);
-    debug_frame(e->root_frame);
+    frame_debug(e->root_frame);
     return true;
 }
 
@@ -2258,16 +2258,16 @@ static bool cmd_wresize(EditorState *e, const CommandArgs *a)
             return error_msg("Invalid resize value: %s", arg);
         }
         if (arg[0] == '+' || arg[0] == '-') {
-            add_to_frame_size(window->frame, dir, n);
+            frame_add_to_size(window->frame, dir, n);
         } else {
-            resize_frame(window->frame, dir, n);
+            frame_resize(window->frame, dir, n);
         }
     } else {
-        equalize_frame_sizes(window->frame->parent);
+        frame_equalize_sizes(window->frame->parent);
     }
 
     mark_everything_changed(e);
-    debug_frame(e->root_frame);
+    frame_debug(e->root_frame);
     // TODO: return false if resize failed?
     return true;
 }
@@ -2296,9 +2296,9 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
 
     Frame *frame;
     if (root) {
-        frame = split_root_frame(e, vertical, before);
+        frame = frame_split_root(e, vertical, before);
     } else {
-        frame = split_frame(e->window, vertical, before);
+        frame = frame_split(e->window, vertical, before);
     }
 
     View *save = e->view;
@@ -2325,13 +2325,13 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
 
     if (!view) {
         // Open failed, remove new window
-        remove_frame(e, e->window->frame);
+        frame_remove(e, e->window->frame);
         e->view = save;
         e->buffer = save->buffer;
         e->window = save->window;
     }
 
-    debug_frame(e->root_frame);
+    frame_debug(e->root_frame);
     return !!view;
 }
 

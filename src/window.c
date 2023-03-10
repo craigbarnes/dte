@@ -353,7 +353,7 @@ View *window_open_files(Window *window, char **filenames, const Encoding *encodi
     return first;
 }
 
-void mark_buffer_tabbars_changed(Buffer *buffer)
+void buffer_mark_tabbars_changed(Buffer *buffer)
 {
     for (size_t i = 0, n = buffer->views.count; i < n; i++) {
         View *view = buffer->views.ptrs[i];
@@ -390,7 +390,7 @@ static void set_edit_size(Window *window, const GlobalOptions *options)
     window->edit_x = window->x + xo;
 }
 
-void calculate_line_numbers(Window *window)
+void window_calculate_line_numbers(Window *window)
 {
     const GlobalOptions *options = &window->editor->options;
     int w = line_numbers_width(window, options);
@@ -403,7 +403,7 @@ void calculate_line_numbers(Window *window)
     set_edit_size(window, options);
 }
 
-void set_window_coordinates(Window *window, int x, int y)
+void window_set_coordinates(Window *window, int x, int y)
 {
     const GlobalOptions *options = &window->editor->options;
     window->x = x;
@@ -412,11 +412,11 @@ void set_window_coordinates(Window *window, int x, int y)
     window->edit_y = y + edit_y_offset(options);
 }
 
-void set_window_size(Window *window, int w, int h)
+void window_set_size(Window *window, int w, int h)
 {
     window->w = w;
     window->h = h;
-    calculate_line_numbers(window);
+    window_calculate_line_numbers(window);
 }
 
 int window_get_scroll_margin(const Window *window, unsigned int scroll_margin)
@@ -466,7 +466,7 @@ static void find_prev_and_next(Window *window, void *ud)
     data->prev = window;
 }
 
-Window *prev_window(Window *window)
+Window *window_prev(Window *window)
 {
     WindowCallbackData data = {.target = window};
     frame_for_each_window(window->editor->root_frame, find_prev_and_next, &data);
@@ -474,7 +474,7 @@ Window *prev_window(Window *window)
     return data.prev ? data.prev : data.last;
 }
 
-Window *next_window(Window *window)
+Window *window_next(Window *window)
 {
     WindowCallbackData data = {.target = window};
     frame_for_each_window(window->editor->root_frame, find_prev_and_next, &data);
@@ -498,10 +498,10 @@ void window_close(Window *window)
     Window *next_or_prev = data.next ? data.next : data.prev;
     BUG_ON(!next_or_prev);
 
-    remove_frame(e, window->frame);
+    frame_remove(e, window->frame);
     e->window = NULL;
     set_view(next_or_prev->view);
 
     mark_everything_changed(e);
-    debug_frame(e->root_frame);
+    frame_debug(e->root_frame);
 }

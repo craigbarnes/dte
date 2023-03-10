@@ -87,7 +87,7 @@ static void set_size(Frame *frame, int size)
     bool vertical = frame->parent->vertical;
     int w = vertical ? frame->parent->w : size;
     int h = vertical ? size : frame->parent->h;
-    set_frame_size(frame, w, h);
+    frame_set_size(frame, w, h);
 }
 
 static void divide_equally(const Frame *frame)
@@ -291,7 +291,7 @@ static Frame *find_resizable(Frame *frame, ResizeDirection dir)
     return NULL;
 }
 
-void set_frame_size(Frame *frame, int w, int h)
+void frame_set_size(Frame *frame, int w, int h)
 {
     int min_w = get_min_w(frame);
     int min_h = get_min_h(frame);
@@ -302,7 +302,7 @@ void set_frame_size(Frame *frame, int w, int h)
 
     if (frame->window) {
         w -= rightmost_frame(frame) ? 0 : 1; // Separator
-        set_window_size(frame->window, w, h);
+        window_set_size(frame->window, w, h);
         return;
     }
 
@@ -313,14 +313,14 @@ void set_frame_size(Frame *frame, int w, int h)
     }
 }
 
-void equalize_frame_sizes(Frame *parent)
+void frame_equalize_sizes(Frame *parent)
 {
     parent->equal_size = true;
     divide_equally(parent);
     update_window_coordinates(parent);
 }
 
-void resize_frame(Frame *frame, ResizeDirection dir, int size)
+void frame_resize(Frame *frame, ResizeDirection dir, int size)
 {
     frame = find_resizable(frame, dir);
     if (!frame) {
@@ -333,15 +333,15 @@ void resize_frame(Frame *frame, ResizeDirection dir, int size)
     update_window_coordinates(parent);
 }
 
-void add_to_frame_size(Frame *frame, ResizeDirection dir, int amount)
+void frame_add_to_size(Frame *frame, ResizeDirection dir, int amount)
 {
-    resize_frame(frame, dir, get_size(frame) + amount);
+    frame_resize(frame, dir, get_size(frame) + amount);
 }
 
 static void update_frame_coordinates(const Frame *frame, int x, int y)
 {
     if (frame->window) {
-        set_window_coordinates(frame->window, x, y);
+        window_set_coordinates(frame->window, x, y);
         return;
     }
 
@@ -370,7 +370,7 @@ void update_window_coordinates(Frame *frame)
     update_frame_coordinates(get_root_frame(frame), 0, 0);
 }
 
-Frame *split_frame(Window *window, bool vertical, bool before)
+Frame *frame_split(Window *window, bool vertical, bool before)
 {
     Frame *frame = window->frame;
     Frame *parent = frame->parent;
@@ -388,13 +388,13 @@ Frame *split_frame(Window *window, bool vertical, bool before)
     parent->equal_size = true;
 
     // Recalculate
-    set_frame_size(parent, parent->w, parent->h);
+    frame_set_size(parent, parent->w, parent->h);
     update_window_coordinates(parent);
     return frame;
 }
 
 // Doesn't really split root but adds new frame between root and its contents
-Frame *split_root_frame(EditorState *e, bool vertical, bool before)
+Frame *frame_split_root(EditorState *e, bool vertical, bool before)
 {
     Frame *old_root = e->root_frame;
     Frame *new_root = new_frame();
@@ -404,7 +404,7 @@ Frame *split_root_frame(EditorState *e, bool vertical, bool before)
     e->root_frame = new_root;
 
     Frame *frame = add_frame(new_root, new_window(e), before ? 0 : 1);
-    set_frame_size(new_root, old_root->w, old_root->h);
+    frame_set_size(new_root, old_root->w, old_root->h);
     update_window_coordinates(new_root);
     return frame;
 }
@@ -423,7 +423,7 @@ static void free_frame(Frame *frame)
     free(frame);
 }
 
-void remove_frame(EditorState *e, Frame *frame)
+void frame_remove(EditorState *e, Frame *frame)
 {
     Frame *parent = frame->parent;
     if (!parent) {
@@ -454,7 +454,7 @@ void remove_frame(EditorState *e, Frame *frame)
     }
 
     // Recalculate
-    set_frame_size(parent, parent->w, parent->h);
+    frame_set_size(parent, parent->w, parent->h);
     update_window_coordinates(parent);
 }
 
@@ -484,13 +484,13 @@ void dump_frame(const Frame *frame, size_t level, String *str)
 }
 
 #if DEBUG >= 1
-void debug_frame(const Frame *frame)
+void frame_debug(const Frame *frame)
 {
     sanity_check_frame(frame);
     for (size_t i = 0, n = frame->frames.count; i < n; i++) {
         const Frame *c = frame->frames.ptrs[i];
         BUG_ON(c->parent != frame);
-        debug_frame(c);
+        frame_debug(c);
     }
 }
 #endif

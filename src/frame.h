@@ -29,20 +29,20 @@ typedef enum {
 struct EditorState;
 
 Frame *new_root_frame(struct Window *window);
-void set_frame_size(Frame *frame, int w, int h);
-void equalize_frame_sizes(Frame *parent);
-void add_to_frame_size(Frame *frame, ResizeDirection dir, int amount);
-void resize_frame(Frame *frame, ResizeDirection dir, int size);
-void update_window_coordinates(Frame *frame);
-Frame *split_frame(struct Window *window, bool vertical, bool before);
-Frame *split_root_frame(struct EditorState *e, bool vertical, bool before);
-void remove_frame(struct EditorState *e, Frame *frame);
+void frame_set_size(Frame *frame, int w, int h);
+void frame_equalize_sizes(Frame *parent);
+void frame_add_to_size(Frame *frame, ResizeDirection dir, int amount);
+void frame_resize(Frame *frame, ResizeDirection dir, int size);
+Frame *frame_split(struct Window *window, bool vertical, bool before);
+Frame *frame_split_root(struct EditorState *e, bool vertical, bool before);
+void frame_remove(struct EditorState *e, Frame *frame);
 void dump_frame(const Frame *frame, size_t level, String *str);
+void update_window_coordinates(Frame *frame);
 
 #if DEBUG >= 1
-  void debug_frame(const Frame *frame);
+  void frame_debug(const Frame *frame);
 #else
-  static inline void debug_frame(const Frame* UNUSED_ARG(frame)) {}
+  static inline void frame_debug(const Frame* UNUSED_ARG(frame)) {}
 #endif
 
 #endif
