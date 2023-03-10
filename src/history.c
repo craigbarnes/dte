@@ -3,6 +3,7 @@
 #include <string.h>
 #include "history.h"
 #include "error.h"
+#include "util/arith.h"
 #include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
@@ -143,4 +144,18 @@ void history_free(History *history)
     history->filename = NULL;
     history->first = NULL;
     history->last = NULL;
+}
+
+String history_dump(const History *history)
+{
+    const size_t nr_entries = history->entries.count;
+    const size_t size = round_size_to_next_multiple(16 * nr_entries, 4096);
+    String buf = string_new(size);
+    size_t n = 0;
+    for (HistoryEntry *e = history->first; e; e = e->next, n++) {
+        string_append_cstring(&buf, e->text);
+        string_append_byte(&buf, '\n');
+    }
+    BUG_ON(n != nr_entries);
+    return buf;
 }

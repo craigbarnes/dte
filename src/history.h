@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "util/hashmap.h"
 #include "util/macros.h"
+#include "util/string.h"
 
 typedef struct HistoryEntry {
     struct HistoryEntry *next;
@@ -31,5 +32,6 @@ bool history_search_backward(const History *history, const HistoryEntry **pos, c
 void history_load(History *history, char *filename);
 void history_save(const History *history);
 void history_free(History *history);
+String history_dump(const History *history);
 
 #endif

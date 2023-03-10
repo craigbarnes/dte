@@ -310,28 +310,14 @@ static bool show_wsplit(EditorState *e, const char *name, bool cflag)
     return true;
 }
 
-static String do_history_dump(const History *history)
-{
-    const size_t nr_entries = history->entries.count;
-    const size_t size = round_size_to_next_multiple(16 * nr_entries, 4096);
-    String buf = string_new(size);
-    size_t n = 0;
-    for (HistoryEntry *e = history->first; e; e = e->next, n++) {
-        string_append_cstring(&buf, e->text);
-        string_append_byte(&buf, '\n');
-    }
-    BUG_ON(n != nr_entries);
-    return buf;
-}
-
 String dump_command_history(EditorState *e)
 {
-    return do_history_dump(&e->command_history);
+    return history_dump(&e->command_history);
 }
 
 String dump_search_history(EditorState *e)
 {
-    return do_history_dump(&e->search_history);
+    return history_dump(&e->search_history);
 }
 
 typedef struct {
