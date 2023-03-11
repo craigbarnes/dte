@@ -1,0 +1,13 @@
+syntax ctags
+
+state start text
+    char ! comment
+    noeat text
+
+state text
+    char "\n" start
+    eat this
+
+state comment
+    char "\n" start
+    eat this

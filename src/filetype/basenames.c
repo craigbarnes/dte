@@ -91,6 +91,7 @@ static const struct FileBasenameMap {
     {"shellcheckrc", CONFIG, true},
     {"sudoers", CONFIG, false},
     {"sxhkdrc", CONFIG, true},
+    {"tags", CTAGS, false},
     {"tcshrc", CSH, true},
     {"terminalrc", INI, false},
     {"texmf.cnf", TEXMFCNF, false},

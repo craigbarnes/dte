@@ -103,6 +103,7 @@ static void test_find_ft_filename(TestContext *ctx)
         {"file.automount", "ini"},
         {"file.nginxconf", "nginx"},
         {"meson_options.txt", "meson"},
+        {"tags", "ctags"},
         {"Makefile.am", "make"},
         {"Makefile.in", "make"},
         {"Makefile.i_", NULL},
