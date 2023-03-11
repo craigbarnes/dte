@@ -516,6 +516,11 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[57399u", 8, '0'},
         {"\033[57405u", 8, '6'},
         {"\033[57408u", 8, '9'},
+        {"\033[57359u", 8, KEY_SCROLL_LOCK},
+        {"\033[57361u", 8, KEY_PRINT_SCREEN},
+        {"\033[57362u", 8, KEY_PAUSE},
+        {"\033[57363u", 8, KEY_MENU},
+        {"\033[57361;2u", 10, MOD_SHIFT | KEY_PRINT_SCREEN},
         // TODO: {"\033[57414u", 8, KEY_ENTER},
         {"\033[57415u", 8, '='},
         {"\033[57427u", 8, KEY_BEGIN},
@@ -826,6 +831,10 @@ static void test_keycode_to_string(TestContext *ctx)
         {"right", KEY_RIGHT},
         {"up", KEY_UP},
         {"down", KEY_DOWN},
+        {"scrlock", KEY_SCROLL_LOCK},
+        {"print", KEY_PRINT_SCREEN},
+        {"pause", KEY_PAUSE},
+        {"menu", KEY_MENU},
         {"C-a", MOD_CTRL | 'a'},
         {"C-s", MOD_CTRL | 's'},
         {"M-a", MOD_META | 'a'},
@@ -920,6 +929,12 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(key, MOD_HYPER | MOD_SHIFT | 'z');
     EXPECT_TRUE(parse_key_string(&key, "s-S-t"));
     EXPECT_EQ(key, MOD_SUPER | MOD_SHIFT | 't');
+    EXPECT_TRUE(parse_key_string(&key, "S-print"));
+    EXPECT_EQ(key, MOD_SHIFT | KEY_PRINT_SCREEN);
+    EXPECT_TRUE(parse_key_string(&key, "pause"));
+    EXPECT_EQ(key, KEY_PAUSE);
+    EXPECT_TRUE(parse_key_string(&key, "C-S-scrlock"));
+    EXPECT_EQ(key, MOD_CTRL | MOD_SHIFT | KEY_SCROLL_LOCK);
 
     EXPECT_FALSE(parse_key_string(&key, "C-"));
     EXPECT_FALSE(parse_key_string(&key, "C-M-"));

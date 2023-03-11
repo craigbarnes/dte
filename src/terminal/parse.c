@@ -82,10 +82,10 @@ static KeyCode decode_key_from_param(uint32_t param)
 static KeyCode decode_kitty_special_key(uint32_t n)
 {
     switch (n) {
-    // case 57359: return KEY_SCROLL_LOCK;
-    // case 57361: return KEY_PRINT_SCREEN;
-    // case 57362: return KEY_PAUSE;
-    // case 57363: return KEY_MENU;
+    case 57359: return KEY_SCROLL_LOCK;
+    case 57361: return KEY_PRINT_SCREEN;
+    case 57362: return KEY_PAUSE;
+    case 57363: return KEY_MENU;
     case 57376: return KEY_F13;
     case 57377: return KEY_F14;
     case 57378: return KEY_F15;
