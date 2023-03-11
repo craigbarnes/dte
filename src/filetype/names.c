@@ -1,5 +1,6 @@
 typedef enum {
     ADA,
+    ASCIIDOC,
     ASM,
     AWK,
     BATCH,
@@ -7,6 +8,7 @@ typedef enum {
     C, CPLUSPLUS = C,
     CLOJURE,
     CMAKE,
+    COBOL,
     COCCINELLE,
     COFFEESCRIPT,
     CONFIG,
@@ -26,6 +28,7 @@ typedef enum {
     ERLANG,
     FISH,
     GCODE,
+    GDSCRIPT,
     GETTEXT,
     GITCOMMIT,
     GITIGNORE,
@@ -108,6 +111,7 @@ typedef enum {
 
 static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [ADA] = "ada",
+    [ASCIIDOC] = "asciidoc",
     [ASM] = "asm",
     [AWK] = "awk",
     [BATCH] = "batch",
@@ -115,6 +119,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [C] = "c",
     [CLOJURE] = "clojure",
     [CMAKE] = "cmake",
+    [COBOL] = "cobol",
     [COCCINELLE] = "coccinelle",
     [COFFEESCRIPT] = "coffee",
     [CONFIG] = "config",
@@ -134,6 +139,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [ERLANG] = "erlang",
     [FISH] = "fish",
     [GCODE] = "gcode",
+    [GDSCRIPT] = "gdscript",
     [GETTEXT] = "gettext",
     [GITCOMMIT] = "gitcommit",
     [GITIGNORE] = "gitignore",

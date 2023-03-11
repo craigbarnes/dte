@@ -17,6 +17,8 @@ static const struct FileBasenameMap {
     {"Gemfile", RUBY, false},
     {"Gemfile.lock", RUBY, false},
     {"Kbuild", MAKE, false},
+    {"Kconfig", CONFIG, false},
+    {"Kconfig.debug", CONFIG, false},
     {"MERGE_MSG", GITCOMMIT, false},
     {"Makefile", MAKE, false},
     {"Makefile.am", MAKE, false},
