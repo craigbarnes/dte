@@ -49,6 +49,7 @@ static const struct FileInterpreterMap {
     {"r6rs", SCHEME},
     {"racket", SCHEME},
     {"rake", RUBY},
+    {"rbx", RUBY},
     {"ruby", RUBY},
     {"runghc", HASKELL},
     {"sbcl", LISP},
