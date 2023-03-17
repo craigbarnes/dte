@@ -29,7 +29,7 @@ Features
 Screenshot
 ----------
 
-![dte screenshot](https://craigbarnes.gitlab.io/dte/screenshot.png)
+[![screenshot]][screenshot]
 
 Installing
 ----------
@@ -136,6 +136,7 @@ Public License version 2 for more details.
 [color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
+[screenshot]: https://craigbarnes.gitlab.io/dte/screenshot.png
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 [kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [synchronized updates]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
