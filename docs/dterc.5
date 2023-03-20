@@ -1762,7 +1762,9 @@ Display "Press any key to continue" prompt
 .PP
 .TP
 \fB\-s\fR
-Silent. Both \fBstderr\fR(3) and \fBstdout\fR(3) are redirected to \fB/dev/null\fR
+Don't echo command output to the terminal during execution;
+just silently collect messages (use this to avoid screen
+flicker, e.g. for commands that typically complete quickly)
 .PP
 See also: \fBerrorfmt\fR and \fBmsg\fR commands.
 .P
