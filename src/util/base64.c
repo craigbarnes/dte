@@ -55,22 +55,14 @@ size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
 
 void base64_encode_final(const char *in, size_t ilen, char out[4])
 {
+    BUG_ON(ilen - 1 > 1);
     const unsigned char *u_in = in;
-    uint32_t v;
-    switch (ilen) {
-    case 1:
-        v = (uint32_t)u_in[0] << 16;
-        out[2] = '=';
-        break;
-    case 2:
-        v = (uint32_t)u_in[0] << 16 | (uint32_t)u_in[1] << 8;
-        out[2] = base64_encode_table[(v >> 6) & 63];
-        break;
-    default:
-        BUG("Invalid input length: %zu", ilen);
-    }
-
+    uint32_t a = u_in[0];
+    uint32_t b = (ilen == 2) ? u_in[1] : 0;
+    uint32_t v = a << 16 | b << 8;
+    char x = (ilen == 2) ? base64_encode_table[(v >> 6) & 63] : '=';
     out[0] = base64_encode_table[(v >> 18) & 63];
     out[1] = base64_encode_table[(v >> 12) & 63];
+    out[2] = x;
     out[3] = '=';
 }
