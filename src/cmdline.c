@@ -20,15 +20,12 @@
 static void cmdline_delete(CommandLine *c)
 {
     size_t pos = c->pos;
-    size_t len = 1;
-
     if (pos == c->buf.len) {
         return;
     }
 
     u_get_char(c->buf.buffer, c->buf.len, &pos);
-    len = pos - c->pos;
-    string_remove(&c->buf, c->pos, len);
+    string_remove(&c->buf, c->pos, pos - c->pos);
 }
 
 void cmdline_clear(CommandLine *c)
@@ -48,9 +45,9 @@ void cmdline_free(CommandLine *c)
 
 static void set_text(CommandLine *c, const char *text)
 {
-    string_clear(&c->buf);
-    const size_t text_len = strlen(text);
+    size_t text_len = strlen(text);
     c->pos = text_len;
+    string_clear(&c->buf);
     string_append_buf(&c->buf, text, text_len);
 }
 
