@@ -421,12 +421,9 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    bool internal = has_flag(a, 'i');
     bool clipboard = has_flag(a, 'b');
     bool primary = has_flag(a, 'p');
-    if (!(internal || clipboard || primary)) {
-        internal = true;
-    }
+    bool internal = has_flag(a, 'i') || !(clipboard || primary);
 
     if (internal) {
         copy(&e->clipboard, view, size, line_copy);
