@@ -403,6 +403,25 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
 
 static bool cmd_copy(EditorState *e, const CommandArgs *a)
 {
+    const char *text = a->args[0];
+    Terminal *term = &e->terminal;
+    bool clipboard = has_flag(a, 'b');
+    bool primary = has_flag(a, 'p');
+    bool internal = has_flag(a, 'i') || !(clipboard || primary);
+
+    if (text) {
+        size_t len = strlen(text);
+        if (internal) {
+            record_copy(&e->clipboard, xstrdup(text), len, false);
+        }
+        if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
+            if (!term_osc52_copy(&term->obuf, text, len, clipboard, primary)) {
+                error_msg_errno("OSC 52 copy failed");
+            }
+        }
+        return true;
+    }
+
     View *view = e->view;
     const BlockIter save = view->cursor;
     size_t size;
@@ -421,15 +440,10 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    bool clipboard = has_flag(a, 'b');
-    bool primary = has_flag(a, 'p');
-    bool internal = has_flag(a, 'i') || !(clipboard || primary);
-
     if (internal) {
         copy(&e->clipboard, view, size, line_copy);
     }
 
-    Terminal *term = &e->terminal;
     if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
         if (internal) {
             view->cursor = save;
@@ -2372,7 +2386,7 @@ static const Command cmds[] = {
     {"close", "fpqw", false, 0, 0, cmd_close},
     {"command", "-", false, 0, 1, cmd_command},
     {"compile", "-1ps", false, 2, -1, cmd_compile},
-    {"copy", "bikp", false, 0, 0, cmd_copy},
+    {"copy", "bikp", false, 0, 1, cmd_copy},
     {"cursor", "", true, 0, 3, cmd_cursor},
     {"cut", "", false, 0, 0, cmd_cut},
     {"delete", "", false, 0, 0, cmd_delete},
