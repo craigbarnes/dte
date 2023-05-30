@@ -369,7 +369,8 @@ static bool cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
-    Condition *c = add_condition(sp, cmdargs_has_flag(a, 'b') ? COND_INLIST_BUFFER : COND_INLIST, args[1], emit);
+    ConditionType type = cmdargs_has_flag(a, 'b') ? COND_INLIST_BUFFER : COND_INLIST;
+    Condition *c = add_condition(sp, type, args[1], emit);
 
     if (!c) {
         return false;
