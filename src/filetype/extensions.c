@@ -133,6 +133,7 @@ static const struct FileExtensionMap {
     {"nim", NIM},
     {"ninja", NINJA},
     {"nix", NIX},
+    {"odin", ODIN},
     {"opml", XML},
     {"page", XML},
     {"pas", PASCAL},
