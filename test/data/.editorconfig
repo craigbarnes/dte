@@ -4,8 +4,8 @@
 
 root = true
 
-[*.?{foo,bar}.[xyz]]   # inline comment
-    indent_style = space  # another inline comment
+[*.?{foo,bar}.[xyz]]
+    indent_style = space
     indent_size = 3
     max_line_length = 68
     = property with no name

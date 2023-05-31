@@ -8,9 +8,9 @@
 static void test_ini_parse(TestContext *ctx)
 {
     static const char input[] =
-        " \t  key = val   #   inline comment    \n"
+        " \t  key = val   \n"
         "\n"
-        " \t [section 1] #; ...\n"
+        " \t [section 1]  \n"
         "xyz = 123\n"
         "\tfoo bar = this;is#not#a;comment\n"
         "[section 2]\n"
@@ -26,7 +26,7 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.name.data);
     ASSERT_NONNULL(ini.value.data);
     EXPECT_NULL(ini.section.data);
-    EXPECT_EQ(ini.pos, 39);
+    EXPECT_EQ(ini.pos, 17);
     EXPECT_EQ(ini.name_count, 1);
     EXPECT_TRUE(strview_equal_cstring(&ini.name, "key"));
     EXPECT_TRUE(strview_equal_cstring(&ini.value, "val"));
@@ -35,7 +35,7 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.name.data);
     ASSERT_NONNULL(ini.value.data);
     ASSERT_NONNULL(ini.section.data);
-    EXPECT_EQ(ini.pos, 72);
+    EXPECT_EQ(ini.pos, 45);
     EXPECT_EQ(ini.name_count, 1);
     EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 1"));
     EXPECT_TRUE(strview_equal_cstring(&ini.name, "xyz"));
@@ -45,7 +45,7 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.name.data);
     ASSERT_NONNULL(ini.value.data);
     ASSERT_NONNULL(ini.section.data);
-    EXPECT_EQ(ini.pos, 105);
+    EXPECT_EQ(ini.pos, 78);
     EXPECT_EQ(ini.name_count, 2);
     EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 1"));
     EXPECT_TRUE(strview_equal_cstring(&ini.name, "foo bar"));
@@ -55,7 +55,7 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.name.data);
     ASSERT_NONNULL(ini.value.data);
     ASSERT_NONNULL(ini.section.data);
-    EXPECT_EQ(ini.pos, 121);
+    EXPECT_EQ(ini.pos, 94);
     EXPECT_EQ(ini.name_count, 1);
     EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 2"));
     EXPECT_TRUE(strview_equal_cstring(&ini.name, "x"));

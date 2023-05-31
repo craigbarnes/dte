@@ -1,30 +1,6 @@
 #include "ini.h"
-#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"
-
-static void strip_trailing_comments_and_whitespace(StringView *line)
-{
-    const char *str = line->data;
-    size_t len = line->length;
-
-    // Remove inline comments
-    char prev_char = '\0';
-    for (size_t i = len; i > 0; i--) {
-        if (ascii_isspace(str[i]) && (prev_char == '#' || prev_char == ';')) {
-            len = i;
-        }
-        prev_char = str[i];
-    }
-
-    // Trim trailing whitespace
-    const char *ptr = str + len - 1;
-    while (ptr > str && ascii_isspace(*ptr--)) {
-        len--;
-    }
-
-    line->length = len;
-}
 
 bool ini_parse(IniParser *ctx)
 {
@@ -39,7 +15,7 @@ bool ini_parse(IniParser *ctx)
             continue;
         }
 
-        strip_trailing_comments_and_whitespace(&line);
+        strview_trim_right(&line);
         BUG_ON(line.length == 0);
         if (line.data[0] == '[') {
             if (strview_has_suffix(&line, "]")) {
