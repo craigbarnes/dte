@@ -155,7 +155,7 @@ Public License version 2 for more details.
 [Ubuntu]: https://launchpad.net/ubuntu/+source/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
-[SlackBuilds]: https://slackbuilds.org/repository/14.2/development/dte/
+[SlackBuilds]: https://slackbuilds.org/repository/15.0/development/dte/
 [SlackBuild Usage HOWTO]: https://slackbuilds.org/howto/
 [FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
 [DPorts]: https://gitweb.dragonflybsd.org/dports.git/tree/HEAD:/editors/dte
