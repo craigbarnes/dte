@@ -24,6 +24,10 @@ body {
     outline: 0;
 }
 
+#top-nav a:focus-visible {
+    outline: solid;
+}
+
 #top-nav a:active {
     position: relative;
     top: 1px;
