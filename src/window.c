@@ -365,18 +365,18 @@ void buffer_mark_tabbars_changed(Buffer *buffer)
     }
 }
 
-static int line_numbers_width(const Window *window, const GlobalOptions *options)
+static int line_numbers_width(const GlobalOptions *options, const View *view)
 {
-    if (!options->show_line_numbers || !window->view) {
+    if (!options->show_line_numbers || !view) {
         return 0;
     }
-    size_t width = size_str_width(window->view->buffer->nl) + 1;
+    size_t width = size_str_width(view->buffer->nl) + 1;
     return MAX(width, LINE_NUMBERS_MIN_WIDTH);
 }
 
-static int edit_x_offset(const Window *window, const GlobalOptions *options)
+static int edit_x_offset(const GlobalOptions *options, const View *view)
 {
-    return line_numbers_width(window, options);
+    return line_numbers_width(options, view);
 }
 
 static int edit_y_offset(const GlobalOptions *options)
@@ -386,9 +386,8 @@ static int edit_y_offset(const GlobalOptions *options)
 
 static void set_edit_size(Window *window, const GlobalOptions *options)
 {
-    int xo = edit_x_offset(window, options);
+    int xo = edit_x_offset(options, window->view);
     int yo = edit_y_offset(options);
-
     window->edit_w = window->w - xo;
     window->edit_h = window->h - yo - 1; // statusline
     window->edit_x = window->x + xo;
@@ -397,7 +396,7 @@ static void set_edit_size(Window *window, const GlobalOptions *options)
 void window_calculate_line_numbers(Window *window)
 {
     const GlobalOptions *options = &window->editor->options;
-    int w = line_numbers_width(window, options);
+    int w = line_numbers_width(options, window->view);
     if (w != window->line_numbers.width) {
         window->line_numbers.width = w;
         window->line_numbers.first = 0;
@@ -412,7 +411,7 @@ void window_set_coordinates(Window *window, int x, int y)
     const GlobalOptions *options = &window->editor->options;
     window->x = x;
     window->y = y;
-    window->edit_x = x + edit_x_offset(window, options);
+    window->edit_x = x + edit_x_offset(options, window->view);
     window->edit_y = y + edit_y_offset(options);
 }
 
