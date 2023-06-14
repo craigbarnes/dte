@@ -42,9 +42,12 @@ static void update_first_tab_idx(Window *window)
 
 static void calculate_tabbar(Window *window)
 {
+    void **ptrs = window->views.ptrs;
+    size_t n = window->views.count;
     int total_w = 0;
-    for (size_t i = 0, n = window->views.count; i < n; i++) {
-        View *view = window->views.ptrs[i];
+
+    for (size_t i = 0; i < n; i++) {
+        View *view = ptrs[i];
         if (view == window->view) {
             // Make sure current tab is visible
             window->first_tab_idx = MIN(i, window->first_tab_idx);
@@ -62,8 +65,8 @@ static void calculate_tabbar(Window *window)
     // Truncate all wide tabs
     total_w = 0;
     int truncated_count = 0;
-    for (size_t i = 0, n = window->views.count; i < n; i++) {
-        View *view = window->views.ptrs[i];
+    for (size_t i = 0; i < n; i++) {
+        View *view = ptrs[i];
         int truncated_w = 20;
         if (view->tt_width > truncated_w) {
             view->tt_truncated_width = truncated_w;
@@ -89,8 +92,8 @@ static void calculate_tabbar(Window *window)
         int extra_avg = extra / truncated_count;
         int extra_mod = extra % truncated_count;
 
-        for (size_t i = 0, n = window->views.count; i < n; i++) {
-            View *view = window->views.ptrs[i];
+        for (size_t i = 0; i < n; i++) {
+            View *view = ptrs[i];
             int add = view->tt_width - view->tt_truncated_width;
             if (add == 0) {
                 continue;
