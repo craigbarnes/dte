@@ -167,12 +167,15 @@ View *window_find_unclosable_view(Window *window)
     if (window->view && !view_can_close(window->view)) {
         return window->view;
     }
+
+    void **ptrs = window->views.ptrs;
     for (size_t i = 0, n = window->views.count; i < n; i++) {
-        View *view = window->views.ptrs[i];
+        View *view = ptrs[i];
         if (!view_can_close(view)) {
             return view;
         }
     }
+
     return NULL;
 }
 
@@ -283,8 +286,9 @@ void set_view(View *view)
     }
 
     // Save cursor states of views sharing same buffer
+    void **ptrs = view->buffer->views.ptrs;
     for (size_t i = 0, n = view->buffer->views.count; i < n; i++) {
-        View *other = view->buffer->views.ptrs[i];
+        View *other = ptrs[i];
         if (other != view) {
             other->saved_cursor_offset = block_iter_get_offset(&other->cursor);
             other->restore_cursor = true;
@@ -432,8 +436,10 @@ void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), voi
         func(frame->window, data);
         return;
     }
+
+    void **ptrs = frame->frames.ptrs;
     for (size_t i = 0, n = frame->frames.count; i < n; i++) {
-        frame_for_each_window(frame->frames.ptrs[i], func, data);
+        frame_for_each_window(ptrs[i], func, data);
     }
 }
 
