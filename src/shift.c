@@ -125,6 +125,10 @@ void shift_lines(View *view, int count)
     init_selection(view, &info);
     view->cursor = info.si;
     size_t nr_lines = get_nr_selected_lines(&info);
+    if (unlikely(nr_lines == 0)) {
+        return;
+    }
+
     do_shift_lines(view, count, nr_lines);
     if (info.swapped) {
         // Cursor should be at beginning of selection

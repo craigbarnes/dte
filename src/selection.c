@@ -83,15 +83,14 @@ size_t get_nr_selected_lines(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
     size_t pos = info->so;
-    CodePoint u = 0;
-    size_t nr_lines = 1;
+    size_t nr_lines = 0;
 
     while (pos < info->eo) {
-        if (u == '\n') {
-            nr_lines++;
-        }
-        pos += block_iter_next_char(&bi, &u);
+        nr_lines++;
+        pos += block_iter_eat_line(&bi);
+        BUG_ON(block_iter_is_eof(&bi) && pos != info->eo);
     }
+
     return nr_lines;
 }
 
@@ -106,5 +105,6 @@ size_t get_nr_selected_chars(const SelectionInfo *info)
         nr_chars++;
         pos += block_iter_next_char(&bi, &u);
     }
+
     return nr_chars;
 }
