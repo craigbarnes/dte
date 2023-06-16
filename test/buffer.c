@@ -139,7 +139,6 @@ static void test_buffer_insert_bytes(TestContext *ctx)
     window_close_current_view(e->window);
 }
 
-
 static const TestEntry tests[] = {
     TEST(test_find_buffer_by_id),
     TEST(test_buffer_mark_lines_changed),

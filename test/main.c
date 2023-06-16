@@ -26,6 +26,7 @@ extern const TestGroup frame_tests;
 extern const TestGroup history_tests;
 extern const TestGroup indent_tests;
 extern const TestGroup option_tests;
+extern const TestGroup shift_tests;
 extern const TestGroup spawn_tests;
 extern const TestGroup status_tests;
 extern const TestGroup syntax_tests;
@@ -205,6 +206,7 @@ int main(void)
     run_tests(&ctx, &bind_tests);
     run_tests(&ctx, &cmdline_tests_late);
     run_tests(&ctx, &buffer_tests);
+    run_tests(&ctx, &shift_tests);
     run_tests(&ctx, &bookmark_tests);
     run_tests(&ctx, &syntax_tests);
     run_tests(&ctx, &dump_tests);
