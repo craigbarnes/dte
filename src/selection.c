@@ -82,11 +82,9 @@ char *view_get_selection(View *view, size_t *size)
 size_t get_nr_selected_lines(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
-    size_t pos = info->so;
     size_t nr_lines = 0;
 
-    while (pos < info->eo) {
-        nr_lines++;
+    for (size_t pos = info->so, eo = info->eo; pos < eo; nr_lines++) {
         pos += block_iter_eat_line(&bi);
         BUG_ON(block_iter_is_eof(&bi) && pos != info->eo);
     }
@@ -97,12 +95,10 @@ size_t get_nr_selected_lines(const SelectionInfo *info)
 size_t get_nr_selected_chars(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
-    size_t pos = info->so;
-    CodePoint u;
     size_t nr_chars = 0;
+    CodePoint u;
 
-    while (pos < info->eo) {
-        nr_chars++;
+    for (size_t pos = info->so, eo = info->eo; pos < eo; nr_chars++) {
         pos += block_iter_next_char(&bi, &u);
     }
 
