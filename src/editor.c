@@ -123,6 +123,7 @@ EditorState *init_editor_state(void)
             .statusline_right = str_intern(" %y,%X  %u  %o  %E%s%b%s%n %t   %p "),
             .tab_bar = true,
             .utf8_bom = false,
+            .window_separator = WINSEP_BAR,
         }
     };
 

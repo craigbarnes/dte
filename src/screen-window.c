@@ -1,22 +1,28 @@
 #include "screen.h"
 
-static void print_separator(Window *window, void *ud)
+static void print_separator(Window *window, void* UNUSED_ARG(ud))
 {
-    Terminal *term = ud;
+    EditorState *e = window->editor;
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
-    if (window->x + window->w == term->width) {
+    unsigned int x = window->x + window->w;
+    if (x == term->width) {
         return;
     }
-    for (int y = 0, h = window->h; y < h; y++) {
-        term_move_cursor(obuf, window->x + window->w, window->y + y);
-        term_add_byte(obuf, '|');
+
+    BUG_ON(x > term->width);
+    const char sep = (e->options.window_separator == WINSEP_BAR) ? '|' : ' ';
+
+    for (unsigned int y = 0, h = window->h; y < h; y++) {
+        term_move_cursor(obuf, x, window->y + y);
+        term_add_byte(obuf, sep);
     }
 }
 
-static void update_separators(Terminal *term, const ColorScheme *colors, const Frame *frame)
+void update_window_separators(EditorState *e)
 {
-    set_builtin_color(term, colors, BC_STATUSLINE);
-    frame_for_each_window(frame, print_separator, term);
+    set_builtin_color(&e->terminal, &e->colors, BC_STATUSLINE);
+    frame_for_each_window(e->root_frame, print_separator, NULL);
 }
 
 static void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *window, bool force)
@@ -83,7 +89,7 @@ void update_all_windows(EditorState *e)
 {
     update_window_sizes(&e->terminal, e->root_frame);
     frame_for_each_window(e->root_frame, update_window_full, NULL);
-    update_separators(&e->terminal, &e->colors, e->root_frame);
+    update_window_separators(e);
 }
 
 static void update_window(EditorState *e, Window *window)

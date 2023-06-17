@@ -147,6 +147,14 @@ static void overwrite_changed(EditorState *e, bool global)
     }
 }
 
+static void window_separator_changed(EditorState *e, bool global)
+{
+    BUG_ON(!global);
+    if (e->root_frame) {
+        update_window_separators(e);
+    }
+}
+
 static void redraw_buffer(EditorState *e, bool global)
 {
     if (e->buffer && !global) {
@@ -420,6 +428,7 @@ static const char *const bool_enum[] = {"false", "true", NULL};
 static const char *const newline_enum[] = {"unix", "dos", NULL};
 static const char *const tristate_enum[] = {"false", "true", "auto", NULL};
 static const char *const save_unmodified_enum[] = {"none", "touch", "full", NULL};
+static const char *const window_separator_enum[] = {"blank", "bar", NULL};
 
 static const char *const detect_indent_values[] = {
     "1", "2", "3", "4", "5", "6", "7", "8",
@@ -471,6 +480,7 @@ static const OptionDesc option_desc[] = {
     UINT_OPT("tab-width", C(tab_width), 1, TAB_WIDTH_MAX, redraw_buffer),
     UINT_OPT("text-width", C(text_width), 1, TEXT_WIDTH_MAX, NULL),
     BOOL_OPT("utf8-bom", G(utf8_bom), NULL),
+    ENUM_OPT("window-separator", G(window_separator), window_separator_enum, window_separator_changed),
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, redraw_buffer),
 };
 

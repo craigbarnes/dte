@@ -49,8 +49,14 @@ void update_status_line(const Window *window);
 void update_range(EditorState *e, const View *view, long y1, long y2);
 
 // screen-window.c
+typedef enum {
+    WINSEP_BLANK, // ASCII space; ' '
+    WINSEP_BAR,   // ASCII vertical bar; '|'
+} WindowSeparatorType;
+
 void update_all_windows(EditorState *e);
 void update_buffer_windows(EditorState *e, const Buffer *buffer);
+void update_window_separators(EditorState *e);
 
 // screen-prompt.c
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;

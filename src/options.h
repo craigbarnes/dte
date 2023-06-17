@@ -78,6 +78,7 @@ typedef struct {
     unsigned int scroll_margin;
     unsigned int crlf_newlines; // Default value for new files
     unsigned int case_sensitive_search; // SearchCaseSensitivity
+    unsigned int window_separator; // WindowSeparatorType
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;
