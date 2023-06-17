@@ -18,32 +18,33 @@ static void test_shift_lines(TestContext *ctx)
     opts->expand_tab = true;
 
     static const char text[] = "    line 1\n    line 2\n";
+    BlockIter *cursor = &view->cursor;
     buffer_insert_bytes(view, text, sizeof(text) - 1);
-    block_iter_goto_offset(&view->cursor, 4);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 4);
+    block_iter_goto_offset(cursor, 4);
+    EXPECT_EQ(block_iter_get_offset(cursor), 4);
 
     CodePoint u = 0;
-    EXPECT_EQ(block_iter_get_char(&view->cursor, &u), 1);
+    EXPECT_EQ(block_iter_get_char(cursor, &u), 1);
     EXPECT_EQ(u, 'l');
 
     shift_lines(view, 1);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 8);
+    EXPECT_EQ(block_iter_get_offset(cursor), 8);
     shift_lines(view, 1);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 12);
+    EXPECT_EQ(block_iter_get_offset(cursor), 12);
     shift_lines(view, 2);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 20);
+    EXPECT_EQ(block_iter_get_offset(cursor), 20);
     shift_lines(view, -1);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 16);
+    EXPECT_EQ(block_iter_get_offset(cursor), 16);
     shift_lines(view, -2);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 8);
+    EXPECT_EQ(block_iter_get_offset(cursor), 8);
     shift_lines(view, -2);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 0);
+    EXPECT_EQ(block_iter_get_offset(cursor), 0);
     shift_lines(view, -1);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 0);
+    EXPECT_EQ(block_iter_get_offset(cursor), 0);
     shift_lines(view, 1);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 4);
+    EXPECT_EQ(block_iter_get_offset(cursor), 4);
     shift_lines(view, -50);
-    EXPECT_EQ(block_iter_get_offset(&view->cursor), 0);
+    EXPECT_EQ(block_iter_get_offset(cursor), 0);
 
     window_close_current_view(e->window);
 }
