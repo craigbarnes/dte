@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "macros.h"
 
-// Work around some musl-targetted toolchains failing to include this
+// Work around some musl-targeted toolchains failing to include this
 // header automatically and thus failing to define __STDC_ISO_10646__
 #if HAS_INCLUDE(<stdc-predef.h>)
 # include <stdc-predef.h>
