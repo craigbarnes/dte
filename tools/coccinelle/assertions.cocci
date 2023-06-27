@@ -9,7 +9,9 @@ can't be optimized away (even in non-debug builds). The exceptions
 listed above were known to be amenable to dead code elimination (i.e.
 being optimized away) at the time they were added here.
 
-See also: https://codeberg.org/dnkl/foot/issues/330#issuecomment-175276
+See also:
+- https://codeberg.org/dnkl/foot/issues/330#issuecomment-175276
+- https://codeberg.org/dnkl/foot/pulls/331#issuecomment-175279
 */
 
 * BUG_ON(<+...f(...)...+>)
