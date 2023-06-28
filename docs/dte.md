@@ -276,7 +276,7 @@ The following environment variables are set by dte:
 :   Program exited normally.
 
 `64`
-:   Command-line usage error (see "synopsis" above).
+:   Command-line usage error (see ["synopsis"] above).
 
 `65`
 :   Input data error (e.g. data specified by the `-s` option).
@@ -335,6 +335,7 @@ input/output of both.
 [history files]: #files
 [command mode]: #command-mode
 [search mode]: #search-mode
+["synopsis"]: #synopsis
 
 [`bind`]: dterc.html#bind
 [`cd`]: dterc.html#cd
