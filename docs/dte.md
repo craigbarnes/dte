@@ -20,7 +20,7 @@ seealso: ["`dterc`", "`dte-syntax`"]
 # Options
 
 `-c` _command_
-:   Run _command_, after reading the rc file and opening any _file_
+:   Run _command_, after reading the [rc file] and opening any _file_
     arguments. See [`dterc`] for available commands.
 
 `-t` _ctag_
@@ -36,20 +36,20 @@ seealso: ["`dterc`", "`dte-syntax`"]
     set appropriately.
 
 `-b` _rcname_
-:   Dump the contents of the built-in rc or syntax file named _rcname_
-    and exit.
+:   Dump the contents of the built-in config or syntax file named
+    _rcname_ and exit.
 
 `-B`
 :   Print a list of all built-in config names that can be used with the
     `-b` option and exit.
 
 `-H`
-:   Don't load history files at startup or save history files on exit (see
-    `FILES` section below). History features will work as usual but will
-    be in-memory only and not persisted to the filesystem.
+:   Don't load [history files] at startup or save history files on
+    exit (see below). History features will work as usual but will be
+    in-memory only and not persisted to the filesystem.
 
 `-R`
-:   Don't read the rc file.
+:   Don't read the [rc file].
 
 `-K`
 :   Start in a special mode that continuously reads input and prints the
@@ -111,10 +111,10 @@ are also various key combinations bound by default:
 :   Redo
 
 `M-x`
-:   Enter command mode
+:   Enter [command mode]
 
 `C-f`
-:   Enter search mode
+:   Enter [search mode]
 
 `F3`
 :   Search next
@@ -189,7 +189,7 @@ The key bindings for search mode are mostly the same as in command mode,
 plus these additional keys:
 
 `M-c`
-:   Toggle case sensitive search option.
+:   Toggle [`case-sensitive-search`] option.
 
 `M-r`
 :   Reverse search direction.
@@ -247,24 +247,24 @@ The following environment variables are set by dte:
 # Files
 
 `$DTE_HOME/rc`
-:   User configuration file. See [`dterc`] for a full list of
-    available commands and options or run "dte -b rc" to see the built-in,
-    default config.
+:   User configuration file. See [`dterc`] for a full list of available
+    [commands][config-commands] and [options] or run "dte -b rc" to see
+    the built-in, [default config].
 
 `$DTE_HOME/syntax/*`
-:   User syntax files. These override the syntax files that come with
-    the program. See [`dte-syntax`] for more information or run
-    "dte -b syntax/dte" for a basic example.
+:   User syntax files. These override the [built-in syntax files] that
+    come with the program. See [`dte-syntax`] for more information or
+    run "dte -b syntax/dte" for a basic example.
 
 `$DTE_HOME/file-history`
 :   History of edited files and cursor positions. Used only if the
     [`file-history`] option is enabled.
 
 `$DTE_HOME/command-history`
-:   History of `dterc` commands used while in command mode.
+:   History of `dterc` commands used while in [command mode].
 
 `$DTE_HOME/search-history`
-:   History of search patterns used while in search mode.
+:   History of search patterns used while in [search mode].
 
 `$XDG_RUNTIME_DIR/dte-locks`
 :   List of files currently open in a dte process (if the [`lock-files`]
@@ -326,6 +326,16 @@ input/output of both.
 
 [`dterc`]: dterc.html
 [`dte-syntax`]: dte-syntax.html
+[config-commands]: dterc.html#configuration-commands
+[options]: dterc.html#options
+[`case-sensitive-search`]: dterc.html#case-sensitive-search
+[default config]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/rc
+[built-in syntax files]: https://gitlab.com/craigbarnes/dte/-/tree/master/config/syntax
+[rc file]: #files
+[history files]: #files
+[command mode]: #command-mode
+[search mode]: #search-mode
+
 [`bind`]: dterc.html#bind
 [`cd`]: dterc.html#cd
 [`show bind`]: dterc.html#show
@@ -336,6 +346,7 @@ input/output of both.
 [`quit`]: dterc.html#quit
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
+
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
 [`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html

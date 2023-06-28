@@ -37,8 +37,8 @@ set appropriately.
 .PP
 .TP
 \fB\-b\fR \fIrcname\fR
-Dump the contents of the built\-in rc or syntax file named \fIrcname\fR
-and exit.
+Dump the contents of the built\-in config or syntax file named
+\fIrcname\fR and exit.
 .PP
 .TP
 \fB\-B\fR
@@ -47,9 +47,9 @@ Print a list of all built\-in config names that can be used with the
 .PP
 .TP
 \fB\-H\fR
-Don't load history files at startup or save history files on exit (see
-\fBFILES\fR section below). History features will work as usual but will
-be in\-memory only and not persisted to the filesystem.
+Don't load history files at startup or save history files on
+exit (see below). History features will work as usual but will be
+in\-memory only and not persisted to the filesystem.
 .PP
 .TP
 \fB\-R\fR
@@ -225,7 +225,7 @@ plus these additional keys:
 .P
 .TP
 \fBM\-c\fR
-Toggle case sensitive search option.
+Toggle \fBcase\-sensitive\-search\fR option.
 .PP
 .TP
 \fBM\-r\fR
@@ -294,15 +294,15 @@ directory \fBcd \-\fR switches to.
 .SH FILES
 .TP
 \fB$DTE_HOME/rc\fR
-User configuration file. See \fBdterc\fR(5) for a full list of
-available commands and options or run "dte \-b rc" to see the built\-in,
-default config.
+User configuration file. See \fBdterc\fR(5) for a full list of available
+commands and options or run "dte \-b rc" to see
+the built\-in, default config.
 .PP
 .TP
 \fB$DTE_HOME/syntax/*\fR
-User syntax files. These override the syntax files that come with
-the program. See \fBdte\-syntax\fR(5) for more information or run
-"dte \-b syntax/dte" for a basic example.
+User syntax files. These override the built\-in syntax files that
+come with the program. See \fBdte\-syntax\fR(5) for more information or
+run "dte \-b syntax/dte" for a basic example.
 .PP
 .TP
 \fB$DTE_HOME/file\-history\fR
