@@ -98,6 +98,7 @@ static void test_exec_config(TestContext *ctx)
         "pipe-to.txt",
         "redo1.txt",
         "redo2.txt",
+        "replace.txt",
         "shift.txt",
     };
 

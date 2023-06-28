@@ -1,0 +1,9 @@
+open -e UTF-8
+insert 'AA BB XX YY 11 22'
+replace -g [A-Z] '&.'
+replace -g [0-9]
+replace X _
+replace 'B\.(B)\.' '\1#'
+replace ' +$'
+save -f build/test/replace.txt
+close
