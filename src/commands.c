@@ -1525,8 +1525,9 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
         {'i', REPLACE_IGNORE_CASE},
     };
 
+    const char *replacement = a->args[1] ? a->args[1] : "";
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    return reg_replace(e->view, a->args[0], a->args[1], flags);
+    return reg_replace(e->view, a->args[0], replacement, flags);
 }
 
 static bool cmd_right(EditorState *e, const CommandArgs *a)
@@ -2426,7 +2427,7 @@ static const Command cmds[] = {
     {"redo", "", false, 0, 1, cmd_redo},
     {"refresh", "", false, 0, 0, cmd_refresh},
     {"repeat", "-", false, 2, -1, cmd_repeat},
-    {"replace", "bcgi", false, 2, 2, cmd_replace},
+    {"replace", "bcgi", false, 1, 2, cmd_replace},
     {"right", "c", false, 0, 0, cmd_right},
     {"save", "Bbde=fpu", false, 0, 1, cmd_save},
     {"scroll-down", "", false, 0, 0, cmd_scroll_down},
