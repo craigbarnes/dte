@@ -114,7 +114,14 @@ void end_update(EditorState *e)
 
     e->buffer->changed_line_min = LONG_MAX;
     e->buffer->changed_line_max = -1;
-    frame_for_each_window(e->root_frame, clear_update_tabbar, NULL);
+
+    const Frame *root = e->root_frame;
+    if (root->window) {
+        // Only 1 window to update
+        clear_update_tabbar(root->window, NULL);
+    } else {
+        frame_for_each_window(root, clear_update_tabbar, NULL);
+    }
 }
 
 void start_update(Terminal *term)

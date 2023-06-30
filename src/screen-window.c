@@ -7,6 +7,7 @@ static void print_separator(Window *window, void* UNUSED_ARG(ud))
     TermOutputBuffer *obuf = &term->obuf;
     unsigned int x = window->x + window->w;
     if (x == term->width) {
+        // Window is on right edge; no separator needed
         return;
     }
 
@@ -21,6 +22,11 @@ static void print_separator(Window *window, void* UNUSED_ARG(ud))
 
 void update_window_separators(EditorState *e)
 {
+    if (e->root_frame->window) {
+        // Only 1 window in use; no separators needed
+        return;
+    }
+
     set_builtin_color(&e->terminal, &e->colors, BC_STATUSLINE);
     frame_for_each_window(e->root_frame, print_separator, NULL);
 }
