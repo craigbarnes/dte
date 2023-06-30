@@ -19,6 +19,6 @@ bool file_location_go(Window *window, const FileLocation *loc) NONNULL_ARGS WARN
 void file_location_free(FileLocation *loc) NONNULL_ARGS;
 
 void bookmark_push(PointerArray *bookmarks, FileLocation *loc) NONNULL_ARGS;
-void bookmark_pop(Window *window, PointerArray *bookmarks) NONNULL_ARGS;
+void bookmark_pop(PointerArray *bookmarks, Window *window) NONNULL_ARGS;
 
 #endif

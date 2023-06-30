@@ -89,7 +89,7 @@ void bookmark_push(PointerArray *bookmarks, FileLocation *loc)
     ptr_array_append(bookmarks, loc);
 }
 
-void bookmark_pop(Window *window, PointerArray *bookmarks)
+void bookmark_pop(PointerArray *bookmarks, Window *window)
 {
     void **ptrs = bookmarks->ptrs;
     size_t count = bookmarks->count;

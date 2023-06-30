@@ -252,12 +252,13 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
 
 static bool cmd_bookmark(EditorState *e, const CommandArgs *a)
 {
+    PointerArray *bookmarks = &e->bookmarks;
     if (has_flag(a, 'r')) {
-        bookmark_pop(e->window, &e->bookmarks);
+        bookmark_pop(bookmarks, e->window);
         return true;
     }
 
-    bookmark_push(&e->bookmarks, get_current_file_location(e->view));
+    bookmark_push(bookmarks, get_current_file_location(e->view));
     return true;
 }
 
@@ -2052,7 +2053,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
 static bool cmd_tag(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
-        bookmark_pop(e->window, &e->bookmarks);
+        bookmark_pop(&e->bookmarks, e->window);
         return true;
     }
 
