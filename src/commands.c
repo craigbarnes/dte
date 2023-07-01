@@ -2040,8 +2040,11 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
     }
 
     ui_end(e);
+    LOG_INFO("suspending");
     bool suspended = !kill(0, SIGSTOP);
-    if (!suspended) {
+    if (suspended) {
+        LOG_INFO("resumed");
+    } else {
         error_msg_errno("kill");
     }
 
