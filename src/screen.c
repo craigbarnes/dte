@@ -138,18 +138,18 @@ void update_window_sizes(Terminal *term, Frame *frame)
 
 void update_screen_size(Terminal *term, Frame *root_frame)
 {
-    unsigned int width, height;
-    if (!term_get_size(&width, &height)) {
+    unsigned int w, h;
+    if (!term_get_size(&w, &h) || (w == term->width && h == term->height)) {
         return;
     }
 
     // TODO: remove minimum width/height and instead make update_screen()
     // do something sensible when the terminal dimensions are tiny
-    term->width = MAX(width, 3);
-    term->height = MAX(height, 3);
+    term->width = MAX(w, 3);
+    term->height = MAX(h, 3);
 
     update_window_sizes(term, root_frame);
-    LOG_INFO("terminal size: %ux%u", width, height);
+    LOG_INFO("terminal size: %ux%u", w, h);
 }
 
 NOINLINE
