@@ -268,6 +268,8 @@ static String term_read_detected_paste(TermInputBuffer *input)
     }
 
     string_replace_byte(&str, '\r', '\n');
+    const char *plural = (str.len == 1) ? "" : "s";
+    LOG_DEBUG("detected paste of %zu byte%s", str.len, plural);
     return str;
 }
 
@@ -306,14 +308,14 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
     if (unlikely(remainder)) {
         // Copy anything still in the buffer beyond the end delimiter
         // into the normal input buffer
-        LOG_INFO("remainder after bracketed paste: %zu", remainder);
+        LOG_DEBUG("remainder after bracketed paste: %zu", remainder);
         BUG_ON(remainder > TERM_INBUF_SIZE);
         memcpy(input->buf, start + final_chunk_len, remainder);
         input->len = remainder;
     }
 
     const char *plural = (str.len == 1) ? "" : "s";
-    LOG_INFO("received bracketed paste of %zu byte%s", str.len, plural);
+    LOG_DEBUG("received bracketed paste of %zu byte%s", str.len, plural);
     string_replace_byte(&str, '\r', '\n');
     return str;
 
