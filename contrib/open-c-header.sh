@@ -1,9 +1,8 @@
 #!/bin/sh
 set -eu
 
-path="$1"
-
-case "$path" in
-    *.c) echo "$path" | sed 's|\.c$|.h|' ;;
-    *.h) echo "$path" | sed 's|\.h$|.c|' ;;
-esac
+echo "$1" | sed -n '
+    /\.c$/ {s/c$/h/p; q}
+    /\.h$/ {s/h$/c/p; q}
+    q
+'
