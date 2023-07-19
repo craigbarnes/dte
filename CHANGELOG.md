@@ -1,6 +1,9 @@
 Releases
 ========
 
+All releases and notable changes will be documented here, using a format
+similar to the one described by [Keep a Changelog].
+
 v1.11.1 (latest release)
 ------------------------
 
@@ -600,6 +603,7 @@ system except a somewhat recent kernel.
 
 
 [website]: https://craigbarnes.gitlab.io/dte/
+[Keep a Changelog]: https://keepachangelog.com/
 [Contour]: https://github.com/contour-terminal/contour
 [WezTerm]: https://wezfurlong.org/wezterm/
 [Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
