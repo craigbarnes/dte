@@ -444,6 +444,9 @@ static void test_cached_command_new(TestContext *ctx)
         "insert -xyz321", // Invalid flags
         "alias 1 2 3", // Too many arguments
         "alias", // Too few arguments
+        "insert 'xyz.", // CMDERR_UNCLOSED_SQUOTE
+        "insert \"xyz", // CMDERR_UNCLOSED_DQUOTE
+        "insert xyz\\", // CMDERR_UNEXPECTED_EOF
     };
 
     for (size_t i = 0; i < ARRAYLEN(uncacheable); i++) {
