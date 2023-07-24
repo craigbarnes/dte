@@ -5,6 +5,11 @@
 #include "util/ascii.h"
 #include "window.h"
 
+static const char *dummy_lookup_alias(const char* UNUSED_ARG(name), void* UNUSED_ARG(ud))
+{
+    return "insert \"...";
+}
+
 static void test_normal_command_errors(TestContext *ctx)
 {
     static const struct {
@@ -129,6 +134,38 @@ static void test_normal_command_errors(TestContext *ctx)
 
     window_close_current_view(e->window);
     set_view(e->window->view);
+
+    // Special case errors produced by run_command():
+    // ----------------------------------------------
+
+    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    runner.lookup_alias = NULL;
+    clear_error();
+    EXPECT_FALSE(handle_command(&runner, "_xyz"));
+    bool is_error = false;
+    const char *msg = get_msg(&is_error);
+    EXPECT_STREQ(msg, "No such command: _xyz");
+    EXPECT_TRUE(is_error);
+
+    runner.lookup_alias = dummy_lookup_alias;
+    clear_error();
+    EXPECT_FALSE(handle_command(&runner, "_abc"));
+    msg = get_msg(&is_error);
+    EXPECT_TRUE(msg && str_has_prefix(msg, "Parsing alias _abc:"));
+    EXPECT_TRUE(is_error);
+
+    EXPECT_NULL(current_config.file);
+    current_config.file = "example";
+    current_config.line = 1;
+    runner.lookup_alias = NULL;
+    clear_error();
+    EXPECT_FALSE(handle_command(&runner, "quit"));
+    msg = get_msg(&is_error);
+    EXPECT_STREQ(msg, "example:1: Command quit not allowed in config file");
+    EXPECT_TRUE(is_error);
+    current_config.file = NULL;
+
+    // TODO: Cover alias recursion overflow check in run_commands()
 }
 
 static const TestEntry tests[] = {
