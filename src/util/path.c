@@ -93,30 +93,26 @@ char *path_relative(const char *abs, const char *cwd)
     return filename;
 }
 
+static bool path_has_dir_prefix(const char *path, size_t pathlen, const StringView *dir)
+{
+    return strn_has_strview_prefix(path, pathlen, dir) && path[dir->length] == '/';
+}
+
 char *short_filename_cwd(const char *abs, const char *cwd, const StringView *home)
 {
     char *rel = path_relative(abs, cwd);
     size_t abs_len = strlen(abs);
     size_t rel_len = strlen(rel);
-    if (abs_len < rel_len) {
-        // Prefer absolute if relative isn't shorter
-        free(rel);
-        rel = xstrdup(abs);
-        rel_len = abs_len;
-    }
+    size_t suffix_len = (abs_len - home->length) + 1;
 
-    size_t home_len = home->length;
-    if (strn_has_strview_prefix(abs, abs_len, home) && abs[home_len] == '/') {
-        size_t suffix_len = (abs_len - home_len) + 1;
-        if (suffix_len < rel_len) {
-            // Prefer absolute path in tilde notation (e.g. "~/abs/path")
-            // if shorter than relative
-            free(rel);
-            char *tilde = xmalloc(suffix_len + 1);
-            tilde[0] = '~';
-            memcpy(tilde + 1, abs + home_len, suffix_len);
-            return tilde;
-        }
+    if (path_has_dir_prefix(abs, abs_len, home) && suffix_len < rel_len) {
+        // Prefer absolute in tilde notation (e.g. "~/abs/path"), if applicable
+        // and shorter than relative
+        rel[0] = '~';
+        memcpy(rel + 1, abs + home->length, suffix_len);
+    } else if (abs_len < rel_len) {
+        // Prefer absolute, if shorter than relative
+        memcpy(rel, abs, abs_len + 1);
     }
 
     return rel;
