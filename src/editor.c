@@ -59,7 +59,7 @@ static void set_and_check_locale(void)
         fallback = setlocale(LC_CTYPE, fallbacks[i]);
     }
     if (fallback) {
-        LOG_INFO("using fallback locale for LC_CTYPE: %s", fallback);
+        LOG_NOTICE("using fallback locale for LC_CTYPE: %s", fallback);
         return;
     }
 

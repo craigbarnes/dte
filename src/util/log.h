@@ -13,6 +13,7 @@ typedef enum {
     LOG_LEVEL_CRITICAL,
     LOG_LEVEL_ERROR,
     LOG_LEVEL_WARNING,
+    LOG_LEVEL_NOTICE,
     LOG_LEVEL_INFO,
     LOG_LEVEL_DEBUG,
     LOG_LEVEL_TRACE,
@@ -23,6 +24,7 @@ typedef enum {
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_ERRNO(prefix) LOG_ERROR("%s: %s", prefix, strerror(errno))
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
+#define LOG_NOTICE(...) LOG(LOG_LEVEL_NOTICE, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
 
 #if DEBUG >= 2

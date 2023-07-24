@@ -82,6 +82,7 @@ static void test_init(TestContext *ctx)
     LOG_CRITICAL("%s: testing LOG_CRITICAL()", __func__);
     LOG_ERROR("%s: testing LOG_ERROR()", __func__);
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
+    LOG_NOTICE("%s: testing LOG_NOTICE()", __func__);
     LOG_INFO("%s: testing LOG_INFO()", __func__);
 
     EditorState *e = init_editor_state();

@@ -2547,6 +2547,7 @@ static void test_log_level_from_str(TestContext *ctx)
     EXPECT_EQ(log_level_from_str("crit"), LOG_LEVEL_CRITICAL);
     EXPECT_EQ(log_level_from_str("error"), LOG_LEVEL_ERROR);
     EXPECT_EQ(log_level_from_str("warning"), LOG_LEVEL_WARNING);
+    EXPECT_EQ(log_level_from_str("notice"), LOG_LEVEL_NOTICE);
     EXPECT_EQ(log_level_from_str("info"), LOG_LEVEL_INFO);
     EXPECT_EQ(log_level_from_str("debug"), LOG_LEVEL_DEBUG);
     EXPECT_EQ(log_level_from_str("trace"), LOG_LEVEL_TRACE);
@@ -2567,6 +2568,7 @@ static void test_log_level_to_str(TestContext *ctx)
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_CRITICAL), "crit");
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_ERROR), "error");
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_WARNING), "warning");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_NOTICE), "notice");
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_INFO), "info");
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_DEBUG), "debug");
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_TRACE), "trace");
