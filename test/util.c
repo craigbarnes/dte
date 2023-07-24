@@ -2436,6 +2436,24 @@ static void test_xfopen(TestContext *ctx)
     }
 }
 
+static void test_xstdio(TestContext *ctx)
+{
+    FILE *f = xfopen("/dev/null", "r+", O_CLOEXEC, 0666);
+    ASSERT_NONNULL(f);
+
+    char buf[16];
+    EXPECT_NULL(xfgets(buf, sizeof(buf), f));
+
+    EXPECT_TRUE(xfputs("str", f) != EOF);
+    EXPECT_EQ(xfputc(' ', f), ' ');
+    EXPECT_EQ(xfprintf(f, "fmt %d", 42), 6);
+    EXPECT_EQ(xfflush(f), 0);
+
+    if (likely(f)) {
+        EXPECT_EQ(fclose(f), 0);
+    }
+}
+
 static void test_fd_set_cloexec(TestContext *ctx)
 {
     int fd = open("/dev/null", O_RDONLY);
@@ -2648,6 +2666,7 @@ static const TestEntry tests[] = {
     TEST(test_mem_intern),
     TEST(test_read_file),
     TEST(test_xfopen),
+    TEST(test_xstdio),
     TEST(test_fd_set_cloexec),
     TEST(test_fd_set_nonblock),
     TEST(test_fork_exec),
