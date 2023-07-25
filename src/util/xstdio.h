@@ -14,6 +14,7 @@ static inline FILE *xfopen(const char *path, const char *mode, int flags, mode_t
     BUG_ON(mode[0] == '\0');
     bool plus = (mode[1] == '+');
     BUG_ON(mode[plus ? 2 : 1] != '\0');
+    BUG_ON(flags != (flags & (O_CLOEXEC | O_NOCTTY | O_NOFOLLOW)));
 
     switch (mode[0]) {
     case 'a':
