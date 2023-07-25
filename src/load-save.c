@@ -370,6 +370,9 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
     }
 
 #if HAVE_MKOSTEMP
+    // Note: the O_CLOEXEC flag is set here just for precautionary reasons.
+    // No exec*() calls can occur between this fd being opened and closed,
+    // unless a bug creeps into the code.
     int fd = mkostemp(buf, O_CLOEXEC);
 #else
     int fd = mkstemp(buf);
