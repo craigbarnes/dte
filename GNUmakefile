@@ -97,7 +97,7 @@ uninstall-appstream:
 
 check-tests: $(test) all
 	$(E) EXEC '$(test)'
-	$(Q) ./$(test)
+	$(Q) TZ=UTC ./$(test)
 
 check-opts: $(dte)
 	$(E) EXEC 'test/check-opts.sh'

@@ -2619,11 +2619,11 @@ static void test_timespec_to_str(TestContext *ctx)
         ASSERT_TRUE(len >= 24);
         ASSERT_TRUE(len < sizeof(buf));
 
-        // TODO: check resulting string, but in a way that doesn't
-        // assume a specific timezone offset:
-        //
-        //buf[24] = '\0';
-        //EXPECT_STREQ(buf, "1970-01-01 02:12:01.9876");
+        if (timezone == 0 && daylight == 0) {
+            EXPECT_STREQ(buf, "1970-01-01 01:12:01.9876 +0000");
+        } else {
+            LOG_WARNING("non-zero timezone/daylight; skipping timespec_to_str() test");
+        }
 
         EXPECT_NONNULL(timespec_to_str(&ts, buf, len + 1));
 
