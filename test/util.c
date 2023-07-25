@@ -29,6 +29,7 @@
 #include "util/string-view.h"
 #include "util/string.h"
 #include "util/strtonum.h"
+#include "util/time-util.h"
 #include "util/unicode.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -2599,6 +2600,46 @@ static void test_log_level_to_str(TestContext *ctx)
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_TRACE), "trace");
 }
 
+static void test_timespec_to_str(TestContext *ctx)
+{
+    struct timespec ts = {
+        .tv_sec = 4321,
+        .tv_nsec = 9876,
+    };
+
+    EXPECT_TRUE(timespecs_equal(&ts, &ts));
+
+    char buf[64];
+    const char *r = timespec_to_str(&ts, buf, sizeof(buf));
+    EXPECT_NONNULL(r);
+
+    if (likely(r)) {
+        ASSERT_PTREQ(r, buf);
+        EXPECT_TRUE(str_has_prefix(buf, "1970-01-01 02:12:01.9876 "));
+
+        size_t len = strlen(buf);
+        EXPECT_NONNULL(timespec_to_str(&ts, buf, len + 1));
+        ASSERT_TRUE(len >= 1);
+
+        errno = 0;
+        EXPECT_NULL(timespec_to_str(&ts, buf, len));
+        EXPECT_EQ(errno, ENOBUFS);
+
+        errno = 0;
+        EXPECT_NULL(timespec_to_str(&ts, buf, len - 1));
+        EXPECT_EQ(errno, ENOBUFS);
+    }
+
+    errno = 0;
+    EXPECT_NULL(timespec_to_str(&ts, buf, 1));
+    EXPECT_EQ(errno, ENOBUFS);
+
+    errno = 0;
+    ts.tv_nsec = 1000000000L;
+    EXPECT_NULL(timespec_to_str(&ts, buf, sizeof(buf)));
+    EXPECT_EQ(errno, EINVAL);
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -2681,6 +2722,7 @@ static const TestEntry tests[] = {
     TEST(test_xmemmem),
     TEST(test_log_level_from_str),
     TEST(test_log_level_to_str),
+    TEST(test_timespec_to_str),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);
