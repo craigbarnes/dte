@@ -369,7 +369,12 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
         return -1;
     }
 
+#if HAVE_MKOSTEMP
+    int fd = mkostemp(buf, O_CLOEXEC);
+#else
     int fd = mkstemp(buf);
+#endif
+
     if (fd < 0) {
         // No write permission to the directory?
         buf[0] = '\0';
