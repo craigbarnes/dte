@@ -223,11 +223,16 @@ The following environment variables are inspected at startup:
     `24bit`.
 
 The following environment variables affect various library routines used
-by dte and are inspected on every use:
+by dte:
 
 `PATH`
-:   Colon-delimited list of directory prefixes, used by [`execvp`]
+:   Colon-delimited list of directory prefixes, as used by [`execvp`]
     to find executables.
+
+`TZ`
+:   Timezone specification, as used by [`tzset`] to initialize time
+    conversion information. This affects file modification times shown
+    by the [`show buffer`] command.
 
 The following environment variables are set by dte:
 
@@ -340,6 +345,7 @@ input/output of both.
 [`bind`]: dterc.html#bind
 [`cd`]: dterc.html#cd
 [`show bind`]: dterc.html#show
+[`show buffer`]: dterc.html#show
 [`next`]: dterc.html#next
 [`prev`]: dterc.html#prev
 [`open`]: dterc.html#open
@@ -351,3 +357,4 @@ input/output of both.
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
 [`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html
+[`tzset`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/tzset.html

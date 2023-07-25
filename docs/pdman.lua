@@ -138,6 +138,7 @@ local crossrefs = {
     dterc = "(5)",
     ["dte-syntax"] = "(5)",
     execvp = "(3)",
+    tzset = "(3)",
     glob = "(7)",
     regex = "(7)",
     stdout = "(3)",

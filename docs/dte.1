@@ -266,12 +266,18 @@ Enables support for 24\-bit terminal colors, if set to \fBtruecolor\fR or
 \fB24bit\fR.
 .PP
 The following environment variables affect various library routines used
-by dte and are inspected on every use:
+by dte:
 .P
 .TP
 \fBPATH\fR
-Colon\-delimited list of directory prefixes, used by \fBexecvp\fR(3)
+Colon\-delimited list of directory prefixes, as used by \fBexecvp\fR(3)
 to find executables.
+.PP
+.TP
+\fBTZ\fR
+Timezone specification, as used by \fBtzset\fR(3) to initialize time
+conversion information. This affects file modification times shown
+by the \fBshow buffer\fR command.
 .PP
 The following environment variables are set by dte:
 .P
