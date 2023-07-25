@@ -2615,11 +2615,14 @@ static void test_timespec_to_str(TestContext *ctx)
 
     if (likely(r)) {
         ASSERT_PTREQ(r, buf);
-        EXPECT_TRUE(str_has_prefix(buf, "1970-01-01 02:12:01.9876 "));
+        size_t len = strnlen(buf, sizeof(buf));
+        ASSERT_TRUE(len >= 24);
+        ASSERT_TRUE(len < sizeof(buf));
 
-        size_t len = strlen(buf);
+        buf[24] = '\0';
+        EXPECT_STREQ(buf, "1970-01-01 02:12:01.9876");
+
         EXPECT_NONNULL(timespec_to_str(&ts, buf, len + 1));
-        ASSERT_TRUE(len >= 1);
 
         errno = 0;
         EXPECT_NULL(timespec_to_str(&ts, buf, len));
