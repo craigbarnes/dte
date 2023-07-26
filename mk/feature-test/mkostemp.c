@@ -16,6 +16,7 @@
 
 int main(void)
 {
-    int fd = (mkostemp)("tmp-XXXXXX", O_CLOEXEC);
+    char buf[] = "tmp-XXXXXX";
+    int fd = (mkostemp)(buf, O_CLOEXEC);
     return (fd < 0);
 }
