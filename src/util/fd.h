@@ -13,7 +13,7 @@
  * using these functions should do a read-modify-write operation on
  * them, rather than assuming that only the values defined by this
  * volume of POSIX.1-2017 are valid. It is a common error to forget
- * this, particularly in the case of F_SETFD.
+ * this, particularly in the case of F_SETFD."
  *
  * https://pubs.opengroup.org/onlinepubs/9699919799/functions/fcntl.html#tag_16_122_07
  */
