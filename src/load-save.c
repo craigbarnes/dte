@@ -352,6 +352,34 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
     return true;
 }
 
+static int xmkstemp_cloexec(char *path_template)
+{
+    int fd;
+#if HAVE_MKOSTEMP
+    do {
+        fd = mkostemp(path_template, O_CLOEXEC);
+    } while (unlikely(fd == -1 && errno == EINTR));
+    return fd;
+#endif
+
+    do {
+        fd = mkstemp(path_template);
+    } while (unlikely(fd == -1 && errno == EINTR));
+
+    if (fd == -1) {
+        return fd;
+    }
+
+    if (unlikely(!fd_set_cloexec(fd, true))) {
+        int e = errno;
+        xclose(fd);
+        errno = e;
+        return -1;
+    }
+
+    return fd;
+}
+
 static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_t buflen)
 {
     if (str_has_prefix(filename, "/tmp/")) {
@@ -369,16 +397,8 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
         return -1;
     }
 
-#if HAVE_MKOSTEMP
-    // Note: the O_CLOEXEC flag is set here just for precautionary reasons.
-    // No exec*() calls can occur between this fd being opened and closed,
-    // unless a bug creeps into the code.
-    int fd = mkostemp(buf, O_CLOEXEC);
-#else
-    int fd = mkstemp(buf);
-#endif
-
-    if (fd < 0) {
+    int fd = xmkstemp_cloexec(buf);
+    if (fd == -1) {
         // No write permission to the directory?
         buf[0] = '\0';
         return -1;
