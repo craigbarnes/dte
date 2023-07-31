@@ -409,13 +409,14 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
     bool clipboard = has_flag(a, 'b');
     bool primary = has_flag(a, 'p');
     bool internal = has_flag(a, 'i') || !(clipboard || primary);
+    bool osc52 = (clipboard || primary) && term->features & TFLAG_OSC52_COPY;
 
     if (text) {
         size_t len = strlen(text);
         if (internal) {
             record_copy(&e->clipboard, xstrdup(text), len, false);
         }
-        if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
+        if (osc52) {
             if (!term_osc52_copy(&term->obuf, text, len, clipboard, primary)) {
                 error_msg_errno("OSC 52 copy failed");
             }
@@ -445,7 +446,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         copy(&e->clipboard, view, size, line_copy);
     }
 
-    if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
+    if (osc52) {
         if (internal) {
             view->cursor = save;
             if (view->selection) {
