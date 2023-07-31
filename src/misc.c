@@ -750,14 +750,12 @@ void change_case(View *view, char mode)
     free(src);
 
     if (move && dst.len > 0) {
+        size_t skip = dst.len;
         if (was_selecting) {
             // Move cursor back to where it was
-            size_t idx = dst.len;
-            u_prev_char(dst.buffer, &idx);
-            block_iter_skip_bytes(&view->cursor, idx);
-        } else {
-            block_iter_skip_bytes(&view->cursor, dst.len);
+            u_prev_char(dst.buffer, &skip);
         }
+        block_iter_skip_bytes(&view->cursor, skip);
     }
 
     string_free(&dst);
