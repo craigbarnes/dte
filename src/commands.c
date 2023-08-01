@@ -1425,6 +1425,7 @@ static bool cmd_refresh(EditorState *e, const CommandArgs *a)
 
 static bool repeat_insert(EditorState *e, const char *str, unsigned int count, bool move_after)
 {
+    BUG_ON(count < 2);
     size_t str_len = strlen(str);
     size_t bufsize;
     if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
@@ -1442,6 +1443,7 @@ static bool repeat_insert(EditorState *e, const char *str, unsigned int count, b
     char tmp[4096];
     if (str_len == 1) {
         memset(buf, str[0], bufsize);
+        LOG_DEBUG("Optimized %u inserts of 1 byte into 1 memset()", count);
         goto insert;
     } else if (bufsize < 2 * sizeof(tmp) || str_len > sizeof(tmp) / 8) {
         for (size_t i = 0; i < count; i++) {
@@ -1506,7 +1508,7 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
     }
 
     CommandFunc fn = cmd->cmd;
-    if (fn == (CommandFunc)cmd_insert && !has_flag(&a2, 'k')) {
+    if (count > 1 && fn == (CommandFunc)cmd_insert && !has_flag(&a2, 'k')) {
         // Use optimized implementation for repeated "insert"
         return repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
     }
