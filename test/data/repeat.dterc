@@ -8,7 +8,7 @@ repeat 2 insert baz
 repeat 3 insert -km .
 repeat 2 insert -k ,
 repeat 1 insert {}
-repeat 2048 insert test
+repeat 2050 insert test
 undo
 save -f build/test/repeat.txt
 close

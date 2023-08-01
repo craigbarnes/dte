@@ -59,6 +59,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"quit 9000", "exit code should be between"},
         {"redo 8", "nothing to redo"},
         {"repeat x up", "not a valid repeat count"},
+        {"repeat 2 invalid-cmd", "no such command: invalid-cmd"},
         {"replace '' x", "must contain at least 1 character"},
         {"replace e5fwHgHuCFVZd x", "not found"},
         {"save -bB", "flags -b and -B can't be used together"},
