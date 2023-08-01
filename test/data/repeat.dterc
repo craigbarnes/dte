@@ -1,0 +1,14 @@
+open
+repeat 0 insert -m x
+repeat 1 insert -m y
+repeat 2 insert -m z
+repeat 0 insert -m foo
+repeat 1 insert -m bar
+repeat 2 insert baz
+repeat 3 insert -km .
+repeat 2 insert -k ,
+repeat 1 insert {}
+repeat 2048 insert test
+undo
+save -f build/test/repeat.txt
+close

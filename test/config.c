@@ -100,6 +100,7 @@ static void test_exec_config(TestContext *ctx)
         "redo2.txt",
         "replace.txt",
         "shift.txt",
+        "repeat.txt",
     };
 
     // Delete output files left over from previous runs
