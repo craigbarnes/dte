@@ -16,7 +16,7 @@ func(...)
 }
 
 @@
-identifier func;
+identifier func !~ "reg_replace";
 expression x, y;
 binary operator cmp = {>, >=};
 position p;
