@@ -18,7 +18,8 @@ FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
 DOCFILES = $(call GITATTRS, xml markdown)
-SPATCHFILES = $(foreach f, arraylen assertions minmax tailcall wrap, tools/coccinelle/$f.cocci)
+SPATCHNAMES = arraylen assertions minmax tailcall wrap perf
+SPATCHFILES = $(foreach f, $(SPATCHNAMES), tools/coccinelle/$f.cocci)
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
