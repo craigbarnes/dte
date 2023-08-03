@@ -2,9 +2,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "highlight.h"
-#include "block-iter.h"
 #include "syntax/merge.h"
-#include "syntax/syntax.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"
@@ -285,9 +283,15 @@ static void block_iter_move_down(BlockIter *bi, size_t count)
     }
 }
 
-static ssize_t fill_hole(Buffer *buffer, BlockIter *bi, const ColorScheme *cs, ssize_t sidx, ssize_t eidx)
-{
-    void **ptrs = buffer->line_start_states.ptrs;
+static ssize_t fill_hole (
+    Syntax *syn,
+    PointerArray *line_start_states,
+    const ColorScheme *cs,
+    BlockIter *bi,
+    ssize_t sidx,
+    ssize_t eidx
+) {
+    void **ptrs = line_start_states->ptrs;
     ssize_t idx = sidx;
 
     while (idx < eidx) {
@@ -295,7 +299,7 @@ static ssize_t fill_hole(Buffer *buffer, BlockIter *bi, const ColorScheme *cs, s
         State *st;
         fill_line_nl_ref(bi, &line);
         block_iter_eat_line(bi);
-        highlight_line(buffer->syn, ptrs[idx++], cs, &line, &st);
+        highlight_line(syn, ptrs[idx++], cs, &line, &st);
 
         if (ptrs[idx] == st) {
             // Was not invalidated and didn't change
@@ -316,16 +320,20 @@ static ssize_t fill_hole(Buffer *buffer, BlockIter *bi, const ColorScheme *cs, s
     return idx - sidx;
 }
 
-void hl_fill_start_states(Buffer *buffer, const ColorScheme *cs, size_t line_nr)
-{
-    BlockIter bi = block_iter(buffer);
-    PointerArray *s = &buffer->line_start_states;
-    ssize_t current_line = 0;
-    ssize_t idx = 0;
-
-    if (!buffer->syn) {
+void hl_fill_start_states (
+    Syntax *syn,
+    PointerArray *line_start_states,
+    const ColorScheme *cs,
+    BlockIter *bi,
+    size_t line_nr
+) {
+    if (!syn) {
         return;
     }
+
+    PointerArray *s = line_start_states;
+    ssize_t current_line = 0;
+    ssize_t idx = 0;
 
     // NOTE: "+ 2" so that you don't have to worry about overflow in fill_hole()
     resize_line_states(s, line_nr + 2);
@@ -346,29 +354,29 @@ void hl_fill_start_states(Buffer *buffer, const ColorScheme *cs, size_t line_nr)
 
         // Go to line before first hole
         idx--;
-        block_iter_move_down(&bi, idx - current_line);
+        block_iter_move_down(bi, idx - current_line);
         current_line = idx;
 
         // NOTE: might not fill entire hole, which is ok
-        ssize_t count = fill_hole(buffer, &bi, cs, idx, last);
+        ssize_t count = fill_hole(syn, s, cs, bi, idx, last);
         idx += count;
         current_line += count;
     }
 
     // Add new
-    block_iter_move_down(&bi, s->count - 1 - current_line);
+    block_iter_move_down(bi, s->count - 1 - current_line);
     while (s->count - 1 < line_nr) {
         StringView line;
-        fill_line_nl_ref(&bi, &line);
+        fill_line_nl_ref(bi, &line);
         highlight_line (
-            buffer->syn,
+            syn,
             states[s->count - 1],
             cs,
             &line,
             &states[s->count]
         );
         s->count++;
-        block_iter_eat_line(&bi);
+        block_iter_eat_line(bi);
     }
 }
 

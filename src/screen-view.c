@@ -380,9 +380,10 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
     y2 -= view->vy;
 
     bool got_line = !block_iter_is_eof(&bi);
-    hl_fill_start_states(view->buffer, &e->colors, info.line_nr);
     Syntax *syn = view->buffer->syn;
     PointerArray *lss = &view->buffer->line_start_states;
+    BlockIter tmp = block_iter(view->buffer);
+    hl_fill_start_states(syn, lss, &e->colors, &tmp, info.line_nr);
     long i;
 
     for (i = y1; got_line && i < y2; i++) {

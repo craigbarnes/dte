@@ -90,17 +90,8 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_NONNULL(view);
     Buffer *buffer = view->buffer;
     ASSERT_NONNULL(buffer);
-
-    const ColorScheme *colors = &e->colors;
     const size_t line_nr = 5;
     ASSERT_TRUE(buffer->nl >= line_nr);
-    hl_fill_start_states(buffer, colors, buffer->nl);
-    block_iter_goto_line(&view->cursor, line_nr - 1);
-    view_update_cursor_x(view);
-    view_update_cursor_y(view);
-    view_update(view, 0);
-    ASSERT_EQ(view->cx, 0);
-    ASSERT_EQ(view->cy, line_nr - 1);
 
     Syntax *syn = buffer->syn;
     ASSERT_NONNULL(syn);
@@ -108,9 +99,16 @@ static void test_hl_line(TestContext *ctx)
     EXPECT_STREQ(syn->name, "c");
     EXPECT_FALSE(syn->heredoc);
 
+    const ColorScheme *colors = &e->colors;
     PointerArray *lss = &buffer->line_start_states;
-    ASSERT_TRUE(lss->alloc >= line_nr);
-    ASSERT_NONNULL(lss->ptrs);
+    BlockIter tmp = block_iter(buffer);
+    hl_fill_start_states(syn, lss, colors, &tmp, buffer->nl);
+    block_iter_goto_line(&view->cursor, line_nr - 1);
+    view_update_cursor_x(view);
+    view_update_cursor_y(view);
+    view_update(view, 0);
+    ASSERT_EQ(view->cx, 0);
+    ASSERT_EQ(view->cy, line_nr - 1);
 
     StringView line;
     fetch_this_line(&view->cursor, &line);
