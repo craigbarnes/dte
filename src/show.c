@@ -50,7 +50,7 @@ static void open_temporary_buffer (
     Buffer *buffer = view->buffer;
     buffer->temporary = true;
     do_insert(view, text, text_len);
-    set_display_filename(buffer, xasprintf("(%s %s)", cmd, cmd_arg));
+    buffer_set_display_filename(buffer, xasprintf("(%s %s)", cmd, cmd_arg));
     buffer_set_encoding(buffer, encoding_from_type(UTF8), e->options.utf8_bom);
 
     if (flags & SHOW_LASTLINE) {

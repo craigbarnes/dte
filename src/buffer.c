@@ -16,7 +16,7 @@
 #include "util/time-util.h"
 #include "util/xmalloc.h"
 
-void set_display_filename(Buffer *buffer, char *name)
+void buffer_set_display_filename(Buffer *buffer, char *name)
 {
     free(buffer->display_filename);
     buffer->display_filename = name;
@@ -189,20 +189,21 @@ bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes)
     return false;
 }
 
-void update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd)
+void buffer_update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd)
 {
     const char *abs = buffer->abs_filename;
     if (!abs) {
         return;
     }
     char *name = cwd ? short_filename_cwd(abs, cwd, home) : xstrdup(abs);
-    set_display_filename(buffer, name);
+    buffer_set_display_filename(buffer, name);
 }
 
-void update_short_filename(Buffer *buffer, const StringView *home)
+void buffer_update_short_filename(Buffer *buffer, const StringView *home)
 {
-    BUG_ON(!buffer->abs_filename);
-    set_display_filename(buffer, short_filename(buffer->abs_filename, home));
+    const char *abs = buffer->abs_filename;
+    BUG_ON(!abs);
+    buffer_set_display_filename(buffer, short_filename(abs, home));
 }
 
 void buffer_update_syntax(EditorState *e, Buffer *buffer)

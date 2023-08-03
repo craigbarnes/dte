@@ -120,7 +120,7 @@ View *window_open_buffer (
         // FIXME: obviously wrong
         buffer->abs_filename = xstrdup(filename);
     }
-    update_short_filename(buffer, &e->home_dir);
+    buffer_update_short_filename(buffer, &e->home_dir);
 
     if (e->options.lock_files) {
         if (!lock_file(buffer->abs_filename)) {

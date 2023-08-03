@@ -310,7 +310,7 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
 
     for (size_t i = 0, n = e->buffers.count; i < n; i++) {
         Buffer *buffer = e->buffers.ptrs[i];
-        update_short_filename_cwd(buffer, &e->home_dir, cwd);
+        buffer_update_short_filename_cwd(buffer, &e->home_dir, cwd);
     }
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
@@ -1772,7 +1772,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
 
         free(buffer->abs_filename);
         buffer->abs_filename = absolute;
-        update_short_filename(buffer, &e->home_dir);
+        buffer_update_short_filename(buffer, &e->home_dir);
 
         // Filename change is not detected (only buffer_modified() change)
         buffer_mark_tabbars_changed(buffer);
@@ -2085,7 +2085,7 @@ static bool cmd_title(EditorState *e, const CommandArgs *a)
     if (buffer->abs_filename) {
         return error_msg("saved buffers can't be retitled");
     }
-    set_display_filename(buffer, xstrdup(a->args[0]));
+    buffer_set_display_filename(buffer, xstrdup(a->args[0]));
     buffer_mark_tabbars_changed(buffer);
     return true;
 }

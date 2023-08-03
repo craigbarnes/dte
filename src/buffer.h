@@ -81,23 +81,24 @@ static inline BlockIter block_iter(Buffer *buffer)
 
 struct EditorState;
 
+const char *buffer_filename(const Buffer *buffer) NONNULL_ARGS_AND_RETURN;
 void buffer_mark_lines_changed(Buffer *buffer, long min, long max) NONNULL_ARGS;
 void buffer_set_encoding(Buffer *buffer, Encoding encoding, bool utf8_bom) NONNULL_ARGS;
-const char *buffer_filename(const Buffer *buffer) NONNULL_ARGS_AND_RETURN;
-void set_display_filename(Buffer *buffer, char *name) NONNULL_ARG(1);
-void update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd) NONNULL_ARG(1, 2);
-void update_short_filename(Buffer *buffer, const StringView *home) NONNULL_ARGS;
-Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNULL_ARGS;
-Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
-Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
-Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts) NONNULL_ARGS_AND_RETURN;
-void free_buffer(Buffer *buffer) NONNULL_ARGS;
-void remove_and_free_buffer(PointerArray *buffers, Buffer *buffer) NONNULL_ARGS;
-void free_blocks(Buffer *buffer) NONNULL_ARGS;
+void buffer_set_display_filename(Buffer *buffer, char *name) NONNULL_ARG(1);
+void buffer_update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd) NONNULL_ARG(1, 2);
+void buffer_update_short_filename(Buffer *buffer, const StringView *home) NONNULL_ARGS;
 bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes) NONNULL_ARGS;
 void buffer_update_syntax(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_setup(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2]) NONNULL_ARGS;
+void free_buffer(Buffer *buffer) NONNULL_ARGS;
+void free_blocks(Buffer *buffer) NONNULL_ARGS;
 String dump_buffer(const Buffer *buffer) NONNULL_ARGS;
+
+Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNULL_ARGS;
+Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
+Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
+Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts) NONNULL_ARGS_AND_RETURN;
+void remove_and_free_buffer(PointerArray *buffers, Buffer *buffer) NONNULL_ARGS;
 
 #endif

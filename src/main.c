@@ -225,7 +225,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 
     BUG_ON(!buffer != !name);
     if (name) {
-        set_display_filename(buffer, xstrdup(name));
+        buffer_set_display_filename(buffer, xstrdup(name));
     }
 
     return buffer;
