@@ -1857,19 +1857,19 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static uint_least64_t get_flagset_npw(void)
+static unsigned int count_npw_flags(const CommandArgs *a)
 {
     uint_least64_t npw = 0;
     npw |= cmdargs_flagset_value('n');
     npw |= cmdargs_flagset_value('p');
     npw |= cmdargs_flagset_value('w');
-    return npw;
+    return u64_popcount(a->flag_set & npw);
 }
 
 static bool cmd_search(EditorState *e, const CommandArgs *a)
 {
     const char *pattern = a->args[0];
-    if (u64_popcount(a->flag_set & get_flagset_npw()) + !!pattern >= 2) {
+    if (count_npw_flags(a) + !!pattern > 1) {
         return error_msg("flags [-n|-p|-w] and [pattern] argument are mutually exclusive");
     }
 
@@ -2482,7 +2482,7 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         CommandArgs a = cmdargs_new(args_copy);
         bool ret = true;
         if (do_parse_args(cmd, &a) == ARGERR_NONE) {
-            if (a.nr_args == 0 && !(a.flag_set & get_flagset_npw())) {
+            if (a.nr_args + count_npw_flags(&a) == 0) {
                 // If command is "search" with no pattern argument and without
                 // flags -n, -p or -w, the command would put the editor into
                 // search mode, which shouldn't be recorded.
