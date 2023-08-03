@@ -102,12 +102,22 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_EQ(view->cx, 0);
     ASSERT_EQ(view->cy, line_nr - 1);
 
+    Syntax *syn = buffer->syn;
+    ASSERT_NONNULL(syn);
+    ASSERT_NONNULL(syn->start_state);
+    EXPECT_STREQ(syn->name, "c");
+    EXPECT_FALSE(syn->heredoc);
+
+    PointerArray *lss = &buffer->line_start_states;
+    ASSERT_TRUE(lss->alloc >= line_nr);
+    ASSERT_NONNULL(lss->ptrs);
+
     StringView line;
     fetch_this_line(&view->cursor, &line);
     ASSERT_EQ(line.length, 65);
 
     bool next_changed;
-    const TermColor **hl = hl_line(buffer, colors, &line, line_nr, &next_changed);
+    const TermColor **hl = hl_line(syn, lss, colors, &line, line_nr, &next_changed);
     ASSERT_NONNULL(hl);
     EXPECT_TRUE(next_changed);
 

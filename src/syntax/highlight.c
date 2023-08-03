@@ -373,21 +373,22 @@ void hl_fill_start_states(Buffer *buffer, const ColorScheme *cs, size_t line_nr)
 }
 
 const TermColor **hl_line (
-    Buffer *buffer,
+    Syntax *syn,
+    PointerArray *line_start_states,
     const ColorScheme *cs,
     const StringView *line,
     size_t line_nr,
     bool *next_changed
 ) {
     *next_changed = false;
-    if (!buffer->syn) {
+    if (!syn) {
         return NULL;
     }
 
-    PointerArray *s = &buffer->line_start_states;
+    PointerArray *s = line_start_states;
     BUG_ON(line_nr >= s->count);
     State *next;
-    const TermColor **colors = highlight_line(buffer->syn, s->ptrs[line_nr++], cs, line, &next);
+    const TermColor **colors = highlight_line(syn, s->ptrs[line_nr++], cs, line, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);

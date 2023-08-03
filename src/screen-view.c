@@ -381,7 +381,10 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
 
     bool got_line = !block_iter_is_eof(&bi);
     hl_fill_start_states(view->buffer, &e->colors, info.line_nr);
+    Syntax *syn = view->buffer->syn;
+    PointerArray *lss = &view->buffer->line_start_states;
     long i;
+
     for (i = y1; got_line && i < y2; i++) {
         obuf->x = 0;
         term_move_cursor(obuf, edit_x, edit_y + i);
@@ -389,7 +392,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
         StringView line;
         fill_line_nl_ref(&bi, &line);
         bool next_changed;
-        const TermColor **colors = hl_line(view->buffer, &e->colors, &line, info.line_nr, &next_changed);
+        const TermColor **colors = hl_line(syn, lss, &e->colors, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, colors);
         print_line(e, &info);
 
