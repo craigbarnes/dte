@@ -411,16 +411,15 @@ const TermColor **hl_line (
 }
 
 // Called after text has been inserted to re-highlight changed lines
-void hl_insert(Buffer *buffer, size_t first, size_t lines)
+void hl_insert(PointerArray *line_start_states, size_t first, size_t lines)
 {
-    PointerArray *s = &buffer->line_start_states;
-    size_t last = first + lines;
-
+    PointerArray *s = line_start_states;
     if (first >= s->count) {
         // Nothing to re-highlight
         return;
     }
 
+    size_t last = first + lines;
     if (last + 1 >= s->count) {
         // Last already highlighted lines changed; there's nothing to
         // gain, so throw them away
@@ -444,11 +443,9 @@ void hl_insert(Buffer *buffer, size_t first, size_t lines)
 }
 
 // Called after text has been deleted to re-highlight changed lines
-void hl_delete(Buffer *buffer, size_t first, size_t deleted_nl)
+void hl_delete(PointerArray *line_start_states, size_t first, size_t deleted_nl)
 {
-    PointerArray *s = &buffer->line_start_states;
-    size_t last = first + deleted_nl;
-
+    PointerArray *s = line_start_states;
     if (s->count == 1) {
         return;
     }
@@ -458,6 +455,7 @@ void hl_delete(Buffer *buffer, size_t first, size_t deleted_nl)
         return;
     }
 
+    size_t last = first + deleted_nl;
     if (last + 1 >= s->count) {
         // Last already highlighted lines changed; there's nothing to
         // gain, so throw them away

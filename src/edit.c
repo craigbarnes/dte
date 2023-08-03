@@ -233,7 +233,7 @@ void do_insert(View *view, const char *buf, size_t len)
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, nl ? LONG_MAX : view->cy);
     if (buffer->syn) {
-        hl_insert(buffer, view->cy, nl);
+        hl_insert(&buffer->line_start_states, view->cy, nl);
     }
 }
 
@@ -323,7 +323,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
     if (buffer->syn) {
-        hl_delete(buffer, view->cy, deleted_nl);
+        hl_delete(&buffer->line_start_states, view->cy, deleted_nl);
     }
     return deleted;
 }
@@ -378,8 +378,8 @@ char *do_replace(View *view, size_t del, const char *buf, size_t ins)
     buffer_mark_lines_changed(buffer, view->cy, max);
 
     if (buffer->syn) {
-        hl_delete(buffer, view->cy, del_nl);
-        hl_insert(buffer, view->cy, ins_nl);
+        hl_delete(&buffer->line_start_states, view->cy, del_nl);
+        hl_insert(&buffer->line_start_states, view->cy, ins_nl);
     }
 
     return deleted;
