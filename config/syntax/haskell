@@ -1,0 +1,96 @@
+syntax .haskell-ncomment
+
+state start comment
+    str "{-" nested-1
+    str -- "-}" END comment
+    eat this
+
+state nested-1 comment
+    str "{-" nested-2
+    str -- "-}" start
+    eat this
+
+state nested-2 comment
+    str -- "-}" nested-1
+    eat this
+
+syntax .haskell-string
+
+state start string
+    char \" END string
+    char -b \\ escape
+    eat this
+
+state escape special
+    char abfnrtv\\\"\'& start special
+    char -b ^ escape-cntrl
+    char -b A-Z escape-ascii
+    char 0-9 escape-decimal
+    char -b o escape-maybe-octal
+    char -b x escape-maybe-hexadecimal
+    noeat start
+
+state escape-cntrl special
+    char A-Z@[]^_ start special
+    recolor string
+    noeat start
+
+state escape-ascii special
+    inlist ascii-escape start special
+    char -b A-Z0-9 this
+    recolor string
+    noeat start
+
+state escape-decimal special
+    char -b 0-9 this
+    noeat start
+
+state escape-maybe-octal special
+    char 0-7 escape-octal
+    recolor string
+    noeat start
+
+state escape-octal special
+    char 0-7 this
+    noeat start
+
+state escape-maybe-hexadecimal special
+    char a-fA-F0-9 escape-hexadecimal
+    recolor string
+    noeat start
+
+state escape-hexadecimal special
+    char a-fA-F0-9 this
+    noeat start
+
+list ascii-escape \
+    \\NUL \\SOH \\STX \\ETX \\EOT \\ENQ \\ACK \\BEL \\BS \\HT \\LF \
+    \\VT \\FF \\CR \\SO \\SI \\DLE \\DC1 \\DC2 \\DC3 \\DC4 \\NAK \\SYN \
+    \\ETB \\CAN \\EM \\SUB \\ESC \\FS \\GS \\RS \\US \\SP \\DEL
+
+syntax haskell
+
+state start
+    char -b a-z varid
+    char -b A-Z conid
+    char \" .haskell-string:this
+    str -- "--" comment
+    str "{-" .haskell-ncomment:this
+    eat this
+
+state varid
+    char -b a-zA-Z0-9\'_ this
+    inlist keywords start keyword
+    noeat start
+
+state conid type
+    char -b a-zA-Z0-9\'_ this
+    noeat start
+
+state comment comment
+    char "\n" start
+    eat this
+
+list keywords \
+    case class data default deriving do else if import in infix infixl \
+    infixr instance let module newtype of then type where
