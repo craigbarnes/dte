@@ -591,6 +591,13 @@ static void test_string(TestContext *ctx)
     EXPECT_STREQ(string_borrow_cstring(&s), ">12foo3123");
     EXPECT_EQ(s.len, 10);
 
+    string_replace_byte(&s, '1', '_');
+    EXPECT_STREQ(string_borrow_cstring(&s), ">_2foo3_23");
+    string_replace_byte(&s, '_', '.');
+    string_replace_byte(&s, '2', '+');
+    string_replace_byte(&s, '3', '$');
+    EXPECT_STREQ(string_borrow_cstring(&s), ">.+foo$.+$");
+
     string_free(&s);
     EXPECT_NULL(s.buffer);
     EXPECT_EQ(s.len, 0);
