@@ -21,6 +21,15 @@ static void test_parse_ctags_line(TestContext *ctx)
     EXPECT_EQ(tag.local, true);
     free_tag(&tag);
 
+    line = "abc\t123.py\t/^backslashes \\\\ in \\ \\: pattern$/";
+    tag = (Tag){.pattern = NULL};
+    EXPECT_TRUE(parse_ctags_line(&tag, line, strlen(line)));
+    EXPECT_EQ(tag.filename.length, 6);
+    EXPECT_STREQ(tag.pattern, "^backslashes \\\\ in  : pattern$");
+    EXPECT_EQ(tag.lineno, 0);
+    EXPECT_EQ(tag.kind, 0);
+    free_tag(&tag);
+
     line = "example\tsrc/xyz.c\t488;\"\tk";
     tag = (Tag){.pattern = NULL};
     EXPECT_TRUE(parse_ctags_line(&tag, line, strlen(line)));
