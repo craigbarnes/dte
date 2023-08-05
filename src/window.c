@@ -209,9 +209,7 @@ size_t remove_view(View *view)
         e->buffer = NULL;
     }
 
-    size_t idx = ptr_array_idx(&window->views, view);
-    BUG_ON(idx >= window->views.count);
-    ptr_array_remove_idx(&window->views, idx);
+    size_t idx = ptr_array_remove(&window->views, view);
     window->update_tabbar = true;
 
     Buffer *buffer = view->buffer;
