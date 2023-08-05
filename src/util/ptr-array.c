@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <string.h>
 #include "ptr-array.h"
-#include "debug.h"
 
 void ptr_array_append(PointerArray *array, void *ptr)
 {

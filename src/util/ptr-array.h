@@ -2,6 +2,7 @@
 #define UTIL_PTR_ARRAY_H
 
 #include <stdlib.h>
+#include "debug.h"
 #include "macros.h"
 #include "xmalloc.h"
 
@@ -37,6 +38,18 @@ static inline void ptr_array_init(PointerArray *array, size_t capacity)
     array->count = 0;
     array->ptrs = capacity ? xnew(array->ptrs, capacity) : NULL;
     array->alloc = capacity;
+}
+
+// Swap the pointers at two indices
+NONNULL_ARGS
+static inline void ptr_array_swap(PointerArray *array, size_t a, size_t b)
+{
+    BUG_ON(a >= array->count);
+    BUG_ON(b >= array->count);
+    void **ptrs = array->ptrs;
+    void *tmp = ptrs[a];
+    ptrs[a] = ptrs[b];
+    ptrs[b] = tmp;
 }
 
 // Free each pointer and then free the array

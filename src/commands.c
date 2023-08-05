@@ -2368,10 +2368,7 @@ static bool cmd_wswap(EditorState *e, const CommandArgs *a)
     BUG_ON(current >= count);
     size_t next = size_increment_wrapped(current, count);
 
-    void **ptrs = parent->frames.ptrs;
-    Frame *tmp = ptrs[current];
-    ptrs[current] = ptrs[next];
-    ptrs[next] = tmp;
+    ptr_array_swap(&parent->frames, current, next);
     mark_everything_changed(e);
     return true;
 }
