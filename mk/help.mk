@@ -26,7 +26,7 @@ ifeq "$(DEVMK)" "loaded"
 	$P html 'Generate website'
 	$P htmlgz 'Generate statically gzipped website (for GitLab Pages)'
 	$P pdf 'Generate PDF user manual from man pages'
-	$P coverage-report 'Generate HTML coverage report with lcov(1)'
+	$P coverage-report 'Generate HTML coverage report with gcovr(1)'
 	$P gen-unidata 'Generate Unicode data tables'
 	$P dist 'Generate tarball for latest git commit'
 	$P dist-latest-release 'Generate tarball for latest release'

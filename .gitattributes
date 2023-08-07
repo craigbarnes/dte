@@ -24,7 +24,6 @@
 /docs/releasing.md export-ignore
 /mk/dev.mk export-ignore
 /mk/coverage.mk export-ignore
-/mk/lcovrc export-ignore
 /tools export-ignore
 /tools/** export-ignore
 

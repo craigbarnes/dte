@@ -1,7 +1,0 @@
-lcov_excl_line = (BUG|TEST_FAIL|fatal_error) *\(
-lcov_function_coverage = 0
-genhtml_css_file = build/docs/lcov.css
-genhtml_function_coverage = 0
-genhtml_hi_limit = 85
-genhtml_med_limit = 50
-geninfo_external = 0
