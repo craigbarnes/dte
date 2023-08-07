@@ -9,10 +9,12 @@ gcovr: gcovr-html
 gcovr-html: public/coverage/index.html
 gcovr-xml: build/coverage.xml
 
+# TODO: Use `--html-nested` instead of `--html-details` when Docker
+# image used for GitLab CI `pages` job has `gcovr >= 6.0`
 public/coverage/index.html: FORCE | public/coverage/
 	$(RM) public/coverage/*.html public/coverage/*.html.gz
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
-	$(GCOVR) $(GCOVRFLAGS) -s --html-nested '$@'
+	$(GCOVR) $(GCOVRFLAGS) -s --html-details '$@'
 	find $| -name '*.css' -o -name '*.html' | $(XARGS_P) -- gzip -9kf
 
 build/coverage.xml: FORCE | build/
