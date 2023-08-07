@@ -107,7 +107,7 @@ coverage:
 .pages:
     stage: dist
     needs: []
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-11
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
     coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
     artifacts:
         paths: [public]
