@@ -22,6 +22,7 @@ erase-word
 filter sort -r
 ft ext filetype
 hi default red black bold
+hi default
 bof
 select
 eof
@@ -58,12 +59,8 @@ cut
 paste -c
 set syntax true
 set set-window-title true
-setenv SETENVTEST 1111
-insert $SETENVTEST
-setenv SETENVTEST
 shift +2
 clear
-#tag
 toggle set-window-title
 up
 view 1
@@ -90,4 +87,3 @@ repeat 3 move-tab right
 move-tab 17
 open -g ../../docs/*
 cd -
-#suspend
