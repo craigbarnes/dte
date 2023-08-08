@@ -19,6 +19,7 @@ if test "$(uname -m)" = x86_64; then
     opts="$opts -Mintel --section=.text"
 fi
 
+# shellcheck disable=SC2086
 exec "${OBJDUMP:-objdump}" \
     --source \
     --show-all-symbols \
