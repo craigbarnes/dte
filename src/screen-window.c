@@ -14,8 +14,8 @@ static void print_separator(Window *window, void* UNUSED_ARG(ud))
     BUG_ON(x > term->width);
     const char sep = (e->options.window_separator == WINSEP_BAR) ? '|' : ' ';
 
-    for (unsigned int y = 0, h = window->h; y < h; y++) {
-        term_move_cursor(obuf, x, window->y + y);
+    for (unsigned int y = window->y, n = y + window->h; y < n; y++) {
+        term_move_cursor(obuf, x, y);
         term_add_byte(obuf, sep);
     }
 }
