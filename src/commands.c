@@ -2363,11 +2363,8 @@ static bool cmd_wswap(EditorState *e, const CommandArgs *a)
         return false;
     }
 
-    size_t count = parent->frames.count;
     size_t current = ptr_array_idx(&parent->frames, frame);
-    BUG_ON(current >= count);
-    size_t next = size_increment_wrapped(current, count);
-
+    size_t next = size_increment_wrapped(current, parent->frames.count);
     ptr_array_swap(&parent->frames, current, next);
     mark_everything_changed(e);
     return true;
