@@ -11,6 +11,7 @@ errorfmt gcc " *inlined from '.*' at (.*):([0-9]+):" file line
 
 # ASan stack trace (e.g. " #12 0x55af25320630 in func_name src/filename.c:1142")
 errorfmt gcc '^ *(#[0-9]+ 0x[0-9A-Fa-f]+ in [[:alnum:]_]+) ([^:]+):([0-9]+)$' message file line
+errorfmt gcc '^ *(#[0-9]+ 0x[0-9A-Fa-f]+ in [[:alnum:]_]+) ([^:]+):([0-9]+):([0-9]+)$' message file line column
 
 errorfmt -i gcc '^In file included from (.+):([0-9]+)[,:]'
 errorfmt -i gcc '^ +from (.+):([0-9]+)[,:]'
