@@ -147,6 +147,10 @@ local crossrefs = {
     ctags = "(1)",
     fmt = "(1)",
     terminfo = "(5)",
+    locale = "(7)",
+    regcomp = "(3)",
+    towlower = "(3)",
+    towupper = "(3)",
 }
 
 function Code(s, attr)

@@ -195,7 +195,7 @@ plus these additional keys:
 :   Reverse search direction.
 
 `Enter`
-:   Perform regex search.
+:   Perform [`regex`] search.
 
 `M-Enter`
 :   Perform plain-text search (escapes the regex).
@@ -233,6 +233,18 @@ by dte:
 :   Timezone specification, as used by [`tzset`] to initialize time
     conversion information. This affects file modification times shown
     by the [`show buffer`] command.
+
+`LC_CTYPE`
+:   [`locale`] specification for character types, as used by [`regcomp`],
+    [`towlower`] and [`towupper`]. This affects the behavior of the
+    [`case`] command, any command that takes a [`regex`] argument and
+    any [`regex`] patterns used in [search mode].
+
+`LANG`
+:   Fallback value for `LC_CTYPE` (see [`locale`] for details).
+
+`LC_ALL`
+:   Overrides `LC_CTYPE` and/or `LANG`, if set (see [`locale`] for details).
 
 The following environment variables are set by dte:
 
@@ -343,6 +355,7 @@ input/output of both.
 ["synopsis"]: #synopsis
 
 [`bind`]: dterc.html#bind
+[`case`]: dterc.html#case
 [`cd`]: dterc.html#cd
 [`show bind`]: dterc.html#show
 [`show buffer`]: dterc.html#show
@@ -356,5 +369,10 @@ input/output of both.
 
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
 [`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
+[`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html
 [`tzset`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/tzset.html
+[`regcomp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/regcomp.html
+[`towlower`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/towlower.html
+[`towupper`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/towupper.html
+[`locale`]: https://man7.org/linux/man-pages/man7/locale.7.html

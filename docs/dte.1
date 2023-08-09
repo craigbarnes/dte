@@ -233,7 +233,7 @@ Reverse search direction.
 .PP
 .TP
 \fBEnter\fR
-Perform regex search.
+Perform \fBregex\fR(7) search.
 .PP
 .TP
 \fBM\-Enter\fR
@@ -278,6 +278,21 @@ to find executables.
 Timezone specification, as used by \fBtzset\fR(3) to initialize time
 conversion information. This affects file modification times shown
 by the \fBshow buffer\fR command.
+.PP
+.TP
+\fBLC_CTYPE\fR
+\fBlocale\fR(7) specification for character types, as used by \fBregcomp\fR(3),
+\fBtowlower\fR(3) and \fBtowupper\fR(3). This affects the behavior of the
+\fBcase\fR command, any command that takes a \fBregex\fR(7) argument and
+any \fBregex\fR(7) patterns used in search mode.
+.PP
+.TP
+\fBLANG\fR
+Fallback value for \fBLC_CTYPE\fR (see \fBlocale\fR(7) for details).
+.PP
+.TP
+\fBLC_ALL\fR
+Overrides \fBLC_CTYPE\fR and/or \fBLANG\fR, if set (see \fBlocale\fR(7) for details).
 .PP
 The following environment variables are set by dte:
 .P
