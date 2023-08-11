@@ -40,7 +40,7 @@ bool file_location_go(Window *window, const FileLocation *loc)
             return false;
         }
     } else if (loc->line > 0) {
-        move_to_filepos(view, loc->line, loc->column ? loc->column : 1);
+        move_to_filepos(view, loc->line, MAX(loc->column, 1));
     }
 
     unselect(view);

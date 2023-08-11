@@ -93,7 +93,7 @@ static inline bool path_parent(StringView *path)
 
     ssize_t slash_idx = strview_memrchr_idx(path, '/');
     BUG_ON(slash_idx < 0);
-    path->length = slash_idx ? slash_idx : 1;
+    path->length = MAX(slash_idx, 1);
     return true;
 }
 
