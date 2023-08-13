@@ -33,13 +33,8 @@ void buffer_set_display_filename(Buffer *buffer, char *name)
  */
 void buffer_mark_lines_changed(Buffer *buffer, long min, long max)
 {
-    if (min > max) {
-        long tmp = min;
-        min = max;
-        max = tmp;
-    }
-    buffer->changed_line_min = MIN(min, buffer->changed_line_min);
-    buffer->changed_line_max = MAX(max, buffer->changed_line_max);
+    buffer->changed_line_min = MIN3(min, max, buffer->changed_line_min);
+    buffer->changed_line_max = MAX3(min, max, buffer->changed_line_max);
 }
 
 const char *buffer_filename(const Buffer *buffer)
