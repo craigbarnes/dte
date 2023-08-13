@@ -105,14 +105,15 @@ static void update_window(EditorState *e, Window *window)
     }
 
     const View *view = window->view;
+    const Buffer *buffer = view->buffer;
     if (e->options.show_line_numbers) {
-        // Force updating lines numbers if all lines changed
-        bool force = (view->buffer->changed_line_max == LONG_MAX);
+        // Force updating line numbers if all lines changed
+        bool force = (buffer->changed_line_max == LONG_MAX);
         update_line_numbers(&e->terminal, &e->colors, window, force);
     }
 
-    long y1 = MAX(view->buffer->changed_line_min, view->vy);
-    long y2 = MIN(view->buffer->changed_line_max, view->vy + window->edit_h - 1);
+    long y1 = MAX(buffer->changed_line_min, view->vy);
+    long y2 = MIN(buffer->changed_line_max, view->vy + window->edit_h - 1);
     update_range(e, view, y1, y2 + 1);
     update_status_line(window);
 }
