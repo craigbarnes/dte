@@ -7,18 +7,13 @@
 
 static inline size_t u_char_size(CodePoint u)
 {
-    if (likely(u <= 0x7f)) {
-        return 1;
-    } else if (u <= 0x7ff) {
-        return 2;
-    } else if (u <= 0xffff) {
-        return 3;
-    } else if (u <= UNICODE_MAX_VALID_CODEPOINT) {
-        return 4;
-    }
+    // If `u` is invalid, set `adj` to 3 and use to adjust the calculation
+    // so that 1 is returned. This indicates an invalid byte in the UTF-8
+    // byte sequence.
+    size_t inv = (u > UNICODE_MAX_VALID_CODEPOINT);
+    size_t adj = inv | (inv << 1);
 
-    // Invalid byte in UTF-8 byte sequence
-    return 1;
+    return 1 + (u > 0x7F) + (u > 0x7FF) + (u > 0xFFFF) - adj;
 }
 
 size_t u_str_width(const unsigned char *str);
