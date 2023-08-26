@@ -1121,6 +1121,32 @@ static void test_filemode_to_str(TestContext *ctx)
 #endif
 }
 
+static void test_u_char_size(TestContext *ctx)
+{
+    EXPECT_EQ(u_char_size('\0'), 1);
+    EXPECT_EQ(u_char_size(' '), 1);
+    EXPECT_EQ(u_char_size('z'), 1);
+    EXPECT_EQ(u_char_size(0x7E), 1);
+    EXPECT_EQ(u_char_size(0x7F), 1);
+    EXPECT_EQ(u_char_size(0x80), 2);
+    EXPECT_EQ(u_char_size(0x81), 2);
+    EXPECT_EQ(u_char_size(0xFF), 2);
+    EXPECT_EQ(u_char_size(0x7FE), 2);
+    EXPECT_EQ(u_char_size(0x7FF), 2);
+    EXPECT_EQ(u_char_size(0x800), 3);
+    EXPECT_EQ(u_char_size(0x801), 3);
+    EXPECT_EQ(u_char_size(0x1234), 3);
+    EXPECT_EQ(u_char_size(0xFFFE), 3);
+    EXPECT_EQ(u_char_size(0xFFFF), 3);
+    EXPECT_EQ(u_char_size(0x10000), 4);
+    EXPECT_EQ(u_char_size(0x10001), 4);
+    EXPECT_EQ(u_char_size(0x10FFFE), 4);
+    EXPECT_EQ(u_char_size(0x10FFFF), 4);
+    EXPECT_EQ(u_char_size(0x110000), 1);
+    EXPECT_EQ(u_char_size(0x110001), 1);
+    EXPECT_EQ(u_char_size(UINT32_MAX), 1);
+}
+
 static void test_u_char_width(TestContext *ctx)
 {
     // ASCII (1 column)
@@ -2688,6 +2714,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_umax_to_str),
     TEST(test_buf_uint_to_str),
     TEST(test_filemode_to_str),
+    TEST(test_u_char_size),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),
     TEST(test_u_to_upper),
