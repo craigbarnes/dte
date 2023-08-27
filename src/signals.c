@@ -49,7 +49,7 @@ static const int fatal_signals[] = {
 #endif
 };
 
-void handle_sigwinch(int UNUSED_ARG(signum))
+static void handle_sigwinch(int UNUSED_ARG(signum))
 {
     resized = 1;
 }
