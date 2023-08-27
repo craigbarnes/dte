@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "ui.h"
 #include "signals.h"
 #include "terminal/input.h"
 

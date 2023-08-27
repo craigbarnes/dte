@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "ui.h"
 #include "error.h"
 #include "search.h"
 

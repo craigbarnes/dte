@@ -1,5 +1,5 @@
 #include <string.h>
-#include "screen.h"
+#include "ui.h"
 #include "frame.h"
 #include "terminal/cursor.h"
 #include "terminal/ioctl.h"

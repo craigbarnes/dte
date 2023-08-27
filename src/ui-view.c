@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "ui.h"
 #include "indent.h"
 #include "selection.h"
 #include "syntax/highlight.h"

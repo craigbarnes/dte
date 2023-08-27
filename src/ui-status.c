@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "ui.h"
 #include "status.h"
 
 void update_status_line(const Window *window)

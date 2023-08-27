@@ -1,4 +1,4 @@
-#include "screen.h"
+#include "ui.h"
 
 static void print_separator(Window *window, void* UNUSED_ARG(ud))
 {
