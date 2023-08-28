@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <string.h>
 #include <strings.h>
 #include "block-iter.h"
 #include "options.h"

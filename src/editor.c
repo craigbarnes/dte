@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include "editor.h"
 #include "bind.h"
@@ -24,20 +23,18 @@
 #include "signals.h"
 #include "syntax/syntax.h"
 #include "tag.h"
+#include "terminal/color.h"
 #include "terminal/input.h"
+#include "terminal/key.h"
 #include "terminal/mode.h"
 #include "terminal/output.h"
-#include "terminal/style.h"
 #include "ui.h"
-#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/intern.h"
 #include "util/log.h"
-#include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xstdio.h"
-#include "window.h"
 #include "../build/version.h"
 
 static void set_and_check_locale(void)

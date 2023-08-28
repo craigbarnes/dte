@@ -1,7 +1,6 @@
 #ifndef ENCODING_H
 #define ENCODING_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "util/macros.h"
 

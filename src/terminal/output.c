@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "indent.h"
 #include "output.h"
+#include "color.h"
+#include "indent.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/log.h"

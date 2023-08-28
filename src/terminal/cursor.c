@@ -1,7 +1,7 @@
 #include <string.h>
 #include "cursor.h"
+#include "style.h"
 #include "util/array.h"
-#include "util/numtostr.h"
 #include "util/debug.h"
 
 static const char cursor_modes[NR_CURSOR_MODES][12] = {

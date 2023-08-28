@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <string.h>
 #include "style.h"
 #include "color.h"

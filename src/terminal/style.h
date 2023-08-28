@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include "color.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 

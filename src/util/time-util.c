@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <string.h>
 #include "time-util.h"
 #include "debug.h"
 #include "numtostr.h"

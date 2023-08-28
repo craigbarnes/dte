@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "color.h"
+#include "style.h"
 #include "terminal.h"
 #include "util/macros.h"
 #include "util/unicode.h"

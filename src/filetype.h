@@ -2,7 +2,6 @@
 #define FILETYPE_H
 
 #include <stdbool.h>
-#include <string.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"

@@ -9,7 +9,6 @@
 #include "syntax/state.h"
 #include "util/debug.h"
 #include "util/intern.h"
-#include "util/log.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
