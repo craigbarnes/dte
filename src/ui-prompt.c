@@ -1,6 +1,7 @@
 #include "ui.h"
 #include "signals.h"
 #include "terminal/input.h"
+#include "terminal/paste.h"
 
 static char get_choice(Terminal *term, const char *choices, unsigned int esc_timeout)
 {

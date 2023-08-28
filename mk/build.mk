@@ -53,7 +53,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight merge state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color cursor input ioctl key linux mode osc52 output parse rxvt \
+    color cursor input ioctl key linux mode osc52 output parse paste rxvt \
     style terminal )
 
 editor_objects := $(call prefix-obj, build/, \

@@ -27,6 +27,7 @@
 #include "terminal/key.h"
 #include "terminal/mode.h"
 #include "terminal/output.h"
+#include "terminal/paste.h"
 #include "terminal/terminal.h"
 #include "ui.h"
 #include "util/debug.h"

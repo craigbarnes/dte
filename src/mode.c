@@ -6,7 +6,7 @@
 #include "completion.h"
 #include "misc.h"
 #include "shift.h"
-#include "terminal/input.h"
+#include "terminal/paste.h"
 #include "util/debug.h"
 #include "util/unicode.h"
 #include "view.h"
