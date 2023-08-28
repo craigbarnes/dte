@@ -32,11 +32,6 @@ typedef struct {
     unsigned int len;
 } ByteOrderMark;
 
-static inline bool same_encoding(const Encoding *a, const Encoding *b)
-{
-    return a->type == b->type && a->name == b->name;
-}
-
 Encoding encoding_from_type(EncodingType type);
 Encoding encoding_from_name(const char *name) NONNULL_ARGS;
 EncodingType lookup_encoding(const char *name) NONNULL_ARGS;
