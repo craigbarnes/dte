@@ -6,14 +6,12 @@ static void print_separator(Window *window, void* UNUSED_ARG(ud))
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     unsigned int x = window->x + window->w;
-    if (x == term->width) {
+    if (x >= term->width) {
         // Window is on right edge; no separator needed
         return;
     }
 
-    BUG_ON(x > term->width);
     const char sep = (e->options.window_separator == WINSEP_BAR) ? '|' : ' ';
-
     for (unsigned int y = window->y, n = y + window->h; y < n; y++) {
         term_move_cursor(obuf, x, y);
         term_add_byte(obuf, sep);
