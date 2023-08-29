@@ -2,28 +2,28 @@
 #include "util/debug.h"
 #include "util/strtonum.h"
 
-static unsigned int rgb_to_rrggbb(unsigned int c)
-{
-    unsigned int r = c & 0xF;
-    unsigned int g = c & 0xF0;
-    unsigned int b = c & 0xF00;
-    return r | (r|g) << 4 | (g|b) << 8 | b << 12;
-}
-
 int32_t parse_rgb(const char *str, size_t len)
 {
+    unsigned int mask = 0;
     unsigned int val = 0;
-    size_t n = buf_parse_hex_uint(str, len, &val);
-    switch (n) {
-    case 3:
-        val = rgb_to_rrggbb(val);
-        // Fallthrough
-    case 6:
-        if (likely(n == len)) {
-            return COLOR_RGB(val);
+
+    if (len == 6) {
+        for (size_t i = 0; i < len; i++) {
+            unsigned int digit = hex_decode(str[i]);
+            mask |= digit;
+            val = val << 4 | digit;
         }
+    } else if (len == 3) {
+        for (size_t i = 0; i < len; i++) {
+            unsigned int digit = hex_decode(str[i]);
+            mask |= digit;
+            val = val << 8 | digit << 4 | digit;
+        }
+    } else {
+        return COLOR_INVALID;
     }
-    return COLOR_INVALID;
+
+    return unlikely(mask & HEX_INVALID) ? COLOR_INVALID : COLOR_RGB(val);
 }
 
 // Calculate squared Euclidean distance between 2 RGB colors
