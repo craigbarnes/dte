@@ -8,6 +8,7 @@
 #include <time.h>
 #include "filetype.h"
 #include "indent.h"
+#include "terminal/color.h"
 #include "util/arith.h"
 #include "util/macros.h"
 #include "util/str-util.h"
@@ -169,9 +170,49 @@ static void bench_get_indent(void)
     }
 }
 
+static void bench_parse_rgb(void)
+{
+    static const char colors[][7] = {
+        "\003000",
+        "\003fff",
+        "\006123456",
+        "\006abcdef",
+        "\006ABCDEF",
+        "\006012345",
+        "\006111111",
+        "\006ffffff",
+        "\006223344",
+        "\006fefefe",
+        "\006123456",
+        "\006aaaaaa",
+        "\006000000",
+        "\006a4b6c9",
+        "\006fedcba",
+        "\006999999",
+    };
+
+    static_assert(IS_POWER_OF_2(ARRAYLEN(colors)));
+    unsigned int iterations = 30000;
+    unsigned int accum = 0;
+    struct timespec start;
+    get_time(&start);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        const char *s = colors[i % ARRAYLEN(colors)];
+        accum |= parse_rgb(s + 1, s[0]);
+    }
+
+    if (accum != COLOR_RGB(0xFFFFFF)) {
+        fail("unexpected result in %s(): %u", __func__, accum);
+    }
+
+    report(&start, iterations, "parse_rgb()");
+}
+
 int main(void)
 {
     bench_find_ft();
     bench_get_indent();
+    bench_parse_rgb();
     return 0;
 }
