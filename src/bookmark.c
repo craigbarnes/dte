@@ -83,7 +83,7 @@ void bookmark_push(PointerArray *bookmarks, FileLocation *loc)
 {
     const size_t max_entries = 256;
     if (bookmarks->count == max_entries) {
-        file_location_free(ptr_array_remove_idx(bookmarks, 0));
+        file_location_free(ptr_array_remove_index(bookmarks, 0));
     }
     BUG_ON(bookmarks->count >= max_entries);
     ptr_array_append(bookmarks, loc);

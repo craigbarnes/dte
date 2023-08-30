@@ -20,7 +20,7 @@ CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_s
 
     ptr_array_trim_nulls(&array);
     size_t n = array.count;
-    if (n < 2 || ptr_array_idx(&array, NULL) != n - 1) {
+    if (n < 2 || ptr_array_index(&array, NULL) != n - 1) {
         // Only single commands can be cached
         goto nocache;
     }
@@ -36,7 +36,7 @@ CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_s
         goto nocache;
     }
 
-    free(ptr_array_remove_idx(&array, 0));
+    free(ptr_array_remove_index(&array, 0));
     CommandArgs cmdargs = cmdargs_new((char**)array.ptrs);
     if (do_parse_args(cmd, &cmdargs) != ARGERR_NONE) {
         goto nocache;

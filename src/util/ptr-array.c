@@ -17,13 +17,13 @@ void ptr_array_append(PointerArray *array, void *ptr)
     array->ptrs[array->count++] = ptr;
 }
 
-void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
+void ptr_array_insert(PointerArray *array, void *ptr, size_t idx)
 {
-    BUG_ON(pos > array->count);
-    size_t count = array->count - pos;
+    BUG_ON(idx > array->count);
+    size_t count = array->count - idx;
     ptr_array_append(array, NULL);
-    memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void*));
-    array->ptrs[pos] = ptr;
+    memmove(array->ptrs + idx + 1, array->ptrs + idx, count * sizeof(void*));
+    array->ptrs[idx] = ptr;
 }
 
 // Move a pointer from one index to another
@@ -64,22 +64,22 @@ void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)
 
 size_t ptr_array_remove(PointerArray *array, void *ptr)
 {
-    size_t pos = ptr_array_idx(array, ptr);
-    ptr_array_remove_idx(array, pos);
-    return pos;
+    size_t idx = ptr_array_index(array, ptr);
+    ptr_array_remove_index(array, idx);
+    return idx;
 }
 
-void *ptr_array_remove_idx(PointerArray *array, size_t pos)
+void *ptr_array_remove_index(PointerArray *array, size_t idx)
 {
-    BUG_ON(pos >= array->count);
+    BUG_ON(idx >= array->count);
     void **ptrs = array->ptrs;
-    void *removed = ptrs[pos];
+    void *removed = ptrs[idx];
     array->count--;
-    memmove(ptrs + pos, ptrs + pos + 1, (array->count - pos) * sizeof(void*));
+    memmove(ptrs + idx, ptrs + idx + 1, (array->count - idx) * sizeof(void*));
     return removed;
 }
 
-size_t ptr_array_idx(const PointerArray *array, const void *ptr)
+size_t ptr_array_index(const PointerArray *array, const void *ptr)
 {
     for (size_t i = 0, n = array->count; i < n; i++) {
         if (array->ptrs[i] == ptr) {

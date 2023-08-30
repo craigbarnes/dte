@@ -172,7 +172,7 @@ static void fix_size(const Frame *frame)
 static void add_to_sibling_size(Frame *frame, int count)
 {
     const Frame *parent = frame->parent;
-    size_t idx = ptr_array_idx(&parent->frames, frame);
+    size_t idx = ptr_array_index(&parent->frames, frame);
     BUG_ON(idx >= parent->frames.count);
     if (idx == parent->frames.count - 1) {
         frame = parent->frames.ptrs[idx - 1];
@@ -196,7 +196,7 @@ static int sub(Frame *frame, int count)
 static void subtract_from_sibling_size(const Frame *frame, int count)
 {
     const Frame *parent = frame->parent;
-    size_t idx = ptr_array_idx(&parent->frames, frame);
+    size_t idx = ptr_array_index(&parent->frames, frame);
     BUG_ON(idx >= parent->frames.count);
     void **ptrs = parent->frames.ptrs;
 
@@ -387,7 +387,7 @@ Frame *frame_split(Window *window, bool vertical, bool before)
         parent = frame;
     }
 
-    size_t idx = ptr_array_idx(&parent->frames, window->frame);
+    size_t idx = ptr_array_index(&parent->frames, window->frame);
     BUG_ON(idx >= parent->frames.count);
     idx += before ? 0 : 1;
     frame = add_frame(parent, new_window(window->editor), idx);
@@ -448,7 +448,7 @@ void frame_remove(EditorState *e, Frame *frame)
         c->w = parent->w;
         c->h = parent->h;
         if (gp) {
-            size_t idx = ptr_array_idx(&gp->frames, parent);
+            size_t idx = ptr_array_index(&gp->frames, parent);
             BUG_ON(idx >= gp->frames.count);
             gp->frames.ptrs[idx] = c;
         } else {

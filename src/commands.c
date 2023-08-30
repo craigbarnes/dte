@@ -986,7 +986,7 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
     Window *window = e->window;
     const size_t ntabs = window->views.count;
     const char *str = a->args[0];
-    size_t to, from = ptr_array_idx(&window->views, e->view);
+    size_t to, from = ptr_array_index(&window->views, e->view);
     BUG_ON(from >= ntabs);
     if (streq(str, "left")) {
         to = size_decrement_wrapped(from, ntabs);
@@ -1043,7 +1043,7 @@ static bool cmd_new_line(EditorState *e, const CommandArgs *a)
 static bool cmd_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    size_t i = ptr_array_idx(&e->window->views, e->view);
+    size_t i = ptr_array_index(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
     set_view(e->window->views.ptrs[size_increment_wrapped(i, n)]);
@@ -1305,7 +1305,7 @@ static bool cmd_pgup(EditorState *e, const CommandArgs *a)
 static bool cmd_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    size_t i = ptr_array_idx(&e->window->views, e->view);
+    size_t i = ptr_array_index(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
     set_view(e->window->views.ptrs[size_decrement_wrapped(i, n)]);
@@ -2363,7 +2363,7 @@ static bool cmd_wswap(EditorState *e, const CommandArgs *a)
         return false;
     }
 
-    size_t current = ptr_array_idx(&parent->frames, frame);
+    size_t current = ptr_array_index(&parent->frames, frame);
     size_t next = size_increment_wrapped(current, parent->frames.count);
     ptr_array_swap(&parent->frames, current, next);
     mark_everything_changed(e);
