@@ -69,12 +69,12 @@ static void test_parse_rgb(TestContext *ctx)
     EXPECT_EQ(parse_rgb(STRN("123456789")), COLOR_INVALID);
 }
 
-static void test_parse_term_color(TestContext *ctx)
+static void test_parse_term_style(TestContext *ctx)
 {
     static const struct {
         ssize_t expected_return;
         const char *const strs[4];
-        TermColor expected_color;
+        TermStyle expected_style;
     } tests[] = {
         {3, {"bold", "red", "yellow"}, {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
         {1, {"#ff0000"}, {COLOR_RGB(0xff0000), -1, 0}},
@@ -128,15 +128,15 @@ static void test_parse_term_color(TestContext *ctx)
         {0, {"1/2/\x9E"}, {COLOR_INVALID, COLOR_INVALID, 0}},
     };
     FOR_EACH_I(i, tests) {
-        const TermColor expected = tests[i].expected_color;
-        TermColor parsed = {COLOR_INVALID, COLOR_INVALID, 0};
+        const TermStyle expected = tests[i].expected_style;
+        TermStyle parsed = {COLOR_INVALID, COLOR_INVALID, 0};
         char **strs = (char**)tests[i].strs;
-        ssize_t n = parse_term_color(&parsed, strs, string_array_length(strs));
+        ssize_t n = parse_term_style(&parsed, strs, string_array_length(strs));
         IEXPECT_EQ(n, tests[i].expected_return);
         IEXPECT_EQ(parsed.fg, expected.fg);
         IEXPECT_EQ(parsed.bg, expected.bg);
         IEXPECT_EQ(parsed.attr, expected.attr);
-        IEXPECT_TRUE(same_color(&parsed, &expected));
+        IEXPECT_TRUE(same_style(&parsed, &expected));
     }
 }
 
@@ -246,11 +246,11 @@ static void test_color_to_nearest(TestContext *ctx)
     EXPECT_EQ(count, 255 + ARRAYLEN(color_stops) - 1);
 }
 
-static void test_term_color_to_string(TestContext *ctx)
+static void test_term_style_to_string(TestContext *ctx)
 {
     static const struct {
         const char *expected_string;
-        const TermColor color;
+        const TermStyle style;
     } tests[] = {
         {"red yellow bold", {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
         {"#ff0000", {COLOR_RGB(0xff0000), -1, 0}},
@@ -274,18 +274,18 @@ static void test_term_color_to_string(TestContext *ctx)
     };
 
     FOR_EACH_I(i, tests) {
-        const char *str = term_color_to_string(&tests[i].color);
+        const char *str = term_style_to_string(&tests[i].style);
         EXPECT_STREQ(str, tests[i].expected_string);
     }
 
     // Ensure longest possible color string doesn't overflow the
-    // static buffer in term_color_to_string()
-    const TermColor color = {
+    // static buffer in term_style_to_string()
+    const TermStyle style = {
         .fg = COLOR_LIGHTMAGENTA,
         .bg = COLOR_LIGHTMAGENTA,
         .attr = ~0U
     };
-    EXPECT_EQ(strlen(term_color_to_string(&color)), 94);
+    EXPECT_EQ(strlen(term_style_to_string(&style)), 94);
 }
 
 static void test_cursor_mode_from_str(TestContext *ctx)
@@ -1117,7 +1117,7 @@ static void test_term_set_bytes(TestContext *ctx)
     term_output_free(obuf);
 }
 
-static void test_term_set_color(TestContext *ctx)
+static void test_term_set_style(TestContext *ctx)
 {
     Terminal term = {.color_type = TERM_8_COLOR};
     term_init(&term, "tmux", "truecolor");
@@ -1129,29 +1129,29 @@ static void test_term_set_color(TestContext *ctx)
     ASSERT_TRUE(TERM_OUTBUF_SIZE >= 64);
     memset(obuf->buf, '?', 64);
 
-    TermColor c = {
+    TermStyle style = {
         .fg = COLOR_RED,
         .bg = COLOR_YELLOW,
         .attr = ATTR_BOLD | ATTR_REVERSE,
     };
 
-    term_set_color(&term, &c);
+    term_set_style(&term, &style);
     EXPECT_EQ(obuf->count, 14);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;1;7;31;43m", 14);
     ASSERT_TRUE(clear_obuf(obuf));
 
-    c.attr = 0;
-    c.fg = COLOR_RGB(0x12ef46);
-    term_set_color(&term, &c);
+    style.attr = 0;
+    style.fg = COLOR_RGB(0x12ef46);
+    term_set_style(&term, &style);
     EXPECT_EQ(obuf->count, 22);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;2;18;239;70;43m", 22);
     ASSERT_TRUE(clear_obuf(obuf));
 
-    c.fg = 144;
-    c.bg = COLOR_DEFAULT;
-    term_set_color(&term, &c);
+    style.fg = 144;
+    style.bg = COLOR_DEFAULT;
+    term_set_style(&term, &style);
     EXPECT_EQ(obuf->count, 13);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
@@ -1278,9 +1278,9 @@ static void test_term_begin_sync_update(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_parse_rgb),
-    TEST(test_parse_term_color),
+    TEST(test_parse_term_style),
     TEST(test_color_to_nearest),
-    TEST(test_term_color_to_string),
+    TEST(test_term_style_to_string),
     TEST(test_cursor_mode_from_str),
     TEST(test_cursor_type_from_str),
     TEST(test_cursor_color_from_str),
@@ -1297,7 +1297,7 @@ static const TestEntry tests[] = {
     TEST(test_term_clear_eol),
     TEST(test_term_move_cursor),
     TEST(test_term_set_bytes),
-    TEST(test_term_set_color),
+    TEST(test_term_set_style),
     TEST(test_term_osc52_copy),
     TEST(test_term_set_cursor_style),
     TEST(test_term_restore_cursor_style),

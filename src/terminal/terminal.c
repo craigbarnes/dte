@@ -15,7 +15,7 @@ typedef struct {
     const char name[12];
     unsigned int name_len : 4;
     unsigned int color_type : 3; // TermColorCapabilityType
-    unsigned int ncv_attrs : 5; // TermColor attributes (see "ncv" in terminfo(5))
+    unsigned int ncv_attrs : 5; // TermStyle attributes (see "ncv" in terminfo(5))
     unsigned int features : 20; // TermFeatureFlags
 } TermEntry;
 
@@ -35,7 +35,7 @@ enum {
 };
 
 enum {
-    // Short aliases for TermColor attributes:
+    // Short aliases for TermStyle attributes:
     UL = ATTR_UNDERLINE,
     REV = ATTR_REVERSE,
     DIM = ATTR_DIM,

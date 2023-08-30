@@ -42,8 +42,8 @@ typedef struct {
     // emit name or list name (COND_INLIST)
     char *emit_name;
 
-    // Set after all colors have been added (config loaded)
-    const TermColor *emit_color;
+    // Set after all styles have been added (config loaded)
+    const TermStyle *emit_style;
 } Action;
 
 typedef struct {
@@ -75,7 +75,7 @@ typedef struct {
     HashMap states;
     struct State *start_state;
     HashMap string_lists;
-    HashMap default_colors;
+    HashMap default_styles;
     bool heredoc;
     bool used;
     bool warned_unused_subsyntax;
@@ -121,9 +121,9 @@ void finalize_syntax(HashMap *syntaxes, Syntax *syn, unsigned int saved_nr_error
 
 Syntax *find_any_syntax(const HashMap *syntaxes, const char *name);
 Syntax *find_syntax(const HashMap *syntaxes, const char *name);
-void update_state_colors(const Syntax *syn, State *s, const ColorScheme *colors);
-void update_syntax_colors(Syntax *syn, const ColorScheme *colors);
-void update_all_syntax_colors(const HashMap *syntaxes, const ColorScheme *colors);
+void update_state_styles(const Syntax *syn, State *s, const ColorScheme *colors);
+void update_syntax_styles(Syntax *syn, const ColorScheme *colors);
+void update_all_syntax_styles(const HashMap *syntaxes, const ColorScheme *colors);
 void find_unused_subsyntaxes(const HashMap *syntaxes);
 void free_syntaxes(HashMap *syntaxes);
 

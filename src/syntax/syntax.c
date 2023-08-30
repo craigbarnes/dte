@@ -59,7 +59,7 @@ static void free_syntax_contents(Syntax *syn)
 {
     hashmap_free(&syn->states, FREE_FUNC(free_state));
     hashmap_free(&syn->string_lists, FREE_FUNC(free_string_list));
-    hashmap_free(&syn->default_colors, NULL);
+    hashmap_free(&syn->default_styles, NULL);
 }
 
 static void free_syntax(Syntax *syn)
@@ -143,12 +143,12 @@ Syntax *find_syntax(const HashMap *syntaxes, const char *name)
     return syn;
 }
 
-static const char *find_default_color(const Syntax *syn, const char *name)
+static const char *find_default_style(const Syntax *syn, const char *name)
 {
-    return hashmap_get(&syn->default_colors, name);
+    return hashmap_get(&syn->default_styles, name);
 }
 
-static void update_action_color(const Syntax *syn, Action *a, const ColorScheme *colors)
+static void update_action_style(const Syntax *syn, Action *a, const ColorScheme *colors)
 {
     const char *name = a->emit_name;
     if (!name) {
@@ -157,44 +157,44 @@ static void update_action_color(const Syntax *syn, Action *a, const ColorScheme 
 
     char full[256];
     xsnprintf(full, sizeof full, "%s.%s", syn->name, name);
-    a->emit_color = find_color(colors, full);
-    if (a->emit_color) {
+    a->emit_style = find_style(colors, full);
+    if (a->emit_style) {
         return;
     }
 
-    const char *def = find_default_color(syn, name);
+    const char *def = find_default_style(syn, name);
     if (!def) {
         return;
     }
 
     xsnprintf(full, sizeof full, "%s.%s", syn->name, def);
-    a->emit_color = find_color(colors, full);
+    a->emit_style = find_style(colors, full);
 }
 
-void update_state_colors(const Syntax *syn, State *s, const ColorScheme *colors)
+void update_state_styles(const Syntax *syn, State *s, const ColorScheme *colors)
 {
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
-        update_action_color(syn, &c->a, colors);
+        update_action_style(syn, &c->a, colors);
     }
-    update_action_color(syn, &s->default_action, colors);
+    update_action_style(syn, &s->default_action, colors);
 }
 
-void update_syntax_colors(Syntax *syn, const ColorScheme *colors)
+void update_syntax_styles(Syntax *syn, const ColorScheme *colors)
 {
     if (is_subsyntax(syn)) {
         // No point in updating colors of a sub-syntax
         return;
     }
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
-        update_state_colors(syn, it.entry->value, colors);
+        update_state_styles(syn, it.entry->value, colors);
     }
 }
 
-void update_all_syntax_colors(const HashMap *syntaxes, const ColorScheme *colors)
+void update_all_syntax_styles(const HashMap *syntaxes, const ColorScheme *colors)
 {
     for (HashMapIter it = hashmap_iter(syntaxes); hashmap_next(&it); ) {
-        update_syntax_colors(it.entry->value, colors);
+        update_syntax_styles(it.entry->value, colors);
     }
 }
 

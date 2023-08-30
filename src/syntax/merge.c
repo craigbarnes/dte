@@ -112,7 +112,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
         BUG_ON(!new_state);
         fix_conditions(syn, new_state, merge, prefix, buf);
         if (merge->delim) {
-            update_state_colors(syn, new_state, colors);
+            update_state_styles(syn, new_state, colors);
         }
     }
 

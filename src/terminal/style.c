@@ -105,7 +105,7 @@ static int32_t parse_color(const char *str)
 // Note: this function returns the number of valid strings parsed, or -1 if
 // more than 2 valid colors were encountered. Thus, success is indicated by
 // a return value equal to `nstrs`.
-ssize_t parse_term_color(TermColor *color, char **strs, size_t nstrs)
+ssize_t parse_term_style(TermStyle *style, char **strs, size_t nstrs)
 {
     int32_t colors[2] = {COLOR_DEFAULT, COLOR_DEFAULT};
     unsigned int attrs = 0;
@@ -135,7 +135,7 @@ ssize_t parse_term_color(TermColor *color, char **strs, size_t nstrs)
         colors[nr_colors++] = c;
     }
 
-    *color = (TermColor) {
+    *style = (TermStyle) {
         .fg = colors[0],
         .bg = colors[1],
         .attr = attrs
@@ -175,16 +175,16 @@ size_t color_to_str(char *buf, int32_t color)
     return 7;
 }
 
-const char *term_color_to_string(const TermColor *color)
+const char *term_style_to_string(const TermStyle *style)
 {
     static char buf[128];
-    size_t pos = color_to_str(buf, color->fg);
-    if (color->bg != COLOR_DEFAULT || (color->attr & ATTR_KEEP) != 0) {
+    size_t pos = color_to_str(buf, style->fg);
+    if (style->bg != COLOR_DEFAULT || (style->attr & ATTR_KEEP) != 0) {
         buf[pos++] = ' ';
-        pos += color_to_str(buf + pos, color->bg);
+        pos += color_to_str(buf + pos, style->bg);
     }
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
-        if (color->attr & (1U << i)) {
+        if (style->attr & (1U << i)) {
             size_t len = strlen(attr_names[i]);
             BUG_ON(pos + len + 2 >= sizeof(buf));
             buf[pos++] = ' ';

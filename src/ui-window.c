@@ -25,7 +25,7 @@ void update_window_separators(EditorState *e)
         return;
     }
 
-    set_builtin_color(&e->terminal, &e->colors, BC_STATUSLINE);
+    set_builtin_style(&e->terminal, &e->colors, BSE_STATUSLINE);
     frame_for_each_window(e->root_frame, print_separator, NULL);
 }
 
@@ -56,7 +56,7 @@ static void update_line_numbers(Terminal *term, const ColorScheme *colors, Windo
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
     term_output_reset(term, window->x, window->w, 0);
-    set_builtin_color(term, colors, BC_LINENUMBER);
+    set_builtin_style(term, colors, BSE_LINENUMBER);
 
     for (int y = 0, h = window->edit_h, edit_y = window->edit_y; y < h; y++) {
         unsigned long line = view->vy + y + 1;

@@ -737,8 +737,8 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
 
     char **strs = a->args + 1;
     size_t strs_len = a->nr_args - 1;
-    TermColor color;
-    ssize_t n = parse_term_color(&color, strs, strs_len);
+    TermStyle style;
+    ssize_t n = parse_term_style(&style, strs, strs_len);
     if (unlikely(n != strs_len)) {
         if (n < 0) {
             return error_msg("too many colors");
@@ -749,25 +749,25 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
 
     TermColorCapabilityType color_type = e->terminal.color_type;
     bool optimize = e->options.optimize_true_color;
-    int32_t fg = color_to_nearest(color.fg, color_type, optimize);
-    int32_t bg = color_to_nearest(color.bg, color_type, optimize);
+    int32_t fg = color_to_nearest(style.fg, color_type, optimize);
+    int32_t bg = color_to_nearest(style.bg, color_type, optimize);
     if (
         color_type != TERM_TRUE_COLOR
         && has_flag(a, 'c')
-        && (fg != color.fg || bg != color.bg)
+        && (fg != style.fg || bg != style.bg)
     ) {
         return true;
     }
 
-    color.fg = fg;
-    color.bg = bg;
-    set_highlight_color(&e->colors, a->args[0], &color);
+    style.fg = fg;
+    style.bg = bg;
+    set_highlight_style(&e->colors, a->args[0], &style);
 
 update:
     // Don't call update_all_syntax_colors() needlessly; it's called
     // right after config has been loaded
     if (e->status != EDITOR_INITIALIZING) {
-        update_all_syntax_colors(&e->syntaxes, &e->colors);
+        update_all_syntax_styles(&e->syntaxes, &e->colors);
         mark_everything_changed(e);
     }
     return true;

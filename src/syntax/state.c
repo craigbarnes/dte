@@ -254,7 +254,7 @@ static bool cmd_default(SyntaxParser *sp, const CommandArgs *a)
     }
 
     const char *value = str_intern(a->args[0]);
-    HashMap *map = &sp->current_syntax->default_colors;
+    HashMap *map = &sp->current_syntax->default_styles;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
         const char *name = a->args[i];
         const void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
@@ -654,7 +654,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
     }
 
     if (e->status != EDITOR_INITIALIZING) {
-        update_syntax_colors(syn, sp.colors);
+        update_syntax_styles(syn, sp.colors);
     }
 
     return syn;

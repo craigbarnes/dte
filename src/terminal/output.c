@@ -220,8 +220,8 @@ void term_clear_eol(Terminal *term)
     }
     if (
         obuf->can_clear
-        && (obuf->color.bg < 0 || term->features & TFLAG_BACK_COLOR_ERASE)
-        && !(obuf->color.attr & ATTR_REVERSE)
+        && (obuf->style.bg < 0 || term->features & TFLAG_BACK_COLOR_ERASE)
+        && !(obuf->style.attr & ATTR_REVERSE)
     ) {
         term_add_literal(obuf, "\033[K");
         obuf->x = end;
@@ -383,19 +383,19 @@ static void do_set_color(TermOutputBuffer *obuf, int32_t color, char ch)
     }
 }
 
-static bool attr_is_set(const TermColor *color, unsigned int attr, unsigned int ncv_attrs)
+static bool attr_is_set(const TermStyle *style, unsigned int attr, unsigned int ncv_attrs)
 {
-    if (color->attr & attr) {
+    if (style->attr & attr) {
         if (unlikely(ncv_attrs & attr)) {
             // Terminal only allows attr when not using colors
-            return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+            return style->fg == COLOR_DEFAULT && style->bg == COLOR_DEFAULT;
         }
         return true;
     }
     return false;
 }
 
-void term_set_color(Terminal *term, const TermColor *color)
+void term_set_style(Terminal *term, const TermStyle *style)
 {
     static const struct {
         char code;
@@ -416,16 +416,16 @@ void term_set_color(Terminal *term, const TermColor *color)
 
     unsigned int ncv_attributes = term->ncv_attributes;
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
-        if (attr_is_set(color, attr_map[i].attr, ncv_attributes)) {
+        if (attr_is_set(style, attr_map[i].attr, ncv_attributes)) {
             term_add_byte(obuf, ';');
             term_add_byte(obuf, attr_map[i].code);
         }
     }
 
-    do_set_color(obuf, color->fg, '3');
-    do_set_color(obuf, color->bg, '4');
+    do_set_color(obuf, style->fg, '3');
+    do_set_color(obuf, style->bg, '4');
     term_add_byte(obuf, 'm');
-    obuf->color = *color;
+    obuf->style = *style;
 }
 
 void term_set_cursor_style(Terminal *term, TermCursorStyle s)

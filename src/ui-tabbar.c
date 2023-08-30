@@ -135,7 +135,7 @@ static void print_tab_title(Terminal *term, const ColorScheme *colors, const Vie
     bool is_modified = buffer_modified(view->buffer);
     bool left_overflow = (obuf->x == 0 && idx > 0);
 
-    set_builtin_color(term, colors, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
+    set_builtin_style(term, colors, is_active_tab ? BSE_ACTIVETAB : BSE_INACTIVETAB);
     term_put_char(obuf, left_overflow ? '<' : ' ');
     term_add_str(obuf, tab_number);
     term_put_char(obuf, is_modified ? '+' : ':');
@@ -163,7 +163,7 @@ void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window)
         print_tab_title(term, colors, view, i);
     }
 
-    set_builtin_color(term, colors, BC_TABBAR);
+    set_builtin_style(term, colors, BSE_TABBAR);
 
     if (i == n) {
         term_clear_eol(term);

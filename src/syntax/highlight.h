@@ -9,7 +9,7 @@
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 
-const TermColor **hl_line (
+const TermStyle **hl_line (
     Syntax *syn,
     PointerArray *line_start_states,
     const ColorScheme *cs,

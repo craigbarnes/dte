@@ -182,9 +182,9 @@ void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *pref
     collect_bound_keys(&e->modes[INPUT_NORMAL].key_bindings, a, prefix);
 }
 
-void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix)
+void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
 {
-    collect_builtin_colors(a, prefix);
+    collect_builtin_styles(a, prefix);
     collect_hashmap_keys(&e->colors.other, a, prefix);
 }
 
@@ -334,7 +334,7 @@ static void complete_hi(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_hl_colors(e, &cs->completions, cs->parsed);
+        collect_hl_styles(e, &cs->completions, cs->parsed);
     } else {
         collect_colors_and_attributes(&cs->completions, cs->parsed);
     }

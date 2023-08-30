@@ -118,9 +118,9 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(obuf->scroll_x, 0);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_EQ(obuf->width, 0);
-    EXPECT_EQ(obuf->color.fg, 0);
-    EXPECT_EQ(obuf->color.bg, 0);
-    EXPECT_EQ(obuf->color.attr, 0);
+    EXPECT_EQ(obuf->style.fg, 0);
+    EXPECT_EQ(obuf->style.bg, 0);
+    EXPECT_EQ(obuf->style.attr, 0);
     EXPECT_EQ(obuf->cursor_style.type, 0);
     EXPECT_EQ(obuf->cursor_style.color, 0);
 

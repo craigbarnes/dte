@@ -115,16 +115,16 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_EQ(line.length, 65);
 
     bool next_changed;
-    const TermColor **hl = hl_line(syn, lss, colors, &line, line_nr, &next_changed);
+    const TermStyle **hl = hl_line(syn, lss, colors, &line, line_nr, &next_changed);
     ASSERT_NONNULL(hl);
     EXPECT_TRUE(next_changed);
 
-    const TermColor *t = find_color(colors, "text");
-    const TermColor *c = find_color(colors, "constant");
-    const TermColor *s = find_color(colors, "string");
-    const TermColor *x = find_color(colors, "special");
-    const TermColor *n = find_color(colors, "numeric");
-    const TermColor *y = find_color(colors, "type");
+    const TermStyle *t = find_style(colors, "text");
+    const TermStyle *c = find_style(colors, "constant");
+    const TermStyle *s = find_style(colors, "string");
+    const TermStyle *x = find_style(colors, "special");
+    const TermStyle *n = find_style(colors, "numeric");
+    const TermStyle *y = find_style(colors, "type");
     ASSERT_NONNULL(t);
     ASSERT_NONNULL(c);
     ASSERT_NONNULL(s);
@@ -138,7 +138,7 @@ static void test_hl_line(TestContext *ctx)
     EXPECT_EQ(n->fg, COLOR_BLUE);
     EXPECT_EQ(y->fg, COLOR_GREEN);
 
-    const TermColor *const expected_colors[] = {
+    const TermStyle *const expected_colors[] = {
         t, t, t, t, t, t, t, t, t, t, t, t, c, c, c, c,
         c, c, t, t, s, s, s, s, s, s, s, s, s, s, s, s,
         s, s, s, s, x, x, s, t, t, s, s, s, s, s, t, t,
@@ -153,7 +153,7 @@ static void test_hl_line(TestContext *ctx)
         if (i >= ARRAYLEN(expected_colors)) {
             continue;
         }
-        IEXPECT_TRUE(same_color(hl[i], expected_colors[i]));
+        IEXPECT_TRUE(same_style(hl[i], expected_colors[i]));
     }
 
     EXPECT_EQ(i, ARRAYLEN(expected_colors));

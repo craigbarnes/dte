@@ -74,29 +74,29 @@ static State *handle_heredoc (
 }
 
 // Set colors in range [start,end] and return number of colors set
-static size_t set_color_range (
-    const TermColor **colors,
+static size_t set_style_range (
+    const TermStyle **styles,
     const Action *action,
     size_t start,
     size_t end
 ) {
     BUG_ON(start > end);
-    const TermColor *color = action->emit_color;
+    const TermStyle *style = action->emit_style;
     for (size_t i = start; i < end; i++) {
-        colors[i] = color;
+        styles[i] = style;
     }
     return end - start;
 }
 
 // Line should be terminated with \n unless it's the last line
-static const TermColor **highlight_line (
+static const TermStyle **highlight_line (
     Syntax *syn,
     State *state,
     const ColorScheme *cs,
     const StringView *line_sv,
     State **ret
 ) {
-    static const TermColor **colors;
+    static const TermStyle **styles;
     static size_t alloc;
     const unsigned char *const line = line_sv->data;
     const size_t len = line_sv->length;
@@ -105,14 +105,14 @@ static const TermColor **highlight_line (
 
     if (len > alloc) {
         alloc = round_size_to_next_multiple(len, 128);
-        xrenew(colors, alloc);
+        xrenew(styles, alloc);
     }
 
     top:
     if (i >= len) {
         BUG_ON(i > len);
         *ret = state;
-        return colors;
+        return styles;
     }
 
     for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
@@ -127,14 +127,14 @@ static const TermColor **highlight_line (
             if (sidx < 0) {
                 sidx = i;
             }
-            colors[i++] = a->emit_color;
+            styles[i++] = a->emit_style;
             state = a->destination;
             goto top;
         case COND_BUFIS:
             if (sidx < 0 || !bufis(u, line + sidx, i - sidx)) {
                 break;
             }
-            set_color_range(colors, a, sidx, i);
+            set_style_range(styles, a, sidx, i);
             sidx = -1;
             state = a->destination;
             goto top;
@@ -142,7 +142,7 @@ static const TermColor **highlight_line (
             if (sidx < 0 || !bufis_icase(u, line + sidx, i - sidx)) {
                 break;
             }
-            set_color_range(colors, a, sidx, i);
+            set_style_range(styles, a, sidx, i);
             sidx = -1;
             state = a->destination;
             goto top;
@@ -150,7 +150,7 @@ static const TermColor **highlight_line (
             if (!bitset_contains(u->bitset, line[i])) {
                 break;
             }
-            colors[i++] = a->emit_color;
+            styles[i++] = a->emit_style;
             sidx = -1;
             state = a->destination;
             goto top;
@@ -158,7 +158,7 @@ static const TermColor **highlight_line (
             if (u->ch != line[i]) {
                 break;
             }
-            colors[i++] = a->emit_color;
+            styles[i++] = a->emit_style;
             sidx = -1;
             state = a->destination;
             goto top;
@@ -166,7 +166,7 @@ static const TermColor **highlight_line (
             if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
                 break;
             }
-            set_color_range(colors, a, sidx, i);
+            set_style_range(styles, a, sidx, i);
             sidx = -1;
             state = a->destination;
             goto top;
@@ -174,16 +174,16 @@ static const TermColor **highlight_line (
             if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
                 break;
             }
-            set_color_range(colors, a, sidx, i);
+            set_style_range(styles, a, sidx, i);
             state = a->destination;
             goto top;
         case COND_RECOLOR: {
             size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
-            set_color_range(colors, a, start, i);
+            set_style_range(styles, a, start, i);
             } break;
         case COND_RECOLOR_BUFFER:
             if (sidx >= 0) {
-                set_color_range(colors, a, sidx, i);
+                set_style_range(styles, a, sidx, i);
                 sidx = -1;
             }
             break;
@@ -193,7 +193,7 @@ static const TermColor **highlight_line (
             if (len < end || !mem_equal(u->str.buf, line + i, slen)) {
                 break;
             }
-            i += set_color_range(colors, a, i, end);
+            i += set_style_range(styles, a, i, end);
             sidx = -1;
             state = a->destination;
             goto top;
@@ -204,7 +204,7 @@ static const TermColor **highlight_line (
             if (len < end || !mem_equal_icase(u->str.buf, line + i, slen)) {
                 break;
             }
-            i += set_color_range(colors, a, i, end);
+            i += set_style_range(styles, a, i, end);
             sidx = -1;
             state = a->destination;
             goto top;
@@ -214,8 +214,8 @@ static const TermColor **highlight_line (
             if (len < i + 2 || !mem_equal(u->str.buf, line + i, 2)) {
                 break;
             }
-            colors[i++] = a->emit_color;
-            colors[i++] = a->emit_color;
+            styles[i++] = a->emit_style;
+            styles[i++] = a->emit_style;
             sidx = -1;
             state = a->destination;
             goto top;
@@ -224,7 +224,7 @@ static const TermColor **highlight_line (
             size_t slen = u->heredocend.length;
             size_t end = i + slen;
             if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
-                i += set_color_range(colors, a, i, end);
+                i += set_style_range(styles, a, i, end);
                 sidx = -1;
                 state = a->destination;
                 goto top;
@@ -237,7 +237,7 @@ static const TermColor **highlight_line (
 
     switch (state->type) {
     case STATE_EAT:
-        colors[i++] = state->default_action.emit_color;
+        styles[i++] = state->default_action.emit_style;
         // Fallthrough
     case STATE_NOEAT:
         sidx = -1;
@@ -380,7 +380,7 @@ void hl_fill_start_states (
     }
 }
 
-const TermColor **hl_line (
+const TermStyle **hl_line (
     Syntax *syn,
     PointerArray *line_start_states,
     const ColorScheme *cs,
@@ -396,7 +396,7 @@ const TermColor **hl_line (
     PointerArray *s = line_start_states;
     BUG_ON(line_nr >= s->count);
     State *next;
-    const TermColor **colors = highlight_line(syn, s->ptrs[line_nr++], cs, line, &next);
+    const TermStyle **styles = highlight_line(syn, s->ptrs[line_nr++], cs, line, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);
@@ -416,7 +416,7 @@ const TermColor **hl_line (
             mark_state_invalid(s->ptrs, line_nr + 1);
         }
     }
-    return colors;
+    return styles;
 }
 
 // Called after text has been inserted to re-highlight changed lines

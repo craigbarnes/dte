@@ -5,25 +5,25 @@
 #include "terminal/ioctl.h"
 #include "util/log.h"
 
-void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color)
+void set_style(Terminal *term, const ColorScheme *colors, const TermStyle *style)
 {
-    TermColor tmp = *color;
+    TermStyle tmp = *style;
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = colors->builtin[BC_DEFAULT].fg;
+        tmp.fg = colors->builtin[BSE_DEFAULT].fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = colors->builtin[BC_DEFAULT].bg;
+        tmp.bg = colors->builtin[BSE_DEFAULT].bg;
     }
-    if (same_color(&tmp, &term->obuf.color)) {
+    if (same_style(&tmp, &term->obuf.style)) {
         return;
     }
-    term_set_color(term, &tmp);
+    term_set_style(term, &tmp);
 }
 
-void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEnum c)
+void set_builtin_style(Terminal *term, const ColorScheme *colors, BuiltinStyleEnum s)
 {
-    set_color(term, colors, &colors->builtin[c]);
+    set_style(term, colors, &colors->builtin[s]);
 }
 
 static void update_cursor_style(EditorState *e)
@@ -67,16 +67,16 @@ void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_tit
     term_add_literal(obuf, " dte\033\\");
 }
 
-void mask_color(TermColor *color, const TermColor *over)
+void mask_style(TermStyle *style, const TermStyle *over)
 {
     if (over->fg != COLOR_KEEP) {
-        color->fg = over->fg;
+        style->fg = over->fg;
     }
     if (over->bg != COLOR_KEEP) {
-        color->bg = over->bg;
+        style->bg = over->bg;
     }
     if (!(over->attr & ATTR_KEEP)) {
-        color->attr = over->attr;
+        style->attr = over->attr;
     }
 }
 

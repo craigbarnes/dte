@@ -10,7 +10,7 @@
 }
 
 {
-   static TermColor** in highlight_line()
+   static TermStyle** in highlight_line()
    Memcheck:Leak
    match-leak-kinds: reachable
    ...

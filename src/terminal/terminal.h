@@ -64,7 +64,7 @@ typedef struct {
     uint8_t tab_mode; // TermTabOutputMode
     uint8_t tab_width;
     bool can_clear;
-    TermColor color;
+    TermStyle style;
     TermCursorStyle cursor_style;
 } TermOutputBuffer;
 

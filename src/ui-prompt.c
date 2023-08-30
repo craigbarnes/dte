@@ -34,7 +34,7 @@ static char get_choice(Terminal *term, const char *choices, unsigned int esc_tim
 
 static void show_dialog (
     EditorState *e,
-    const TermColor *text_color,
+    const TermStyle *text_style,
     const char *question
 ) {
     Terminal *term = &e->terminal;
@@ -53,19 +53,19 @@ static void show_dialog (
 
     // The "underline" and "strikethrough" attributes should only apply
     // to the text, not the whole dialog background:
-    TermColor dialog_color = *text_color;
+    TermStyle dialog_style = *text_style;
     TermOutputBuffer *obuf = &term->obuf;
-    dialog_color.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
-    set_color(term, &e->colors, &dialog_color);
+    dialog_style.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
+    set_style(term, &e->colors, &dialog_style);
 
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(term, x, width, 0);
         term_move_cursor(obuf, x, y);
         if (y == mid) {
             term_set_bytes(term, ' ', (width - question_width) / 2);
-            set_color(term, &e->colors, text_color);
+            set_style(term, &e->colors, text_style);
             term_add_str(obuf, question);
-            set_color(term, &e->colors, &dialog_color);
+            set_style(term, &e->colors, &dialog_style);
         }
         term_clear_eol(term);
     }
@@ -73,13 +73,13 @@ static void show_dialog (
 
 char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
-    const TermColor *color = &e->colors.builtin[BC_DIALOG];
+    const TermStyle *style = &e->colors.builtin[BSE_DIALOG];
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
 
     normal_update(e);
     term_hide_cursor(term);
-    show_dialog(e, color, question);
+    show_dialog(e, style, question);
     show_message(term, &e->colors, question, false);
     term_output_flush(obuf);
 
@@ -91,7 +91,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         }
         ui_resize(e);
         term_hide_cursor(term);
-        show_dialog(e, color, question);
+        show_dialog(e, style, question);
         show_message(term, &e->colors, question, false);
         term_output_flush(obuf);
     }

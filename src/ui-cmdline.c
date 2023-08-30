@@ -4,13 +4,13 @@
 
 static void print_message(Terminal *term, const ColorScheme *colors, const char *msg, bool is_error)
 {
-    BuiltinColorEnum c = BC_COMMANDLINE;
+    BuiltinStyleEnum c = BSE_COMMANDLINE;
     if (msg[0]) {
-        c = is_error ? BC_ERRORMSG : BC_INFOMSG;
+        c = is_error ? BSE_ERRORMSG : BSE_INFOMSG;
     }
 
     TermOutputBuffer *obuf = &term->obuf;
-    set_builtin_color(term, colors, c);
+    set_builtin_style(term, colors, c);
 
     for (size_t i = 0; msg[i]; ) {
         CodePoint u = u_get_char(msg, i + 4, &i);
@@ -47,7 +47,7 @@ static size_t print_command(Terminal *term, const ColorScheme *colors, const Com
         obuf->scroll_x = w - term->width;
     }
 
-    set_builtin_color(term, colors, BC_COMMANDLINE);
+    set_builtin_style(term, colors, BSE_COMMANDLINE);
     term_put_char(obuf, prefix);
 
     size_t x = obuf->x - obuf->scroll_x;

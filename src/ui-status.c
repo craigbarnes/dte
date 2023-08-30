@@ -19,7 +19,7 @@ void update_status_line(const Window *window)
     static_assert_compatible_types(w, window->w);
     term_output_reset(term, window->x, w, 0);
     term_move_cursor(obuf, window->x, window->y + window->h - 1);
-    set_builtin_color(term, colors, BC_STATUSLINE);
+    set_builtin_style(term, colors, BSE_STATUSLINE);
 
     if (lw + rw <= w) {
         // Both fit

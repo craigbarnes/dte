@@ -121,11 +121,11 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
     return true;
 }
 
-static bool show_color(EditorState *e, const char *color_name, bool cflag)
+static bool show_color(EditorState *e, const char *name, bool cflag)
 {
-    const TermColor *hl = find_color(&e->colors, color_name);
+    const TermStyle *hl = find_style(&e->colors, name);
     if (!hl) {
-        info_msg("no color entry with name '%s'", color_name);
+        info_msg("no color entry with name '%s'", name);
         return true;
     }
 
@@ -133,11 +133,11 @@ static bool show_color(EditorState *e, const char *color_name, bool cflag)
         CommandLine *c = &e->cmdline;
         set_input_mode(e, INPUT_COMMAND);
         cmdline_clear(c);
-        string_append_hl_color(&c->buf, color_name, hl);
+        string_append_hl_style(&c->buf, name, hl);
         c->pos = c->buf.len;
     } else {
-        const char *color_str = term_color_to_string(hl);
-        info_msg("color '%s' is set to: %s", color_name, color_str);
+        const char *style_str = term_style_to_string(hl);
+        info_msg("color '%s' is set to: %s", name, style_str);
     }
 
     return true;
@@ -444,9 +444,9 @@ static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))
     return dump_builtin_configs();
 }
 
-static String do_dump_hl_colors(EditorState *e)
+static String do_dump_hl_styles(EditorState *e)
 {
-    return dump_hl_colors(&e->colors);
+    return dump_hl_styles(&e->colors);
 }
 
 static String do_dump_filetypes(EditorState *e)
@@ -481,13 +481,13 @@ static const ShowHandler show_handlers[] = {
     {"bind", DTERC, dump_all_bindings, show_binding, collect_bound_normal_keys},
     {"buffer", 0, do_dump_buffer, NULL, NULL},
     {"builtin", 0, do_dump_builtin_configs, show_builtin, do_collect_builtin_configs},
-    {"color", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
+    {"color", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
     {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
     {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
     {"env", 0, dump_env, show_env, collect_env},
     {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
     {"ft", DTERC, do_dump_filetypes, NULL, NULL},
-    {"hi", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
+    {"hi", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
     {"include", 0, do_dump_builtin_configs, show_builtin, do_collect_builtin_includes},
     {"macro", DTERC, do_dump_macro, NULL, NULL},
     {"msg", MSGLINE, do_dump_messages, NULL, NULL},
