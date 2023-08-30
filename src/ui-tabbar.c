@@ -137,9 +137,9 @@ static void print_tab_title(Terminal *term, const StyleMap *styles, const View *
 
     set_builtin_style(term, styles, is_active_tab ? BSE_ACTIVETAB : BSE_INACTIVETAB);
     term_put_char(obuf, left_overflow ? '<' : ' ');
-    term_add_str(obuf, tab_number);
+    term_put_str(obuf, tab_number);
     term_put_char(obuf, is_modified ? '+' : ':');
-    term_add_str(obuf, filename);
+    term_put_str(obuf, filename);
 
     size_t ntabs = view->window->views.count;
     bool right_overflow = (obuf->x == (obuf->width - 1) && idx < (ntabs - 1));

@@ -1011,7 +1011,7 @@ static void test_term_add_str(TestContext *ctx)
     ASSERT_TRUE(256 <= TERM_OUTBUF_SIZE);
     memset(obuf->buf, 0, 256);
 
-    term_add_str(obuf, "this should write nothing because obuf.width == 0");
+    term_put_str(obuf, "this should write nothing because obuf.width == 0");
     EXPECT_EQ(obuf->count, 0);
     EXPECT_EQ(obuf->x, 0);
 
@@ -1024,7 +1024,7 @@ static void test_term_add_str(TestContext *ctx)
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(obuf->can_clear, true);
 
-    term_add_str(obuf, "1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
+    term_put_str(obuf, "1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
     EXPECT_EQ(obuf->count, 20);
     EXPECT_EQ(obuf->x, 17);
     EXPECT_STREQ(obuf->buf, "1\xF0\x9F\xA7\xB2 ^I xyz ^I^M \xC2\xB6");

@@ -64,7 +64,7 @@ static void show_dialog (
         if (y == mid) {
             term_set_bytes(term, ' ', (width - question_width) / 2);
             set_style(term, &e->styles, text_style);
-            term_add_str(obuf, question);
+            term_put_str(obuf, question);
             set_style(term, &e->styles, &dialog_style);
         }
         term_clear_eol(term);

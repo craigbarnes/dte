@@ -60,11 +60,11 @@ void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_tit
     // FIXME: title must not contain control characters
     TermOutputBuffer *obuf = &term->obuf;
     const char *filename = buffer_filename(buffer);
-    term_add_literal(obuf, "\033]2;");
-    term_add_bytes(obuf, filename, strlen(filename));
-    term_add_byte(obuf, ' ');
-    term_add_byte(obuf, buffer_modified(buffer) ? '+' : '-');
-    term_add_literal(obuf, " dte\033\\");
+    term_put_literal(obuf, "\033]2;");
+    term_put_bytes(obuf, filename, strlen(filename));
+    term_put_byte(obuf, ' ');
+    term_put_byte(obuf, buffer_modified(buffer) ? '+' : '-');
+    term_put_literal(obuf, " dte\033\\");
 }
 
 void mask_style(TermStyle *style, const TermStyle *over)

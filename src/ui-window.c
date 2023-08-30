@@ -14,7 +14,7 @@ static void print_separator(Window *window, void* UNUSED_ARG(ud))
     const char sep = (e->options.window_separator == WINSEP_BAR) ? '|' : ' ';
     for (unsigned int y = window->y, n = y + window->h; y < n; y++) {
         term_move_cursor(obuf, x, y);
-        term_add_byte(obuf, sep);
+        term_put_byte(obuf, sep);
     }
 }
 
@@ -68,7 +68,7 @@ static void update_line_numbers(Terminal *term, const StyleMap *styles, Window *
             } while (line /= 10);
         }
         term_move_cursor(obuf, x, edit_y + y);
-        term_add_bytes(obuf, buf, width);
+        term_put_bytes(obuf, buf, width);
     }
 }
 

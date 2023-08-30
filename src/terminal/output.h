@@ -8,7 +8,7 @@
 #include "util/macros.h"
 #include "util/unicode.h"
 
-#define term_add_literal(buf, s) term_add_bytes(buf, s, STRLEN(s))
+#define term_put_literal(buf, s) term_put_bytes(buf, s, STRLEN(s))
 
 static inline size_t obuf_avail(TermOutputBuffer *obuf)
 {
@@ -18,12 +18,12 @@ static inline size_t obuf_avail(TermOutputBuffer *obuf)
 void term_output_init(TermOutputBuffer *obuf);
 void term_output_free(TermOutputBuffer *obuf);
 void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x);
-void term_add_byte(TermOutputBuffer *obuf, char ch);
-void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
+void term_put_byte(TermOutputBuffer *obuf, char ch);
+void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
 void term_set_bytes(Terminal *term, char ch, size_t count);
 void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count);
-void term_add_str(TermOutputBuffer *obuf, const char *str);
-void term_add_uint(TermOutputBuffer *obuf, unsigned int x);
+void term_put_str(TermOutputBuffer *obuf, const char *str);
+void term_put_uint(TermOutputBuffer *obuf, unsigned int x);
 void term_use_alt_screen_buffer(Terminal *term);
 void term_use_normal_screen_buffer(Terminal *term);
 void term_hide_cursor(Terminal *term);

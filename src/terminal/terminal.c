@@ -204,15 +204,15 @@ void term_enable_private_modes(Terminal *term)
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
     if (features & METAESC) {
-        term_add_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
+        term_put_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
     }
     if (features & KITTYKBD) {
-        term_add_literal(obuf, "\033[>5u");
+        term_put_literal(obuf, "\033[>5u");
     } else if (features & ITERM2) {
-        term_add_literal(obuf, "\033[>1u");
+        term_put_literal(obuf, "\033[>1u");
     } else {
         // Try to use "modifyOtherKeys" mode
-        term_add_literal(obuf, "\033[>4;1m");
+        term_put_literal(obuf, "\033[>4;1m");
     }
 
     // Try to enable bracketed paste mode. This is done unconditionally,
@@ -222,7 +222,7 @@ void term_enable_private_modes(Terminal *term)
 
     // TODO: fix term_read_bracketed_paste() to handle end delimiters
     // that get split between 2 reads before re-enabling this
-    //term_add_literal(obuf, "\033[?2004s\033[?2004h");
+    //term_put_literal(obuf, "\033[?2004s\033[?2004h");
 }
 
 void term_restore_private_modes(Terminal *term)
@@ -230,14 +230,14 @@ void term_restore_private_modes(Terminal *term)
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
     if (features & METAESC) {
-        term_add_literal(obuf, "\033[?1036;1039r");
+        term_put_literal(obuf, "\033[?1036;1039r");
     }
     if (features & (KITTYKBD | ITERM2)) {
-        term_add_literal(obuf, "\033[<u");
+        term_put_literal(obuf, "\033[<u");
     } else {
-        term_add_literal(obuf, "\033[>4m");
+        term_put_literal(obuf, "\033[>4m");
     }
-    //term_add_literal(obuf, "\033[?2004l\033[?2004r");
+    //term_put_literal(obuf, "\033[?2004l\033[?2004r");
 }
 
 void term_restore_cursor_style(Terminal *term)

@@ -22,23 +22,23 @@ void update_status_line(const Window *window)
 
     if (lw + rw <= w) {
         // Both fit
-        term_add_str(obuf, lbuf);
+        term_put_str(obuf, lbuf);
         term_set_bytes(term, ' ', w - lw - rw);
-        term_add_str(obuf, rbuf);
+        term_put_str(obuf, rbuf);
     } else if (lw <= w && rw <= w) {
         // Both would fit separately, draw overlapping
-        term_add_str(obuf, lbuf);
+        term_put_str(obuf, lbuf);
         obuf->x = w - rw;
         term_move_cursor(obuf, window->x + w - rw, window->y + window->h - 1);
-        term_add_str(obuf, rbuf);
+        term_put_str(obuf, rbuf);
     } else if (lw <= w) {
         // Left fits
-        term_add_str(obuf, lbuf);
+        term_put_str(obuf, lbuf);
         term_clear_eol(term);
     } else if (rw <= w) {
         // Right fits
         term_set_bytes(term, ' ', w - rw);
-        term_add_str(obuf, rbuf);
+        term_put_str(obuf, rbuf);
     } else {
         term_clear_eol(term);
     }

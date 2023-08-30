@@ -14,14 +14,14 @@ bool term_osc52_copy(TermOutputBuffer *output, const char *text, size_t text_len
         return false;
     }
 
-    term_add_literal(output, "\033]52;");
+    term_put_literal(output, "\033]52;");
     if (primary) {
-        term_add_byte(output, 'p');
+        term_put_byte(output, 'p');
     }
     if (clipboard) {
-        term_add_byte(output, 'c');
+        term_put_byte(output, 'c');
     }
-    term_add_byte(output, ';');
+    term_put_byte(output, ';');
 
     if (unlikely(text_len == 0)) {
         goto out;
@@ -42,10 +42,10 @@ bool term_osc52_copy(TermOutputBuffer *output, const char *text, size_t text_len
         olen += 4;
     }
 
-    term_add_bytes(output, buf, olen);
+    term_put_bytes(output, buf, olen);
 
 out:
     free(buf);
-    term_add_literal(output, "\033\\");
+    term_put_literal(output, "\033\\");
     return true;
 }

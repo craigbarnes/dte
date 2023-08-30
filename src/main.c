@@ -117,7 +117,7 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
     term_input_init(ibuf);
     term_output_init(obuf);
     term_enable_private_modes(&term);
-    term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
+    term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
     char keystr[KEYCODE_STR_MAX];
@@ -135,9 +135,9 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
             loop = false;
         }
         size_t keylen = keycode_to_string(key, keystr);
-        term_add_literal(obuf, "  ");
-        term_add_bytes(obuf, keystr, keylen);
-        term_add_literal(obuf, "\r\n");
+        term_put_literal(obuf, "  ");
+        term_put_bytes(obuf, keystr, keylen);
+        term_put_literal(obuf, "\r\n");
         term_output_flush(obuf);
     }
 
