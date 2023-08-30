@@ -1,7 +1,6 @@
 #ifndef BOOKMARK_H
 #define BOOKMARK_H
 
-#include <stdbool.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "view.h"

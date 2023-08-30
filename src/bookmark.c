@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include "bookmark.h"
 #include "buffer.h"

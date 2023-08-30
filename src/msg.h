@@ -1,7 +1,6 @@
 #ifndef MSG_H
 #define MSG_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "bookmark.h"
 #include "util/macros.h"
