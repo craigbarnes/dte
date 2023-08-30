@@ -10,7 +10,7 @@
 #include "util/xmalloc.h"
 #include "util/xstdio.h"
 
-void history_add(History *history, const char *text)
+void history_append(History *history, const char *text)
 {
     BUG_ON(history->max_entries < 2);
     if (text[0] == '\0') {
@@ -110,7 +110,7 @@ void history_load(History *history, char *filename)
     }
 
     for (size_t pos = 0, size = ssize; pos < size; ) {
-        history_add(history, buf_next_line(buf, &pos, size));
+        history_append(history, buf_next_line(buf, &pos, size));
     }
 
     free(buf);

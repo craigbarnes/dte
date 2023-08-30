@@ -410,7 +410,7 @@ static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
     if (!cmdargs_has_flag(a, 'H') && str[0] != ' ') {
         // This is done before handle_command() because "command [text]"
         // can modify the contents of the command-line
-        history_add(&e->command_history, str);
+        history_append(&e->command_history, str);
     }
 
     current_command = NULL;
@@ -445,7 +445,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         BUG_ON(!str);
         search_set_regexp(&e->search, str);
         if (add_to_history) {
-            history_add(&e->search_history, str);
+            history_append(&e->search_history, str);
         }
     }
 

@@ -26,7 +26,7 @@ typedef struct {
     size_t max_entries;
 } History;
 
-void history_add(History *history, const char *text);
+void history_append(History *history, const char *text);
 bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
 bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
 void history_load(History *history, char *filename);

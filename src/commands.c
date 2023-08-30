@@ -1921,7 +1921,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     }
 
     if (!has_flag(a, 'H')) {
-        history_add(&e->search_history, pattern);
+        history_append(&e->search_history, pattern);
     }
 
     return found;

@@ -16,7 +16,7 @@ enum {
     MAX_ENTRIES = 512
 };
 
-void file_history_add(FileHistory *history, unsigned long row, unsigned long col, const char *filename)
+void file_history_append(FileHistory *history, unsigned long row, unsigned long col, const char *filename)
 {
     BUG_ON(row == 0);
     BUG_ON(col == 0);
@@ -106,7 +106,7 @@ void file_history_load(FileHistory *history, char *filename)
             continue;
         }
         buf[pos - 1] = '\0'; // null-terminate line, by replacing '\n' with '\0'
-        file_history_add(history, row, col, line.data);
+        file_history_append(history, row, col, line.data);
     }
 
     free(buf);

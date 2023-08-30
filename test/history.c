@@ -6,21 +6,21 @@
 #include "util/readfile.h"
 #include "util/xmalloc.h"
 
-static void test_history_add(TestContext *ctx)
+static void test_history_append(TestContext *ctx)
 {
     History h = {.max_entries = 7};
-    history_add(&h, "A");
+    history_append(&h, "A");
     EXPECT_EQ(h.entries.count, 1);
     EXPECT_STREQ(h.first->text, "A");
     EXPECT_NULL(h.first->prev);
     EXPECT_NULL(h.first->next);
     EXPECT_PTREQ(h.first, h.last);
 
-    history_add(&h, "A");
+    history_append(&h, "A");
     EXPECT_EQ(h.entries.count, 1);
     EXPECT_PTREQ(h.first, h.last);
 
-    history_add(&h, "B");
+    history_append(&h, "B");
     EXPECT_EQ(h.entries.count, 2);
     EXPECT_STREQ(h.first->text, "A");
     EXPECT_STREQ(h.last->text, "B");
@@ -29,7 +29,7 @@ static void test_history_add(TestContext *ctx)
     EXPECT_PTREQ(h.first->next, h.last);
     EXPECT_PTREQ(h.last->prev, h.first);
 
-    history_add(&h, "C");
+    history_append(&h, "C");
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.first->text, "A");
     EXPECT_STREQ(h.first->next->text, "B");
@@ -38,7 +38,7 @@ static void test_history_add(TestContext *ctx)
     EXPECT_NULL(h.first->prev);
     EXPECT_NULL(h.last->next);
 
-    history_add(&h, "A");
+    history_append(&h, "A");
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.last->text, "A");
     EXPECT_STREQ(h.first->text, "B");
@@ -47,7 +47,7 @@ static void test_history_add(TestContext *ctx)
     EXPECT_STREQ(h.first->next->text, "C");
     EXPECT_STREQ(h.last->prev->text, "C");
 
-    history_add(&h, "C");
+    history_append(&h, "C");
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.last->text, "C");
     EXPECT_STREQ(h.first->text, "B");
@@ -56,30 +56,30 @@ static void test_history_add(TestContext *ctx)
     EXPECT_STREQ(h.first->next->text, "A");
     EXPECT_STREQ(h.last->prev->text, "A");
 
-    history_add(&h, "B");
-    history_add(&h, "C");
+    history_append(&h, "B");
+    history_append(&h, "C");
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.first->text, "A");
     EXPECT_STREQ(h.first->next->text, "B");
     EXPECT_STREQ(h.last->prev->text, "B");
     EXPECT_STREQ(h.last->text, "C");
 
-    history_add(&h, "D");
-    history_add(&h, "E");
-    history_add(&h, "F");
-    history_add(&h, "G");
+    history_append(&h, "D");
+    history_append(&h, "E");
+    history_append(&h, "F");
+    history_append(&h, "G");
     EXPECT_EQ(h.entries.count, 7);
     EXPECT_STREQ(h.last->text, "G");
     EXPECT_STREQ(h.first->text, "A");
     EXPECT_STREQ(h.last->prev->text, "F");
 
-    history_add(&h, "H");
+    history_append(&h, "H");
     EXPECT_EQ(h.entries.count, 7);
     EXPECT_STREQ(h.last->text, "H");
     EXPECT_STREQ(h.first->text, "B");
     EXPECT_STREQ(h.last->prev->text, "G");
 
-    history_add(&h, "I");
+    history_append(&h, "I");
     EXPECT_EQ(h.entries.count, 7);
     EXPECT_STREQ(h.last->text, "I");
     EXPECT_STREQ(h.first->text, "C");
@@ -89,17 +89,17 @@ static void test_history_add(TestContext *ctx)
     h = (History){.max_entries = 2};
     EXPECT_EQ(h.entries.count, 0);
 
-    history_add(&h, "1");
+    history_append(&h, "1");
     EXPECT_EQ(h.entries.count, 1);
     EXPECT_STREQ(h.last->text, "1");
     EXPECT_STREQ(h.first->text, "1");
 
-    history_add(&h, "2");
+    history_append(&h, "2");
     EXPECT_EQ(h.entries.count, 2);
     EXPECT_STREQ(h.last->text, "2");
     EXPECT_STREQ(h.first->text, "1");
 
-    history_add(&h, "3");
+    history_append(&h, "3");
     EXPECT_EQ(h.entries.count, 2);
     EXPECT_STREQ(h.last->text, "3");
     EXPECT_STREQ(h.first->text, "2");
@@ -166,7 +166,7 @@ static void test_history_tombstone_pressure(TestContext *ctx)
 {
     History h = {.max_entries = 512};
     for (unsigned int i = 0; i < 12000; i++) {
-        history_add(&h, uint_to_str(i));
+        history_append(&h, uint_to_str(i));
     }
 
     EXPECT_EQ(h.entries.count, h.max_entries);
@@ -227,7 +227,7 @@ static void test_file_history_find(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
-    TEST(test_history_add),
+    TEST(test_history_append),
     TEST(test_history_search),
     TEST(test_history_tombstone_pressure),
     TEST(test_file_history_find),

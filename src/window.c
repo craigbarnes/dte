@@ -217,7 +217,7 @@ size_t remove_view(View *view)
     if (buffer->views.count == 0) {
         if (buffer->options.file_history && buffer->abs_filename) {
             FileHistory *hist = &e->file_history;
-            file_history_add(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
+            file_history_append(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
         }
         remove_and_free_buffer(&e->buffers, buffer);
     }
