@@ -199,7 +199,7 @@ void free_editor_state(EditorState *e)
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
     hashmap_free(&e->compilers, FREE_FUNC(free_compiler));
-    hashmap_free(&e->colors.other, free);
+    hashmap_free(&e->styles.other, free);
     hashmap_free(&e->aliases, free);
 
     for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {

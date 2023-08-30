@@ -22,7 +22,7 @@
 typedef struct {
     const StringView *home_dir;
     const char *user_config_dir;
-    const ColorScheme *colors;
+    const StyleMap *styles;
     HashMap *syntaxes;
     Syntax *current_syntax;
     State *current_state;
@@ -134,7 +134,7 @@ static bool subsyntax_call(SyntaxParser *sp, const char *name, const char *ret, 
     }
 
     if (subsyn) {
-        *dest = merge_syntax(sp->current_syntax, &m, sp->colors);
+        *dest = merge_syntax(sp->current_syntax, &m, sp->styles);
         return true;
     }
 
@@ -624,7 +624,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
     SyntaxParser sp = {
         .home_dir = &e->home_dir,
         .user_config_dir = e->user_config_dir,
-        .colors = &e->colors,
+        .styles = &e->styles,
         .syntaxes = &e->syntaxes,
         .current_syntax = NULL,
         .current_state = NULL,
@@ -654,7 +654,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
     }
 
     if (e->status != EDITOR_INITIALIZING) {
-        update_syntax_styles(syn, sp.colors);
+        update_syntax_styles(syn, sp.styles);
     }
 
     return syn;

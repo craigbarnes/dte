@@ -23,9 +23,9 @@ typedef struct {
 } LineInfo;
 
 // Like mask_style() but can change bg color only if it has not been changed yet
-static void mask_style2(const ColorScheme *colors, TermStyle *style, const TermStyle *over)
+static void mask_style2(const StyleMap *styles, TermStyle *style, const TermStyle *over)
 {
-    int32_t default_bg = colors->builtin[BSE_DEFAULT].bg;
+    int32_t default_bg = styles->builtin[BSE_DEFAULT].bg;
     if (over->bg != COLOR_KEEP && (style->bg == default_bg || style->bg < 0)) {
         style->bg = over->bg;
     }
@@ -40,14 +40,14 @@ static void mask_style2(const ColorScheme *colors, TermStyle *style, const TermS
 }
 
 static void mask_selection_and_current_line (
-    const ColorScheme *colors,
+    const StyleMap *styles,
     const LineInfo *info,
     TermStyle *style
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
-        mask_style(style, &colors->builtin[BSE_SELECTION]);
+        mask_style(style, &styles->builtin[BSE_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
-        mask_style2(colors, style, &colors->builtin[BSE_CURRENTLINE]);
+        mask_style2(styles, style, &styles->builtin[BSE_CURRENTLINE]);
     }
 }
 
@@ -148,16 +148,16 @@ static CodePoint screen_next_char(EditorState *e, LineInfo *info)
     if (info->styles && info->styles[pos]) {
         style = *info->styles[pos];
     } else {
-        style = e->colors.builtin[BSE_DEFAULT];
+        style = e->styles.builtin[BSE_DEFAULT];
     }
     if (is_non_text(u, e->options.display_special)) {
-        mask_style(&style, &e->colors.builtin[BSE_NONTEXT]);
+        mask_style(&style, &e->styles.builtin[BSE_NONTEXT]);
     }
     if (ws_error) {
-        mask_style(&style, &e->colors.builtin[BSE_WSERROR]);
+        mask_style(&style, &e->styles.builtin[BSE_WSERROR]);
     }
-    mask_selection_and_current_line(&e->colors, info, &style);
-    set_style(&e->terminal, &e->colors, &style);
+    mask_selection_and_current_line(&e->styles, info, &style);
+    set_style(&e->terminal, &e->styles, &style);
 
     info->offset += count;
     return u;
@@ -196,10 +196,10 @@ static bool is_notice(const char *word, size_t len)
 }
 
 // Highlight certain words inside comments
-static void hl_words(Terminal *term, const ColorScheme *colors, const LineInfo *info)
+static void hl_words(Terminal *term, const StyleMap *styles, const LineInfo *info)
 {
-    const TermStyle *cc = find_style(colors, "comment");
-    const TermStyle *nc = find_style(colors, "notice");
+    const TermStyle *cc = find_style(styles, "comment");
+    const TermStyle *nc = find_style(styles, "notice");
 
     if (!info->styles || !cc || !nc) {
         return;
@@ -321,8 +321,8 @@ static void print_line(EditorState *e, LineInfo *info)
         screen_skip_char(obuf, info);
     }
 
-    const ColorScheme *colors = &e->colors;
-    hl_words(term, colors, info);
+    const StyleMap *styles = &e->styles;
+    hl_words(term, styles, info);
 
     while (info->pos < info->size) {
         BUG_ON(obuf->x > obuf->scroll_x + obuf->width);
@@ -337,16 +337,16 @@ static void print_line(EditorState *e, LineInfo *info)
     TermStyle style;
     if (e->options.display_special && obuf->x >= obuf->scroll_x) {
         // Syntax highlighter highlights \n but use default style anyway
-        style = colors->builtin[BSE_DEFAULT];
-        mask_style(&style, &colors->builtin[BSE_NONTEXT]);
-        mask_selection_and_current_line(colors, info, &style);
-        set_style(term, colors, &style);
+        style = styles->builtin[BSE_DEFAULT];
+        mask_style(&style, &styles->builtin[BSE_NONTEXT]);
+        mask_selection_and_current_line(styles, info, &style);
+        set_style(term, styles, &style);
         term_put_char(obuf, '$');
     }
 
-    style = colors->builtin[BSE_DEFAULT];
-    mask_selection_and_current_line(colors, info, &style);
-    set_style(term, colors, &style);
+    style = styles->builtin[BSE_DEFAULT];
+    mask_selection_and_current_line(styles, info, &style);
+    set_style(term, styles, &style);
     info->offset++;
     term_clear_eol(term);
 }
@@ -383,7 +383,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
     Syntax *syn = view->buffer->syn;
     PointerArray *lss = &view->buffer->line_start_states;
     BlockIter tmp = block_iter(view->buffer);
-    hl_fill_start_states(syn, lss, &e->colors, &tmp, info.line_nr);
+    hl_fill_start_states(syn, lss, &e->styles, &tmp, info.line_nr);
     long i;
 
     for (i = y1; got_line && i < y2; i++) {
@@ -393,7 +393,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
         StringView line;
         fill_line_nl_ref(&bi, &line);
         bool next_changed;
-        const TermStyle **styles = hl_line(syn, lss, &e->colors, &line, info.line_nr, &next_changed);
+        const TermStyle **styles = hl_line(syn, lss, &e->styles, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, styles);
         print_line(e, &info);
 
@@ -409,18 +409,18 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
 
     if (i < y2 && info.line_nr == view->cy) {
         // Dummy empty line is shown only if cursor is on it
-        TermStyle style = e->colors.builtin[BSE_DEFAULT];
+        TermStyle style = e->styles.builtin[BSE_DEFAULT];
 
         obuf->x = 0;
-        mask_style2(&e->colors, &style, &e->colors.builtin[BSE_CURRENTLINE]);
-        set_style(term, &e->colors, &style);
+        mask_style2(&e->styles, &style, &e->styles.builtin[BSE_CURRENTLINE]);
+        set_style(term, &e->styles, &style);
 
         term_move_cursor(obuf, edit_x, edit_y + i++);
         term_clear_eol(term);
     }
 
     if (i < y2) {
-        set_builtin_style(term, &e->colors, BSE_NOLINE);
+        set_builtin_style(term, &e->styles, BSE_NOLINE);
     }
     for (; i < y2; i++) {
         obuf->x = 0;

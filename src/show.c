@@ -123,7 +123,7 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 
 static bool show_color(EditorState *e, const char *name, bool cflag)
 {
-    const TermStyle *hl = find_style(&e->colors, name);
+    const TermStyle *hl = find_style(&e->styles, name);
     if (!hl) {
         info_msg("no color entry with name '%s'", name);
         return true;
@@ -446,7 +446,7 @@ static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))
 
 static String do_dump_hl_styles(EditorState *e)
 {
-    return dump_hl_styles(&e->colors);
+    return dump_hl_styles(&e->styles);
 }
 
 static String do_dump_filetypes(EditorState *e)

@@ -99,10 +99,10 @@ static void test_hl_line(TestContext *ctx)
     EXPECT_STREQ(syn->name, "c");
     EXPECT_FALSE(syn->heredoc);
 
-    const ColorScheme *colors = &e->colors;
+    const StyleMap *styles = &e->styles;
     PointerArray *lss = &buffer->line_start_states;
     BlockIter tmp = block_iter(buffer);
-    hl_fill_start_states(syn, lss, colors, &tmp, buffer->nl);
+    hl_fill_start_states(syn, lss, styles, &tmp, buffer->nl);
     block_iter_goto_line(&view->cursor, line_nr - 1);
     view_update_cursor_x(view);
     view_update_cursor_y(view);
@@ -115,16 +115,16 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_EQ(line.length, 65);
 
     bool next_changed;
-    const TermStyle **hl = hl_line(syn, lss, colors, &line, line_nr, &next_changed);
+    const TermStyle **hl = hl_line(syn, lss, styles, &line, line_nr, &next_changed);
     ASSERT_NONNULL(hl);
     EXPECT_TRUE(next_changed);
 
-    const TermStyle *t = find_style(colors, "text");
-    const TermStyle *c = find_style(colors, "constant");
-    const TermStyle *s = find_style(colors, "string");
-    const TermStyle *x = find_style(colors, "special");
-    const TermStyle *n = find_style(colors, "numeric");
-    const TermStyle *y = find_style(colors, "type");
+    const TermStyle *t = find_style(styles, "text");
+    const TermStyle *c = find_style(styles, "constant");
+    const TermStyle *s = find_style(styles, "string");
+    const TermStyle *x = find_style(styles, "special");
+    const TermStyle *n = find_style(styles, "numeric");
+    const TermStyle *y = find_style(styles, "type");
     ASSERT_NONNULL(t);
     ASSERT_NONNULL(c);
     ASSERT_NONNULL(s);
@@ -138,7 +138,7 @@ static void test_hl_line(TestContext *ctx)
     EXPECT_EQ(n->fg, COLOR_BLUE);
     EXPECT_EQ(y->fg, COLOR_GREEN);
 
-    const TermStyle *const expected_colors[] = {
+    const TermStyle *const expected_styles[] = {
         t, t, t, t, t, t, t, t, t, t, t, t, c, c, c, c,
         c, c, t, t, s, s, s, s, s, s, s, s, s, s, s, s,
         s, s, s, s, x, x, s, t, t, s, s, s, s, s, t, t,
@@ -150,13 +150,13 @@ static void test_hl_line(TestContext *ctx)
     for (size_t pos = 0; pos < line.length; i++) {
         CodePoint u = u_get_char(line.data, line.length, &pos);
         IEXPECT_EQ(u, line.data[i]);
-        if (i >= ARRAYLEN(expected_colors)) {
+        if (i >= ARRAYLEN(expected_styles)) {
             continue;
         }
-        IEXPECT_TRUE(same_style(hl[i], expected_colors[i]));
+        IEXPECT_TRUE(same_style(hl[i], expected_styles[i]));
     }
 
-    EXPECT_EQ(i, ARRAYLEN(expected_colors));
+    EXPECT_EQ(i, ARRAYLEN(expected_styles));
     window_close(window);
 }
 

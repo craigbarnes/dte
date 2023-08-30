@@ -5,15 +5,15 @@
 #include "terminal/ioctl.h"
 #include "util/log.h"
 
-void set_style(Terminal *term, const ColorScheme *colors, const TermStyle *style)
+void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style)
 {
     TermStyle tmp = *style;
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = colors->builtin[BSE_DEFAULT].fg;
+        tmp.fg = styles->builtin[BSE_DEFAULT].fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = colors->builtin[BSE_DEFAULT].bg;
+        tmp.bg = styles->builtin[BSE_DEFAULT].bg;
     }
     if (same_style(&tmp, &term->obuf.style)) {
         return;
@@ -21,9 +21,9 @@ void set_style(Terminal *term, const ColorScheme *colors, const TermStyle *style
     term_set_style(term, &tmp);
 }
 
-void set_builtin_style(Terminal *term, const ColorScheme *colors, BuiltinStyleEnum s)
+void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s)
 {
-    set_style(term, colors, &colors->builtin[s]);
+    set_style(term, styles, &styles->builtin[s]);
 }
 
 static void update_cursor_style(EditorState *e)

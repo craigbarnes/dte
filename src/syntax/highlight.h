@@ -12,7 +12,7 @@
 const TermStyle **hl_line (
     Syntax *syn,
     PointerArray *line_start_states,
-    const ColorScheme *cs,
+    const StyleMap *sm,
     const StringView *line,
     size_t line_nr,
     bool *next_changed
@@ -21,7 +21,7 @@ const TermStyle **hl_line (
 void hl_fill_start_states (
     Syntax *syn,
     PointerArray *line_start_states,
-    const ColorScheme *cs,
+    const StyleMap *sm,
     BlockIter *bi,
     size_t line_nr
 );

@@ -148,7 +148,7 @@ static const char *find_default_style(const Syntax *syn, const char *name)
     return hashmap_get(&syn->default_styles, name);
 }
 
-static void update_action_style(const Syntax *syn, Action *a, const ColorScheme *colors)
+static void update_action_style(const Syntax *syn, Action *a, const StyleMap *styles)
 {
     const char *name = a->emit_name;
     if (!name) {
@@ -157,7 +157,7 @@ static void update_action_style(const Syntax *syn, Action *a, const ColorScheme 
 
     char full[256];
     xsnprintf(full, sizeof full, "%s.%s", syn->name, name);
-    a->emit_style = find_style(colors, full);
+    a->emit_style = find_style(styles, full);
     if (a->emit_style) {
         return;
     }
@@ -168,33 +168,33 @@ static void update_action_style(const Syntax *syn, Action *a, const ColorScheme 
     }
 
     xsnprintf(full, sizeof full, "%s.%s", syn->name, def);
-    a->emit_style = find_style(colors, full);
+    a->emit_style = find_style(styles, full);
 }
 
-void update_state_styles(const Syntax *syn, State *s, const ColorScheme *colors)
+void update_state_styles(const Syntax *syn, State *s, const StyleMap *styles)
 {
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
-        update_action_style(syn, &c->a, colors);
+        update_action_style(syn, &c->a, styles);
     }
-    update_action_style(syn, &s->default_action, colors);
+    update_action_style(syn, &s->default_action, styles);
 }
 
-void update_syntax_styles(Syntax *syn, const ColorScheme *colors)
+void update_syntax_styles(Syntax *syn, const StyleMap *styles)
 {
     if (is_subsyntax(syn)) {
-        // No point in updating colors of a sub-syntax
+        // No point in updating styles of a sub-syntax
         return;
     }
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
-        update_state_styles(syn, it.entry->value, colors);
+        update_state_styles(syn, it.entry->value, styles);
     }
 }
 
-void update_all_syntax_styles(const HashMap *syntaxes, const ColorScheme *colors)
+void update_all_syntax_styles(const HashMap *syntaxes, const StyleMap *styles)
 {
     for (HashMapIter it = hashmap_iter(syntaxes); hashmap_next(&it); ) {
-        update_syntax_styles(it.entry->value, colors);
+        update_syntax_styles(it.entry->value, styles);
     }
 }
 

@@ -300,7 +300,7 @@ static void log_config_counts(const EditorState *e)
         "binds=%zu aliases=%zu hi=%zu ft=%zu option=%zu errorfmt=%zu(%zu)",
         nbinds,
         e->aliases.count,
-        e->colors.other.count + NR_BSE,
+        e->styles.other.count + NR_BSE,
         e->filetypes.count,
         e->file_options.count,
         e->compilers.count,
@@ -452,7 +452,7 @@ loop_break:;
     }
 
     log_config_counts(e);
-    update_all_syntax_styles(&e->syntaxes, &e->colors);
+    update_all_syntax_styles(&e->syntaxes, &e->styles);
 
     Window *window = new_window(e);
     e->window = window;

@@ -29,45 +29,45 @@ UNITTEST {
     CHECK_BSEARCH_STR_ARRAY(builtin_style_names, strcmp);
 }
 
-static TermStyle *find_real_style(ColorScheme *colors, const char *name)
+static TermStyle *find_real_style(StyleMap *styles, const char *name)
 {
     ssize_t idx = BSEARCH_IDX(name, builtin_style_names, vstrcmp);
     if (idx >= 0) {
         BUG_ON(idx >= ARRAYLEN(builtin_style_names));
-        return &colors->builtin[idx];
+        return &styles->builtin[idx];
     }
-    return hashmap_get(&colors->other, name);
+    return hashmap_get(&styles->other, name);
 }
 
-static const TermStyle *find_real_style_const(const ColorScheme *colors, const char *name)
+static const TermStyle *find_real_style_const(const StyleMap *styles, const char *name)
 {
-    return find_real_style((ColorScheme*)colors, name);
+    return find_real_style((StyleMap*)styles, name);
 }
 
-void set_highlight_style(ColorScheme *colors, const char *name, const TermStyle *style)
+void set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style)
 {
-    TermStyle *existing = find_real_style(colors, name);
+    TermStyle *existing = find_real_style(styles, name);
     if (existing) {
         *existing = *style;
     } else {
-        hashmap_insert(&colors->other, xstrdup(name), XMEMDUP(style));
+        hashmap_insert(&styles->other, xstrdup(name), XMEMDUP(style));
     }
 }
 
-const TermStyle *find_style(const ColorScheme *colors, const char *name)
+const TermStyle *find_style(const StyleMap *styles, const char *name)
 {
-    const TermStyle *style = find_real_style_const(colors, name);
+    const TermStyle *style = find_real_style_const(styles, name);
     if (style) {
         return style;
     }
 
     const char *dot = strchr(name, '.');
-    return dot ? find_real_style_const(colors, dot + 1) : NULL;
+    return dot ? find_real_style_const(styles, dot + 1) : NULL;
 }
 
-void clear_hl_styles(ColorScheme *colors)
+void clear_hl_styles(StyleMap *styles)
 {
-    hashmap_clear(&colors->other, free);
+    hashmap_clear(&styles->other, free);
 }
 
 void collect_builtin_styles(PointerArray *a, const char *prefix)
@@ -98,16 +98,16 @@ void string_append_hl_style(String *s, const char *name, const TermStyle *style)
     string_append_cstring(s, term_style_to_string(style));
 }
 
-String dump_hl_styles(const ColorScheme *colors)
+String dump_hl_styles(const StyleMap *styles)
 {
     String buf = string_new(4096);
     string_append_literal(&buf, "# UI colors:\n");
     for (size_t i = 0; i < NR_BSE; i++) {
-        string_append_hl_style(&buf, builtin_style_names[i], &colors->builtin[i]);
+        string_append_hl_style(&buf, builtin_style_names[i], &styles->builtin[i]);
         string_append_byte(&buf, '\n');
     }
 
-    const HashMap *hl_styles = &colors->other;
+    const HashMap *hl_styles = &styles->other;
     const size_t count = hl_styles->count;
     if (unlikely(count == 0)) {
         return buf;

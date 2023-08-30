@@ -29,13 +29,13 @@ typedef enum {
 typedef struct {
     TermStyle builtin[NR_BSE];
     HashMap other;
-} ColorScheme;
+} StyleMap;
 
-void set_highlight_style(ColorScheme *colors, const char *name, const TermStyle *style) NONNULL_ARGS;
-const TermStyle *find_style(const ColorScheme *colors, const char *name) NONNULL_ARGS;
-void clear_hl_styles(ColorScheme *colors) NONNULL_ARGS;
+void set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style) NONNULL_ARGS;
+const TermStyle *find_style(const StyleMap *styles, const char *name) NONNULL_ARGS;
+void clear_hl_styles(StyleMap *styles) NONNULL_ARGS;
 void collect_builtin_styles(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void string_append_hl_style(String *s, const char *name, const TermStyle *style) NONNULL_ARGS;
-String dump_hl_styles(const ColorScheme *colors) NONNULL_ARGS;
+String dump_hl_styles(const StyleMap *styles) NONNULL_ARGS;
 
 #endif

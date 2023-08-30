@@ -27,8 +27,8 @@ void update_screen(EditorState *e, const ScreenState *s);
 void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
-void set_style(Terminal *term, const ColorScheme *colors, const TermStyle *style);
-void set_builtin_style(Terminal *term, const ColorScheme *colors, BuiltinStyleEnum c);
+void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);
+void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s);
 void mask_style(TermStyle *style, const TermStyle *over);
 void start_update(Terminal *term);
 void end_update(EditorState *e);
@@ -37,10 +37,10 @@ void restore_cursor(EditorState *e);
 
 // ui-cmdline.c
 void update_command_line(EditorState *e);
-void show_message(Terminal *term, const ColorScheme *colors, const char *msg, bool is_error);
+void show_message(Terminal *term, const StyleMap *styles, const char *msg, bool is_error);
 
 // ui-tabbar.c
-void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window);
+void print_tabbar(Terminal *term, const StyleMap *styles, Window *window);
 
 // ui-status.c
 void update_status_line(const Window *window);

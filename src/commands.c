@@ -761,13 +761,13 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
 
     style.fg = fg;
     style.bg = bg;
-    set_highlight_style(&e->colors, a->args[0], &style);
+    set_highlight_style(&e->styles, a->args[0], &style);
 
 update:
-    // Don't call update_all_syntax_colors() needlessly; it's called
+    // Don't call update_all_syntax_styles() needlessly; it's called
     // right after config has been loaded
     if (e->status != EDITOR_INITIALIZING) {
-        update_all_syntax_styles(&e->syntaxes, &e->colors);
+        update_all_syntax_styles(&e->syntaxes, &e->styles);
         mark_everything_changed(e);
     }
     return true;

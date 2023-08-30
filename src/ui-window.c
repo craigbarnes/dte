@@ -25,11 +25,11 @@ void update_window_separators(EditorState *e)
         return;
     }
 
-    set_builtin_style(&e->terminal, &e->colors, BSE_STATUSLINE);
+    set_builtin_style(&e->terminal, &e->styles, BSE_STATUSLINE);
     frame_for_each_window(e->root_frame, print_separator, NULL);
 }
 
-static void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *window, bool force)
+static void update_line_numbers(Terminal *term, const StyleMap *styles, Window *window, bool force)
 {
     const View *view = window->view;
     size_t lines = view->buffer->nl;
@@ -56,7 +56,7 @@ static void update_line_numbers(Terminal *term, const ColorScheme *colors, Windo
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
     term_output_reset(term, window->x, window->w, 0);
-    set_builtin_style(term, colors, BSE_LINENUMBER);
+    set_builtin_style(term, styles, BSE_LINENUMBER);
 
     for (int y = 0, h = window->edit_h, edit_y = window->edit_y; y < h; y++) {
         unsigned long line = view->vy + y + 1;
@@ -80,10 +80,10 @@ static void update_window_full(Window *window, void* UNUSED_ARG(data))
     view_update_cursor_y(view);
     view_update(view, e->options.scroll_margin);
     if (e->options.tab_bar) {
-        print_tabbar(&e->terminal, &e->colors, window);
+        print_tabbar(&e->terminal, &e->styles, window);
     }
     if (e->options.show_line_numbers) {
-        update_line_numbers(&e->terminal, &e->colors, window, true);
+        update_line_numbers(&e->terminal, &e->styles, window, true);
     }
     update_range(e, view, view->vy, view->vy + window->edit_h);
     update_status_line(window);
@@ -99,7 +99,7 @@ void update_all_windows(EditorState *e)
 static void update_window(EditorState *e, Window *window)
 {
     if (e->options.tab_bar && window->update_tabbar) {
-        print_tabbar(&e->terminal, &e->colors, window);
+        print_tabbar(&e->terminal, &e->styles, window);
     }
 
     const View *view = window->view;
@@ -107,7 +107,7 @@ static void update_window(EditorState *e, Window *window)
     if (e->options.show_line_numbers) {
         // Force updating line numbers if all lines changed
         bool force = (buffer->changed_line_max == LONG_MAX);
-        update_line_numbers(&e->terminal, &e->colors, window, force);
+        update_line_numbers(&e->terminal, &e->styles, window, force);
     }
 
     long y1 = MAX(buffer->changed_line_min, view->vy);

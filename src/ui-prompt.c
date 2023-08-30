@@ -56,16 +56,16 @@ static void show_dialog (
     TermStyle dialog_style = *text_style;
     TermOutputBuffer *obuf = &term->obuf;
     dialog_style.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
-    set_style(term, &e->colors, &dialog_style);
+    set_style(term, &e->styles, &dialog_style);
 
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(term, x, width, 0);
         term_move_cursor(obuf, x, y);
         if (y == mid) {
             term_set_bytes(term, ' ', (width - question_width) / 2);
-            set_style(term, &e->colors, text_style);
+            set_style(term, &e->styles, text_style);
             term_add_str(obuf, question);
-            set_style(term, &e->colors, &dialog_style);
+            set_style(term, &e->styles, &dialog_style);
         }
         term_clear_eol(term);
     }
@@ -73,14 +73,14 @@ static void show_dialog (
 
 char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
-    const TermStyle *style = &e->colors.builtin[BSE_DIALOG];
+    const TermStyle *style = &e->styles.builtin[BSE_DIALOG];
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
 
     normal_update(e);
     term_hide_cursor(term);
     show_dialog(e, style, question);
-    show_message(term, &e->colors, question, false);
+    show_message(term, &e->styles, question, false);
     term_output_flush(obuf);
 
     unsigned int esc_timeout = e->options.esc_timeout;
@@ -92,7 +92,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         ui_resize(e);
         term_hide_cursor(term);
         show_dialog(e, style, question);
-        show_message(term, &e->colors, question, false);
+        show_message(term, &e->styles, question, false);
         term_output_flush(obuf);
     }
 
@@ -114,7 +114,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     start_update(term);
     update_term_title(term, e->buffer, e->options.set_window_title);
     update_buffer_windows(e, e->buffer);
-    show_message(term, &e->colors, question, false);
+    show_message(term, &e->styles, question, false);
     end_update(e);
 
     unsigned int esc_timeout = e->options.esc_timeout;
@@ -125,7 +125,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
         }
         ui_resize(e);
         term_hide_cursor(term);
-        show_message(term, &e->colors, question, false);
+        show_message(term, &e->styles, question, false);
         restore_cursor(e);
         term_show_cursor(term);
         term_output_flush(&term->obuf);

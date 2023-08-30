@@ -139,7 +139,7 @@ int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 
 void exec_builtin_color_reset(EditorState *e)
 {
-    clear_hl_styles(&e->colors);
+    clear_hl_styles(&e->styles);
     const StringView reset = string_view(builtin_color_reset, sizeof(builtin_color_reset) - 1);
     const ConfigState saved = current_config;
     current_config.file = "color/reset";

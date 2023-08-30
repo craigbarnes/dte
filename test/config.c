@@ -56,7 +56,7 @@ static void test_builtin_configs(TestContext *ctx)
         }
     }
 
-    update_all_syntax_styles(&e->syntaxes, &e->colors);
+    update_all_syntax_styles(&e->syntaxes, &e->styles);
 }
 
 static void expect_files_equal(TestContext *ctx, const char *path1, const char *path2)
@@ -283,7 +283,7 @@ void init_headless_mode(TestContext *ctx)
     e->terminal.width = 80;
     e->terminal.height = 24;
     exec_builtin_rc(e);
-    update_all_syntax_styles(&e->syntaxes, &e->colors);
+    update_all_syntax_styles(&e->syntaxes, &e->styles);
     e->options.lock_files = false;
     e->window = new_window(e);
     e->root_frame = new_root_frame(e->window);

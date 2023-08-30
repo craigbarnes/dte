@@ -10,7 +10,6 @@ void update_status_line(const Window *window)
     sf_format(window, opts, mode, lbuf, sizeof lbuf, opts->statusline_left);
     sf_format(window, opts, mode, rbuf, sizeof rbuf, opts->statusline_right);
 
-    const ColorScheme *colors = &e->colors;
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     size_t lw = u_str_width(lbuf);
@@ -19,7 +18,7 @@ void update_status_line(const Window *window)
     static_assert_compatible_types(w, window->w);
     term_output_reset(term, window->x, w, 0);
     term_move_cursor(obuf, window->x, window->y + window->h - 1);
-    set_builtin_style(term, colors, BSE_STATUSLINE);
+    set_builtin_style(term, &e->styles, BSE_STATUSLINE);
 
     if (lw + rw <= w) {
         // Both fit

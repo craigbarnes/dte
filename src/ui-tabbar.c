@@ -121,7 +121,7 @@ static void calculate_tabbar(Window *window)
     window->first_tab_idx = 0;
 }
 
-static void print_tab_title(Terminal *term, const ColorScheme *colors, const View *view, size_t idx)
+static void print_tab_title(Terminal *term, const StyleMap *styles, const View *view, size_t idx)
 {
     const char *filename = buffer_filename(view->buffer);
     int skip = view->tt_width - view->tt_truncated_width;
@@ -135,7 +135,7 @@ static void print_tab_title(Terminal *term, const ColorScheme *colors, const Vie
     bool is_modified = buffer_modified(view->buffer);
     bool left_overflow = (obuf->x == 0 && idx > 0);
 
-    set_builtin_style(term, colors, is_active_tab ? BSE_ACTIVETAB : BSE_INACTIVETAB);
+    set_builtin_style(term, styles, is_active_tab ? BSE_ACTIVETAB : BSE_INACTIVETAB);
     term_put_char(obuf, left_overflow ? '<' : ' ');
     term_add_str(obuf, tab_number);
     term_put_char(obuf, is_modified ? '+' : ':');
@@ -146,7 +146,7 @@ static void print_tab_title(Terminal *term, const ColorScheme *colors, const Vie
     term_put_char(obuf, right_overflow ? '>' : ' ');
 }
 
-void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window)
+void print_tabbar(Terminal *term, const StyleMap *styles, Window *window)
 {
     TermOutputBuffer *obuf = &term->obuf;
     term_output_reset(term, window->x, window->w, 0);
@@ -160,10 +160,10 @@ void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window)
         if (obuf->x + view->tt_truncated_width > window->w) {
             break;
         }
-        print_tab_title(term, colors, view, i);
+        print_tab_title(term, styles, view, i);
     }
 
-    set_builtin_style(term, colors, BSE_TABBAR);
+    set_builtin_style(term, styles, BSE_TABBAR);
 
     if (i == n) {
         term_clear_eol(term);

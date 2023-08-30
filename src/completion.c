@@ -185,7 +185,7 @@ void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *pref
 void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
 {
     collect_builtin_styles(a, prefix);
-    collect_hashmap_keys(&e->colors.other, a, prefix);
+    collect_hashmap_keys(&e->styles.other, a, prefix);
 }
 
 void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)

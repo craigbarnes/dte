@@ -65,7 +65,7 @@ static void fix_conditions (
 // pointers and strings as appropriate.
 // NOTE: string_lists is owned by Syntax, so there's no need to
 // copy it. Freeing Condition does not free any string lists.
-State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
+State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
 {
     // Generate a prefix for merged state names, to avoid clashes
     static unsigned int counter;
@@ -103,7 +103,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
         s->copied = true;
     }
 
-    // Fix conditions and update colors for newly merged states
+    // Fix conditions and update styles for newly merged states
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         const State *subsyn_state = it.entry->value;
         BUG_ON(!subsyn_state);
@@ -112,7 +112,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
         BUG_ON(!new_state);
         fix_conditions(syn, new_state, merge, prefix, buf);
         if (merge->delim) {
-            update_state_styles(syn, new_state, colors);
+            update_state_styles(syn, new_state, styles);
         }
     }
 

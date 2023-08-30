@@ -67,7 +67,7 @@ typedef struct EditorState {
     HashMap aliases;
     HashMap compilers;
     HashMap syntaxes;
-    ColorScheme colors;
+    StyleMap styles;
     CommandMacroState macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];
     Frame *root_frame;
