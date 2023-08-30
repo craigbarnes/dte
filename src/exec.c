@@ -131,7 +131,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     add_message_for_tag(&e->messages, &tag, &dir);
 
 activate:
-    activate_current_message_save(e->view);
+    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
 }
 
 static const char **lines_and_columns_env(const Window *window)

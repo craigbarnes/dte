@@ -383,8 +383,8 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
         {'s', SPAWN_QUIET},
     };
 
-    Compiler *c = find_compiler(&e->compilers, a->args[0]);
-    if (unlikely(!c)) {
+    Compiler *compiler = find_compiler(&e->compilers, a->args[0]);
+    if (unlikely(!compiler)) {
         return error_msg("No such error parser %s", a->args[0]);
     }
 
@@ -394,12 +394,11 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
         .flags = cmdargs_convert_flags(a, map, ARRAYLEN(map)),
     };
 
-    clear_messages(&e->messages);
-    bool ok = spawn_compiler(&ctx, c, &e->messages);
-    if (e->messages.array.count) {
-        activate_current_message_save(e->view);
-    }
-    return ok;
+    MessageArray *messages = &e->messages;
+    clear_messages(messages);
+    bool spawned = spawn_compiler(&ctx, compiler, messages);
+    activate_current_message_save(messages, &e->bookmarks, e->view);
+    return spawned;
 }
 
 static bool cmd_copy(EditorState *e, const CommandArgs *a)
@@ -1031,7 +1030,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     msgs->pos = p;
-    return activate_current_message(msgs, e->window);
+    return !!activate_current_message(msgs, e->window);
 }
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
@@ -2075,7 +2074,7 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
 
     const char *filename = e->buffer->abs_filename;
     size_t ntags = tag_lookup(&e->tagfile, &name, filename, &e->messages);
-    activate_current_message_save(e->view);
+    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
     return (ntags > 0);
 }
 
