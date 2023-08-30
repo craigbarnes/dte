@@ -33,9 +33,8 @@ void add_message(MessageArray *msgs, Message *m)
     ptr_array_append(&msgs->array, m);
 }
 
-bool activate_current_message(EditorState *e)
+bool activate_current_message(const MessageArray *msgs, Window *window)
 {
-    const MessageArray *msgs = &e->messages;
     size_t count = msgs->array.count;
     if (count == 0) {
         return true;
@@ -45,7 +44,7 @@ bool activate_current_message(EditorState *e)
     BUG_ON(pos >= count);
     const Message *m = msgs->array.ptrs[pos];
     const FileLocation *loc = m->loc;
-    if (loc && loc->filename && !file_location_go(e->window, loc)) {
+    if (loc && loc->filename && !file_location_go(window, loc)) {
         // Failed to jump to location; error message is visible
         return false;
     }
@@ -59,16 +58,16 @@ bool activate_current_message(EditorState *e)
     return true;
 }
 
-bool activate_current_message_save(EditorState *e)
+bool activate_current_message_save(const View *view)
 {
-    const View *view = e->view;
     const BlockIter save = view->cursor;
     FileLocation *loc = get_current_file_location(view);
-    bool ok = activate_current_message(e);
+    EditorState *e = view->window->editor;
+    bool ok = activate_current_message(&e->messages, e->window);
 
-    // Save position if file changed or cursor moved
-    view = e->view;
-    if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
+    const BlockIter *cursor = &e->view->cursor;
+    if (cursor->blk != save.blk || cursor->offset != save.offset) {
+        // Bookmark previous location if file changed or cursor moved
         bookmark_push(&e->bookmarks, loc);
     } else {
         file_location_free(loc);

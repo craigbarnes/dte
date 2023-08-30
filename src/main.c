@@ -523,7 +523,7 @@ loop_break:;
     if (tag) {
         StringView tag_sv = strview_from_cstring(tag);
         if (tag_lookup(&e->tagfile, &tag_sv, NULL, &e->messages)) {
-            activate_current_message(e);
+            activate_current_message(&e->messages, e->window);
             if (dview && nr_commands == 0 && window->views.count > 1) {
                 // Close default/empty buffer, if `-t` jumped to a tag
                 // and no commands were executed via `-c`

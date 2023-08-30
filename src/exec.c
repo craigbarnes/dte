@@ -96,7 +96,7 @@ static void parse_and_activate_message(EditorState *e, const String *str)
         return;
     }
     msgs->pos = MIN(x - 1, count - 1);
-    activate_current_message(e);
+    activate_current_message(msgs, e->window);
 }
 
 static void parse_and_goto_tag(EditorState *e, const String *str)
@@ -131,7 +131,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     add_message_for_tag(&e->messages, &tag, &dir);
 
 activate:
-    activate_current_message_save(e);
+    activate_current_message_save(e->view);
 }
 
 static const char **lines_and_columns_env(const Window *window)

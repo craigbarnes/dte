@@ -397,7 +397,7 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
     clear_messages(&e->messages);
     bool ok = spawn_compiler(&ctx, c, &e->messages);
     if (e->messages.array.count) {
-        activate_current_message_save(e);
+        activate_current_message_save(e->view);
     }
     return ok;
 }
@@ -1031,7 +1031,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     msgs->pos = p;
-    return activate_current_message(e);
+    return activate_current_message(msgs, e->window);
 }
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
@@ -2075,7 +2075,7 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
 
     const char *filename = e->buffer->abs_filename;
     size_t ntags = tag_lookup(&e->tagfile, &name, filename, &e->messages);
-    activate_current_message_save(e);
+    activate_current_message_save(e->view);
     return (ntags > 0);
 }
 
