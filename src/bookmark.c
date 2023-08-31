@@ -22,12 +22,12 @@ FileLocation *get_current_file_location(const View *view)
     return loc;
 }
 
-View *file_location_go(Window *window, const FileLocation *loc)
+bool file_location_go(Window *window, const FileLocation *loc)
 {
     View *view = window_open_buffer(window, loc->filename, true, NULL);
     if (!view) {
         // Failed to open file; error message should be visible
-        return NULL;
+        return false;
     }
 
     if (window->view != view) {
@@ -38,14 +38,14 @@ View *file_location_go(Window *window, const FileLocation *loc)
 
     if (loc->pattern) {
         if (!search_tag(view, loc->pattern)) {
-            return NULL;
+            return false;
         }
     } else if (loc->line > 0) {
         move_to_filepos(view, loc->line, MAX(loc->column, 1));
     }
 
     unselect(view);
-    return view;
+    return true;
 }
 
 static bool file_location_return(Window *window, const FileLocation *loc)

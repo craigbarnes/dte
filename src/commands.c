@@ -1030,7 +1030,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     msgs->pos = p;
-    return !!activate_current_message(msgs, e->window);
+    return activate_current_message(msgs, e->window);
 }
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)

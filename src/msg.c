@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "msg.h"
+#include "editor.h"
 #include "error.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -32,25 +33,20 @@ void add_message(MessageArray *msgs, Message *m)
     ptr_array_append(&msgs->array, m);
 }
 
-View *activate_current_message(const MessageArray *msgs, Window *window)
+bool activate_current_message(const MessageArray *msgs, Window *window)
 {
     size_t count = msgs->array.count;
     if (count == 0) {
-        return NULL;
+        return false;
     }
 
     size_t pos = msgs->pos;
     BUG_ON(pos >= count);
     const Message *m = msgs->array.ptrs[pos];
     const FileLocation *loc = m->loc;
-    View *view = NULL;
-
-    if (loc && loc->filename) {
-        view = file_location_go(window, loc);
-        if (!view) {
-            // Failed to jump to location; error message is visible
-            return NULL;
-        }
+    if (loc && loc->filename && !file_location_go(window, loc)) {
+        // Failed to jump to location; error message is visible
+        return false;
     }
 
     if (count == 1) {
@@ -59,7 +55,7 @@ View *activate_current_message(const MessageArray *msgs, Window *window)
         info_msg("[%zu/%zu] %s", pos + 1, count, m->msg);
     }
 
-    return view;
+    return true;
 }
 
 void activate_current_message_save (
@@ -73,18 +69,15 @@ void activate_current_message_save (
 
     const BlockIter save = view->cursor;
     FileLocation *loc = get_current_file_location(view);
-    view = activate_current_message(msgs, view->window);
+    activate_current_message(msgs, view->window);
+    const BlockIter *cursor = &view->window->editor->view->cursor;
 
-    if (view) {
-        const BlockIter *cursor = &view->cursor;
-        if (cursor->blk != save.blk || cursor->offset != save.offset) {
-            // Bookmark previous location if file changed or cursor moved
-            bookmark_push(bookmarks, loc);
-            return;
-        }
+    if (cursor->blk != save.blk || cursor->offset != save.offset) {
+        // Bookmark previous location if file changed or cursor moved
+        bookmark_push(bookmarks, loc);
+    } else {
+        file_location_free(loc);
     }
-
-    file_location_free(loc);
 }
 
 void clear_messages(MessageArray *msgs)
