@@ -261,8 +261,8 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     memcpy(m->msg + prefix_len, tag->name.data, tag->name.length);
     m->msg[msg_len] = '\0';
 
-    m->loc = xnew0(FileLocation, 1);
-    m->loc->filename = path_join_sv(dir, &tag->filename, false);
+    char *filename = path_join_sv(dir, &tag->filename, false);
+    m->loc = new_file_location(filename, 0, 0, 0);
 
     if (tag->pattern) {
         m->loc->pattern = tag->pattern; // Message takes ownership

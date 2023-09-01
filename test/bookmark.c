@@ -12,9 +12,7 @@ static void test_bookmark_push(TestContext *ctx)
 
     size_t n = 300;
     for (size_t i = 0; i < n; i++) {
-        FileLocation *loc = xmalloc(sizeof(*loc));
-        *loc = (FileLocation){.buffer_id = i};
-        bookmark_push(&bookmarks, loc);
+        bookmark_push(&bookmarks, new_file_location(NULL, i, 0, 0));
     }
 
     ASSERT_EQ(bookmarks.count, 256);

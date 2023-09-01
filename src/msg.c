@@ -68,16 +68,19 @@ void activate_current_message_save (
     }
 
     const BlockIter save = view->cursor;
-    FileLocation *loc = get_current_file_location(view);
+    const unsigned long line = view->cy + 1;
+    const unsigned long col = view->cx_char + 1;
     activate_current_message(msgs, view->window);
-    const BlockIter *cursor = &view->window->editor->view->cursor;
 
-    if (cursor->blk != save.blk || cursor->offset != save.offset) {
-        // Bookmark previous location if file changed or cursor moved
-        bookmark_push(bookmarks, loc);
-    } else {
-        file_location_free(loc);
+    const BlockIter *cursor = &view->window->editor->view->cursor;
+    if (cursor->blk == save.blk && cursor->offset == save.offset) {
+        return;
     }
+
+    // Active view or cursor position changed; bookmark previous location
+    const Buffer *b = view->buffer;
+    char *filename = b->abs_filename ? xstrdup(b->abs_filename) : NULL;
+    bookmark_push(bookmarks, new_file_location(filename, b->id, line, col));
 }
 
 void clear_messages(MessageArray *msgs)

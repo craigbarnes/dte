@@ -45,7 +45,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
         }
 
         Message *msg = new_message(str + m[mi].rm_so, m[mi].rm_eo - m[mi].rm_so);
-        msg->loc = xnew0(FileLocation, 1);
+        msg->loc = new_file_location(NULL, 0, 0, 0);
 
         int8_t fi = p->capture_index[ERRFMT_FILE];
         if (fi >= 0 && m[fi].rm_so >= 0) {

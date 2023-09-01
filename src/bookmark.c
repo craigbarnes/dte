@@ -7,19 +7,12 @@
 #include "move.h"
 #include "search.h"
 #include "util/debug.h"
-#include "util/xmalloc.h"
 
-FileLocation *get_current_file_location(const View *view)
+FileLocation *get_current_file_location(const View *v)
 {
-    const char *filename = view->buffer->abs_filename;
-    FileLocation *loc = xmalloc(sizeof(*loc));
-    *loc = (FileLocation) {
-        .filename = filename ? xstrdup(filename) : NULL,
-        .buffer_id = view->buffer->id,
-        .line = view->cy + 1,
-        .column = view->cx_char + 1
-    };
-    return loc;
+    const Buffer *b = v->buffer;
+    char *filename = b->abs_filename ? xstrdup(b->abs_filename) : NULL;
+    return new_file_location(filename, b->id, v->cy + 1, v->cx_char + 1);
 }
 
 bool file_location_go(Window *window, const FileLocation *loc)
