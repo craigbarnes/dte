@@ -33,11 +33,11 @@ static char get_choice(Terminal *term, const char *choices, unsigned int esc_tim
 }
 
 static void show_dialog (
-    EditorState *e,
+    Terminal *term,
+    const StyleMap *styles,
     const TermStyle *text_style,
     const char *question
 ) {
-    Terminal *term = &e->terminal;
     unsigned int question_width = u_str_width(question);
     unsigned int min_width = question_width + 2;
     if (term->height < 12 || term->width < min_width) {
@@ -56,16 +56,16 @@ static void show_dialog (
     TermStyle dialog_style = *text_style;
     TermOutputBuffer *obuf = &term->obuf;
     dialog_style.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
-    set_style(term, &e->styles, &dialog_style);
+    set_style(term, styles, &dialog_style);
 
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(term, x, width, 0);
         term_move_cursor(obuf, x, y);
         if (y == mid) {
             term_set_bytes(term, ' ', (width - question_width) / 2);
-            set_style(term, &e->styles, text_style);
+            set_style(term, styles, text_style);
             term_put_str(obuf, question);
-            set_style(term, &e->styles, &dialog_style);
+            set_style(term, styles, &dialog_style);
         }
         term_clear_eol(term);
     }
@@ -73,14 +73,15 @@ static void show_dialog (
 
 char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
-    const TermStyle *style = &e->styles.builtin[BSE_DIALOG];
+    const StyleMap *styles = &e->styles;
+    const TermStyle *style = &styles->builtin[BSE_DIALOG];
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
 
     normal_update(e);
     term_hide_cursor(term);
-    show_dialog(e, style, question);
-    show_message(term, &e->styles, question, false);
+    show_dialog(term, styles, style, question);
+    show_message(term, styles, question, false);
     term_output_flush(obuf);
 
     unsigned int esc_timeout = e->options.esc_timeout;
@@ -91,8 +92,8 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         }
         ui_resize(e);
         term_hide_cursor(term);
-        show_dialog(e, style, question);
-        show_message(term, &e->styles, question, false);
+        show_dialog(term, styles, style, question);
+        show_message(term, styles, question, false);
         term_output_flush(obuf);
     }
 
