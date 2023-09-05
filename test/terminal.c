@@ -1000,7 +1000,7 @@ static void test_term_init(TestContext *ctx)
     EXPECT_EQ(term.features, 0);
 }
 
-static void test_term_add_str(TestContext *ctx)
+static void test_term_put_str(TestContext *ctx)
 {
     Terminal term = {.width = 80, .height = 24};
     TermOutputBuffer *obuf = &term.obuf;
@@ -1293,7 +1293,7 @@ static const TestEntry tests[] = {
     TEST(test_keycode_to_string),
     TEST(test_parse_key_string),
     TEST(test_term_init),
-    TEST(test_term_add_str),
+    TEST(test_term_put_str),
     TEST(test_term_clear_eol),
     TEST(test_term_move_cursor),
     TEST(test_term_set_bytes),
