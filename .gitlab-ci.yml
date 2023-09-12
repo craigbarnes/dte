@@ -17,7 +17,6 @@ default:
         - make
         - cat build/feature.h
         - ldd dte
-        - make check-headers check-whitespace
         - make check
         - make check LDFLAGS=-static
 
@@ -88,6 +87,13 @@ android:
         - make CC="$CC_ARMV7A"
         - make CC="$CC_I686"
         - make CC="$CC_X86_64"
+
+lint:
+    stage: test
+    needs: []
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
+    script:
+        - make check-source
 
 coverage:
     stage: test
