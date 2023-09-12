@@ -81,7 +81,6 @@ EditorState *init_editor_state(void)
         .status = EDITOR_INITIALIZING,
         .input_mode = INPUT_NORMAL,
         .version = VERSION,
-        .new_file_mode = 0666 & ~get_umask(),
         .command_history = {
             .max_entries = 512,
         },
@@ -163,6 +162,10 @@ EditorState *init_editor_state(void)
     if (pgid != pid) {
         LOG_INFO("pgid: %jd", (intmax_t)pgid);
     }
+
+    mode_t mask = get_umask();
+    e->new_file_mode = 0666 & ~mask;
+    LOG_INFO("umask: %04o", 0777u & mask);
 
     set_and_check_locale();
     init_file_locks_context(e->user_config_dir, pid);
