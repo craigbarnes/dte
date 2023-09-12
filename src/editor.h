@@ -56,6 +56,7 @@ typedef struct EditorState {
     Terminal terminal;
     StringView home_dir;
     const char *user_config_dir;
+    mode_t new_file_mode;
     bool child_controls_terminal;
     bool everything_changed;
     bool cursor_style_changed;

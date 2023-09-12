@@ -1749,7 +1749,15 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    if (!save_buffer(buffer, absolute, &encoding, crlf, bom, hardlinks)) {
+    FileSaveContext ctx = {
+        .encoding = &encoding,
+        .new_file_mode = e->new_file_mode,
+        .crlf = crlf,
+        .write_bom = bom,
+        .hardlinks = hardlinks,
+    };
+
+    if (!save_buffer(buffer, absolute, &ctx)) {
         goto error;
     }
 

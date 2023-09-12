@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "editor.h"
 #include "bind.h"
@@ -66,6 +67,13 @@ static void set_and_check_locale(void)
     exit(EX_CONFIG);
 }
 
+static mode_t get_umask(void)
+{
+    mode_t old = umask(0);
+    umask(old);
+    return old;
+}
+
 EditorState *init_editor_state(void)
 {
     EditorState *e = xnew(EditorState, 1);
@@ -73,6 +81,7 @@ EditorState *init_editor_state(void)
         .status = EDITOR_INITIALIZING,
         .input_mode = INPUT_NORMAL,
         .version = VERSION,
+        .new_file_mode = 0666 & ~get_umask(),
         .command_history = {
             .max_entries = 512,
         },

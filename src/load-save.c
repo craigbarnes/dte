@@ -305,14 +305,6 @@ error:
     return false;
 }
 
-static mode_t get_umask(void)
-{
-    // Wonderful get-and-set API
-    mode_t old = umask(0);
-    umask(old);
-    return old;
-}
-
 static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType bom_type)
 {
     size_t size = 0;
@@ -380,8 +372,13 @@ static int xmkstemp_cloexec(char *path_template)
     return fd;
 }
 
-static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_t buflen)
-{
+static int tmp_file (
+    const char *filename,
+    const FileInfo *info,
+    mode_t new_file_mode,
+    char *buf,
+    size_t buflen
+) {
     if (str_has_prefix(filename, "/tmp/")) {
         // Don't use temporary file when saving file in /tmp because crontab
         // command doesn't like the file to be replaced
@@ -406,7 +403,7 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
 
     if (!info->mode) {
         // New file
-        if (xfchmod(fd, 0666 & ~get_umask()) != 0) {
+        if (xfchmod(fd, new_file_mode) != 0) {
             LOG_WARNING("failed to set file mode: %s", strerror(errno));
         }
         return fd;
@@ -449,22 +446,18 @@ static int xfsync(int fd)
 #endif
 }
 
-bool save_buffer (
-    Buffer *buffer,
-    const char *filename,
-    const Encoding *encoding,
-    bool crlf,
-    bool write_bom,
-    bool hardlinks
-) {
+bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx)
+{
+    BUG_ON(!ctx->encoding);
+
     char tmp[8192];
     tmp[0] = '\0';
     int fd = -1;
-    if (hardlinks) {
+    if (ctx->hardlinks) {
         LOG_INFO("target file has hard links; writing in-place");
     } else {
         // Try to use temporary file (safer)
-        fd = tmp_file(filename, &buffer->file, tmp, sizeof(tmp));
+        fd = tmp_file(filename, &buffer->file, ctx->new_file_mode, tmp, sizeof(tmp));
     }
 
     if (fd < 0) {
@@ -473,7 +466,7 @@ bool save_buffer (
         mode_t mode = buffer->file.mode;
         if (mode == 0) {
             // New file
-            mode = 0666 & ~get_umask();
+            mode = ctx->new_file_mode;
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
@@ -481,14 +474,14 @@ bool save_buffer (
         }
     }
 
-    FileEncoder *enc = new_file_encoder(encoding, crlf, fd);
+    FileEncoder *enc = new_file_encoder(ctx->encoding, ctx->crlf, fd);
     if (unlikely(!enc)) {
         // This should never happen because encoding is validated early
         error_msg_errno("new_file_encoder");
         goto error;
     }
 
-    EncodingType bom_type = write_bom ? encoding->type : UNKNOWN_ENCODING;
+    EncodingType bom_type = ctx->write_bom ? ctx->encoding->type : UNKNOWN_ENCODING;
     if (!write_buffer(buffer, enc, fd, bom_type)) {
         goto error;
     }
