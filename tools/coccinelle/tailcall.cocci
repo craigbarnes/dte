@@ -52,3 +52,26 @@ expression dest, a2, a3;
 - tail(dest, a2, a3);
 - return dest;
 + return tail(dest, a2, a3);
+
+@@
+expression false = false;
+expression fmt, x, y, z;
+@@
+
+(
+- error_msg(fmt);
+- return false;
++ return error_msg(fmt);
+|
+- error_msg(fmt, x);
+- return false;
++ return error_msg(fmt, x);
+|
+- error_msg(fmt, x, y);
+- return false;
++ return error_msg(fmt, x, y);
+|
+- error_msg(fmt, x, y, z);
+- return false;
++ return error_msg(fmt, x, y, z);
+)
