@@ -454,7 +454,7 @@ void frame_remove(EditorState *e, Frame *frame)
         } else {
             e->root_frame = c;
         }
-        free(parent->frames.ptrs);
+        ptr_array_free_array(&parent->frames);
         free(parent);
         parent = c;
     }

@@ -115,8 +115,8 @@ void free_buffer(Buffer *buffer)
     }
 
     free_changes(&buffer->change_head);
-    free(buffer->line_start_states.ptrs);
-    free(buffer->views.ptrs);
+    ptr_array_free_array(&buffer->line_start_states);
+    ptr_array_free_array(&buffer->views);
     free(buffer->display_filename);
     free(buffer->abs_filename);
 

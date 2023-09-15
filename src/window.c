@@ -191,7 +191,7 @@ static void window_remove_views(Window *window)
 void window_free(Window *window)
 {
     window_remove_views(window);
-    free(window->views.ptrs);
+    ptr_array_free_array(&window->views);
     window->frame = NULL;
     free(window);
 }
