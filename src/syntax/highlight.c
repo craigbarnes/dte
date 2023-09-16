@@ -5,6 +5,7 @@
 #include "syntax/merge.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/intern.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -48,9 +49,12 @@ static State *handle_heredoc (
     const char *delim,
     size_t len
 ) {
+    delim = mem_intern(delim, len);
     for (size_t i = 0, n = state->heredoc.states.count; i < n; i++) {
         HeredocState *s = state->heredoc.states.ptrs[i];
-        if (s->len == len && mem_equal(s->delim, delim, len)) {
+        // Note: this tests string equality via (interned) pointer equality
+        if (s->delim == delim) {
+            BUG_ON(s->len != len);
             return s->state;
         }
     }
@@ -65,7 +69,7 @@ static State *handle_heredoc (
     HeredocState *s = xnew(HeredocState, 1);
     *s = (HeredocState) {
         .state = merge_syntax(syn, &m, sm),
-        .delim = xmemdup(delim, len),
+        .delim = delim,
         .len = len,
     };
 

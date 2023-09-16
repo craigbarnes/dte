@@ -48,10 +48,8 @@ static void fix_conditions (
         if (!c->a.destination && cond_type_has_destination(c->type)) {
             c->a.destination = m->return_state;
         }
-
         if (m->delim && c->type == COND_HEREDOCEND) {
-            c->u.heredocend.data = xmemdup(m->delim, m->delim_len);
-            c->u.heredocend.length = m->delim_len;
+            c->u.heredocend = string_view(m->delim, m->delim_len);
         }
     }
 

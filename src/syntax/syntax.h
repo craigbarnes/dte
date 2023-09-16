@@ -100,8 +100,8 @@ typedef struct State {
 } State;
 
 typedef struct {
-    State *state;
-    char *delim;
+    State *state; // Borrowed (owned by `Syntax::states`)
+    const char *delim; // Interned
     size_t len;
 } HeredocState;
 
