@@ -9,10 +9,13 @@
 #include "util/string-view.h"
 #include "util/unicode.h"
 
+// An iterator used to represent the cursor position for each View of a
+// Buffer (see View::cursor) and also as a means for accessing/iterating
+// the Blocks that make up the text contents of a Buffer (see Buffer::blocks).
 typedef struct {
-    Block *blk;
-    const ListHead *head;
-    size_t offset;
+    Block *blk; // The Block this iterator/cursor currently points to
+    const ListHead *head; // A pointer to the Buffer::blocks that owns `blk`
+    size_t offset; // The current position within `blk->data`
 } BlockIter;
 
 static inline void block_iter_bof(BlockIter *bi)
