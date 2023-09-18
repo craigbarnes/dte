@@ -30,10 +30,7 @@ View *window_add_buffer(Window *window, Buffer *buffer)
     *view = (View) {
         .buffer = buffer,
         .window = window,
-        .cursor = {
-            .blk = BLOCK(buffer->blocks.next),
-            .head = &buffer->blocks,
-        }
+        .cursor = block_iter(buffer),
     };
 
     ptr_array_append(&buffer->views, view);
