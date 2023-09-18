@@ -8,13 +8,13 @@ static void test_sf_format(TestContext *ctx)
         .options = {.filetype = "none"},
     };
 
-    list_init(&buffer.blocks);
     Block *block = block_new(1);
+    list_init(&buffer.blocks);
     list_add_before(&block->node, &buffer.blocks);
 
     View view = {
         .buffer = &buffer,
-        .cursor = {.head = &buffer.blocks, .blk = block},
+        .cursor = block_iter(&buffer),
     };
 
     GlobalOptions opts = {.case_sensitive_search = CSS_FALSE};
