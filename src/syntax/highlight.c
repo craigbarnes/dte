@@ -28,18 +28,14 @@ static bool states_equal(void **ptrs, size_t idx, const State *b)
 
 static bool bufis(const ConditionData *u, const char *buf, size_t len)
 {
-    if (len != (size_t)u->str.len) {
-        return false;
-    }
-    return mem_equal(u->str.buf, buf, len);
+    size_t ulen = u->str.len;
+    return (ulen == len) && mem_equal(u->str.buf, buf, len);
 }
 
 static bool bufis_icase(const ConditionData *u, const char *buf, size_t len)
 {
-    if (len != (size_t)u->str.len) {
-        return false;
-    }
-    return mem_equal_icase(u->str.buf, buf, len);
+    size_t ulen = u->str.len;
+    return (ulen == len) && mem_equal_icase(u->str.buf, buf, len);
 }
 
 static State *handle_heredoc (
