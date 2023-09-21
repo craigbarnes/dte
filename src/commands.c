@@ -800,8 +800,9 @@ static bool cmd_insert(EditorState *e, const CommandArgs *a)
 
 static bool cmd_join(EditorState *e, const CommandArgs *a)
 {
-    BUG_ON(a->nr_args);
-    join_lines(e->view);
+    const char *delim = a->args[0] ? a->args[0] : " ";
+    size_t delim_len = strlen(delim);
+    join_lines(e->view, delim, delim_len);
     return true;
 }
 
@@ -2415,7 +2416,7 @@ static const Command cmds[] = {
     {"hi", "-c", true, 0, -1, cmd_hi},
     {"include", "bq", true, 1, 1, cmd_include},
     {"insert", "km", false, 1, 1, cmd_insert},
-    {"join", "", false, 0, 0, cmd_join},
+    {"join", "", false, 0, 1, cmd_join},
     {"left", "c", false, 0, 0, cmd_left},
     {"line", "", false, 1, 1, cmd_line},
     {"load-syntax", "", true, 1, 1, cmd_load_syntax},

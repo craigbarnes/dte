@@ -901,9 +901,10 @@ Clear current line.
 `-i`
 :   Do not [`auto-indent`] the line after clearing
 
-### **join**
+### **join** [_delimiter_]
 
-Join selection or next line to current.
+Join selection or next line to current using _delimiter_. If _delimiter_
+is not provided, a space is used.
 
 ### **new-line** [**-a**]
 

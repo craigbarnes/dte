@@ -363,7 +363,7 @@ void insert_ch(View *view, CodePoint ch)
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
-static void join_selection(View *view)
+static void join_selection(View *view, const char *delim, size_t delim_len)
 {
     size_t count = prepare_selection(view);
     size_t len = 0, join = 0;
@@ -387,9 +387,9 @@ static void join_selection(View *view)
             join++;
         } else {
             if (join) {
-                buffer_replace_bytes(view, len, " ", 1);
-                // Skip the space we inserted and the char we read last
-                block_iter_next_char(&view->cursor, &ch);
+                buffer_replace_bytes(view, len, delim, delim_len);
+                // Skip the delimiter we inserted and the char we read last
+                block_iter_skip_bytes(&view->cursor, delim_len);
                 block_iter_next_char(&view->cursor, &ch);
                 bi = view->cursor;
             }
@@ -415,12 +415,12 @@ static void join_selection(View *view)
     end_change_chain(view);
 }
 
-void join_lines(View *view)
+void join_lines(View *view, const char *delim, size_t delim_len)
 {
     BlockIter bi = view->cursor;
 
     if (view->selection) {
-        join_selection(view);
+        join_selection(view, delim, delim_len);
         return;
     }
 
@@ -453,7 +453,7 @@ void join_lines(View *view)
     if (u == '\n') {
         buffer_delete_bytes(view, count);
     } else {
-        buffer_replace_bytes(view, count, " ", 1);
+        buffer_replace_bytes(view, count, delim, delim_len);
     }
 }
 

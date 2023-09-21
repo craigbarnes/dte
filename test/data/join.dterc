@@ -1,0 +1,19 @@
+open
+insert "a\nb\nc"
+repeat 2 down -l
+join
+
+down
+
+insert "a\nb\nc"
+repeat 2 down -l
+join ","
+
+down
+
+insert "a\nb\nc"
+repeat 2 down -l
+join "=>"
+
+save -f build/test/join.txt
+close

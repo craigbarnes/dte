@@ -150,7 +150,7 @@ Editing Commands:
 .br
    \fBclear\fR
 .br
-   \fBjoin\fR
+   \fBjoin\fR [\fIdelimiter\fR]
 .br
    \fBnew\-line\fR [\fB\-a\fR]
 .br
@@ -1429,9 +1429,10 @@ Clear current line.
 Do not \fBauto\-indent\fR the line after clearing
 .PP
 .RE
-\fBjoin\fR
+\fBjoin\fR [\fIdelimiter\fR]
 .RS
-Join selection or next line to current.
+Join selection or next line to current using \fIdelimiter\fR. If \fIdelimiter\fR
+is not provided, a space is used.
 .P
 .RE
 \fBnew\-line\fR [\fB\-a\fR]

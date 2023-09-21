@@ -12,7 +12,7 @@ void insert_text(View *view, const char *text, size_t size, bool move_after);
 void delete_ch(View *view);
 void erase(View *view);
 void insert_ch(View *view, CodePoint ch);
-void join_lines(View *view);
+void join_lines(View *view, const char *delim, size_t delim_len);
 void clear_lines(View *view, bool auto_indent);
 void delete_lines(View *view);
 void new_line(View *view, bool above);
