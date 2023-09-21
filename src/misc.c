@@ -417,31 +417,36 @@ static void join_selection(View *view, const char *delim, size_t delim_len)
 
 void join_lines(View *view, const char *delim, size_t delim_len)
 {
-    BlockIter bi = view->cursor;
-
     if (view->selection) {
         join_selection(view, delim, delim_len);
         return;
     }
 
-    if (!block_iter_next_line(&bi)) {
-        return;
-    }
-    if (block_iter_is_eof(&bi)) {
+    // Create an iterator and position it at the beginning of the next line
+    // (or return early, if there is no next line)
+    BlockIter next = view->cursor;
+    if (!block_iter_next_line(&next) || block_iter_is_eof(&next)) {
         return;
     }
 
-    BlockIter next = bi;
+    // Create a second iterator and position it at the end of the current line
+    BlockIter eol = next;
     CodePoint u;
+    size_t nbytes = block_iter_prev_char(&eol, &u);
+    BUG_ON(nbytes != 1);
+    BUG_ON(u != '\n');
+
+    // Skip over trailing whitespace at the end of the current line
     size_t count = 1;
-    block_iter_prev_char(&bi, &u);
-    while (block_iter_prev_char(&bi, &u)) {
+    while (block_iter_prev_char(&eol, &u)) {
         if (u != '\t' && u != ' ') {
-            block_iter_next_char(&bi, &u);
+            block_iter_next_char(&eol, &u);
             break;
         }
         count++;
     }
+
+    // Skip over leading whitespace at the start of the next line
     while (block_iter_next_char(&next, &u)) {
         if (u != '\t' && u != ' ') {
             break;
@@ -449,10 +454,16 @@ void join_lines(View *view, const char *delim, size_t delim_len)
         count++;
     }
 
-    view->cursor = bi;
+    // Move the cursor to the join position
+    view->cursor = eol;
+
     if (u == '\n') {
+        // If the next line was empty (or whitespace only) just discard
+        // it, by deleting the newline and any whitespace
         buffer_delete_bytes(view, count);
     } else {
+        // Otherwise, join the current and next lines together, by
+        // replacing the newline/whitespace with the delimiter string
         buffer_replace_bytes(view, count, delim, delim_len);
     }
 }
