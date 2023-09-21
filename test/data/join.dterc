@@ -15,5 +15,12 @@ insert "a\nb\nc"
 repeat 2 down -l
 join "=>"
 
+down
+
+insert "foo  \n  bar  \t\n baz\n \t\t \n\t\n\nxyz"
+join ''
+join ::
+repeat 10 join ++
+
 save -f build/test/join.txt
 close
