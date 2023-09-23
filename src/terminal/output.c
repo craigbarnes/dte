@@ -276,15 +276,8 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
 
 static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
 {
-    if (u < 0x80) {
-        if (!ascii_iscntrl(u)) {
-            obuf->x++;
-        } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-            obuf->x = next_indent_width(obuf->x, obuf->tab_width);
-        } else {
-            // Control
-            obuf->x += 2;
-        }
+    if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
+        obuf->x = next_indent_width(obuf->x, obuf->tab_width);
     } else {
         obuf->x += u_char_width(u);
     }
