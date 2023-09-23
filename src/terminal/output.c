@@ -286,7 +286,6 @@ static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
             obuf->x += 2;
         }
     } else {
-        // u_char_width() needed to handle 0x80-0x9f even if term_utf8 is false
         obuf->x += u_char_width(u);
     }
 

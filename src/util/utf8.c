@@ -161,6 +161,7 @@ CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
 
     *idx = i;
     return u;
+
 invalid:
     *idx += 1;
     return -first;
