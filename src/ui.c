@@ -136,8 +136,14 @@ void update_window_sizes(Terminal *term, Frame *frame)
     update_window_coordinates(frame);
 }
 
+static bool is_root_frame(const Frame *frame)
+{
+    return !frame->parent;
+}
+
 void update_screen_size(Terminal *term, Frame *root_frame)
 {
+    BUG_ON(!is_root_frame(root_frame));
     unsigned int w, h;
     if (!term_get_size(&w, &h) || (w == term->width && h == term->height)) {
         return;

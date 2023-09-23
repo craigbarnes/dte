@@ -67,14 +67,25 @@ static int get_min_h(const Frame *frame)
     return max;
 }
 
+// Get parent frame and assert non-NULL, for use in contexts where
+// `frame` may not be the root frame
+static Frame *frame_must_get_parent(const Frame *frame)
+{
+    Frame *parent = frame->parent;
+    BUG_ON(!parent);
+    return parent;
+}
+
 static int get_min(const Frame *frame)
 {
-    return frame->parent->vertical ? get_min_h(frame) : get_min_w(frame);
+    const Frame *parent = frame_must_get_parent(frame);
+    return parent->vertical ? get_min_h(frame) : get_min_w(frame);
 }
 
 static int get_size(const Frame *frame)
 {
-    return frame->parent->vertical ? frame->h : frame->w;
+    const Frame *parent = frame_must_get_parent(frame);
+    return parent->vertical ? frame->h : frame->w;
 }
 
 static int get_container_size(const Frame *frame)
@@ -84,9 +95,10 @@ static int get_container_size(const Frame *frame)
 
 static void set_size(Frame *frame, int size)
 {
-    bool vertical = frame->parent->vertical;
-    int w = vertical ? frame->parent->w : size;
-    int h = vertical ? size : frame->parent->h;
+    const Frame *parent = frame_must_get_parent(frame);
+    bool vertical = parent->vertical;
+    int w = vertical ? parent->w : size;
+    int h = vertical ? size : parent->h;
     frame_set_size(frame, w, h);
 }
 
@@ -171,14 +183,13 @@ static void fix_size(const Frame *frame)
 
 static void add_to_sibling_size(Frame *frame, int count)
 {
-    const Frame *parent = frame->parent;
-    size_t idx = ptr_array_index(&parent->frames, frame);
-    BUG_ON(idx >= parent->frames.count);
-    if (idx == parent->frames.count - 1) {
-        frame = parent->frames.ptrs[idx - 1];
-    } else {
-        frame = parent->frames.ptrs[idx + 1];
-    }
+    const Frame *parent = frame_must_get_parent(frame);
+    const PointerArray *pframes = &parent->frames;
+    size_t idx = ptr_array_index(pframes, frame);
+    BUG_ON(idx >= pframes->count);
+
+    bool last = (idx == pframes->count - 1);
+    frame = pframes->ptrs[last ? idx - 1 : idx + 1];
     set_size(frame, get_size(frame) + count);
 }
 
@@ -195,12 +206,13 @@ static int sub(Frame *frame, int count)
 
 static void subtract_from_sibling_size(const Frame *frame, int count)
 {
-    const Frame *parent = frame->parent;
-    size_t idx = ptr_array_index(&parent->frames, frame);
-    BUG_ON(idx >= parent->frames.count);
-    void **ptrs = parent->frames.ptrs;
+    const Frame *parent = frame_must_get_parent(frame);
+    const PointerArray *pframes = &parent->frames;
+    size_t idx = ptr_array_index(pframes, frame);
+    BUG_ON(idx >= pframes->count);
+    void **ptrs = pframes->ptrs;
 
-    for (size_t i = idx + 1, n = parent->frames.count; i < n; i++) {
+    for (size_t i = idx + 1, n = pframes->count; i < n; i++) {
         count = sub(ptrs[i], count);
         if (count == 0) {
             return;
@@ -217,7 +229,7 @@ static void subtract_from_sibling_size(const Frame *frame, int count)
 
 static void resize_to(Frame *frame, int size)
 {
-    const Frame *parent = frame->parent;
+    const Frame *parent = frame_must_get_parent(frame);
     int total = parent->vertical ? parent->h : parent->w;
     int count = parent->frames.count;
     int min = get_min(frame);
@@ -332,7 +344,7 @@ void frame_resize(Frame *frame, ResizeDirection dir, int size)
         return;
     }
 
-    Frame *parent = frame->parent;
+    Frame *parent = frame_must_get_parent(frame);
     parent->equal_size = false;
     resize_to(frame, size);
     update_window_coordinates(parent);
