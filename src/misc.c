@@ -193,31 +193,41 @@ void erase(View *view)
     buffer_erase_bytes(view, size);
 }
 
-// Go to beginning of whitespace (tabs and spaces) under cursor and
-// return number of whitespace bytes after cursor after moving cursor
-static size_t goto_beginning_of_whitespace(View *view)
+// Count spaces and tabs at or after iterator (and move beyond them)
+static size_t count_blanks_fwd(BlockIter *bi)
 {
-    BlockIter bi = view->cursor;
     size_t count = 0;
     CodePoint u;
-
-    // Count spaces and tabs at or after cursor
-    while (block_iter_next_char(&bi, &u)) {
+    while (block_iter_next_char(bi, &u)) {
         if (u != '\t' && u != ' ') {
-            break;
-        }
-        count++;
-    }
-
-    // Count spaces and tabs before cursor
-    while (block_iter_prev_char(&view->cursor, &u)) {
-        if (u != '\t' && u != ' ') {
-            block_iter_next_char(&view->cursor, &u);
             break;
         }
         count++;
     }
     return count;
+}
+
+// Count spaces and tabs before iterator (and move to beginning of them)
+static size_t count_blanks_bwd(BlockIter *bi)
+{
+    size_t count = 0;
+    CodePoint u;
+    while (block_iter_prev_char(bi, &u)) {
+        if (u != '\t' && u != ' ') {
+            block_iter_next_char(bi, &u);
+            break;
+        }
+        count++;
+    }
+    return count;
+}
+
+// Go to beginning of whitespace (tabs and spaces) under cursor and
+// return number of whitespace bytes surrounding cursor
+static size_t goto_beginning_of_whitespace(BlockIter *cursor)
+{
+    BlockIter tmp = *cursor;
+    return count_blanks_fwd(&tmp) + count_blanks_bwd(cursor);
 }
 
 static bool ws_only(const StringView *line)
@@ -257,7 +267,7 @@ static void insert_nl(View *view)
         unselect(view);
     } else {
         // Trim whitespace around cursor
-        del_count = goto_beginning_of_whitespace(view);
+        del_count = goto_beginning_of_whitespace(&view->cursor);
     }
 
     // Prepare inserted indentation
