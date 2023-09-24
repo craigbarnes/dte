@@ -248,30 +248,41 @@ void term_output_flush(TermOutputBuffer *obuf)
     }
 }
 
+static const char *get_tab_str(TermTabOutputMode tab_mode)
+{
+    static const char tabstr[][8] = {
+        [TAB_NORMAL]  = "        ",
+        [TAB_SPECIAL] = ">-------",
+        // TAB_CONTROL is printed with u_set_char() and is thus omitted
+    };
+    BUG_ON(tab_mode >= ARRAYLEN(tabstr));
+    return tabstr[tab_mode];
+}
+
 static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
 {
-    size_t n = obuf->x - obuf->scroll_x;
     char *buf = obuf->buf + obuf->count;
+    size_t n = obuf->x - obuf->scroll_x;
+    BUG_ON(n > 7);
     obuf_need_space(obuf, 8);
+
+    char tmp[4];
+    const char *src;
     if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-        memset(buf, (obuf->tab_mode == TAB_SPECIAL) ? '-' : ' ', n);
-        obuf->count += n;
-    } else if (u < 0x20) {
-        *buf = u | 0x40;
-        obuf->count++;
-    } else if (u == 0x7f) {
-        *buf = '?';
-        obuf->count++;
-    } else if (u_is_unprintable(u)) {
-        char tmp[4];
+        src = get_tab_str(obuf->tab_mode) + 1;
+    } else if (u < 0x20 || u == 0x7F || u_is_unprintable(u)) {
         size_t idx = 0;
-        u_set_hex(tmp, &idx, u);
-        memcpy(buf, tmp + 4 - n, n);
-        obuf->count += n;
+        u_set_char(tmp, &idx, u);
+        BUG_ON(idx == 0 || idx > 4);
+        src = tmp + idx - n;
     } else {
         *buf = '>';
         obuf->count++;
+        return;
     }
+
+    obuf->count += n;
+    memcpy(buf, src, n);
 }
 
 static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
@@ -300,11 +311,6 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         return false;
     }
 
-    static const char tabstr[][8] = {
-        [TAB_NORMAL]  = "        ",
-        [TAB_SPECIAL] = ">-------",
-    };
-
     obuf_need_space(obuf, 8);
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
@@ -313,9 +319,8 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
             size_t width = next_indent_width(obuf->x, obuf->tab_width) - obuf->x;
             BUG_ON(width > 8);
-            BUG_ON(obuf->tab_mode >= ARRAYLEN(tabstr));
             width = MIN(width, space);
-            memcpy(obuf->buf + obuf->count, tabstr[obuf->tab_mode], 8);
+            memcpy(obuf->buf + obuf->count, get_tab_str(obuf->tab_mode), 8);
             obuf->count += width;
             obuf->x += width;
         } else {
