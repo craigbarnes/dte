@@ -40,6 +40,15 @@ static inline void ptr_array_init(PointerArray *array, size_t capacity)
     array->alloc = capacity;
 }
 
+// Like ptr_array_index(), but asserting that `ptr` should always be found
+// in the array (i.e. is known to be present), instead of the caller doing so
+static inline size_t ptr_array_xindex(const PointerArray *array, const void *ptr)
+{
+    size_t idx = ptr_array_index(array, ptr);
+    BUG_ON(idx >= array->count);
+    return idx;
+}
+
 // Swap the pointers at two indices
 NONNULL_ARGS
 static inline void ptr_array_swap(PointerArray *array, size_t a, size_t b)

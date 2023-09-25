@@ -986,8 +986,7 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
     Window *window = e->window;
     const size_t ntabs = window->views.count;
     const char *str = a->args[0];
-    size_t to, from = ptr_array_index(&window->views, e->view);
-    BUG_ON(from >= ntabs);
+    size_t to, from = ptr_array_xindex(&window->views, e->view);
     if (streq(str, "left")) {
         to = size_decrement_wrapped(from, ntabs);
     } else if (streq(str, "right")) {
@@ -1043,10 +1042,10 @@ static bool cmd_new_line(EditorState *e, const CommandArgs *a)
 static bool cmd_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    size_t i = ptr_array_index(&e->window->views, e->view);
-    size_t n = e->window->views.count;
-    BUG_ON(i >= n);
-    set_view(e->window->views.ptrs[size_increment_wrapped(i, n)]);
+    const PointerArray *views = &e->window->views;
+    size_t current = ptr_array_xindex(views, e->view);
+    size_t next = size_increment_wrapped(current, views->count);
+    set_view(views->ptrs[next]);
     return true;
 }
 
@@ -1305,10 +1304,10 @@ static bool cmd_pgup(EditorState *e, const CommandArgs *a)
 static bool cmd_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    size_t i = ptr_array_index(&e->window->views, e->view);
-    size_t n = e->window->views.count;
-    BUG_ON(i >= n);
-    set_view(e->window->views.ptrs[size_decrement_wrapped(i, n)]);
+    const PointerArray *views = &e->window->views;
+    size_t current = ptr_array_xindex(views, e->view);
+    size_t prev = size_decrement_wrapped(current, views->count);
+    set_view(views->ptrs[prev]);
     return true;
 }
 
@@ -2371,9 +2370,10 @@ static bool cmd_wswap(EditorState *e, const CommandArgs *a)
         return false;
     }
 
-    size_t current = ptr_array_index(&parent->frames, frame);
-    size_t next = size_increment_wrapped(current, parent->frames.count);
-    ptr_array_swap(&parent->frames, current, next);
+    PointerArray *pframes = &parent->frames;
+    size_t current = ptr_array_xindex(pframes, frame);
+    size_t next = size_increment_wrapped(current, pframes->count);
+    ptr_array_swap(pframes, current, next);
     mark_everything_changed(e);
     return true;
 }

@@ -20,7 +20,7 @@ CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_s
 
     ptr_array_trim_nulls(&array);
     size_t n = array.count;
-    if (n < 2 || ptr_array_index(&array, NULL) != n - 1) {
+    if (n < 2 || ptr_array_xindex(&array, NULL) != n - 1) {
         // Only single commands can be cached
         goto nocache;
     }

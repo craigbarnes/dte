@@ -185,9 +185,7 @@ static void add_to_sibling_size(Frame *frame, int count)
 {
     const Frame *parent = frame_must_get_parent(frame);
     const PointerArray *pframes = &parent->frames;
-    size_t idx = ptr_array_index(pframes, frame);
-    BUG_ON(idx >= pframes->count);
-
+    size_t idx = ptr_array_xindex(pframes, frame);
     bool last = (idx == pframes->count - 1);
     frame = pframes->ptrs[last ? idx - 1 : idx + 1];
     set_size(frame, get_size(frame) + count);
@@ -208,8 +206,7 @@ static void subtract_from_sibling_size(const Frame *frame, int count)
 {
     const Frame *parent = frame_must_get_parent(frame);
     const PointerArray *pframes = &parent->frames;
-    size_t idx = ptr_array_index(pframes, frame);
-    BUG_ON(idx >= pframes->count);
+    size_t idx = ptr_array_xindex(pframes, frame);
     void **ptrs = pframes->ptrs;
 
     for (size_t i = idx + 1, n = pframes->count; i < n; i++) {
@@ -399,8 +396,7 @@ Frame *frame_split(Window *window, bool vertical, bool before)
         parent = frame;
     }
 
-    size_t idx = ptr_array_index(&parent->frames, window->frame);
-    BUG_ON(idx >= parent->frames.count);
+    size_t idx = ptr_array_xindex(&parent->frames, window->frame);
     idx += before ? 0 : 1;
     frame = add_frame(parent, new_window(window->editor), idx);
     parent->equal_size = true;
@@ -460,8 +456,7 @@ void frame_remove(EditorState *e, Frame *frame)
         c->w = parent->w;
         c->h = parent->h;
         if (gp) {
-            size_t idx = ptr_array_index(&gp->frames, parent);
-            BUG_ON(idx >= gp->frames.count);
+            size_t idx = ptr_array_xindex(&gp->frames, parent);
             gp->frames.ptrs[idx] = c;
         } else {
             e->root_frame = c;
