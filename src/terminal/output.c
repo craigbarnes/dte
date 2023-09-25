@@ -55,7 +55,7 @@ static bool term_direct_write(const char *str, size_t count)
     return true;
 }
 
-// Does not update obuf.x
+// NOTE: does not update `obuf.x`; see term_put_byte()
 void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
 {
     if (unlikely(count > obuf_avail(obuf))) {
@@ -115,7 +115,9 @@ void term_set_bytes(Terminal *term, char ch, size_t count)
     }
 }
 
-// Does not update obuf.x
+// Append a single byte to the buffer.
+// NOTE: this does not update `obuf.x`, since it can be used to write
+// bytes within escape sequences without advancing the cursor position.
 void term_put_byte(TermOutputBuffer *obuf, char ch)
 {
     obuf_need_space(obuf, 1);
@@ -132,14 +134,16 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
     }
 }
 
-// Does not update obuf.x
+// Append the decimal string representation of `x` to the buffer.
+// NOTE: does not update `obuf.x`; see term_put_byte().
 void term_put_uint(TermOutputBuffer *obuf, unsigned int x)
 {
     obuf_need_space(obuf, DECIMAL_STR_MAX(x));
     obuf->count += buf_uint_to_str(x, obuf->buf + obuf->count);
 }
 
-// Does not update obuf.x
+// Append the (2 digit) hexadecimal string representation of `x` to the buffer.
+// NOTE: does not update `obuf.x`; see term_put_byte().
 static void term_put_u8_hex(TermOutputBuffer *obuf, uint8_t x)
 {
     obuf_need_space(obuf, 2);
