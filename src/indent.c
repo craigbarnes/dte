@@ -117,38 +117,40 @@ size_t get_indent_width(const StringView *line, unsigned int tab_width)
     return width;
 }
 
-static ssize_t get_current_indent_bytes(const LocalOptions *options, const char *buf, size_t cursor_offset)
-{
-    const size_t tw = options->tab_width;
-    const size_t iw = options->indent_width;
-    size_t ibytes = 0;
-    size_t iwidth = 0;
+static ssize_t get_current_indent_bytes (
+    const char *buf,
+    size_t cursor_offset,
+    unsigned int iw,
+    unsigned int tw
+) {
+    size_t bytes = 0;
+    size_t width = 0;
 
     for (size_t i = 0; i < cursor_offset; i++) {
-        if (indent_remainder(iwidth, iw) == 0) {
-            ibytes = 0;
-            iwidth = 0;
+        if (indent_remainder(width, iw) == 0) {
+            bytes = 0;
+            width = 0;
         }
         switch (buf[i]) {
         case '\t':
-            iwidth = next_indent_width(iwidth, tw);
+            width = next_indent_width(width, tw);
             break;
         case ' ':
-            iwidth++;
+            width++;
             break;
         default:
             // Cursor not at indentation
             return -1;
         }
-        ibytes++;
+        bytes++;
     }
 
-    if (indent_remainder(iwidth, iw)) {
+    if (indent_remainder(width, iw)) {
         // Cursor at middle of indentation level
         return -1;
     }
 
-    return (ssize_t)ibytes;
+    return (ssize_t)bytes;
 }
 
 size_t get_indent_level_bytes_left(const LocalOptions *options, BlockIter *cursor)
@@ -158,35 +160,38 @@ size_t get_indent_level_bytes_left(const LocalOptions *options, BlockIter *curso
     if (!cursor_offset) {
         return 0;
     }
-    ssize_t ibytes = get_current_indent_bytes(options, line.data, cursor_offset);
+
+    unsigned int iw = options->indent_width;
+    unsigned int tw = options->tab_width;
+    ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset, iw, tw);
     return (ibytes < 0) ? 0 : (size_t)ibytes;
 }
 
 size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *cursor)
 {
+    unsigned int iw = options->indent_width;
+    unsigned int tw = options->tab_width;
     StringView line;
     size_t cursor_offset = fetch_this_line(cursor, &line);
-    ssize_t ibytes = get_current_indent_bytes(options, line.data, cursor_offset);
+    ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset, iw, tw);
     if (ibytes < 0) {
         return 0;
     }
 
-    const size_t tw = options->tab_width;
-    const size_t iw = options->indent_width;
-    size_t iwidth = 0;
+    size_t width = 0;
     for (size_t i = cursor_offset, n = line.length; i < n; i++) {
         switch (line.data[i]) {
         case '\t':
-            iwidth = next_indent_width(iwidth, tw);
+            width = next_indent_width(width, tw);
             break;
         case ' ':
-            iwidth++;
+            width++;
             break;
         default:
             // No full indentation level at cursor position
             return 0;
         }
-        if (indent_remainder(iwidth, iw) == 0) {
+        if (indent_remainder(width, iw) == 0) {
             return i - cursor_offset + 1;
         }
     }
