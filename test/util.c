@@ -2430,9 +2430,11 @@ static void test_mem_intern(TestContext *ctx)
 static void test_read_file(TestContext *ctx)
 {
     char *buf = NULL;
-    EXPECT_EQ(read_file("test", &buf), -1);
+    errno = 0;
+    EXPECT_EQ(read_file("/", &buf), -1);
     EXPECT_EQ(errno, EISDIR);
     EXPECT_NULL(buf);
+    free(buf);
 
     ssize_t size = read_file("test/data/3lines.txt", &buf);
     EXPECT_EQ(size, 26);
@@ -2448,12 +2450,6 @@ static void test_read_file(TestContext *ctx)
     EXPECT_STREQ(line, "  line #3");
     EXPECT_EQ(pos, 26);
     free(buf);
-    buf = NULL;
-
-    EXPECT_EQ(read_file("/dev/null", &buf), 0);
-    ASSERT_NONNULL(buf);
-    EXPECT_EQ(buf[0], '\0');
-    free(buf);
 }
 
 static void test_read_file_with_limit(TestContext *ctx)
@@ -2463,6 +2459,12 @@ static void test_read_file_with_limit(TestContext *ctx)
     EXPECT_EQ(read_file_with_limit("test/data/3lines.txt", &buf, 1), -1);
     EXPECT_EQ(errno, EFBIG);
     EXPECT_NULL(buf);
+    free(buf);
+
+    buf = NULL;
+    ASSERT_EQ(read_file_with_limit("/dev/null", &buf, 64), 0);
+    ASSERT_NONNULL(buf);
+    EXPECT_UINT_EQ((unsigned char)buf[0], '\0');
     free(buf);
 }
 
