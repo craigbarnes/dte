@@ -61,7 +61,7 @@ static bool indent_inc(const LocalOptions *options, const StringView *line)
 
 char *get_indent_for_next_line(const LocalOptions *options, const StringView *line)
 {
-    size_t width = get_indent_width(options, line);
+    size_t width = get_indent_width(line, options->tab_width);
     if (indent_inc(options, line)) {
         width = next_indent_width(width, options->indent_width);
     }
@@ -101,15 +101,15 @@ IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
     return info;
 }
 
-size_t get_indent_width(const LocalOptions *options, const StringView *line)
+size_t get_indent_width(const StringView *line, unsigned int tab_width)
 {
     const char *buf = line->data;
     size_t width = 0;
-    for (size_t i = 0, n = line->length, tw = options->tab_width; i < n; i++) {
+    for (size_t i = 0, n = line->length; i < n; i++) {
         if (buf[i] == ' ') {
             width++;
         } else if (buf[i] == '\t') {
-            width = next_indent_width(width, tw);
+            width = next_indent_width(width, tab_width);
         } else {
             break;
         }

@@ -110,7 +110,7 @@ void select_block(View *view)
 
 static int get_indent_of_matching_brace(const View *view)
 {
-    const LocalOptions *options = &view->buffer->options;
+    unsigned int tab_width = view->buffer->options.tab_width;
     BlockIter bi = view->cursor;
     StringView line;
     int level = 0;
@@ -119,7 +119,7 @@ static int get_indent_of_matching_brace(const View *view)
         fetch_this_line(&bi, &line);
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
-                return get_indent_width(options, &line);
+                return get_indent_width(&line, tab_width);
             }
         }
         if (line_has_closing_brace(line)) {
@@ -611,7 +611,7 @@ static bool is_paragraph_separator(const StringView *line)
 
 static bool in_paragraph(const LocalOptions *options, const StringView *line, size_t indent_width)
 {
-    if (get_indent_width(options, line) != indent_width) {
+    if (get_indent_width(line, options->tab_width) != indent_width) {
         return false;
     }
     return !is_paragraph_separator(line);
@@ -628,7 +628,7 @@ static size_t paragraph_size(View *view)
         // Not in paragraph
         return 0;
     }
-    size_t indent_width = get_indent_width(options, &line);
+    size_t indent_width = get_indent_width(&line, options->tab_width);
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
@@ -669,7 +669,7 @@ void format_paragraph(View *view, size_t text_width)
     const LocalOptions *options = &view->buffer->options;
     char *sel = block_iter_get_bytes(&view->cursor, len);
     StringView sv = string_view(sel, len);
-    size_t indent_width = get_indent_width(options, &sv);
+    size_t indent_width = get_indent_width(&sv, options->tab_width);
     char *indent = make_indent(options, indent_width);
 
     ParagraphFormatter pf = {

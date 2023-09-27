@@ -114,7 +114,7 @@ static void bench_find_ft(void)
     do_bench_find_ft("config", "/etc/hosts");
 }
 
-static void do_bench_get_indent_width(const LocalOptions *opts, const StringView *line)
+static void do_bench_get_indent_width(const StringView *line, unsigned int tab_width)
 {
     unsigned int iterations = 30000;
     unsigned int accum = 0;
@@ -122,14 +122,14 @@ static void do_bench_get_indent_width(const LocalOptions *opts, const StringView
     get_time(&start);
 
     for (unsigned int i = 0; i < iterations; i++) {
-        accum += get_indent_width(opts, line);
+        accum += get_indent_width(line, tab_width);
     }
 
     if (accum != (iterations * line->length)) {
         fail("unexpected result in %s(): %u", __func__, accum);
     }
 
-    report(&start, iterations, "get_indent_width() <- %u", opts->indent_width);
+    report(&start, iterations, "get_indent_width() <- %u", tab_width);
 }
 
 static void do_bench_get_indent_info(const LocalOptions *opts, const StringView *line)
@@ -157,13 +157,12 @@ static void bench_get_indent(void)
     char buf[64];
     size_t n = sizeof(buf);
     StringView line = string_view(memset(buf, ' ', n), n);
-    LocalOptions options = {.expand_tab = true, .tab_width = 8};
 
     for (unsigned int i = 1; i <= 8; i++) {
-        options.indent_width = i;
-        do_bench_get_indent_width(&options, &line);
+        do_bench_get_indent_width(&line, i);
     }
 
+    LocalOptions options = {.expand_tab = true, .tab_width = 8};
     for (unsigned int i = 1; i <= 8; i++) {
         options.indent_width = i;
         do_bench_get_indent_info(&options, &line);
