@@ -8,6 +8,7 @@
 #include <time.h>
 #include "filetype.h"
 #include "indent.h"
+#include "options.h"
 #include "terminal/color.h"
 #include "util/arith.h"
 #include "util/macros.h"
@@ -158,13 +159,15 @@ static void bench_get_indent(void)
     size_t n = sizeof(buf);
     StringView line = string_view(memset(buf, ' ', n), n);
 
-    for (unsigned int i = 1; i <= 8; i++) {
-        do_bench_get_indent_width(&line, i);
+    static_assert(TAB_WIDTH_MAX == 8);
+    for (unsigned int tw = 1; tw <= 8; tw++) {
+        do_bench_get_indent_width(&line, tw);
     }
 
+    static_assert(INDENT_WIDTH_MAX == 8);
     LocalOptions options = {.expand_tab = true, .tab_width = 8};
-    for (unsigned int i = 1; i <= 8; i++) {
-        options.indent_width = i;
+    for (unsigned int iw = 1; iw <= 8; iw++) {
+        options.indent_width = iw;
         do_bench_get_indent_info(&options, &line);
     }
 }
