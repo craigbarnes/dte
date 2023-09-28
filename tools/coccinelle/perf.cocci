@@ -1,5 +1,16 @@
 @@
-identifier func !~ "divide_equally|add_status_pos|repeat_insert|calculate_tabbar|view_update_vx|report|test_.*";
+identifier func != {
+    add_status_pos,
+    calculate_tabbar,
+    divide_equally,
+    repeat_insert,
+    report,
+    test_indent_level,
+    test_next_indent_width,
+    test_size_decrement_wrapped,
+    test_size_increment_wrapped,
+    view_update_vx
+};
 identifier ident;
 expression x;
 binary operator op = {/, %};

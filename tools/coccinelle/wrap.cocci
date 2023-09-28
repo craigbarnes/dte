@@ -1,5 +1,5 @@
 @@
-identifier func !~ "test_size_increment_wrapped";
+identifier func != test_size_increment_wrapped;
 expression x, m;
 @@
 
@@ -12,7 +12,7 @@ func(...)
 }
 
 @@
-identifier func !~ "test_size_decrement_wrapped";
+identifier func != test_size_decrement_wrapped;
 expression x, m;
 @@
 

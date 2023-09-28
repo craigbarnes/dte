@@ -1,6 +1,6 @@
 @@
 identifier func;
-identifier tail !~ "va_end|.*free.*";
+identifier tail != {free, ptr_array_free, search_free_regexp, va_end};
 expression lhs, rhs, a1;
 @@
 
@@ -15,8 +15,8 @@ func(...)
 
 @@
 identifier func;
-identifier tail !~ "string_reserve_space|obuf_need_space";
-expression lhs !~ "current_config";
+identifier tail != {string_reserve_space, obuf_need_space};
+expression lhs != current_config;
 expression rhs, a1, a2;
 @@
 
@@ -30,7 +30,7 @@ func(...)
 }
 
 @@
-identifier func !~ "ptr_array_insert|ptr_array_move|finish_syntax";
+identifier func != {ptr_array_insert, ptr_array_move, finish_syntax};
 identifier tail;
 expression lhs, rhs, a1, a2, a3;
 @@
@@ -45,7 +45,7 @@ func(...)
 }
 
 @@
-identifier tail =~ "mem(set|cpy|move)";
+identifier tail = {memset, memcpy, memmove};
 expression dest, a2, a3;
 @@
 

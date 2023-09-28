@@ -1,5 +1,22 @@
 @@
-identifier f !~ "strlen|ARRAYLEN|IS_POWER_OF_2|has_flag|cond_type_has_destination|count_nl|list_empty|mem_equal|block_iter_is_bol|block_iter_is_eof|is_valid_filetype_name|path_is_absolute|obuf_avail|strview_has_prefix|strview_has_suffix";
+identifier func != {
+    ARRAYLEN,
+    IS_POWER_OF_2,
+    block_iter_is_bol,
+    block_iter_is_eof,
+    cond_type_has_destination,
+    count_nl,
+    has_flag,
+    is_root_frame,
+    is_valid_filetype_name,
+    list_empty,
+    mem_equal,
+    obuf_avail,
+    path_is_absolute,
+    strlen,
+    strview_has_prefix,
+    strview_has_suffix
+};
 @@
 
 /*
@@ -14,4 +31,4 @@ See also:
 - https://codeberg.org/dnkl/foot/pulls/331#issuecomment-175279
 */
 
-* BUG_ON(<+...f(...)...+>)
+* BUG_ON(<+...func(...)...+>)
