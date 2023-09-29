@@ -596,30 +596,30 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     pf->cur_width += word_width;
 }
 
+static bool is_long_comment_delim(const StringView *sv)
+{
+    // TODO: make this configurable
+    return strview_equal_cstring(sv, "/*") || strview_equal_cstring(sv, "*/");
+}
+
 static bool is_paragraph_separator(const StringView *line)
 {
     StringView trimmed = *line;
     strview_trim(&trimmed);
-
-    return
-        trimmed.length == 0
-        // TODO: make this configurable
-        || strview_equal_cstring(&trimmed, "/*")
-        || strview_equal_cstring(&trimmed, "*/")
-    ;
+    return (trimmed.length == 0) || is_long_comment_delim(&trimmed);
 }
 
-static bool in_paragraph(const LocalOptions *options, const StringView *line, size_t indent_width)
-{
-    if (get_indent_width(line, options->tab_width) != indent_width) {
-        return false;
-    }
-    return !is_paragraph_separator(line);
+static bool in_paragraph (
+    const StringView *line,
+    size_t para_indent_width,
+    unsigned int tab_width
+) {
+    size_t w = get_indent_width(line, tab_width);
+    return (w == para_indent_width) && !is_paragraph_separator(line);
 }
 
 static size_t paragraph_size(View *view)
 {
-    const LocalOptions *options = &view->buffer->options;
     BlockIter bi = view->cursor;
     StringView line;
     block_iter_bol(&bi);
@@ -628,12 +628,14 @@ static size_t paragraph_size(View *view)
         // Not in paragraph
         return 0;
     }
-    size_t indent_width = get_indent_width(&line, options->tab_width);
+
+    unsigned int tab_width = view->buffer->options.tab_width;
+    size_t para_indent_width = get_indent_width(&line, tab_width);
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
         fill_line_ref(&bi, &line);
-        if (!in_paragraph(options, &line, indent_width)) {
+        if (!in_paragraph(&line, para_indent_width, tab_width)) {
             block_iter_eat_line(&bi);
             break;
         }
@@ -649,7 +651,7 @@ static size_t paragraph_size(View *view)
         }
         size += bytes;
         fill_line_ref(&bi, &line);
-    } while (in_paragraph(options, &line, indent_width));
+    } while (in_paragraph(&line, para_indent_width, tab_width));
     return size;
 }
 
