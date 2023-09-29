@@ -142,6 +142,31 @@ static void add_status_umax(Formatter *f, uintmax_t x)
     add_status_bytes(f, buf, len);
 }
 
+static void add_status_bool(Formatter *f, bool state, const char *on, const char *off)
+{
+    const char *str = state ? on : off;
+    add_status_bytes(f, str, strlen(str));
+}
+
+static void add_status_unicode(Formatter *f, const BlockIter *cursor)
+{
+    CodePoint u;
+    if (unlikely(!block_iter_get_char(cursor, &u))) {
+        return;
+    }
+
+    if (!u_is_unicode(u)) {
+        add_status_literal(f, "Invalid");
+        return;
+    }
+
+    char str[STRLEN("U+10FFFF") + 1];
+    str[0] = 'U';
+    str[1] = '+';
+    size_t ndigits = buf_umax_to_hex_str(u, str + 2, 4);
+    add_status_bytes(f, str, 2 + ndigits);
+}
+
 static void add_status_pos(Formatter *f)
 {
     size_t lines = f->window->view->buffer->nl;
@@ -219,7 +244,6 @@ void sf_format (
 
     const View *view = window->view;
     const Buffer *buffer = view->buffer;
-    CodePoint u;
 
     while (f.pos < f.size && *format) {
         unsigned char ch = *format++;
@@ -282,18 +306,10 @@ void sf_format (
             }
             break;
         case STATUS_LINE_ENDING:
-            if (buffer->crlf_newlines) {
-                add_status_literal(&f, "CRLF");
-            } else {
-                add_status_literal(&f, "LF");
-            }
+            add_status_bool(&f, buffer->crlf_newlines, "CRLF", "LF");
             break;
         case STATUS_OVERWRITE:
-            if (buffer->options.overwrite) {
-                add_status_literal(&f, "OVR");
-            } else {
-                add_status_literal(&f, "INS");
-            }
+            add_status_bool(&f, buffer->options.overwrite, "OVR", "INS");
             break;
         case STATUS_SEPARATOR_LONG:
             f.separator = LONG_SEPARATOR_SIZE;
@@ -305,18 +321,7 @@ void sf_format (
             add_status_str(&f, buffer->options.filetype);
             break;
         case STATUS_UNICODE:
-            if (unlikely(!block_iter_get_char(&view->cursor, &u))) {
-                break;
-            }
-            if (u_is_unicode(u)) {
-                char str[STRLEN("U+10FFFF") + 1];
-                str[0] = 'U';
-                str[1] = '+';
-                size_t ndigits = buf_umax_to_hex_str(u, str + 2, 4);
-                add_status_bytes(&f, str, 2 + ndigits);
-            } else {
-                add_status_literal(&f, "Invalid");
-            }
+            add_status_unicode(&f, &view->cursor);
             break;
         case STATUS_ESCAPED_PERCENT:
             add_separator(&f);
