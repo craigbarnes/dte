@@ -15,6 +15,7 @@
 # define SANE_WCTYPE 1
 #endif
 
+// The maximum Unicode codepoint allowed by RFC 3629
 #define UNICODE_MAX_VALID_CODEPOINT UINT32_C(0x10FFFF)
 
 typedef uint32_t CodePoint;

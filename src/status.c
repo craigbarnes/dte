@@ -20,6 +20,12 @@ typedef struct {
     InputMode input_mode;
 } Formatter;
 
+enum {
+    SHORT_SEPARATOR_SIZE = 1, // For STATUS_SEPARATOR
+    LONG_SEPARATOR_SIZE = 3, // For STATUS_SEPARATOR_LONG
+    SEPARATOR_WRITE_SIZE = 4, // See add_separator()
+};
+
 typedef enum {
     STATUS_INVALID = 0,
     STATUS_ESCAPED_PERCENT,
@@ -78,10 +84,16 @@ static void add_ch(Formatter *f, char ch)
 
 static void add_separator(Formatter *f)
 {
-    while (f->separator && f->pos < f->size) {
-        add_ch(f, ' ');
-        f->separator--;
-    }
+    size_t len = MIN(f->separator, f->size - f->pos);
+    BUG_ON(len > LONG_SEPARATOR_SIZE);
+    char *dest = f->buf + f->pos;
+    f->pos += len;
+    f->separator = 0;
+
+    // The extra buffer space set aside by sf_format() allows us to write
+    // 4 bytes unconditionally here, to allow this memset() call to be
+    // optimized into a simple move instruction
+    memset(dest, ' ', SEPARATOR_WRITE_SIZE);
 }
 
 static void add_status_str(Formatter *f, const char *str)
@@ -202,7 +214,7 @@ void sf_format (
         .opts = opts,
         .input_mode = mode,
         .buf = buf,
-        .size = size - 5, // Max length of char and terminating NUL
+        .size = size - SEPARATOR_WRITE_SIZE - UTF8_MAX_SEQ_LEN - 1,
     };
 
     const View *view = window->view;
@@ -284,10 +296,10 @@ void sf_format (
             }
             break;
         case STATUS_SEPARATOR_LONG:
-            f.separator = 3;
+            f.separator = LONG_SEPARATOR_SIZE;
             break;
         case STATUS_SEPARATOR:
-            f.separator = 1;
+            f.separator = SHORT_SEPARATOR_SIZE;
             break;
         case STATUS_FILETYPE:
             add_status_str(&f, buffer->options.filetype);

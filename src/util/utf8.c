@@ -31,7 +31,9 @@ static const int8_t seq_len_table[256] = {
 
 static int u_seq_len(unsigned char first_byte)
 {
-    return seq_len_table[first_byte];
+    int len = seq_len_table[first_byte];
+    BUG_ON(len < I || len > UTF8_MAX_SEQ_LEN);
+    return len;
 }
 
 static bool u_is_continuation_byte(unsigned char u)
@@ -57,7 +59,7 @@ static bool u_seq_len_ok(CodePoint u, int len)
 static unsigned int u_get_first_byte_mask(unsigned int len)
 {
     BUG_ON(len < 2);
-    BUG_ON(len > 4);
+    BUG_ON(len > UTF8_MAX_SEQ_LEN);
     return (0x80 >> len) - 1;
 }
 
@@ -122,7 +124,7 @@ CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
         *idx = i + 1;
         return u;
     }
-    return u_get_nonascii(str, i + 4, idx);
+    return u_get_nonascii(str, i + UTF8_MAX_SEQ_LEN, idx);
 }
 
 CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx)
