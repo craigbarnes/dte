@@ -44,45 +44,63 @@
     #define CLANG_AT_LEAST(x, y) 0
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc-9.5.0/cpp/_005f_005fhas_005fattribute.html
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
 #ifdef __has_attribute
+    // Supported by GCC 9+ and Clang
     #define HAS_ATTRIBUTE(x) __has_attribute(x)
 #else
     #define HAS_ATTRIBUTE(x) 0
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc-11.4.0/cpp/_005f_005fhas_005fc_005fattribute.html
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-c-attribute
 #ifdef __has_c_attribute
+    // Supported by GCC 11+ and Clang
     #define HAS_C_ATTRIBUTE(x) __has_c_attribute(x)
 #else
     #define HAS_C_ATTRIBUTE(x) 0
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc-10.5.0/cpp/_005f_005fhas_005fbuiltin.html
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-builtin
 #ifdef __has_builtin
+    // Supported by GCC 10+ and Clang
     #define HAS_BUILTIN(x) __has_builtin(x)
 #else
     #define HAS_BUILTIN(x) 0
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc-9.5.0/cpp/_005f_005fhas_005finclude.html
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-include
 #ifdef __has_include
+    // Supported by GCC 9+ and Clang
     #define HAS_INCLUDE(x) __has_include(x)
 #else
     #define HAS_INCLUDE(x) 0
 #endif
 
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-warning
 #ifdef __has_warning
+    // Supported by Clang
     #define HAS_WARNING(x) __has_warning(x)
 #else
     #define HAS_WARNING(x) 0
 #endif
 
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60512
 #ifdef __has_feature
+    // Supported by Clang
     #define HAS_FEATURE(x) __has_feature(x)
 #else
     #define HAS_FEATURE(x) 0
 #endif
 
-// __has_extension() is a Clang macro used to determine if a feature is
-// available even if not standardized in the current "-std" mode
+// https://clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
 #ifdef __has_extension
+    // __has_extension() is a Clang 3.0+ macro used to determine if a feature
+    // is available even if not standardized in the current `-std=...` mode
     #define HAS_EXTENSION(x) __has_extension(x)
 #else
     // Clang versions prior to 3.0 only supported __has_feature()
