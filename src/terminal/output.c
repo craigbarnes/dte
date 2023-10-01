@@ -437,8 +437,9 @@ void term_set_style(Terminal *term, const TermStyle *style)
 void term_set_cursor_style(Terminal *term, TermCursorStyle s)
 {
     TermCursorType type = (s.type == CURSOR_KEEP) ? CURSOR_DEFAULT : s.type;
-    BUG_ON(type < 0 || type > 6);
-    BUG_ON(s.color <= COLOR_INVALID);
+    int32_t color = (s.color == COLOR_KEEP) ? COLOR_DEFAULT : s.color;
+    BUG_ON(type <= CURSOR_INVALID || type >= CURSOR_KEEP);
+    BUG_ON(color != COLOR_DEFAULT && !color_is_rgb(color));
 
     // Set shape with DECSCUSR
     TermOutputBuffer *obuf = &term->obuf;
@@ -446,13 +447,13 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
     term_put_uint(obuf, type);
     term_put_literal(obuf, " q");
 
-    if (s.color == COLOR_DEFAULT || s.color == COLOR_KEEP) {
+    if (color == COLOR_DEFAULT) {
         // Reset color with OSC 112
         term_put_literal(obuf, "\033]112\033\\");
     } else {
         // Set RGB color with OSC 12
         uint8_t r, g, b;
-        color_split_rgb(s.color, &r, &g, &b);
+        color_split_rgb(color, &r, &g, &b);
         term_put_literal(obuf, "\033]12;rgb:");
         term_put_u8_hex(obuf, r);
         term_put_byte(obuf, '/');
@@ -462,5 +463,6 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
         term_put_literal(obuf, "\033\\");
     }
 
-    obuf->cursor_style = s;
+    obuf->cursor_style.type = type;
+    obuf->cursor_style.color = color;
 }

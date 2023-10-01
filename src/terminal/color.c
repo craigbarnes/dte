@@ -64,7 +64,7 @@ UNITTEST {
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
 {
-    if (!(color & COLOR_FLAG_RGB)) {
+    if (!color_is_rgb(color)) {
         BUG_ON(color > 255);
         *exact = true;
         return color;

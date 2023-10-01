@@ -169,7 +169,7 @@ size_t color_to_str(char *buf, int32_t color)
         return buf_uint_to_str((unsigned int)color, buf);
     }
 
-    BUG_ON(!(color & COLOR_FLAG_RGB));
+    BUG_ON(!color_is_rgb(color));
     buf[0] = '#';
     hex_encode_u24_fixed(buf + 1, color);
     return 7;
