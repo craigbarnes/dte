@@ -52,20 +52,20 @@ typedef enum {
 } TermTabOutputMode;
 
 typedef struct {
-    char *buf;
-    size_t count;
+    char *buf; // Pointer to allocated buffer (see TERM_OUTBUF_SIZE)
+    size_t count; // Number of buffered bytes (see term_output_flush())
     size_t scroll_x; // Number of characters scrolled (x direction)
 
     // Current x position (tab: 1-8, double-width: 2, invalid UTF-8 byte: 4)
     // if smaller than scroll_x printed characters are not visible
     size_t x;
 
-    unsigned int width; // Width of the terminal area being written to
-    uint8_t tab_mode; // TermTabOutputMode
-    uint8_t tab_width;
-    bool can_clear;
-    TermStyle style;
-    TermCursorStyle cursor_style;
+    unsigned int width; // Width of terminal area being written to
+    uint8_t tab_mode; // See TermTabOutputMode
+    uint8_t tab_width; // See LocalOptions::tab_width
+    bool can_clear; // Whether lines can be cleared with EL (Erase in Line) sequence
+    TermStyle style; // The style currently active in the terminal
+    TermCursorStyle cursor_style; // The cursor style currently active in the terminal
 } TermOutputBuffer;
 
 typedef struct {
