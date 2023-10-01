@@ -11,7 +11,7 @@
 #define xnew0(type, n) xcalloc(size_multiply(sizeof(type), (n)))
 
 #define xrenew(mem, n) do { \
-    mem = xrealloc(mem, size_multiply(sizeof(*mem), (n))); \
+    mem = xreallocarray(mem, (n), sizeof(*mem)); \
 } while (0)
 
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
@@ -31,6 +31,12 @@ static inline size_t size_multiply(size_t a, size_t b)
     }
     // Otherwise, emit a call to the checked implementation
     return size_multiply_(a, b);
+}
+
+RETURNS_NONNULL ALLOC_SIZE(2, 3)
+static inline void *xreallocarray(void *ptr, size_t nmemb, size_t size)
+{
+    return xrealloc(ptr, size_multiply(nmemb, size));
 }
 
 NONNULL_ARGS_AND_RETURN ALLOC_SIZE(2)
