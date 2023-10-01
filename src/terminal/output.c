@@ -412,6 +412,11 @@ void term_set_style(Terminal *term, const TermStyle *style)
         {'9', ATTR_STRIKETHROUGH}
     };
 
+    // TODO: take `TermOutputBuffer::style` into account and only emit
+    // the minimal set of parameters needed to update the terminal's
+    // current state (i.e. without using `0` to reset or emitting
+    // already active attributes/colors)
+
     TermOutputBuffer *obuf = &term->obuf;
     term_put_literal(obuf, "\033[0");
 

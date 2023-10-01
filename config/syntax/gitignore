@@ -5,6 +5,7 @@ state line-start text
     char ! text negated
     noeat text
 
+# TODO: Highlight range notation (e.g. `[a-f]`; see fnmatch(3) and glob(7))
 state text
     char "\n" line-start
     char "\\" backslash
