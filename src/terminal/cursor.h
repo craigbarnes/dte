@@ -16,6 +16,11 @@ typedef enum {
     NR_CURSOR_MODES,
 } CursorInputMode;
 
+static inline bool cursor_color_is_valid(int32_t c)
+{
+    return c == COLOR_KEEP || c == COLOR_DEFAULT || color_is_rgb(c);
+}
+
 static inline bool same_cursor(const TermCursorStyle *a, const TermCursorStyle *b)
 {
     return a->type == b->type && a->color == b->color;

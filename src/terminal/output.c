@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "output.h"
 #include "color.h"
+#include "cursor.h"
 #include "indent.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -439,7 +440,7 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
     TermCursorType type = (s.type == CURSOR_KEEP) ? CURSOR_DEFAULT : s.type;
     int32_t color = (s.color == COLOR_KEEP) ? COLOR_DEFAULT : s.color;
     BUG_ON(type <= CURSOR_INVALID || type >= CURSOR_KEEP);
-    BUG_ON(color != COLOR_DEFAULT && !color_is_rgb(color));
+    BUG_ON(!cursor_color_is_valid(color));
 
     // Set shape with DECSCUSR
     TermOutputBuffer *obuf = &term->obuf;
