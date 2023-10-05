@@ -18,7 +18,7 @@ void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style)
     if (same_style(&tmp, &term->obuf.style)) {
         return;
     }
-    term_set_style(term, &tmp);
+    term_set_style(term, tmp);
 }
 
 void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s)

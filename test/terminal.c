@@ -1135,7 +1135,7 @@ static void test_term_set_style(TestContext *ctx)
         .attr = ATTR_BOLD | ATTR_REVERSE,
     };
 
-    term_set_style(&term, &style);
+    term_set_style(&term, style);
     EXPECT_EQ(obuf->count, 14);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;1;7;31;43m", 14);
@@ -1143,7 +1143,7 @@ static void test_term_set_style(TestContext *ctx)
 
     style.attr = 0;
     style.fg = COLOR_RGB(0x12ef46);
-    term_set_style(&term, &style);
+    term_set_style(&term, style);
     EXPECT_EQ(obuf->count, 22);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;2;18;239;70;43m", 22);
@@ -1151,10 +1151,31 @@ static void test_term_set_style(TestContext *ctx)
 
     style.fg = 144;
     style.bg = COLOR_DEFAULT;
-    term_set_style(&term, &style);
+    term_set_style(&term, style);
     EXPECT_EQ(obuf->count, 13);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    style.fg = COLOR_DEFAULT;
+    style.bg = COLOR_DEFAULT;
+    style.attr = ATTR_REVERSE | ATTR_DIM | ATTR_UNDERLINE | ATTR_KEEP;
+    term.ncv_attributes = ATTR_DIM | ATTR_STRIKETHROUGH;
+    term_set_style(&term, style);
+    EXPECT_EQ(obuf->count, 10);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;2;4;7m", 10);
+    style.attr &= ~ATTR_KEEP;
+    EXPECT_TRUE(same_style(&obuf->style, &style));
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    style.fg = COLOR_BLUE;
+    term_set_style(&term, style);
+    EXPECT_EQ(obuf->count, 11);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;4;7;34m", 11);
+    style.attr &= ~ATTR_DIM;
+    EXPECT_TRUE(same_style(&obuf->style, &style));
     ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);

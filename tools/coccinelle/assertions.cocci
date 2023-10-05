@@ -5,6 +5,7 @@ identifier func != {
     block_iter_is_bol,
     block_iter_is_eof,
     color_is_rgb,
+    color_is_valid,
     cond_type_has_destination,
     count_nl,
     cursor_color_is_valid,

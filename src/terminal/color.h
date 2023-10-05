@@ -47,6 +47,11 @@ static inline bool color_is_rgb(int32_t color)
     return !!(color & COLOR_FLAG_RGB);
 }
 
+static inline bool color_is_valid(int32_t color)
+{
+    return (color >= COLOR_KEEP && color <= 255) || color_is_rgb(color);
+}
+
 static inline void color_split_rgb(int32_t c, uint8_t *r, uint8_t *g, uint8_t *b)
 {
     *r = (c >> 16) & 0xff;

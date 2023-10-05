@@ -385,19 +385,30 @@ static void do_set_color(TermOutputBuffer *obuf, int32_t color, char ch)
     }
 }
 
-static bool attr_is_set(const TermStyle *style, unsigned int attr, unsigned int ncv_attrs)
+static int32_t color_normalize(int32_t color)
 {
-    if (style->attr & attr) {
-        if (unlikely(ncv_attrs & attr)) {
-            // Terminal only allows attr when not using colors
-            return style->fg == COLOR_DEFAULT && style->bg == COLOR_DEFAULT;
-        }
-        return true;
-    }
-    return false;
+    BUG_ON(!color_is_valid(color));
+    return (color <= COLOR_KEEP) ? COLOR_DEFAULT : color;
 }
 
-void term_set_style(Terminal *term, const TermStyle *style)
+static void term_style_sanitize(TermStyle *style, unsigned int ncv_attrs)
+{
+    // Replace COLOR_KEEP fg/bg colors with COLOR_DEFAULT, to normalize the
+    // values set in TermOutputBuffer::style
+    style->fg = color_normalize(style->fg);
+    style->bg = color_normalize(style->bg);
+
+    // Unset ATTR_KEEP, since it's meaningless at this stage (and shouldn't
+    // be set in TermOutputBuffer::style)
+    style->attr &= ~ATTR_KEEP;
+
+    // Unset ncv_attrs bits, if fg and/or bg color is non-default (see "ncv"
+    // in terminfo(5) man page)
+    bool have_color = (style->fg > COLOR_DEFAULT || style->bg > COLOR_DEFAULT);
+    style->attr &= (have_color ? ~ncv_attrs : ~0u);
+}
+
+void term_set_style(Terminal *term, TermStyle style)
 {
     static const struct {
         char code;
@@ -419,20 +430,20 @@ void term_set_style(Terminal *term, const TermStyle *style)
     // already active attributes/colors)
 
     TermOutputBuffer *obuf = &term->obuf;
+    term_style_sanitize(&style, term->ncv_attributes);
     term_put_literal(obuf, "\033[0");
 
-    unsigned int ncv_attributes = term->ncv_attributes;
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
-        if (attr_is_set(style, attr_map[i].attr, ncv_attributes)) {
+        if (style.attr & attr_map[i].attr) {
             term_put_byte(obuf, ';');
             term_put_byte(obuf, attr_map[i].code);
         }
     }
 
-    do_set_color(obuf, style->fg, '3');
-    do_set_color(obuf, style->bg, '4');
+    do_set_color(obuf, style.fg, '3');
+    do_set_color(obuf, style.bg, '4');
     term_put_byte(obuf, 'm');
-    obuf->style = *style;
+    obuf->style = style;
 }
 
 void term_set_cursor_style(Terminal *term, TermCursorStyle s)
