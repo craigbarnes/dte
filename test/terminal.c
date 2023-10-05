@@ -285,7 +285,16 @@ static void test_term_style_to_string(TestContext *ctx)
         .bg = COLOR_LIGHTMAGENTA,
         .attr = ~0U
     };
-    EXPECT_EQ(strlen(term_style_to_string(&style)), 94);
+
+    static const char expected[] =
+        "lightmagenta lightmagenta "
+        "keep underline reverse blink dim "
+        "bold invisible italic strikethrough"
+    ;
+
+    static_assert(sizeof(expected) - 1 == 94);
+    const char *str = term_style_to_string(&style);
+    EXPECT_STREQ(str, expected);
 }
 
 static void test_cursor_mode_from_str(TestContext *ctx)
