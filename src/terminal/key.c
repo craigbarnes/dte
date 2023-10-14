@@ -190,9 +190,7 @@ size_t keycode_to_string(KeyCode k, char *buf)
         goto copy;
     }
 
-    static const char prefix[] = "INVALID; 0x";
-    const size_t plen = sizeof(prefix) - 1;
-    memcpy(buf, prefix, plen);
+    size_t plen = memcpy_literal(buf, "INVALID; 0x");
     return plen + buf_umax_to_hex_str(k, buf + plen, 8);
 
 copy:
