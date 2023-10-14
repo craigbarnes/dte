@@ -114,14 +114,14 @@ static void add_status_bytes(Formatter *f, const char *str, size_t len)
     if (unlikely(len == 0)) {
         return;
     }
+
     add_separator(f);
     if (f->pos >= f->size) {
         return;
     }
-    const size_t avail = f->size - f->pos;
-    len = MIN(len, avail);
-    memcpy(f->buf + f->pos, str, len);
-    f->pos += len;
+
+    size_t avail = f->size - f->pos;
+    f->pos += copystr(f->buf + f->pos, str, MIN(len, avail));
 }
 
 PRINTF(2)
