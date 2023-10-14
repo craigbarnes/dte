@@ -211,13 +211,20 @@ static void test_hex_decode(TestContext *ctx)
 static void test_hex_encode_byte(TestContext *ctx)
 {
     char buf[4] = {0};
-    EXPECT_STREQ(hex_encode_byte(buf, 0x00), "00");
-    EXPECT_STREQ(hex_encode_byte(buf, 0x05), "05");
-    EXPECT_STREQ(hex_encode_byte(buf, 0x10), "10");
-    EXPECT_STREQ(hex_encode_byte(buf, 0x1b), "1b");
-    EXPECT_STREQ(hex_encode_byte(buf, 0xee), "ee");
-    EXPECT_STREQ(hex_encode_byte(buf, 0xfe), "fe");
-    EXPECT_STREQ(hex_encode_byte(buf, 0xff), "ff");
+    EXPECT_EQ(hex_encode_byte(buf, 0x00), 2);
+    EXPECT_STREQ(buf, "00");
+    EXPECT_EQ(hex_encode_byte(buf, 0x05), 2);
+    EXPECT_STREQ(buf, "05");
+    EXPECT_EQ(hex_encode_byte(buf, 0x10), 2);
+    EXPECT_STREQ(buf, "10");
+    EXPECT_EQ(hex_encode_byte(buf, 0x1b), 2);
+    EXPECT_STREQ(buf, "1b");
+    EXPECT_EQ(hex_encode_byte(buf, 0xee), 2);
+    EXPECT_STREQ(buf, "ee");
+    EXPECT_EQ(hex_encode_byte(buf, 0xfe), 2);
+    EXPECT_STREQ(buf, "fe");
+    EXPECT_EQ(hex_encode_byte(buf, 0xff), 2);
+    EXPECT_STREQ(buf, "ff");
 }
 
 static void test_hex_encode_u24_fixed(TestContext *ctx)
@@ -1093,6 +1100,25 @@ static void test_buf_uint_to_str(TestContext *ctx)
     static_assert(sizeof(buf) > 10);
     EXPECT_EQ(buf_uint_to_str(4294967295u, buf), 10);
     EXPECT_STREQ(buf, "4294967295");
+}
+
+static void test_buf_u8_to_str(TestContext *ctx)
+{
+    // Note: EXPECT_STREQ() only works here if the tests are done in ascending
+    // order, since buf_u8_to_str() doesn't null-terminate the buffer
+    char buf[4] = {0};
+    EXPECT_EQ(buf_u8_to_str(0, buf), 1);
+    EXPECT_STREQ(buf, "0");
+    EXPECT_EQ(buf_u8_to_str(1, buf), 1);
+    EXPECT_STREQ(buf, "1");
+    EXPECT_EQ(buf_u8_to_str(9, buf), 1);
+    EXPECT_STREQ(buf, "9");
+    EXPECT_EQ(buf_u8_to_str(99, buf), 2);
+    EXPECT_STREQ(buf, "99");
+    EXPECT_EQ(buf_u8_to_str(100, buf), 3);
+    EXPECT_STREQ(buf, "100");
+    EXPECT_EQ(buf_u8_to_str(255, buf), 3);
+    EXPECT_STREQ(buf, "255");
 }
 
 static void test_filemode_to_str(TestContext *ctx)
@@ -2715,6 +2741,7 @@ static const TestEntry tests[] = {
     TEST(test_ulong_to_str),
     TEST(test_buf_umax_to_str),
     TEST(test_buf_uint_to_str),
+    TEST(test_buf_u8_to_str),
     TEST(test_filemode_to_str),
     TEST(test_u_char_size),
     TEST(test_u_char_width),

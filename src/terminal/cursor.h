@@ -21,6 +21,11 @@ static inline bool cursor_color_is_valid(int32_t c)
     return c == COLOR_KEEP || c == COLOR_DEFAULT || color_is_rgb(c);
 }
 
+static inline bool cursor_type_is_valid(TermCursorType type)
+{
+    return type >= CURSOR_DEFAULT && type <= CURSOR_KEEP;
+}
+
 static inline bool same_cursor(const TermCursorStyle *a, const TermCursorStyle *b)
 {
     return a->type == b->type && a->color == b->color;

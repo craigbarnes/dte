@@ -1166,6 +1166,14 @@ static void test_term_set_style(TestContext *ctx)
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
     ASSERT_TRUE(clear_obuf(obuf));
 
+    style.fg = COLOR_GRAY;
+    style.bg = COLOR_RGB(0x00b91f);
+    term_set_style(&term, style);
+    EXPECT_EQ(obuf->count, 21);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;37;48;2;0;185;31m", 21);
+    ASSERT_TRUE(clear_obuf(obuf));
+
     style.fg = COLOR_DEFAULT;
     style.bg = COLOR_DEFAULT;
     style.attr = ATTR_REVERSE | ATTR_DIM | ATTR_UNDERLINE | ATTR_KEEP;

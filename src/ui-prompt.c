@@ -6,11 +6,10 @@
 static char get_choice(Terminal *term, const char *choices, unsigned int esc_timeout)
 {
     KeyCode key = term_read_key(term, esc_timeout);
-    if (key == KEY_NONE) {
-        return 0;
-    }
 
     switch (key) {
+    case KEY_NONE:
+        return 0;
     case KEY_BRACKETED_PASTE:
     case KEY_DETECTED_PASTE:
         term_discard_paste(&term->ibuf, key == KEY_BRACKETED_PASTE);

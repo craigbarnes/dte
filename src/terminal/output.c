@@ -26,12 +26,13 @@ void term_output_free(TermOutputBuffer *obuf)
     free(obuf->buf);
 }
 
-static void obuf_need_space(TermOutputBuffer *obuf, size_t count)
+static char *obuf_need_space(TermOutputBuffer *obuf, size_t count)
 {
     BUG_ON(count > TERM_OUTBUF_SIZE);
     if (unlikely(obuf_avail(obuf) < count)) {
         term_output_flush(obuf);
     }
+    return obuf->buf + obuf->count;
 }
 
 void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x)
@@ -42,7 +43,7 @@ void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scro
     obuf->scroll_x = scroll_x;
     obuf->tab_width = 8;
     obuf->tab_mode = TAB_CONTROL;
-    obuf->can_clear = start_x + width == term->width;
+    obuf->can_clear = ((start_x + width) == term->width);
 }
 
 // Write directly to the terminal, as done when e.g. flushing the output buffer
@@ -59,26 +60,26 @@ static bool term_direct_write(const char *str, size_t count)
 // NOTE: does not update `obuf.x`; see term_put_byte()
 void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
 {
-    if (unlikely(count > obuf_avail(obuf))) {
+    if (unlikely(count >= TERM_OUTBUF_SIZE)) {
         term_output_flush(obuf);
-        if (unlikely(count >= TERM_OUTBUF_SIZE)) {
-            if (term_direct_write(str, count)) {
-                LOG_INFO("writing %zu bytes directly to terminal", count);
-            }
-            return;
+        if (term_direct_write(str, count)) {
+            LOG_INFO("writing %zu bytes directly to terminal", count);
         }
+        return;
     }
-    memcpy(obuf->buf + obuf->count, str, count);
+
+    char *buf = obuf_need_space(obuf, count);
     obuf->count += count;
+    memcpy(buf, str, count);
 }
 
-void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
+static void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 {
     while (count) {
-        obuf_need_space(obuf, 1);
+        char *buf = obuf_need_space(obuf, 1);
         size_t avail = obuf_avail(obuf);
         size_t n = MIN(count, avail);
-        memset(obuf->buf + obuf->count, ch, n);
+        memset(buf, ch, n);
         obuf->count += n;
         count -= n;
     }
@@ -90,10 +91,17 @@ static void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
         term_repeat_byte(obuf, ch, count);
         return;
     }
-    term_put_byte(obuf, ch);
-    term_put_literal(obuf, "\033[");
-    term_put_uint(obuf, count - 1);
-    term_put_byte(obuf, 'b');
+
+    const size_t maxlen = STRLEN("_E[30000b");
+    char *buf = obuf_need_space(obuf, maxlen);
+    size_t i = 0;
+    buf[i++] = ch;
+    buf[i++] = '\033';
+    buf[i++] = '[';
+    i += buf_uint_to_str(count - 1, buf + i);
+    buf[i++] = 'b';
+    BUG_ON(i > maxlen);
+    obuf->count += i;
 }
 
 void term_set_bytes(Terminal *term, char ch, size_t count)
@@ -133,23 +141,6 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
             break;
         }
     }
-}
-
-// Append the decimal string representation of `x` to the buffer.
-// NOTE: does not update `obuf.x`; see term_put_byte().
-void term_put_uint(TermOutputBuffer *obuf, unsigned int x)
-{
-    obuf_need_space(obuf, DECIMAL_STR_MAX(x));
-    obuf->count += buf_uint_to_str(x, obuf->buf + obuf->count);
-}
-
-// Append the (2 digit) hexadecimal string representation of `x` to the buffer.
-// NOTE: does not update `obuf.x`; see term_put_byte().
-static void term_put_u8_hex(TermOutputBuffer *obuf, uint8_t x)
-{
-    obuf_need_space(obuf, 2);
-    hex_encode_byte(obuf->buf + obuf->count, x);
-    obuf->count += 2;
 }
 
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer
@@ -193,13 +184,19 @@ void term_end_sync_update(Terminal *term)
 
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 {
-    term_put_literal(obuf, "\033[");
-    term_put_uint(obuf, y + 1);
+    const size_t maxlen = STRLEN("E[;H") + (2 * DECIMAL_STR_MAX(x));
+    char *buf = obuf_need_space(obuf, maxlen);
+    size_t i = memcpy_literal(buf, "\033[");
+    i += buf_uint_to_str(y + 1, buf + i);
+
     if (x != 0) {
-        term_put_byte(obuf, ';');
-        term_put_uint(obuf, x + 1);
+        buf[i++] = ';';
+        i += buf_uint_to_str(x + 1, buf + i);
     }
-    term_put_byte(obuf, 'H');
+
+    buf[i++] = 'H';
+    BUG_ON(i > maxlen);
+    obuf->count += i;
 }
 
 void term_save_title(Terminal *term)
@@ -223,16 +220,18 @@ void term_clear_eol(Terminal *term)
     if (obuf->x >= end) {
         return;
     }
+
     if (
         obuf->can_clear
         && (obuf->style.bg < 0 || term->features & TFLAG_BACK_COLOR_ERASE)
         && !(obuf->style.attr & ATTR_REVERSE)
     ) {
-        term_put_literal(obuf, "\033[K");
         obuf->x = end;
-    } else {
-        term_set_bytes(term, ' ', end - obuf->x);
+        term_put_literal(obuf, "\033[K");
+        return;
     }
+
+    term_set_bytes(term, ' ', end - obuf->x);
 }
 
 void term_clear_screen(TermOutputBuffer *obuf)
@@ -247,9 +246,10 @@ void term_clear_screen(TermOutputBuffer *obuf)
 
 void term_output_flush(TermOutputBuffer *obuf)
 {
-    if (obuf->count) {
-        term_direct_write(obuf->buf, obuf->count);
+    size_t n = obuf->count;
+    if (n) {
         obuf->count = 0;
+        term_direct_write(obuf->buf, n);
     }
 }
 
@@ -359,30 +359,41 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
     return true;
 }
 
-static void do_set_color(TermOutputBuffer *obuf, int32_t color, char ch)
+static size_t do_set_color(char *buf, int32_t color, bool bg)
 {
     if (color < 0) {
-        return;
+        return 0;
     }
-
-    term_put_byte(obuf, ';');
-    term_put_byte(obuf, ch);
 
     if (likely(color < 8)) {
-        term_put_byte(obuf, '0' + color);
-    } else if (color < 256) {
-        term_put_literal(obuf, "8;5;");
-        term_put_uint(obuf, color);
-    } else {
-        uint8_t r, g, b;
-        color_split_rgb(color, &r, &g, &b);
-        term_put_literal(obuf, "8;2;");
-        term_put_uint(obuf, r);
-        term_put_byte(obuf, ';');
-        term_put_uint(obuf, g);
-        term_put_byte(obuf, ';');
-        term_put_uint(obuf, b);
+        buf[0] = ';';
+        buf[1] = bg ? '4' : '3';
+        buf[2] = '0' + color;
+        return 3;
     }
+
+    static const char prefixes[2][2][6] = {
+        {";38;5;", ";48;5;"},
+        {";38;2;", ";48;2;"},
+    };
+
+    bool rgb = color_is_rgb(color);
+    const char *prefix = prefixes[rgb ? 1 : 0][bg ? 1 : 0];
+    size_t i = copystr(buf, prefix, sizeof(prefixes[0][0]));
+
+    if (!rgb) {
+        BUG_ON(color > 255);
+        return i + buf_u8_to_str(color, buf + i);
+    }
+
+    uint8_t r, g, b;
+    color_split_rgb(color, &r, &g, &b);
+    i += buf_u8_to_str(r, buf + i);
+    buf[i++] = ';';
+    i += buf_u8_to_str(g, buf + i);
+    buf[i++] = ';';
+    i += buf_u8_to_str(b, buf + i);
+    return i;
 }
 
 static int32_t color_normalize(int32_t color)
@@ -429,52 +440,71 @@ void term_set_style(Terminal *term, TermStyle style)
     // current state (i.e. without using `0` to reset or emitting
     // already active attributes/colors)
 
-    TermOutputBuffer *obuf = &term->obuf;
     term_style_sanitize(&style, term->ncv_attributes);
-    term_put_literal(obuf, "\033[0");
+
+    const size_t maxcolor = STRLEN(";38;2;255;255;255");
+    const size_t maxlen = STRLEN("E[0m") + (2 * maxcolor) + (2 * ARRAYLEN(attr_map));
+    char *buf = obuf_need_space(&term->obuf, maxlen);
+    size_t pos = memcpy_literal(buf, "\033[0");
 
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
         if (style.attr & attr_map[i].attr) {
-            term_put_byte(obuf, ';');
-            term_put_byte(obuf, attr_map[i].code);
+            buf[pos++] = ';';
+            buf[pos++] = attr_map[i].code;
         }
     }
 
-    do_set_color(obuf, style.fg, '3');
-    do_set_color(obuf, style.bg, '4');
-    term_put_byte(obuf, 'm');
-    obuf->style = style;
+    pos += do_set_color(buf + pos, style.fg, false);
+    pos += do_set_color(buf + pos, style.bg, true);
+    buf[pos++] = 'm';
+    BUG_ON(pos > maxlen);
+    term->obuf.count += pos;
+    term->obuf.style = style;
+}
+
+static void cursor_style_normalize(TermCursorStyle *s)
+{
+    BUG_ON(!cursor_type_is_valid(s->type));
+    BUG_ON(!cursor_color_is_valid(s->color));
+    s->type = (s->type == CURSOR_KEEP) ? CURSOR_DEFAULT : s->type;
+    s->color = (s->color == COLOR_KEEP) ? COLOR_DEFAULT : s->color;
 }
 
 void term_set_cursor_style(Terminal *term, TermCursorStyle s)
 {
-    TermCursorType type = (s.type == CURSOR_KEEP) ? CURSOR_DEFAULT : s.type;
-    int32_t color = (s.color == COLOR_KEEP) ? COLOR_DEFAULT : s.color;
-    BUG_ON(type <= CURSOR_INVALID || type >= CURSOR_KEEP);
-    BUG_ON(!cursor_color_is_valid(color));
+    TermOutputBuffer *obuf = &term->obuf;
+    cursor_style_normalize(&s);
+    obuf->cursor_style = s;
+
+    const size_t maxlen = STRLEN("E[7 qE]12;rgb:aa/bb/ccST");
+    char *buf = obuf_need_space(obuf, maxlen);
+    size_t i = 0;
 
     // Set shape with DECSCUSR
-    TermOutputBuffer *obuf = &term->obuf;
-    term_put_literal(obuf, "\033[");
-    term_put_uint(obuf, type);
-    term_put_literal(obuf, " q");
+    BUG_ON(s.type < 0 || s.type > 9);
+    buf[i++] = '\033';
+    buf[i++] = '[';
+    buf[i++] = '0' + s.type;
+    buf[i++] = ' ';
+    buf[i++] = 'q';
 
-    if (color == COLOR_DEFAULT) {
+    if (s.color == COLOR_DEFAULT) {
         // Reset color with OSC 112
-        term_put_literal(obuf, "\033]112\033\\");
+        i += memcpy_literal(buf + i, "\033]112");
     } else {
         // Set RGB color with OSC 12
         uint8_t r, g, b;
-        color_split_rgb(color, &r, &g, &b);
-        term_put_literal(obuf, "\033]12;rgb:");
-        term_put_u8_hex(obuf, r);
-        term_put_byte(obuf, '/');
-        term_put_u8_hex(obuf, g);
-        term_put_byte(obuf, '/');
-        term_put_u8_hex(obuf, b);
-        term_put_literal(obuf, "\033\\");
+        color_split_rgb(s.color, &r, &g, &b);
+        i += memcpy_literal(buf + i, "\033]12;rgb:");
+        i += hex_encode_byte(buf + i, r);
+        buf[i++] = '/';
+        i += hex_encode_byte(buf + i, g);
+        buf[i++] = '/';
+        i += hex_encode_byte(buf + i, b);
     }
 
-    obuf->cursor_style.type = type;
-    obuf->cursor_style.color = color;
+    buf[i++] = '\033';
+    buf[i++] = '\\';
+    BUG_ON(i > maxlen);
+    obuf->count += i;
 }

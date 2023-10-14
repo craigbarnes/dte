@@ -10,6 +10,14 @@
 #include "string-view.h"
 #include "xmalloc.h"
 
+#define memcpy_literal(dest, lit) copystr(dest, lit, STRLEN(lit))
+
+static inline size_t copystr(char *dest, const char *src, size_t len)
+{
+    memcpy(dest, src, len);
+    return len;
+}
+
 PURE NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)
 {
