@@ -9,6 +9,7 @@ identifier func != {
     cond_type_has_destination,
     count_nl,
     cursor_color_is_valid,
+    cursor_type_is_valid,
     has_flag,
     is_root_frame,
     is_valid_filetype_name,
