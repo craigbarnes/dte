@@ -747,14 +747,11 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
     }
 
     TermColorCapabilityType color_type = e->terminal.color_type;
-    bool optimize = e->options.optimize_true_color;
+    bool true_color = (color_type >= TERM_TRUE_COLOR);
+    bool optimize = (true_color && e->options.optimize_true_color);
     int32_t fg = color_to_nearest(style.fg, color_type, optimize);
     int32_t bg = color_to_nearest(style.bg, color_type, optimize);
-    if (
-        color_type != TERM_TRUE_COLOR
-        && has_flag(a, 'c')
-        && (fg != style.fg || bg != style.bg)
-    ) {
+    if (!true_color && has_flag(a, 'c') && (fg != style.fg || bg != style.bg)) {
         return true;
     }
 

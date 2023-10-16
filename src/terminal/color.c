@@ -64,13 +64,8 @@ UNITTEST {
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
 {
-    if (!color_is_rgb(color)) {
-        BUG_ON(color > 255);
-        *exact = true;
-        return color;
-    }
-
     uint8_t r, g, b;
+    BUG_ON(!color_is_rgb(color));
     color_split_rgb(color, &r, &g, &b);
 
     // Calculate closest 6x6x6 RGB cube color
@@ -100,16 +95,6 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
         *exact = (rgb_distance == 0);
         return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
-}
-
-// Convert a 24-bit RGB color to an xterm palette color if one matches
-// exactly, or otherwise return the original color unchanged. This is
-// useful for reducing the size of SGR sequences sent to the terminal.
-static int32_t color_rgb_optimize(int32_t color)
-{
-    bool exact;
-    int32_t new_color = color_rgb_to_256(color, &exact);
-    return exact ? new_color : color;
 }
 
 static uint8_t color_256_to_16(uint8_t color)
@@ -155,38 +140,37 @@ static uint8_t color_256_to_16(uint8_t color)
     return table[color];
 }
 
-static uint8_t color_any_to_256(int32_t color)
+int32_t color_to_nearest(int32_t c, TermColorCapabilityType type, bool optimize)
 {
-    BUG_ON(color < 0);
-    bool exact;
-    return color_rgb_to_256(color, &exact);
-}
+    static const int32_t limits[] = {
+        [TERM_0_COLOR] = COLOR_DEFAULT,
+        [TERM_8_COLOR] = COLOR_GRAY,
+        [TERM_16_COLOR] = COLOR_WHITE,
+        [TERM_256_COLOR] = 255,
+        [TERM_TRUE_COLOR] = COLOR_RGB(0xFFFFFF),
+    };
 
-static uint8_t color_any_to_16(int32_t color)
-{
-    return color_256_to_16(color_any_to_256(color));
-}
+    BUG_ON(!color_is_valid(c));
+    BUG_ON(type < 0 || type >= ARRAYLEN(limits));
+    BUG_ON(optimize && type < TERM_TRUE_COLOR);
 
-static uint8_t color_any_to_8(int32_t color)
-{
-    return color_any_to_16(color) & 7;
-}
+    // If `optimize` is true, the effective type changes from TERM_TRUE_COLOR
+    // to TERM_256_COLOR as far as the condition below is concerned
+    TermColorCapabilityType limit_type = type - (optimize ? 1 : 0);
 
-int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optimize)
-{
-    if (color < 0) {
-        return color;
+    if (likely(c <= limits[limit_type])) {
+        // Color is already within the supported range
+        return c;
     }
-    switch (type) {
-    case TERM_0_COLOR: return COLOR_DEFAULT;
-    case TERM_8_COLOR: return color_any_to_8(color);
-    case TERM_16_COLOR: return color_any_to_16(color);
-    case TERM_256_COLOR: return color_any_to_256(color);
-    case TERM_TRUE_COLOR: return optimize ? color_rgb_optimize(color) : color;
-    }
-    BUG("unexpected TermColorCapabilityType value");
-    // This should never be reached, but it silences compiler warnings
-    // when DEBUG == 0 and __builtin_unreachable() isn't supported
-    // (i.e. BUG() expands to nothing)
-    return COLOR_DEFAULT;
+
+    bool rgb = color_is_rgb(c);
+    BUG_ON(optimize && !rgb);
+
+    bool exact = true;
+    int32_t tmp = rgb ? color_rgb_to_256(c, &exact) : c;
+    c = (type <= TERM_256_COLOR || exact) ? tmp : c;
+    c = (type <= TERM_16_COLOR) ? color_256_to_16(c) : c;
+    c = (type <= TERM_8_COLOR) ? (c & 7) : c;
+    c = (type == TERM_0_COLOR) ? COLOR_DEFAULT : c;
+    return c;
 }
