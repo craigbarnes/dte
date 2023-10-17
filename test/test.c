@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 
@@ -59,7 +60,7 @@ void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, 
 
 void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, const void *m2, size_t len)
 {
-    if (mem_equal(m1, m2, len)) {
+    if (likely(mem_equal(m1, m2, len))) {
         ctx->passed++;
         return;
     }

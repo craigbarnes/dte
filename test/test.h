@@ -76,6 +76,6 @@ void assert_ptreq(TestContext *ctx, const char *file, int line, const void *p1, 
 void assert_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
 void assert_true(TestContext *ctx, const char *file, int line, bool x);
 void assert_nonnull(TestContext *ctx, const char *file, int line, const void *ptr);
-size_t make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize) NONNULL_ARGS;
+size_t make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize) COLD NONNULL_ARGS;
 
 #endif
