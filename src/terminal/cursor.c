@@ -48,7 +48,7 @@ const char *cursor_type_to_str(TermCursorType type)
 const char *cursor_color_to_str(int32_t c)
 {
     BUG_ON(!cursor_color_is_valid(c));
-    static char buf[8];
+    static char buf[16];
     size_t n = color_to_str(buf, c);
     BUG_ON(n < 4 || n >= sizeof(buf));
     buf[n] = '\0';
