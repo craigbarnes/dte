@@ -1174,6 +1174,33 @@ static void test_term_set_style(TestContext *ctx)
     EXPECT_MEMEQ(obuf->buf, "\033[0;37;48;2;0;185;31m", 21);
     ASSERT_TRUE(clear_obuf(obuf));
 
+    style.fg = COLOR_WHITE;
+    style.bg = COLOR_DARKGRAY;
+    style.attr = ATTR_ITALIC;
+    term_set_style(&term, style);
+    EXPECT_EQ(obuf->count, 13);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;3;97;100m", 13);
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    // Ensure longest sequence doesn't trigger assertion
+    static const char longest[] =
+        "\033[0;"
+        "1;2;3;4;5;7;8;9;"
+        "38;2;100;101;199;"
+        "48;2;200;202;255m"
+    ;
+    const size_t n = sizeof(longest) - 1;
+    ASSERT_EQ(n, 54);
+    style.fg = COLOR_RGB(0x6465C7);
+    style.bg = COLOR_RGB(0xC8CAFF);
+    style.attr = ~0u;
+    term_set_style(&term, style);
+    EXPECT_EQ(obuf->count, n);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, longest, n);
+    ASSERT_TRUE(clear_obuf(obuf));
+
     style.fg = COLOR_DEFAULT;
     style.bg = COLOR_DEFAULT;
     style.attr = ATTR_REVERSE | ATTR_DIM | ATTR_UNDERLINE | ATTR_KEEP;

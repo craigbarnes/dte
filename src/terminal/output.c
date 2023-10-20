@@ -359,41 +359,55 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
     return true;
 }
 
-static size_t do_set_color(char *buf, int32_t color, bool bg)
+static size_t set_color_suffix(char *buf, int32_t color)
 {
-    if (color < 0) {
-        return 0;
+    BUG_ON(color < 0);
+    if (likely(color < 16)) {
+        buf[0] = '0' + (color & 7);
+        return 1;
     }
 
-    if (likely(color < 8)) {
-        buf[0] = ';';
-        buf[1] = bg ? '4' : '3';
-        buf[2] = '0' + color;
-        return 3;
-    }
-
-    static const char prefixes[2][2][6] = {
-        {";38;5;", ";48;5;"},
-        {";38;2;", ";48;2;"},
-    };
-
-    bool rgb = color_is_rgb(color);
-    const char *prefix = prefixes[rgb ? 1 : 0][bg ? 1 : 0];
-    size_t i = copystr(buf, prefix, sizeof(prefixes[0][0]));
-
-    if (!rgb) {
+    if (!color_is_rgb(color)) {
         BUG_ON(color > 255);
+        size_t i = memcpy_literal(buf, "8;5;");
         return i + buf_u8_to_str(color, buf + i);
     }
 
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
+    size_t i = memcpy_literal(buf, "8;2;");
     i += buf_u8_to_str(r, buf + i);
     buf[i++] = ';';
     i += buf_u8_to_str(g, buf + i);
     buf[i++] = ';';
     i += buf_u8_to_str(b, buf + i);
     return i;
+}
+
+static size_t set_fg_color(char *buf, int32_t color)
+{
+    if (color < 0) {
+        return 0;
+    }
+
+    bool light = (color >= 8 && color <= 15);
+    buf[0] = ';';
+    buf[1] = light ? '9' : '3';
+    return 2 + set_color_suffix(buf + 2, color);
+}
+
+static size_t set_bg_color(char *buf, int32_t color)
+{
+    if (color < 0) {
+        return 0;
+    }
+
+    bool light = (color >= 8 && color <= 15);
+    buf[0] = ';';
+    buf[1] = light ? '1' : '4';
+    buf[2] = '0';
+    size_t i = light ? 3 : 2;
+    return i + set_color_suffix(buf + i, color);
 }
 
 static int32_t color_normalize(int32_t color)
@@ -454,8 +468,8 @@ void term_set_style(Terminal *term, TermStyle style)
         }
     }
 
-    pos += do_set_color(buf + pos, style.fg, false);
-    pos += do_set_color(buf + pos, style.bg, true);
+    pos += set_fg_color(buf + pos, style.fg);
+    pos += set_bg_color(buf + pos, style.bg);
     buf[pos++] = 'm';
     BUG_ON(pos > maxlen);
     term->obuf.count += pos;
