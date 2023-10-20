@@ -22,7 +22,7 @@ typedef int (*CompareFunction)(const void *, const void *);
 typedef void (*FreeFunction)(void *ptr);
 #define FREE_FUNC(f) (FreeFunction)f
 
-void ptr_array_append(PointerArray *array, void *ptr) NONNULL_ARG(1);
+void ptr_array_grow_and_append(PointerArray *array, void *ptr) NONNULL_ARG(1) NOINLINE;
 void ptr_array_insert(PointerArray *array, void *ptr, size_t idx) NONNULL_ARG(1);
 void ptr_array_move(PointerArray *array, size_t from, size_t to) NONNULL_ARGS;
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr) NONNULL_ARGS;
@@ -38,6 +38,16 @@ static inline void ptr_array_init(PointerArray *array, size_t capacity)
     array->count = 0;
     array->ptrs = capacity ? xnew(array->ptrs, capacity) : NULL;
     array->alloc = capacity;
+}
+
+NONNULL_ARG(1)
+static inline void ptr_array_append(PointerArray *array, void *ptr)
+{
+    if (unlikely(array->alloc <= array->count)) {
+        ptr_array_grow_and_append(array, ptr);
+        return;
+    }
+    array->ptrs[array->count++] = ptr;
 }
 
 // Like ptr_array_index(), but asserting that `ptr` should always be found

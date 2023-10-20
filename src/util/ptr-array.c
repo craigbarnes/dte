@@ -2,18 +2,24 @@
 #include <string.h>
 #include "ptr-array.h"
 
-void ptr_array_append(PointerArray *array, void *ptr)
+static void ptr_array_grow(PointerArray *array)
 {
-    size_t alloc = array->alloc;
-    if (unlikely(alloc == array->count)) {
-        const size_t ALLOC_MIN = 8;
-        alloc = MAX((alloc * 3) / 2, ALLOC_MIN);
-        if (unlikely(alloc <= array->count)) {
-            fatal_error(__func__, EOVERFLOW);
-        }
-        xrenew(array->ptrs, alloc);
-        array->alloc = alloc;
+    BUG_ON(array->alloc < array->count);
+    const size_t ALLOC_MIN = 8;
+    size_t alloc = MAX((array->alloc * 3) / 2, ALLOC_MIN);
+    if (unlikely(alloc <= array->count)) {
+        fatal_error(__func__, EOVERFLOW);
     }
+    xrenew(array->ptrs, alloc);
+    array->alloc = alloc;
+}
+
+// This is separate from ptr_array_append(), to allow the hot path to be
+// inlined. It also duplicates the append operation, so as to allow tail
+// calling, which appears to improve code generation.
+void ptr_array_grow_and_append(PointerArray *array, void *ptr)
+{
+    ptr_array_grow(array);
     array->ptrs[array->count++] = ptr;
 }
 
