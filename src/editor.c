@@ -221,7 +221,7 @@ void free_editor_state(EditorState *e)
     free_interned_strings();
     free_interned_regexps();
 
-    // TODO: intern this (so that it's freed by free_intern_pool())
+    // TODO: intern this (so that it's freed by free_interned_strings())
     free((void*)e->user_config_dir);
 
     free(e);
