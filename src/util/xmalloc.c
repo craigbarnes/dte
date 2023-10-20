@@ -83,6 +83,11 @@ static char *xvasprintf(const char *format, va_list ap)
 
 error:
     fatal_error(__func__, errno);
+
+    // This is unreachable, but it can silence spurious warnings
+    // (e.g. "function might return no value") given by compilers
+    // that lack proper `noreturn` support (e.g. tcc)
+    return xcalloc(1);
 }
 
 char *xasprintf(const char *format, ...)
