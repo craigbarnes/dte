@@ -123,6 +123,14 @@ UNITTEST {
     BUG_ON(!BSEARCH(&k, terms, term_name_compare));
     k.length--;
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
+    for (size_t i = 0; i < ARRAYLEN(terms); i++) {
+        size_t len = strlen(terms[i].name);
+        BUG_ON(terms[i].name_len != len);
+    }
+    for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
+        size_t len = strlen(color_suffixes[i].suffix);
+        BUG_ON(color_suffixes[i].suffix_len != len);
+    }
 }
 
 void term_init(Terminal *term, const char *name, const char *colorterm)
