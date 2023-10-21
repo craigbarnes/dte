@@ -70,13 +70,13 @@ static void print_stack_trace(void)
 noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...)
 {
-    char str[512];
+    char buf[512];
     va_list ap;
-    str[0] = '\0';
     va_start(ap, fmt);
-    vsnprintf(str, sizeof str, fmt, ap);
+    int r = vsnprintf(buf, sizeof buf, fmt, ap);
     va_end(ap);
 
+    const char *str = likely(r >= 0) ? buf : "??";
     log_msg(LOG_LEVEL_CRITICAL, file, line, "BUG in %s(): '%s'", func, str);
     cleanup();
 
