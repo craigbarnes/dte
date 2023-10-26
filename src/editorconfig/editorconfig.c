@@ -12,6 +12,10 @@
 #include "util/strtonum.h"
 #include "util/str-util.h"
 
+enum {
+    MAX_FILESIZE = 32u << 20, // 32 MiB
+};
+
 typedef struct {
     const char *const pathname;
     StringView config_file_dir;
@@ -202,7 +206,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
     // Iterate up directory tree, looking for ".editorconfig" at each level
     while (1) {
         char *text;
-        ssize_t len = read_file_with_limit(buf, &text, 32u << 20);
+        ssize_t len = read_file_with_limit(buf, &text, MAX_FILESIZE);
         if (len >= 0) {
             data.config_file_dir = string_view(buf, dir_len);
             editorconfig_parse(text, len, &data);
