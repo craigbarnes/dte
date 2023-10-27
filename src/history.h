@@ -29,7 +29,7 @@ typedef struct {
 void history_append(History *history, const char *text);
 bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
 bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
-void history_load(History *history, char *filename);
+void history_load(History *history, char *filename, size_t size_limit);
 void history_save(const History *history);
 void history_free(History *history);
 String history_dump(const History *history);

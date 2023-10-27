@@ -111,7 +111,7 @@ static void test_history_search(TestContext *ctx)
 {
     const char *filename = "test/data/history";
     History h = {.max_entries = 64};
-    history_load(&h, xstrdup(filename));
+    history_load(&h, xstrdup(filename), 4096);
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.filename, filename);
     ASSERT_NONNULL(h.first);
@@ -178,7 +178,7 @@ static void test_file_history_find(TestContext *ctx)
 {
     const char fh_filename[] = "test/data/file-history";
     FileHistory h = {.filename = NULL};
-    file_history_load(&h, xstrdup(fh_filename));
+    file_history_load(&h, xstrdup(fh_filename), 4096);
     EXPECT_STREQ(h.filename, fh_filename);
     EXPECT_EQ(h.entries.count, 3);
 

@@ -75,7 +75,7 @@ static bool parse_ulong_field(StringView *sv, unsigned long *valp)
     return true;
 }
 
-void file_history_load(FileHistory *history, char *filename)
+void file_history_load(FileHistory *history, char *filename, size_t size_limit)
 {
     BUG_ON(!history);
     BUG_ON(!filename);
@@ -85,7 +85,7 @@ void file_history_load(FileHistory *history, char *filename)
     history->filename = filename;
 
     char *buf;
-    const ssize_t ssize = read_file(filename, &buf);
+    const ssize_t ssize = read_file_with_limit(filename, &buf, size_limit);
     if (ssize < 0) {
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));

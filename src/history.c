@@ -90,7 +90,7 @@ bool history_search_backward (
     return false;
 }
 
-void history_load(History *history, char *filename)
+void history_load(History *history, char *filename, size_t size_limit)
 {
     BUG_ON(!history);
     BUG_ON(!filename);
@@ -101,7 +101,7 @@ void history_load(History *history, char *filename)
     history->filename = filename;
 
     char *buf;
-    const ssize_t ssize = read_file(filename, &buf);
+    const ssize_t ssize = read_file_with_limit(filename, &buf, size_limit);
     if (ssize < 0) {
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));

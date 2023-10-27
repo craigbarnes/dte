@@ -462,9 +462,10 @@ loop_break:;
     set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
-        file_history_load(&e->file_history, path_join(cfgdir, "file-history"));
-        history_load(&e->command_history, path_join(cfgdir, "command-history"));
-        history_load(&e->search_history, path_join(cfgdir, "search-history"));
+        size_t size_limit = 64u << 20; // 64 MiB
+        file_history_load(&e->file_history, path_join(cfgdir, "file-history"), size_limit);
+        history_load(&e->command_history, path_join(cfgdir, "command-history"), size_limit);
+        history_load(&e->search_history, path_join(cfgdir, "search-history"), size_limit);
         if (e->search_history.last) {
             search_set_regexp(&e->search, e->search_history.last->text);
         }
