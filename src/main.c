@@ -440,7 +440,7 @@ loop_break:;
 
     if (read_rc) {
         ConfigFlags flags = CFG_NOFLAGS;
-        char buf[4096];
+        char buf[8192];
         if (rc) {
             flags |= CFG_MUST_EXIST;
         } else {

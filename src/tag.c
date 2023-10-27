@@ -136,7 +136,7 @@ void tag_file_free(TagFile *tf)
 
 static bool load_tag_file(TagFile *tf)
 {
-    char path[4096];
+    char path[8192];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
         LOG_ERRNO("getcwd");
         return false;

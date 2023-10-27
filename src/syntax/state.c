@@ -444,7 +444,7 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
         hashset_init(&loaded_builtins, 8, false);
     }
 
-    char buf[4096];
+    char buf[8192];
     char *path;
     size_t path_len;
     HashSet *set;
@@ -667,7 +667,7 @@ Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
     }
 
     const char *cfgdir = e->user_config_dir;
-    char filename[4096];
+    char filename[8192];
     int err;
 
     xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
