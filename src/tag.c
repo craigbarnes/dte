@@ -14,22 +14,20 @@
 
 static const char *current_filename; // For sorting tags
 
+static bool tag_is_local_to_file(const Tag *tag, const char *path)
+{
+    return tag->local && !!path && strview_equal_cstring(&tag->filename, path);
+}
+
 static int visibility_cmp(const Tag *a, const Tag *b)
 {
-    bool a_this_file = false;
-    bool b_this_file = false;
-
     if (!a->local && !b->local) {
         return 0;
     }
 
     // Is tag visibility limited to the current file?
-    if (a->local) {
-        a_this_file = current_filename && strview_equal_cstring(&a->filename, current_filename);
-    }
-    if (b->local) {
-        b_this_file = current_filename && strview_equal_cstring(&b->filename, current_filename);
-    }
+    bool a_this_file = tag_is_local_to_file(a, current_filename);
+    bool b_this_file = tag_is_local_to_file(b, current_filename);
 
     // Tags local to other file than current are not interesting
     if (a->local && !a_this_file) {
@@ -52,11 +50,11 @@ static int visibility_cmp(const Tag *a, const Tag *b)
         if (b->local && b_this_file) {
             return 0;
         }
-        // a is more interesting because it is local symbol
+        // a is more interesting because it's a local symbol
         return -1;
     }
     if (b->local && b_this_file) {
-        // b is more interesting because it is local symbol
+        // b is more interesting because it's a local symbol
         return 1;
     }
     return 0;
