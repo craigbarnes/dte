@@ -112,7 +112,7 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
     }
 
     char *buf;
-    ssize_t size = read_file(filename, &buf);
+    ssize_t size = read_file(filename, &buf, 0);
     if (size < 0) {
         int err = errno;
         if (err != ENOENT || must_exist) {

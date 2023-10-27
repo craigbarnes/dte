@@ -137,7 +137,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
     }
 
     char *buf = NULL;
-    ssize_t ssize = read_file(file_locks, &buf);
+    ssize_t ssize = read_file(file_locks, &buf, 0);
     if (ssize < 0) {
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", file_locks, strerror(errno));

@@ -206,7 +206,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
     // Iterate up directory tree, looking for ".editorconfig" at each level
     while (1) {
         char *text;
-        ssize_t len = read_file_with_limit(buf, &text, MAX_FILESIZE);
+        ssize_t len = read_file(buf, &text, MAX_FILESIZE);
         if (len >= 0) {
             data.config_file_dir = string_view(buf, dir_len);
             editorconfig_parse(text, len, &data);

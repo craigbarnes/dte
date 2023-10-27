@@ -5,7 +5,7 @@
 #include "readfile.h"
 #include "xreadwrite.h"
 
-ssize_t read_file_with_limit(const char *filename, char **bufp, size_t size_limit)
+ssize_t read_file(const char *filename, char **bufp, size_t size_limit)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd == -1) {
@@ -52,9 +52,4 @@ error:
 error_noclose:
     *bufp = NULL;
     return -1;
-}
-
-ssize_t read_file(const char *filename, char **bufp)
-{
-    return read_file_with_limit(filename, bufp, 0);
 }

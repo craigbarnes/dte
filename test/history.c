@@ -152,7 +152,7 @@ static void test_history_search(TestContext *ctx)
     history_save(&h);
     history_free(&h);
     char *buf = NULL;
-    ssize_t n = read_file_with_limit(filename, &buf, 4096);
+    ssize_t n = read_file(filename, &buf, 4096);
     EXPECT_EQ(n, 14);
     EXPECT_STREQ(buf, "one\ntwo\nthree\n");
     free(buf);

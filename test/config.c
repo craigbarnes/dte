@@ -49,7 +49,7 @@ static void test_builtin_configs(TestContext *ctx)
             char path[4096];
             xsnprintf(path, sizeof path, "config/%s", cfg.name);
             char *src;
-            ssize_t size = read_file_with_limit(path, &src, 8u << 20);
+            ssize_t size = read_file(path, &src, 8u << 20);
             ASSERT_EQ(size, cfg.text.length);
             EXPECT_MEMEQ(src, cfg.text.data, size);
             free(src);
@@ -63,7 +63,7 @@ static void expect_files_equal(TestContext *ctx, const char *path1, const char *
 {
     size_t filesize_limit = 1u << 20; // 1MiB
     char *buf1;
-    ssize_t size1 = read_file_with_limit(path1, &buf1, filesize_limit);
+    ssize_t size1 = read_file(path1, &buf1, filesize_limit);
     if (size1 < 0) {
         TEST_FAIL("Error reading '%s': %s", path1, strerror(errno));
         return;
@@ -71,7 +71,7 @@ static void expect_files_equal(TestContext *ctx, const char *path1, const char *
     ctx->passed++;
 
     char *buf2;
-    ssize_t size2 = read_file_with_limit(path2, &buf2, filesize_limit);
+    ssize_t size2 = read_file(path2, &buf2, filesize_limit);
     if (size2 < 0) {
         free(buf1);
         TEST_FAIL("Error reading '%s': %s", path2, strerror(errno));

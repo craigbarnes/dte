@@ -83,7 +83,7 @@ static void test_next_tag(TestContext *ctx)
     };
 
     char *buf;
-    ssize_t len = read_file_with_limit("test/data/ctags.txt", &buf, 8192);
+    ssize_t len = read_file("test/data/ctags.txt", &buf, 8192);
     ASSERT_TRUE(len >= 64);
 
     StringView prefix = STRING_VIEW("");
