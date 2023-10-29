@@ -110,11 +110,13 @@ static int open_tag_file(char *path)
             return fd;
         }
         if (errno != ENOENT) {
+            error_msg("failed to open '%s': %s", path, strerror(errno));
             return -1;
         }
         *slash = '\0';
     }
-    errno = ENOENT;
+
+    error_msg("no tags file");
     return -1;
 }
 
@@ -138,8 +140,7 @@ static bool load_tag_file(TagFile *tf)
 {
     char path[8192];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
-        LOG_ERRNO("getcwd");
-        return false;
+        return error_msg_errno("getcwd");
     }
 
     int fd = open_tag_file(path);
@@ -149,14 +150,14 @@ static bool load_tag_file(TagFile *tf)
 
     struct stat st;
     if (unlikely(fstat(fd, &st) != 0)) {
-        LOG_ERRNO("fstat");
+        const char *str = strerror(errno);
         xclose(fd);
-        return false;
+        return error_msg("fstat: %s", str);
     }
 
     if (unlikely(st.st_size <= 0)) {
         xclose(fd);
-        return false;
+        return error_msg("empty tags file");
     }
 
     if (tf->filename) {
@@ -170,16 +171,16 @@ static bool load_tag_file(TagFile *tf)
 
     char *buf = malloc(st.st_size);
     if (unlikely(!buf)) {
-        LOG_ERRNO("malloc");
         xclose(fd);
-        return false;
+        return error_msg("malloc: %s", strerror(ENOMEM));
     }
 
     ssize_t size = xread_all(fd, buf, st.st_size);
+    int err = errno;
     xclose(fd);
     if (size < 0) {
         free(buf);
-        return false;
+        return error_msg("read: %s", strerror(err));
     }
 
     *tf = (TagFile) {
@@ -276,7 +277,6 @@ size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, Mes
 {
     clear_messages(messages);
     if (!load_tag_file(tf)) {
-        error_msg("No tags file");
         return 0;
     }
 
