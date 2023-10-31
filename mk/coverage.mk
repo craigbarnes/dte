@@ -4,8 +4,7 @@
 GCOVR ?= gcovr
 GCOVRFLAGS ?= -j$(NPROC) --config gcovr.cfg --sort-percentage
 
-coverage-report: gcovr
-gcovr: gcovr-html
+coverage-report: gcovr-html
 gcovr-html: public/coverage/index.html
 gcovr-xml: build/coverage.xml
 
@@ -24,7 +23,7 @@ public/coverage/: public/
 	$(Q) mkdir -p $@
 
 
-NON_PARALLEL_TARGETS += coverage-report gcovr gcovr-html gcovr-xml
+NON_PARALLEL_TARGETS += coverage-report gcovr-html gcovr-xml
 NON_PARALLEL_TARGETS += public/coverage/index.html build/coverage.xml
 
-.PHONY: coverage-report gcovr gcovr-html gcovr-xml
+.PHONY: coverage-report gcovr-html gcovr-xml
