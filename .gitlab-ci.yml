@@ -41,6 +41,10 @@ rocky-8:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-rocky-8
 
+rocky-9:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-rocky-9
+
 debian-10:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
