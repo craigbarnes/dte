@@ -129,8 +129,9 @@ void term_set_bytes(Terminal *term, char ch, size_t count)
 // bytes within escape sequences without advancing the cursor position.
 void term_put_byte(TermOutputBuffer *obuf, char ch)
 {
-    obuf_need_space(obuf, 1);
-    obuf->buf[obuf->count++] = ch;
+    char *buf = obuf_need_space(obuf, 1);
+    buf[0] = ch;
+    obuf->count++;
 }
 
 void term_put_str(TermOutputBuffer *obuf, const char *str)
