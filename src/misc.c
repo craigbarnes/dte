@@ -360,7 +360,7 @@ void insert_ch(View *view, CodePoint ch)
         static_assert(sizeof(buf) >= INDENT_WIDTH_MAX);
         memset(ins, ' ', ins_count);
     } else {
-        u_set_char_raw(ins, &ins_count, ch);
+        ins_count += u_set_char_raw(ins + ins_count, ch);
     }
 
     // Record change

@@ -42,22 +42,26 @@ void string_append_byte(String *s, unsigned char byte)
 size_t string_append_codepoint(String *s, CodePoint u)
 {
     string_reserve_space(s, 4);
-    return u_set_char_raw(s->buffer, &s->len, u);
+    size_t n = u_set_char_raw(s->buffer + s->len, u);
+    s->len += n;
+    return n;
 }
 
-static void string_make_space(String *s, size_t pos, size_t len)
+static char *string_make_space(String *s, size_t pos, size_t len)
 {
     BUG_ON(pos > s->len);
     BUG_ON(len == 0);
     string_reserve_space(s, len);
-    memmove(s->buffer + pos + len, s->buffer + pos, s->len - pos);
+    char *start = s->buffer + pos;
+    memmove(start + len, start, s->len - pos);
     s->len += len;
+    return start;
 }
 
 size_t string_insert_codepoint(String *s, size_t pos, CodePoint u)
 {
-    string_make_space(s, pos, u_char_size(u));
-    return u_set_char_raw(s->buffer, &pos, u);
+    size_t len = u_char_size(u);
+    return u_set_char_raw(string_make_space(s, pos, len), u);
 }
 
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
@@ -65,8 +69,7 @@ void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
     if (len == 0) {
         return;
     }
-    string_make_space(s, pos, len);
-    memcpy(s->buffer + pos, buf, len);
+    memcpy(string_make_space(s, pos, len), buf, len);
 }
 
 void string_append_buf(String *s, const char *ptr, size_t len)

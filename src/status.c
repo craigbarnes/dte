@@ -102,11 +102,16 @@ static void add_status_str(Formatter *f, const char *str)
     if (unlikely(!str[0])) {
         return;
     }
+
     add_separator(f);
-    size_t idx = 0;
-    while (f->pos < f->size && str[idx]) {
-        u_set_char(f->buf, &f->pos, u_str_get_char(str, &idx));
+    char *buf = f->buf;
+    size_t pos = f->pos;
+
+    for (size_t i = 0, size = f->size; pos < size && str[i]; ) {
+        pos += u_set_char(buf + pos, u_str_get_char(str, &i));
     }
+
+    f->pos = pos;
 }
 
 static void add_status_bytes(Formatter *f, const char *str, size_t len)

@@ -22,14 +22,14 @@ static inline size_t u_char_size(CodePoint u)
 
 size_t u_str_width(const unsigned char *str);
 
-CodePoint u_prev_char(const unsigned char *buf, size_t *idx);
+CodePoint u_prev_char(const unsigned char *str, size_t *idx);
 CodePoint u_str_get_char(const unsigned char *str, size_t *idx);
-CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx);
-CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx);
+CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx);
+CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
 
-size_t u_set_char_raw(char *str, size_t *idx, CodePoint u);
-void u_set_char(char *str, size_t *idx, CodePoint u);
-void u_set_hex(char *str, size_t *idx, CodePoint u);
+size_t u_set_char_raw(char *buf, CodePoint u);
+size_t u_set_char(char *buf, CodePoint u);
+size_t u_set_hex(char *buf, CodePoint u);
 
 /*
  * Total width of skipped characters is stored back to @width.

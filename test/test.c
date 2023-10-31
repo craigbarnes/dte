@@ -29,7 +29,7 @@ size_t make_printable_mem(const char *src, size_t src_len, char *dest, size_t de
     BUG_ON(destsize < 16);
     size_t len = 0;
     for (size_t i = 0; i < src_len && len < destsize - 5; ) {
-        u_set_char(dest, &len, u_get_char(src, src_len, &i));
+        len += u_set_char(dest + len, u_get_char(src, src_len, &i));
     }
     dest[len] = '\0';
     return len;

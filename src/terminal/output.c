@@ -288,8 +288,7 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
     if (u_is_unprintable(u)) {
         BUG_ON(n > 3);
         char tmp[8] = {'\0'};
-        size_t idx = 0;
-        u_set_hex(tmp, &idx, u);
+        u_set_hex(tmp, u);
         memcpy(buf, tmp + 4 - n, 4);
         obuf->count += n;
         return;
@@ -351,13 +350,12 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         const size_t width = u_char_width(u);
         if (likely(width <= space)) {
             obuf->x += width;
-            u_set_char(obuf->buf, &obuf->count, u);
+            obuf->count += u_set_char(obuf->buf + obuf->count, u);
         } else if (u_is_unprintable(u)) {
             // <xx> would not fit.
             // There's enough space in the buffer so render all 4 characters
             // but increment position less.
-            size_t idx = obuf->count;
-            u_set_hex(obuf->buf, &idx, u);
+            u_set_hex(obuf->buf + obuf->count, u);
             obuf->count += space;
             obuf->x += space;
         } else {

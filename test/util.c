@@ -1430,57 +1430,39 @@ static void test_u_str_width(TestContext *ctx)
 static void test_u_set_char_raw(TestContext *ctx)
 {
     unsigned char buf[16] = "";
-    size_t i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 'a'), 1);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char_raw(buf, 'a'), 1);
     EXPECT_EQ(buf[0], 'a');
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, '\0'), 1);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char_raw(buf, '\0'), 1);
     EXPECT_EQ(buf[0], '\0');
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0x1F), 1);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char_raw(buf, 0x1F), 1);
     EXPECT_EQ(buf[0], 0x1F);
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0x7F), 1);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char_raw(buf, 0x7F), 1);
     EXPECT_EQ(buf[0], 0x7F);
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0x7FF), 2);
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(u_set_char_raw(buf, 0x7FF), 2);
     EXPECT_EQ(buf[0], 0xDF);
     EXPECT_EQ(buf[1], 0xBF);
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0xFF45), 3);
-    EXPECT_EQ(i, 3);
+    EXPECT_EQ(u_set_char_raw(buf, 0xFF45), 3);
     EXPECT_EQ(buf[0], 0xEF);
     EXPECT_EQ(buf[1], 0xBD);
     EXPECT_EQ(buf[2], 0x85);
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0x1F311), 4);
-    EXPECT_EQ(i, 4);
+    EXPECT_EQ(u_set_char_raw(buf, 0x1F311), 4);
     EXPECT_EQ(buf[0], 0xF0);
     EXPECT_EQ(buf[1], 0x9F);
     EXPECT_EQ(buf[2], 0x8C);
     EXPECT_EQ(buf[3], 0x91);
 
-    i = 0;
     buf[1] = 0x88;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0x110000), 1);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char_raw(buf, 0x110000), 1);
     EXPECT_EQ(buf[0], 0);
     EXPECT_EQ(buf[1], 0x88);
 
-    i = 0;
-    EXPECT_EQ(u_set_char_raw(buf, &i, 0x110042), 1);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char_raw(buf, 0x110042), 1);
     EXPECT_EQ(buf[0], 0x42);
     EXPECT_EQ(buf[1], 0x88);
 }
@@ -1488,86 +1470,60 @@ static void test_u_set_char_raw(TestContext *ctx)
 static void test_u_set_char(TestContext *ctx)
 {
     unsigned char buf[16] = "";
-    size_t i = 0;
-    u_set_char(buf, &i, 'a');
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char(buf, 'a'), 1);
     EXPECT_EQ(buf[0], 'a');
 
-    i = 0;
-    u_set_char(buf, &i, 0x00DF);
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(u_set_char(buf, 0x00DF), 2);
     EXPECT_EQ(buf[0], 0xC3);
     EXPECT_EQ(buf[1], 0x9F);
 
-    i = 0;
-    u_set_char(buf, &i, 0x0E01);
-    EXPECT_EQ(i, 3);
+    EXPECT_EQ(u_set_char(buf, 0x0E01), 3);
     EXPECT_EQ(buf[0], 0xE0);
     EXPECT_EQ(buf[1], 0xB8);
     EXPECT_EQ(buf[2], 0x81);
 
-    i = 0;
-    u_set_char(buf, &i, 0x1F914);
-    EXPECT_EQ(i, 4);
+    EXPECT_EQ(u_set_char(buf, 0x1F914), 4);
     EXPECT_EQ(buf[0], 0xF0);
     EXPECT_EQ(buf[1], 0x9F);
     EXPECT_EQ(buf[2], 0xA4);
     EXPECT_EQ(buf[3], 0x94);
 
-    i = 0;
-    u_set_char(buf, &i, 0x10FFFF);
-    EXPECT_EQ(i, 4);
+    EXPECT_EQ(u_set_char(buf, 0x10FFFF), 4);
     EXPECT_EQ(buf[0], '<');
     EXPECT_EQ(buf[1], '?');
     EXPECT_EQ(buf[2], '?');
     EXPECT_EQ(buf[3], '>');
 
-    i = 0;
-    u_set_char(buf, &i, '\0');
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(u_set_char(buf, '\0'), 2);
     EXPECT_EQ(buf[0], '^');
     EXPECT_EQ(buf[1], '@');
 
-    i = 0;
-    u_set_char(buf, &i, '\t');
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(u_set_char(buf, '\t'), 2);
     EXPECT_EQ(buf[0], '^');
     EXPECT_EQ(buf[1], 'I');
 
-    i = 0;
-    u_set_char(buf, &i, 0x1F);
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(u_set_char(buf, 0x1F), 2);
     EXPECT_EQ(buf[0], '^');
     EXPECT_EQ(buf[1], '_');
 
-    i = 0;
-    u_set_char(buf, &i, 0x7F);
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(u_set_char(buf, 0x7F), 2);
     EXPECT_EQ(buf[0], '^');
     EXPECT_EQ(buf[1], '?');
 
-    i = 0;
-    u_set_char(buf, &i, 0x80);
-    EXPECT_EQ(i, 4);
+    EXPECT_EQ(u_set_char(buf, 0x80), 4);
     EXPECT_EQ(buf[0], '<');
     EXPECT_EQ(buf[1], '?');
     EXPECT_EQ(buf[2], '?');
     EXPECT_EQ(buf[3], '>');
 
-    i = 0;
-    u_set_char(buf, &i, 0x7E);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char(buf, 0x7E), 1);
     EXPECT_EQ(buf[0], '~');
 
-    i = 0;
-    u_set_char(buf, &i, 0x20);
-    EXPECT_EQ(i, 1);
+    EXPECT_EQ(u_set_char(buf, 0x20), 1);
     EXPECT_EQ(buf[0], ' ');
 
     unsigned char c = 0xA5;
-    i = 0;
-    u_set_char(buf, &i, 0x110000 + c);
-    EXPECT_EQ(i, 4);
+    EXPECT_EQ(u_set_char(buf, 0x110000 + c), 4);
     EXPECT_EQ(buf[0], '<');
     EXPECT_EQ(buf[1], '5');
     EXPECT_EQ(buf[2], 'b');

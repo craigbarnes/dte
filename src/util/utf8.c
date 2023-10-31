@@ -169,69 +169,67 @@ invalid:
     return -first;
 }
 
-size_t u_set_char_raw(char *str, size_t *idx, CodePoint u)
+size_t u_set_char_raw(char *buf, CodePoint u)
 {
-    static const uint8_t prefixes[] = {0, 0, 0xC0, 0xE0, 0xF0};
-    const size_t len = u_char_size(u);
-    const uint8_t first_byte_prefix = prefixes[len];
-    const size_t i = *idx;
+    unsigned int prefix = 0;
+    size_t len = u_char_size(u);
+    BUG_ON(len == 0 || len > UTF8_MAX_SEQ_LEN);
 
     switch (len) {
     case 4:
-        str[i + 3] = (u & 0x3F) | 0x80;
+        buf[3] = (u & 0x3F) | 0x80;
         u >>= 6;
+        prefix |= 0xF0;
         // Fallthrough
     case 3:
-        str[i + 2] = (u & 0x3F) | 0x80;
+        buf[2] = (u & 0x3F) | 0x80;
         u >>= 6;
+        prefix |= 0xE0;
         // Fallthrough
     case 2:
-        str[i + 1] = (u & 0x3F) | 0x80;
+        buf[1] = (u & 0x3F) | 0x80;
         u >>= 6;
-        // Fallthrough
-    case 1:
-        str[i] = (u & 0xFF) | first_byte_prefix;
-        *idx = i + len;
-        return len;
+        prefix |= 0xC0;
     }
 
-    BUG("unexpected UTF-8 sequence length: %zu", len);
-    return 0;
+    buf[0] = (u & 0xFF) | prefix;
+    return len;
 }
 
-void u_set_char(char *str, size_t *idx, CodePoint u)
+size_t u_set_char(char *buf, CodePoint u)
 {
-    size_t i = *idx;
     if (likely(u <= 0x7F)) {
+        size_t i = 0;
         if (unlikely(ascii_iscntrl(u))) {
             // Use caret notation for control chars:
-            str[i++] = '^';
+            buf[i++] = '^';
             u = (u + 64) & 0x7F;
         }
-        str[i++] = u;
-        *idx = i;
-    } else if (u_is_unprintable(u)) {
-        u_set_hex(str, idx, u);
-    } else {
-        BUG_ON(u > 0x10FFFF); // (implied by !u_is_unprintable(u))
-        u_set_char_raw(str, idx, u);
+        buf[i++] = u;
+        return i;
     }
+
+    if (u_is_unprintable(u)) {
+        return u_set_hex(buf, u);
+    }
+
+    BUG_ON(u > 0x10FFFF); // (implied by !u_is_unprintable(u))
+    return u_set_char_raw(buf, u);
 }
 
-void u_set_hex(char *str, size_t *idx, CodePoint u)
+size_t u_set_hex(char *buf, CodePoint u)
 {
-    char *p = str + *idx;
-    p[0] = '<';
+    buf[0] = '<';
     if (!u_is_unicode(u)) {
         // Invalid byte (negated)
         u *= -1;
-        hex_encode_byte(p + 1, u & 0xFF);
+        hex_encode_byte(buf + 1, u & 0xFF);
     } else {
-        p[1] = '?';
-        p[2] = '?';
+        buf[1] = '?';
+        buf[2] = '?';
     }
-    p[3] = '>';
-    *idx += 4;
+    buf[3] = '>';
+    return 4;
 }
 
 size_t u_skip_chars(const char *str, int *width)

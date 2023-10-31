@@ -180,7 +180,7 @@ size_t keycode_to_string(KeyCode k, char *buf)
                 goto copy;
             }
         }
-        u_set_char(buf, &pos, key);
+        pos += u_set_char(buf + pos, key);
         buf[pos] = '\0';
         return pos;
     }
