@@ -268,9 +268,11 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
 {
     char *buf = obuf_need_space(obuf, 7);
     size_t n = obuf->x - obuf->scroll_x;
-    BUG_ON(n == 0 || n > 7);
+    BUG_ON(n == 0);
 
     if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
+        static_assert(TAB_WIDTH_MAX == 8);
+        BUG_ON(n > 7);
         memcpy(buf, get_tab_str(obuf->tab_mode) + 1, 7);
         obuf->count += n;
         return;
@@ -293,6 +295,7 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
         return;
     }
 
+    BUG_ON(n != 1);
     buf[0] = '>';
     obuf->count++;
 }
