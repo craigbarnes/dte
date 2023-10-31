@@ -266,28 +266,35 @@ static const char *get_tab_str(TermTabOutputMode tab_mode)
 
 static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
 {
-    char *buf = obuf->buf + obuf->count;
+    char *buf = obuf_need_space(obuf, 7);
     size_t n = obuf->x - obuf->scroll_x;
-    BUG_ON(n > 7);
-    obuf_need_space(obuf, 8);
+    BUG_ON(n == 0 || n > 7);
 
-    char tmp[4];
-    const char *src;
     if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-        src = get_tab_str(obuf->tab_mode) + 1;
-    } else if (u < 0x20 || u == 0x7F || u_is_unprintable(u)) {
-        size_t idx = 0;
-        u_set_char(tmp, &idx, u);
-        BUG_ON(idx == 0 || idx > 4);
-        src = tmp + idx - n;
-    } else {
-        *buf = '>';
+        memcpy(buf, get_tab_str(obuf->tab_mode) + 1, 7);
+        obuf->count += n;
+        return;
+    }
+
+    if (u < 0x20 || u == 0x7F) {
+        BUG_ON(n != 1);
+        buf[0] = (u + 64) & 0x7F;
         obuf->count++;
         return;
     }
 
-    obuf->count += n;
-    memcpy(buf, src, n);
+    if (u_is_unprintable(u)) {
+        BUG_ON(n > 3);
+        char tmp[8] = {'\0'};
+        size_t idx = 0;
+        u_set_hex(tmp, &idx, u);
+        memcpy(buf, tmp + 4 - n, 4);
+        obuf->count += n;
+        return;
+    }
+
+    buf[0] = '>';
+    obuf->count++;
 }
 
 static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
