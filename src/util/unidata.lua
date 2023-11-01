@@ -68,7 +68,7 @@ local function read_ucd(path, pattern)
             " path/to/UnicodeData.txt",
             " path/to/EastAsianWidth.txt",
             " path/to/DerivedCoreProperties.txt",
-            "\n(available from: https://unicode.org/Public/15.0.0/ucd/)\n"
+            "\n(available from: https://unicode.org/Public/15.1.0/ucd/)\n"
         )
         os.exit(1)
     end
@@ -165,7 +165,7 @@ assert(prev_codepoint == 0x10FFFD)
 assert(exclude.n == 127 + 3)
 unprintable:insert(prev_codepoint + 1, 0x10FFFF)
 
-for min, max in eaw:gmatch "\n(%x+)%.*(%x*);[WF]" do
+for min, max in eaw:gmatch "\n(%x+)%.*(%x*) *; *[WF]" do
     min = assert(tonumber(min, 16))
     max = tonumber(max, 16)
     double_width:insert(min, max or min)
