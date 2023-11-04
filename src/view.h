@@ -56,7 +56,7 @@ void view_update_cursor_x(View *view) NONNULL_ARGS;
 void view_update(View *view, unsigned int scroll_margin) NONNULL_ARGS;
 long view_get_preferred_x(View *view) NONNULL_ARGS;
 bool view_can_close(const View *view) NONNULL_ARGS;
-StringView view_do_get_word_under_cursor(const View *view, size_t *offset_in_line) NONNULL_ARGS;
 StringView view_get_word_under_cursor(const View *view) NONNULL_ARGS;
+StringView get_word_under_cursor(StringView line, size_t cursor_offset);
 
 #endif

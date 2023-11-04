@@ -246,8 +246,9 @@ ssize_t handle_exec (
             ctx.input.length = prepare_selection(view);
             replace_input = true;
         } else {
-            size_t offset;
-            StringView word = view_do_get_word_under_cursor(e->view, &offset);
+            StringView line;
+            size_t offset = fetch_this_line(&view->cursor, &line);
+            StringView word = get_word_under_cursor(line, offset);
             if (word.length == 0) {
                 break;
             }
