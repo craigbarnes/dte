@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <unistd.h>
 #include "xreadwrite.h"
 
@@ -19,13 +20,24 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
     return r;
 }
 
+static size_t rwsize(size_t count)
+{
+#if defined(__APPLE__)
+    // See: https://gitlab.com/craigbarnes/dte/-/issues/201
+    const size_t maxsize = (size_t)INT_MAX;
+#else
+    const size_t maxsize = (size_t)SSIZE_MAX;
+#endif
+    return MIN(count, maxsize);
+}
+
 ssize_t xread_all(int fd, void *buf, size_t count)
 {
     char *b = buf;
     size_t pos = 0;
     do {
-        ssize_t rc = read(fd, b + pos, count - pos);
-        if (unlikely(rc == -1)) {
+        ssize_t rc = read(fd, b + pos, rwsize(count - pos));
+        if (unlikely(rc < 0)) {
             if (errno == EINTR) {
                 continue;
             }
@@ -45,8 +57,8 @@ ssize_t xwrite_all(int fd, const void *buf, size_t count)
     const char *b = buf;
     const size_t count_save = count;
     do {
-        ssize_t rc = write(fd, b, count);
-        if (unlikely(rc == -1)) {
+        ssize_t rc = write(fd, b, rwsize(count));
+        if (unlikely(rc < 0)) {
             if (errno == EINTR) {
                 continue;
             }
