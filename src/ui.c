@@ -67,19 +67,6 @@ void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_tit
     term_put_literal(obuf, " dte\033\\");
 }
 
-void mask_style(TermStyle *style, const TermStyle *over)
-{
-    if (over->fg != COLOR_KEEP) {
-        style->fg = over->fg;
-    }
-    if (over->bg != COLOR_KEEP) {
-        style->bg = over->bg;
-    }
-    if (!(over->attr & ATTR_KEEP)) {
-        style->attr = over->attr;
-    }
-}
-
 void restore_cursor(EditorState *e)
 {
     unsigned int x, y;

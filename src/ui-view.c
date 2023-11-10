@@ -22,6 +22,19 @@ typedef struct {
     const TermStyle **styles;
 } LineInfo;
 
+static void mask_style(TermStyle *style, const TermStyle *over)
+{
+    if (over->fg != COLOR_KEEP) {
+        style->fg = over->fg;
+    }
+    if (over->bg != COLOR_KEEP) {
+        style->bg = over->bg;
+    }
+    if (!(over->attr & ATTR_KEEP)) {
+        style->attr = over->attr;
+    }
+}
+
 // Like mask_style() but can change bg color only if it has not been changed yet
 static void mask_style2(const StyleMap *styles, TermStyle *style, const TermStyle *over)
 {

@@ -29,7 +29,6 @@ void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
 void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);
 void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s);
-void mask_style(TermStyle *style, const TermStyle *over);
 void start_update(Terminal *term);
 void end_update(EditorState *e);
 void normal_update(EditorState *e);
