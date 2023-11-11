@@ -198,6 +198,9 @@ static size_t count_blanks_fwd(BlockIter *bi)
 {
     size_t count = 0;
     CodePoint u;
+    // TODO: Use byte-wise iteration instead of `block_iter_next_char()`;
+    // we're only operating on one line and checking for ASCII characters,
+    // so Block traversal and Unicode-aware decoding are both unnecessary
     while (block_iter_next_char(bi, &u)) {
         if (u != '\t' && u != ' ') {
             break;
@@ -212,6 +215,7 @@ static size_t count_blanks_bwd(BlockIter *bi)
 {
     size_t count = 0;
     CodePoint u;
+    // TODO: See `count_blanks_fwd()`
     while (block_iter_prev_char(bi, &u)) {
         if (u != '\t' && u != ' ') {
             block_iter_next_char(bi, &u);
@@ -447,34 +451,24 @@ void join_lines(View *view, const char *delim, size_t delim_len)
     BUG_ON(u != '\n');
 
     // Skip over trailing whitespace at the end of the current line
-    size_t count = 1;
-    while (block_iter_prev_char(&eol, &u)) {
-        if (u != '\t' && u != ' ') {
-            block_iter_next_char(&eol, &u);
-            break;
-        }
-        count++;
-    }
+    size_t del_count = 1 + count_blanks_bwd(&eol);
 
     // Skip over leading whitespace at the start of the next line
-    while (block_iter_next_char(&next, &u)) {
-        if (u != '\t' && u != ' ') {
-            break;
-        }
-        count++;
-    }
+    del_count += count_blanks_fwd(&next);
 
     // Move the cursor to the join position
     view->cursor = eol;
 
-    if (u == '\n') {
+    // TODO: Use `buffer_replace_bytes()` for both of these cases and
+    // simply set `delim_len` to `0` for the pure delete case
+    if (block_iter_is_bol(&next)) {
         // If the next line was empty (or whitespace only) just discard
         // it, by deleting the newline and any whitespace
-        buffer_delete_bytes(view, count);
+        buffer_delete_bytes(view, del_count);
     } else {
         // Otherwise, join the current and next lines together, by
         // replacing the newline/whitespace with the delimiter string
-        buffer_replace_bytes(view, count, delim, delim_len);
+        buffer_replace_bytes(view, del_count, delim, delim_len);
     }
 }
 
