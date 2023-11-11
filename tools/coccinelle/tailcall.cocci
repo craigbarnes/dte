@@ -1,6 +1,12 @@
 @@
 identifier func;
-identifier tail != {free, ptr_array_free, search_free_regexp, va_end};
+identifier tail != {
+    free,
+    ptr_array_free,
+    ptr_array_grow,
+    search_free_regexp,
+    va_end
+};
 expression lhs, rhs, a1;
 @@
 
