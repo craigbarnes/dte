@@ -336,10 +336,11 @@ static const char usage[] =
 int main(int argc, char *argv[])
 {
     static const char optstring[] = "hBHKRVb:c:t:r:s:";
-    const char *tag = NULL;
     const char *rc = NULL;
     const char *commands[8];
+    const char *tags[8];
     size_t nr_commands = 0;
+    size_t nr_tags = 0;
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
@@ -355,7 +356,11 @@ int main(int argc, char *argv[])
             commands[nr_commands++] = optarg;
             break;
         case 't':
-            tag = optarg;
+            if (unlikely(nr_tags >= ARRAYLEN(tags))) {
+                fputs("Error: too many -t options used\n", stderr);
+                return EX_USAGE;
+            }
+            tags[nr_tags++] = optarg;
             break;
         case 'r':
             rc = optarg;
@@ -521,20 +526,27 @@ loop_break:;
         handle_normal_command(e, commands[i], false);
     }
 
-    if (tag) {
-        StringView tag_sv = strview_from_cstring(tag);
+    size_t opened_tags = 0;
+    for (size_t i = 0; i < nr_tags; i++) {
+        StringView tag_sv = strview_from_cstring(tags[i]);
+        // TODO: Split `tag_lookup()` into multiple functions, to avoid
+        // duplicated clearing/loading in cases like this
         if (tag_lookup(&e->tagfile, &tag_sv, NULL, &e->messages)) {
-            activate_current_message(&e->messages, e->window);
-            if (dview && nr_commands == 0 && window->views.count > 1) {
-                // Close default/empty buffer, if `-t` jumped to a tag
-                // and no commands were executed via `-c`
-                remove_view(dview);
-                dview = NULL;
+            if (activate_current_message(&e->messages, e->window)) {
+                opened_tags++;
             }
         }
     }
 
-    if (nr_commands > 0 || tag) {
+    if (dview && nr_commands == 0 && opened_tags > 0) {
+        // Close default/empty buffer, if `-t` jumped to a tag and no
+        // commands were executed via `-c`
+        BUG_ON(window->views.count < 2);
+        remove_view(dview);
+        dview = NULL;
+    }
+
+    if (nr_commands + nr_tags > 0) {
         normal_update(e);
     }
 

@@ -62,6 +62,10 @@ check_exit "$?" 64
 $dte -cquit -c2 -c3 -c4 -c5 -c6 -c7 -c8 -c9 2>/dev/null
 check_exit "$?" 64
 
+# Too many -t options
+$dte -cquit -t1 -t2 -t3 -t4 -t5 -t6 -t7 -t8 -t9 2>/dev/null
+check_exit "$?" 64
+
 # Unset $TERM
 TERM='' $dte -cquit 2>/dev/null
 check_exit "$?" 64
