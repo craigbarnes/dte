@@ -115,7 +115,7 @@
     #define MSAN_ENABLED 1
 #endif
 
-#if __STDC_VERSION__ > 202300L
+#if __STDC_VERSION__ >= 202311L
     #define UNUSED [[__maybe_unused__]]
 #elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
@@ -280,7 +280,7 @@
 #define XSTRDUP XMALLOC NONNULL_ARGS
 #define NONNULL_ARGS_AND_RETURN RETURNS_NONNULL NONNULL_ARGS
 
-#if __STDC_VERSION__ > 202300L
+#if __STDC_VERSION__ >= 202311L
     #define ALIGNOF(t) alignof(t)
 #elif __STDC_VERSION__ >= 201112L
     #define ALIGNOF(t) _Alignof(t)
@@ -298,7 +298,7 @@
     #define noreturn
 #endif
 
-#if __STDC_VERSION__ > 202300L
+#if __STDC_VERSION__ >= 202311L
     #define HAS_STATIC_ASSERT 1
 #elif __STDC_VERSION__ >= 201112L
     #define static_assert(x) _Static_assert((x), #x)
