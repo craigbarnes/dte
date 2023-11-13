@@ -798,8 +798,7 @@ static bool cmd_insert(EditorState *e, const CommandArgs *a)
 static bool cmd_join(EditorState *e, const CommandArgs *a)
 {
     const char *delim = a->args[0] ? a->args[0] : " ";
-    size_t delim_len = strlen(delim);
-    join_lines(e->view, delim, delim_len);
+    join_lines(e->view, delim, strlen(delim));
     return true;
 }
 

@@ -459,10 +459,8 @@ void join_lines(View *view, const char *delim, size_t delim_len)
     // Move the cursor to the join position
     view->cursor = eol;
 
-    // TODO: Use `buffer_replace_bytes()` for both of these cases and
-    // simply set `delim_len` to `0` for the pure delete case
     if (block_iter_is_bol(&next)) {
-        // If the next line was empty (or whitespace only) just discard
+        // If the next line is empty (or whitespace only) just discard
         // it, by deleting the newline and any whitespace
         buffer_delete_bytes(view, del_count);
     } else {
