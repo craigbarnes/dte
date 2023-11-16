@@ -479,24 +479,31 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 
 IGNORE_WARNING("-Wincompatible-pointer-types")
 
+// Note that some of the `Command::flags` entries here aren't actually
+// used in the `cmd` handler and are only included to mirror commands
+// of the same name in normal mode. This is done as a convenience for
+// allowing key binding commands like e.g. `bind -cns C-M-c 'copy -bk'`
+// to be used, instead of needing 2 different commands (with and without
+// the `-k` flag for normal vs. command/search modes).
+
 static const Command common_cmds[] = {
-    {"bol", "", false, 0, 0, cmd_bol},
+    {"bol", "st", false, 0, 0, cmd_bol}, // Ignored flags: s, t
     {"cancel", "", false, 0, 0, cmd_cancel},
-    {"clear", "", false, 0, 0, cmd_clear},
-    {"copy", "bip", false, 0, 0, cmd_copy},
+    {"clear", "i", false, 0, 0, cmd_clear}, // Ignored flag: i
+    {"copy", "bikp", false, 0, 0, cmd_copy}, // Ignored flag: k
     {"delete", "", false, 0, 0, cmd_delete},
-    {"delete-eol", "", false, 0, 0, cmd_delete_eol},
-    {"delete-word", "", false, 0, 0, cmd_delete_word},
+    {"delete-eol", "n", false, 0, 0, cmd_delete_eol}, // Ignored flag: n
+    {"delete-word", "s", false, 0, 0, cmd_delete_word}, // Ignored flag: s
     {"eol", "", false, 0, 0, cmd_eol},
     {"erase", "", false, 0, 0, cmd_erase},
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
-    {"erase-word", "", false, 0, 0, cmd_erase_word},
+    {"erase-word", "s", false, 0, 0, cmd_erase_word}, // Ignored flag: s
     {"left", "", false, 0, 0, cmd_left},
-    {"paste", "m", false, 0, 0, cmd_paste},
+    {"paste", "acm", false, 0, 0, cmd_paste}, // Ignored flags: a, c
     {"right", "", false, 0, 0, cmd_right},
-    {"toggle", "g", false, 1, -1, cmd_toggle},
-    {"word-bwd", "", false, 0, 0, cmd_word_bwd},
-    {"word-fwd", "", false, 0, 0, cmd_word_fwd},
+    {"toggle", "gv", false, 1, -1, cmd_toggle}, // Ignored flag: v
+    {"word-bwd", "s", false, 0, 0, cmd_word_bwd}, // Ignored flag: s
+    {"word-fwd", "s", false, 0, 0, cmd_word_fwd}, // Ignored flag: s
 };
 
 static const Command search_cmds[] = {
