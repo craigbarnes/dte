@@ -36,11 +36,13 @@ ifeq "$(DEVMK)" "loaded"
 	$P check-codespell 'Check spelling errors with codespell(1)'
 	$P check-shell-scripts 'Check shell scripts with shellcheck(1)'
 	$P check-whitespace 'Check source files for indent/newline errors'
-	$P check-headers 'Check header files for various mistakes'
+	$P check-headers 'Check C headers and includes for various mistakes'
 	$P check-docs 'Check HTTP status of URLs found in docs'
 	$P check-clang-tidy 'Run clang-tidy(1) checks from .clang-tidy'
 	$P check-desktop-file 'Run desktop-file-validate(1) checks'
 	$P check-appstream 'Run appstream-util(1) checks'
+	$P check-source 'Equivalent to "make check-{whitespace,headers,codespell,shell-scripts}"'
+	$P check-aux 'Equivalent to "make check-{desktop-file,appstream}"'
 	$P distcheck 'Run "make check" on the unpacked "make dist" tarball'
 	@echo
 endif
