@@ -43,23 +43,24 @@ UNITTEST {
     BUG_ON(color_distance(255,255,255, 0,0,0) != 255 * 255 * 3);
 }
 
-// Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
-static uint8_t nearest_cube_index(uint8_t c)
+// Convert RGB color component (0-255) to nearest xterm color cube index (0-5).
+// Color stops: 0, 95, 135, 175, 215, 255.
+static unsigned int nearest_cube_index(uint8_t c)
 {
-    if (c < 75) {
-        c += 28;
-    }
-    return (c - 35) / 40;
+    unsigned int a = (c < 80) ? MIN(c, 7) : 35;
+    return (c - a) / 40;
 }
 
 UNITTEST {
     BUG_ON(nearest_cube_index(0) != 0);
     BUG_ON(nearest_cube_index(46) != 0);
     BUG_ON(nearest_cube_index(47) != 1);
-    BUG_ON(nearest_cube_index(0x72) != 1);
-    BUG_ON(nearest_cube_index(0x73) != 2);
-    BUG_ON(nearest_cube_index(0xaa) != 3);
-    BUG_ON(nearest_cube_index(0xff) != 5);
+    BUG_ON(nearest_cube_index(114) != 1);
+    BUG_ON(nearest_cube_index(115) != 2);
+    BUG_ON(nearest_cube_index(170) != 3);
+    BUG_ON(nearest_cube_index(255) != 5);
+    BUG_ON(nearest_cube_index(255 - 20) != 5);
+    BUG_ON(nearest_cube_index(255 - 21) != 4);
 }
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
@@ -69,7 +70,7 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
     color_split_rgb(color, &r, &g, &b);
 
     // Calculate closest 6x6x6 RGB cube color
-    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
+    static const uint8_t color_stops[6] = {0, 95, 135, 175, 215, 255};
     uint8_t r_idx = nearest_cube_index(r);
     uint8_t g_idx = nearest_cube_index(g);
     uint8_t b_idx = nearest_cube_index(b);
