@@ -254,6 +254,24 @@ error:
     return ret;
 }
 
+static bool filesize_exceeds_limit(off_t size, unsigned int limit_in_mib)
+{
+    BUG_ON(size < 0);
+    off_t size_in_mib = size >> 20;
+
+    // Round up to the next whole MiB (by adding 1), if there's a remainder
+    size_in_mib += ((size_in_mib << 20) != size);
+
+    return limit_in_mib > 0 && size_in_mib > limit_in_mib;
+}
+
+UNITTEST {
+    const unsigned int seven_mib = 7u << 20;
+    BUG_ON(filesize_exceeds_limit(seven_mib, 7));
+    BUG_ON(!filesize_exceeds_limit(seven_mib + 1, 7));
+    BUG_ON(filesize_exceeds_limit(seven_mib, 0));
+}
+
 bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, bool must_exist)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
@@ -279,10 +297,11 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
             error_msg("Invalid file size: %jd", (intmax_t)buffer->file.size);
             goto error;
         }
-        if (buffer->file.size / 1024 / 1024 > gopts->filesize_limit) {
+        const unsigned int limit_mib = gopts->filesize_limit;
+        if (unlikely(filesize_exceeds_limit(buffer->file.size, limit_mib))) {
             error_msg (
                 "File size exceeds 'filesize-limit' option (%uMiB): %s",
-                gopts->filesize_limit, filename
+                limit_mib, filename
             );
             goto error;
         }
