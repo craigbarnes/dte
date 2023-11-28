@@ -285,20 +285,22 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
         }
         fixup_blocks(buffer);
     } else {
-        if (!buffer_fstat(&buffer->file, fd)) {
+        FileInfo *info = &buffer->file;
+        if (!buffer_fstat(info, fd)) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
             goto error;
         }
-        if (!S_ISREG(buffer->file.mode)) {
+        if (!S_ISREG(info->mode)) {
             error_msg("Not a regular file %s", filename);
             goto error;
         }
-        if (unlikely(buffer->file.size < 0)) {
-            error_msg("Invalid file size: %jd", (intmax_t)buffer->file.size);
+        off_t size = info->size;
+        if (unlikely(size < 0)) {
+            error_msg("Invalid file size: %jd", (intmax_t)size);
             goto error;
         }
-        const unsigned int limit_mib = gopts->filesize_limit;
-        if (unlikely(filesize_exceeds_limit(buffer->file.size, limit_mib))) {
+        unsigned int limit_mib = gopts->filesize_limit;
+        if (unlikely(filesize_exceeds_limit(size, limit_mib))) {
             error_msg (
                 "File size exceeds 'filesize-limit' option (%uMiB): %s",
                 limit_mib, filename
