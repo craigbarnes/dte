@@ -15,7 +15,7 @@ if test -t 1; then
     fi
 fi
 
-if test "$(uname -m)" = x86_64; then
+if test "$(uname -m)" = x86_64 -a -z "$OBJDUMP"; then
     opts="$opts -Mintel --section=.text"
 fi
 
