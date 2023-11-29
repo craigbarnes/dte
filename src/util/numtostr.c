@@ -117,6 +117,16 @@ size_t buf_uint_to_str(unsigned int x, char *buf)
 # define VTXBIT ((mode_t)0)
 #endif
 
+/*
+ * Writes the string representation of permission bits from `mode` into `buf`.
+ * This follows the POSIX ls(1) format, but excludes the "is a directory"
+ * clause for the T/t field (as permitted by the spec).
+ *
+ * See also:
+ *
+ * - https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
+ * - https://gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html#index-long-ls-format
+ */
 char *filemode_to_str(mode_t mode, char *buf)
 {
     static const char xmap[8] = "-xSs-xTt";
