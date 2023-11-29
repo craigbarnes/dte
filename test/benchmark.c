@@ -14,11 +14,8 @@
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
+#include "util/time-util.h"
 #include "util/xsnprintf.h"
-
-enum {
-    NS_PER_SECOND = 1000000000LL
-};
 
 COLD PRINTF(1)
 static noreturn void fail(const char *format, ...)

@@ -7,6 +7,11 @@
 #include <time.h>
 #include "macros.h"
 
+#define NS_PER_SECOND (1000000000L)
+#define MS_PER_SECOND (1000L)
+#define NS_PER_MS (1000000L)
+#define US_PER_MS (1000L)
+
 static inline const struct timespec *get_stat_mtime(const struct stat *st)
 {
 #if defined(__APPLE__)

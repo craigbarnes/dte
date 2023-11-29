@@ -5,7 +5,7 @@
 
 char *timespec_to_str(const struct timespec *ts, char *buf, size_t bufsize)
 {
-    if (unlikely(ts->tv_nsec > 999999999)) {
+    if (unlikely(ts->tv_nsec >= NS_PER_SECOND)) {
         errno = EINVAL;
         return NULL;
     }

@@ -16,6 +16,7 @@
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
+#include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
@@ -128,11 +129,8 @@ static bool lock_or_unlock(const char *filename, bool lock)
             }
             error_msg("Stale lock file %s removed", file_locks_lock);
         } else {
-            const struct timespec req = {
-                .tv_sec = 0,
-                .tv_nsec = 100 * 1000000,
-            };
-            nanosleep(&req, NULL);
+            struct timespec ts = {.tv_nsec = 100 * NS_PER_MS}; // 100ms
+            nanosleep(&ts, NULL);
         }
     }
 

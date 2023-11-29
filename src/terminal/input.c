@@ -7,6 +7,7 @@
 #include "input.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/time-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 
@@ -54,11 +55,11 @@ static bool fill_buffer(TermInputBuffer *input)
     return true;
 }
 
-static bool fill_buffer_timeout(TermInputBuffer *input, unsigned int esc_timeout)
+static bool fill_buffer_timeout(TermInputBuffer *input, unsigned int esc_timeout_ms)
 {
     struct timeval tv = {
-        .tv_sec = esc_timeout / 1000,
-        .tv_usec = (esc_timeout % 1000) * 1000
+        .tv_sec = esc_timeout_ms / MS_PER_SECOND,
+        .tv_usec = (esc_timeout_ms % MS_PER_SECOND) * US_PER_MS
     };
 
     fd_set set;
@@ -160,7 +161,7 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-KeyCode term_read_key(Terminal *term, unsigned int esc_timeout)
+KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
 {
     TermInputBuffer *input = &term->ibuf;
     if (!input->len && !fill_buffer(input)) {
@@ -180,7 +181,7 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout)
         }
         if (input->len == 1) {
             // Sometimes alt-key gets split into two reads
-            fill_buffer_timeout(input, esc_timeout);
+            fill_buffer_timeout(input, esc_timeout_ms);
             if (input->len > 1 && input->buf[1] == '\033') {
                 /*
                  * Double-esc (+ maybe some other characters)
