@@ -1143,11 +1143,13 @@ static void test_filemode_to_str(TestContext *ctx)
 
 #ifdef S_ISVTX
     EXPECT_STREQ("--S--S--T", filemode_to_str(07000, buf));
+    EXPECT_STREQ("--s--s--t", filemode_to_str(07111, buf));
     EXPECT_STREQ("rwsrwsrwt", filemode_to_str(07777, buf));
     EXPECT_STREQ("rwSrwSrwT", filemode_to_str(07666, buf));
     EXPECT_STREQ("------rwt", filemode_to_str(01007, buf));
 #else
     EXPECT_STREQ("--S--S---", filemode_to_str(07000, buf));
+    EXPECT_STREQ("--s--s--x", filemode_to_str(07111, buf));
     EXPECT_STREQ("rwsrwsrwx", filemode_to_str(07777, buf));
     EXPECT_STREQ("rwSrwSrw-", filemode_to_str(07666, buf));
     EXPECT_STREQ("------rwx", filemode_to_str(01007, buf));
