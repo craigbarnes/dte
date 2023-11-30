@@ -14,22 +14,23 @@ void update_status_line(const Window *window)
     TermOutputBuffer *obuf = &term->obuf;
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
-    int w = window->w;
-    static_assert_compatible_types(w, window->w);
-    term_output_reset(term, window->x, w, 0);
-    term_move_cursor(obuf, window->x, window->y + window->h - 1);
+    unsigned int x = window->x;
+    unsigned int y = (window->y + window->h) - 1;
+    unsigned int w = window->w;
+    term_output_reset(term, x, w, 0);
+    term_move_cursor(obuf, x, y);
     set_builtin_style(term, &e->styles, BSE_STATUSLINE);
 
-    if (lw + rw <= w) {
-        // Both fit
+    if (lw <= w && rw <= w) {
         term_put_str(obuf, lbuf);
-        term_set_bytes(term, ' ', w - lw - rw);
-        term_put_str(obuf, rbuf);
-    } else if (lw <= w && rw <= w) {
-        // Both would fit separately, draw overlapping
-        term_put_str(obuf, lbuf);
+        if (lw + rw <= w) {
+            // Both fit; clear the inner space
+            term_clear_eol(term);
+        } else {
+            // Both would fit separately; draw overlapping
+        }
         obuf->x = w - rw;
-        term_move_cursor(obuf, window->x + w - rw, window->y + window->h - 1);
+        term_move_cursor(obuf, x + w - rw, y);
         term_put_str(obuf, rbuf);
     } else if (lw <= w) {
         // Left fits
