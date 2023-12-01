@@ -214,6 +214,15 @@ void term_restore_title(Terminal *term)
     }
 }
 
+static bool term_can_clear_eol_with_el_sequence(const Terminal *term)
+{
+    const TermOutputBuffer *obuf = &term->obuf;
+    bool bce = !!(term->features & TFLAG_BACK_COLOR_ERASE);
+    bool rev = !!(obuf->style.attr & ATTR_REVERSE);
+    bool bg = (obuf->style.bg >= COLOR_BLACK);
+    return obuf->can_clear && (bce || !bg) && !rev;
+}
+
 void term_clear_eol(Terminal *term)
 {
     TermOutputBuffer *obuf = &term->obuf;
@@ -222,11 +231,7 @@ void term_clear_eol(Terminal *term)
         return;
     }
 
-    if (
-        obuf->can_clear
-        && (obuf->style.bg < 0 || term->features & TFLAG_BACK_COLOR_ERASE)
-        && !(obuf->style.attr & ATTR_REVERSE)
-    ) {
+    if (term_can_clear_eol_with_el_sequence(term)) {
         obuf->x = end;
         term_put_literal(obuf, "\033[K");
         return;
