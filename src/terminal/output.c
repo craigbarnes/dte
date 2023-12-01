@@ -214,7 +214,7 @@ void term_restore_title(Terminal *term)
     }
 }
 
-static bool term_can_clear_eol_with_el_sequence(const Terminal *term)
+bool term_can_clear_eol_with_el_sequence(const Terminal *term)
 {
     const TermOutputBuffer *obuf = &term->obuf;
     bool bce = !!(term->features & TFLAG_BACK_COLOR_ERASE);

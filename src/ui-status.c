@@ -1,5 +1,6 @@
 #include "ui.h"
 #include "status.h"
+#include "util/log.h"
 
 void update_status_line(const Window *window)
 {
@@ -21,26 +22,34 @@ void update_status_line(const Window *window)
     term_move_cursor(obuf, x, y);
     set_builtin_style(term, &e->styles, BSE_STATUSLINE);
 
-    if (lw <= w && rw <= w) {
+    if (lw <= w) {
+        LOG_TRACE("drawing statusline-left; width=%zu", lw);
         term_put_str(obuf, lbuf);
-        if (lw + rw <= w) {
-            // Both fit; clear the inner space
-            term_clear_eol(term);
+    }
+
+    if (lw <= w && rw <= w && lw + rw > w) {
+        // Left and right sides both fit individually, but not together.
+        // They'll be drawn overlapping, so there's no inner gap to clear.
+        LOG_TRACE("no statusline gap to clear");
+    } else {
+        if (rw <= w && !term_can_clear_eol_with_el_sequence(term)) {
+            // If rbuf will be printed below and EL can't be used, fill the
+            // gap between the left and right sides with the minimal number
+            // of space characters, instead of letting the fallback path in
+            // `term_clear_eol()` print spaces all the way to the end.
+            size_t nspaces = w - rw - obuf->x;
+            LOG_TRACE("filling statusline gap with %zu spaces", nspaces);
+            term_set_bytes(term, ' ', nspaces);
         } else {
-            // Both would fit separately; draw overlapping
+            LOG_TRACE("filling statusline gap with term_clear_eol()");
+            term_clear_eol(term);
         }
+    }
+
+    if (rw <= w) {
+        LOG_TRACE("drawing statusline-right; width=%zu", rw);
         obuf->x = w - rw;
         term_move_cursor(obuf, x + w - rw, y);
         term_put_str(obuf, rbuf);
-    } else if (lw <= w) {
-        // Left fits
-        term_put_str(obuf, lbuf);
-        term_clear_eol(term);
-    } else if (rw <= w) {
-        // Right fits
-        term_set_bytes(term, ' ', w - rw);
-        term_put_str(obuf, rbuf);
-    } else {
-        term_clear_eol(term);
     }
 }
