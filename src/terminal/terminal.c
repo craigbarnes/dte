@@ -86,9 +86,13 @@ static const TermEntry terms[] = {
     {"teken", 5, TERM_8_COLOR, DIM | REV, BCE},
     {"terminator", 10, TERM_256_COLOR, 0, BCE | TITLE},
     {"termite", 7, TERM_8_COLOR, 0, TITLE},
+    // TODO: Add REP to tmux features, when it becomes safe to assume that
+    // TERM=tmux* implies tmux >= 2.6 (see commit 5fc0be50450e75)
     {"tmux", 4, TERM_8_COLOR, 0, TITLE | OSC52},
     {"wezterm", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC},
     {"xfce", 4, TERM_8_COLOR, 0, BCE | TITLE},
+    // Note: xterm supports REP, but TERM=xterm* is used by too many other
+    // terminals to safely add it here
     {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC},
     {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
 };
