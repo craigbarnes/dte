@@ -230,7 +230,7 @@ static void add_misc_status(Formatter *f)
     add_status_format(f, "[%zu %s%s]", n, unit, plural);
 }
 
-void sf_format (
+size_t sf_format (
     const Window *window,
     const GlobalOptions *opts,
     InputMode mode,
@@ -339,6 +339,9 @@ void sf_format (
     }
 
     f.buf[f.pos] = '\0';
+
+    // TODO: Calculate display width during formatting
+    return u_str_width(f.buf);
 }
 
 // Returns the offset of the first invalid format specifier, or 0 if

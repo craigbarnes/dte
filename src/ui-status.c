@@ -6,15 +6,15 @@ void update_status_line(const Window *window)
 {
     EditorState *e = window->editor;
     const GlobalOptions *opts = &e->options;
+    const char *lfmt = opts->statusline_left;
+    const char *rfmt = opts->statusline_right;
     InputMode mode = e->input_mode;
     char lbuf[512], rbuf[512];
-    sf_format(window, opts, mode, lbuf, sizeof lbuf, opts->statusline_left);
-    sf_format(window, opts, mode, rbuf, sizeof rbuf, opts->statusline_right);
+    size_t lw = sf_format(window, opts, mode, lbuf, sizeof lbuf, lfmt);
+    size_t rw = sf_format(window, opts, mode, rbuf, sizeof rbuf, rfmt);
 
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
-    size_t lw = u_str_width(lbuf);
-    size_t rw = u_str_width(rbuf);
     unsigned int x = window->x;
     unsigned int y = (window->y + window->h) - 1;
     unsigned int w = window->w;

@@ -8,7 +8,7 @@
 
 size_t statusline_format_find_error(const char *str);
 
-void sf_format (
+size_t sf_format (
     const Window *window,
     const GlobalOptions *opts,
     InputMode mode,
