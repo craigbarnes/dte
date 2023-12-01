@@ -132,6 +132,7 @@ bind F5 refresh
 # as distinct sequences, so don't be surprised if they don't work.
 bind C-tab next
 bind C-S-tab prev
+bind C-S-g 'search -p'
 
 # Command/search mode bindings:
 bind -cs left left
