@@ -230,6 +230,91 @@ static void add_misc_status(Formatter *f)
     add_status_format(f, "[%zu %s%s]", n, unit, plural);
 }
 
+static void expand_format_specifier(Formatter *f, FormatSpecifierType type)
+{
+    const View *view = f->window->view;
+    const Buffer *buffer = view->buffer;
+    switch (type) {
+    case STATUS_BOM:
+        if (buffer->bom) {
+            add_status_literal(f, "BOM");
+        }
+        return;
+    case STATUS_FILENAME:
+        add_status_str(f, buffer_filename(buffer));
+        return;
+    case STATUS_MODIFIED:
+        if (buffer_modified(buffer)) {
+            add_separator(f);
+            add_ch(f, '*');
+        }
+        return;
+    case STATUS_READONLY:
+        if (buffer->readonly) {
+            add_status_literal(f, "RO");
+        } else if (buffer->temporary) {
+            add_status_literal(f, "TMP");
+        }
+        return;
+    case STATUS_CURSOR_ROW:
+        add_status_umax(f, view->cy + 1);
+        return;
+    case STATUS_TOTAL_ROWS:
+        add_status_umax(f, buffer->nl);
+        return;
+    case STATUS_CURSOR_COL:
+        add_status_umax(f, view->cx_display + 1);
+        return;
+    case STATUS_CURSOR_COL_BYTES:
+        add_status_umax(f, view->cx_char + 1);
+        if (view->cx_display != view->cx_char) {
+            add_ch(f, '-');
+            add_status_umax(f, view->cx_display + 1);
+        }
+        return;
+    case STATUS_SCROLL_POSITION:
+        add_status_pos(f);
+        return;
+    case STATUS_ENCODING:
+        add_status_str(f, buffer->encoding.name);
+        return;
+    case STATUS_MISC:
+        add_misc_status(f);
+        return;
+    case STATUS_IS_CRLF:
+        if (buffer->crlf_newlines) {
+            add_status_literal(f, "CRLF");
+        }
+        return;
+    case STATUS_LINE_ENDING:
+        add_status_bool(f, buffer->crlf_newlines, "CRLF", "LF");
+        return;
+    case STATUS_OVERWRITE:
+        add_status_bool(f, buffer->options.overwrite, "OVR", "INS");
+        return;
+    case STATUS_SEPARATOR_LONG:
+        f->separator = LONG_SEPARATOR_SIZE;
+        return;
+    case STATUS_SEPARATOR:
+        f->separator = SHORT_SEPARATOR_SIZE;
+        return;
+    case STATUS_FILETYPE:
+        add_status_str(f, buffer->options.filetype);
+        return;
+    case STATUS_UNICODE:
+        add_status_unicode(f, &view->cursor);
+        return;
+    case STATUS_ESCAPED_PERCENT:
+        add_separator(f);
+        add_ch(f, '%');
+        return;
+    case STATUS_INVALID:
+        break;
+    }
+
+    BUG("should be unreachable, due to validate_statusline_format()");
+}
+
 size_t sf_format (
     const Window *window,
     const GlobalOptions *opts,
@@ -247,9 +332,6 @@ size_t sf_format (
         .size = size - SEPARATOR_WRITE_SIZE - UTF8_MAX_SEQ_LEN - 1,
     };
 
-    const View *view = window->view;
-    const Buffer *buffer = view->buffer;
-
     while (f.pos < f.size && *format) {
         unsigned char ch = *format++;
         if (ch != '%') {
@@ -257,90 +339,11 @@ size_t sf_format (
             add_ch(&f, ch);
             continue;
         }
-
-        switch (lookup_format_specifier(*format++)) {
-        case STATUS_BOM:
-            if (buffer->bom) {
-                add_status_literal(&f, "BOM");
-            }
-            break;
-        case STATUS_FILENAME:
-            add_status_str(&f, buffer_filename(buffer));
-            break;
-        case STATUS_MODIFIED:
-            if (buffer_modified(buffer)) {
-                add_separator(&f);
-                add_ch(&f, '*');
-            }
-            break;
-        case STATUS_READONLY:
-            if (buffer->readonly) {
-                add_status_literal(&f, "RO");
-            } else if (buffer->temporary) {
-                add_status_literal(&f, "TMP");
-            }
-            break;
-        case STATUS_CURSOR_ROW:
-            add_status_umax(&f, view->cy + 1);
-            break;
-        case STATUS_TOTAL_ROWS:
-            add_status_umax(&f, buffer->nl);
-            break;
-        case STATUS_CURSOR_COL:
-            add_status_umax(&f, view->cx_display + 1);
-            break;
-        case STATUS_CURSOR_COL_BYTES:
-            add_status_umax(&f, view->cx_char + 1);
-            if (view->cx_display != view->cx_char) {
-                add_ch(&f, '-');
-                add_status_umax(&f, view->cx_display + 1);
-            }
-            break;
-        case STATUS_SCROLL_POSITION:
-            add_status_pos(&f);
-            break;
-        case STATUS_ENCODING:
-            add_status_str(&f, buffer->encoding.name);
-            break;
-        case STATUS_MISC:
-            add_misc_status(&f);
-            break;
-        case STATUS_IS_CRLF:
-            if (buffer->crlf_newlines) {
-                add_status_literal(&f, "CRLF");
-            }
-            break;
-        case STATUS_LINE_ENDING:
-            add_status_bool(&f, buffer->crlf_newlines, "CRLF", "LF");
-            break;
-        case STATUS_OVERWRITE:
-            add_status_bool(&f, buffer->options.overwrite, "OVR", "INS");
-            break;
-        case STATUS_SEPARATOR_LONG:
-            f.separator = LONG_SEPARATOR_SIZE;
-            break;
-        case STATUS_SEPARATOR:
-            f.separator = SHORT_SEPARATOR_SIZE;
-            break;
-        case STATUS_FILETYPE:
-            add_status_str(&f, buffer->options.filetype);
-            break;
-        case STATUS_UNICODE:
-            add_status_unicode(&f, &view->cursor);
-            break;
-        case STATUS_ESCAPED_PERCENT:
-            add_separator(&f);
-            add_ch(&f, '%');
-            break;
-        case STATUS_INVALID:
-        default:
-            BUG("should be unreachable, due to validate_statusline_format()");
-        }
+        FormatSpecifierType type = lookup_format_specifier(*format++);
+        expand_format_specifier(&f, type);
     }
 
     f.buf[f.pos] = '\0';
-
-    // TODO: Calculate display width during formatting
     return u_str_width(f.buf);
 }
 
