@@ -233,27 +233,24 @@ static ByteType get_byte_type(unsigned char byte)
     return rows[(byte >> 4) & 0xF];
 }
 
-#if DEBUG >= 2
+#define UNHANDLED(var, ...) unhandled(var, __LINE__, __VA_ARGS__)
 
-#define UNHANDLED(var, ...) unhandled(var, __FILE__, __LINE__, __VA_ARGS__)
-static PRINTF(4) void unhandled(bool *var, const char *file, int line, const char *fmt, ...)
+PRINTF(3)
+static void unhandled(bool *var, int line, const char *fmt, ...)
 {
     if (*var) {
-        return; // Only log the first error in a sequence
+        // Only log the first error in a sequence
+        return;
     }
-    va_list ap;
-    va_start(ap, fmt);
-    log_msgv(LOG_LEVEL_DEBUG, file, line, fmt, ap);
-    va_end(ap);
+
     *var = true;
+    if (DEBUG >= 2) {
+        va_list ap;
+        va_start(ap, fmt);
+        log_msgv(LOG_LEVEL_DEBUG, __FILE__, line, fmt, ap);
+        va_end(ap);
+    }
 }
-
-#else
-
-#define UNHANDLED(var, ...) unhandled(var)
-static void unhandled(bool *var) {*var = true;}
-
-#endif
 
 typedef struct {
     uint32_t params[4][4];
