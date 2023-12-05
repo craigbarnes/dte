@@ -13,7 +13,10 @@ enum {
 
 static void sanity_check_blocks(const View *view, bool check_newlines)
 {
-#if DEBUG >= 1
+    if (DEBUG < 1) {
+        return;
+    }
+
     const Buffer *buffer = view->buffer;
     BUG_ON(list_empty(&buffer->blocks));
     BUG_ON(view->cursor.offset > view->cursor.blk->size);
@@ -43,11 +46,6 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
         }
     }
     BUG_ON(!cursor_seen);
-#else
-    // Silence "unused parameter" warnings
-    (void)view;
-    (void)check_newlines;
-#endif
 }
 
 static size_t copy_count_nl(char *dst, const char *src, size_t len)

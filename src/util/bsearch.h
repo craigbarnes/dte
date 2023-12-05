@@ -36,10 +36,13 @@ static inline void check_bsearch_array (
     size_t name_size,
     StringCompareFunction cmp
 ) {
+    if (DEBUG < 1) {
+        return;
+    }
+
     BUG_ON(!cmp);
     check_array(base, array_name, name_field_name, array_len, elem_size, name_size);
 
-#if DEBUG >= 1
     const char *first_name = base;
     for (size_t i = 1; i < array_len; i++) {
         const char *curr_name = first_name + (i * elem_size);
@@ -52,7 +55,6 @@ static inline void check_bsearch_array (
             );
         }
     }
-#endif
 }
 
 // Like bsearch(3), but returning the index of the element instead of

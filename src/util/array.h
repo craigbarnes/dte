@@ -97,6 +97,10 @@ static inline void check_array (
     size_t elem_size,
     size_t name_size
 ) {
+    if (DEBUG < 1) {
+        return;
+    }
+
     BUG_ON(!base);
     BUG_ON(!array_name);
     BUG_ON(!name_field_name);
@@ -105,7 +109,6 @@ static inline void check_array (
     BUG_ON(elem_size == 0);
     BUG_ON(name_size == 0);
 
-#if DEBUG >= 1
     const char *first_name = base;
     for (size_t i = 0; i < array_len; i++) {
         const char *curr_name = first_name + (i * elem_size);
@@ -118,7 +121,6 @@ static inline void check_array (
             BUG("String sentinel missing from %s[%zu]%s", array_name, i, name_field_name);
         }
     }
-#endif
 }
 
 #endif

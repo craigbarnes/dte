@@ -229,7 +229,10 @@ void free_editor_state(EditorState *e)
 
 static void sanity_check(const View *view)
 {
-#if DEBUG >= 1
+    if (DEBUG < 1) {
+        return;
+    }
+
     const Block *blk;
     block_for_each(blk, &view->buffer->blocks) {
         if (blk == view->cursor.blk) {
@@ -237,10 +240,8 @@ static void sanity_check(const View *view)
             return;
         }
     }
+
     BUG("cursor not seen");
-#else
-    (void)view;
-#endif
 }
 
 void any_key(Terminal *term, unsigned int esc_timeout)
