@@ -11,7 +11,7 @@ identifier func != {
     test_size_increment_wrapped,
     view_update_vx
 };
-identifier ident;
+identifier ident !~ "^[A-Z][A-Z0-9_]+$";
 expression x;
 binary operator op = {/, %};
 position p;
