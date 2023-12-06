@@ -104,24 +104,24 @@ else ifeq "$(OS)" "Cygwin"
   EXEC_SUFFIX = .exe
 else ifeq "$(KERNEL)" "OpenBSD"
   LDLIBS_ICONV = -liconv
-  BASIC_CFLAGS += -I/usr/local/include
+  BASIC_CPPFLAGS += -I/usr/local/include
   BASIC_LDFLAGS += -L/usr/local/lib
 else ifeq "$(KERNEL)" "NetBSD"
   ifeq ($(shell expr "`uname -r`" : '[01]\.'),2)
     LDLIBS_ICONV = -liconv
   endif
-  BASIC_CFLAGS += -I/usr/pkg/include
+  BASIC_CPPFLAGS += -I/usr/pkg/include
   BASIC_LDFLAGS += -L/usr/pkg/lib
 endif
 
 ifeq "$(ICONV_DISABLE)" "1"
-  build/convert.o: BASIC_CFLAGS += -DICONV_DISABLE=1
+  build/convert.o: BASIC_CPPFLAGS += -DICONV_DISABLE=1
 else
   LDLIBS += $(LDLIBS_ICONV)
 endif
 
 ifeq "$(SANE_WCTYPE)" "1"
-  BASIC_CFLAGS += -DSANE_WCTYPE=1
+  BASIC_CPPFLAGS += -DSANE_WCTYPE=1
 endif
 
 dte = dte$(EXEC_SUFFIX)
@@ -151,12 +151,9 @@ ifeq "$(DEBUG)" "0"
   $(call make-lazy,UNWIND)
 endif
 
-BASIC_CFLAGS += \
-    $(CSTD) $(CWARNS) $(UNWIND) \
-    -DDEBUG=$(DEBUG) \
-    -D_FILE_OFFSET_BITS=64
-
-$(all_objects): BASIC_CFLAGS += -Isrc
+BASIC_CFLAGS += $(CSTD) $(CWARNS) $(UNWIND)
+BASIC_CPPFLAGS += -DDEBUG=$(DEBUG) -D_FILE_OFFSET_BITS=64
+$(all_objects): BASIC_CPPFLAGS += -Isrc
 
 OPTCHECK = mk/optcheck.sh $(if $(MAKE_S),-s)
 
@@ -200,7 +197,7 @@ build/terminal/ioctl.o: build/feature.h
 build/compat.o: build/feature.h
 src/compat.h: build/feature.h
 
-CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
+CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
 featuredef = $(HASH)define HAVE_$(call toupper,$(notdir $(basename $(1))))
 
