@@ -2664,7 +2664,7 @@ static void test_timespec_to_str(TestContext *ctx)
     EXPECT_EQ(errno, ENOBUFS);
 
     errno = 0;
-    ts.tv_nsec = 1000000000L;
+    ts.tv_nsec = NS_PER_SECOND;
     EXPECT_NULL(timespec_to_str(&ts, buf, sizeof(buf)));
     EXPECT_EQ(errno, EINVAL);
 }
