@@ -404,7 +404,6 @@ void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
     counts[1] = bytes;
 }
 
-// TODO: Human-readable size (MiB/GiB/etc.) for "Bytes" and FileInfo::size
 String dump_buffer(const Buffer *buffer)
 {
     uintmax_t counts[2];
