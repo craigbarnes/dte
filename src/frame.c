@@ -1,6 +1,5 @@
 #include "frame.h"
 #include "editor.h"
-#include "util/debug.h"
 #include "util/xmalloc.h"
 #include "window.h"
 

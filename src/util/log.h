@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
+#include "debug.h"
 #include "macros.h"
 
 typedef enum {

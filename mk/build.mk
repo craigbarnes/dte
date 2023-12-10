@@ -149,10 +149,13 @@ endif
 ifeq "$(DEBUG)" "0"
   UNWIND = $(call cc-option,-fno-asynchronous-unwind-tables)
   $(call make-lazy,UNWIND)
+  BASIC_CFLAGS += $(UNWIND)
+else
+  BASIC_CPPFLAGS += -DDEBUG=$(DEBUG)
 endif
 
-BASIC_CFLAGS += $(CSTD) $(CWARNS) $(UNWIND)
-BASIC_CPPFLAGS += -DDEBUG=$(DEBUG) -D_FILE_OFFSET_BITS=64
+BASIC_CFLAGS += $(CSTD) $(CWARNS)
+BASIC_CPPFLAGS += -D_FILE_OFFSET_BITS=64
 $(all_objects): BASIC_CPPFLAGS += -Isrc
 
 OPTCHECK = mk/optcheck.sh $(if $(MAKE_S),-s)

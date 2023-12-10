@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "regexp.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"

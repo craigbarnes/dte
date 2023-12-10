@@ -13,7 +13,6 @@
 #include "ui.h"
 #include "util/arith.h"
 #include "util/bsearch.h"
-#include "util/debug.h"
 #include "util/intern.h"
 #include "util/numtostr.h"
 #include "util/str-util.h"

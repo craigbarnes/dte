@@ -353,12 +353,6 @@
     #define COUNTER_ __LINE__
 #endif
 
-#if defined(DEBUG) && (DEBUG > 0)
-    #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER_)(void)
-#else
-    #define UNITTEST UNUSED static void XPASTE(unittest_, COUNTER_)(void)
-#endif
-
 #ifdef __clang__
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(clang diagnostic push) \

@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include "log.h"
 #include "array.h"
-#include "debug.h"
 #include "fd.h"
 #include "str-util.h"
 #include "xreadwrite.h"
