@@ -2,6 +2,25 @@
 #include <unistd.h>
 #include "xreadwrite.h"
 
+#if defined(__APPLE__)
+    // See: https://gitlab.com/craigbarnes/dte/-/issues/201
+    #define MAX_RW_COUNT ((size_t)INT_MAX)
+#elif defined(__linux__) && 0x7ffff000 <= SSIZE_MAX
+    // Unlike macOS, trying to read or write more than 0x7ffff000 bytes
+    // on Linux simply causes the syscall to return (at most) the upper
+    // limit, rather than indicating an error condition. Thus, using
+    // this value here is done simply because it's a more appropriate
+    // value than SSIZE_MAX, not because it's actually needed for
+    // correct functioning of xread_all().
+    // See also:
+    // - https://man7.org/linux/man-pages/man2/read.2.html#NOTES
+    // - https://man7.org/linux/man-pages/man2/write.2.html#NOTES
+    // - https://stackoverflow.com/a/70370002
+    #define MAX_RW_COUNT ((size_t)0x7ffff000)
+#else
+    #define MAX_RW_COUNT ((size_t)SSIZE_MAX)
+#endif
+
 ssize_t xread(int fd, void *buf, size_t count)
 {
     ssize_t r;
@@ -22,13 +41,7 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
 
 static size_t rwsize(size_t count)
 {
-#if defined(__APPLE__)
-    // See: https://gitlab.com/craigbarnes/dte/-/issues/201
-    const size_t maxsize = (size_t)INT_MAX;
-#else
-    const size_t maxsize = (size_t)SSIZE_MAX;
-#endif
-    return MIN(count, maxsize);
+    return MIN(count, MAX_RW_COUNT);
 }
 
 ssize_t xread_all(int fd, void *buf, size_t count)
