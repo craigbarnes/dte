@@ -9,8 +9,13 @@
   <launchable type="desktop-id">dte.desktop</launchable>
   <url type="homepage">https://craigbarnes.gitlab.io/dte/</url>
   <url type="bugtracker">https://gitlab.com/craigbarnes/dte/-/issues</url>
+  <url type="help">https://craigbarnes.gitlab.io/dte/dte.html</url>
   <url type="donation">https://liberapay.com/craigbarnes/donate</url>
+  <url type="contact">https://gitlab.com/craigbarnes/dte#contact</url>
+  <url type="vcs-browser">https://gitlab.com/craigbarnes/dte</url>
+  <url type="contribute">https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md</url>
   <content_rating type="oars-1.1"/>
+
   <description>
     <p>
       Editor features:
@@ -33,24 +38,29 @@
       </ul>
     </p>
   </description>
+
   <provides>
     <binary>dte</binary>
   </provides>
+
   <screenshots>
     <screenshot type="default">
       <image>https://craigbarnes.gitlab.io/screenshot/dte16x9.png</image>
     </screenshot>
   </screenshots>
+
   <categories>
     <category>Utility</category>
     <category>TextEditor</category>
   </categories>
+
   <keywords>
     <keyword>development</keyword>
     <keyword>programming</keyword>
     <keyword>text</keyword>
     <keyword>editor</keyword>
   </keywords>
+
   <releases>
     <release version="1.11.1" date="2023-03-01"/>
     <release version="1.11" date="2023-01-21"/>
