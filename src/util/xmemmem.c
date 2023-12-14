@@ -9,7 +9,8 @@ void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen
 
 #if HAVE_MEMMEM
     return memmem(haystack, hlen, needle, nlen);
-#else
+#endif
+
     // Note: this fallback implementation isn't well suited to general
     // purpose use and can exhibit poor performance under certain
     // inputs. A library-quality memmem(3) is not a trivial thing to
@@ -44,5 +45,4 @@ void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen
 
     BUG("unexpected loop break");
     return NULL;
-#endif
 }

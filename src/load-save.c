@@ -135,16 +135,17 @@ static void fixup_blocks(Buffer *buffer)
 
 static int xmadvise_sequential(void *addr, size_t len)
 {
+    BUG_ON(!addr);
+    BUG_ON(len == 0);
+
 #if HAVE_POSIX_MADVISE
     return posix_madvise(addr, len, POSIX_MADV_SEQUENTIAL);
-#else
+#endif
+
     // "The posix_madvise() function shall have no effect on the semantics
     // of access to memory in the specified range, although it may affect
     // the performance of access". Ergo, doing nothing is a valid fallback.
-    (void)addr;
-    (void)len;
     return 0;
-#endif
 }
 
 static bool update_file_info(FileInfo *info, const struct stat *st)
