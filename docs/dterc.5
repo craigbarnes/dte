@@ -1525,7 +1525,8 @@ Move after inserted text
 \fBreplace\fR [\fB\-bcgi\fR] \fIpattern\fR \fIreplacement\fR
 .RS
 Replace all instances of text matching \fIpattern\fR with the \fIreplacement\fR
-text.
+text. Matching is confined to text falling within the current selection,
+if there is one.
 .P
 The \fIpattern\fR argument is a POSIX extended \fBregex\fR(7).
 .P
@@ -1569,6 +1570,7 @@ Examples:
 .IP
 .nf
 \f[C]
+replace\ ^\ #
 replace\ 'Hello\ World'\ '&\ (Hallo\ Welt)'
 replace\ "[\ \\t]+$"\ ''
 replace\ \-cg\ '([^\ ]+)\ +([^\ ]+)'\ '\\2\ \\1'

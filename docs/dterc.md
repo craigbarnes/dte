@@ -978,7 +978,8 @@ Insert _text_ into the buffer.
 ### **replace** [**-bcgi**] _pattern_ _replacement_
 
 Replace all instances of text matching _pattern_ with the _replacement_
-text.
+text. Matching is confined to text falling within the current selection,
+if there is one.
 
 The _pattern_ argument is a POSIX extended [`regex`].
 
@@ -1011,6 +1012,7 @@ _pattern_ argument, since double quoted arguments have their own
 
 Examples:
 
+    replace ^ #
     replace 'Hello World' '& (Hallo Welt)'
     replace "[ \t]+$" ''
     replace -cg '([^ ]+) +([^ ]+)' '\2 \1'
