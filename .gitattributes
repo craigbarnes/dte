@@ -14,11 +14,7 @@
 [attr]html 2space
 [attr]xml 2space
 
-/mk/version.sh export-subst
-.git* export-ignore
-/.mailmap export-ignore
-/.clang-tidy export-ignore
-/.editorconfig export-ignore
+/.* export-ignore
 /docs/README.md export-ignore
 /docs/contributing.md export-ignore
 /docs/releasing.md export-ignore
@@ -45,6 +41,7 @@ GNUmakefile make
 makefile make
 LICENSE text
 
+/mk/version.sh export-subst
 /config/** dterc
 /config/README.md -dterc
 /tools/git-hooks/commit-msg awk
