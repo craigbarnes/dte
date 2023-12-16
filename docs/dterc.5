@@ -1525,8 +1525,7 @@ Move after inserted text
 \fBreplace\fR [\fB\-bcgi\fR] \fIpattern\fR \fIreplacement\fR
 .RS
 Replace all instances of text matching \fIpattern\fR with the \fIreplacement\fR
-text. Matching is confined to text falling within the current selection,
-if there is one.
+text. Matching is confined to the current selection, if there is one.
 .P
 The \fIpattern\fR argument is a POSIX extended \fBregex\fR(7).
 .P
@@ -1551,7 +1550,7 @@ Note: extra care must be taken when using double quotes for the
 .P
 .TP
 \fB\-b\fR
-Use basic instead of extended regex syntax
+Use basic (instead of extended) regex syntax
 .PP
 .TP
 \fB\-c\fR

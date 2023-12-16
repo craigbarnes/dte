@@ -978,8 +978,7 @@ Insert _text_ into the buffer.
 ### **replace** [**-bcgi**] _pattern_ _replacement_
 
 Replace all instances of text matching _pattern_ with the _replacement_
-text. Matching is confined to text falling within the current selection,
-if there is one.
+text. Matching is confined to the current selection, if there is one.
 
 The _pattern_ argument is a POSIX extended [`regex`].
 
@@ -999,7 +998,7 @@ _pattern_ argument, since double quoted arguments have their own
 (higher precedence) backslash sequences.
 
 `-b`
-:   Use basic instead of extended regex syntax
+:   Use basic (instead of extended) regex syntax
 
 `-c`
 :   Ask for confirmation before each replacement
