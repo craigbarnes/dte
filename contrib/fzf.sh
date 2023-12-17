@@ -13,10 +13,6 @@ fzf \
     --bind='f1:change-prompt(find .>)+reload(find . -type f -not -path "*/\.git/*")' \
     --bind='f2:change-prompt(git ls-files>)+reload(git ls-files)' \
 | awk '
-    function gencmd(cmd, filename) {
-        return cmd " -- \047" filename "\047"
-    }
-
     BEGIN {
         cmds["ctrl-v"] = "wsplit -h"
         cmds["ctrl-h"] = "wsplit"
@@ -31,12 +27,7 @@ fzf \
         next
     }
 
-    NR == 2 {
-        print gencmd(first, $0)
-        next
-    }
-
     {
-        print gencmd(cmd, $0)
+        printf("%s -- \047%s\047\n", NR == 2 ? first : cmd, $0)
     }
 '
