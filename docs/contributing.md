@@ -2,7 +2,7 @@ Contributing
 ============
 
 Please observe the following guidelines when creating new [issues]
-or [pull requests] for dte.
+or [merge requests] for dte.
 
 Issues
 ------
@@ -14,10 +14,10 @@ Issues
 * If suggesting new features, mention *at least* one real-world
   use case in the opening description.
 
-Pull Requests
--------------
+Merge Requests
+--------------
 
-* Create a separate git branch for each pull request.
+* Create a separate git branch for each merge request.
 * Use `git rebase` to avoid merge commits and fix-up commits.
 * Run `make git-hooks` **before** creating any commits. This installs
   a git [`pre-commit`] hook that automatically builds and tests each
@@ -43,7 +43,7 @@ See Also
 
 
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues
-[pull requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
+[merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-spans-and-blocks
 
 [`pre-commit`]: ../tools/git-hooks/pre-commit

@@ -3,7 +3,7 @@ dte Contributed Scripts
 
 This directory contains various example scripts that are intended to be
 used in conjunction with the [`exec`] and [`compile`] commands. Feel
-free to send pull requests adding new scripts here. Using `sh` or `awk`
+free to send [merge requests] adding new scripts here. Using `sh` or `awk`
 as the script interpreter is a plus (for portability reasons), although
 it's not a strict requirement.
 
@@ -52,3 +52,4 @@ to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
 [`compile`]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
 [`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
+[merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
