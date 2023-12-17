@@ -13,6 +13,7 @@ include mk/help.mk
 # https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 prefix ?= /usr/local
 datarootdir ?= $(prefix)/share
+datadir ?= $(datarootdir)
 exec_prefix ?= $(prefix)
 bindir ?= $(exec_prefix)/bin
 mandir ?= $(datarootdir)/man
@@ -35,6 +36,10 @@ RM = rm -f
 define POSTINSTALL
  (update-desktop-database -q '$(appdir)' 2>/dev/null && $(LOG) UPDATE '$(appdir)/mimeinfo.cache') || :
 endef
+
+CONTRIB_SCRIPTS = \
+    fzf.sh git-changes.sh lf-wrapper.sh longest-line.awk \
+    open-c-header.sh ranger-wrapper.sh xtag.sh
 
 all: $(dte)
 check: check-tests check-opts
@@ -95,6 +100,18 @@ install-appstream:
 uninstall-appstream:
 	$(RM) '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
 
+install-contrib:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(datadir)/dte'
+	$(Q) $(foreach f, $(CONTRIB_SCRIPTS), \
+	  $(LOG) INSTALL '$(DESTDIR)$(datadir)/dte/$(f)'; \
+	  $(INSTALL_PROGRAM) 'contrib/$(f)' '$(DESTDIR)$(datadir)/dte'; \
+	)
+	$(E) INSTALL '$(DESTDIR)$(datadir)/dte/README.md'
+	$(Q) $(INSTALL_DATA) contrib/README.md '$(DESTDIR)$(datadir)/dte'
+
+uninstall-contrib:
+	$(RM) -r '$(DESTDIR)$(datadir)/dte'
+
 check-tests: $(test) all
 	$(E) EXEC '$(test)'
 	$(Q) TZ=UTC ./$(test)
@@ -119,7 +136,7 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream
+INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream contrib
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
 .PHONY: check check-tests check-opts installcheck bench

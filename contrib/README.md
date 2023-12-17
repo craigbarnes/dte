@@ -2,10 +2,7 @@ dte Contributed Scripts
 =======================
 
 This directory contains various example scripts that are intended to be
-used in conjunction with the [`exec`] and [`compile`] commands. Feel
-free to send [merge requests] adding new scripts here. Using `sh` or `awk`
-as the script interpreter is a plus (for portability reasons), although
-it's not a strict requirement.
+used in conjunction with the [`exec`] and [`compile`] commands.
 
 Usage Examples
 --------------
@@ -47,6 +44,13 @@ alias xtag 'exec -s -o eval -e errmsg $DTE_HOME/scripts/xtag.sh $WORD'
 
 *Note:* the above examples assume you've copied the scripts in question
 to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
+
+Contributing
+------------
+
+Feel free to send [merge requests] adding new scripts here. Using `sh`
+or `awk` as the script interpreter is a plus (for portability), but
+isn't a requirement.
 
 
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
