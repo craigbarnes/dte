@@ -76,17 +76,12 @@ NONNULL_ARGS
 static inline int ascii_strcmp_icase(const char *s1, const char *s2)
 {
     unsigned char c1, c2;
-    int result;
-    size_t i = 0;
-
     do {
-        c1 = ascii_tolower(s1[i]);
-        c2 = ascii_tolower(s2[i]);
-        result = c1 - c2;
-        i++;
-    } while (c1 && result == 0);
+        c1 = ascii_tolower(*s1++);
+        c2 = ascii_tolower(*s2++);
+    } while (c1 && c1 == c2);
 
-    return result;
+    return c1 - c2;
 }
 
 NONNULL_ARGS
