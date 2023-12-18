@@ -453,7 +453,8 @@ String dump_buffer(const Buffer *buffer)
     char modestr[12];
     char timestr[64];
     if (!timespec_to_str(&file->mtime, timestr, sizeof(timestr))) {
-        memcpy(timestr, STRN("[error]") + 1);
+        static const char msg[] = "[error]";
+        memcpy(timestr, msg, sizeof(msg));
     }
 
     string_sprintf (
