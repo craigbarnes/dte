@@ -36,19 +36,18 @@ Installing
 
 `dte` can be installed via package manager on the following platforms:
 
-| OS                        | Install command                            |
-|---------------------------|--------------------------------------------|
-| [Debian]                  | `apt-get install dte`                      |
-| [Ubuntu]                  | `apt-get install dte`                      |
-| Arch Linux ([AUR])        | `$AUR_HELPER -S dte`                       |
-| [Void Linux]              | `xbps-install -S dte`                      |
-| Slackware ([SlackBuilds]) | See: [SlackBuild Usage HOWTO]              |
-| [FreeBSD]                 | `pkg install dte`                          |
-| DragonFly BSD ([DPorts])  | `pkg install dte`                          |
-| [OpenBSD]                 | `pkg_add dte`                              |
-| NetBSD ([pkgsrc])         | `pkg_add dte`                              |
-| macOS ([Homebrew])        | `brew tap yumitsu/dte && brew install dte` |
-| Android ([Termux])        | `pkg install dte`                          |
+| OS                        | Install command               |
+|---------------------------|-------------------------------|
+| [Debian]                  | `apt-get install dte`         |
+| [Ubuntu]                  | `apt-get install dte`         |
+| Arch Linux ([AUR])        | `$AUR_HELPER -S dte`          |
+| [Void Linux]              | `xbps-install -S dte`         |
+| Slackware ([SlackBuilds]) | See: [SlackBuild Usage HOWTO] |
+| [FreeBSD]                 | `pkg install dte`             |
+| DragonFly BSD ([DPorts])  | `pkg install dte`             |
+| [OpenBSD]                 | `pkg_add dte`                 |
+| NetBSD ([pkgsrc])         | `pkg_add dte`                 |
+| Android ([Termux])        | `pkg install dte`             |
 
 Building
 --------
@@ -161,7 +160,6 @@ Public License version 2 for more details.
 [DPorts]: https://gitweb.dragonflybsd.org/dports.git/tree/HEAD:/editors/dte
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
 [pkgsrc]: https://cdn.netbsd.org/pub/pkgsrc/current/pkgsrc/editors/dte/index.html
-[Homebrew]: https://github.com/yumitsu/homebrew-dte
 [`brew`]: https://brew.sh/
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
