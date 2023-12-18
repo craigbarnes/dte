@@ -387,6 +387,19 @@ static void test_ascii(TestContext *ctx)
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "Ctr"));
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "CtrM"));
 
+    EXPECT_EQ(ascii_strcmp_icase("", ""), 0);
+    EXPECT_EQ(ascii_strcmp_icase("A", "A"), 0);
+    EXPECT_EQ(ascii_strcmp_icase("xyz", ""), 'x');
+    EXPECT_EQ(ascii_strcmp_icase("", "xyz"), -'x');
+    EXPECT_EQ(ascii_strcmp_icase("xyz", "xy"), 'z');
+    EXPECT_EQ(ascii_strcmp_icase("xy", "xyz"), -'z');
+    EXPECT_EQ(ascii_strcmp_icase("\xFF", "\xFE"), 1);
+    EXPECT_EQ(ascii_strcmp_icase("\xFE", "\xFF"), -1);
+    EXPECT_EQ(ascii_strcmp_icase("\x80\xFF\xC1", "\x80\xFF\x01"), 0xC0);
+    EXPECT_EQ(ascii_strcmp_icase("\x80\xFF\x01", "\x80\xFF\xC1"), -0xC0);
+    EXPECT_EQ(ascii_strcmp_icase("\x80\xFF\x01", "\x80"), 0xFF);
+    EXPECT_EQ(ascii_strcmp_icase("\x80", "\x80\xFF\x01"), -0xFF);
+
     const char s1[8] = "Ctrl+Up";
     const char s2[8] = "CTRL+U_";
     EXPECT_TRUE(mem_equal_icase(s1, s2, 0));
