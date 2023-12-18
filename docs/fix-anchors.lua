@@ -11,7 +11,7 @@ local h2
 
 local function Pandoc(doc)
     local title = assert(doc.meta.title[1].text)
-    if not allowed_docs[title] then
+    if not allowed_docs[title] or doc.meta.title[2] then
         local msg = "file-specific filter used on unknown document: '%s'"
         error(msg:format(title))
     end

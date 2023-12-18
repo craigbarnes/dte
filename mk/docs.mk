@@ -21,10 +21,11 @@ pdf: public/dte.pdf
 
 $(html-man): public/%.html: docs/%.md
 public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md
-public/releases.html: docs/releases.yml CHANGELOG.md
+public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
-public/dterc.html public/dte-syntax.html: PDHTML += -L docs/fix-anchors.lua
-public/dte.html: PDHTML += --indented-code-classes=sh
+public/releases.html: private PDHTML += -L docs/releases.lua
+public/dterc.html public/dte-syntax.html: private PDHTML += -L docs/fix-anchors.lua
+public/dte.html: private PDHTML += --indented-code-classes=sh
 
 docs/%.1: docs/%.md docs/pdman.lua
 	$(E) PANDOC $@
