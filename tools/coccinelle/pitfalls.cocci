@@ -38,7 +38,15 @@ identifier func != {
 * BUG_ON(<+...func(...)...+>)
 
 @@
-identifier func = {memcpy, memmove, mempcpy, strncasecmp, strncmp, write};
+identifier func = {
+    memcmp,
+    memcpy,
+    memmove,
+    mempcpy,
+    strncasecmp,
+    strncmp,
+    write
+};
 expression arg1;
 @@
 
@@ -48,7 +56,7 @@ expression arg1;
  * expanded comma will likely interact with in unexpected ways.
  *
  * See also:
- * - https://github.com/NetBSD/pkgsrc-wip/commit/c457663f729ccf5c411847abd370b43e2247f50d#r135218375
+ * - https://gitlab.com/craigbarnes/dte/-/commit/77bec65e5f43ded39239a96cf8c26a5a599c31eb
  * - ISO C99 §7.1.4p1
  */
 
