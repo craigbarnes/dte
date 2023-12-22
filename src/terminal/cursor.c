@@ -45,12 +45,11 @@ const char *cursor_type_to_str(TermCursorType type)
     return cursor_types[type];
 }
 
-const char *cursor_color_to_str(int32_t c)
+const char *cursor_color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
 {
-    BUG_ON(!cursor_color_is_valid(c));
-    static char buf[16];
-    size_t n = color_to_str(buf, c);
-    BUG_ON(n < 4 || n >= sizeof(buf));
+    BUG_ON(!cursor_color_is_valid(color));
+    size_t n = color_to_str(buf, color);
+    BUG_ON(n < STRLEN("keep") || n >= COLOR_STR_BUFSIZE);
     buf[n] = '\0';
     return buf;
 }

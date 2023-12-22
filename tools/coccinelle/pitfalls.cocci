@@ -2,6 +2,7 @@
 identifier func != {
     ARRAYLEN,
     IS_POWER_OF_2,
+    STRLEN,
     block_iter_is_bol,
     block_iter_is_eof,
     color_is_rgb,

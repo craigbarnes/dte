@@ -157,10 +157,11 @@ void collect_colors_and_attributes(PointerArray *a, const char *prefix)
     }
 }
 
-size_t color_to_str(char *buf, int32_t color)
+size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
 {
     BUG_ON(!color_is_valid(color));
     if (color < 16) {
+        static_assert(sizeof(color_names[0]) <= COLOR_STR_BUFSIZE);
         memcpy(buf, color_names[color + 2], sizeof(color_names[0]));
         return strlen(buf);
     }
@@ -174,9 +175,8 @@ size_t color_to_str(char *buf, int32_t color)
     return 7;
 }
 
-const char *term_style_to_string(const TermStyle *style)
+const char *term_style_to_string(char buf[TERM_STYLE_BUFSIZE], const TermStyle *style)
 {
-    static char buf[128];
     size_t pos = color_to_str(buf, style->fg);
 
     if (style->bg != COLOR_DEFAULT || (style->attr & ATTR_KEEP) != 0) {
@@ -186,7 +186,7 @@ const char *term_style_to_string(const TermStyle *style)
 
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
         if (style->attr & (1U << i)) {
-            BUG_ON(pos + 2 + sizeof(attr_names[0]) >= sizeof(buf));
+            BUG_ON(pos + 2 + sizeof(attr_names[0]) >= TERM_STYLE_BUFSIZE);
             buf[pos++] = ' ';
             memcpy(buf + pos, attr_names[i], sizeof(attr_names[0]));
             pos += strlen(buf + pos);

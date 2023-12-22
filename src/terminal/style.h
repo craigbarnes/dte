@@ -7,6 +7,9 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
+#define COLOR_STR_BUFSIZE 16
+#define TERM_STYLE_BUFSIZE 128
+
 enum {
     ATTR_KEEP = 0x01,
     ATTR_UNDERLINE = 0x02,
@@ -31,8 +34,8 @@ static inline bool same_style(const TermStyle *a, const TermStyle *b)
 }
 
 ssize_t parse_term_style(TermStyle *style, char **strs, size_t nstrs) NONNULL_ARGS WARN_UNUSED_RESULT;
-size_t color_to_str(char *buf, int32_t color) NONNULL_ARGS WARN_UNUSED_RESULT;
-const char *term_style_to_string(const TermStyle *style) NONNULL_ARGS_AND_RETURN;
+size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color) NONNULL_ARGS WARN_UNUSED_RESULT;
+const char *term_style_to_string(char buf[TERM_STYLE_BUFSIZE], const TermStyle *style) NONNULL_ARGS_AND_RETURN;
 void collect_colors_and_attributes(PointerArray *a, const char *prefix) NONNULL_ARGS;
 
 #endif

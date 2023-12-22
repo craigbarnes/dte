@@ -273,8 +273,9 @@ static void test_term_style_to_string(TestContext *ctx)
         {"default default keep", {COLOR_DEFAULT, COLOR_DEFAULT, ATTR_KEEP}},
     };
 
+    char buf[TERM_STYLE_BUFSIZE];
     FOR_EACH_I(i, tests) {
-        const char *str = term_style_to_string(&tests[i].style);
+        const char *str = term_style_to_string(buf, &tests[i].style);
         EXPECT_STREQ(str, tests[i].expected_string);
     }
 
@@ -293,7 +294,7 @@ static void test_term_style_to_string(TestContext *ctx)
     ;
 
     static_assert(sizeof(expected) - 1 == 94);
-    const char *str = term_style_to_string(&style);
+    const char *str = term_style_to_string(buf, &style);
     EXPECT_STREQ(str, expected);
 }
 
@@ -343,9 +344,10 @@ static void test_cursor_color_from_str(TestContext *ctx)
 
 static void test_cursor_color_to_str(TestContext *ctx)
 {
-    EXPECT_STREQ(cursor_color_to_str(COLOR_DEFAULT), "default");
-    EXPECT_STREQ(cursor_color_to_str(COLOR_KEEP), "keep");
-    EXPECT_STREQ(cursor_color_to_str(COLOR_RGB(0x190AFE)), "#190afe");
+    char buf[COLOR_STR_BUFSIZE];
+    EXPECT_STREQ(cursor_color_to_str(buf, COLOR_DEFAULT), "default");
+    EXPECT_STREQ(cursor_color_to_str(buf, COLOR_KEEP), "keep");
+    EXPECT_STREQ(cursor_color_to_str(buf, COLOR_RGB(0x190AFE)), "#190afe");
 }
 
 static void test_same_cursor(TestContext *ctx)

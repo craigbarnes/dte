@@ -95,7 +95,8 @@ void string_append_hl_style(String *s, const char *name, const TermStyle *style)
     if (unlikely(name[0] == '-')) {
         string_append_literal(s, "-- ");
     }
-    string_append_cstring(s, term_style_to_string(style));
+    char buf[TERM_STYLE_BUFSIZE];
+    string_append_cstring(s, term_style_to_string(buf, style));
 }
 
 String dump_hl_styles(const StyleMap *styles)

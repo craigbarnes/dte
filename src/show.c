@@ -136,7 +136,8 @@ static bool show_color(EditorState *e, const char *name, bool cflag)
         string_append_hl_style(&c->buf, name, hl);
         c->pos = c->buf.len;
     } else {
-        const char *style_str = term_style_to_string(hl);
+        char buf[TERM_STYLE_BUFSIZE];
+        const char *style_str = term_style_to_string(buf, hl);
         info_msg("color '%s' is set to: %s", name, style_str);
     }
 
@@ -151,8 +152,10 @@ static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
     }
 
     TermCursorStyle style = e->cursor_styles[mode];
+    char colorbuf[COLOR_STR_BUFSIZE];
     const char *type = cursor_type_to_str(style.type);
-    const char *color = cursor_color_to_str(style.color);
+    const char *color = cursor_color_to_str(colorbuf, style.color);
+
     if (cflag) {
         char buf[64];
         xsnprintf(buf, sizeof buf, "cursor %s %s %s", mode_str, type, color);
@@ -411,6 +414,7 @@ static String dump_compilers(EditorState *e)
 static String dump_cursors(EditorState *e)
 {
     String buf = string_new(128);
+    char colorbuf[COLOR_STR_BUFSIZE];
     for (CursorInputMode m = 0; m < ARRAYLEN(e->cursor_styles); m++) {
         const TermCursorStyle *style = &e->cursor_styles[m];
         string_append_literal(&buf, "cursor ");
@@ -418,7 +422,7 @@ static String dump_cursors(EditorState *e)
         string_append_byte(&buf, ' ');
         string_append_cstring(&buf, cursor_type_to_str(style->type));
         string_append_byte(&buf, ' ');
-        string_append_cstring(&buf, cursor_color_to_str(style->color));
+        string_append_cstring(&buf, cursor_color_to_str(colorbuf, style->color));
         string_append_byte(&buf, '\n');
     }
     return buf;
