@@ -3,12 +3,11 @@
 -- Pandoc's (ambiguous) default of `#v182`
 
 local function Pandoc(doc)
-    local t1 = assert(doc.meta.title[1].text)
-    local t3 = assert(doc.meta.title[3].text)
-    if t1 ~= "dte" or t3 ~= "Releases" or doc.meta.title[4] then
-        local msg = "file-specific filter used on unknown document"
-        error(msg:format(title))
-    end
+    local msg = "file-specific filter used on unknown document"
+    local t = assert(doc.meta.title, msg)
+    assert(t[1] and t[1].text == "dte", msg)
+    assert(t[3] and t[3].text == "Releases", msg)
+    assert(not t[4], msg)
 end
 
 local function Header(header)
