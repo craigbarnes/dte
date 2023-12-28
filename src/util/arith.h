@@ -45,6 +45,13 @@ static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
     CHECKED_ADD(a, b, result);
 }
 
+// Saturating subtract
+static inline size_t size_ssub(size_t a, size_t b)
+{
+    size_t r = a - b;
+    return (r > a) ? 0 : r;
+}
+
 // Round x up to a multiple of r (which *must* be a power of 2)
 static inline size_t round_size_to_next_multiple(size_t x, size_t r)
 DIAGNOSE_IF(!IS_POWER_OF_2(r))

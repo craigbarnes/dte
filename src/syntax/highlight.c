@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include "highlight.h"
 #include "syntax/merge.h"
+#include "util/arith.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/intern.h"
@@ -177,10 +178,9 @@ static const TermStyle **highlight_line (
             set_style_range(styles, a, sidx, i);
             state = a->destination;
             goto top;
-        case COND_RECOLOR: {
-            size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
-            set_style_range(styles, a, start, i);
-            } break;
+        case COND_RECOLOR:
+            set_style_range(styles, a, size_ssub(i, u->recolor_len), i);
+            break;
         case COND_RECOLOR_BUFFER:
             if (sidx >= 0) {
                 set_style_range(styles, a, sidx, i);

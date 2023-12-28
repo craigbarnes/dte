@@ -2410,6 +2410,22 @@ static void test_size_add(TestContext *ctx)
     EXPECT_UINT_EQ(size_add(0, 0), 0);
 }
 
+static void test_size_ssub(TestContext *ctx)
+{
+    EXPECT_UINT_EQ(size_ssub(0, 1), 0);
+    EXPECT_UINT_EQ(size_ssub(1, 1), 0);
+    EXPECT_UINT_EQ(size_ssub(2, 1), 1);
+    EXPECT_UINT_EQ(size_ssub(191, 170), 21);
+
+    const size_t m = SIZE_MAX;
+    EXPECT_UINT_EQ(size_ssub(m - 1, m - 2), 1);
+    EXPECT_UINT_EQ(size_ssub(m - 1, m), 0);
+    EXPECT_UINT_EQ(size_ssub(m, m), 0);
+    EXPECT_UINT_EQ(size_ssub(0, m), 0);
+    EXPECT_UINT_EQ(size_ssub(1, m), 0);
+    EXPECT_UINT_EQ(size_ssub(m, 1), m - 1);
+}
+
 static void test_mem_intern(TestContext *ctx)
 {
     const char *ptrs[256];
@@ -2755,6 +2771,7 @@ static const TestEntry tests[] = {
     TEST(test_size_add_overflows),
     TEST(test_size_multiply),
     TEST(test_size_add),
+    TEST(test_size_ssub),
     TEST(test_mem_intern),
     TEST(test_read_file),
     TEST(test_xfopen),
