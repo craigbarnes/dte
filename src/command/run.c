@@ -74,7 +74,7 @@ static bool run_command(CommandRunner *runner, char **av)
 static bool run_commands(CommandRunner *runner, const PointerArray *array)
 {
     if (unlikely(runner->recursion_count > 16)) {
-        return error_msg("alias recursion overflow");
+        return error_msg("alias recursion limit reached");
     }
 
     void **ptrs = array->ptrs;
