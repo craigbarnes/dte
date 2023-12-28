@@ -89,12 +89,18 @@ static void open_files_from_string(EditorState *e, const String *str)
 
 static void parse_and_activate_message(EditorState *e, const String *str)
 {
+    if (unlikely(str->len == 0)) {
+        error_msg("child produced no output");
+        return;
+    }
+
     MessageArray *msgs = &e->messages;
     size_t count = msgs->array.count;
     size_t x;
     if (!count || !buf_parse_size(str->buffer, str->len, &x) || !x) {
         return;
     }
+
     msgs->pos = MIN(x - 1, count - 1);
     activate_current_message(msgs, e->window);
 }
