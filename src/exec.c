@@ -112,32 +112,33 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         return;
     }
 
-    Tag tag;
     size_t pos = 0;
     StringView line = buf_slice_next_line(str->buffer, &pos, str->len);
     if (line.length == 0) {
         return;
     }
 
-    if (!parse_ctags_line(&tag, line.data, line.length)) {
-        // Treat line as simple tag name
-        tag_lookup(&e->tagfile, &line, e->buffer->abs_filename, &e->messages);
-        goto activate;
+    MessageArray *msgs = &e->messages;
+    Tag tag;
+    bool parsed = parse_ctags_line(&tag, line.data, line.length);
+
+    if (parsed) {
+        char cwd[8192];
+        if (unlikely(!getcwd(cwd, sizeof cwd))) {
+            error_msg_errno("getcwd() failed");
+            return;
+        }
+        StringView dir = strview_from_cstring(cwd);
+        clear_messages(msgs);
+        add_message_for_tag(msgs, &tag, &dir);
+    } else {
+        // Treat line as a simple tag name
+        if (!tag_lookup(&e->tagfile, &line, e->buffer->abs_filename, msgs)) {
+            return;
+        }
     }
 
-    char buf[8192];
-    const char *cwd = getcwd(buf, sizeof buf);
-    if (unlikely(!cwd)) {
-        error_msg_errno("getcwd() failed");
-        return;
-    }
-
-    StringView dir = strview_from_cstring(cwd);
-    clear_messages(&e->messages);
-    add_message_for_tag(&e->messages, &tag, &dir);
-
-activate:
-    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
+    activate_current_message_save(msgs, &e->bookmarks, e->view);
 }
 
 static const char **lines_and_columns_env(const Window *window)
