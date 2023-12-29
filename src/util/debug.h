@@ -1,6 +1,7 @@
 #ifndef UTIL_DEBUG_H
 #define UTIL_DEBUG_H
 
+#include <stddef.h> // unreachable()
 #include "macros.h"
 
 #ifndef DEBUG
@@ -14,6 +15,14 @@
     } \
     UNIGNORE_WARNINGS \
 } while (0)
+
+#if GNUC_AT_LEAST(4, 5) || HAS_BUILTIN(__builtin_unreachable)
+    #define UNREACHABLE() __builtin_unreachable()
+#elif __STDC_VERSION__ >= 202311L
+    #define UNREACHABLE() unreachable()
+#else
+    #define UNREACHABLE()
+#endif
 
 #if DEBUG >= 1
     #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER_)(void)

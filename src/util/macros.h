@@ -251,12 +251,6 @@
     #define COLD
 #endif
 
-#if GNUC_AT_LEAST(4, 5) || HAS_BUILTIN(__builtin_unreachable)
-    #define UNREACHABLE() __builtin_unreachable()
-#else
-    #define UNREACHABLE()
-#endif
-
 #if GNUC_AT_LEAST(5, 0) || HAS_ATTRIBUTE(returns_nonnull)
     #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else
