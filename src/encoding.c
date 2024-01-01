@@ -38,7 +38,7 @@ static const EncodingAlias encoding_aliases[] = {
     {"UTF8", UTF8},
 };
 
-static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
+static const ByteOrderMark boms[] = {
     [UTF8] = {{0xef, 0xbb, 0xbf}, 3},
     [UTF16BE] = {{0xfe, 0xff}, 2},
     [UTF16LE] = {{0xff, 0xfe}, 2},
@@ -49,6 +49,8 @@ static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
 UNITTEST {
     CHECK_BSEARCH_ARRAY(encoding_aliases, alias, ascii_strcmp_icase);
     CHECK_STRING_ARRAY(encoding_names);
+    static_assert(ARRAYLEN(encoding_names) == UNKNOWN_ENCODING);
+    static_assert(ARRAYLEN(boms) == UNKNOWN_ENCODING);
 }
 
 static int enc_alias_cmp(const void *key, const void *elem)
@@ -64,7 +66,6 @@ EncodingType lookup_encoding(const char *name)
         return UTF8;
     }
 
-    static_assert(ARRAYLEN(encoding_names) == NR_ENCODING_TYPES - 1);
     for (size_t i = 0; i < ARRAYLEN(encoding_names); i++) {
         if (ascii_streq_icase(name, encoding_names[i])) {
             return (EncodingType) i;
@@ -77,8 +78,7 @@ EncodingType lookup_encoding(const char *name)
 
 const char *encoding_from_type(EncodingType type)
 {
-    BUG_ON(type >= NR_ENCODING_TYPES);
-    BUG_ON(type == UNKNOWN_ENCODING);
+    BUG_ON(type >= UNKNOWN_ENCODING);
 
     // There's no need to call str_intern() here; the names in the array
     // can be considered static interns
@@ -88,7 +88,6 @@ const char *encoding_from_type(EncodingType type)
 const char *encoding_normalize(const char *name)
 {
     EncodingType type = lookup_encoding(name);
-    BUG_ON(type >= NR_ENCODING_TYPES);
     if (type != UNKNOWN_ENCODING) {
         return encoding_from_type(type);
     }
@@ -110,20 +109,18 @@ EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
     }
 
     // Iterate array backwards to ensure UTF32LE is checked before UTF16LE
-    for (int i = NR_ENCODING_TYPES - 1; i >= 0; i--) {
+    for (size_t n = ARRAYLEN(boms), i = n - 1; i < n; i--) {
         const unsigned int bom_len = boms[i].len;
-        if (bom_len > 0 && size >= bom_len && mem_equal(buf, boms[i].bytes, bom_len)) {
-            return (EncodingType) i;
+        BUG_ON(bom_len == 0);
+        if (size >= bom_len && mem_equal(buf, boms[i].bytes, bom_len)) {
+            return (EncodingType)i;
         }
     }
 
     return UNKNOWN_ENCODING;
 }
 
-const ByteOrderMark *get_bom_for_encoding(EncodingType encoding)
+const ByteOrderMark *get_bom_for_encoding(EncodingType type)
 {
-    static_assert(ARRAYLEN(boms) == NR_ENCODING_TYPES);
-    BUG_ON(encoding >= ARRAYLEN(boms));
-    const ByteOrderMark *bom = &boms[encoding];
-    return bom->len ? bom : NULL;
+    return encoding_type_has_bom(type) ? &boms[type] : NULL;
 }

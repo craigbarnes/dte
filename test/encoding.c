@@ -87,6 +87,9 @@ static void test_get_bom_for_encoding(TestContext *ctx)
     EXPECT_MEMEQ(bom->bytes, "\xfe\xff", 2);
 
     EXPECT_NULL(get_bom_for_encoding(UNKNOWN_ENCODING));
+    EXPECT_FALSE(encoding_type_has_bom(UNKNOWN_ENCODING));
+    EXPECT_TRUE(encoding_type_has_bom(UTF8));
+    EXPECT_TRUE(encoding_type_has_bom(UTF32LE));
 }
 
 static const TestEntry tests[] = {
