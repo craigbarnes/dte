@@ -60,6 +60,10 @@ static int enc_alias_cmp(const void *key, const void *elem)
 
 EncodingType lookup_encoding(const char *name)
 {
+    if (likely(name == encoding_names[UTF8])) {
+        return UTF8;
+    }
+
     static_assert(ARRAYLEN(encoding_names) == NR_ENCODING_TYPES - 1);
     for (size_t i = 0; i < ARRAYLEN(encoding_names); i++) {
         if (ascii_streq_icase(name, encoding_names[i])) {
