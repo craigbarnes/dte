@@ -1087,13 +1087,13 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
         args += a->nr_flag_args;
     }
 
-    Encoding encoding = {.type = ENCODING_AUTODETECT};
+    const char *encoding = NULL; // (Auto-detect)
     if (requested_encoding) {
         EncodingType enctype = lookup_encoding(requested_encoding);
         if (enctype == UTF8) {
-            encoding = encoding_from_type(enctype);
+            encoding = encoding_from_type(UTF8);
         } else if (conversion_supported_by_iconv(requested_encoding, "UTF-8")) {
-            encoding = encoding_from_name(requested_encoding);
+            encoding = encoding_normalize(requested_encoding);
         } else {
             if (errno == EINVAL) {
                 return error_msg("Unsupported encoding '%s'", requested_encoding);
@@ -1106,8 +1106,9 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
         }
     }
 
+    Window *window = e->window;
     if (a->nr_args == 0) {
-        View *view = window_open_new_file(e->window);
+        View *view = window_open_new_file(window);
         view->buffer->temporary = temporary;
         if (requested_encoding) {
             buffer_set_encoding(view->buffer, encoding, e->options.utf8_bom);
@@ -1128,10 +1129,10 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
     View *first_opened;
     if (!paths[1]) {
         // Previous view is remembered when opening single file
-        first_opened = window_open_file(e->window, paths[0], &encoding);
+        first_opened = window_open_file(window, paths[0], encoding);
     } else {
         // It makes no sense to remember previous view when opening multiple files
-        first_opened = window_open_files(e->window, paths, &encoding);
+        first_opened = window_open_files(window, paths, encoding);
     }
 
     if (use_glob) {
@@ -1603,21 +1604,21 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         args += a->nr_flag_args;
     }
 
-    Encoding encoding = buffer->encoding;
+    const char *encoding = buffer->encoding;
     bool bom = buffer->bom;
     if (requested_encoding) {
         EncodingType et = lookup_encoding(requested_encoding);
         if (et == UTF8) {
-            if (encoding.type != UTF8) {
+            if (!encoding_is_utf8(encoding)) {
                 // Encoding changed
-                encoding = encoding_from_type(et);
+                encoding = encoding_from_type(UTF8);
                 bom = e->options.utf8_bom;
             }
         } else if (conversion_supported_by_iconv("UTF-8", requested_encoding)) {
-            encoding = encoding_from_name(requested_encoding);
-            if (encoding.name != buffer->encoding.name) {
+            encoding = encoding_normalize(requested_encoding);
+            if (encoding != buffer->encoding) {
                 // Encoding changed
-                bom = !!get_bom_for_encoding(encoding.type);
+                bom = !!get_bom_for_encoding(lookup_encoding(encoding));
             }
         } else {
             if (errno == EINVAL) {
@@ -1740,7 +1741,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         && st.st_gid == buffer->file.gid
         && !buffer_modified(buffer)
         && absolute == buffer->abs_filename
-        && encoding.name == buffer->encoding.name
+        && encoding == buffer->encoding
         && crlf == buffer->crlf_newlines
         && bom == buffer->bom
         && save_unmodified_buffer(buffer, absolute)
@@ -1750,7 +1751,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     }
 
     FileSaveContext ctx = {
-        .encoding = &encoding,
+        .encoding = encoding,
         .new_file_mode = e->new_file_mode,
         .crlf = crlf,
         .write_bom = bom,

@@ -1,6 +1,7 @@
 #ifndef ENCODING_H
 #define ENCODING_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "util/macros.h"
 
@@ -12,28 +13,27 @@ typedef enum {
     UTF32LE,
     UNKNOWN_ENCODING,
     NR_ENCODING_TYPES,
-
-    // This value is used by the "open" command to instruct other
-    // routines that no specific encoding was requested and that
-    // it should be detected instead. It is always replaced by
-    // some other value by the time a file is successfully opened.
-    ENCODING_AUTODETECT
 } EncodingType;
 
 typedef struct {
-    EncodingType type;
-    // An interned encoding name compatible with iconv_open(3)
-    const char *name;
-} Encoding;
-
-typedef struct {
-    const unsigned char bytes[4];
+    unsigned char bytes[4];
     unsigned int len;
 } ByteOrderMark;
 
-Encoding encoding_from_type(EncodingType type);
-Encoding encoding_from_name(const char *name) NONNULL_ARGS;
 EncodingType lookup_encoding(const char *name) NONNULL_ARGS;
+
+static inline bool encoding_is_utf8(const char *name)
+{
+    return lookup_encoding(name) == UTF8;
+}
+
+static inline bool encoding_type_has_bom(EncodingType type)
+{
+    return (type >= UTF8 && type <= UTF32LE);
+}
+
+const char *encoding_normalize(const char *name) NONNULL_ARGS_AND_RETURN;
+const char *encoding_from_type(EncodingType type) RETURNS_NONNULL;
 EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size);
 const ByteOrderMark *get_bom_for_encoding(EncodingType encoding);
 

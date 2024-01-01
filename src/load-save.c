@@ -55,21 +55,18 @@ copy:
 static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size_t size, bool utf8_bom)
 {
     EncodingType bom_type = detect_encoding_from_bom(buf, size);
-    EncodingType enc_type = buffer->encoding.type;
-    if (enc_type == ENCODING_AUTODETECT) {
-        if (bom_type != UNKNOWN_ENCODING) {
-            BUG_ON(buffer->encoding.name);
-            Encoding e = encoding_from_type(bom_type);
-            if (conversion_supported_by_iconv(e.name, "UTF-8")) {
-                buffer_set_encoding(buffer, e, utf8_bom);
-            } else {
-                buffer_set_encoding(buffer, encoding_from_type(UTF8), utf8_bom);
-            }
+    if (!buffer->encoding && bom_type != UNKNOWN_ENCODING) {
+        const char *enc = encoding_from_type(bom_type);
+        if (!conversion_supported_by_iconv(enc, "UTF-8")) {
+            // TODO: Use error_msg() and return false here?
+            LOG_NOTICE("file has %s BOM, but conversion unsupported", enc);
+            enc = encoding_from_type(UTF8);
         }
+        buffer_set_encoding(buffer, enc, utf8_bom);
     }
 
     // Skip BOM only if it matches the specified file encoding
-    if (bom_type != UNKNOWN_ENCODING && bom_type == buffer->encoding.type) {
+    if (bom_type != UNKNOWN_ENCODING && bom_type == lookup_encoding(buffer->encoding)) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
             const size_t bom_len = bom->len;
@@ -79,7 +76,12 @@ static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size
         }
     }
 
-    FileDecoder *dec = new_file_decoder(buffer->encoding.name, buf, size);
+    if (!buffer->encoding) {
+        buffer->encoding = encoding_from_type(UTF8);
+        buffer->bom = utf8_bom;
+    }
+
+    FileDecoder *dec = new_file_decoder(buffer->encoding, buf, size);
     if (!dec) {
         return false;
     }
@@ -101,11 +103,6 @@ static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size
         if (blk) {
             add_block(buffer, blk);
         }
-    }
-
-    if (buffer->encoding.type == ENCODING_AUTODETECT) {
-        const char *enc = file_decoder_get_encoding(dec);
-        buffer_set_encoding(buffer, encoding_from_name(enc ? enc : "UTF-8"), utf8_bom);
     }
 
     free_file_decoder(dec);
@@ -285,6 +282,9 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
             return error_msg("File %s does not exist", filename);
         }
         fixup_blocks(buffer);
+        BUG_ON(buffer->encoding);
+        buffer->encoding = encoding_from_type(UTF8);
+        buffer->bom = gopts->utf8_bom;
     } else {
         FileInfo *info = &buffer->file;
         if (!buffer_fstat(info, fd)) {
@@ -315,11 +315,7 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
         xclose(fd);
     }
 
-    if (buffer->encoding.type == ENCODING_AUTODETECT) {
-        Encoding enc = encoding_from_type(UTF8);
-        buffer_set_encoding(buffer, enc, gopts->utf8_bom);
-    }
-
+    BUG_ON(!buffer->encoding);
     return true;
 
 error:
@@ -327,14 +323,16 @@ error:
     return false;
 }
 
-static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType bom_type)
-{
+static bool write_buffer (
+    Buffer *buffer,
+    FileEncoder *enc,
+    const ByteOrderMark *bom,
+    int fd
+) {
     size_t size = 0;
-    const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
     if (bom) {
         size = bom->len;
-        BUG_ON(size == 0);
-        if (xwrite_all(fd, bom->bytes, size) < 0) {
+        if (size && xwrite_all(fd, bom->bytes, size) < 0) {
             return error_msg_errno("write");
         }
     }
@@ -503,8 +501,12 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
         goto error;
     }
 
-    EncodingType bom_type = ctx->write_bom ? ctx->encoding->type : UNKNOWN_ENCODING;
-    if (!write_buffer(buffer, enc, fd, bom_type)) {
+    const ByteOrderMark *bom = NULL;
+    if (unlikely(ctx->write_bom)) {
+        bom = get_bom_for_encoding(lookup_encoding(ctx->encoding));
+    }
+
+    if (!write_buffer(buffer, enc, bom, fd)) {
         goto error;
     }
 

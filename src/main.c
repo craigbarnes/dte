@@ -12,6 +12,7 @@
 #include "compiler.h"
 #include "config.h"
 #include "editor.h"
+#include "encoding.h"
 #include "error.h"
 #include "file-history.h"
 #include "frame.h"
@@ -201,8 +202,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     Buffer *buffer = NULL;
 
     if (fds[STDIN_FILENO] >= 3) {
-        Encoding enc = encoding_from_type(UTF8);
-        buffer = buffer_new(&e->buffers, &e->options, &enc);
+        buffer = buffer_new(&e->buffers, &e->options, encoding_from_type(UTF8));
         if (read_blocks(buffer, fds[STDIN_FILENO], false)) {
             name = "(stdin)";
             buffer->temporary = true;

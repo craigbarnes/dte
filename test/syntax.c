@@ -2,6 +2,7 @@
 #include "block-iter.h"
 #include "config.h"
 #include "editor.h"
+#include "encoding.h"
 #include "syntax/bitset.h"
 #include "syntax/highlight.h"
 #include "util/log.h"
@@ -79,14 +80,10 @@ static void test_hl_line(TestContext *ctx)
         return;
     }
 
-    const Encoding utf8 = encoding_from_type(UTF8);
-    EXPECT_EQ(utf8.type, UTF8);
-    EXPECT_STREQ(utf8.name, "UTF-8");
-
     EditorState *e = ctx->userdata;
     Window *window = e->window;
     ASSERT_NONNULL(window);
-    View *view = window_open_file(window, "test/data/test.c", &utf8);
+    View *view = window_open_file(window, "test/data/test.c", NULL);
     ASSERT_NONNULL(view);
     Buffer *buffer = view->buffer;
     ASSERT_NONNULL(buffer);

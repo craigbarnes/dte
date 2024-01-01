@@ -8,7 +8,6 @@
 #include <time.h>
 #include "block-iter.h"
 #include "change.h"
-#include "encoding.h"
 #include "options.h"
 #include "syntax/syntax.h"
 #include "util/list.h"
@@ -49,7 +48,7 @@ typedef struct Buffer {
     bool setup;
     bool crlf_newlines;
     bool bom;
-    Encoding encoding; // Encoding of the file (buffer always contains UTF-8)
+    const char *encoding; // Encoding of the file (buffer always contains UTF-8)
     LocalOptions options;
     Syntax *syn;
     long changed_line_min;
@@ -83,7 +82,7 @@ struct EditorState;
 
 const char *buffer_filename(const Buffer *buffer) NONNULL_ARGS_AND_RETURN;
 void buffer_mark_lines_changed(Buffer *buffer, long min, long max) NONNULL_ARGS;
-void buffer_set_encoding(Buffer *buffer, Encoding encoding, bool utf8_bom) NONNULL_ARGS;
+void buffer_set_encoding(Buffer *buffer, const char *encoding, bool utf8_bom) NONNULL_ARGS;
 void buffer_set_display_filename(Buffer *buffer, char *name) NONNULL_ARG(1);
 void buffer_update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd) NONNULL_ARG(1, 2);
 void buffer_update_short_filename(Buffer *buffer, const StringView *home) NONNULL_ARGS;
@@ -97,7 +96,7 @@ String dump_buffer(const Buffer *buffer) NONNULL_ARGS;
 
 Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
-Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
+Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const char *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
 Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts) NONNULL_ARGS_AND_RETURN;
 void remove_and_free_buffer(PointerArray *buffers, Buffer *buffer) NONNULL_ARGS;
 

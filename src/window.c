@@ -49,7 +49,7 @@ View *window_open_buffer (
     Window *window,
     const char *filename,
     bool must_exist,
-    const Encoding *encoding
+    const char *encoding
 ) {
     if (unlikely(filename[0] == '\0')) {
         error_msg("Empty filename not allowed");
@@ -314,7 +314,7 @@ static bool is_useless_empty_view(const View *v)
     return v && v->window->views.count == 1 && buffer_is_empty_and_untouched(v->buffer);
 }
 
-View *window_open_file(Window *window, const char *filename, const Encoding *encoding)
+View *window_open_file(Window *window, const char *filename, const char *encoding)
 {
     View *prev = window->view;
     bool useless = is_useless_empty_view(prev);
@@ -331,7 +331,7 @@ View *window_open_file(Window *window, const char *filename, const Encoding *enc
 }
 
 // Open multiple files in window and return the first opened View
-View *window_open_files(Window *window, char **filenames, const Encoding *encoding)
+View *window_open_files(Window *window, char **filenames, const char *encoding)
 {
     View *empty = window->view;
     bool useless = is_useless_empty_view(empty);

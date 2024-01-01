@@ -48,6 +48,7 @@ static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
 
 UNITTEST {
     CHECK_BSEARCH_ARRAY(encoding_aliases, alias, ascii_strcmp_icase);
+    CHECK_STRING_ARRAY(encoding_names);
 }
 
 static int enc_alias_cmp(const void *key, const void *elem)
@@ -70,40 +71,31 @@ EncodingType lookup_encoding(const char *name)
     return a ? a->encoding : UNKNOWN_ENCODING;
 }
 
-static const char *encoding_type_to_string(EncodingType type)
+const char *encoding_from_type(EncodingType type)
 {
-    if (type < NR_ENCODING_TYPES && type != UNKNOWN_ENCODING) {
-        return str_intern(encoding_names[type]);
-    }
-    return NULL;
+    BUG_ON(type >= NR_ENCODING_TYPES);
+    BUG_ON(type == UNKNOWN_ENCODING);
+
+    // There's no need to call str_intern() here; the names in the array
+    // can be considered static interns
+    return encoding_names[type];
 }
 
-Encoding encoding_from_name(const char *name)
+const char *encoding_normalize(const char *name)
 {
-    const EncodingType type = lookup_encoding(name);
-    const char *normalized_name;
-    if (type == UNKNOWN_ENCODING) {
-        char upper[256];
-        size_t n;
-        for (n = 0; n < sizeof(upper) && name[n]; n++) {
-            upper[n] = ascii_toupper(name[n]);
-        }
-        normalized_name = mem_intern(upper, n);
-    } else {
-        normalized_name = encoding_type_to_string(type);
+    EncodingType type = lookup_encoding(name);
+    BUG_ON(type >= NR_ENCODING_TYPES);
+    if (type != UNKNOWN_ENCODING) {
+        return encoding_from_type(type);
     }
-    return (Encoding) {
-        .type = type,
-        .name = normalized_name
-    };
-}
 
-Encoding encoding_from_type(EncodingType type)
-{
-    return (Encoding) {
-        .type = type,
-        .name = encoding_type_to_string(type)
-    };
+    char upper[256];
+    size_t n;
+    for (n = 0; n < sizeof(upper) && name[n]; n++) {
+        upper[n] = ascii_toupper(name[n]);
+    }
+
+    return mem_intern(upper, n);
 }
 
 EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
@@ -120,6 +112,7 @@ EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
             return (EncodingType) i;
         }
     }
+
     return UNKNOWN_ENCODING;
 }
 

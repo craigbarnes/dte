@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "convert.h"
+#include "encoding.h"
 #include "util/debug.h"
 #include "util/intern.h"
 #include "util/log.h"
@@ -84,9 +85,9 @@ bool conversion_supported_by_iconv (
     return false;
 }
 
-FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
+FileEncoder *new_file_encoder(const char *encoding, bool crlf, int fd)
 {
-    if (unlikely(encoding->type != UTF8)) {
+    if (unlikely(!encoding_is_utf8(encoding))) {
         errno = EINVAL;
         return NULL;
     }
@@ -118,10 +119,11 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
 
 FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, size_t n)
 {
-    if (unlikely(encoding && !streq(encoding, "UTF-8"))) {
+    if (unlikely(!encoding_is_utf8(encoding))) {
         errno = EINVAL;
         return NULL;
     }
+
     FileDecoder *dec = xnew0(FileDecoder, 1);
     dec->ibuf = buf;
     dec->isize = n;
@@ -435,14 +437,14 @@ bool conversion_supported_by_iconv(const char *from, const char *to)
     return true;
 }
 
-FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
+FileEncoder *new_file_encoder(const char *encoding, bool crlf, int fd)
 {
     FileEncoder *enc = xnew0(FileEncoder, 1);
     enc->crlf = crlf;
     enc->fd = fd;
 
-    if (encoding->type != UTF8) {
-        enc->cconv = cconv_from_utf8(encoding->name);
+    if (!encoding_is_utf8(encoding)) {
+        enc->cconv = cconv_from_utf8(encoding);
         if (!enc->cconv) {
             free(enc);
             return NULL;
@@ -552,10 +554,6 @@ FileDecoder *new_file_decoder (
     FileDecoder *dec = xnew0(FileDecoder, 1);
     dec->ibuf = buf;
     dec->isize = size;
-
-    if (!encoding) {
-        encoding = "UTF-8";
-    }
 
     if (!set_encoding(dec, encoding)) {
         free_file_decoder(dec);

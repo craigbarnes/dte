@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include "buffer.h"
 #include "editor.h"
+#include "encoding.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "lock.h"
@@ -42,23 +43,23 @@ const char *buffer_filename(const Buffer *buffer)
     return name ? name : "(No name)";
 }
 
-void buffer_set_encoding(Buffer *buffer, Encoding encoding, bool utf8_bom)
+void buffer_set_encoding(Buffer *buffer, const char *encoding, bool utf8_bom)
 {
-    if (
-        buffer->encoding.type != encoding.type
-        || buffer->encoding.name != encoding.name
-    ) {
-        const EncodingType type = encoding.type;
-        if (type == UTF8) {
-            buffer->bom = utf8_bom;
-        } else {
-            buffer->bom = type < NR_ENCODING_TYPES && !!get_bom_for_encoding(type);
-        }
-        buffer->encoding = encoding;
+    if (DEBUG >= 1) {
+        const char *nenc = encoding_normalize(encoding);
+        BUG_ON(encoding != nenc);
     }
+
+    if (buffer->encoding == encoding) {
+        return;
+    }
+
+    EncodingType type = lookup_encoding(encoding);
+    buffer->bom = (type == UTF8) ? utf8_bom : encoding_type_has_bom(type);
+    buffer->encoding = encoding;
 }
 
-Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding)
+Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const char *encoding)
 {
     static unsigned long id;
     Buffer *buffer = xnew0(Buffer, 1);
@@ -69,9 +70,7 @@ Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Enco
     buffer->crlf_newlines = gopts->crlf_newlines;
 
     if (encoding) {
-        buffer_set_encoding(buffer, *encoding, gopts->utf8_bom);
-    } else {
-        buffer->encoding.type = ENCODING_AUTODETECT;
+        buffer_set_encoding(buffer, encoding, gopts->utf8_bom);
     }
 
     static_assert(sizeof(*gopts) >= sizeof(CommonOptions));
@@ -86,8 +85,7 @@ Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Enco
 
 Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts)
 {
-    Encoding enc = encoding_from_type(UTF8);
-    Buffer *buffer = buffer_new(buffers, gopts, &enc);
+    Buffer *buffer = buffer_new(buffers, gopts, encoding_from_type(UTF8));
 
     // At least one block required
     Block *blk = block_new(1);
@@ -417,7 +415,7 @@ String dump_buffer(const Buffer *buffer)
         "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %ju\n",
         "     Name:", buffer_filename(buffer),
         "       ID:", buffer->id,
-        " Encoding:", buffer->encoding.name,
+        " Encoding:", buffer->encoding,
         " Filetype:", buffer->options.filetype,
         "   Blocks:", counts[0],
         "    Lines:", buffer->nl,

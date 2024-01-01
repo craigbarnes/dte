@@ -185,7 +185,7 @@ static void test_global_state(TestContext *ctx)
     ASSERT_PTREQ(buffer->views.ptrs[0], view);
     ASSERT_PTREQ(e->buffers.ptrs[0], buffer);
 
-    ASSERT_NONNULL(buffer->encoding.name);
+    ASSERT_NONNULL(buffer->encoding);
     ASSERT_NONNULL(buffer->blocks.next);
     ASSERT_PTREQ(&buffer->blocks, view->cursor.head);
     ASSERT_PTREQ(buffer->blocks.next, view->cursor.blk);

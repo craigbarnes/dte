@@ -1,11 +1,12 @@
 #include "test.h"
+#include "encoding.h"
 #include "status.h"
 #include "util/utf8.h"
 
 static void test_sf_format(TestContext *ctx)
 {
     Buffer buffer = {
-        .encoding = {.type = UTF8, .name = "UTF-8"},
+        .encoding = encoding_from_type(UTF8),
         .options = {.filetype = "none"},
     };
 

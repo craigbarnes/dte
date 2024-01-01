@@ -276,7 +276,7 @@ static void expand_format_specifier(Formatter *f, FormatSpecifierType type)
         add_status_pos(f);
         return;
     case STATUS_ENCODING:
-        add_status_str(f, buffer->encoding.name);
+        add_status_str(f, buffer->encoding);
         return;
     case STATUS_MISC:
         add_misc_status(f);

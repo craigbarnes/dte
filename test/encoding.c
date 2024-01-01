@@ -64,18 +64,36 @@ static void test_lookup_encoding(TestContext *ctx)
 
 static void test_encoding_from_type(TestContext *ctx)
 {
-    const Encoding a = encoding_from_type(UTF8);
-    EXPECT_EQ(a.type, UTF8);
-    EXPECT_STREQ(a.name, "UTF-8");
-    // Ensure Encoding::name is an interned string
-    EXPECT_PTREQ(encoding_from_type(UTF8).name, a.name);
-    EXPECT_PTREQ(encoding_from_name("utf8").name, a.name);
+    const char *a = encoding_from_type(UTF8);
+    EXPECT_STREQ(a, "UTF-8");
+    EXPECT_TRUE(encoding_is_utf8(a));
+    // Ensure returned value is an "interned" string
+    EXPECT_PTREQ(a, encoding_normalize("utf8"));
+    EXPECT_PTREQ(a, encoding_from_type(UTF8));
+}
+
+static void test_get_bom_for_encoding(TestContext *ctx)
+{
+    const ByteOrderMark *bom = get_bom_for_encoding(UTF8);
+    ASSERT_EQ(bom->len, 3);
+    EXPECT_MEMEQ(bom->bytes, "\xef\xbb\xbf", 3);
+
+    bom = get_bom_for_encoding(UTF32LE);
+    ASSERT_EQ(bom->len, 4);
+    EXPECT_MEMEQ(bom->bytes, "\xff\xfe\0\0", 4);
+
+    bom = get_bom_for_encoding(UTF16BE);
+    ASSERT_EQ(bom->len, 2);
+    EXPECT_MEMEQ(bom->bytes, "\xfe\xff", 2);
+
+    EXPECT_NULL(get_bom_for_encoding(UNKNOWN_ENCODING));
 }
 
 static const TestEntry tests[] = {
     TEST(test_detect_encoding_from_bom),
     TEST(test_lookup_encoding),
     TEST(test_encoding_from_type),
+    TEST(test_get_bom_for_encoding),
 };
 
 const TestGroup encoding_tests = TEST_GROUP(tests);
