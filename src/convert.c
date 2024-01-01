@@ -91,6 +91,7 @@ FileEncoder *new_file_encoder(const char *encoding, bool crlf, int fd)
         errno = EINVAL;
         return NULL;
     }
+
     FileEncoder *enc = xnew0(FileEncoder, 1);
     enc->crlf = crlf;
     enc->fd = fd;
@@ -439,18 +440,18 @@ bool conversion_supported_by_iconv(const char *from, const char *to)
 
 FileEncoder *new_file_encoder(const char *encoding, bool crlf, int fd)
 {
-    FileEncoder *enc = xnew0(FileEncoder, 1);
-    enc->crlf = crlf;
-    enc->fd = fd;
-
-    if (!encoding_is_utf8(encoding)) {
-        enc->cconv = cconv_from_utf8(encoding);
-        if (!enc->cconv) {
-            free(enc);
+    struct cconv *cconv = NULL;
+    if (unlikely(!encoding_is_utf8(encoding))) {
+        cconv = cconv_from_utf8(encoding);
+        if (!cconv) {
             return NULL;
         }
     }
 
+    FileEncoder *enc = xnew0(FileEncoder, 1);
+    enc->cconv = cconv;
+    enc->crlf = crlf;
+    enc->fd = fd;
     return enc;
 }
 
