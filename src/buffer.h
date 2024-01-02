@@ -16,7 +16,14 @@
 #include "util/string-view.h"
 #include "util/string.h"
 
-// Subset of stat(3) struct
+/*
+ * Subset of stat(3) struct, to minimize size bloat.
+ * Example sizes (glibc 2.38, x86_64):
+ *
+ * - sizeof(FileInfo): 56
+ * - sizeof(struct stat): 144
+ * - Difference: 88 bytes (per Buffer)
+ */
 typedef struct {
     dev_t dev;
     ino_t ino;
