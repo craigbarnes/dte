@@ -393,7 +393,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
     y2 -= view->vy;
 
     bool got_line = !block_iter_is_eof(&bi);
-    Syntax *syn = view->buffer->syn;
+    Syntax *syn = view->buffer->syntax;
     PointerArray *lss = &view->buffer->line_start_states;
     BlockIter tmp = block_iter(view->buffer);
     hl_fill_start_states(syn, lss, &e->styles, &tmp, info.line_nr);

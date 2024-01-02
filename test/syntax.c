@@ -90,7 +90,7 @@ static void test_hl_line(TestContext *ctx)
     const size_t line_nr = 5;
     ASSERT_TRUE(buffer->nl >= line_nr);
 
-    Syntax *syn = buffer->syn;
+    Syntax *syn = buffer->syntax;
     ASSERT_NONNULL(syn);
     ASSERT_NONNULL(syn->start_state);
     EXPECT_STREQ(syn->name, "c");

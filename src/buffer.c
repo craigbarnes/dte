@@ -208,11 +208,11 @@ void buffer_update_syntax(EditorState *e, Buffer *buffer)
             syn = load_syntax_by_filetype(e, buffer->options.filetype);
         }
     }
-    if (syn == buffer->syn) {
+    if (syn == buffer->syntax) {
         return;
     }
 
-    buffer->syn = syn;
+    buffer->syntax = syn;
     if (syn) {
         // Start state of first line is constant
         PointerArray *s = &buffer->line_start_states;

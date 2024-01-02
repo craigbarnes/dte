@@ -59,7 +59,7 @@ typedef struct Buffer {
     bool bom;
     const char *encoding; // Encoding of the file (buffer always contains UTF-8)
     LocalOptions options;
-    Syntax *syn;
+    Syntax *syntax;
     long changed_line_min;
     long changed_line_max;
     // Index 0 is always syn->states.ptrs[0].
