@@ -272,8 +272,10 @@ UNITTEST {
 
 bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, bool must_exist)
 {
-    int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
+    BUG_ON(buffer->abs_filename);
+    BUG_ON(!list_empty(&buffer->blocks));
 
+    int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd < 0) {
         if (errno != ENOENT) {
             return error_msg("Error opening %s: %s", filename, strerror(errno));
@@ -281,41 +283,46 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
         if (must_exist) {
             return error_msg("File %s does not exist", filename);
         }
-        fixup_blocks(buffer);
-        BUG_ON(buffer->encoding);
-        buffer->encoding = encoding_from_type(UTF8);
-        buffer->bom = gopts->utf8_bom;
-    } else {
-        FileInfo *info = &buffer->file;
-        if (!buffer_fstat(info, fd)) {
-            error_msg("fstat failed on %s: %s", filename, strerror(errno));
-            goto error;
+        if (!buffer->encoding) {
+            buffer->encoding = encoding_from_type(UTF8);
+            buffer->bom = gopts->utf8_bom;
         }
-        if (!S_ISREG(info->mode)) {
-            error_msg("Not a regular file %s", filename);
-            goto error;
-        }
-        off_t size = info->size;
-        if (unlikely(size < 0)) {
-            error_msg("Invalid file size: %jd", (intmax_t)size);
-            goto error;
-        }
-        unsigned int limit_mib = gopts->filesize_limit;
-        if (unlikely(filesize_exceeds_limit(size, limit_mib))) {
-            error_msg (
-                "File size exceeds 'filesize-limit' option (%uMiB): %s",
-                limit_mib, filename
-            );
-            goto error;
-        }
-        if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
-            error_msg("Error reading %s: %s", filename, strerror(errno));
-            goto error;
-        }
-        xclose(fd);
+        Block *blk = block_new(1);
+        list_add_before(&blk->node, &buffer->blocks);
+        return true;
+    }
+
+    FileInfo *info = &buffer->file;
+    if (!buffer_fstat(info, fd)) {
+        error_msg("fstat failed on %s: %s", filename, strerror(errno));
+        goto error;
+    }
+    if (!S_ISREG(info->mode)) {
+        error_msg("Not a regular file %s", filename);
+        goto error;
+    }
+
+    off_t size = info->size;
+    unsigned int limit_mib = gopts->filesize_limit;
+    if (unlikely(size < 0)) {
+        error_msg("Invalid file size: %jd", (intmax_t)size);
+        goto error;
+    }
+    if (unlikely(filesize_exceeds_limit(size, limit_mib))) {
+        error_msg (
+            "File size exceeds 'filesize-limit' option (%uMiB): %s",
+            limit_mib, filename
+        );
+        goto error;
+    }
+
+    if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
+        error_msg("Error reading %s: %s", filename, strerror(errno));
+        goto error;
     }
 
     BUG_ON(!buffer->encoding);
+    xclose(fd);
     return true;
 
 error:
