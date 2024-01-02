@@ -21,9 +21,9 @@ enum {
 // Buffer of the *current* View (Window::view::buffer).
 typedef struct Window {
     struct EditorState *editor;
-    PointerArray views;
+    PointerArray views; // All Views contained by this Window
     Frame *frame;
-    View *view; // Current view
+    View *view; // Current View
     View *prev_view; // Previous view, if set
     int x, y; // Coordinates for top left of window
     int w, h; // Width and height of window (including tabbar and status)

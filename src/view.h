@@ -14,8 +14,12 @@ typedef enum {
     SELECT_LINES,
 } SelectionType;
 
-// A view into a Buffer, with its own cursor position and selection.
-// Visually speaking, each tab in a Window corresponds to a View.
+/*
+ * A view into a Buffer, with its own cursor position and selection.
+ * Visually speaking, each tab in a Window corresponds to a View and
+ * if there are multiple Windows there may be multiple Views of the
+ * same Buffer (see Buffer::views).
+ */
 typedef struct View {
     struct Buffer *buffer;
     struct Window *window;
