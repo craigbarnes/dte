@@ -40,15 +40,15 @@ typedef struct {
  * some file-specific metadata and options.
  */
 typedef struct Buffer {
-    ListHead blocks;
+    ListHead blocks; // Doubly linked list of Blocks, forming the text contents
     Change change_head;
     Change *cur_change;
-    Change *saved_change; // Used to determine if buffer is modified
-    FileInfo file;
+    Change *saved_change; // Used to determine if there are unsaved changes
+    FileInfo file; // File metadata, taken from the most recent stat(3) call
     unsigned long id; // Needed for identifying buffers whose filename is NULL
-    size_t nl;
+    size_t nl; // Total number of lines (sum of all Block::nl counts)
     PointerArray views; // Views pointing to this buffer
-    char *display_filename;
+    char *display_filename; // Short filename, as displayed in the tab bar
     char *abs_filename;
     bool readonly;
     bool temporary;
