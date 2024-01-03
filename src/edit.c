@@ -65,11 +65,7 @@ static size_t insert_to_current(BlockIter *cursor, const char *buf, size_t len)
     Block *blk = cursor->blk;
     size_t offset = cursor->offset;
     size_t size = blk->size + len;
-
-    if (size > blk->alloc) {
-        blk->alloc = round_size_to_next_multiple(size, BLOCK_ALLOC_MULTIPLE);
-        xrenew(blk->data, blk->alloc);
-    }
+    block_grow(blk, size);
     memmove(blk->data + offset + len, blk->data + offset, blk->size - offset);
     size_t nl = copy_count_nl(blk->data + offset, buf, len);
     blk->nl += nl;
@@ -305,11 +301,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
     ) {
         Block *next = BLOCK(blk->node.next);
         size_t size = blk->size + next->size;
-
-        if (size > blk->alloc) {
-            blk->alloc = round_size_to_next_multiple(size, BLOCK_ALLOC_MULTIPLE);
-            xrenew(blk->data, blk->alloc);
-        }
+        block_grow(blk, size);
         memcpy(blk->data + blk->size, next->data, next->size);
         blk->size = size;
         blk->nl += next->nl;
@@ -346,10 +338,7 @@ char *do_replace(View *view, size_t del, const char *buf, size_t ins)
         }
     }
 
-    if (new_size > blk->alloc) {
-        blk->alloc = round_size_to_next_multiple(new_size, BLOCK_ALLOC_MULTIPLE);
-        xrenew(blk->data, blk->alloc);
-    }
+    block_grow(blk, new_size);
 
     // Modification is limited to one block
     Buffer *buffer = view->buffer;

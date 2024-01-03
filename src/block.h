@@ -5,10 +5,6 @@
 #include "util/list.h"
 #include "util/macros.h"
 
-enum {
-    BLOCK_ALLOC_MULTIPLE = 64
-};
-
 // Blocks always contain whole lines.
 // There's one zero-sized block for an empty file.
 // Otherwise zero-sized blocks are forbidden.
@@ -34,6 +30,7 @@ static inline Block *BLOCK(ListHead *item)
 }
 
 Block *block_new(size_t alloc) RETURNS_NONNULL;
+void block_grow(Block *blk, size_t alloc) NONNULL_ARGS;
 void block_free(Block *blk) NONNULL_ARGS;
 
 #endif

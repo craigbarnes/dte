@@ -119,10 +119,7 @@ static void fixup_blocks(Buffer *buffer)
         // and cause lots of trouble
         Block *blk = BLOCK(buffer->blocks.prev);
         if (blk->size && blk->data[blk->size - 1] != '\n') {
-            if (blk->size == blk->alloc) {
-                blk->alloc = round_size_to_next_multiple(blk->size + 1, 64);
-                xrenew(blk->data, blk->alloc);
-            }
+            block_grow(blk, blk->size + 1);
             blk->data[blk->size++] = '\n';
             blk->nl++;
             buffer->nl++;

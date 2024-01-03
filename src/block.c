@@ -2,6 +2,10 @@
 #include "block.h"
 #include "util/xmalloc.h"
 
+enum {
+    BLOCK_ALLOC_MULTIPLE = 64
+};
+
 Block *block_new(size_t alloc)
 {
     Block *blk = xnew0(Block, 1);
@@ -9,6 +13,14 @@ Block *block_new(size_t alloc)
     blk->data = xmalloc(alloc);
     blk->alloc = alloc;
     return blk;
+}
+
+void block_grow(Block *blk, size_t alloc)
+{
+    if (alloc > blk->alloc) {
+        blk->alloc = round_size_to_next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
+        xrenew(blk->data, blk->alloc);
+    }
 }
 
 void block_free(Block *blk)
