@@ -19,7 +19,7 @@ void block_grow(Block *blk, size_t alloc)
 {
     if (alloc > blk->alloc) {
         blk->alloc = round_size_to_next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
-        xrenew(blk->data, blk->alloc);
+        blk->data = xrealloc(blk->data, blk->alloc);
     }
 }
 

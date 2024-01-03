@@ -62,7 +62,7 @@ static size_t unix_to_dos (
 ) {
     if (enc->nsize < size * 2) {
         enc->nsize = size * 2;
-        xrenew(enc->nbuf, enc->nsize);
+        enc->nbuf = xrealloc(enc->nbuf, enc->nsize);
     }
     size_t d = 0;
     for (size_t s = 0; s < size; s++) {
@@ -224,7 +224,7 @@ static void encode_replacement(struct cconv *c)
 static void resize_obuf(struct cconv *c)
 {
     c->osize *= 2;
-    xrenew(c->obuf, c->osize);
+    c->obuf = xrealloc(c->obuf, c->osize);
 }
 
 static void add_replacement(struct cconv *c)

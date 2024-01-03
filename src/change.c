@@ -84,14 +84,14 @@ static void record_delete(View *view, char *buf, size_t len, bool move_after)
     Change *change = view->buffer->cur_change;
     if (change_merge == prev_change_merge) {
         if (change_merge == CHANGE_MERGE_DELETE) {
-            xrenew(change->buf, change->del_count + len);
+            change->buf = xrealloc(change->buf, change->del_count + len);
             memcpy(change->buf + change->del_count, buf, len);
             change->del_count += len;
             free(buf);
             return;
         }
         if (change_merge == CHANGE_MERGE_ERASE) {
-            xrenew(buf, len + change->del_count);
+            buf = xrealloc(buf, len + change->del_count);
             memcpy(buf + len, change->buf, change->del_count);
             change->del_count += len;
             free(change->buf);

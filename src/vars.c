@@ -78,7 +78,7 @@ static char *expand_word(const EditorState *e)
     size_t size;
     char *selection = view_get_selection(e->view, &size);
     if (selection) {
-        xrenew(selection, size + 1);
+        selection = xrealloc(selection, size + 1);
         selection[size] = '\0';
         return selection;
     }

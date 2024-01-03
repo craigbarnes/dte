@@ -14,7 +14,7 @@ static COLD void string_grow(String *s, size_t min_alloc)
     }
     alloc = round_size_to_next_multiple(alloc, 16);
     s->alloc = alloc;
-    xrenew(s->buffer, alloc);
+    s->buffer = xrealloc(s->buffer, alloc);
 }
 
 char *string_reserve_space(String *s, size_t more)

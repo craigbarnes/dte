@@ -16,7 +16,7 @@
 
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
-void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);
+void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply_(size_t a, size_t b);
@@ -33,7 +33,7 @@ static inline size_t size_multiply(size_t a, size_t b)
     return size_multiply_(a, b);
 }
 
-RETURNS_NONNULL ALLOC_SIZE(2, 3)
+RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2, 3)
 static inline void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 {
     return xrealloc(ptr, size_multiply(nmemb, size));

@@ -150,7 +150,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
         if (pid == 0) {
             intmax_t p = (intmax_t)editor_pid;
             size_t n = strlen(filename) + DECIMAL_STR_MAX(pid) + 4;
-            xrenew(buf, size + n);
+            buf = xrealloc(buf, size + n);
             size += xsnprintf(buf + size, n, "%jd %s\n", p, filename);
         } else {
             intmax_t p = (intmax_t)pid;
