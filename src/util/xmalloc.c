@@ -38,10 +38,16 @@ void *xmalloc(size_t size)
     return check_alloc(malloc(size));
 }
 
-void *xcalloc(size_t size)
+void *xcalloc(size_t nmemb, size_t size)
 {
-    BUG_ON(size == 0);
-    return check_alloc(calloc(1, size));
+    if (__STDC_VERSION__ < 202311L) {
+        // ISO C23 (§7.24.3.2) requires calloc() to check for integer
+        // overflow in `nmemb * size`, but older C standards don't
+        size_multiply(nmemb, size);
+    }
+
+    BUG_ON(nmemb == 0 || size == 0);
+    return check_alloc(calloc(nmemb, size));
 }
 
 void *xrealloc(void *ptr, size_t size)
@@ -87,7 +93,7 @@ error:
     // This is unreachable, but it can silence spurious warnings
     // (e.g. "function might return no value") given by compilers
     // that lack proper `noreturn` support (e.g. tcc)
-    return xcalloc(1);
+    return xcalloc(1, 1);
 }
 
 char *xasprintf(const char *format, ...)

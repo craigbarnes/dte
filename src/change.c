@@ -12,7 +12,7 @@ static ChangeMergeEnum prev_change_merge;
 
 static Change *alloc_change(void)
 {
-    return xcalloc(sizeof(Change));
+    return xnew0(Change, 1);
 }
 
 static void add_change(Buffer *buffer, Change *change)

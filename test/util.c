@@ -133,7 +133,7 @@ static void test_xmalloc(TestContext *ctx)
     EXPECT_STREQ(str, "xyz 12340");
     free(str);
 
-    str = xcalloc(4);
+    str = xcalloc(4, 1);
     EXPECT_MEMEQ(str, "\0\0\0\0", 4);
     free(str);
 

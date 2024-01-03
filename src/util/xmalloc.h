@@ -8,11 +8,11 @@
 
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
 #define xnew(type, n) xmalloc(size_multiply(sizeof(type), (n)))
-#define xnew0(type, n) xcalloc(size_multiply(sizeof(type), (n)))
+#define xnew0(type, n) xcalloc((n), sizeof(type))
 #define xrenew(mem, n) xreallocarray(mem, (n), sizeof(*mem))
 
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
-void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
+void *xcalloc(size_t nmemb, size_t size) XMALLOC ALLOC_SIZE(1, 2);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
