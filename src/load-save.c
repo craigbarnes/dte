@@ -114,16 +114,20 @@ static void fixup_blocks(Buffer *buffer)
     if (list_empty(&buffer->blocks)) {
         Block *blk = block_new(1);
         list_add_before(&blk->node, &buffer->blocks);
-    } else {
-        // Incomplete lines are not allowed because they are special cases
-        // and cause lots of trouble
-        Block *blk = BLOCK(buffer->blocks.prev);
-        if (blk->size && blk->data[blk->size - 1] != '\n') {
-            block_grow(blk, blk->size + 1);
-            blk->data[blk->size++] = '\n';
-            blk->nl++;
-            buffer->nl++;
-        }
+        return;
+    }
+
+    Block *lastblk = BLOCK(buffer->blocks.prev);
+    BUG_ON(!lastblk);
+    size_t n = lastblk->size;
+    if (n && lastblk->data[n - 1] != '\n') {
+        // Incomplete lines are not allowed because they're special
+        // cases and cause lots of trouble
+        block_grow(lastblk, n + 1);
+        lastblk->data[n] = '\n';
+        lastblk->size++;
+        lastblk->nl++;
+        buffer->nl++;
     }
 }
 
