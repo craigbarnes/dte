@@ -10,7 +10,7 @@ static void ptr_array_grow(PointerArray *array)
     if (unlikely(alloc <= array->count)) {
         fatal_error(__func__, EOVERFLOW);
     }
-    xrenew(array->ptrs, alloc);
+    array->ptrs = xrenew(array->ptrs, alloc);
     array->alloc = alloc;
 }
 

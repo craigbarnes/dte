@@ -106,7 +106,7 @@ static const TermStyle **highlight_line (
 
     if (len > alloc) {
         alloc = round_size_to_next_multiple(len, 128);
-        xrenew(styles, alloc);
+        styles = xrenew(styles, alloc);
     }
 
     top:
@@ -263,7 +263,7 @@ static void resize_line_states(PointerArray *s, size_t count)
 {
     if (s->alloc < count) {
         s->alloc = round_size_to_next_multiple(count, 64);
-        xrenew(s->ptrs, s->alloc);
+        s->ptrs = xrenew(s->ptrs, s->alloc);
     }
 }
 

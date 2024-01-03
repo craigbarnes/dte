@@ -9,10 +9,7 @@
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
 #define xnew(type, n) xmalloc(size_multiply(sizeof(type), (n)))
 #define xnew0(type, n) xcalloc(size_multiply(sizeof(type), (n)))
-
-#define xrenew(mem, n) do { \
-    mem = xreallocarray(mem, (n), sizeof(*mem)); \
-} while (0)
+#define xrenew(mem, n) xreallocarray(mem, (n), sizeof(*mem))
 
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);

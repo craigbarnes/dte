@@ -19,7 +19,7 @@ static void add_change(Buffer *buffer, Change *change)
 {
     Change *head = buffer->cur_change;
     change->next = head;
-    xrenew(head->prev, head->nr_prev + 1);
+    head->prev = xrenew(head->prev, head->nr_prev + 1);
     head->prev[head->nr_prev++] = change;
     buffer->cur_change = change;
 }
