@@ -5,7 +5,7 @@ help:
 	$P vars 'Print system/build information'
 	$P tags 'Create tags(5) file using ctags(1)'
 	$P clean 'Remove generated files'
-	$P install 'Equivalent to all 5 install-* targets below'
+	$P install 'Equivalent to the 5 (3 on macOS) install-* targets below'
 	$P install-bin 'Install $(dte) binary'
 	$P install-man 'Install man pages'
 	$P install-bash-completion 'Install bash auto-completion script'
@@ -17,6 +17,7 @@ help:
 	$P check 'Equivalent to "make check-tests check-opts"'
 	$P check-tests 'Compile and run unit tests'
 	$P check-opts 'Test dte(1) command-line options and error handling'
+	$P install-full 'Same as "make install", but without macOS-specific exclusions'
 	@echo
 ifeq "$(DEVMK)" "loaded"
 	@printf ' Dev targets:\n\n'

@@ -13,6 +13,10 @@ targets:
 * `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
 * `install-appstream`: Install [AppStream] metadata (excluded on macOS)
 
+The last 2 targets are excluded on macOS because they'd typically just be
+unused clutter on that platform. However, `make install-full` can be used
+to run *all* of the above targets, regardless of platform.
+
 For more information about available `make` targets, run `make help`.
 
 Installation variables

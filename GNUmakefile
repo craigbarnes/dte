@@ -45,8 +45,13 @@ all: $(dte)
 check: check-tests check-opts
 install: install-bin install-man install-bash-completion
 uninstall: uninstall-bin uninstall-man uninstall-bash-completion
+install-full: install
+uninstall-full: uninstall
 
-ifneq "$(KERNEL)" "Darwin"
+ifeq "$(KERNEL)" "Darwin"
+ install-full: install-desktop-file install-appstream
+ uninstall-full: uninstall-desktop-file uninstall-appstream
+else
  install: install-desktop-file install-appstream
  uninstall: uninstall-desktop-file uninstall-appstream
 endif
@@ -136,7 +141,7 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream contrib
+INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream full contrib
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
 .PHONY: check check-tests check-opts installcheck bench
