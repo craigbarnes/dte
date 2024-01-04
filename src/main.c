@@ -37,6 +37,7 @@
 #include "util/log.h"
 #include "util/macros.h"
 #include "util/path.h"
+#include "util/progname.h"
 #include "util/ptr-array.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -383,7 +384,7 @@ int main(int argc, char *argv[])
         case 'V':
             return write_stdout(copyright, sizeof(copyright));
         case 'h':
-            printf(usage, (argv[0] && argv[0][0]) ? argv[0] : "dte");
+            printf(usage, progname(argc, argv, "dte"));
             return EX_OK;
         default:
             return EX_USAGE;

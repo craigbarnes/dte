@@ -62,3 +62,16 @@ expression arg1;
  */
 
 * func(arg1, <+...STRN(...)...+>)
+
+@@
+identifier main = main;
+identifier argv = argv;
+@@
+
+// In main(), progname() should be used instead of argv[0]
+main(...)
+{
+    <...
+*   argv[0]
+    ...>
+}
