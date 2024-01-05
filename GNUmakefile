@@ -119,7 +119,7 @@ uninstall-contrib:
 
 check-tests: $(test) all
 	$(E) EXEC '$(test)'
-	$(Q) TZ=UTC ./$(test)
+	$(Q) ./$(test)
 
 check-opts: $(dte)
 	$(E) EXEC 'test/check-opts.sh'

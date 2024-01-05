@@ -70,6 +70,7 @@ static void test_init(TestContext *ctx)
     ASSERT_EQ(setenv("HOME", home, true), 0);
     ASSERT_EQ(setenv("DTE_HOME", dte_home, true), 0);
     ASSERT_EQ(setenv("XDG_RUNTIME_DIR", dte_home, true), 0);
+    ASSERT_EQ(setenv("TZ", "UTC", true), 0);
 
     free(home);
     free(dte_home);

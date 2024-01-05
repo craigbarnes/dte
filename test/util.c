@@ -2671,7 +2671,8 @@ static void test_timespec_to_str(TestContext *ctx)
         ASSERT_TRUE(len >= 24);
         ASSERT_TRUE(len < sizeof(buf));
 
-        if (timezone == 0 && daylight == 0) {
+        if (likely(timezone == 0 && daylight == 0)) {
+            // Note: $TZ is set to "UTC" in test_init()
             EXPECT_STREQ(buf, "1970-01-01 01:12:01.9876 +0000");
         } else {
             LOG_WARNING("non-zero timezone/daylight; skipping timespec_to_str() test");
