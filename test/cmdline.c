@@ -178,7 +178,7 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "set case-sensitive-search auto ");
     reset_completion(c);
 
-    ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", true), 0);
+    ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", 1), 0);
 
     cmdline_set_text(c, "insert $" ENV_VAR_PREFIX);
     complete_command_next(e);

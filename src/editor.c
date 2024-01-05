@@ -171,7 +171,7 @@ EditorState *init_editor_state(void)
     init_file_locks_context(e->user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
-    if (unlikely(setenv("DTE_VERSION", VERSION, true) != 0)) {
+    if (unlikely(setenv("DTE_VERSION", VERSION, 1) != 0)) {
         fatal_error("setenv", errno);
     }
 

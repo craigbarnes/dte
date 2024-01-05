@@ -1998,7 +1998,7 @@ static bool cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     const size_t nr_args = a->nr_args;
     int res;
     if (nr_args == 2) {
-        res = setenv(name, a->args[1], true);
+        res = setenv(name, a->args[1], 1);
     } else {
         BUG_ON(nr_args != 1);
         res = unsetenv(name);

@@ -67,7 +67,7 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
         for (size_t i = 0; env[i]; i += 2) {
             const char *name = env[i];
             const char *value = env[i + 1];
-            int r = value ? setenv(name, value, true) : unsetenv(name);
+            int r = value ? setenv(name, value, 1) : unsetenv(name);
             if (unlikely(r != 0)) {
                 goto error;
             }
