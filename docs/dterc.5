@@ -185,14 +185,14 @@ Editing Commands:
 .P
 External Commands:
 .br
-   \fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR]... \fIcommand\fR [\fIparameter\fR]...
+   \fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR]... \fIcommand\fR [\fIargument\fR]...
 .br
-   \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
+   \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIargument\fR]...
 .br
 .P
 Other Commands:
 .br
-   \fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIparameters\fR]...
+   \fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIargument\fR]...
 .br
    \fBtoggle\fR [\fB\-gv\fR] \fIoption\fR [\fIvalues\fR]...
 .br
@@ -1623,7 +1623,7 @@ Cancel selection.
 .P
 .RE
 .SS External Commands
-\fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR]... \fIcommand\fR [\fIparameter\fR]...
+\fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR]... \fIcommand\fR [\fIargument\fR]...
 .RS
 Execute external \fIcommand\fR, with custom actions for standard streams.
 The \fB\-i\fR, \fB\-o\fR and \fB\-e\fR options represent standard input, output and
@@ -1700,11 +1700,11 @@ Cancel the effects of \fB\-s\fR (last one wins)
 .PP
 .TP
 \fB\-m\fR
-Move cursor after any inserted text
+Move cursor after inserted text (if any)
 .PP
 .TP
 \fB\-n\fR
-Strip newline from end of inserted text
+Strip newline from end of inserted text (if any)
 .PP
 For convenience, there are several built\-in aliases to simplify common
 uses of \fBexec\fR:
@@ -1741,10 +1741,12 @@ exec\-tag\ sh\ \-c\ 'readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-
 .PP
 Note that \fIcommand\fR is executed directly using \fBexecvp\fR(3). To use shell
 features like pipes or redirection, use a shell interpreter as the
-\fIcommand\fR (see second example above).
+\fIcommand\fR (see second example above). If complex commands become
+difficult to read (e.g. due to nested/escaped quotes), it's recommended
+to create external scripts and execute those instead.
 .P
 .RE
-\fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
+\fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIargument\fR]...
 .RS
 Run external \fIcommand\fR and collect output messages. This can be
 used to run e.g. compilers, build systems, code search utilities,
@@ -1773,7 +1775,7 @@ See also: \fBerrorfmt\fR and \fBmsg\fR commands.
 .P
 .RE
 .SS Other Commands
-\fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIparameters\fR]...
+\fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIargument\fR]...
 .RS
 Run \fIcommand\fR \fIcount\fR times.
 .P

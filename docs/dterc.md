@@ -1057,7 +1057,7 @@ Cancel selection.
 
 ## External Commands
 
-### **exec** [**-pstmn**] [**-ioe** _action_]... _command_ [_parameter_]...
+### **exec** [**-pstmn**] [**-ioe** _action_]... _command_ [_argument_]...
 
 Execute external _command_, with custom actions for standard streams.
 The `-i`, `-o` and `-e` options represent standard input, output and
@@ -1113,10 +1113,10 @@ Actions for stderr (`-e`):
 :   Cancel the effects of `-s` (last one wins)
 
 `-m`
-:   Move cursor after any inserted text
+:   Move cursor after inserted text (if any)
 
 `-n`
-:   Strip newline from end of inserted text
+:   Strip newline from end of inserted text (if any)
 
 For convenience, there are several built-in aliases to simplify common
 uses of `exec`:
@@ -1143,9 +1143,11 @@ Examples:
 
 Note that _command_ is executed directly using [`execvp`]. To use shell
 features like pipes or redirection, use a shell interpreter as the
-_command_ (see second example above).
+_command_ (see second example above). If complex commands become
+difficult to read (e.g. due to nested/escaped quotes), it's recommended
+to create [external scripts] and execute those instead.
 
-### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
+### **compile** [**-1ps**] _errorfmt_ _command_ [_argument_]...
 
 Run external _command_ and collect output messages. This can be
 used to run e.g. compilers, build systems, code search utilities,
@@ -1171,7 +1173,7 @@ See also: [`errorfmt`] and [`msg`] commands.
 
 ## Other Commands
 
-### **repeat** _count_ _command_ [_parameters_]...
+### **repeat** _count_ _command_ [_argument_]...
 
 Run _command_ _count_ times.
 
@@ -1567,6 +1569,7 @@ errors should be highlighted. Set to `""` to disable.
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings
 [`color/reset`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/reset
+[external scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/contrib
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
