@@ -36,20 +36,7 @@ static void get_time(struct timespec *ts)
     }
 }
 
-static void timespec_subtract (
-    const struct timespec *lhs,
-    const struct timespec *rhs,
-    struct timespec *res
-) {
-    res->tv_sec = lhs->tv_sec - rhs->tv_sec;
-    res->tv_nsec = lhs->tv_nsec - rhs->tv_nsec;
-    if (res->tv_nsec < 0) {
-        res->tv_sec--;
-        res->tv_nsec += NS_PER_SECOND;
-    }
-}
-
-static uintmax_t timespec_to_ns(struct timespec *ts)
+static uintmax_t timespec_to_ns(const struct timespec *ts)
 {
     if (ts->tv_sec < 0 || ts->tv_nsec < 0) {
         fail("%s(): negative timespec value", __func__);

@@ -1,6 +1,5 @@
 #include <errno.h>
 #include "time-util.h"
-#include "debug.h"
 #include "numtostr.h"
 
 char *timespec_to_str(const struct timespec *ts, char *buf, size_t bufsize)
