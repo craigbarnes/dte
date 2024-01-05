@@ -31,7 +31,7 @@ static const int8_t seq_len_table[256] = {
 
 static int u_seq_len(unsigned char first_byte)
 {
-    int len = seq_len_table[first_byte];
+    int8_t len = seq_len_table[first_byte];
     BUG_ON(len < I || len > UTF8_MAX_SEQ_LEN);
     return len;
 }
