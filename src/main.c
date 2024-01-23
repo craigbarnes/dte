@@ -122,7 +122,7 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
     term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
-    char keystr[KEYCODE_STR_MAX];
+    char buf[KEYCODE_STR_MAX + 4];
     for (bool loop = true; loop; ) {
         KeyCode key = term_read_key(&term, 100);
         switch (key) {
@@ -136,11 +136,10 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
         case MOD_CTRL | 'd':
             loop = false;
         }
-        size_t keylen = keycode_to_string(key, keystr);
-        term_put_literal(obuf, "  ");
-        term_put_bytes(obuf, keystr, keylen);
-        term_put_literal(obuf, "\r\n");
-        term_output_flush(obuf);
+        size_t n = memcpy_literal(buf, "  ");
+        n += keycode_to_string(key, buf + n);
+        n += memcpy_literal(buf + n, "\r\n");
+        (void)!xwrite_all(STDOUT_FILENO, buf, n);
     }
 
     term_restore_private_modes(&term);
