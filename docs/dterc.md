@@ -309,8 +309,8 @@ The _fg-color_ and _bg-color_ arguments can be one of the following:
 * `white` (`15`)
 
 Colors `16` to `231` correspond to R/G/B colors and `232` to `255` are
-grayscale values (see https://www.ditig.com/256-colors-cheat-sheet for
-more details).
+grayscale values (see https://www.ditig.com/publications/256-colors-cheat-sheet
+for more details).
 
 If the terminal has limited support for rendering colors, the _fg-color_
 and _bg-color_ arguments will fall back to the nearest supported color

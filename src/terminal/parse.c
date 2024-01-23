@@ -4,7 +4,7 @@
 // See also:
 // - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 // - https://sw.kovidgoyal.net/kitty/keyboard-protocol/
-// - ECMA-48 §5.4 (https://www.ecma-international.org/publications-and-standards/standards/ecma-48/)
+// - ECMA-48 §5.4 (https://ecma-international.org/publications-and-standards/standards/ecma-48/)
 
 #include <stdbool.h>
 #include <stdint.h>

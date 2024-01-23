@@ -619,7 +619,7 @@ system except a somewhat recent kernel.
 [exec aliases]: https://gitlab.com/craigbarnes/dte/-/blob/14dd15b72383db784156b20d4ab7ac392552fe59/config/rc#L60-66
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
-[ECMA-48]: https://www.ecma-international.org/publications-and-standards/standards/ecma-48/
+[ECMA-48]: https://ecma-international.org/publications-and-standards/standards/ecma-48/
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
 
