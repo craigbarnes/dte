@@ -30,6 +30,7 @@
 #include "load-save.h"
 #include "lock.h"
 #include "misc.h"
+#include "mode.h"
 #include "move.h"
 #include "msg.h"
 #include "regexp.h"
@@ -179,32 +180,61 @@ static bool cmd_alias(EditorState *e, const CommandArgs *a)
 
 static bool cmd_bind(EditorState *e, const CommandArgs *a)
 {
-    const char *keystr = a->args[0];
-    const char *cmd = a->args[1];
+    const char *keystr = a->args[a->nr_flag_args];
+    const char *cmd = a->args[a->nr_flag_args + 1];
     KeyCode key;
     if (unlikely(!parse_key_string(&key, keystr))) {
         return error_msg("invalid key string: %s", keystr);
     }
 
-    const bool modes[] = {
-        [INPUT_NORMAL] = a->nr_flags == 0 || has_flag(a, 'n'),
-        [INPUT_COMMAND] = has_flag(a, 'c'),
-        [INPUT_SEARCH] = has_flag(a, 's'),
+    ModeHandler *modes[10];
+    size_t nmodes = 0;
+    static_assert(ARRAYLEN(modes) <= ARRAYLEN(a->flags));
+    if (has_flag(a, 'n') || a->nr_flags == 0) {
+        modes[nmodes++] = e->normal_mode;
+    }
+    if (has_flag(a, 'c')) {
+        modes[nmodes++] = e->command_mode;
+    }
+    if (has_flag(a, 's')) {
+        modes[nmodes++] = e->search_mode;
+    }
+
+    if (unlikely(nmodes + a->nr_flag_args > ARRAYLEN(modes))) {
+        // This is already prevented by the ARGERR_TOO_MANY_OPTIONS check
+        // in do_parse_args(), but since that's only incidental, it's still
+        // checked here nonetheless
+        return error_msg("too many modes specified");
+    }
+
+    // Gather pointers to modes specified via `-T modename`. This is done
+    // separately from adding/removing bindings, partly so that either all
+    // modes are processed or none are (if the error below is triggered).
+    for (size_t i = 0, n = a->nr_flag_args; i < n; i++) {
+        const char *name = a->args[i];
+        ModeHandler *mode = get_mode_handler(&e->modes, name);
+        if (unlikely(!mode)) {
+            return error_msg("can't bind key in unknown mode '%s'", name);
+        }
+        modes[nmodes++] = mode;
+    }
+
+    if (!cmd) {
+        for (size_t i = 0; i < nmodes; i++) {
+            remove_binding(&modes[i]->key_bindings, key);
+        }
+        return true;
+    }
+
+    CommandRunner runner = {
+        .home_dir = &e->home_dir,
+        .userdata = e,
     };
 
-    static_assert(ARRAYLEN(modes) == ARRAYLEN(e->modes));
-
-    for (InputMode i = 0; i < ARRAYLEN(modes); i++) {
-        if (!modes[i]) {
-            continue;
-        }
-        IntMap *bindings = &e->modes[i].key_bindings;
-        if (likely(cmd)) {
-            CommandRunner runner = cmdrunner_for_mode(e, i, false);
-            add_binding(bindings, key, cached_command_new(&runner, cmd));
-        } else {
-            remove_binding(bindings, key);
-        }
+    for (size_t i = 0; i < nmodes; i++) {
+        runner.cmds = modes[i]->cmds;
+        CachedCommand *cc = cached_command_new(&runner, cmd);
+        add_binding(&modes[i]->key_bindings, key, cc);
     }
 
     return true;
@@ -368,7 +398,7 @@ static bool cmd_close(EditorState *e, const CommandArgs *a)
 static bool cmd_command(EditorState *e, const CommandArgs *a)
 {
     const char *text = a->args[0];
-    set_input_mode(e, INPUT_COMMAND);
+    push_input_mode(e, e->command_mode);
     if (text) {
         cmdline_set_text(&e->cmdline, text);
     }
@@ -523,6 +553,42 @@ static bool cmd_cut(EditorState *e, const CommandArgs *a)
         cut(&e->clipboard, view, block_iter_eat_line(&tmp), true);
         move_to_preferred_x(view, x);
     }
+    return true;
+}
+
+static bool cmd_def_mode(EditorState *e, const CommandArgs *a)
+{
+    const char *name = a->args[0];
+    if (name[0] == '\0' || name[0] == '-' ) {
+        return error_msg("mode name can't be empty or start with '-'");
+    }
+
+    HashMap *modes = &e->modes;
+    if (hashmap_get(modes, name)) {
+        return error_msg("mode '%s' already exists", name);
+    }
+
+    PointerArray ftmodes = PTR_ARRAY_INIT;
+    for (size_t i = 1, n = a->nr_args; i < n; i++) {
+        const char *ftname = a->args[i];
+        ModeHandler *mode = get_mode_handler(modes, ftname);
+        if (unlikely(!mode)) {
+            ptr_array_free_array(&ftmodes);
+            return error_msg("unknown fallthrough mode '%s'", ftname);
+        }
+        if (unlikely(mode->cmds != &normal_commands)) {
+            // TODO: Support "command" and "search" as fallback modes?
+            // If implemented, all involved modes need to use the same
+            // `CommandSet`.
+            ptr_array_free_array(&ftmodes);
+            return error_msg("unable to use '%s' as fall-through mode", ftname);
+        }
+        ptr_array_append(&ftmodes, mode);
+    }
+
+    ModeHandler *mode = new_mode(modes, xstrdup(name), &normal_commands);
+    mode->insert_text_for_unicode_range = !has_flag(a, 'u');
+    mode->fallthrough_modes = ftmodes;
     return true;
 }
 
@@ -979,6 +1045,18 @@ search_bwd:
 
 not_found:
     return error_msg("No matching bracket found");
+}
+
+static bool cmd_mode(EditorState *e, const CommandArgs *a)
+{
+    const char *name = a->args[0];
+    ModeHandler *handler = get_mode_handler(&e->modes, name);
+    if (!handler) {
+        return error_msg("unknown mode '%s'", name);
+    }
+
+    push_input_mode(e, handler);
+    return true;
 }
 
 static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
@@ -1663,7 +1741,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
             if (!has_flag(a, 'p')) {
                 return error_msg("No filename");
             }
-            set_input_mode(e, INPUT_COMMAND);
+            push_input_mode(e, e->command_mode);
             cmdline_set_text(&e->cmdline, "save ");
             return true;
         }
@@ -1823,16 +1901,23 @@ static bool cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
     Window *window = e->window;
     View *view = e->view;
     long max = view->buffer->nl - window->edit_h + 1;
+
+    long count;
     if (view->vy < max && max > 0) {
-        long count = window->edit_h - 1;
+        bool half = has_flag(a, 'h');
+        unsigned int shift = half & 1;
+        count = (window->edit_h - 1) >> shift;
         if (view->vy + count > max) {
             count = max - view->vy;
         }
         view->vy += count;
-        move_down(view, count);
     } else if (view->cy < view->buffer->nl) {
-        move_down(view, view->buffer->nl - view->cy);
+        count = view->buffer->nl - view->cy;
+    } else {
+        return true;
     }
+
+    move_down(view, count);
     return true;
 }
 
@@ -1841,13 +1926,20 @@ static bool cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     Window *window = e->window;
     View *view = e->view;
+
+    long count;
     if (view->vy > 0) {
-        long count = MIN(window->edit_h - 1, view->vy);
+        bool half = has_flag(a, 'h');
+        unsigned int shift = half & 1;
+        count = MIN((window->edit_h - 1) >> shift, view->vy);
         view->vy -= count;
-        move_up(view, count);
     } else if (view->cy > 0) {
-        move_up(view, view->cy);
+        count = view->cy;
+    } else {
+        return true;
     }
+
+    move_up(view, count);
     return true;
 }
 
@@ -1916,7 +2008,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
 
     search->reverse = has_flag(a, 'r');
     if (!pattern) {
-        set_input_mode(e, INPUT_SEARCH);
+        push_input_mode(e, e->search_mode);
         return true;
     }
 
@@ -2383,7 +2475,7 @@ IGNORE_WARNING("-Wincompatible-pointer-types")
 
 static const Command cmds[] = {
     {"alias", "-", true, 1, 2, cmd_alias},
-    {"bind", "-cns", true, 1, 2, cmd_bind},
+    {"bind", "-cnsT=", true, 1, 2, cmd_bind},
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "cl", false, 0, 0, cmd_bof},
@@ -2400,6 +2492,7 @@ static const Command cmds[] = {
     {"copy", "bikp", false, 0, 1, cmd_copy},
     {"cursor", "", true, 0, 3, cmd_cursor},
     {"cut", "", false, 0, 0, cmd_cut},
+    {"def-mode", "u", true, 1, 16, cmd_def_mode},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "n", false, 0, 0, cmd_delete_eol},
     {"delete-line", "", false, 0, 0, cmd_delete_line},
@@ -2423,6 +2516,7 @@ static const Command cmds[] = {
     {"load-syntax", "", true, 1, 1, cmd_load_syntax},
     {"macro", "", false, 1, 1, cmd_macro},
     {"match-bracket", "", false, 0, 0, cmd_match_bracket},
+    {"mode", "", true, 1, 1, cmd_mode},
     {"move-tab", "", false, 1, 1, cmd_move_tab},
     {"msg", "np", false, 0, 1, cmd_msg},
     {"new-line", "a", false, 0, 0, cmd_new_line},
@@ -2441,8 +2535,8 @@ static const Command cmds[] = {
     {"right", "c", false, 0, 0, cmd_right},
     {"save", "Bbde=fpu", false, 0, 1, cmd_save},
     {"scroll-down", "", false, 0, 0, cmd_scroll_down},
-    {"scroll-pgdown", "", false, 0, 0, cmd_scroll_pgdown},
-    {"scroll-pgup", "", false, 0, 0, cmd_scroll_pgup},
+    {"scroll-pgdown", "h", false, 0, 0, cmd_scroll_pgdown},
+    {"scroll-pgup", "h", false, 0, 0, cmd_scroll_pgup},
     {"scroll-up", "", false, 0, 0, cmd_scroll_up},
     {"search", "Hnprw", false, 0, 1, cmd_search},
     {"select", "kl", false, 0, 0, cmd_select},
@@ -2568,19 +2662,19 @@ const char *find_normal_alias(const char *name, void *userdata)
 
 bool handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
 {
-    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, allow_recording);
+    CommandRunner runner = normal_mode_cmdrunner(e, allow_recording);
     return handle_command(&runner, cmd);
 }
 
 void exec_normal_config(EditorState *e, StringView config)
 {
-    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    CommandRunner runner = normal_mode_cmdrunner(e, false);
     exec_config(&runner, config);
 }
 
 int read_normal_config(EditorState *e, const char *filename, ConfigFlags flags)
 {
-    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    CommandRunner runner = normal_mode_cmdrunner(e, false);
     return read_config(&runner, filename, flags);
 }
 

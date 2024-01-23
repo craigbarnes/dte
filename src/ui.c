@@ -29,7 +29,7 @@ void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum 
 static void update_cursor_style(EditorState *e)
 {
     CursorInputMode mode;
-    if (e->input_mode == INPUT_NORMAL) {
+    if (e->mode->cmds == &normal_commands) {
         bool overwrite = e->buffer->options.overwrite;
         mode = overwrite ? CURSOR_MODE_OVERWRITE : CURSOR_MODE_INSERT;
     } else {
@@ -70,18 +70,12 @@ void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_tit
 void restore_cursor(EditorState *e)
 {
     unsigned int x, y;
-    switch (e->input_mode) {
-    case INPUT_NORMAL:
+    if (e->mode->cmds == &normal_commands) {
         x = e->window->edit_x + e->view->cx_display - e->view->vx;
         y = e->window->edit_y + e->view->cy - e->view->vy;
-        break;
-    case INPUT_COMMAND:
-    case INPUT_SEARCH:
+    } else {
         x = e->cmdline_x;
         y = e->terminal.height - 1;
-        break;
-    default:
-        BUG("unhandled input mode");
     }
     term_move_cursor(&e->terminal.obuf, x, y);
 }

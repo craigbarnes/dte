@@ -18,7 +18,7 @@
 static void test_parse_command_arg(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e, false);
     ASSERT_PTREQ(runner.userdata, e);
     ASSERT_PTREQ(runner.cmds, &normal_commands);
     EXPECT_PTREQ(runner.lookup_alias, find_normal_alias);
@@ -191,7 +191,7 @@ static void test_parse_command_arg(TestContext *ctx)
 static void test_parse_commands(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e, false);
     PointerArray array = PTR_ARRAY_INIT;
     EXPECT_EQ(parse_commands(&runner, &array, " left  -c;;"), CMDERR_NONE);
     ASSERT_EQ(array.count, 5);
@@ -279,7 +279,7 @@ static void test_find_normal_command(TestContext *ctx)
 static void test_parse_args(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e, false);
     const CommandSet *cmds = runner.cmds;
     const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
     PointerArray array = PTR_ARRAY_INIT;
@@ -414,7 +414,7 @@ static void test_parse_args(TestContext *ctx)
 static void test_cached_command_new(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e, false);
     const CommandSet *cmds = runner.cmds;
     const char cmd_str[] = "open -t -e UTF-8 file.c inc.h";
     CachedCommand *cc = cached_command_new(&runner, cmd_str);

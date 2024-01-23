@@ -14,7 +14,9 @@
 #include "commands.h"
 #include "compiler.h"
 #include "config.h"
+#include "exec.h"
 #include "filetype.h"
+#include "mode.h"
 #include "options.h"
 #include "show.h"
 #include "syntax/color.h"
@@ -25,6 +27,7 @@
 #include "util/arith.h"
 #include "util/array.h"
 #include "util/ascii.h"
+#include "util/bit.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/intmap.h"
@@ -129,7 +132,7 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
 {
     StringView esc = cs->escaped;
     if (strview_has_prefix(&esc, "~/")) {
-        CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+        CommandRunner runner = normal_mode_cmdrunner(e, false);
         char *str = parse_command_arg(&runner, esc.data, esc.length, false);
         const char *slash = strrchr(str, '/');
         BUG_ON(!slash);
@@ -179,7 +182,7 @@ static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const ch
 
 void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *prefix)
 {
-    collect_bound_keys(&e->modes[INPUT_NORMAL].key_bindings, a, prefix);
+    collect_bound_keys(&e->normal_mode->key_bindings, a, prefix);
 }
 
 void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
@@ -225,24 +228,28 @@ static void complete_alias(EditorState *e, const CommandArgs *a)
 
 static void complete_bind(EditorState *e, const CommandArgs *a)
 {
-    static const char flags[] = {
-        [INPUT_NORMAL] = 'n',
-        [INPUT_COMMAND] = 'c',
-        [INPUT_SEARCH] = 's',
-    };
-
-    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->modes));
-    InputMode mode = INPUT_NORMAL;
-    for (size_t i = 0, count = 0; i < ARRAYLEN(flags); i++) {
-        if (cmdargs_has_flag(a, flags[i])) {
-            if (++count >= 2) {
-                return; // Don't complete bindings for multiple modes
-            }
-            mode = i;
-        }
+    if (u64_popcount(a->flag_set) > 1 || a->nr_flag_args > 1) {
+        // Don't complete bindings for multiple modes
+        return;
     }
 
-    const IntMap *key_bindings = &e->modes[mode].key_bindings;
+    const ModeHandler *mode;
+    if (cmdargs_has_flag(a, 'c')) {
+        mode = e->command_mode;
+    } else if (cmdargs_has_flag(a, 's')) {
+        mode = e->search_mode;
+    } else if (cmdargs_has_flag(a, 'T')) {
+        BUG_ON(a->nr_flag_args != 1);
+        BUG_ON(a->flags[0] != 'T');
+        mode = get_mode_handler(&e->modes, a->args[0]);
+        if (!mode) {
+            return;
+        }
+    } else {
+        mode = e->normal_mode;
+    }
+
+    const IntMap *key_bindings = &mode->key_bindings;
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         collect_bound_keys(key_bindings, &cs->completions, cs->parsed);
@@ -254,7 +261,7 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
     }
 
     KeyCode key;
-    if (!parse_key_string(&key, a->args[0])) {
+    if (!parse_key_string(&key, a->args[a->nr_flag_args])) {
         return;
     }
     const CachedCommand *cmd = lookup_binding(key_bindings, key);
@@ -309,6 +316,34 @@ static void complete_cursor(EditorState *e, const CommandArgs *a)
         if (str_has_prefix(rgb_example, cs->parsed)) {
             ptr_array_append(&cs->completions, xstrdup(rgb_example));
         }
+    }
+}
+
+static void complete_def_mode(EditorState *e, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        return;
+    }
+
+    CompletionState *cs = &e->cmdline.completion;
+    PointerArray *completions = &cs->completions;
+    const char *prefix = cs->parsed;
+
+    for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
+        const char *name = it.entry->key;
+        const ModeHandler *mode = it.entry->value;
+        if (!str_has_prefix(name, prefix)) {
+            continue;
+        }
+        if (mode->cmds != &normal_commands) {
+            // Exclude command/search mode
+            continue;
+        }
+        if (string_array_contains_str(a->args + 1 + a->nr_flag_args, name)) {
+            // Exclude modes already specified in a previous argument
+            continue;
+        }
+        ptr_array_append(completions, xstrdup(name));
     }
 }
 
@@ -368,6 +403,16 @@ static void complete_macro(EditorState *e, const CommandArgs *a)
 
     CompletionState *cs = &e->cmdline.completion;
     COLLECT_STRINGS(verbs, &cs->completions, cs->parsed);
+}
+
+static void complete_mode(EditorState *e, const CommandArgs *a)
+{
+    if (a->nr_args != 0) {
+        return;
+    }
+
+    CompletionState *cs = &e->cmdline.completion;
+    collect_hashmap_keys(&e->modes, &cs->completions, cs->parsed);
 }
 
 static void complete_move_tab(EditorState *e, const CommandArgs *a)
@@ -502,12 +547,14 @@ static const CompletionHandler completion_handlers[] = {
     {"cd", complete_cd},
     {"compile", complete_compile},
     {"cursor", complete_cursor},
+    {"def-mode", complete_def_mode},
     {"errorfmt", complete_errorfmt},
     {"exec", complete_exec},
     {"ft", complete_ft},
     {"hi", complete_hi},
     {"include", complete_include},
     {"macro", complete_macro},
+    {"mode", complete_mode},
     {"move-tab", complete_move_tab},
     {"open", complete_open},
     {"option", complete_option},
@@ -603,6 +650,25 @@ static bool collect_command_flags (
     return true;
 }
 
+static void collect_command_flag_args (
+    EditorState *e,
+    PointerArray *array,
+    const char *prefix,
+    const char *cmd,
+    const CommandArgs *a
+) {
+    char flag = a->flags[0];
+    if (streq(cmd, "bind")) {
+        WARN_ON(flag != 'T');
+        collect_hashmap_keys(&e->modes, array, prefix);
+    } else if (streq(cmd, "exec")) {
+        int fd = (flag == 'i') ? 0 : (flag == 'o' ? 1 : 2);
+        WARN_ON(fd == 2 && flag != 'e');
+        collect_exec_actions(array, prefix, fd);
+    }
+    // TODO: Completions for `open -e` and `save -e`
+}
+
 static void collect_completions(EditorState *e, char **args, size_t argc)
 {
     CompletionState *cs = &e->cmdline.completion;
@@ -622,7 +688,8 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
         }
     }
 
-    const Command *cmd = find_normal_command(args[0]);
+    const char *cmdname = args[0];
+    const Command *cmd = find_normal_command(cmdname);
     if (!cmd) {
         return;
     }
@@ -630,6 +697,12 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
     char **args_copy = copy_string_array(args + 1, argc - 1);
     CommandArgs a = cmdargs_new(args_copy);
     ArgParseError err = do_parse_args(cmd, &a);
+
+    if (err == ARGERR_OPTION_ARGUMENT_MISSING) {
+        collect_command_flag_args(e, arr, prefix, cmdname, &a);
+        goto out;
+    }
+
     bool dash = (prefix[0] == '-');
     if (
         (err != ARGERR_NONE && err != ARGERR_TOO_FEW_ARGUMENTS)
@@ -646,10 +719,10 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
         goto out;
     }
 
-    const CompletionHandler *h = BSEARCH(args[0], completion_handlers, vstrcmp);
+    const CompletionHandler *h = BSEARCH(cmdname, completion_handlers, vstrcmp);
     if (h) {
         h->complete(e, &a);
-    } else if (streq(args[0], "repeat")) {
+    } else if (streq(cmdname, "repeat")) {
         if (a.nr_args == 1) {
             collect_normal_commands(arr, prefix);
         } else if (a.nr_args >= 2) {
@@ -707,7 +780,7 @@ static int strptrcmp(const void *v1, const void *v2)
 static void init_completion(EditorState *e, const CommandLine *cmdline)
 {
     CompletionState *cs = &e->cmdline.completion;
-    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e, false);
     BUG_ON(cs->orig);
     BUG_ON(runner.userdata != e);
     BUG_ON(!runner.lookup_alias);

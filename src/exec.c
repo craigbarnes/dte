@@ -64,6 +64,21 @@ ExecAction lookup_exec_action(const char *name, int fd)
     return (i >= 0 && (exec_map[i].flags & 1u << fd)) ? i : EXEC_INVALID;
 }
 
+void collect_exec_actions(PointerArray *a, const char *prefix, int fd)
+{
+    if (unlikely(fd < 0 || fd > 2)) {
+        return;
+    }
+
+    unsigned int flag = 1u << fd;
+    for (size_t i = 0; i < ARRAYLEN(exec_map); i++) {
+        const char *action = exec_map[i].name;
+        if ((exec_map[i].flags & flag) && str_has_prefix(action, prefix)) {
+            ptr_array_append(a, xstrdup(action));
+        }
+    }
+}
+
 static void open_files_from_string(EditorState *e, const String *str)
 {
     PointerArray filenames = PTR_ARRAY_INIT;

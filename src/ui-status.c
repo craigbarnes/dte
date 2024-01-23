@@ -8,7 +8,7 @@ void update_status_line(const Window *window)
     const GlobalOptions *opts = &e->options;
     const char *lfmt = opts->statusline_left;
     const char *rfmt = opts->statusline_right;
-    InputMode mode = e->input_mode;
+    const ModeHandler *mode = e->mode;
     char lbuf[512], rbuf[512];
     size_t lw = sf_format(window, opts, mode, lbuf, sizeof lbuf, lfmt);
     size_t rw = sf_format(window, opts, mode, rbuf, sizeof rbuf, rfmt);

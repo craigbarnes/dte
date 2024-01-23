@@ -6,6 +6,7 @@
 #include "editor.h"
 #include "spawn.h"
 #include "util/macros.h"
+#include "util/ptr-array.h"
 
 typedef enum {
     EXEC_INVALID = -1,
@@ -33,5 +34,6 @@ ssize_t handle_exec (
 ) NONNULL_ARGS;
 
 ExecAction lookup_exec_action(const char *name, int fd) NONNULL_ARGS;
+void collect_exec_actions(PointerArray *a, const char *prefix, int fd) NONNULL_ARGS;
 
 #endif

@@ -17,7 +17,7 @@ typedef struct {
     size_t separator;
     const Window *window;
     const GlobalOptions *opts;
-    InputMode input_mode;
+    const ModeHandler *mode;
 } Formatter;
 
 enum {
@@ -37,6 +37,7 @@ typedef enum {
     STATUS_TOTAL_ROWS,
     STATUS_BOM,
     STATUS_FILENAME,
+    STATUS_INPUT_MODE,
     STATUS_MODIFIED,
     STATUS_LINE_ENDING,
     STATUS_OVERWRITE,
@@ -61,6 +62,7 @@ static FormatSpecifierType lookup_format_specifier(unsigned char ch)
     case 'Y': return STATUS_TOTAL_ROWS;
     case 'b': return STATUS_BOM;
     case 'f': return STATUS_FILENAME;
+    case 'i': return STATUS_INPUT_MODE;
     case 'm': return STATUS_MODIFIED;
     case 'n': return STATUS_LINE_ENDING;
     case 'o': return STATUS_OVERWRITE;
@@ -209,7 +211,7 @@ static void add_misc_status(Formatter *f)
         [CSS_AUTO] = {STRN("[case-sensitive = auto]")},
     };
 
-    if (f->input_mode == INPUT_SEARCH) {
+    if (f->mode->cmds == &search_mode_commands) {
         SearchCaseSensitivity css = f->opts->case_sensitive_search;
         BUG_ON(css >= ARRAYLEN(css_strs));
         add_status_bytes(f, css_strs[css].str, css_strs[css].len);
@@ -242,6 +244,9 @@ static void expand_format_specifier(Formatter *f, FormatSpecifierType type)
         return;
     case STATUS_FILENAME:
         add_status_str(f, buffer_filename(buffer));
+        return;
+    case STATUS_INPUT_MODE:
+        add_status_str(f, f->mode->name);
         return;
     case STATUS_MODIFIED:
         if (buffer_modified(buffer)) {
@@ -318,7 +323,7 @@ static void expand_format_specifier(Formatter *f, FormatSpecifierType type)
 size_t sf_format (
     const Window *window,
     const GlobalOptions *opts,
-    InputMode mode,
+    const ModeHandler *mode,
     char *buf, // NOLINT(readability-non-const-parameter)
     size_t size,
     const char *format
@@ -327,7 +332,7 @@ size_t sf_format (
     Formatter f = {
         .window = window,
         .opts = opts,
-        .input_mode = mode,
+        .mode = mode,
         .buf = buf,
         .size = size - SEPARATOR_WRITE_SIZE - UTF8_MAX_SEQ_LEN - 1,
     };

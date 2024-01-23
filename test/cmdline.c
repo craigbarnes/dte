@@ -13,8 +13,8 @@ static void test_command_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     CommandLine *c = &e->cmdline;
-    set_input_mode(e, INPUT_COMMAND);
-    EXPECT_EQ(e->input_mode, INPUT_COMMAND);
+    push_input_mode(e, e->command_mode);
+    EXPECT_PTREQ(e->mode, e->command_mode);
 
     EXPECT_TRUE(handle_input(e, 'a'));
     EXPECT_EQ(c->pos, 1);
@@ -24,9 +24,9 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_EQ(c->pos, 5);
     EXPECT_STRING_EQ(c->buf, "a\xF0\x9F\xA6\x99");
 
-    CommandRunner runner = cmdrunner_for_mode(e, INPUT_COMMAND, false);
+    CommandRunner runner = cmdrunner(e, &cmd_mode_commands, false);
     EXPECT_PTREQ(runner.userdata, e);
-    EXPECT_PTREQ(runner.cmds, e->modes[INPUT_COMMAND].cmds);
+    EXPECT_PTREQ(runner.cmds, &cmd_mode_commands);
     EXPECT_NULL(runner.lookup_alias);
     EXPECT_EQ(runner.recursion_count, 0);
     EXPECT_FALSE(runner.allow_recording);
@@ -110,7 +110,7 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_EQ(c->pos, 0);
     EXPECT_NULL(c->search_pos);
     EXPECT_EQ(c->buf.len, 0);
-    EXPECT_EQ(e->input_mode, INPUT_NORMAL);
+    EXPECT_PTREQ(e->mode, e->normal_mode);
 
     string_free(&c->buf);
     EXPECT_NULL(c->buf.buffer);
@@ -141,6 +141,21 @@ static void test_complete_command(TestContext *ctx)
     cmdline_set_text(c, "bind -cs ");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "bind -cs ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -c -T search ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -c -T search ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -T ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -T command");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -T se");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -T search ");
     reset_completion(c);
 
     cmdline_set_text(c, "wrap");
@@ -384,6 +399,10 @@ static void test_complete_command(TestContext *ctx)
     cmdline_set_text(c, "exec -o");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "exec -o ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -o buffer");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -o eval");
     reset_completion(c);
 
     cmdline_set_text(c, "exec -- -");
@@ -482,6 +501,11 @@ static void test_complete_command_extra(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "bind -s C-g ");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "bind -s C-g cancel ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -T command tab ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -T command tab complete-next ");
     reset_completion(c);
 
     cmdline_set_text(c, "compile -1s bas");

@@ -212,7 +212,8 @@ static void test_macro_record(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     CommandMacroState *m = &e->macro;
-    EXPECT_EQ(e->input_mode, INPUT_NORMAL);
+    EXPECT_PTREQ(e->mode->cmds, &normal_commands);
+
     EXPECT_EQ(m->macro.count, 0);
     EXPECT_EQ(m->prev_macro.count, 0);
     EXPECT_FALSE(macro_is_recording(m));

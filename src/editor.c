@@ -10,20 +10,14 @@
 #include "editor.h"
 #include "bind.h"
 #include "bookmark.h"
-#include "command/macro.h"
-#include "commands.h"
 #include "compiler.h"
 #include "encoding.h"
 #include "error.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "lock.h"
-#include "mode.h"
-#include "regexp.h"
-#include "search.h"
 #include "signals.h"
 #include "syntax/syntax.h"
-#include "tag.h"
 #include "terminal/color.h"
 #include "terminal/input.h"
 #include "terminal/key.h"
@@ -31,9 +25,9 @@
 #include "terminal/output.h"
 #include "terminal/paste.h"
 #include "ui.h"
-#include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/intern.h"
+#include "util/intmap.h"
 #include "util/log.h"
 #include "util/xmalloc.h"
 #include "util/xstdio.h"
@@ -79,7 +73,6 @@ EditorState *init_editor_state(void)
     EditorState *e = xnew(EditorState, 1);
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
-        .input_mode = INPUT_NORMAL,
         .version = VERSION,
         .command_history = {
             .max_entries = 512,
@@ -92,11 +85,6 @@ EditorState *init_editor_state(void)
             [CURSOR_MODE_INSERT] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
             [CURSOR_MODE_OVERWRITE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
             [CURSOR_MODE_CMDLINE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
-        },
-        .modes = {
-            [INPUT_NORMAL] = {.cmds = &normal_commands},
-            [INPUT_COMMAND] = {.cmds = &cmd_mode_commands},
-            [INPUT_SEARCH] = {.cmds = &search_mode_commands},
         },
         .options = {
             .auto_indent = true,
@@ -134,12 +122,6 @@ EditorState *init_editor_state(void)
     };
 
     sanity_check_global_options(&e->options);
-
-    for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
-        const CommandSet *cmds = e->modes[i].cmds;
-        BUG_ON(!cmds);
-        BUG_ON(!cmds->lookup);
-    }
 
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
@@ -185,10 +167,24 @@ EditorState *init_editor_state(void)
     term_input_init(&e->terminal.ibuf);
     term_output_init(&e->terminal.obuf);
     hashmap_init(&e->aliases, 32);
-    intmap_init(&e->modes[INPUT_NORMAL].key_bindings, 150);
-    intmap_init(&e->modes[INPUT_COMMAND].key_bindings, 40);
-    intmap_init(&e->modes[INPUT_SEARCH].key_bindings, 40);
+
+    HashMap *modes = &e->modes;
+    e->normal_mode = new_mode(modes, xstrdup("normal"), &normal_commands);
+    e->command_mode = new_mode(modes, xstrdup("command"), &cmd_mode_commands);
+    e->search_mode = new_mode(modes, xstrdup("search"), &search_mode_commands);
+    e->mode = e->normal_mode;
+    intmap_init(&e->normal_mode->key_bindings, 150);
+    intmap_init(&e->command_mode->key_bindings, 40);
+    intmap_init(&e->search_mode->key_bindings, 40);
+
     return e;
+}
+
+static void free_mode_handler(ModeHandler *handler)
+{
+    ptr_array_free_array(&handler->fallthrough_modes);
+    free_bindings(&handler->key_bindings);
+    free(handler);
 }
 
 void free_editor_state(EditorState *e)
@@ -211,12 +207,9 @@ void free_editor_state(EditorState *e)
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
     hashmap_free(&e->compilers, FREE_FUNC(free_compiler));
+    hashmap_free(&e->modes, FREE_FUNC(free_mode_handler));
     hashmap_free(&e->styles.other, free);
     hashmap_free(&e->aliases, free);
-
-    for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
-        free_bindings(&e->modes[i].key_bindings);
-    }
 
     free_interned_strings();
     free_interned_regexps();

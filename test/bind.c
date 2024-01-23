@@ -11,7 +11,8 @@
 static void test_add_binding(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    IntMap *bindings = &e->modes[INPUT_NORMAL].key_bindings;
+    // TODO: Use a temporary IntMap, instead of normal mode bindings?
+    IntMap *bindings = &e->normal_mode->key_bindings;
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F12;
     const CachedCommand *bind = lookup_binding(bindings, key);
     EXPECT_NULL(bind);
@@ -20,7 +21,7 @@ static void test_add_binding(TestContext *ctx)
     ASSERT_NONNULL(insert_cmd);
 
     static const char cmd_str[] = "insert xyz";
-    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    CommandRunner runner = normal_mode_cmdrunner(e, false);
     CachedCommand *cc = cached_command_new(&runner, cmd_str);
     ASSERT_NONNULL(cc);
 
@@ -45,8 +46,8 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_TRUE(handle_normal_command(e, "open; bind C-S-F11 'insert -m zzz'", false));
 
     // Bound command should be cached
-    InputMode mode = INPUT_NORMAL;
-    const IntMap *bindings = &e->modes[mode].key_bindings;
+    const ModeHandler *mode = e->normal_mode;
+    const IntMap *bindings = &mode->key_bindings;
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F11;
     const CachedCommand *binding = lookup_binding(bindings, key);
     ASSERT_NONNULL(binding);

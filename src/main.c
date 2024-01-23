@@ -287,8 +287,9 @@ static void log_config_counts(const EditorState *e)
     }
 
     size_t nbinds = 0;
-    for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
-        nbinds += e->modes[i].key_bindings.count;
+    for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
+        const ModeHandler *mode = it.entry->value;
+        nbinds += mode->key_bindings.count;
     }
 
     size_t nerrorfmts = 0;

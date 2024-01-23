@@ -23,6 +23,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"alias 'x y' up", "invalid byte in alias name"},
         {"alias open close", "can't replace existing command"},
         {"bind C-C-C", "invalid key string"},
+        {"bind -T invalid-mode C-k eol", "can't bind key in unknown mode"},
         {"cd", "too few arguments"},
         {"cd ''", "directory argument cannot be empty"},
         {"cd /non-existent/dir/_x_29_", "changing directory failed"},
@@ -30,6 +31,10 @@ static void test_normal_command_errors(TestContext *ctx)
         {"cursor xyz bar #f40", "invalid mode argument"},
         {"cursor insert _ #f40", "invalid cursor type"},
         {"cursor insert bar blue", "invalid cursor color"},
+        {"def-mode normal", "mode 'normal' already exists"},
+        {"def-mode command", "mode 'command' already exists"},
+        {"def-mode search", "mode 'search' already exists"},
+        {"def-mode _m; def-mode _m", "mode '_m' already exists"},
         {"errorfmt x (re) zz", "unknown substring name"},
         {"errorfmt x (re) file line", "invalid substring count"},
         {"exec -s sh -c 'kill -s USR1 $$'", "child received signal"},
@@ -139,7 +144,7 @@ static void test_normal_command_errors(TestContext *ctx)
     // Special case errors produced by run_command():
     // ----------------------------------------------
 
-    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    CommandRunner runner = normal_mode_cmdrunner(e, false);
     runner.lookup_alias = NULL;
     clear_error();
     EXPECT_FALSE(handle_command(&runner, "_xyz"));

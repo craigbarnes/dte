@@ -12,6 +12,7 @@
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
+#include "mode.h"
 #include "msg.h"
 #include "options.h"
 #include "regexp.h"
@@ -22,7 +23,6 @@
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
-#include "util/intmap.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -36,20 +36,13 @@ typedef enum {
     EDITOR_EXIT_MAX = 125,
 } EditorStatus;
 
-typedef enum {
-    INPUT_NORMAL,
-    INPUT_COMMAND,
-    INPUT_SEARCH,
-} InputMode;
-
-typedef struct {
-    const CommandSet *cmds;
-    IntMap key_bindings;
-} ModeHandler;
-
 typedef struct EditorState {
     EditorStatus status;
-    InputMode input_mode;
+    ModeHandler *mode; // Current mode
+    ModeHandler *prev_mode; // Mode to use after leaving command/search mode
+    ModeHandler *normal_mode;
+    ModeHandler *command_mode;
+    ModeHandler *search_mode;
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;
@@ -62,11 +55,11 @@ typedef struct EditorState {
     bool cursor_style_changed;
     bool session_leader;
     size_t cmdline_x;
-    ModeHandler modes[3];
     Clipboard clipboard;
     TagFile tagfile;
     HashMap aliases;
     HashMap compilers;
+    HashMap modes;
     HashMap syntaxes;
     StyleMap styles;
     CommandMacroState macro;
@@ -92,23 +85,48 @@ static inline void mark_everything_changed(EditorState *e)
     e->everything_changed = true;
 }
 
-static inline void set_input_mode(EditorState *e, InputMode mode)
+static inline void set_input_mode(EditorState *e, ModeHandler *mode)
 {
-    e->cursor_style_changed = true;
-    e->input_mode = mode;
+    if (e->mode != mode) {
+        e->mode = mode;
+        e->cursor_style_changed = true;
+    }
 }
 
-static inline CommandRunner cmdrunner_for_mode(EditorState *e, InputMode mode, bool allow_recording)
+static inline void push_input_mode(EditorState *e, ModeHandler *mode)
 {
-    BUG_ON(mode >= ARRAYLEN(e->modes));
-    CommandRunner runner = {
-        .cmds = e->modes[mode].cmds,
-        .lookup_alias = (mode == INPUT_NORMAL) ? find_normal_alias : NULL,
+    if (e->mode->cmds == &normal_commands) {
+        // Save the previous mode only when entering command/search mode, so
+        // that the previously active mode can be returned to on accept/cancel
+        // (regardless of edge cases like e.g. running `command; command`)
+        e->prev_mode = e->mode;
+    }
+    set_input_mode(e, mode);
+}
+
+static inline void pop_input_mode(EditorState *e)
+{
+    BUG_ON(!e->prev_mode);
+    set_input_mode(e, e->prev_mode);
+}
+
+static inline CommandRunner cmdrunner (
+    EditorState *e,
+    const CommandSet *cmds,
+    bool allow_recording
+) {
+    return (CommandRunner) {
+        .cmds = cmds,
+        .lookup_alias = (cmds == &normal_commands) ? find_normal_alias : NULL,
         .home_dir = &e->home_dir,
         .allow_recording = allow_recording,
         .userdata = e,
     };
-    return runner;
+}
+
+static inline CommandRunner normal_mode_cmdrunner(EditorState *e, bool allow_recording)
+{
+    return cmdrunner(e, &normal_commands, allow_recording);
 }
 
 EditorState *init_editor_state(void) RETURNS_NONNULL;

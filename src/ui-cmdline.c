@@ -68,24 +68,18 @@ static size_t print_command(Terminal *term, const StyleMap *styles, const Comman
 void update_command_line(EditorState *e)
 {
     Terminal *term = &e->terminal;
-    char prefix = ':';
     term_output_reset(term, 0, term->width, 0);
     term_move_cursor(&term->obuf, 0, term->height - 1);
-    switch (e->input_mode) {
-    case INPUT_NORMAL: {
+
+    if (e->mode->cmds == &normal_commands) {
         bool msg_is_error;
         const char *msg = get_msg(&msg_is_error);
         print_message(term, &e->styles, msg, msg_is_error);
-        break;
-    }
-    case INPUT_SEARCH:
-        prefix = e->search.reverse ? '?' : '/';
-        // Fallthrough
-    case INPUT_COMMAND:
+    } else {
+        bool search_mode = (e->mode->cmds == &search_mode_commands);
+        char prefix = search_mode ? (e->search.reverse ? '?' : '/') : ':';
         e->cmdline_x = print_command(term, &e->styles, &e->cmdline, prefix);
-        break;
-    default:
-        BUG("unhandled input mode");
     }
+
     term_clear_eol(term);
 }

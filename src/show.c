@@ -18,6 +18,7 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
+#include "mode.h"
 #include "msg.h"
 #include "options.h"
 #include "syntax/color.h"
@@ -78,7 +79,7 @@ static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag
     }
 
     if (cflag) {
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_set_text(&e->cmdline, cmd_str);
     } else {
         info_msg("%s is aliased to: %s", alias_name, cmd_str);
@@ -104,14 +105,14 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
         return error_msg("%s is not a bindable key", keystr);
     }
 
-    const CachedCommand *b = lookup_binding(&e->modes[INPUT_NORMAL].key_bindings, key);
+    const CachedCommand *b = lookup_binding(&e->normal_mode->key_bindings, key);
     if (!b) {
         info_msg("%s is not bound to a command", keystr);
         return true;
     }
 
     if (cflag) {
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_set_text(&e->cmdline, b->cmd_str);
     } else {
         info_msg("%s is bound to: %s", keystr, b->cmd_str);
@@ -130,7 +131,7 @@ static bool show_color(EditorState *e, const char *name, bool cflag)
 
     if (cflag) {
         CommandLine *c = &e->cmdline;
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_clear(c);
         string_append_hl_style(&c->buf, name, hl);
         c->pos = c->buf.len;
@@ -158,7 +159,7 @@ static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
     if (cflag) {
         char buf[64];
         xsnprintf(buf, sizeof buf, "cursor %s %s %s", mode_str, type, color);
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_set_text(&e->cmdline, buf);
     } else {
         info_msg("cursor '%s' is set to: %s %s", mode_str, type, color);
@@ -176,7 +177,7 @@ static bool show_env(EditorState *e, const char *name, bool cflag)
     }
 
     if (cflag) {
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("$%s is set to: %s", name, value);
@@ -262,7 +263,7 @@ static bool show_option(EditorState *e, const char *name, bool cflag)
     }
 
     if (cflag) {
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("%s is set to: %s", name, value);
@@ -302,7 +303,7 @@ static bool show_wsplit(EditorState *e, const char *name, bool cflag)
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 
     if (cflag) {
-        set_input_mode(e, INPUT_COMMAND);
+        push_input_mode(e, e->command_mode);
         cmdline_set_text(&e->cmdline, buf);
     } else {
         info_msg("current window dimensions: %s", buf);
@@ -372,22 +373,94 @@ static String dump_normal_aliases(EditorState *e)
     return buf;
 }
 
+typedef struct {
+    const char *name;
+    const ModeHandler *handler;
+} ModeHandlerEntry;
+
+static int mhe_cmp(const void *ap, const void *bp)
+{
+    const ModeHandlerEntry *a = ap;
+    const ModeHandlerEntry *b = bp;
+    return strcmp(a->name, b->name);
+}
+
+static bool is_builtin_mode(const EditorState *e, const ModeHandler *m)
+{
+    return m == e->normal_mode || m == e->command_mode || m == e->search_mode;
+}
+
 static String dump_all_bindings(EditorState *e)
 {
-    static const char flags[][4] = {
-        [INPUT_NORMAL] = "",
-        [INPUT_COMMAND] = "-c ",
-        [INPUT_SEARCH] = "-s ",
-    };
-
-    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->modes));
     String buf = string_new(4096);
-    for (InputMode i = 0, n = ARRAYLEN(e->modes); i < n; i++) {
-        const IntMap *bindings = &e->modes[i].key_bindings;
-        if (dump_bindings(bindings, flags[i], &buf) && i != n - 1) {
-            string_append_byte(&buf, '\n');
-        }
+    if (dump_bindings(&e->normal_mode->key_bindings, "", &buf)) {
+        string_append_byte(&buf, '\n');
     }
+
+    size_t count = e->modes.count;
+    BUG_ON(count < 3);
+    count -= 3;
+
+    if (count) {
+        // Clone custom modes in HashMap as an array
+        ModeHandlerEntry *array = xnew(ModeHandlerEntry, count);
+        size_t n = 0;
+        for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
+            const char *name = it.entry->key;
+            const ModeHandler *handler = it.entry->value;
+            if (is_builtin_mode(e, handler)) {
+                continue;
+            }
+            array[n++] = (ModeHandlerEntry) {
+                .name = name,
+                .handler = handler,
+            };
+        }
+
+        // Sort the array
+        BUG_ON(n != count);
+        qsort(array, count, sizeof(array[0]), mhe_cmp);
+
+        // Serialize bindings for each mode, sorted by mode name
+        for (size_t i = 0; i < count; i++) {
+            const char *name = array[i].name;
+            const ModeHandler *handler = array[i].handler;
+            const IntMap *bindings = &handler->key_bindings;
+            if (dump_bindings(bindings, name, &buf)) {
+                string_append_byte(&buf, '\n');
+            }
+        }
+
+        free(array);
+    }
+
+    dump_bindings(&e->command_mode->key_bindings, "-c ", &buf);
+    string_append_byte(&buf, '\n');
+    dump_bindings(&e->search_mode->key_bindings, "-s ", &buf);
+    return buf;
+}
+
+static String dump_modes(EditorState *e)
+{
+    String buf = string_new(256);
+
+    // TODO: Serialize in alphabetical order, instead of table order?
+    for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
+        const ModeHandler *mode = it.entry->value;
+        string_append_literal(&buf, "def-mode ");
+        if (!mode->insert_text_for_unicode_range) {
+            string_append_literal(&buf, "-u ");
+        }
+        string_append_cstring(&buf, mode->name);
+        const PointerArray *ftmodes = &mode->fallthrough_modes;
+        for (size_t i = 0, n = ftmodes->count; i < n; i++) {
+            const ModeHandler *ftmode = ftmodes->ptrs[i];
+            string_append_byte(&buf, ' ');
+            string_append_cstring(&buf, ftmode->name);
+        }
+        string_append_byte(&buf, '\n');
+    }
+
     return buf;
 }
 
@@ -487,6 +560,7 @@ static const ShowHandler show_handlers[] = {
     {"color", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
     {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
     {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
+    {"def-mode", DTERC, dump_modes, NULL, NULL},
     {"env", 0, dump_env, show_env, collect_env},
     {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
     {"ft", DTERC, do_dump_filetypes, NULL, NULL},

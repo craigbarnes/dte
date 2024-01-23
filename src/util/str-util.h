@@ -172,6 +172,16 @@ static inline bool string_array_contains_prefix(char **strs, const char *prefix)
     return false;
 }
 
+static inline bool string_array_contains_str(char **strs, const char *str)
+{
+    for (size_t i = 0; strs[i]; i++) {
+        if (streq(strs[i], str)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static inline char **copy_string_array(char **src, size_t count)
 {
     char **dst = xnew(char*, count + 1);

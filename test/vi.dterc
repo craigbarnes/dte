@@ -1,0 +1,160 @@
+alias w 'save'
+alias q 'quit'
+alias q! 'quit -f'
+alias wq 'save; quit'
+
+# Show current mode in the statusline (%i)
+set statusline-left ' %i%S%f%s%m%s%r%s%M'
+
+# Create "vi-normal" mode, with text insertion for normal keys disabled (-u)
+def-mode -u vi-normal
+
+# Go into "vi-normal" mode at startup
+mode vi-normal
+
+# Create "vi-insert" mode, which "falls through" to dte's built-in "normal"
+# mode for unbound keys (note: the ability to remove/rename built-in modes
+# will be implemented eventually, to avoid confusion with e.g. "normal" vs
+# "vi-normal")
+def-mode vi-insert normal
+bind -T vi-insert ^[ 'mode vi-normal'
+
+# Create an alias for setting up bindings, to minimize verbosity below
+alias nmap 'bind -T vi-normal'
+
+nmap left left
+nmap right right
+nmap up up
+nmap down down
+nmap home bol
+nmap end eol
+nmap pgup pgup
+nmap pgdown pgdown
+nmap delete delete
+nmap a 'right; mode vi-insert'
+nmap b word-bwd
+nmap e word-fwd
+nmap h left
+nmap i 'mode vi-insert'
+nmap j down
+nmap k up
+nmap l right
+nmap n 'search -n'
+nmap o 'new-line; mode vi-insert'
+nmap s 'delete; mode vi-insert'
+nmap u undo
+nmap w 'word-fwd -s'
+nmap x delete
+nmap A 'eol; mode vi-insert'
+nmap C 'delete-eol; mode vi-insert'
+nmap D delete-eol
+nmap I 'bol; bol -t; mode vi-insert'
+nmap J join
+nmap N 'search -p'
+nmap O 'new-line -a; mode vi-insert'
+nmap S 'clear; mode vi-insert'
+nmap X erase
+nmap 0 bol
+nmap space right
+nmap : 'mode command'
+nmap ^ 'bol; bol -t'
+nmap _ 'bol; bol -t'
+nmap -- - 'up; bol; bol -t'
+nmap + 'down; bol; bol -t'
+nmap \$ eol
+nmap | bol
+nmap / search
+nmap ? 'search -r'
+nmap > 'shift 1'
+nmap < 'shift -- -1'
+nmap ~ case
+nmap { blkup
+nmap } blkdown
+nmap % match-bracket
+nmap C-] tag
+nmap C-b pgup
+nmap C-d 'scroll-pgdown -h'
+nmap C-e scroll-down
+nmap C-f pgdown
+nmap C-h left
+nmap C-? left
+nmap C-j down
+nmap C-l refresh
+nmap C-m 'down; bol; bol -t'
+nmap C-u 'scroll-pgup -h'
+nmap enter 'down; bol; bol -t'
+nmap C-n down
+nmap C-p up
+nmap C-t 'tag -r'
+nmap C-y scroll-up
+nmap C-z suspend
+
+
+# The above bindings were "adapted" (subject to my ignorance of vi) from
+# the list at https://hea-www.harvard.edu/~fine/Tech/vi.html. Most of the
+# remainder are listed below, except for a small handful of removed items
+# (deemed not useful or out of scope).
+#
+# Possible improvements (to the editor, to emulate some vi-isms):
+#
+# * Flags for movement commands, to stop e.g. `eol; right -X` from moving
+#   beyond the end of the line.
+# * Support for colorizing the status line, to make the mode indicator more
+#   prominent (among other uses).
+# * The ability to rename or remove modes, e.g. the default "normal" mode
+#   (taking care not to allow "dangling" fallthrough modes).
+# * Allow binding "unmodified" keys, even when `insert_text_for_unicode_range`
+#   is set to `true`. If a binding has been explicitly added for a key that would
+#   otherwise insert text, it can't really have been done by accident and should
+#   probably be respected.
+# * Extend `cursor` command to allow configuring cursor styles for custom modes.
+
+# TODO: Implement these:
+# ------------------------------------------------------------------------------
+# f   find character after cursor in current line   (character to find)
+# F   backwards version of "f"   (character to find)
+# t   same as "f" but cursor moves to just before found character   (character to find)
+# T   backwards version of "t"   (character to find)
+# ;   repeat last "f", "F", "t", or "T" command
+# ,   reverse direction of last "f", "F", "t", or "T" command
+# r   replace single character at cursor   (replacement character expected)
+# E   move to end of Word
+# W   foreward Word
+# H   home cursor - goto first line on screen
+# L   goto last line on screen
+# M   goto middle line on screen
+
+# Implementing repeat counts may be on the table, but it will require specific
+# support in the editor beyond just custom keymaps.
+# TODO: Consider implementing separately, at a later time:
+# ------------------------------------------------------------------------------
+# 1-9 numeric precursor to other commands   ([additional numbers (0-9)] command)
+# G   goto line number prefixed, or goto end if none
+
+# TODO: Decide what to do with these
+# ------------------------------------------------------------------------------
+# c   change command   (cursor motion command)
+# d   delete command   (cursor motion command)
+# m   mark current line and position   (mark character tag (a-z))
+# p   put buffer after cursor
+# y   yank command   (cursor motion command)
+# z   position current line   (CR = top; "." = center; "-"=bottom)
+# B   move back one Word  (N.B.: "word" and "Word" are two different things in vi)
+# P   put buffer before cursor
+# Q   leave visual mode (go into "ex" mode)
+# R   replace mode - replaces through end of current line, then inserts   (text, ESC)
+# U   restores line to state when cursor was moved into it
+# Y   yank entire line
+# !   shell command filter   (cursor motion command, shell command)
+# @   vi eval   (buffer name (a-z))
+# &   repeat last ex substitution (":s ...") not including modifiers
+# (   move to previous sentence
+# )   move to next sentence
+# [   move to previous "{...}" section   ("[")
+# ]   move to next "{...}" section   ("]")
+# '   move to marked line, first non-whitespace   (character tag (a-z))
+# `   move to marked line, memorized column   (character tag (a-z))
+# "   access numbered buffer; load or access lettered buffer   (1-9,a-z)
+# .   repeat last text-changing command
+# ^\  leave visual mode (go into "ex" mode)
+# ^^  switch file buffers

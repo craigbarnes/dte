@@ -28,29 +28,30 @@ void free_bindings(IntMap *bindings)
     intmap_free(bindings, (FreeFunction)cached_command_free);
 }
 
-bool handle_binding(EditorState *e, InputMode mode, KeyCode key)
+bool handle_binding(EditorState *e, const ModeHandler *handler, KeyCode key)
 {
-    const IntMap *bindings = &e->modes[mode].key_bindings;
-    const CachedCommand *binding = lookup_binding(bindings, key);
+    const CachedCommand *binding = lookup_binding(&handler->key_bindings, key);
     if (!binding) {
         return false;
     }
 
+    const CommandSet *cmds = handler->cmds;
+    BUG_ON(!cmds);
+
     // If the command isn't cached or a macro is being recorded
-    const CommandSet *cmds = e->modes[mode].cmds;
     if (!binding->cmd || (cmds->macro_record && macro_is_recording(&e->macro))) {
         // Parse and run command string
-        CommandRunner runner = cmdrunner_for_mode(e, mode, true);
+        CommandRunner runner = cmdrunner(e, cmds, true);
         return handle_command(&runner, binding->cmd_str);
     }
 
     // Command is cached; call it directly
     begin_change(CHANGE_MERGE_NONE);
     current_command = binding->cmd;
-    bool r = binding->cmd->cmd(e, &binding->a);
+    binding->cmd->cmd(e, &binding->a);
     current_command = NULL;
     end_change();
-    return r;
+    return true;
 }
 
 typedef struct {
@@ -102,7 +103,13 @@ bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
     char keystr[KEYCODE_STR_MAX];
     for (size_t i = 0; i < count; i++) {
         string_append_literal(buf, "bind ");
-        string_append_cstring(buf, flag);
+        if (flag[0] != '\0' && flag[0] != '-') {
+            string_append_cstring(buf, "-T ");
+            string_append_escaped_arg(buf, flag, true);
+            string_append_byte(buf, ' ');
+        } else {
+            string_append_cstring(buf, flag);
+        }
         size_t keylen = keycode_to_string(array[i].key, keystr);
         string_append_escaped_arg_sv(buf, string_view(keystr, keylen), true);
         string_append_byte(buf, ' ');

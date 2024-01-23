@@ -70,7 +70,7 @@ static bool cmd_cancel(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     cmdline_clear(c);
-    set_input_mode(e, INPUT_NORMAL);
+    pop_input_mode(e);
     reset_completion(c);
     return true;
 }
@@ -403,7 +403,7 @@ static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     reset_completion(c);
-    set_input_mode(e, INPUT_NORMAL);
+    pop_input_mode(e);
 
     const char *str = string_borrow_cstring(&c->buf);
     cmdline_clear(c);
@@ -473,7 +473,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     current_command = NULL;
     bool found = search_next(e->view, &e->search, e->options.case_sensitive_search);
     cmdline_clear(c);
-    set_input_mode(e, INPUT_NORMAL);
+    pop_input_mode(e);
     return found;
 }
 

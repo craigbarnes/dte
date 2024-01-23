@@ -23,12 +23,17 @@ static void test_sf_format(TestContext *ctx)
     Window window = {.view = &view};
     view.window = &window;
 
+    ModeHandler mode = {
+        .name = "normal",
+        .cmds = &normal_commands,
+    };
+
     char buf[64];
-    size_t width = sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
+    size_t width = sf_format(&window, &opts, &mode, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
     EXPECT_EQ(width, 35);
     EXPECT_STREQ(buf, "% LF 1 0   (No name) ... UTF-8 none");
 
-    width = sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
+    width = sf_format(&window, &opts, &mode, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
     EXPECT_EQ(width, 7);
     EXPECT_STREQ(buf, " LF INS");
 
@@ -36,21 +41,23 @@ static void test_sf_format(TestContext *ctx)
     buffer.crlf_newlines = true;
     buffer.temporary = true;
     buffer.options.overwrite = true;
-    width = sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
+    width = sf_format(&window, &opts, &mode, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
     EXPECT_EQ(width, 21);
     EXPECT_STREQ(buf, "BOM CRLF CRLF TMP OVR");
 
-    width = sf_format(&window, &opts, INPUT_SEARCH, buf, sizeof buf, "%M");
+    mode.name = "search";
+    mode.cmds = &search_mode_commands;
+    width = sf_format(&window, &opts, &mode, buf, sizeof buf, "%M");
     EXPECT_EQ(width, 24);
     EXPECT_STREQ(buf, "[case-sensitive = false]");
 
     opts.case_sensitive_search = CSS_AUTO;
-    width = sf_format(&window, &opts, INPUT_SEARCH, buf, sizeof buf, "%M");
+    width = sf_format(&window, &opts, &mode, buf, sizeof buf, "%M");
     EXPECT_EQ(width, 23);
     EXPECT_STREQ(buf, "[case-sensitive = auto]");
 
     opts.case_sensitive_search = CSS_TRUE;
-    width = sf_format(&window, &opts, INPUT_SEARCH, buf, sizeof buf, "%M%M%M%M%M%M%M");
+    width = sf_format(&window, &opts, &mode, buf, sizeof buf, "%M%M%M%M%M%M%M");
     EXPECT_TRUE(width >= 46);
     ASSERT_TRUE(width < sizeof(buf));
     ASSERT_NONNULL(memchr(buf, '\0', sizeof(buf)));
@@ -64,6 +71,7 @@ static void test_sf_format(TestContext *ctx)
         ['Y'] = "0",
         ['b'] = "BOM",
         ['f'] = "12\xF0\x9F\x91\xBD", // 👽 (U+1F47D)
+        ['i'] = "normal",
         ['n'] = "CRLF",
         ['o'] = "OVR",
         ['p'] = "All",
@@ -73,6 +81,8 @@ static void test_sf_format(TestContext *ctx)
         ['y'] = "1",
     };
 
+    mode.name = "normal";
+    mode.cmds = &normal_commands;
     buffer.display_filename = (char*)expected['f'];
     EXPECT_EQ(u_str_width(expected['f']), 4);
 
@@ -84,7 +94,7 @@ static void test_sf_format(TestContext *ctx)
             EXPECT_UINT_EQ(err, 1);
             continue;
         }
-        width = sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof(buf), fmt);
+        width = sf_format(&window, &opts, &mode, buf, sizeof(buf), fmt);
         ASSERT_NONNULL(memchr(buf, '\0', sizeof(buf)));
         IEXPECT_STREQ(buf, expected[i]);
         IEXPECT_EQ(width, u_str_width(expected[i]));

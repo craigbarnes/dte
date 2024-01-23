@@ -20,6 +20,7 @@ static const struct {
     {"alias", true},
     {"bind", true},
     {"cursor", true},
+    {"def-mode", true},
     {"errorfmt", true},
     {"ft", true},
     {"hi", true},
@@ -32,7 +33,7 @@ static const struct {
 static void test_dump_handlers(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e, false);
     const CommandSet *cmds = runner.cmds;
     ASSERT_NONNULL(cmds);
 
