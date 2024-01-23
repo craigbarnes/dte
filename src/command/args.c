@@ -118,7 +118,7 @@ static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgPar
         return error_msg("Too many options given");
     case ARGERR_OPTION_ARGUMENT_NOT_SEPARATE:
         return error_msg (
-            "Flag -%c must be given separately because it"
+            "Option -%c must be given separately because it"
             " requires an argument",
             a->flags[0]
         );
