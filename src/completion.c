@@ -260,10 +260,11 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
         return;
     }
 
-    KeyCode key;
-    if (!parse_key_string(&key, a->args[a->nr_flag_args])) {
+    KeyCode key = parse_key_string(a->args[a->nr_flag_args]);
+    if (key == KEY_NONE) {
         return;
     }
+
     const CachedCommand *cmd = lookup_binding(key_bindings, key);
     if (!cmd) {
         return;

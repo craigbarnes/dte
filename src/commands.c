@@ -182,8 +182,8 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
 {
     const char *keystr = a->args[a->nr_flag_args];
     const char *cmd = a->args[a->nr_flag_args + 1];
-    KeyCode key;
-    if (unlikely(!parse_key_string(&key, keystr))) {
+    KeyCode key = parse_key_string(keystr);
+    if (unlikely(key == KEY_NONE)) {
         return error_msg("invalid key string: %s", keystr);
     }
 

@@ -103,7 +103,7 @@ end:
     return i;
 }
 
-bool parse_key_string(KeyCode *key, const char *str)
+KeyCode parse_key_string(const char *str)
 {
     KeyCode modifiers;
     str += parse_modifiers(str, &modifiers);
@@ -113,7 +113,7 @@ bool parse_key_string(KeyCode *key, const char *str)
 
     if (u_is_unicode(ch) && pos == len) {
         if (unlikely(u_is_cntrl(ch))) {
-            return false;
+            return KEY_NONE;
         }
         if (u_is_ascii_upper(ch)) {
             if (modifiers & MOD_CTRL) {
@@ -125,26 +125,23 @@ bool parse_key_string(KeyCode *key, const char *str)
                 ch = ascii_tolower(ch);
             }
         }
-        *key = modifiers | ch;
-        return true;
+        return modifiers | ch;
     }
 
     for (size_t i = 0; i < ARRAYLEN(other_keys); i++) {
         if (ascii_streq_icase(str, other_keys[i].name)) {
-            *key = modifiers | other_keys[i].key;
-            return true;
+            return modifiers | other_keys[i].key;
         }
     }
 
     static_assert(ARRAYLEN(special_names) == NR_SPECIAL_KEYS);
     for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
         if (ascii_streq_icase(str, special_names[i])) {
-            *key = modifiers | (KEY_SPECIAL_MIN + i);
-            return true;
+            return modifiers | (KEY_SPECIAL_MIN + i);
         }
     }
 
-    return false;
+    return KEY_NONE;
 }
 
 // Writes the string representation of `k` into `buf` (which must

@@ -90,8 +90,8 @@ static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag
 
 static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 {
-    KeyCode key;
-    if (!parse_key_string(&key, keystr)) {
+    KeyCode key = parse_key_string(keystr);
+    if (key == KEY_NONE) {
         return error_msg("invalid key string: %s", keystr);
     }
 

@@ -884,9 +884,7 @@ static void test_keycode_to_string(TestContext *ctx)
         size_t buflen = keycode_to_string(tests[i].key, buf);
         IEXPECT_STREQ(buf, str);
         IEXPECT_EQ(buflen, len);
-        KeyCode parsed_key = 0;
-        IEXPECT_TRUE(parse_key_string(&parsed_key, str));
-        IEXPECT_EQ(parsed_key, tests[i].key);
+        IEXPECT_EQ(parse_key_string(str), tests[i].key);
     }
 
     // These combos aren't round-trippable by the code above and can't end
@@ -917,67 +915,45 @@ static void test_keycode_to_string(TestContext *ctx)
 
 static void test_parse_key_string(TestContext *ctx)
 {
-    KeyCode key = 0;
-    EXPECT_TRUE(parse_key_string(&key, "^I"));
-    EXPECT_EQ(key, MOD_CTRL | 'i');
-    EXPECT_TRUE(parse_key_string(&key, "^M"));
-    EXPECT_EQ(key, MOD_CTRL | 'm');
-    EXPECT_TRUE(parse_key_string(&key, "C-I"));
-    EXPECT_EQ(key, MOD_CTRL | 'i');
-    EXPECT_TRUE(parse_key_string(&key, "C-M"));
-    EXPECT_EQ(key, MOD_CTRL | 'm');
-    EXPECT_TRUE(parse_key_string(&key, "C-F1"));
-    EXPECT_EQ(key, MOD_CTRL | KEY_F1);
-    EXPECT_TRUE(parse_key_string(&key, "C-M-S-F20"));
-    EXPECT_EQ(key, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F20);
-    EXPECT_TRUE(parse_key_string(&key, "s-m"));
-    EXPECT_EQ(key, MOD_SUPER | 'm');
-    EXPECT_TRUE(parse_key_string(&key, "H-y"));
-    EXPECT_EQ(key, MOD_HYPER | 'y');
-    EXPECT_TRUE(parse_key_string(&key, "H-y"));
-    EXPECT_EQ(key, MOD_HYPER | 'y');
-    EXPECT_TRUE(parse_key_string(&key, "H-S-z"));
-    EXPECT_EQ(key, MOD_HYPER | MOD_SHIFT | 'z');
-    EXPECT_TRUE(parse_key_string(&key, "s-S-t"));
-    EXPECT_EQ(key, MOD_SUPER | MOD_SHIFT | 't');
-    EXPECT_TRUE(parse_key_string(&key, "S-print"));
-    EXPECT_EQ(key, MOD_SHIFT | KEY_PRINT_SCREEN);
-    EXPECT_TRUE(parse_key_string(&key, "pause"));
-    EXPECT_EQ(key, KEY_PAUSE);
-    EXPECT_TRUE(parse_key_string(&key, "C-S-scrlock"));
-    EXPECT_EQ(key, MOD_CTRL | MOD_SHIFT | KEY_SCROLL_LOCK);
+    EXPECT_EQ(parse_key_string("^I"), MOD_CTRL | 'i');
+    EXPECT_EQ(parse_key_string("^M"), MOD_CTRL | 'm');
+    EXPECT_EQ(parse_key_string("C-I"), MOD_CTRL | 'i');
+    EXPECT_EQ(parse_key_string("C-M"), MOD_CTRL | 'm');
+    EXPECT_EQ(parse_key_string("C-F1"), MOD_CTRL | KEY_F1);
+    EXPECT_EQ(parse_key_string("C-M-S-F20"), MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F20);
+    EXPECT_EQ(parse_key_string("s-m"), MOD_SUPER | 'm');
+    EXPECT_EQ(parse_key_string("H-y"), MOD_HYPER | 'y');
+    EXPECT_EQ(parse_key_string("H-y"), MOD_HYPER | 'y');
+    EXPECT_EQ(parse_key_string("H-S-z"), MOD_HYPER | MOD_SHIFT | 'z');
+    EXPECT_EQ(parse_key_string("s-S-t"), MOD_SUPER | MOD_SHIFT | 't');
+    EXPECT_EQ(parse_key_string("S-print"), MOD_SHIFT | KEY_PRINT_SCREEN);
+    EXPECT_EQ(parse_key_string("pause"), KEY_PAUSE);
+    EXPECT_EQ(parse_key_string("C-S-scrlock"), MOD_CTRL | MOD_SHIFT | KEY_SCROLL_LOCK);
 
-    EXPECT_FALSE(parse_key_string(&key, "C-"));
-    EXPECT_FALSE(parse_key_string(&key, "C-M-"));
-    EXPECT_FALSE(parse_key_string(&key, "paste"));
-    EXPECT_FALSE(parse_key_string(&key, "???"));
-    EXPECT_FALSE(parse_key_string(&key, "F0"));
-    EXPECT_FALSE(parse_key_string(&key, "F21"));
-    EXPECT_FALSE(parse_key_string(&key, "F01"));
-    EXPECT_FALSE(parse_key_string(&key, "\t"));
-    EXPECT_FALSE(parse_key_string(&key, "\n"));
-    EXPECT_FALSE(parse_key_string(&key, "\r"));
-    EXPECT_FALSE(parse_key_string(&key, "\x1f"));
-    EXPECT_FALSE(parse_key_string(&key, "\x7f"));
-    EXPECT_FALSE(parse_key_string(&key, "C-\t"));
-    EXPECT_FALSE(parse_key_string(&key, "C-\r"));
-    EXPECT_FALSE(parse_key_string(&key, "C-\x7f"));
+    EXPECT_EQ(parse_key_string("C-"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("C-M-"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("paste"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("???"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("F0"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("F21"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("F01"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("\t"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("\n"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("\r"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("\x1f"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("\x7f"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("C-\t"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("C-\r"), KEY_NONE);
+    EXPECT_EQ(parse_key_string("C-\x7f"), KEY_NONE);
 
     // Special cases for normalization:
-    EXPECT_TRUE(parse_key_string(&key, "C-A"));
-    EXPECT_EQ(key, MOD_CTRL | 'a');
-    EXPECT_TRUE(parse_key_string(&key, "C-S-A"));
-    EXPECT_EQ(key, MOD_CTRL | MOD_SHIFT | 'a');
-    EXPECT_TRUE(parse_key_string(&key, "M-A"));
-    EXPECT_EQ(key, MOD_META | MOD_SHIFT | 'a');
-    EXPECT_TRUE(parse_key_string(&key, "C-?"));
-    EXPECT_EQ(key, MOD_CTRL | '?');
-    EXPECT_TRUE(parse_key_string(&key, "C-H"));
-    EXPECT_EQ(key, MOD_CTRL | 'h');
-    EXPECT_TRUE(parse_key_string(&key, "M-C-?"));
-    EXPECT_EQ(key, MOD_META | MOD_CTRL | '?');
-    EXPECT_TRUE(parse_key_string(&key, "M-C-H"));
-    EXPECT_EQ(key, MOD_META | MOD_CTRL | 'h');
+    EXPECT_EQ(parse_key_string("C-A"), MOD_CTRL | 'a');
+    EXPECT_EQ(parse_key_string("C-S-A"), MOD_CTRL | MOD_SHIFT | 'a');
+    EXPECT_EQ(parse_key_string("M-A"), MOD_META | MOD_SHIFT | 'a');
+    EXPECT_EQ(parse_key_string("C-?"), MOD_CTRL | '?');
+    EXPECT_EQ(parse_key_string("C-H"), MOD_CTRL | 'h');
+    EXPECT_EQ(parse_key_string("M-C-?"), MOD_META | MOD_CTRL | '?');
+    EXPECT_EQ(parse_key_string("M-C-H"), MOD_META | MOD_CTRL | 'h');
 }
 
 static bool clear_obuf(TermOutputBuffer *obuf)
