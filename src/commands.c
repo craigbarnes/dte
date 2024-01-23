@@ -2650,8 +2650,6 @@ const Command *find_normal_command(const char *name)
 const CommandSet normal_commands = {
     .lookup = find_normal_command,
     .macro_record = record_command,
-    .expand_variable = expand_normal_var,
-    .expand_env_vars = true,
 };
 
 const char *find_normal_alias(const char *name, void *userdata)

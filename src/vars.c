@@ -9,6 +9,7 @@
 #include "util/bsearch.h"
 #include "util/numtostr.h"
 #include "util/path.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "view.h"
 
@@ -103,14 +104,14 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(normal_vars, name, strcmp);
 }
 
-bool expand_normal_var(const char *name, char **value, const void *userdata)
+char *expand_normal_var(const char *name, const void *userdata)
 {
     const BuiltinVar *var = BSEARCH(name, normal_vars, vstrcmp);
-    if (!var) {
-        return false;
+    if (var) {
+        return var->expand(userdata);
     }
-    *value = var->expand(userdata);
-    return true;
+    const char *str = xgetenv(name);
+    return str ? xstrdup(str) : NULL;
 }
 
 void collect_normal_vars(PointerArray *a, const char *prefix)

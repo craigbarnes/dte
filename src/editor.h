@@ -26,6 +26,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
+#include "vars.h"
 #include "view.h"
 
 typedef enum {
@@ -115,12 +116,14 @@ static inline CommandRunner cmdrunner (
     const CommandSet *cmds,
     bool allow_recording
 ) {
+    bool normal = (cmds == &normal_commands);
     return (CommandRunner) {
         .cmds = cmds,
-        .lookup_alias = (cmds == &normal_commands) ? find_normal_alias : NULL,
+        .lookup_alias = normal ? find_normal_alias : NULL,
+        .expand_variable = normal ? expand_normal_var : NULL,
         .home_dir = &e->home_dir,
-        .allow_recording = allow_recording,
         .userdata = e,
+        .allow_recording = allow_recording,
     };
 }
 

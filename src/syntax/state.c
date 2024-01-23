@@ -588,19 +588,17 @@ static const Command *find_syntax_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
-static bool expand_syntax_var(const char *name, char **value, const void *userdata)
+static char *expand_syntax_var(const char *name, const void *userdata)
 {
     if (streq(name, "DTE_HOME")) {
         const SyntaxParser *sp = userdata;
-        *value = xstrdup(sp->user_config_dir);
-        return true;
+        return xstrdup(sp->user_config_dir);
     }
-    return false;
+    return NULL;
 }
 
 static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
-    .expand_variable = expand_syntax_var,
 };
 
 static CommandRunner cmdrunner_for_syntaxes(SyntaxParser *sp)
@@ -609,6 +607,7 @@ static CommandRunner cmdrunner_for_syntaxes(SyntaxParser *sp)
         .cmds = &syntax_commands,
         .home_dir = sp->home_dir,
         .userdata = sp,
+        .expand_variable = expand_syntax_var,
     };
     return runner;
 }

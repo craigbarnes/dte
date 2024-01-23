@@ -31,13 +31,12 @@ typedef struct {
 typedef struct {
     const Command* (*lookup)(const char *name);
     void (*macro_record)(const Command *cmd, char **args, void *userdata);
-    bool (*expand_variable)(const char *name, char **value, const void *userdata);
-    bool expand_env_vars;
 } CommandSet;
 
 typedef struct {
     const CommandSet *cmds;
     const char* (*lookup_alias)(const char *name, void *userdata);
+    char* (*expand_variable)(const char *name, const void *userdata);
     const StringView *home_dir;
     void *userdata;
     unsigned int recursion_count;

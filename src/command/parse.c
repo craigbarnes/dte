@@ -92,23 +92,16 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
         n++;
     }
 
-    const CommandSet *cmds = runner->cmds;
-    void *ud = runner->userdata;
-    char *name = xstrcut(cmd, n);
-    char *value;
-    if (cmds->expand_variable && cmds->expand_variable(name, &value, ud)) {
+    if (runner->expand_variable) {
+        char *name = xstrcut(cmd, n);
+        char *value = runner->expand_variable(name, runner->userdata);
+        free(name);
         if (value) {
             string_append_cstring(buf, value);
             free(value);
         }
-    } else if (cmds->expand_env_vars) {
-        const char *val = getenv(name);
-        if (val) {
-            string_append_cstring(buf, val);
-        }
     }
 
-    free(name);
     return n;
 }
 
