@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "xmalloc.h"
 #include "debug.h"
+#include "xsnprintf.h"
 
 static void *check_alloc(void *alloc)
 {
@@ -68,32 +69,15 @@ static char *xvasprintf(const char *format, va_list ap)
     va_copy(ap2, ap);
     int n = vsnprintf(NULL, 0, format, ap2);
     va_end(ap2);
-    if (unlikely(n < 0)) {
-        goto error;
-    } else if (unlikely(n == INT_MAX)) {
-        errno = EOVERFLOW;
-        goto error;
+
+    if (unlikely(n < 0 || n == INT_MAX)) {
+        fatal_error(__func__, n < 0 ? errno : EOVERFLOW);
     }
 
-    char *str = malloc(n + 1);
-    if (unlikely(!str)) {
-        goto error;
-    }
-
-    int m = vsnprintf(str, n + 1, format, ap);
-    if (unlikely(m < 0)) {
-        goto error;
-    }
+    char *str = xmalloc(n + 1);
+    size_t m = xvsnprintf(str, n + 1, format, ap);
     BUG_ON(m != n);
     return str;
-
-error:
-    fatal_error(__func__, errno);
-
-    // This is unreachable, but it can silence spurious warnings
-    // (e.g. "function might return no value") given by compilers
-    // that lack proper `noreturn` support (e.g. tcc)
-    return xcalloc(1, 1);
 }
 
 char *xasprintf(const char *format, ...)
