@@ -5,9 +5,10 @@
 #include "macros.h"
 #include "unicode.h"
 
-// The longest valid UTF-8 sequence (in bytes), given the constraints
-// imposed by `UNICODE_MAX_VALID_CODEPOINT`
-#define UTF8_MAX_SEQ_LEN 4
+enum {
+    // Longest UTF-8 sequence (in bytes) permitted by RFC 3629
+    UTF8_MAX_SEQ_LEN = 4,
+};
 
 static inline size_t u_char_size(CodePoint u)
 {
