@@ -32,7 +32,7 @@ seealso: ["`dterc`", "`dte-syntax`"]
 
 `-s` _file_
 :   Load _file_ as a [`dte-syntax`] file and exit. Any errors
-    encountered are printed to `stderr` and the exit status is
+    encountered are printed to `stderr` and the [exit status] is
     set appropriately.
 
 `-b` _rcname_
@@ -349,6 +349,7 @@ input/output of both.
 [default config]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/rc
 [built-in syntax files]: https://gitlab.com/craigbarnes/dte/-/tree/master/config/syntax
 [rc file]: #files
+[exit status]: #exit-status
 [history files]: #files
 [command mode]: #command-mode
 [search mode]: #search-mode

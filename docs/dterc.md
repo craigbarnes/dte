@@ -1041,7 +1041,7 @@ extend the selected area, until either the [`unselect`] command is used
 (e.g. by pressing `Esc`) or some other operation (e.g. [`delete`],
 [`insert`], etc.) clears the selection.
 
-Note: A better way to create selections is to hold the Shift key whilst
+Note: A better way to create selections is to hold the Shift key while
 moving the cursor. The `select` command exists mostly as a fallback,
 for terminals with limited key binding support.
 
