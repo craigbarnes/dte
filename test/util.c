@@ -1635,6 +1635,15 @@ static void test_ptr_array(TestContext *ctx)
     EXPECT_EQ(a.count, 0);
     ptr_array_trim_nulls(&a);
     EXPECT_EQ(a.count, 0);
+
+    ptr_array_init(&a, 0);
+    EXPECT_EQ(a.alloc, 0);
+    EXPECT_NULL(a.ptrs);
+    ptr_array_free(&a);
+    ptr_array_init(&a, 1);
+    EXPECT_EQ(a.alloc, 8);
+    EXPECT_NONNULL(a.ptrs);
+    ptr_array_free(&a);
 }
 
 static void test_ptr_array_move(TestContext *ctx)

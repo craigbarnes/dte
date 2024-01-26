@@ -158,6 +158,29 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "bind -T search ");
     reset_completion(c);
 
+    cmdline_set_text(c, "def-mode ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "def-mode ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "def-mode xyz ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "def-mode xyz normal ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "def-mode xyz normal ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "mode ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "mode command");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "mode normal");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "mode search");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "mode command");
+    reset_completion(c);
+
     cmdline_set_text(c, "wrap");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "wrap-paragraph ");
