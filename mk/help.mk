@@ -1,3 +1,28 @@
+DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
+ARCH = $(shell uname -m 2>/dev/null)
+_POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
+_XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
+CC_VERSION = $(or \
+    $(shell $(CC) --version 2>/dev/null | head -n1), \
+    $(shell $(CC) -v 2>&1 | grep version) )
+CC_TARGET = $(shell $(CC) -dumpmachine 2>/dev/null)
+PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
+PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
+USERVARS = CC CFLAGS CPPFLAGS LDFLAGS LDLIBS DEBUG
+
+AUTOVARS = \
+    VERSION KERNEL \
+    $(if $(call streq,$(KERNEL),Linux), DISTRO) \
+    ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
+    TERM SHELL LANG $(call echo-if-set, LC_CTYPE LC_ALL) \
+    MAKE_VERSION MAKEFLAGS CC_VERSION CC_TARGET
+
+vars:
+	@echo
+	@$(foreach VAR, $(AUTOVARS), $(call PRINTVAR,$(VAR));)
+	@$(foreach VAR, $(USERVARS), $(call PRINTVARX,$(VAR));)
+	@echo
+
 help: private P = @printf '   %-24s %s\n'
 help:
 	@printf '\n Targets:\n\n'
@@ -48,4 +73,4 @@ ifeq "$(DEVMK)" "loaded"
 	@echo
 endif
 
-.PHONY: help
+.PHONY: vars help
