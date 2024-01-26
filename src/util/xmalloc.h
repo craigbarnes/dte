@@ -24,7 +24,7 @@ static inline size_t size_multiply(size_t a, size_t b)
     // If either argument is known at compile-time to be 1, the multiplication
     // can't overflow and is thus safe to be inlined without checks
     if ((IS_CT_CONSTANT(a) && a == 1) || (IS_CT_CONSTANT(b) && b == 1)) {
-        return a * b;
+        return a * b; // GCOVR_EXCL_LINE
     }
     // Otherwise, emit a call to the checked implementation
     return size_multiply_(a, b);
