@@ -23,6 +23,7 @@
 #include "util/log.h"
 #include "util/numtostr.h"
 #include "util/path.h"
+#include "util/progname.h"
 #include "util/ptr-array.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
@@ -2708,6 +2709,20 @@ static void test_timespec_to_str(TestContext *ctx)
     EXPECT_EQ(errno, EINVAL);
 }
 
+static void test_progname(TestContext *ctx)
+{
+    const char *const args[] = {"arg0", "", NULL};
+    char **arg0 = (char**)args;
+    char **arg1 = arg0 + 1;
+    char **arg2 = arg0 + 2;
+    EXPECT_STREQ(progname(1, arg0, "1"), "arg0");
+    EXPECT_STREQ(progname(1, NULL, "2"), "2");
+    EXPECT_STREQ(progname(0, arg0, "3"), "3");
+    EXPECT_STREQ(progname(1, arg1, "4"), "4");
+    EXPECT_STREQ(progname(1, arg2, "5"), "5");
+    EXPECT_STREQ(progname(0, NULL, NULL), "_PROG_");
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -2793,6 +2808,7 @@ static const TestEntry tests[] = {
     TEST(test_log_level_from_str),
     TEST(test_log_level_to_str),
     TEST(test_timespec_to_str),
+    TEST(test_progname),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);
