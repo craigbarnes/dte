@@ -125,7 +125,7 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
     return cmdargs_has_flag(a, flag);
 }
 
-static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
+static void handle_selection_flags(View *view, const CommandArgs *a)
 {
     SelectionType sel;
     if (has_flag(a, 'l')) {
@@ -137,12 +137,6 @@ static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
         sel = view->select_mode;
     }
     do_selection(view, sel);
-}
-
-static void handle_select_chars_flag(View *view, const CommandArgs *a)
-{
-    BUG_ON(has_flag(a, 'l'));
-    handle_select_chars_or_lines_flags(view, a);
 }
 
 static bool cmd_alias(EditorState *e, const CommandArgs *a)
@@ -242,7 +236,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
 
 static bool cmd_bof(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e->view, a);
+    handle_selection_flags(e->view, a);
     move_bof(e->view);
     return true;
 }
@@ -255,7 +249,7 @@ static bool cmd_bol(EditorState *e, const CommandArgs *a)
     };
 
     SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    handle_select_chars_flag(e->view, a);
+    handle_selection_flags(e->view, a);
     move_bol_smart(e->view, flags);
     return true;
 }
@@ -264,7 +258,7 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    handle_select_chars_or_lines_flags(view, a);
+    handle_selection_flags(view, a);
 
     if (!block_iter_bol(&view->cursor)) {
         unsigned int margin = e->options.scroll_margin;
@@ -638,21 +632,21 @@ static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
 
 static bool cmd_down(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e->view, a);
+    handle_selection_flags(e->view, a);
     move_down(e->view, 1);
     return true;
 }
 
 static bool cmd_eof(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e->view, a);
+    handle_selection_flags(e->view, a);
     move_eof(e->view);
     return true;
 }
 
 static bool cmd_eol(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e->view, a);
+    handle_selection_flags(e->view, a);
     move_eol(e->view);
     return true;
 }
@@ -661,7 +655,7 @@ static bool cmd_eolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    handle_select_chars_or_lines_flags(view, a);
+    handle_selection_flags(view, a);
 
     if (!block_iter_eol(&view->cursor)) {
         Window *window = e->window;
@@ -870,7 +864,7 @@ static bool cmd_join(EditorState *e, const CommandArgs *a)
 
 static bool cmd_left(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e->view, a);
+    handle_selection_flags(e->view, a);
     move_cursor_left(e->view);
     return true;
 }
@@ -1254,7 +1248,7 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
 static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
-    handle_select_chars_or_lines_flags(view, a);
+    handle_selection_flags(view, a);
 
     // If current line is blank, skip past consecutive blank lines
     StringView line;
@@ -1290,7 +1284,7 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
-    handle_select_chars_or_lines_flags(view, a);
+    handle_selection_flags(view, a);
 
     // If cursor is on the first line, just move to bol
     if (view->cy == 0) {
@@ -1343,7 +1337,7 @@ static bool cmd_paste(EditorState *e, const CommandArgs *a)
 static bool cmd_pgdown(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
-    handle_select_chars_or_lines_flags(view, a);
+    handle_selection_flags(view, a);
 
     Window *window = e->window;
     long margin = window_get_scroll_margin(window, e->options.scroll_margin);
@@ -1363,7 +1357,7 @@ static bool cmd_pgdown(EditorState *e, const CommandArgs *a)
 static bool cmd_pgup(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
-    handle_select_chars_or_lines_flags(view, a);
+    handle_selection_flags(view, a);
 
     Window *window = e->window;
     long margin = window_get_scroll_margin(window, e->options.scroll_margin);
@@ -1614,7 +1608,7 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
 
 static bool cmd_right(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e->view, a);
+    handle_selection_flags(e->view, a);
     move_cursor_right(e->view);
     return true;
 }
@@ -2236,7 +2230,7 @@ static bool cmd_unselect(EditorState *e, const CommandArgs *a)
 
 static bool cmd_up(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e->view, a);
+    handle_selection_flags(e->view, a);
     move_up(e->view, 1);
     return true;
 }
@@ -2309,7 +2303,7 @@ static bool cmd_wnext(EditorState *e, const CommandArgs *a)
 
 static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e->view, a);
+    handle_selection_flags(e->view, a);
     bool skip_non_word = has_flag(a, 's');
     word_bwd(&e->view->cursor, skip_non_word);
     view_reset_preferred_x(e->view);
@@ -2318,7 +2312,7 @@ static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
 
 static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e->view, a);
+    handle_selection_flags(e->view, a);
     bool skip_non_word = has_flag(a, 's');
     word_fwd(&e->view->cursor, skip_non_word);
     view_reset_preferred_x(e->view);
@@ -2479,7 +2473,7 @@ static const Command cmds[] = {
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "cl", false, 0, 0, cmd_bof},
-    {"bol", "cst", false, 0, 0, cmd_bol},
+    {"bol", "clst", false, 0, 0, cmd_bol},
     {"bolsf", "cl", false, 0, 0, cmd_bolsf},
     {"bookmark", "r", false, 0, 0, cmd_bookmark},
     {"case", "lu", false, 0, 0, cmd_case},
@@ -2499,7 +2493,7 @@ static const Command cmds[] = {
     {"delete-word", "s", false, 0, 0, cmd_delete_word},
     {"down", "cl", false, 0, 0, cmd_down},
     {"eof", "cl", false, 0, 0, cmd_eof},
-    {"eol", "c", false, 0, 0, cmd_eol},
+    {"eol", "cl", false, 0, 0, cmd_eol},
     {"eolsf", "cl", false, 0, 0, cmd_eolsf},
     {"erase", "", false, 0, 0, cmd_erase},
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
@@ -2511,7 +2505,7 @@ static const Command cmds[] = {
     {"include", "bq", true, 1, 1, cmd_include},
     {"insert", "km", false, 1, 1, cmd_insert},
     {"join", "", false, 0, 1, cmd_join},
-    {"left", "c", false, 0, 0, cmd_left},
+    {"left", "cl", false, 0, 0, cmd_left},
     {"line", "", false, 1, 1, cmd_line},
     {"load-syntax", "", true, 1, 1, cmd_load_syntax},
     {"macro", "", false, 1, 1, cmd_macro},
@@ -2532,7 +2526,7 @@ static const Command cmds[] = {
     {"refresh", "", false, 0, 0, cmd_refresh},
     {"repeat", "-", false, 2, -1, cmd_repeat},
     {"replace", "bcgi", false, 1, 2, cmd_replace},
-    {"right", "c", false, 0, 0, cmd_right},
+    {"right", "cl", false, 0, 0, cmd_right},
     {"save", "Bbde=fpu", false, 0, 1, cmd_save},
     {"scroll-down", "", false, 0, 0, cmd_scroll_down},
     {"scroll-pgdown", "h", false, 0, 0, cmd_scroll_pgdown},
@@ -2556,8 +2550,8 @@ static const Command cmds[] = {
     {"wclose", "fp", false, 0, 0, cmd_wclose},
     {"wflip", "", false, 0, 0, cmd_wflip},
     {"wnext", "", false, 0, 0, cmd_wnext},
-    {"word-bwd", "cs", false, 0, 0, cmd_word_bwd},
-    {"word-fwd", "cs", false, 0, 0, cmd_word_fwd},
+    {"word-bwd", "cls", false, 0, 0, cmd_word_bwd},
+    {"word-fwd", "cls", false, 0, 0, cmd_word_fwd},
     {"wprev", "", false, 0, 0, cmd_wprev},
     {"wrap-paragraph", "", false, 0, 1, cmd_wrap_paragraph},
     {"wresize", "hv", false, 0, 1, cmd_wresize},

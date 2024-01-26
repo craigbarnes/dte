@@ -437,7 +437,7 @@ static void test_complete_command(TestContext *ctx)
 
     cmdline_set_text(c, "left -");
     complete_command_next(e);
-    EXPECT_STRING_EQ(c->buf, "left -c ");
+    EXPECT_STRING_EQ(c->buf, "left -c");
     reset_completion(c);
 
     cmdline_set_text(c, "option -");
