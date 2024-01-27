@@ -173,7 +173,7 @@ static ExitCode init_std_fds(int std_fds[2])
         // editor operation, regardless of how they were redirected
         if (unlikely(!freopen("/dev/tty", i ? "w" : "r", streams[i]))) {
             const char *err = strerror(errno);
-            fprintf(stderr, "Failed to open tty for fd %d: %s\n", i, err);
+            fprintf(stderr, "Failed to open /dev/tty for fd %d: %s\n", i, err);
             return EX_IOERR;
         }
 
