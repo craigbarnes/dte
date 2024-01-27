@@ -11,7 +11,7 @@ static inline int xopen(const char *path, int flags, mode_t mode)
 {
     int fd;
     do {
-        fd = open(path, flags, mode);
+        fd = open(path, flags | O_NOCTTY, mode);
     } while (fd < 0 && errno == EINTR);
 
     return fd;
