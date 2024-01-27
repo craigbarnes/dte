@@ -7,8 +7,10 @@
 #include "test.h"
 #include "editor.h"
 #include "syntax/syntax.h"
+#include "util/fd.h"
 #include "util/log.h"
 #include "util/path.h"
+#include "util/xreadwrite.h"
 
 void init_headless_mode(TestContext *ctx);
 extern const TestGroup bind_tests;
@@ -72,6 +74,36 @@ static void test_posix_sanity(TestContext *ctx)
     ASSERT_EQ(snprintf(NULL, 0, "987654321"), 9);
 
     UNIGNORE_WARNINGS
+}
+
+// Note: this must be ordered before a successful call to log_open()
+// (i.e. the one in test_init()), so as not to trigger the BUG_ON()
+// assertions at the top of log_open()
+static void test_log_open_errors(TestContext *ctx)
+{
+    const LogLevel none = LOG_LEVEL_NONE;
+    const LogLevel info = LOG_LEVEL_INFO;
+    errno = 0;
+    ASSERT_EQ(log_open("/dev/null", none, false), none);
+    EXPECT_EQ(errno, 0);
+    ASSERT_EQ(log_open("build/test/non-existent-dir/x", info, false), none);
+    EXPECT_EQ(errno, ENOENT);
+
+    if (access("/dev/full", W_OK) == 0) {
+        errno = 0;
+        ASSERT_EQ(log_open("/dev/full", info, false), none);
+        EXPECT_EQ(errno, ENOSPC);
+    }
+
+    int tty = open("/dev/tty", O_WRONLY | O_CLOEXEC | O_NOCTTY);
+    if (tty >= 0) {
+        ASSERT_TRUE(tty > STDERR_FILENO);
+        ASSERT_TRUE(is_controlling_tty(tty));
+        EXPECT_EQ(xclose(tty), 0);
+        errno = 0;
+        ASSERT_EQ(log_open("/dev/tty", info, false), none);
+        EXPECT_EQ(errno, EINVAL);
+    }
 }
 
 static void test_init(TestContext *ctx)
@@ -188,6 +220,7 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
 static const TestEntry itests[] = {
     TEST(test_process_sanity),
     TEST(test_posix_sanity),
+    TEST(test_log_open_errors),
     TEST(test_init),
 };
 
