@@ -1,7 +1,9 @@
+#include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "test.h"
 #include "editor.h"
 #include "syntax/syntax.h"
@@ -32,6 +34,21 @@ extern const TestGroup status_tests;
 extern const TestGroup syntax_tests;
 extern const TestGroup terminal_tests;
 extern const TestGroup util_tests;
+
+static bool fd_is_valid(int fd)
+{
+    return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+}
+
+static void test_process_sanity(TestContext *ctx)
+{
+    // Note that if this fails, there'll only be (at best) an "aborted"
+    // message, since there's no stderr for test_fail() to use
+    ASSERT_TRUE(fd_is_valid(STDERR_FILENO));
+
+    ASSERT_NONNULL(freopen("/dev/null", "r", stdin));
+    ASSERT_NONNULL(freopen("/dev/null", "w", stdout));
+}
 
 static void test_posix_sanity(TestContext *ctx)
 {
@@ -169,6 +186,7 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
 }
 
 static const TestEntry itests[] = {
+    TEST(test_process_sanity),
     TEST(test_posix_sanity),
     TEST(test_init),
 };
