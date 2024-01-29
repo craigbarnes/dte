@@ -1739,6 +1739,19 @@ exec\-tag\ sh\ \-c\ 'readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-
 \f[]
 .fi
 .PP
+When passing the buffer through a \fBfilter\fR command, the cursor is
+moved to line 1 and the whole contents is replaced with the output.
+It may be useful to save and restore the cursor position, in cases
+where line numbers remain mostly unchanged. This can be done by
+wrapping the command with \fBbookmark\fR and \fBbookmark \-r\fR, e.g.:
+.P
+.IP
+.nf
+\f[C]
+bookmark;\ filter\ expand\ \-\-tabs=4;\ bookmark\ \-r
+\f[]
+.fi
+.PP
 Note that \fIcommand\fR is executed directly using \fBexecvp\fR(3). To use shell
 features like pipes or redirection, use a shell interpreter as the
 \fIcommand\fR (see second example above). If complex commands become

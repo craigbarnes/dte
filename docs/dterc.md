@@ -1141,6 +1141,14 @@ Examples:
     exec-tag -s echo main
     exec-tag sh -c 'readtags -l | cut -f1 | sort | uniq | fzf --reverse'
 
+When passing the buffer through a `filter` command, the cursor is
+moved to line 1 and the whole contents is replaced with the output.
+It may be useful to save and restore the cursor position, in cases
+where line numbers remain mostly unchanged. This can be done by
+wrapping the command with [`bookmark`] and [`bookmark -r`], e.g.:
+
+    bookmark; filter expand --tabs=4; bookmark -r
+
 Note that _command_ is executed directly using [`execvp`]. To use shell
 features like pipes or redirection, use a shell interpreter as the
 _command_ (see second example above). If complex commands become
@@ -1577,6 +1585,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`alias`]: #alias
 [`bind`]: #bind
+[`bookmark -r`]: #bookmark
 [`bookmark`]: #bookmark
 [`command`]: #command
 [`compile`]: #compile
