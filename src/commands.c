@@ -893,27 +893,6 @@ static bool cmd_line(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static bool cmd_load_syntax(EditorState *e, const CommandArgs *a)
-{
-    const char *arg = a->args[0];
-    const char *slash = strrchr(arg, '/');
-    if (!slash) {
-        const char *filetype = arg;
-        if (find_syntax(&e->syntaxes, filetype)) {
-            return true;
-        }
-        return !!load_syntax_by_filetype(e, filetype);
-    }
-
-    const char *filetype = slash + 1;
-    if (find_syntax(&e->syntaxes, filetype)) {
-        return error_msg("Syntax for filetype %s already loaded", filetype);
-    }
-
-    int err;
-    return !!load_syntax_file(e, arg, CFG_MUST_EXIST, &err);
-}
-
 static bool cmd_macro(EditorState *e, const CommandArgs *a)
 {
     CommandMacroState *m = &e->macro;
@@ -2507,7 +2486,6 @@ static const Command cmds[] = {
     {"join", "", false, 0, 1, cmd_join},
     {"left", "cl", false, 0, 0, cmd_left},
     {"line", "", false, 1, 1, cmd_line},
-    {"load-syntax", "", true, 1, 1, cmd_load_syntax},
     {"macro", "", false, 1, 1, cmd_macro},
     {"match-bracket", "", false, 0, 0, cmd_match_bracket},
     {"mode", "", true, 1, 1, cmd_mode},

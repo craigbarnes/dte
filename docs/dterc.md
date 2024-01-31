@@ -435,16 +435,6 @@ For a basic example of usage, see the output of `dte -b compiler/go`.
 `-i`
 :   Ignore this error
 
-### **load-syntax** _filename_|_filetype_
-
-Load a [`dte-syntax`] file into the editor. If the argument contains a
-`/` character it's considered a filename.
-
-Note: this command only loads a syntax file ready for later use. To
-actually apply a syntax highlighter to the current buffer, use the
-[`set`] command to change the [`filetype`] of the buffer instead, e.g.
-`set filetype html`.
-
 ## Editor Commands
 
 ### **quit** [**-f**|**-p**] [_exitcode_]

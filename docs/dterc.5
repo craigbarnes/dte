@@ -29,8 +29,6 @@ Configuration Commands:
 .br
    \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
 .br
-   \fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
-.br
 .P
 Editor Commands:
 .br
@@ -846,17 +844,6 @@ For a basic example of usage, see the output of \fBdte \-b compiler/go\fR.
 \fB\-i\fR
 Ignore this error
 .PP
-.RE
-\fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
-.RS
-Load a \fBdte\-syntax\fR(5) file into the editor. If the argument contains a
-\fB/\fR character it's considered a filename.
-.P
-Note: this command only loads a syntax file ready for later use. To
-actually apply a syntax highlighter to the current buffer, use the
-\fBset\fR command to change the \fBfiletype\fR of the buffer instead, e.g.
-\fBset filetype html\fR.
-.P
 .RE
 .SS Editor Commands
 \fBquit\fR [\fB\-f\fR|\fB\-p\fR] [\fIexitcode\fR]
