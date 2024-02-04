@@ -11,7 +11,7 @@ man = docs/dte.1 docs/dterc.5 docs/dte-syntax.5
 html-man = public/dte.html public/dterc.html public/dte-syntax.html
 html = public/index.html public/releases.html $(html-man)
 css = public/style.css
-img = public/screenshot.png public/favicon.ico
+img = public/logo.svg public/screenshot.png public/favicon.ico
 
 docs: man html htmlgz
 man: $(man)
@@ -20,7 +20,7 @@ htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
 $(html-man): public/%.html: docs/%.md
-public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md
+public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md | public/screenshot.png
 public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
 public/releases.html: private PDHTML += -L docs/releases.lua
@@ -43,7 +43,7 @@ build/docs/index.md: docs/index.sed README.md | build/docs/
 	$(E) GEN $@
 	$(Q) sed -f $^ > $@
 
-$(html): docs/template.html | public/style.css
+$(html): docs/template.html | public/style.css public/logo.svg
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -o $@ $(filter-out %.html %.lua, $^) $(QUIET_PANDOC)
 

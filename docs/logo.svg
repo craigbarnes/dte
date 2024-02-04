@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="dte-logo"
+   version="1.1"
+   viewBox="0 0 158.75 158.75"
+   height="600"
+   width="600"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title">dte text editor logo</title>
+  <defs
+     id="defs">
+    <linearGradient
+       id="linearGradient01">
+      <stop
+         style="stop-color:#d4d4d4;stop-opacity:1;"
+         offset="0"
+         id="stop01" />
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="1"
+         id="stop02" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="44"
+       x2="464"
+       y1="44"
+       x1="48"
+       id="linearGradient02"
+       xlink:href="#linearGradient03"
+       gradientTransform="matrix(0.37121125,0,0,0.35643502,-15.587518,65.574588)" />
+    <linearGradient
+       id="linearGradient03">
+      <stop
+         id="stop03"
+         offset="0"
+         style="stop-color:#77767b;stop-opacity:1" />
+      <stop
+         style="stop-color:#86847c;stop-opacity:1;"
+         offset="0.05"
+         id="stop04" />
+      <stop
+         id="stop05"
+         offset="0.09999998"
+         style="stop-color:#6e6d6b;stop-opacity:1;" />
+      <stop
+         style="stop-color:#6e6d6b;stop-opacity:1;"
+         offset="0.89999938"
+         id="stop06" />
+      <stop
+         id="stop07"
+         offset="0.94999999"
+         style="stop-color:#86847c;stop-opacity:1;" />
+      <stop
+         id="stop08"
+         offset="1"
+         style="stop-color:#77767b;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-7.049758,1.1834786e-6,-4.5188462e-7,-2.4403009,371.71206,346.99562)"
+       r="44"
+       fy="194.19048"
+       fx="63.999996"
+       cy="194.19048"
+       cx="63.999996"
+       id="radialGradient01"
+       xlink:href="#linearGradient04" />
+    <linearGradient
+       id="linearGradient04">
+      <stop
+         id="stop09"
+         offset="0"
+         style="stop-color:#9a9a9a;stop-opacity:1;" />
+      <stop
+         id="stop10"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:0.09411765" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient01"
+       id="linearGradient05"
+       x1="1.925144"
+       y1="73.200882"
+       x2="157.01982"
+       y2="73.200882"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <metadata
+     id="metadata">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>dte text editor logo</dc:title>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/" />
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>© Craig Barnes 2024</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:identifier />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Craig Barnes</dc:title>
+          </cc:Agent>
+        </dc:creator>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-sa/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#ShareAlike" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="terminal"
+     transform="matrix(0.98206415,0,0,0.92442505,1.2985633,6.7137893)">
+    <rect
+       style="display:inline;fill:url(#linearGradient02);fill-opacity:1;stroke:none;stroke-width:1.45469;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;paint-order:normal;enable-background:new"
+       id="chassis"
+       width="154.4239"
+       height="134.01958"
+       x="2.2306225"
+       y="21.376646"
+       rx="11.878761"
+       ry="20.019878" />
+    <rect
+       ry="11.93036"
+       rx="11.93036"
+       y="1.6187201"
+       x="1.925144"
+       height="143.16432"
+       width="155.09468"
+       id="bevel"
+       style="display:inline;fill:url(#linearGradient05);fill-opacity:1;stroke:none;stroke-width:1.391;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;paint-order:normal;enable-background:new" />
+    <rect
+       transform="scale(1,-1)"
+       ry="6.0492396"
+       rx="6.0492859"
+       y="-139.70668"
+       x="6.9206929"
+       height="133.08424"
+       width="145.18286"
+       id="screen"
+       style="display:inline;fill:#222222;fill-opacity:1;stroke:none;stroke-width:1.51202;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;paint-order:normal;enable-background:new" />
+    <rect
+       transform="scale(-1)"
+       style="display:inline;opacity:0.05;fill:url(#radialGradient01);fill-opacity:1;stroke:none;stroke-width:1.491;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;paint-order:normal;enable-background:new"
+       id="glare"
+       width="131.23396"
+       height="116.32101"
+       x="-145.08946"
+       y="-132.85268" />
+  </g>
+  <g
+     id="foreground">
+    <rect
+       y="39.521458"
+       x="24.055368"
+       height="71.186623"
+       width="39.404026"
+       id="cursor"
+       style="display:inline;fill:#ffffff;stroke:none;stroke-width:0.18901;stroke-miterlimit:4;stroke-dasharray:none" />
+    <g
+       id="text"
+       style="font-size:61.4803px;line-height:1.25;font-family:'DejaVu Sans Mono';-inkscape-font-specification:'DejaVu Sans Mono, Normal';fill:#ffffff;stroke-width:1.65755"
+       transform="scale(1.0328519,0.96819302)"
+       aria-label="dte">
+      <path
+         style="display:inline;fill:#111111"
+         d="M 50.216831,72.303808 V 54.922415 h 5.523621 v 46.710615 h -5.523621 v -4.232771 q -1.380905,2.491633 -3.69242,3.812501 -2.281495,1.29084 -5.283463,1.29084 -6.093995,0 -9.606297,-4.713085 -3.482283,-4.743109 -3.482283,-13.05856 0,-8.195372 3.512302,-12.848422 3.512303,-4.68307 9.576278,-4.68307 3.031987,0 5.343502,1.320866 2.311516,1.290846 3.632381,3.782479 z M 33.976186,84.852034 q 0,6.424211 2.041338,9.696356 2.041338,3.272145 6.033955,3.272145 3.992617,0 6.063975,-3.302165 2.101377,-3.302165 2.101377,-9.666336 0,-6.394192 -2.101377,-9.666337 -2.071358,-3.302164 -6.063975,-3.302164 -3.992617,0 -6.033955,3.272145 -2.041338,3.272145 -2.041338,9.696356 z"
+         id="path1" />
+      <path
+         style="fill:#eaeaea"
+         d="m 79.906293,58.464737 v 9.546257 h 12.548226 v 4.292814 H 79.906293 v 18.251965 q 0,3.72244 1.410925,5.193404 1.410925,1.470964 4.923227,1.470964 h 6.214074 v 4.412889 h -6.754428 q -6.214073,0 -8.765746,-2.49163 -2.551673,-2.491633 -2.551673,-8.585627 V 72.303808 h -8.975883 v -4.292814 h 8.975883 v -9.546257 z m 51.964067,24.976372 v 2.701771 h -23.92569 v 0.180118 q 0,5.493601 2.85187,8.495569 2.88189,3.001968 8.10532,3.001968 2.64173,0 5.52362,-0.840551 2.88188,-0.840551 6.15403,-2.551673 v 5.493601 q -3.15207,1.290848 -6.09399,1.921258 -2.91191,0.66043 -5.6437,0.66043 -7.83514,0 -12.24803,-4.683065 -4.4129,-4.71309 -4.4129,-12.968501 0,-8.045274 4.32284,-12.848423 4.32283,-4.803148 11.52755,-4.803148 6.42422,0 10.11664,4.352853 3.72244,4.352854 3.72244,11.887793 z m -5.52362,-1.621063 q -0.12008,-4.863188 -2.31152,-7.384841 -2.16142,-2.551672 -6.24409,-2.551672 -3.99262,0 -6.57431,2.641731 -2.58169,2.641732 -3.06201,7.324802 z"
+         id="path2" />
+    </g>
+  </g>
+</svg>

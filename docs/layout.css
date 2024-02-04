@@ -6,11 +6,13 @@
 #main-grid > header {
     grid-area: header;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: space-between;
-    padding: 10px;
     margin-bottom: 1em;
     border-bottom: 1px solid #ddd;
+    padding: 0.5em 0 1em 0;
+    transition: padding 300ms;
+    user-select: none;
 }
 
 #main-grid > footer {
@@ -20,13 +22,15 @@
     text-align: right;
 }
 
-#top-title {
-    font-size: 1.4em;
+#logo {
+    margin-right: 0.3em;
 }
 
 #top-nav {
-    line-height: 2.5;
-    user-select: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 1em;
 }
 
 #toc {
@@ -54,6 +58,16 @@
     margin: 0 auto;
 }
 
+#main-grid > main > h1:first-child {
+    margin-top: 0;
+}
+
+@media only screen and (min-width: 360px) {
+    #main-grid > header {
+        flex-direction: row;
+    }
+}
+
 @media only screen and (min-width: 1000px) and (min-device-width: 700px) {
     #main-grid {
         grid-template-areas:
@@ -66,13 +80,13 @@
         grid-template-columns: 1fr 4fr;
     }
 
+    #main-grid > header {
+        padding: 0.5em 1em;
+    }
+
     #toc {
         border-bottom: none;
         font-size: 0.9em;
-    }
-
-    #main-grid > main > h1:first-child {
-        margin-top: 0;
     }
 }
 
