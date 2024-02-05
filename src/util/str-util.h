@@ -10,9 +10,9 @@
 #include "string-view.h"
 #include "xmalloc.h"
 
-#define memcpy_literal(dest, lit) copystr(dest, lit, STRLEN(lit))
+#define copyliteral(dest, lit) copystrn(dest, lit, STRLEN(lit))
 
-static inline size_t copystr(char *dest, const char *src, size_t len)
+static inline size_t copystrn(char *dest, const char *src, size_t len)
 {
     memcpy(dest, src, len);
     return len;

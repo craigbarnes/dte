@@ -187,7 +187,7 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 {
     const size_t maxlen = STRLEN("E[;H") + (2 * DECIMAL_STR_MAX(x));
     char *buf = obuf_need_space(obuf, maxlen);
-    size_t i = memcpy_literal(buf, "\033[");
+    size_t i = copyliteral(buf, "\033[");
     i += buf_uint_to_str(y + 1, buf + i);
 
     if (x != 0) {
@@ -383,13 +383,13 @@ static size_t set_color_suffix(char *buf, int32_t color)
 
     if (!color_is_rgb(color)) {
         BUG_ON(color > 255);
-        size_t i = memcpy_literal(buf, "8;5;");
+        size_t i = copyliteral(buf, "8;5;");
         return i + buf_u8_to_str(color, buf + i);
     }
 
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
-    size_t i = memcpy_literal(buf, "8;2;");
+    size_t i = copyliteral(buf, "8;2;");
     i += buf_u8_to_str(r, buf + i);
     buf[i++] = ';';
     i += buf_u8_to_str(g, buf + i);
@@ -473,7 +473,7 @@ void term_set_style(Terminal *term, TermStyle style)
     const size_t maxcolor = STRLEN(";38;2;255;255;255");
     const size_t maxlen = STRLEN("E[0m") + (2 * maxcolor) + (2 * ARRAYLEN(attr_map));
     char *buf = obuf_need_space(&term->obuf, maxlen);
-    size_t pos = memcpy_literal(buf, "\033[0");
+    size_t pos = copyliteral(buf, "\033[0");
 
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
         if (style.attr & attr_map[i].attr) {
@@ -518,12 +518,12 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
 
     if (s.color == COLOR_DEFAULT) {
         // Reset color with OSC 112
-        i += memcpy_literal(buf + i, "\033]112");
+        i += copyliteral(buf + i, "\033]112");
     } else {
         // Set RGB color with OSC 12
         uint8_t r, g, b;
         color_split_rgb(s.color, &r, &g, &b);
-        i += memcpy_literal(buf + i, "\033]12;rgb:");
+        i += copyliteral(buf + i, "\033]12;rgb:");
         i += hex_encode_byte(buf + i, r);
         buf[i++] = '/';
         i += hex_encode_byte(buf + i, g);

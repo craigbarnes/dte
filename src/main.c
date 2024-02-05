@@ -136,9 +136,9 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
         case MOD_CTRL | 'd':
             loop = false;
         }
-        size_t n = memcpy_literal(buf, "  ");
+        size_t n = copyliteral(buf, "  ");
         n += keycode_to_string(key, buf + n);
-        n += memcpy_literal(buf + n, "\r\n");
+        n += copyliteral(buf + n, "\r\n");
         (void)!xwrite_all(STDOUT_FILENO, buf, n);
     }
 

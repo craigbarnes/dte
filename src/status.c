@@ -128,7 +128,7 @@ static void add_status_bytes(Formatter *f, const char *str, size_t len)
     }
 
     size_t avail = f->size - f->pos;
-    f->pos += copystr(f->buf + f->pos, str, MIN(len, avail));
+    f->pos += copystrn(f->buf + f->pos, str, MIN(len, avail));
 }
 
 PRINTF(2)

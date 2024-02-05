@@ -187,7 +187,7 @@ size_t keycode_to_string(KeyCode k, char *buf)
         goto copy;
     }
 
-    size_t plen = memcpy_literal(buf, "INVALID; 0x");
+    size_t plen = copyliteral(buf, "INVALID; 0x");
     return plen + buf_umax_to_hex_str(k, buf + plen, 8);
 
 copy:
