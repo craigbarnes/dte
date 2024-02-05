@@ -24,19 +24,18 @@ Installation variables
 
 The following Make variables may be useful when packaging `dte`:
 
-* `prefix`: Top-level installation prefix (defaults to `/usr/local`).
-* `bindir`: Installation prefix for program binary (defaults to
-  `$prefix/bin`).
-* `mandir`: Installation prefix for manual pages (defaults to
-  `$prefix/share/man`).
-* `bashcompletiondir`: Installation prefix for bash auto-completion
-  scripts (defaults to `$prefix/share/bash-completion/completions`).
-* `appdir`: Installation prefix for [desktop entry] files (defaults
-  to `$prefix/share/applications`).
-* `metainfodir`: Installation prefix for [AppStream] metadata files
-  (defaults to `$prefix/share/metainfo`).
-* `DESTDIR`: Standard variable used for [staged installs].
-* `V=1`: Enable verbose build output.
+* `prefix`: Top-level installation prefix (defaults to `/usr/local`)
+* `bindir`: Installation prefix for `dte` binary
+* `mandir`: Installation prefix for manual pages
+* `bashcompletiondir`: Installation prefix for bash auto-completion script
+* `appdir`: Installation prefix for [desktop entry] file
+* `metainfodir`: Installation prefix for [AppStream] metadata file
+* `DESTDIR`: Standard variable used for [staged installs]
+* `V=1`: Enable verbose build output
+
+These are defined in accordance with [section 7.2.5] of the
+[GNU Coding Standards] and the full list (along with default values)
+can be found at the top of [`GNUmakefile`].
 
 Example usage:
 
@@ -71,7 +70,7 @@ to a `Config.mk` file, for example:
     V = 1
 
 The `Config.mk` file should be in the project base directory alongside
-`GNUmakefile` and *must* be valid GNU make syntax.
+[`GNUmakefile`] and *must* be valid GNU make syntax.
 
 Stable release tarballs
 -----------------------
@@ -85,10 +84,13 @@ have long-term stable checksums. Use the tarballs from the [releases]
 page, unless you're prepared to deal with future checksum failures.
 
 
+[`GNUmakefile`]: ../GNUmakefile
+[syntax highlighters]: ../config/syntax
 [desktop entry]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
+[section 7.2.5]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
+[GNU Coding Standards]: https://www.gnu.org/prep/standards/html_node/index.html
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
-[syntax highlighters]: ../config/syntax
 [releases]: https://craigbarnes.gitlab.io/dte/releases.html
 [libgit issue #4343]: https://github.com/libgit2/libgit2/issues/4343
