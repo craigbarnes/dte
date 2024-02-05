@@ -15,7 +15,7 @@ static void ptr_array_grow(PointerArray *array)
 }
 
 // This is separate from ptr_array_append(), to allow the hot path to be
-// inlined. It also duplicates the append operation, so as to allow tail
+// inlined. It also duplicates the append operation so as to allow tail
 // calling, which appears to improve code generation.
 void ptr_array_grow_and_append(PointerArray *array, void *ptr)
 {

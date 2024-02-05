@@ -103,12 +103,6 @@ bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
     return false;
 }
 
-void free_cached_regexp(CachedRegexp *cr)
-{
-    regfree(&cr->re);
-    free(cr);
-}
-
 const InternedRegexp *regexp_intern(const char *pattern)
 {
     if (pattern[0] == '\0') {
@@ -128,8 +122,9 @@ const InternedRegexp *regexp_intern(const char *pattern)
         return NULL;
     }
 
-    ir->str = xstrdup(pattern);
-    return hashmap_insert(&interned_regexps, ir->str, ir);
+    char *str = xstrdup(pattern);
+    ir->str = str;
+    return hashmap_insert(&interned_regexps, str, ir);
 }
 
 bool regexp_is_interned(const char *pattern)

@@ -57,7 +57,7 @@ typedef struct {
 typedef struct {
     union {
         FlexArrayStr *str;
-        CachedRegexp *regexp;
+        const InternedRegexp *regexp;
     } u;
     uint8_t type; // FileDetectionType
     char name[];
@@ -71,35 +71,29 @@ static bool ft_uses_regex(FileDetectionType type)
 bool add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type)
 {
     BUG_ON(!is_valid_filetype_name(name));
-    regex_t re;
-    bool use_re = ft_uses_regex(type);
-    if (use_re) {
-        int err = regcomp(&re, str, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
-        if (unlikely(err)) {
-            return regexp_error_msg(&re, str, err);
+    const InternedRegexp *ir = NULL;
+    if (ft_uses_regex(type)) {
+        ir = regexp_intern(str);
+        if (unlikely(!ir)) {
+            return false;
         }
     }
 
     size_t name_len = strlen(name);
-    size_t str_len = strlen(str);
     UserFileTypeEntry *ft = xmalloc(sizeof(*ft) + name_len + 1);
     ft->type = type;
 
-    char *str_dest;
-    if (use_re) {
-        CachedRegexp *r = xmalloc(sizeof(*r) + str_len + 1);
-        r->re = re;
-        ft->u.regexp = r;
-        str_dest = r->str;
+    if (ir) {
+        ft->u.regexp = ir;
     } else {
+        size_t str_len = strlen(str);
         FlexArrayStr *s = xmalloc(sizeof(*s) + str_len + 1);
         s->str_len = str_len;
         ft->u.str = s;
-        str_dest = s->str;
+        memcpy(s->str, str, str_len + 1);
     }
 
     memcpy(ft->name, name, name_len + 1);
-    memcpy(str_dest, str, str_len + 1);
     ptr_array_append(filetypes, ft);
     return true;
 }
@@ -167,9 +161,8 @@ static StringView get_interpreter(StringView line)
 
 static bool ft_str_match(const UserFileTypeEntry *ft, const StringView sv)
 {
-    const char *str = ft->u.str->str;
-    const size_t len = ft->u.str->str_len;
-    return sv.length > 0 && strview_equal_strn(&sv, str, len);
+    const FlexArrayStr *s = ft->u.str;
+    return sv.length > 0 && strview_equal_strn(&sv, s->str, s->str_len);
 }
 
 static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
@@ -325,9 +318,7 @@ String dump_filetypes(const PointerArray *filetypes)
 
 static void free_filetype_entry(UserFileTypeEntry *ft)
 {
-    if (ft_uses_regex(ft->type)) {
-        free_cached_regexp(ft->u.regexp);
-    } else {
+    if (!ft_uses_regex(ft->type)) {
         free(ft->u.str);
     }
     free(ft);
