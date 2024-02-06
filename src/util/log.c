@@ -111,8 +111,8 @@ bool log_close(void)
 
 bool log_level_enabled(LogLevel level)
 {
-    BUG_ON(level <= LOG_LEVEL_NONE);
-    BUG_ON(level > LOG_LEVEL_TRACE);
+    BUG_ON(level <= LOG_LEVEL_NONE || level > LOG_LEVEL_TRACE);
+    BUG_ON(log_level < LOG_LEVEL_NONE || log_level > log_level_max());
     return level <= log_level;
 }
 
