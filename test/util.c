@@ -847,7 +847,7 @@ static void test_buf_parse_size(TestContext *ctx)
 static void test_buf_parse_hex_uint(TestContext *ctx)
 {
     unsigned int val;
-    char buf[(2 * sizeof(val)) + 2];
+    char buf[HEX_STR_MAX(val) + 1];
     size_t buf_len = xsnprintf(buf, sizeof buf, "%x", UINT_MAX);
     val = 0x90;
     EXPECT_EQ(buf_parse_hex_uint(buf, buf_len, &val), buf_len);
