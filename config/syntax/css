@@ -176,6 +176,10 @@ state namespace-end
 state error
     noeat .css-statementerror:END
 
+# TODO: Add support for nesting
+# * https://developer.chrome.com/docs/css-ui/css-nesting
+# * https://codepen.io/argyleink/pen/GRBMXyR
+
 syntax css
 
 state verybeginning
@@ -358,16 +362,15 @@ state value-error error
     noeat values
 
 list -i element \
-    a abbr acronym address area b base bdo big blockquote body br \
-    button caption cite code col colgroup dd del dfn div dl dt em \
-    fieldset form h1 h2 h3 h4 h5 h6 head hr html i iframe img input \
-    ins kbd label legend li link map meta noscript object ol optgroup \
-    option p param pre q samp script select small span strong style \
-    sub sup table tbody td textarea tfoot th thead title tr tt ul var \
-\
-    article aside audio canvas command datalist details embed figure \
-    footer header hgroup keygen main mark meter nav output progress ruby \
-    section time video wbr
+    a abbr address area article aside audio b base bdi bdo blockquote body \
+    br button canvas caption cite code col colgroup data datalist dd del \
+    details dfn dialog div dl dt em embed fieldset figcaption figure footer \
+    form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins \
+    kbd label legend li link main map mark menu meta meter nav noscript \
+    object ol optgroup option output p param picture pre progress q rp rt \
+    ruby s samp script search section select slot small source span strong \
+    style sub summary sup table tbody td template textarea tfoot th thead \
+    time title tr track u ul var video wbr
 
 # https://www.w3.org/Style/CSS/all-properties.en.json
 list -i property \
@@ -544,6 +547,7 @@ list -i pagepseudoclass \
 list -i fontfaceproperty \
     font-family font-stretch font-style font-weight src unicode-range
 
+# TODO: Add units mentioned at https://developer.chrome.com/blog/whats-new-css-ui-2023/#dynamic_viewport_units
 # %, distance, angle, time, frequency, resolution
 list -i unit \
     % fr \
