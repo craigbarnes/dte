@@ -447,20 +447,16 @@ String dump_buffer(const Buffer *buffer)
     }
 
     const FileInfo *file = &buffer->file;
+    const struct timespec *mtime = &file->mtime;
     unsigned int perms = file->mode & 07777;
-    char modestr[12];
-    char timestr[64];
-    if (!timespec_to_str(&file->mtime, timestr, sizeof(timestr))) {
-        static const char msg[] = "[error]";
-        memcpy(timestr, msg, sizeof(msg));
-    }
+    char tstr[64], modestr[12];
 
     string_sprintf (
         &buf,
         "\nLast stat:\n----------\n\n"
         "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
         "     Path:", buffer->abs_filename,
-        " Modified:", timestr,
+        " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
         "     Mode:", filemode_to_str(file->mode, modestr), perms,
         "     User:", (intmax_t)file->uid,
         "    Group:", (intmax_t)file->gid,

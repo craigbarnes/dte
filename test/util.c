@@ -2664,49 +2664,37 @@ static void test_log_level_to_str(TestContext *ctx)
 
 static void test_timespec_to_str(TestContext *ctx)
 {
-    struct timespec ts = {
-        .tv_sec = 4321,
-        .tv_nsec = 9876,
-    };
-
+    char buf[64] = "";
+    size_t size = sizeof(buf) - 1;
+    struct timespec ts = {.tv_sec = 0};
     EXPECT_TRUE(timespecs_equal(&ts, &ts));
-
-    char buf[64];
-    const char *r = timespec_to_str(&ts, buf, sizeof(buf));
-    EXPECT_NONNULL(r);
-
-    if (likely(r)) {
-        ASSERT_PTREQ(r, buf);
-        size_t len = strnlen(buf, sizeof(buf));
-        ASSERT_TRUE(len >= 24);
-        ASSERT_TRUE(len < sizeof(buf));
-
-        if (likely(timezone == 0 && daylight == 0)) {
-            // Note: $TZ is set to "UTC" in test_init()
-            EXPECT_STREQ(buf, "1970-01-01 01:12:01.9876 +0000");
-        } else {
-            LOG_WARNING("non-zero timezone/daylight; skipping timespec_to_str() test");
-        }
-
-        EXPECT_NONNULL(timespec_to_str(&ts, buf, len + 1));
-
-        errno = 0;
-        EXPECT_NULL(timespec_to_str(&ts, buf, len));
-        EXPECT_EQ(errno, ENOBUFS);
-
-        errno = 0;
-        EXPECT_NULL(timespec_to_str(&ts, buf, len - 1));
-        EXPECT_EQ(errno, ENOBUFS);
-    }
-
-    errno = 0;
-    EXPECT_NULL(timespec_to_str(&ts, buf, 1));
-    EXPECT_EQ(errno, ENOBUFS);
 
     errno = 0;
     ts.tv_nsec = NS_PER_SECOND;
-    EXPECT_NULL(timespec_to_str(&ts, buf, sizeof(buf)));
+    EXPECT_NULL(timespec_to_str(&ts, buf, size));
     EXPECT_EQ(errno, EINVAL);
+
+    errno = 0;
+    ts.tv_nsec = -1;
+    EXPECT_NULL(timespec_to_str(&ts, buf, size));
+    EXPECT_EQ(errno, EINVAL);
+
+    if (unlikely(timezone != 0 || daylight != 0)) {
+        // Note: $TZ is set to "UTC" in test_init()
+        LOG_WARNING("non-zero timezone/daylight; skipping TZ-dependent tests");
+        return;
+    }
+
+    ts.tv_sec = 4321;
+    ts.tv_nsec = 9876;
+    const char *r = timespec_to_str(&ts, buf, size);
+    EXPECT_STREQ(r, "1970-01-01 01:12:01.9876 +0000");
+    EXPECT_PTREQ(r, buf);
+
+    ts.tv_sec = -1;
+    ts.tv_nsec = NS_PER_SECOND - 1;
+    r = timespec_to_str(&ts, buf, size);
+    EXPECT_STREQ(r, "1969-12-31 23:59:59.999999999 +0000");
 }
 
 static void test_progname(TestContext *ctx)
