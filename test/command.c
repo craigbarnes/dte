@@ -497,6 +497,9 @@ static void test_string_append_escaped_arg(TestContext *ctx)
     str = escape_command_arg(&buf, "\"''\"", false);
     EXPECT_STREQ(str, "\"\\\"''\\\"\"");
 
+    str = escape_command_arg(&buf, "\t\\", false);
+    EXPECT_STREQ(str, "\"\\t\\\\\"");
+
     str = escape_command_arg(&buf, "~/file with spaces", false);
     EXPECT_STREQ(str, "~/'file with spaces'");
     str = escape_command_arg(&buf, "~/file with spaces", true);

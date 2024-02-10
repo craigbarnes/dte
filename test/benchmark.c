@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "command/serialize.h"
 #include "filetype.h"
 #include "indent.h"
 #include "options.h"
@@ -66,7 +67,7 @@ static void report(const struct timespec *start, unsigned int iters, const char 
     va_start(ap, fmt);
     xvsnprintf(name, sizeof name, fmt, ap);
     va_end(ap);
-    fprintf(stderr, "   BENCH  %-24s  %9ju ns/iter\n", name, ns / iters);
+    fprintf(stderr, "   BENCH  %-29s  %9ju ns/iter\n", name, ns / iters);
 }
 
 static void do_bench_find_ft(const char *expected_ft, const char *filename)
@@ -195,10 +196,45 @@ static void bench_parse_rgb(void)
     report(&start, iterations, "parse_rgb()");
 }
 
+static void bench_string_append_escaped_arg(void)
+{
+    static const char args[][32] = {
+        "asdas893843\t\nxsd asasd\"",
+        "/path with spaces",
+        "hello world",
+        " \t\r\n\x1F\x7F",
+        "/path/with/no/spaces",
+        "need \t\ndquotes",
+        "zas9k5t4 x; e sfgsdf sfh \" '\n",
+        "†•…‰™œŠŸž \033[P",
+    };
+
+    static_assert(IS_POWER_OF_2(ARRAYLEN(args)));
+    unsigned int iterations = 30000;
+    size_t accum = 0;
+    String buf = STRING_INIT;
+    struct timespec start;
+    get_time(&start);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        string_append_escaped_arg(&buf, args[i % ARRAYLEN(args)], true);
+        accum |= buf.len;
+        string_clear(&buf);
+    }
+
+    if (accum != 63) {
+        fail("unexpected result in %s(): %zu", __func__, accum);
+    }
+
+    report(&start, iterations, "string_append_escaped_arg()");
+    string_free(&buf);
+}
+
 int main(void)
 {
     bench_find_ft();
     bench_get_indent();
     bench_parse_rgb();
+    bench_string_append_escaped_arg();
     return 0;
 }
