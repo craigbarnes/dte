@@ -30,6 +30,15 @@ static noreturn void fail(const char *format, ...)
     exit(1);
 }
 
+#define CHECK_RESULT(val, expected) check(__FILE__, __LINE__, val, expected)
+
+static void check(const char *file, int line, uintmax_t a, uintmax_t b)
+{
+    if (a != b) {
+        fail("%s:%d: Result check failed: %ju != %ju", file, line, a, b);
+    }
+}
+
 static void get_time(struct timespec *ts)
 {
     if (clock_gettime(CLOCK_MONOTONIC, ts) != 0) {
@@ -40,7 +49,7 @@ static void get_time(struct timespec *ts)
 static uintmax_t timespec_to_ns(const struct timespec *ts)
 {
     if (ts->tv_sec < 0 || ts->tv_nsec < 0) {
-        fail("%s(): negative timespec value", __func__);
+        fail("%s(): Negative timespec value", __func__);
     }
 
     uintmax_t sec = ts->tv_sec;
@@ -78,7 +87,7 @@ static void do_bench_find_ft(const char *expected_ft, const char *filename)
     PointerArray filetypes = PTR_ARRAY_INIT;
     StringView line = STRING_VIEW_INIT;
     if (!xstreq(find_ft(&filetypes, filename, line), expected_ft)) {
-        fail("unexpected return value for find_ft() in %s()", __func__);
+        fail("Unexpected return value for find_ft() in %s()", __func__);
     }
 
     unsigned int iterations = 300000;
@@ -111,10 +120,7 @@ static void do_bench_get_indent_width(const StringView *line, unsigned int tab_w
         accum += get_indent_width(line, tab_width);
     }
 
-    if (accum != (iterations * line->length)) {
-        fail("unexpected result in %s(): %u", __func__, accum);
-    }
-
+    CHECK_RESULT(accum, iterations * line->length);
     report(&start, iterations, "get_indent_width() <- %u", tab_width);
 }
 
@@ -131,10 +137,7 @@ static void do_bench_get_indent_info(const LocalOptions *opts, const StringView 
         accum += info.width + info.bytes;
     }
 
-    if (accum != iterations * line->length * 2) {
-        fail("unexpected result in %s(): %u", __func__, accum);
-    }
-
+    CHECK_RESULT(accum, iterations * line->length * 2);
     report(&start, iterations, "get_indent_info() <- %u", opts->indent_width);
 }
 
@@ -189,10 +192,7 @@ static void bench_parse_rgb(void)
         accum |= parse_rgb(s + 1, s[0]);
     }
 
-    if (accum != COLOR_RGB(0xFFFFFF)) {
-        fail("unexpected result in %s(): %u", __func__, accum);
-    }
-
+    CHECK_RESULT(accum, COLOR_RGB(0xFFFFFF));
     report(&start, iterations, "parse_rgb()");
 }
 
@@ -222,10 +222,7 @@ static void bench_string_append_escaped_arg(void)
         string_clear(&buf);
     }
 
-    if (accum != 63) {
-        fail("unexpected result in %s(): %zu", __func__, accum);
-    }
-
+    CHECK_RESULT(accum, 63);
     report(&start, iterations, "string_append_escaped_arg()");
     string_free(&buf);
 }
