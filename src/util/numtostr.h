@@ -17,17 +17,6 @@ static inline size_t hex_encode_byte(char *out, uint8_t byte)
     return 2;
 }
 
-// Encodes 24 bits from a uint32_t as 6 hexadecimal digits (fixed width)
-static inline char *hex_encode_u24_fixed(char *out, uint32_t x)
-{
-    UNROLL_LOOP(6)
-    for (size_t i = 0, n = 6; i < n; i++) {
-        unsigned int shift = (n - i - 1) * 4;
-        out[i] = hextab_lower[(x >> shift) & 0xF];
-    }
-    return out;
-}
-
 size_t buf_umax_to_str(uintmax_t x, char *buf) NONNULL_ARGS;
 size_t buf_umax_to_hex_str(uintmax_t x, char *buf, size_t min_digits) NONNULL_ARGS;
 size_t buf_uint_to_str(unsigned int x, char *buf) NONNULL_ARGS;

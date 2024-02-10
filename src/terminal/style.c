@@ -171,7 +171,12 @@ size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
     }
 
     buf[0] = '#';
-    hex_encode_u24_fixed(buf + 1, color);
+    buf[1] = hextab_lower[(color >> 20) & 0xF];
+    buf[2] = hextab_lower[(color >> 16) & 0xF];
+    buf[3] = hextab_lower[(color >> 12) & 0xF];
+    buf[4] = hextab_lower[(color >> 8) & 0xF];
+    buf[5] = hextab_lower[(color >> 4) & 0xF];
+    buf[6] = hextab_lower[(color >> 0) & 0xF];
     return 7;
 }
 

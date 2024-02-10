@@ -246,6 +246,40 @@ static void test_color_to_nearest(TestContext *ctx)
     EXPECT_EQ(count, 255 + ARRAYLEN(color_stops) - 1);
 }
 
+static void test_color_to_str(TestContext *ctx)
+{
+    static const struct {
+        char expected_string[15];
+        uint8_t expected_len;
+        int32_t color;
+    } tests[] = {
+        {STRN("keep"), COLOR_KEEP},
+        {STRN("default"), COLOR_DEFAULT},
+        {STRN("black"), COLOR_BLACK},
+        {STRN("gray"), COLOR_GRAY},
+        {STRN("darkgray"), COLOR_DARKGRAY},
+        {STRN("lightmagenta"), COLOR_LIGHTMAGENTA},
+        {STRN("white"), COLOR_WHITE},
+        {STRN("16"), 16},
+        {STRN("255"), 255},
+        {STRN("#abcdef"), COLOR_RGB(0xabcdef)},
+        {STRN("#00001e"), COLOR_RGB(0x00001e)},
+        {STRN("#000000"), COLOR_RGB(0x000000)},
+        {STRN("#100001"), COLOR_RGB(0x100001)},
+        {STRN("#ffffff"), COLOR_RGB(0xffffff)},
+    };
+
+    char buf[COLOR_STR_BUFSIZE] = "";
+    FOR_EACH_I(i, tests) {
+        int32_t color = tests[i].color;
+        ASSERT_TRUE(color_is_valid(color));
+        size_t len = color_to_str(buf, color);
+        ASSERT_TRUE(len < sizeof(tests[0].expected_string));
+        IEXPECT_EQ(len, tests[i].expected_len);
+        EXPECT_MEMEQ(buf, tests[i].expected_string, len);
+    }
+}
+
 static void test_term_style_to_string(TestContext *ctx)
 {
     static const struct {
@@ -1323,6 +1357,7 @@ static const TestEntry tests[] = {
     TEST(test_parse_rgb),
     TEST(test_parse_term_style),
     TEST(test_color_to_nearest),
+    TEST(test_color_to_str),
     TEST(test_term_style_to_string),
     TEST(test_cursor_mode_from_str),
     TEST(test_cursor_type_from_str),
