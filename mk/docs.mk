@@ -23,6 +23,9 @@ $(html-man): public/%.html: docs/%.md
 public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md | public/screenshot.png
 public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
+public/logo.svg: share/dte.svg
+public/screenshot.png: docs/screenshot.png
+public/favicon.ico: docs/favicon.ico
 public/releases.html: private PDHTML += -L docs/releases.lua
 public/dterc.html public/dte-syntax.html: private PDHTML += -L docs/fix-anchors.lua
 public/dte.html: private PDHTML += --indented-code-classes=sh
@@ -51,9 +54,9 @@ public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
-$(img): public/%: docs/% | public/
+$(img): | public/
 	$(E) CP $@
-	$(Q) cp $< $@
+	$(Q) cp '$<' '$@'
 
 public/%.gz: public/%
 	$(E) GZIP $@
