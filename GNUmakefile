@@ -54,20 +54,23 @@ CONTRIB_SCRIPTS = \
     fzf.sh git-changes.sh lf-wrapper.sh longest-line.awk \
     open-c-header.sh ranger-wrapper.sh xtag.sh
 
-all: $(dte)
-check: check-tests check-opts
-install: install-bin install-man install-bash-completion
-uninstall: uninstall-bin uninstall-man uninstall-bash-completion
-install-full: install
-uninstall-full: uninstall
+INSTALL_TARGETS_BASIC := bin man bash-completion
+INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) desktop-file appstream
 
 ifeq "$(KERNEL)" "Darwin"
- install-full: install-desktop-file install-appstream
- uninstall-full: uninstall-desktop-file uninstall-appstream
+ INSTALL_TARGETS := $(INSTALL_TARGETS_BASIC)
 else
- install: install-desktop-file install-appstream
- uninstall: uninstall-desktop-file uninstall-appstream
+ INSTALL_TARGETS := $(INSTALL_TARGETS_FULL)
 endif
+
+all: $(dte)
+check: check-tests check-opts
+install: $(addprefix install-, $(INSTALL_TARGETS))
+uninstall: $(addprefix uninstall-, $(INSTALL_TARGETS))
+install-full: $(addprefix install-, $(INSTALL_TARGETS_FULL))
+install-basic: $(addprefix install-, $(INSTALL_TARGETS_BASIC))
+uninstall-full: $(addprefix uninstall-, $(INSTALL_TARGETS_FULL))
+uninstall-basic: $(addprefix uninstall-, $(INSTALL_TARGETS_BASIC))
 
 install-bin: all
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
@@ -169,11 +172,11 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_SUBTARGETS = bin man bash-completion desktop-file icons appstream full contrib
+INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic icons contrib
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
 .PHONY: check check-tests check-opts installcheck bench
-.PHONY: $(foreach T, $(INSTALL_SUBTARGETS), install-$(T) uninstall-$(T))
+.PHONY: $(foreach T, $(INSTALL_TARGETS_ALL), install-$(T) uninstall-$(T))
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean install% uninstall%
