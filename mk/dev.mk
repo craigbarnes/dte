@@ -59,12 +59,12 @@ check-codespell:
 	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES) >&2
 
 check-desktop-file:
-	$(E) LINT dte.desktop
-	$(Q) desktop-file-validate dte.desktop >&2
+	$(E) LINT share/dte.desktop
+	$(Q) desktop-file-validate share/dte.desktop >&2
 
 check-appstream:
-	$(E) LINT dte.appdata.xml
-	$(Q) appstream-util --nonet validate dte.appdata.xml | sed '/OK$$/d' >&2
+	$(E) LINT share/dte.appdata.xml
+	$(Q) appstream-util --nonet validate share/dte.appdata.xml | sed '/OK$$/d' >&2
 
 check-docs:
 	@printf '\nChecking links from:\n\n'

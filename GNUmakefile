@@ -106,7 +106,7 @@ uninstall-bash-completion:
 install-desktop-file:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(appdir)'
 	$(E) INSTALL '$(DESTDIR)$(appdir)/$(appid).desktop'
-	$(Q) mk/dtfilter.sh '$(bindir)/$(dte)' <'$(appid).desktop' >'$(DESTDIR)$(appdir)/$(appid).desktop'
+	$(Q) mk/dtfilter.sh '$(bindir)/$(dte)' <'share/$(appid).desktop' >'$(DESTDIR)$(appdir)/$(appid).desktop'
 	$(Q) $(if $(DESTDIR),, $(POSTINSTALL_DESKTOP))
 
 uninstall-desktop-file:
@@ -118,9 +118,9 @@ install-icons:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(hicolordir)/scalable/apps'
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(hicolordir)/48x48/apps'
 	$(E) INSTALL '$(DESTDIR)$(hicolordir)/scalable/apps/dte.svg'
-	$(Q) $(INSTALL_DATA) 'docs/logo.svg' '$(DESTDIR)$(hicolordir)/scalable/apps/dte.svg'
+	$(Q) $(INSTALL_DATA) 'share/dte.svg' '$(DESTDIR)$(hicolordir)/scalable/apps/dte.svg'
 	$(E) INSTALL '$(DESTDIR)$(hicolordir)/48x48/apps/dte.png'
-	$(Q) $(INSTALL_DATA) 'docs/logo-48x48.png' '$(DESTDIR)$(hicolordir)/48x48/apps/dte.png'
+	$(Q) $(INSTALL_DATA) 'share/dte-48x48.png' '$(DESTDIR)$(hicolordir)/48x48/apps/dte.png'
 	$(Q) $(if $(DESTDIR),, $(POSTINSTALL_ICONS))
 
 uninstall-icons:
@@ -131,7 +131,7 @@ uninstall-icons:
 install-appstream:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(metainfodir)'
 	$(E) INSTALL '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
-	$(Q) $(INSTALL_DATA) '$(appid).appdata.xml' '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
+	$(Q) $(INSTALL_DATA) 'share/$(appid).appdata.xml' '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
 
 uninstall-appstream:
 	$(RM) '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'

@@ -2,8 +2,8 @@
 set -eu
 
 # This script is used by `make install-desktop-file` to rewrite the
-# Exec/TryExec fields in dte.desktop to use absolute paths. This is
-# done so that the desktop file for each installation executes the
+# Exec/TryExec fields in share/dte.desktop to use absolute paths. This
+# is done so that the desktop file for each installation executes the
 # appropriate binary, instead of just using $PATH resolution.
 
 exec sed "
