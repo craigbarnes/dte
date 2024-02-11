@@ -98,7 +98,7 @@ uninstall-man:
 install-bash-completion:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bashcompletiondir)'
 	$(E) INSTALL '$(DESTDIR)$(bashcompletiondir)/$(dte)'
-	$(Q) $(INSTALL_DATA) completion.bash '$(DESTDIR)$(bashcompletiondir)/$(dte)'
+	$(Q) $(INSTALL_DATA) share/completion.bash '$(DESTDIR)$(bashcompletiondir)/$(dte)'
 
 uninstall-bash-completion:
 	$(RM) '$(DESTDIR)$(bashcompletiondir)/$(dte)'
