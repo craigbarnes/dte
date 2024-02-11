@@ -20,6 +20,8 @@ mandir ?= $(datarootdir)/man
 man1dir ?= $(mandir)/man1
 man5dir ?= $(mandir)/man5
 appdir ?= $(datarootdir)/applications
+icondir ?= $(datarootdir)/icons
+hicolordir ?= $(icondir)/hicolor
 metainfodir ?= $(datarootdir)/metainfo
 bashcompletiondir ?= $(datarootdir)/bash-completion/completions
 appid = dte
@@ -33,8 +35,19 @@ RM = rm -f
 # unless the DESTDIR variable is set. The presence of DESTDIR usually
 # indicates a distro packaging environment, in which case the equivalent,
 # distro-provided macros/hooks should be used instead.
-define POSTINSTALL
- (update-desktop-database -q '$(appdir)' 2>/dev/null && $(LOG) UPDATE '$(appdir)/mimeinfo.cache') || :
+define POSTINSTALL_DESKTOP
+( \
+  update-desktop-database -q '$(appdir)' 2>/dev/null \
+  && $(LOG) UPDATE '$(appdir)/mimeinfo.cache' \
+) || :
+endef
+
+define POSTINSTALL_ICONS
+( \
+  touch -c '$(hicolordir)' \
+  && gtk-update-icon-cache -qtf '$(hicolordir)' 2>/dev/null \
+  && $(LOG) UPDATE '$(hicolordir)/icon-theme.cache' \
+) || :
 endef
 
 CONTRIB_SCRIPTS = \
@@ -91,11 +104,26 @@ install-desktop-file:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(appdir)'
 	$(E) INSTALL '$(DESTDIR)$(appdir)/$(appid).desktop'
 	$(Q) mk/dtfilter.sh '$(bindir)/$(dte)' <'$(appid).desktop' >'$(DESTDIR)$(appdir)/$(appid).desktop'
-	$(Q) $(if $(DESTDIR),, $(POSTINSTALL))
+	$(Q) $(if $(DESTDIR),, $(POSTINSTALL_DESKTOP))
 
 uninstall-desktop-file:
 	$(RM) '$(DESTDIR)$(appdir)/$(appid).desktop'
-	$(if $(DESTDIR),, $(POSTINSTALL))
+	$(if $(DESTDIR),, $(POSTINSTALL_DESKTOP))
+
+# https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#install_icons
+install-icons:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(hicolordir)/scalable/apps'
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(hicolordir)/48x48/apps'
+	$(E) INSTALL '$(DESTDIR)$(hicolordir)/scalable/apps/dte.svg'
+	$(Q) $(INSTALL_DATA) 'docs/logo.svg' '$(DESTDIR)$(hicolordir)/scalable/apps/dte.svg'
+	$(E) INSTALL '$(DESTDIR)$(hicolordir)/48x48/apps/dte.png'
+	$(Q) $(INSTALL_DATA) 'docs/logo-48x48.png' '$(DESTDIR)$(hicolordir)/48x48/apps/dte.png'
+	$(Q) $(if $(DESTDIR),, $(POSTINSTALL_ICONS))
+
+uninstall-icons:
+	$(RM) '$(DESTDIR)$(hicolordir)/scalable/apps/dte.svg'
+	$(RM) '$(DESTDIR)$(hicolordir)/48x48/apps/dte.png'
+	$(if $(DESTDIR),, $(POSTINSTALL_ICONS))
 
 install-appstream:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(metainfodir)'
@@ -141,7 +169,7 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream full contrib
+INSTALL_SUBTARGETS = bin man bash-completion desktop-file icons appstream full contrib
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
 .PHONY: check check-tests check-opts installcheck bench
