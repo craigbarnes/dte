@@ -2,7 +2,7 @@
 Name = dte
 GenericName = Text Editor
 Comment = Edit text files
-Icon = text-editor
+Icon = dte
 Categories = Utility;TextEditor;
 Keywords = Text;Editor;Plaintext;Write;
 Type = Application

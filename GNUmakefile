@@ -55,7 +55,7 @@ CONTRIB_SCRIPTS = \
     open-c-header.sh ranger-wrapper.sh xtag.sh
 
 INSTALL_TARGETS_BASIC := bin man bash-completion
-INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) desktop-file appstream
+INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) icons desktop-file appstream
 
 ifeq "$(KERNEL)" "Darwin"
  INSTALL_TARGETS := $(INSTALL_TARGETS_BASIC)
@@ -172,7 +172,7 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic icons contrib
+INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic contrib
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
 .PHONY: check check-tests check-opts installcheck bench
