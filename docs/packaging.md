@@ -11,9 +11,10 @@ targets:
 * `install-man`: Install man pages
 * `install-bash-completion`: Install bash auto-completion script
 * `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
+* `install-icons`: Install SVG/PNG icon files (excluded on macOS)
 * `install-appstream`: Install [AppStream] metadata (excluded on macOS)
 
-The last 2 targets are excluded on macOS because they'd typically just be
+The last 3 targets are excluded on macOS because they'd typically just be
 unused clutter on that platform. However, `make install-full` can be used
 to run *all* of the above targets, regardless of platform.
 
