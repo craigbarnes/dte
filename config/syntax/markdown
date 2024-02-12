@@ -154,6 +154,19 @@ state reference-close
     noeat text
 
 state maybe-link-def reference
+    char ^ maybe-footnote-def special
+    noeat maybe-link-def-name
+
+state maybe-footnote-def reference
+    char "\\" .markdown-escape:this
+    char ] maybe-footnote-def-close
+    eat this
+
+state maybe-footnote-def-close reference
+    char : text reference
+    noeat reference-close
+
+state maybe-link-def-name reference
     char "\\" .markdown-escape:this
     char ] maybe-link-def-close
     eat this
