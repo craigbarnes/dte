@@ -69,11 +69,9 @@ installed:
 
     make && sudo make install
 
-------
-
-**Note to macOS users:** macOS still ships with GNU Make 3.81, so
-you'll likely have to install a more recent version with [`brew`]
-and then use `gmake` in place of `make`. For example:
+If you're using macOS, it may be necessary to install a more recent version
+of GNU Make (e.g. with [`brew`]) and then use `gmake` in place of `make`.
+For example:
 
     brew install make
     gmake && sudo gmake install
