@@ -45,18 +45,14 @@ rocky-9:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-rocky-9
 
-debian-10:
+debian-oldstable:
     extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-oldstable
 
-debian-11:
-    extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-11
-
-debian-12:
+debian-stable:
     stage: test
     needs: []
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-12
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
         - make check CC='ccache clang'
         - make check CC='ccache clang' LDFLAGS=-static
