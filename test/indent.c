@@ -25,13 +25,30 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_TRUE(info.wsonly);
     EXPECT_FALSE(info.sane);
 
+    line = strview_from_cstring("    xyz");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 4);
+    EXPECT_EQ(info.width, 4);
+    EXPECT_EQ(info.level, 1);
+    EXPECT_FALSE(info.wsonly);
+    EXPECT_TRUE(info.sane);
+
     options.expand_tab = false,
+    line = strview_from_cstring("\t\t");
     info = get_indent_info(&options, &line);
     EXPECT_EQ(info.bytes, 2);
     EXPECT_EQ(info.width, 8);
     EXPECT_EQ(info.level, 2);
     EXPECT_TRUE(info.wsonly);
     EXPECT_TRUE(info.sane);
+
+    line = strview_from_cstring("    test");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 4);
+    EXPECT_EQ(info.width, 4);
+    EXPECT_EQ(info.level, 1);
+    EXPECT_FALSE(info.wsonly);
+    EXPECT_FALSE(info.sane);
 
     options.indent_width = 8,
     options.tab_width = 8,
@@ -49,6 +66,22 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_EQ(info.width, 17);
     EXPECT_EQ(info.level, 2);
     EXPECT_TRUE(info.wsonly);
+    EXPECT_FALSE(info.sane);
+
+    line = strview_from_cstring("    test");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 4);
+    EXPECT_EQ(info.width, 4);
+    EXPECT_EQ(info.level, 0);
+    EXPECT_FALSE(info.wsonly);
+    EXPECT_TRUE(info.sane);
+
+    line = strview_from_cstring("        test");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 8);
+    EXPECT_EQ(info.width, 8);
+    EXPECT_EQ(info.level, 1);
+    EXPECT_FALSE(info.wsonly);
     EXPECT_FALSE(info.sane);
 }
 
