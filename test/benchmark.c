@@ -16,6 +16,7 @@
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/time-util.h"
+#include "util/utf8.h"
 #include "util/xsnprintf.h"
 
 COLD PRINTF(1)
@@ -34,7 +35,7 @@ static noreturn void fail(const char *format, ...)
 
 static void check(const char *file, int line, uintmax_t a, uintmax_t b)
 {
-    if (a != b) {
+    if (unlikely(a != b)) {
         fail("%s:%d: Result check failed: %ju != %ju", file, line, a, b);
     }
 }
@@ -227,11 +228,45 @@ static void bench_string_append_escaped_arg(void)
     string_free(&buf);
 }
 
+static void bench_u_set_char(void)
+{
+    unsigned int iterations = 250000;
+    size_t accum = 0;
+    char buf[UTF8_MAX_SEQ_LEN];
+    struct timespec start;
+    get_time(&start);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        accum |= u_set_char(buf, i & 0xFFFFF);
+    }
+
+    CHECK_RESULT(accum, 7);
+    report(&start, iterations, "u_set_char()");
+}
+
+static void bench_u_set_char_raw(void)
+{
+    unsigned int iterations = 250000;
+    size_t accum = 0;
+    char buf[UTF8_MAX_SEQ_LEN];
+    struct timespec start;
+    get_time(&start);
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        accum |= u_set_char_raw(buf, i & 0xFFFFF);
+    }
+
+    CHECK_RESULT(accum, 7);
+    report(&start, iterations, "u_set_char_raw()");
+}
+
 int main(void)
 {
     bench_find_ft();
     bench_get_indent();
     bench_parse_rgb();
     bench_string_append_escaped_arg();
+    bench_u_set_char();
+    bench_u_set_char_raw();
     return 0;
 }
