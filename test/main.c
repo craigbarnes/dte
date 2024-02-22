@@ -7,9 +7,13 @@
 #include "test.h"
 #include "editor.h"
 #include "syntax/syntax.h"
+#include "util/exitcode.h"
 #include "util/fd.h"
 #include "util/log.h"
 #include "util/path.h"
+#include "util/progname.h"
+#include "util/str-util.h"
+#include "util/time-util.h"
 #include "util/xreadwrite.h"
 
 void init_headless_mode(TestContext *ctx);
@@ -190,6 +194,18 @@ static void test_deinit(TestContext *ctx)
     EXPECT_TRUE(log_close());
 }
 
+static void print_timing(const TestContext *ctx, const struct timespec ts[2])
+{
+    struct timespec diff;
+    timespec_subtract(&ts[1], &ts[0], &diff);
+
+    double ms = (double)diff.tv_sec * (double)MS_PER_SECOND;
+    ms += (double)diff.tv_nsec / (double)NS_PER_MS;
+
+    int precision = 3 - (ms >= 1000.0) - (ms >= 100.0) - (ms >= 10.0);
+    fprintf(stderr, " %s(%0.*f ms)%s", ctx->dim, precision, ms, ctx->sgr0);
+}
+
 static void run_tests(TestContext *ctx, const TestGroup *g)
 {
     // Note: we avoid using test.h assertions in this function, in order to
@@ -199,20 +215,33 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
         abort();
     }
 
+    bool timing = ctx->timing;
+
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
         if (unlikely(!t->name || !t->func)) {
             fputs("Error: TestEntry with NULL name or function\n", stderr);
             abort();
         }
+
         unsigned int prev_passed = ctx->passed;
         unsigned int prev_failed = ctx->failed;
+        struct timespec times[2];
+        timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[0]);
         t->func(ctx);
+        timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[1]);
         unsigned int passed = ctx->passed - prev_passed;
         unsigned int failed = ctx->failed - prev_failed;
+
         fprintf(stderr, "   CHECK  %-35s  %4u passed", t->name, passed);
+
         if (unlikely(failed > 0)) {
-            fprintf(stderr, " %4u FAILED", failed);
+            fprintf(stderr, " %s%4u FAILED%s", ctx->boldred, failed, ctx->sgr0);
         }
+
+        if (timing) {
+            print_timing(ctx, times);
+        }
+
         fputc('\n', stderr);
     }
 }
@@ -231,12 +260,51 @@ static const TestEntry dtests[] = {
 static const TestGroup init_tests = TEST_GROUP(itests);
 static const TestGroup deinit_tests = TEST_GROUP(dtests);
 
-int main(void)
+static void usage(FILE *stream, int argc, char *argv[])
+{
+    fprintf(stream, "Usage: %s [-cCth]\n", progname(argc, argv, NULL));
+}
+
+int main(int argc, char *argv[])
 {
     TestContext ctx = {
         .passed = 0,
         .failed = 0,
+        .timing = false,
+        .boldred = "\033[1;31m",
+        .dim = "\033[2m",
+        .sgr0 = "\033[0m",
     };
+
+    bool color = isatty(STDERR_FILENO) && !xgetenv("NO_COLOR");
+
+    for (int ch; (ch = getopt(argc, argv, "cCth")) != -1; ) {
+        switch (ch) {
+        case 'c':
+        case 'C':
+            color = (ch == 'c');
+            break;
+        case 't':
+            ctx.timing = true;
+            break;
+        case 'h':
+            usage(stdout, argc, argv);
+            return EX_OK;
+        default:
+            usage(stderr, argc, argv);
+            return EX_USAGE;
+        }
+    }
+
+    setvbuf(stderr, NULL, _IOLBF, 0);
+    if (!color) {
+        ctx.boldred[0] = '\0';
+        ctx.dim[0] = '\0';
+        ctx.sgr0[0] = '\0';
+    }
+
+    struct timespec times[2];
+    bool timing = ctx.timing && !clock_gettime(CLOCK_MONOTONIC, &times[0]);
 
     run_tests(&ctx, &init_tests);
     run_tests(&ctx, &util_tests);
@@ -266,6 +334,19 @@ int main(void)
     run_tests(&ctx, &error_tests);
     run_tests(&ctx, &deinit_tests);
 
-    fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", ctx.passed, ctx.failed);
+    timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[1]);
+
+    fprintf (
+        stderr,
+        "\n   TOTAL  %u passed, %s%u failed%s",
+        ctx.passed,
+        ctx.failed ? ctx.boldred : "", ctx.failed, ctx.sgr0
+    );
+
+    if (timing) {
+        print_timing(&ctx, times);
+    }
+
+    fputs("\n\n", stderr);
     return ctx.failed ? 1 : 0;
 }

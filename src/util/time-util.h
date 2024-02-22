@@ -37,6 +37,23 @@ static inline void timespec_subtract (
     }
 }
 
+static inline int timespec_cmp(const struct timespec *a, const struct timespec *b)
+{
+    time_t sa = a->tv_sec;
+    time_t sb = b->tv_sec;
+    long na = a->tv_nsec;
+    long nb = b->tv_nsec;
+    BUG_ON(na >= NS_PER_SECOND);
+    BUG_ON(nb >= NS_PER_SECOND);
+
+    // Example #1: (sa == sb) && (na == nb):  0 + 0 =  0
+    // Example #2: (sa <  sb) && (na >  nb): -2 + 1 = -1
+    int r = 0;
+    r += (sa == sb) ? 0 : (sa < sb ? -2 : 2);
+    r += (na == nb) ? 0 : (na < nb ? -1 : 1);
+    return r;
+}
+
 static inline bool timespecs_equal(const struct timespec *a, const struct timespec *b)
 {
     return a->tv_sec == b->tv_sec && a->tv_nsec == b->tv_nsec;

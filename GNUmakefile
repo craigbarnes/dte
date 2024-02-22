@@ -150,7 +150,7 @@ uninstall-contrib:
 
 check-tests: $(test) all
 	$(E) EXEC '$(test)'
-	$(Q) ./$(test)
+	$(Q) ./$(test) $(TESTFLAGS)
 
 check-opts: $(dte)
 	$(E) EXEC 'test/check-opts.sh'

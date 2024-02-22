@@ -12,6 +12,10 @@ typedef struct {
     unsigned int passed;
     unsigned int failed;
     void *userdata;
+    char boldred[8];
+    char dim[5];
+    char sgr0[5];
+    bool timing;
 } TestContext;
 
 typedef struct {
