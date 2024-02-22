@@ -6,7 +6,7 @@ variables:
 default:
     interruptible: true
     before_script:
-        - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-t
+        - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-ct
         - export CC="ccache ${CC:-gcc}"
         - make vars
 
