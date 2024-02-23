@@ -2,3 +2,7 @@
 # SC2016: Expressions don't expand in single quotes, use double quotes
 # SC2064: Use single quotes in "trap" command
 disable=SC1091,SC2016,SC2064
+
+# See: shellcheck --list-optional
+enable=check-set-e-suppressed
+enable=deprecate-which
