@@ -33,9 +33,14 @@ static const struct {
 static void test_dump_handlers(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
+    ASSERT_NONNULL(e);
+    ASSERT_NONNULL(e->window);
+    ASSERT_NONNULL(e->view);
+    ASSERT_NONNULL(e->buffer);
     const CommandRunner runner = normal_mode_cmdrunner(e, false);
     const CommandSet *cmds = runner.cmds;
     ASSERT_NONNULL(cmds);
+    ASSERT_NONNULL(cmds->lookup);
 
     for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
         const ShowHandler *handler = lookup_show_handler(handlers[i].name);
