@@ -13,6 +13,7 @@ typedef struct {
     size_t offset;
     ssize_t sel_so;
     ssize_t sel_eo;
+    WhitespaceErrorFlags wse_flags;
 
     const unsigned char *line;
     size_t size;
@@ -72,17 +73,10 @@ static bool is_non_text(CodePoint u, bool display_special)
     return u < 0x20 || u == 0x7F || u_is_unprintable(u);
 }
 
-static WhitespaceErrorFlags get_ws_error(const LocalOptions *opts)
-{
-    WhitespaceErrorFlags taberrs = WSE_TAB_INDENT | WSE_TAB_AFTER_INDENT;
-    WhitespaceErrorFlags extra = opts->expand_tab ? taberrs : WSE_SPACE_INDENT;
-    return opts->ws_error | ((opts->ws_error & WSE_AUTO_INDENT) ? extra : 0);
-}
-
 static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 {
     const View *view = info->view;
-    WhitespaceErrorFlags flags = get_ws_error(&view->buffer->options);
+    WhitespaceErrorFlags flags = info->wse_flags;
     WhitespaceErrorFlags trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
     if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
@@ -103,33 +97,35 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
         WhitespaceErrorFlags mask = in_indent ? WSE_TAB_INDENT : WSE_TAB_AFTER_INDENT;
         return (flags & mask) != 0;
     }
-    if (!in_indent) {
-        // All checks below here only apply to indentation
+
+    if (!in_indent || !(flags & (WSE_SPACE_INDENT | WSE_SPACE_ALIGN))) {
+        // Return early, without doing extra work, if WSE_SPACE_* checks
+        // below aren't applicable
         return false;
     }
 
     const char *line = info->line;
+    const size_t size = info->size;
     size_t pos = i;
     size_t count = 0;
     while (pos > 0 && line[pos - 1] == ' ') {
         pos--;
     }
-    while (pos < info->size && line[pos] == ' ') {
+    while (pos < size && line[pos] == ' ') {
         pos++;
         count++;
     }
 
+    bool space_instead_of_tab = (count >= view->buffer->options.tab_width);
+    bool space_before_tab = (pos < size && line[pos] == '\t');
     WhitespaceErrorFlags mask;
-    if (count >= view->buffer->options.tab_width) {
-        // Spaces used instead of tab
-        mask = WSE_SPACE_INDENT;
-    } else if (pos < info->size && line[pos] == '\t') {
-        // Space before tab
+    if (space_instead_of_tab || space_before_tab) {
         mask = WSE_SPACE_INDENT;
     } else {
         // Less than tab width spaces at end of indentation
         mask = WSE_SPACE_ALIGN;
     }
+
     return (flags & mask) != 0;
 }
 
@@ -257,6 +253,14 @@ static void hl_words(Terminal *term, const StyleMap *styles, const LineInfo *inf
     }
 }
 
+// Get effective `ws-error` flags (i.e. for `auto-indent`)
+static WhitespaceErrorFlags get_wse_flags(const LocalOptions *opts)
+{
+    WhitespaceErrorFlags taberrs = WSE_TAB_INDENT | WSE_TAB_AFTER_INDENT;
+    WhitespaceErrorFlags extra = opts->expand_tab ? taberrs : WSE_SPACE_INDENT;
+    return opts->ws_error | ((opts->ws_error & WSE_AUTO_INDENT) ? extra : 0);
+}
+
 static void line_info_init (
     LineInfo *info,
     const View *view,
@@ -267,6 +271,7 @@ static void line_info_init (
         .view = view,
         .line_nr = line_nr,
         .offset = block_iter_get_offset(bi),
+        .wse_flags = get_wse_flags(&view->buffer->options),
     };
 
     if (!view->selection) {
