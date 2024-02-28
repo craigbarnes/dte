@@ -1,7 +1,7 @@
 #include <errno.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/time.h>
+#include <sys/select.h> // NOLINT(portability-restrict-system-includes)
+#include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
 #include "paste.h"
 #include "util/debug.h"

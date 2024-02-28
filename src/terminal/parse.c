@@ -369,6 +369,7 @@ exit_loop:
     return i;
 }
 
+// NOLINTNEXTLINE(readability-function-size)
 UNITTEST {
     ControlParams csi = {.nparams = 0};
     StringView s = STRING_VIEW("\033[901;0;55mx");

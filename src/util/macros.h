@@ -342,9 +342,9 @@
 #endif
 
 #ifdef __COUNTER__ // Supported by GCC 4.3+ and Clang
-    #define COUNTER_ __COUNTER__
+    #define COUNTER __COUNTER__
 #else
-    #define COUNTER_ __LINE__
+    #define COUNTER __LINE__
 #endif
 
 #ifdef __clang__

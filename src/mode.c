@@ -80,6 +80,7 @@ static bool handle_input_single(EditorState *e, const ModeHandler *handler, KeyC
     return handle_binding(e, handler, key);
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static bool handle_input_recursive (
     EditorState *e,
     const ModeHandler *handler,

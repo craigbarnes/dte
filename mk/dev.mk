@@ -27,7 +27,9 @@ DOCFILES = $(call GITATTRS, xml markdown)
 SPATCHNAMES = arraylen minmax tailcall wrap perf pitfalls staticbuf
 SPATCHFILES = $(foreach f, $(SPATCHNAMES), tools/coccinelle/$f.cocci)
 
-clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
+all_headers := $(shell git ls-files -- 'src/**.h' 'test/**.h')
+clang_tidy_headers := $(filter-out src/util/unidata.h, $(all_headers))
+clang_tidy_targets := $(addprefix clang-tidy-, $(clang_tidy_headers) $(all_sources))
 
 dist: dte-$(DISTVER).tar.gz
 dist-latest-release: $(firstword $(RELEASE_DIST))

@@ -68,6 +68,7 @@ static int binding_cmp(const void *ap, const void *bp)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     KeyBinding a = {.key = KEY_F5};
     KeyBinding b = {.key = KEY_F5};
     BUG_ON(binding_cmp(&a, &b) != 0);
@@ -75,6 +76,7 @@ UNITTEST {
     BUG_ON(binding_cmp(&a, &b) <= 0);
     b.key = KEY_F12;
     BUG_ON(binding_cmp(&a, &b) >= 0);
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)

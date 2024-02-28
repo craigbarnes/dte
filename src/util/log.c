@@ -8,11 +8,13 @@
 #include "xreadwrite.h"
 
 // These are initialized during early startup and then never changed,
-// so they're deemed an "acceptable" use of globals:
+// so they're deemed an acceptable use of non-const globals:
+// NOLINTBEGIN(*-avoid-non-const-global-variables)
 static LogLevel log_level = LOG_LEVEL_NONE;
 static int logfd = -1;
 static char dim[] = "\033[2m";
 static char sgr0[] = "\033[0m";
+// NOLINTEND(*-avoid-non-const-global-variables)
 
 static const struct llmap {
     char name[8];

@@ -25,11 +25,11 @@
 #endif
 
 #if DEBUG >= 1
-    #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER_)(void)
+    #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER)(void)
     #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
     noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...) COLD PRINTF(4);
 #else
-    #define UNITTEST UNUSED static void XPASTE(unittest_, COUNTER_)(void)
+    #define UNITTEST UNUSED static void XPASTE(unittest_, COUNTER)(void)
     #define BUG(...) UNREACHABLE()
 #endif
 

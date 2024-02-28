@@ -7,8 +7,10 @@
 #include "debug.h"
 #include "log.h"
 
+// NOLINTBEGIN(*-avoid-non-const-global-variables)
 static CleanupHandler cleanup_handler = NULL;
 static void *cleanup_userdata = NULL;
+// NOLINTEND(*-avoid-non-const-global-variables)
 
 void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata)
 {
@@ -80,9 +82,9 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
     log_msg(LOG_LEVEL_CRITICAL, file, line, "BUG in %s(): '%s'", func, str);
     cleanup();
 
-    fprintf(stderr, "\n%s:%d: **BUG** in %s(): '%s'\n", file, line, func, str);
+    (void)!fprintf(stderr, "\n%s:%d: **BUG** in %s(): '%s'\n", file, line, func, str);
     print_stack_trace();
-    fflush(stderr);
+    (void)!fflush(stderr);
     abort();
 }
 #endif

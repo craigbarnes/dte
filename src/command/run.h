@@ -43,6 +43,7 @@ typedef struct {
     bool allow_recording;
 } CommandRunner;
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 extern const Command *current_command;
 
 static inline int command_cmp(const void *key, const void *elem)

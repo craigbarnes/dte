@@ -1,6 +1,7 @@
 #include "intern.h"
 #include "hashset.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static HashSet interned_strings;
 
 const void *mem_intern(const void *data, size_t len)

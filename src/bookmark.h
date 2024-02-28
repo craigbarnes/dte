@@ -16,7 +16,7 @@ typedef struct {
 } FileLocation;
 
 static inline FileLocation *new_file_location (
-    char *filename,
+    char *filename, // NOLINT(readability-non-const-parameter): false positive
     unsigned long buffer_id,
     unsigned long line,
     unsigned long column

@@ -334,6 +334,7 @@ static const char usage[] =
     "   -V          Display version number and exit\n"
     "\n";
 
+// NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
     static const char optstring[] = "hBHKRVb:c:t:r:s:";

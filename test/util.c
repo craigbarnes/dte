@@ -84,7 +84,7 @@ static void test_util_macros(TestContext *ctx)
     EXPECT_TRUE(DECIMAL_STR_MAX(unsigned long long) > n);
 }
 
-static void test_IS_POWER_OF_2(TestContext *ctx)
+static void test_is_power_of_2(TestContext *ctx)
 {
     EXPECT_TRUE(IS_POWER_OF_2(1));
     EXPECT_TRUE(IS_POWER_OF_2(2));
@@ -2718,7 +2718,7 @@ static void test_progname(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_util_macros),
-    TEST(test_IS_POWER_OF_2),
+    TEST(test_is_power_of_2),
     TEST(test_xmalloc),
     TEST(test_xstreq),
     TEST(test_str_has_prefix),

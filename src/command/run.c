@@ -8,10 +8,12 @@
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 const Command *current_command;
 
 static bool run_commands(CommandRunner *runner, const PointerArray *array);
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static bool run_command(CommandRunner *runner, char **av)
 {
     const CommandSet *cmds = runner->cmds;
@@ -71,6 +73,7 @@ static bool run_command(CommandRunner *runner, char **av)
     return r;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static bool run_commands(CommandRunner *runner, const PointerArray *array)
 {
     if (unlikely(runner->recursion_count > 16)) {

@@ -22,11 +22,13 @@
 #include "util/xsnprintf.h"
 
 // These are initialized during early startup and then never changed,
-// so they're deemed an "acceptable" use of globals:
+// so they're deemed an acceptable use of non-const globals:
+// NOLINTBEGIN(*-avoid-non-const-global-variables)
 static const char *file_locks;
 static const char *file_locks_lock;
 static mode_t file_locks_mode = 0666;
 static pid_t editor_pid;
+// NOLINTEND(*-avoid-non-const-global-variables)
 
 void init_file_locks_context(const char *fallback_dir, pid_t pid)
 {

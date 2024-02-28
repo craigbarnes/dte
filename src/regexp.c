@@ -8,6 +8,7 @@
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static HashMap interned_regexps;
 
 bool regexp_error_msg(const regex_t *re, const char *pattern, int err)

@@ -5,8 +5,8 @@
 static void ptr_array_grow(PointerArray *array)
 {
     BUG_ON(array->alloc < array->count);
-    const size_t ALLOC_MIN = 8;
-    size_t alloc = MAX((array->alloc * 3) / 2, ALLOC_MIN);
+    const size_t alloc_min = 8;
+    size_t alloc = MAX((array->alloc * 3) / 2, alloc_min);
     if (unlikely(alloc <= array->count)) {
         fatal_error(__func__, EOVERFLOW);
     }

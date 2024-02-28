@@ -8,10 +8,14 @@
 #include "util/log.h"
 #include "util/xstdio.h"
 
+// These are not accessed from signal handlers or multiple threads
+// and are considered an acceptable use of non-const globals:
+// NOLINTBEGIN(*-avoid-non-const-global-variables)
 static char error_buf[512];
 static unsigned int nr_errors;
 static bool msg_is_error;
 static bool print_errors_to_stderr;
+// NOLINTEND(*-avoid-non-const-global-variables)
 
 void clear_error(void)
 {

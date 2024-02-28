@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "hash.h"
 
-char tombstone[16] = "TOMBSTONE";
+const char tombstone[16] = "TOMBSTONE";
 
 enum {
     MIN_SIZE = 8,
@@ -121,7 +121,7 @@ void *intmap_remove(IntMap *map, uint32_t key)
 
     void *value = e->value;
     e->key = 0;
-    e->value = tombstone;
+    e->value = (char*)tombstone;
     map->count--;
     map->tombstones++;
     return value;

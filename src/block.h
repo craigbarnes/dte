@@ -23,6 +23,7 @@ typedef struct {
         block_ = BLOCK(block_->node.next) \
     )
 
+// NOLINTNEXTLINE(readability-identifier-naming)
 static inline Block *BLOCK(ListHead *item)
 {
     static_assert(offsetof(Block, node) == 0);

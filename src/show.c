@@ -36,6 +36,7 @@
 #include "view.h"
 #include "window.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 extern char **environ;
 
 static void open_temporary_buffer (
@@ -582,6 +583,7 @@ const ShowHandler *lookup_show_handler(const char *name)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     CHECK_BSEARCH_ARRAY(show_handlers, name, strcmp);
     BUG_ON(!lookup_show_handler("alias"));
     BUG_ON(!lookup_show_handler("set"));
@@ -589,6 +591,7 @@ UNITTEST {
     BUG_ON(lookup_show_handler("alia"));
     BUG_ON(lookup_show_handler("sete"));
     BUG_ON(lookup_show_handler(""));
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 bool show(EditorState *e, const char *type, const char *key, bool cflag)

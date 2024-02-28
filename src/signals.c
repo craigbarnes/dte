@@ -8,6 +8,7 @@
 #include "util/log.h"
 #include "util/macros.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 volatile sig_atomic_t resized = 0;
 
 static const int ignored_signals[] = {

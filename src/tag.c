@@ -12,6 +12,7 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static const char *current_filename; // For sorting tags
 
 static bool tag_is_local_to_file(const Tag *tag, const char *path)

@@ -1,8 +1,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/time.h>
+#include <sys/select.h> // NOLINT(portability-restrict-system-includes)
+#include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
 #include "input.h"
 #include "util/ascii.h"
@@ -89,6 +89,7 @@ static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
     return true;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static KeyCode read_special(Terminal *term)
 {
     TermInputBuffer *input = &term->ibuf;

@@ -16,7 +16,7 @@ void *xcalloc(size_t nmemb, size_t size) XMALLOC ALLOC_SIZE(1, 2);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
-size_t size_multiply_(size_t a, size_t b);
+size_t do_size_multiply(size_t a, size_t b);
 size_t size_add(size_t a, size_t b);
 
 static inline size_t size_multiply(size_t a, size_t b)
@@ -27,7 +27,7 @@ static inline size_t size_multiply(size_t a, size_t b)
         return a * b; // GCOVR_EXCL_LINE
     }
     // Otherwise, emit a call to the checked implementation
-    return size_multiply_(a, b);
+    return do_size_multiply(a, b);
 }
 
 RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2, 3)

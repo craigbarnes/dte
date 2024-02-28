@@ -72,10 +72,10 @@ size_t u_str_width(const unsigned char *str)
     return w;
 }
 
-CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
+CodePoint u_prev_char(const unsigned char *str, size_t *idx)
 {
     size_t i = *idx;
-    unsigned char ch = buf[--i];
+    unsigned char ch = str[--i];
     if (likely(ch < 0x80)) {
         *idx = i;
         return (CodePoint)ch;
@@ -87,7 +87,7 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
 
     CodePoint u = ch & 0x3f;
     for (unsigned int count = 1, shift = 6; i > 0; ) {
-        ch = buf[--i];
+        ch = str[--i];
         unsigned int len = u_seq_len(ch);
         count++;
         if (len == 0) {
@@ -112,7 +112,7 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
 
 invalid:
     *idx = *idx - 1;
-    u = buf[*idx];
+    u = str[*idx];
     return -u;
 }
 
@@ -127,21 +127,21 @@ CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
     return u_get_nonascii(str, i + UTF8_MAX_SEQ_LEN, idx);
 }
 
-CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx)
+CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx)
 {
     size_t i = *idx;
-    CodePoint u = buf[i];
+    CodePoint u = str[i];
     if (likely(u < 0x80)) {
         *idx = i + 1;
         return u;
     }
-    return u_get_nonascii(buf, size, idx);
+    return u_get_nonascii(str, size, idx);
 }
 
-CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
+CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
 {
     size_t i = *idx;
-    unsigned int first = buf[i++];
+    unsigned int first = str[i++];
     int len = u_seq_len(first);
     if (unlikely(len < 2 || len > size - i + 1)) {
         goto invalid;
@@ -150,7 +150,7 @@ CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
     CodePoint u = first & u_get_first_byte_mask(len);
     int c = len - 1;
     do {
-        unsigned char ch = buf[i++];
+        unsigned char ch = str[i++];
         if (!u_is_continuation_byte(ch)) {
             goto invalid;
         }

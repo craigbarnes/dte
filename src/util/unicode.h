@@ -8,7 +8,7 @@
 // Work around some musl-targeted toolchains failing to include this
 // header automatically and thus failing to define __STDC_ISO_10646__
 #if HAS_INCLUDE(<stdc-predef.h>)
-# include <stdc-predef.h>
+# include <stdc-predef.h> // NOLINT(portability-restrict-system-includes)
 #endif
 
 #if defined(WINT_MAX) && (WINT_MAX >= 0x10FFFF) && defined(__STDC_ISO_10646__)
@@ -36,7 +36,7 @@ static inline bool u_is_ascii_upper(CodePoint u)
 }
 
 #ifdef SANE_WCTYPE
-    #include <wctype.h>
+    #include <wctype.h> // NOLINT(portability-restrict-system-includes)
 
     static inline bool u_is_lower(CodePoint u)
     {

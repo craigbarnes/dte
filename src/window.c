@@ -424,6 +424,7 @@ int window_get_scroll_margin(const Window *window, unsigned int scroll_margin)
     return MIN(max, scroll_margin);
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), void *data)
 {
     if (frame->window) {

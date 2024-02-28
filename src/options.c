@@ -549,6 +549,7 @@ UNITTEST {
         } else if (type == OPT_BOOL) {
             BUG_ON(desc->u.enum_opt.values != bool_enum);
         } else if (type == OPT_ENUM) {
+            // NOLINTNEXTLINE(bugprone-assert-side-effect)
             BUG_ON(count_enum_values(desc) < 2);
         } else if (type == OPT_FLAG) {
             size_t nvals = count_enum_values(desc);
@@ -804,6 +805,7 @@ bool validate_local_options(char **strs)
 #if DEBUG >= 1
 static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
 {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     switch (desc->type) {
     case OPT_STR:
         BUG_ON(!val.str_val);
@@ -834,6 +836,7 @@ static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
     case OPT_BOOL:
         return;
     }
+    // NOLINTEND(bugprone-assert-side-effect)
 
     BUG("unhandled option type");
 }

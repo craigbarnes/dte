@@ -266,9 +266,11 @@ static bool filesize_exceeds_limit(off_t size, unsigned int limit_in_mib)
 
 UNITTEST {
     const unsigned int seven_mib = 7u << 20;
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(filesize_exceeds_limit(seven_mib, 7));
     BUG_ON(!filesize_exceeds_limit(seven_mib + 1, 7));
     BUG_ON(filesize_exceeds_limit(seven_mib, 0));
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, bool must_exist)

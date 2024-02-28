@@ -7,8 +7,12 @@
 #include "util/debug.h"
 #include "util/xmalloc.h"
 
+// NOLINTBEGIN(*-avoid-non-const-global-variables)
 static ChangeMergeEnum change_merge;
 static ChangeMergeEnum prev_change_merge;
+// This doesn't need to be local to buffer because commands are atomic
+static Change *change_barrier;
+// NOLINTEND(*-avoid-non-const-global-variables)
 
 static Change *alloc_change(void)
 {
@@ -23,9 +27,6 @@ static void add_change(Buffer *buffer, Change *change)
     head->prev[head->nr_prev++] = change;
     buffer->cur_change = change;
 }
-
-// This doesn't need to be local to buffer because commands are atomic
-static Change *change_barrier;
 
 static bool is_change_chain_barrier(const Change *change)
 {

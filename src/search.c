@@ -7,6 +7,7 @@
 #include "util/ascii.h"
 #include "util/xmalloc.h"
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
 {
     int flags = block_iter_is_bol(bi) ? 0 : REG_NOTBOL;

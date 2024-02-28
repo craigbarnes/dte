@@ -36,11 +36,13 @@ static int color_distance (
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(color_distance(1,1,1, 1,0,1) != 1);
     BUG_ON(color_distance(100,0,0, 80,0,0) != 400);
     BUG_ON(color_distance(0,5,10, 5,0,2) != 25 + 25 + 64);
     BUG_ON(color_distance(0,0,0, 255,0,0) != 255 * 255);
     BUG_ON(color_distance(255,255,255, 0,0,0) != 255 * 255 * 3);
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 // Convert RGB color component (0-255) to nearest xterm color cube index (0-5).
@@ -52,6 +54,7 @@ static unsigned int nearest_cube_index(uint8_t c)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(nearest_cube_index(0) != 0);
     BUG_ON(nearest_cube_index(46) != 0);
     BUG_ON(nearest_cube_index(47) != 1);
@@ -61,6 +64,7 @@ UNITTEST {
     BUG_ON(nearest_cube_index(255) != 5);
     BUG_ON(nearest_cube_index(255 - 20) != 5);
     BUG_ON(nearest_cube_index(255 - 21) != 4);
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)

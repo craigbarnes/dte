@@ -100,6 +100,7 @@ void expect_nonnull(TestContext *ctx, const char *file, int line, const void *pt
     expect(ptr != NULL, ctx, file, line, "Unexpected NULL pointer");
 }
 
+// NOLINTNEXTLINE(readability-inconsistent-declaration-parameter-name)
 void iexpect_streq(TestContext *ctx, const char *f, int l, size_t i, const char *a, const char *b)
 {
     bool cond = make_printable_str(&a, &b, xstreq(a, b));

@@ -8,6 +8,8 @@ enum {
     WINDOW_MIN_HEIGHT = 3,
 };
 
+// NOLINTBEGIN(misc-no-recursion)
+
 static void sanity_check_frame(const Frame *frame)
 {
     bool has_window = !!frame->window;
@@ -506,3 +508,5 @@ void frame_debug(const Frame *frame)
     }
 }
 #endif
+
+// NOLINTEND(misc-no-recursion)

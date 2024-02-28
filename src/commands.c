@@ -197,7 +197,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
     if (unlikely(nmodes + a->nr_flag_args > ARRAYLEN(modes))) {
         // This is already prevented by the ARGERR_TOO_MANY_OPTIONS check
         // in do_parse_args(), but since that's only incidental, it's still
-        // checked here nonetheless
+        // checked here
         return error_msg("too many modes specified");
     }
 
@@ -2570,6 +2570,7 @@ static bool allow_macro_recording(const Command *cmd, char **args)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     const char *args[4] = {NULL};
     char **argp = (char**)args;
     const Command *cmd = find_normal_command("left");
@@ -2603,6 +2604,7 @@ UNITTEST {
     BUG_ON(allow_macro_recording(cmd, argp));
     args[1] = "str";
     BUG_ON(!allow_macro_recording(cmd, argp));
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 static void record_command(const Command *cmd, char **args, void *userdata)

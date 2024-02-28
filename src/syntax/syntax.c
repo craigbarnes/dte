@@ -18,6 +18,7 @@ Syntax *find_any_syntax(const HashMap *syntaxes, const char *name)
     return hashmap_get(syntaxes, name);
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static void visit(State *s)
 {
     if (s->visited) {

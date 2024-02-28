@@ -97,8 +97,11 @@ static const TermStyle **highlight_line (
     const StringView *line_sv,
     State **ret
 ) {
+    // NOLINTBEGIN(*-avoid-non-const-global-variables)
     static const TermStyle **styles;
     static size_t alloc;
+    // NOLINTEND(*-avoid-non-const-global-variables)
+
     const unsigned char *const line = line_sv->data;
     const size_t len = line_sv->length;
     size_t i = 0;
@@ -452,7 +455,7 @@ void hl_insert(PointerArray *line_start_states, size_t first, size_t lines)
 }
 
 // Called after text has been deleted to re-highlight changed lines
-void hl_delete(PointerArray *line_start_states, size_t first, size_t deleted_nl)
+void hl_delete(PointerArray *line_start_states, size_t first, size_t lines)
 {
     PointerArray *s = line_start_states;
     if (s->count == 1) {
@@ -464,7 +467,7 @@ void hl_delete(PointerArray *line_start_states, size_t first, size_t deleted_nl)
         return;
     }
 
-    size_t last = first + deleted_nl;
+    size_t last = first + lines;
     if (last + 1 >= s->count) {
         // Last already highlighted lines changed; there's nothing to
         // gain, so throw them away
@@ -476,11 +479,11 @@ void hl_delete(PointerArray *line_start_states, size_t first, size_t deleted_nl)
     // save the work
 
     // Remove deleted lines (states)
-    if (deleted_nl) {
+    if (lines) {
         size_t to = first + 1;
         size_t from = last + 1;
         move_line_states(s, to, from, s->count - from);
-        s->count -= deleted_nl;
+        s->count -= lines;
     }
 
     // Invalidate line start state after the changed line

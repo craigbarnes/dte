@@ -13,6 +13,7 @@
 #include "util/str-util.h"
 #include "../build/builtin-config.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 ConfigState current_config;
 
 // Odd number of backslashes at end of line?
@@ -26,12 +27,14 @@ static bool has_line_continuation(StringView line)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(has_line_continuation(string_view(NULL, 0)));
     BUG_ON(has_line_continuation(strview_from_cstring("0")));
     BUG_ON(!has_line_continuation(strview_from_cstring("1 \\")));
     BUG_ON(has_line_continuation(strview_from_cstring("2 \\\\")));
     BUG_ON(!has_line_continuation(strview_from_cstring("3 \\\\\\")));
     BUG_ON(has_line_continuation(strview_from_cstring("4 \\\\\\\\")));
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 void exec_config(CommandRunner *runner, StringView config)
@@ -180,6 +183,8 @@ void collect_builtin_includes(PointerArray *a, const char *prefix)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(!get_builtin_config("rc"));
     BUG_ON(!get_builtin_config("color/reset"));
+    // NOLINTEND(bugprone-assert-side-effect)
 }

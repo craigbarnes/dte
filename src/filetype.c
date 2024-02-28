@@ -23,6 +23,7 @@ static int ft_compare(const void *key, const void *elem)
 }
 
 // Built-in filetypes
+// NOLINTBEGIN(bugprone-suspicious-include)
 #include "filetype/names.c"
 #include "filetype/basenames.c"
 #include "filetype/directories.c"
@@ -30,6 +31,7 @@ static int ft_compare(const void *key, const void *elem)
 #include "filetype/interpreters.c"
 #include "filetype/ignored-exts.c"
 #include "filetype/signatures.c"
+// NOLINTEND(bugprone-suspicious-include)
 
 UNITTEST {
     static_assert(NR_BUILTIN_FILETYPES < 256);

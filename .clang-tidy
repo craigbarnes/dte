@@ -1,3 +1,8 @@
+# See also: .clang-tidy configs in src/util/ and test/.
+# Note that Checks in child configs are additive with the parent config,
+# whereas CheckOptions settings override parent config settings of the
+# same name.
+
 Checks: >
     clang-diagnostic-*,
     clang-analyzer-*,
@@ -7,10 +12,12 @@ Checks: >
     portability-*,
     readability-*,
     misc-*,
+    android-cloexec-*,
+    cppcoreguidelines-avoid-non-const-global-variables,
     modernize-macro-to-enum,
     -clang-diagnostic-pointer-sign,
+    -clang-diagnostic-sign-compare,
     -clang-analyzer-core.NonNullParamChecker,
-    -clang-analyzer-core.NullDereference,
     -clang-analyzer-unix.Malloc,
     -cert-err33-c,
     -bugprone-easily-swappable-parameters,
@@ -19,18 +26,89 @@ Checks: >
     -bugprone-macro-parentheses,
     -bugprone-sizeof-expression,
     -bugprone-not-null-terminated-result,
-    -bugprone-branch-clone,
-    -bugprone-suspicious-string-compare,
-    -bugprone-suspicious-include,
     -readability-else-after-return,
     -readability-function-cognitive-complexity,
     -readability-identifier-length,
-    -readability-implicit-bool-conversion,
-    -readability-inconsistent-declaration-parameter-name,
     -readability-isolate-declaration,
     -readability-magic-numbers,
     -readability-uppercase-literal-suffix,
-    -clang-analyzer-cplusplus*,
     -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
-    -misc-no-recursion,
     -performance-no-int-to-ptr,
+
+CheckOptions:
+    readability-implicit-bool-conversion.AllowIntegerConditions: true
+    readability-implicit-bool-conversion.AllowPointerConditions: true
+    readability-simplify-boolean-expr.ChainedConditionalAssignment: true
+    readability-simplify-boolean-expr.ChainedConditionalReturn: true
+    readability-function-size.LineThreshold: '250'
+    readability-function-size.StatementThreshold: '200'
+    readability-function-size.NestingThreshold: '6'
+    readability-function-size.ParameterThreshold: '6'
+    readability-function-size.VariableThreshold: '32'
+
+    readability-identifier-naming.ConstantCase: lower_case
+    readability-identifier-naming.EnumCase: CamelCase
+    readability-identifier-naming.EnumConstantCase: UPPER_CASE
+    readability-identifier-naming.EnumConstantIgnoredRegexp: '[a-z]'
+    readability-identifier-naming.FunctionCase: lower_case
+    readability-identifier-naming.LocalVariableCase: lower_case
+    readability-identifier-naming.LocalVariableIgnoredRegexp: '[A-Z]'
+    readability-identifier-naming.MacroDefinitionCase: aNy_CasE
+    readability-identifier-naming.MemberCase: lower_case
+    readability-identifier-naming.ParameterCase: lower_case
+    readability-identifier-naming.ParameterIgnoredRegexp: '[A-Z]'
+    readability-identifier-naming.StructCase: CamelCase
+    readability-identifier-naming.TypedefCase: CamelCase
+    readability-identifier-naming.UnionCase: CamelCase
+    readability-identifier-naming.VariableCase: lower_case
+
+    bugprone-assert-side-effect.AssertMacros: BUG_ON
+    bugprone-assert-side-effect.CheckFunctionCalls: true
+    bugprone-assert-side-effect.IgnoredFunctions: >
+        block_iter_is_bol;
+        block_iter_is_eof;
+        color_is_rgb;
+        color_is_valid;
+        cond_type_has_destination;
+        count_nl;
+        cursor_color_is_valid;
+        cursor_type_is_valid;
+        has_flag;
+        is_root_frame;
+        is_valid_filetype_name;
+        list_empty;
+        mem_equal;
+        obuf_avail;
+        path_is_absolute;
+
+    portability-restrict-system-includes.Includes: >
+        -*,
+        dirent.h,
+        errno.h,
+        fcntl.h,
+        glob.h,
+        iconv.h,
+        inttypes.h,
+        langinfo.h,
+        limits.h,
+        locale.h,
+        poll.h,
+        regex.h,
+        signal.h,
+        stdarg.h,
+        stdbool.h,
+        stddef.h,
+        stdint.h,
+        stdio.h,
+        stdlib.h,
+        string.h,
+        strings.h,
+        sys/ioctl.h,
+        sys/mman.h,
+        sys/stat.h,
+        sys/types.h,
+        sys/utsname.h,
+        sys/wait.h,
+        termios.h,
+        time.h,
+        unistd.h,

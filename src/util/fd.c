@@ -22,6 +22,7 @@ int xpipe2(int fd[2], int flags)
     }
 #endif
 
+    // NOLINTNEXTLINE(android-cloexec-pipe)
     if (unlikely(pipe(fd) != 0)) {
         return -1;
     }

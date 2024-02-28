@@ -41,6 +41,7 @@
 #include "util/xmalloc.h"
 #include "vars.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 extern char **environ;
 
 typedef enum {
@@ -85,7 +86,7 @@ static bool do_collect_files (
 
         // TODO: add a global option to allow dotfiles to be included
         // even when there's no prefix
-        if (flen ? strncmp(name, fileprefix, flen) : name[0] == '.') {
+        if (flen ? strncmp(name, fileprefix, flen) != 0 : name[0] == '.') {
             continue;
         }
 
@@ -670,6 +671,7 @@ static void collect_command_flag_args (
     // TODO: Completions for `open -e` and `save -e`
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static void collect_completions(EditorState *e, char **args, size_t argc)
 {
     CompletionState *cs = &e->cmdline.completion;
@@ -755,6 +757,7 @@ static bool is_var(const char *str, size_t len)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(!is_var(STRN("$VAR")));
     BUG_ON(!is_var(STRN("$xy_190")));
     BUG_ON(!is_var(STRN("$__x_y_z")));
@@ -769,6 +772,7 @@ UNITTEST {
     BUG_ON(is_var(STRN("$1")));
     BUG_ON(is_var(STRN("$09")));
     BUG_ON(is_var(STRN("$1a")));
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 static int strptrcmp(const void *v1, const void *v2)

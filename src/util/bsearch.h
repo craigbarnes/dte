@@ -27,6 +27,7 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
     check_bsearch_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0]), cmp); \
 } while (0)
 
+// NOLINTNEXTLINE(readability-function-size): 7 param debug function is fine
 static inline void check_bsearch_array (
     const void *base,
     const char *array_name,

@@ -121,16 +121,21 @@ static int term_name_compare(const void *key, const void *elem)
 UNITTEST {
     CHECK_BSEARCH_ARRAY(terms, name, strcmp);
     CHECK_STRUCT_ARRAY(color_suffixes, suffix);
+
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     StringView k = STRING_VIEW("xtermz");
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
     k.length--;
     BUG_ON(!BSEARCH(&k, terms, term_name_compare));
     k.length--;
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
+    // NOLINTEND(bugprone-assert-side-effect)
+
     for (size_t i = 0; i < ARRAYLEN(terms); i++) {
         size_t len = strlen(terms[i].name);
         BUG_ON(terms[i].name_len != len);
     }
+
     for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
         size_t len = strlen(color_suffixes[i].suffix);
         BUG_ON(color_suffixes[i].suffix_len != len);

@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "macros.h"
 
-extern char tombstone[16];
+extern const char tombstone[16];
 
 typedef void (*FreeFunction)(void *ptr);
 

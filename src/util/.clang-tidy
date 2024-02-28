@@ -1,0 +1,14 @@
+InheritParentConfig: true
+Checks: >
+    bugprone-implicit-widening-of-multiplication-result,
+    bugprone-sizeof-expression,
+    cert-err33-c,
+    clang-analyzer-core.NonNullParamChecker,
+    clang-analyzer-unix.Malloc,
+    performance-no-int-to-ptr,
+CheckOptions:
+    bugprone-assert-side-effect.IgnoredFunctions: >
+        log_level_max;
+        path_is_absolute;
+        strview_has_prefix;
+        strview_has_suffix;
