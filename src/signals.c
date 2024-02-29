@@ -51,29 +51,29 @@ static const int fatal_signals[] = {
 };
 
 enum {
+    KNOWN_SIG_MAX = STRLEN("VTALRM") + 2,
 #if HAVE_SIG2STR
-    XSIG2STR_MAX = SIG2STR_MAX + 1,
+    XSIG2STR_MAX = MAX(KNOWN_SIG_MAX, SIG2STR_MAX + 1),
 #else
-    XSIG2STR_MAX = STRLEN("VTALRM") + 2,
+    XSIG2STR_MAX = KNOWN_SIG_MAX,
 #endif
     SIGNAME_MAX = MAX(16, STRLEN("SIG") + XSIG2STR_MAX),
 };
 
 static int xsig2str(int signum, char buf[XSIG2STR_MAX])
 {
-    const char *name;
-
 #if HAVE_SIG2STR
     if (sig2str(signum, buf) == 0) {
         return 0;
     }
 #elif HAVE_SIGABBREV_NP
-    name = sigabbrev_np(signum);
-    if (name) {
-        goto copy;
+    const char *abbr = sigabbrev_np(signum);
+    if (abbr) {
+        return memccpy(buf, abbr, '\0', XSIG2STR_MAX - 1) ? 0 : -1;
     }
 #endif
 
+    const char *name;
     switch (signum) {
     case SIGINT: name = "INT"; break;
     case SIGQUIT: name = "QUIT"; break;
@@ -108,8 +108,8 @@ static int xsig2str(int signum, char buf[XSIG2STR_MAX])
     default: return -1;
     }
 
-copy:
-    return memccpy(buf, name, '\0', XSIG2STR_MAX - 1) ? 0 : -1;
+    memcpy(buf, name, strlen(name) + 1);
+    return 0;
 }
 
 // strsignal(3) is fine in situations where a signal is being reported
