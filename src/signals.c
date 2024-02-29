@@ -1,8 +1,10 @@
 #include "compat.h"
 #include <errno.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include "signals.h"
+#include "util/array.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/log.h"
@@ -11,44 +13,66 @@
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 volatile sig_atomic_t resized = 0;
 
-static const int ignored_signals[] = {
-    SIGINT,  // Terminal interrupt (see: VINTR in termios(3))
-    SIGQUIT, // Terminal quit (see: VQUIT in termios(3))
-    SIGTSTP, // Terminal stop (see: VSUSP in termios(3))
-    SIGXFSZ, // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
-    SIGPIPE, // Broken pipe (see: EPIPE error in write(3))
-    SIGUSR1, // User signal 1 (terminates by default, for no good reason)
-    SIGUSR2, // User signal 2 (as above)
+typedef void (*SignalHandler)(int signum);
+
+typedef enum {
+    SD_IGNORED,
+    SD_DEFAULT,
+    SD_FATAL,
+    SD_WINCH,
+} SignalDispositionType;
+
+#define sig(name, type) {#name, STRLEN(#name), SIG ## name, type}
+
+static const struct {
+    char name[7];
+    uint8_t name_len;
+    int signum;
+    SignalDispositionType type;
+} signals[] = {
+    sig(INT,  SD_IGNORED), // Terminal interrupt (see: VINTR in termios(3))
+    sig(QUIT, SD_IGNORED), // Terminal quit (see: VQUIT in termios(3))
+    sig(TSTP, SD_IGNORED), // Terminal stop (see: VSUSP in termios(3))
+    sig(XFSZ, SD_IGNORED), // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
+    sig(PIPE, SD_IGNORED), // Broken pipe (see: EPIPE error in write(3))
+    sig(USR1, SD_IGNORED), // User signal 1 (terminates by default, for no good reason)
+    sig(USR2, SD_IGNORED), // User signal 2 (as above)
+
+    sig(ABRT, SD_DEFAULT), // Terminate (cleanup already done)
+    sig(CHLD, SD_DEFAULT), // Ignore (see: wait(3))
+    sig(URG,  SD_DEFAULT), // Ignore
+    sig(TTIN, SD_DEFAULT), // Stop
+    sig(TTOU, SD_DEFAULT), // Stop
+    sig(CONT, SD_DEFAULT), // Continue
+
+    sig(BUS,  SD_FATAL),
+    sig(FPE,  SD_FATAL),
+    sig(ILL,  SD_FATAL),
+    sig(SEGV, SD_FATAL),
+    sig(SYS,  SD_FATAL),
+    sig(TRAP, SD_FATAL),
+    sig(XCPU, SD_FATAL),
+    sig(ALRM, SD_FATAL),
+    sig(HUP,  SD_FATAL),
+    sig(TERM, SD_FATAL),
+    sig(VTALRM, SD_FATAL),
+
+    #ifdef SIGPROF
+        sig(PROF, SD_FATAL),
+    #endif
+
+    #ifdef SIGEMT
+        sig(EMT, SD_FATAL),
+    #endif
+
+    #if defined(SIGWINCH)
+        sig(WINCH, SD_WINCH),
+    #endif
 };
 
-static const int default_signals[] = {
-    SIGABRT, // Terminate (cleanup already done)
-    SIGCHLD, // Ignore (see: wait(3))
-    SIGURG,  // Ignore
-    SIGTTIN, // Stop
-    SIGTTOU, // Stop
-    SIGCONT, // Continue
-};
-
-static const int fatal_signals[] = {
-    SIGBUS,
-    SIGFPE,
-    SIGILL,
-    SIGSEGV,
-    SIGSYS,
-    SIGTRAP,
-    SIGXCPU,
-    SIGALRM,
-    SIGVTALRM,
-    SIGHUP,
-    SIGTERM,
-#ifdef SIGPROF
-    SIGPROF,
-#endif
-#ifdef SIGEMT
-    SIGEMT,
-#endif
-};
+UNITTEST {
+    CHECK_STRUCT_ARRAY(signals, name);
+}
 
 enum {
     KNOWN_SIG_MAX = STRLEN("VTALRM") + 2,
@@ -73,43 +97,14 @@ static int xsig2str(int signum, char buf[XSIG2STR_MAX])
     }
 #endif
 
-    const char *name;
-    switch (signum) {
-    case SIGINT: name = "INT"; break;
-    case SIGQUIT: name = "QUIT"; break;
-    case SIGTSTP: name = "TSTP"; break;
-    case SIGXFSZ: name = "XFSZ"; break;
-    case SIGPIPE: name = "PIPE"; break;
-    case SIGUSR1: name = "USR1"; break;
-    case SIGUSR2: name = "USR2"; break;
-    case SIGABRT: name = "ABRT"; break;
-    case SIGCHLD: name = "CHLD"; break;
-    case SIGURG: name = "URG"; break;
-    case SIGTTIN: name = "TTIN"; break;
-    case SIGTTOU: name = "TTOU"; break;
-    case SIGCONT: name = "CONT"; break;
-    case SIGBUS: name = "BUS"; break;
-    case SIGFPE: name = "FPE"; break;
-    case SIGILL: name = "ILL"; break;
-    case SIGSEGV: name = "SEGV"; break;
-    case SIGSYS: name = "SYS"; break;
-    case SIGTRAP: name = "TRAP"; break;
-    case SIGXCPU: name = "XCPU"; break;
-    case SIGALRM: name = "ALRM"; break;
-    case SIGVTALRM: name = "VTALRM"; break;
-    case SIGHUP: name = "HUP"; break;
-    case SIGTERM: name = "TERM"; break;
-    #ifdef SIGPROF
-        case SIGPROF: name = "PROF"; break;
-    #endif
-    #ifdef SIGEMT
-        case SIGEMT: name = "EMT"; break;
-    #endif
-    default: return -1;
+    for (size_t i = 0; i < ARRAYLEN(signals); i++) {
+        if (signum == signals[i].signum) {
+            memcpy(buf, signals[i].name, signals[i].name_len + 1);
+            return 0;
+        }
     }
 
-    memcpy(buf, name, strlen(name) + 1);
-    return 0;
+    return -1;
 }
 
 // strsignal(3) is fine in situations where a signal is being reported
@@ -186,6 +181,24 @@ static void do_sigaction(int sig, const struct sigaction *action)
     }
 }
 
+static SignalHandler get_sig_handler(SignalDispositionType type)
+{
+    switch (type) {
+    case SD_IGNORED:
+        return SIG_IGN;
+    case SD_DEFAULT:
+        return SIG_DFL;
+    case SD_WINCH:
+        LOG_INFO("setting SIGWINCH handler");
+        return handle_sigwinch;
+    case SD_FATAL:
+        return handle_fatal_signal;
+    }
+
+    BUG("invalid signal disposition type: %d", (int)type);
+    return SIG_DFL;
+}
+
 /*
  * "A program that uses these functions should be written to catch all
  * signals and take other appropriate actions to ensure that when the
@@ -198,9 +211,6 @@ void set_signal_handlers(void)
 {
     struct sigaction action = {.sa_handler = handle_fatal_signal};
     sigfillset(&action.sa_mask);
-    for (size_t i = 0; i < ARRAYLEN(fatal_signals); i++) {
-        do_sigaction(fatal_signals[i], &action);
-    }
 
     // "The default actions for the realtime signals in the range SIGRTMIN
     // to SIGRTMAX shall be to terminate the process abnormally."
@@ -211,21 +221,10 @@ void set_signal_handlers(void)
     }
 #endif
 
-    action.sa_handler = SIG_IGN;
-    for (size_t i = 0; i < ARRAYLEN(ignored_signals); i++) {
-        do_sigaction(ignored_signals[i], &action);
+    for (size_t i = 0; i < ARRAYLEN(signals); i++) {
+        action.sa_handler = get_sig_handler(signals[i].type);
+        do_sigaction(signals[i].signum, &action);
     }
-
-    action.sa_handler = SIG_DFL;
-    for (size_t i = 0; i < ARRAYLEN(default_signals); i++) {
-        do_sigaction(default_signals[i], &action);
-    }
-
-#if defined(SIGWINCH)
-    LOG_INFO("setting SIGWINCH handler");
-    action.sa_handler = handle_sigwinch;
-    do_sigaction(SIGWINCH, &action);
-#endif
 
     // Set signal mask explicitly, to avoid any possibility of
     // inheriting blocked signals
