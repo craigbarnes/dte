@@ -10,6 +10,13 @@ default:
         - export CC="ccache ${CC:-gcc}"
         - make vars
 
+.fragment-1:
+    script: &objsize_and_bench
+        - make DEBUG=0 && make installcheck
+        - strip dte && du -k -h dte
+        - tools/objsize.sh dte
+        - make bench DEBUG=0 CFLAGS=-O3
+
 .test:
     stage: test
     needs: []
@@ -19,19 +26,11 @@ default:
         - ldd dte
         - make check
         - make check LDFLAGS=-static
-
-        - make DEBUG=0 && make installcheck
-        - strip dte && du -k -h dte
-        - tools/objsize.sh dte
-        - make bench DEBUG=0 CFLAGS=-O3
+        - *objsize_and_bench
 
 alpine:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
-
-arch:
-    extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
 
 ubuntu:
     extends: .test
@@ -48,6 +47,14 @@ rocky-9:
 debian-oldstable:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-oldstable
+
+arch:
+    stage: test
+    needs: []
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
+    script:
+        - make check-source check check-clang-tidy
+        - *objsize_and_bench
 
 debian-stable:
     stage: test
@@ -87,13 +94,6 @@ android:
         - make CC="$CC_ARMV7A"
         - make CC="$CC_I686"
         - make CC="$CC_X86_64"
-
-lint:
-    stage: test
-    needs: []
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
-    script:
-        - make check-source
 
 coverage:
     stage: test
