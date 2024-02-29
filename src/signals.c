@@ -50,14 +50,96 @@ static const int fatal_signals[] = {
 #endif
 };
 
-static void handle_sigwinch(int UNUSED_ARG(signum))
+enum {
+#if HAVE_SIG2STR
+    XSIG2STR_MAX = SIG2STR_MAX + 1,
+#else
+    XSIG2STR_MAX = STRLEN("VTALRM") + 2,
+#endif
+    SIGNAME_MAX = MAX(16, STRLEN("SIG") + XSIG2STR_MAX),
+};
+
+static int xsig2str(int signum, char buf[XSIG2STR_MAX])
 {
-    resized = 1;
+    const char *name;
+
+#if HAVE_SIG2STR
+    if (sig2str(signum, buf) == 0) {
+        return 0;
+    }
+#elif HAVE_SIGABBREV_NP
+    name = sigabbrev_np(signum);
+    if (name) {
+        goto copy;
+    }
+#endif
+
+    switch (signum) {
+    case SIGINT: name = "INT"; break;
+    case SIGQUIT: name = "QUIT"; break;
+    case SIGTSTP: name = "TSTP"; break;
+    case SIGXFSZ: name = "XFSZ"; break;
+    case SIGPIPE: name = "PIPE"; break;
+    case SIGUSR1: name = "USR1"; break;
+    case SIGUSR2: name = "USR2"; break;
+    case SIGABRT: name = "ABRT"; break;
+    case SIGCHLD: name = "CHLD"; break;
+    case SIGURG: name = "URG"; break;
+    case SIGTTIN: name = "TTIN"; break;
+    case SIGTTOU: name = "TTOU"; break;
+    case SIGCONT: name = "CONT"; break;
+    case SIGBUS: name = "BUS"; break;
+    case SIGFPE: name = "FPE"; break;
+    case SIGILL: name = "ILL"; break;
+    case SIGSEGV: name = "SEGV"; break;
+    case SIGSYS: name = "SYS"; break;
+    case SIGTRAP: name = "TRAP"; break;
+    case SIGXCPU: name = "XCPU"; break;
+    case SIGALRM: name = "ALRM"; break;
+    case SIGVTALRM: name = "VTALRM"; break;
+    case SIGHUP: name = "HUP"; break;
+    case SIGTERM: name = "TERM"; break;
+    #ifdef SIGPROF
+        case SIGPROF: name = "PROF"; break;
+    #endif
+    #ifdef SIGEMT
+        case SIGEMT: name = "EMT"; break;
+    #endif
+    default: return -1;
+    }
+
+copy:
+    return memccpy(buf, name, '\0', XSIG2STR_MAX - 1) ? 0 : -1;
+}
+
+// strsignal(3) is fine in situations where a signal is being reported
+// as terminating a process, but it tends to be confusing in most other
+// circumstances, where the signal name (not description) is usually
+// clearer
+static const char *signum_to_str(int signum, char buf[SIGNAME_MAX])
+{
+    if (xsig2str(signum, buf + 3) == 0) {
+        return memcpy(buf, "SIG", 3);
+    }
+
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if (signum >= SIGRTMIN && signum <= SIGRTMAX) {
+        static const char rt[] = "realtime signal";
+        static_assert(SIGNAME_MAX >= sizeof(rt));
+        return memcpy(buf, rt, sizeof(rt));
+    }
+#endif
+
+    static const char fallback[] = "unknown signal";
+    static_assert(SIGNAME_MAX >= sizeof(fallback));
+    return memcpy(buf, fallback, sizeof(fallback));
 }
 
 static noreturn COLD void handle_fatal_signal(int signum)
 {
-    LOG_CRITICAL("received signal %d (%s)", signum, strsignal(signum));
+    char buf[SIGNAME_MAX];
+    const char *signame = signum_to_str(signum, buf);
+    log_write(LOG_LEVEL_CRITICAL, signame, strlen(signame));
 
     // If `signum` is SIGHUP, there's no point in trying to clean up the
     // state of the (disconnected) terminal
@@ -84,27 +166,9 @@ static noreturn COLD void handle_fatal_signal(int signum)
     _exit(EX_OSERR);
 }
 
-// strsignal(3) is fine in situations where a signal is being reported
-// as terminating a process, but it tends to be confusing in most other
-// circumstances, where the signal name (not description) is usually
-// clearer
-static const char *signum_to_str(int signum)
+static void handle_sigwinch(int UNUSED_ARG(signum))
 {
-#if HAVE_SIG2STR
-    static char buf[SIG2STR_MAX + 3];
-    if (sig2str(signum, buf + 3) == 0) {
-        return memcpy(buf, "SIG", 3);
-    }
-#elif HAVE_SIGABBREV_NP
-    static char buf[16];
-    const char *abbr = sigabbrev_np(signum);
-    if (abbr && memccpy(buf + 3, abbr, '\0', sizeof(buf) - 3)) {
-        return memcpy(buf, "SIG", 3);
-    }
-#endif
-
-    const char *str = strsignal(signum);
-    return likely(str) ? str : "??";
+    resized = 1;
 }
 
 static void do_sigaction(int sig, const struct sigaction *action)
@@ -116,7 +180,8 @@ static void do_sigaction(int sig, const struct sigaction *action)
         return;
     }
     if (unlikely(old_action.sa_handler == SIG_IGN)) {
-        const char *str = signum_to_str(sig);
+        char buf[SIGNAME_MAX];
+        const char *str = signum_to_str(sig, buf);
         LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
     }
 }

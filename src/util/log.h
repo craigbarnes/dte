@@ -45,6 +45,7 @@ LogLevel log_open(const char *filename, LogLevel level, bool use_color);
 bool log_close(void);
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap) VPRINTF(4);
+void log_write(LogLevel level, const char *str, size_t len);
 LogLevel log_level_default(void);
 LogLevel log_level_from_str(const char *str);
 const char *log_level_to_str(LogLevel level);

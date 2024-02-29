@@ -118,6 +118,22 @@ bool log_level_enabled(LogLevel level)
     return level <= log_level;
 }
 
+// This function should be kept async signal safe
+void log_write(LogLevel level, const char *str, size_t len)
+{
+    // log_level is a non-const global, but as noted above, it's never
+    // modified after early startup and so poses no signal safety issues
+    // (see https://austingroupbugs.net/view.php?id=728#c6430)
+    if (!log_level_enabled(level)) {
+        return;
+    }
+
+    // xwrite_all() only calls write(3), which is async signal safe
+    // (see signal-safety(7))
+    BUG_ON(logfd < 0);
+    (void)!xwrite_all(logfd, str, len);
+}
+
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
 {
     if (!log_level_enabled(level)) {
