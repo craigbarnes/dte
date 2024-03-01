@@ -40,6 +40,10 @@ check-source: check-whitespace check-headers check-codespell check-shell-scripts
 check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
 
+# Excluding analyzer checks makes this target complete in ~12s instead of ~58s
+check-clang-tidy-fast: CLANGTIDYFLAGS += --checks='-clang-analyzer-*'
+check-clang-tidy-fast: check-clang-tidy
+
 check-coccinelle:
 	$(Q) $(foreach sp, $(SPATCHFILES), \
 	  $(LOG) SPATCH $(sp); \
@@ -122,7 +126,7 @@ show-sizes:
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
-	$(Q) $(CLANGTIDY) -quiet $* -- -std=gnu11 -Isrc -DDEBUG=3 2>&1 | \
+	$(Q) $(CLANGTIDY) -quiet $(CLANGTIDYFLAGS) $* -- -std=gnu11 -Isrc -DDEBUG=3 2>&1 | \
 	  sed '/^[0-9]\+ warnings generated\.$$/d' >&2
 
 clang-tidy-src/config.c: build/builtin-config.h
@@ -146,5 +150,5 @@ DEVMK := loaded
     check-all check-source check-docs check-shell-scripts \
     check-whitespace check-headers check-codespell check-coccinelle \
     check-aux check-desktop-file check-appstream \
-    check-clang-tidy $(clang_tidy_targets) \
+    check-clang-tidy check-clang-tidy-fast $(clang_tidy_targets) \
     git-hooks show-sizes
