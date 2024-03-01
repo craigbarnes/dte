@@ -122,7 +122,7 @@ show-sizes:
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
-	$(Q) $(CLANGTIDY) -quiet $* -- -std=gnu11 $(WARNINGS) -Isrc -DDEBUG=3 2>&1 | \
+	$(Q) $(CLANGTIDY) -quiet $* -- -std=gnu11 -Isrc -DDEBUG=3 2>&1 | \
 	  sed '/^[0-9]\+ warnings generated\.$$/d' >&2
 
 clang-tidy-src/config.c: build/builtin-config.h
