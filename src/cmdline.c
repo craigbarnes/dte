@@ -400,7 +400,6 @@ static bool cmd_direction(EditorState *e, const CommandArgs *a)
 
 static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
 {
-    BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     reset_completion(c);
     pop_input_mode(e);
