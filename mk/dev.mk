@@ -20,6 +20,9 @@ MUSLGCC ?= ccache musl-gcc
 SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
 SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
+CTIDYFLAGS ?= -quiet
+CTIDYCFLAGS ?= -std=gnu11 -Isrc -DDEBUG=3
+CTIDYFILTER = 2>&1 | sed -E '/^[0-9]+ warnings? generated\.$$/d' >&2
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
@@ -41,7 +44,7 @@ check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
 
 # Excluding analyzer checks makes this target complete in ~12s instead of ~58s
-check-clang-tidy-fast: CLANGTIDYFLAGS += --checks='-clang-analyzer-*'
+check-clang-tidy-fast: CTIDYFLAGS = -quiet --checks='-clang-analyzer-*'
 check-clang-tidy-fast: check-clang-tidy
 
 check-coccinelle:
@@ -126,8 +129,7 @@ show-sizes:
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
-	$(Q) $(CLANGTIDY) -quiet $(CLANGTIDYFLAGS) $* -- -std=gnu11 -Isrc -DDEBUG=3 2>&1 | \
-	  sed -E '/^[0-9]+ warnings? generated\.$$/d' >&2
+	$(Q) $(CLANGTIDY) $(CTIDYFLAGS) $* -- $(CTIDYCFLAGS) $(CTIDYFILTER)
 
 clang-tidy-src/config.c: build/builtin-config.h
 clang-tidy-src/editor.c: build/version.h src/compat.h
