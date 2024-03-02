@@ -284,19 +284,19 @@ ssize_t handle_exec (
         goto get_bytes;
     case EXEC_MSG: {
         String messages = dump_messages(&e->messages);
-        ctx.input = strview_from_string(&messages),
+        ctx.input = strview_from_string(&messages);
         alloc = messages.buffer;
         break;
     }
     case EXEC_COMMAND: {
         String hist = dump_command_history(e);
-        ctx.input = strview_from_string(&hist),
+        ctx.input = strview_from_string(&hist);
         alloc = hist.buffer;
         break;
     }
     case EXEC_SEARCH: {
         String hist = dump_search_history(e);
-        ctx.input = strview_from_string(&hist),
+        ctx.input = strview_from_string(&hist);
         alloc = hist.buffer;
         break;
     }

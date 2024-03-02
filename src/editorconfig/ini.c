@@ -40,8 +40,8 @@ bool ini_parse(IniParser *ctx)
         strview_remove_prefix(&value, val_offset);
         strview_trim_left(&value);
 
-        ctx->name = name,
-        ctx->value = value,
+        ctx->name = name;
+        ctx->value = value;
         ctx->name_count++;
         ctx->pos = pos;
         return true;

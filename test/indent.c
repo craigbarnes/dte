@@ -33,7 +33,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_FALSE(info.wsonly);
     EXPECT_TRUE(info.sane);
 
-    options.expand_tab = false,
+    options.expand_tab = false;
     line = strview_from_cstring("\t\t");
     info = get_indent_info(&options, &line);
     EXPECT_EQ(info.bytes, 2);
@@ -50,8 +50,8 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_FALSE(info.wsonly);
     EXPECT_FALSE(info.sane);
 
-    options.indent_width = 8,
-    options.tab_width = 8,
+    options.indent_width = 8;
+    options.tab_width = 8;
     line = strview_from_cstring("\t\t  ");
     info = get_indent_info(&options, &line);
     EXPECT_EQ(info.bytes, 4);

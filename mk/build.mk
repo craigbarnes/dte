@@ -12,7 +12,7 @@ WARNINGS = \
     -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings \
     -Wundef -Wshadow -Wcast-align -Wredundant-decls -Wswitch-enum \
     -Wvla -Wold-style-definition -Wframe-larger-than=32768 \
-    -Wpointer-arith -Wnested-externs -Winit-self \
+    -Wpointer-arith -Wnested-externs -Winit-self -Wbad-function-cast \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
 
@@ -21,7 +21,7 @@ WARNINGS_EXTRA = \
     -Walloca -Walloc-zero -Wnull-dereference -Wformat-signedness \
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
     -Wcast-align=strict -Wduplicated-branches -Wduplicated-cond \
-    -Wlogical-op
+    -Wlogical-op -Wcomma
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config css ctags d diff docker dte gcode gitcommit \

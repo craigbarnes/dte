@@ -532,12 +532,14 @@ UNITTEST {
         size_t alignment = map[type].alignment;
         size_t end = desc->offset + map[type].size;
         if (desc->global) {
-            uintptr_t ptr_val = (uintptr_t)global_ptr(desc, &gopts);
+            const char *ptr = global_ptr(desc, &gopts);
+            uintptr_t ptr_val = (uintptr_t)ptr;
             BUG_ON(ptr_val % alignment != 0);
             BUG_ON(end > sizeof(GlobalOptions));
         }
         if (desc->local) {
-            uintptr_t ptr_val = (uintptr_t)local_ptr(desc, &lopts);
+            const char *ptr = local_ptr(desc, &lopts);
+            uintptr_t ptr_val = (uintptr_t)ptr;
             BUG_ON(ptr_val % alignment != 0);
             BUG_ON(end > sizeof(LocalOptions));
         }
