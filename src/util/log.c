@@ -132,6 +132,7 @@ void log_write(LogLevel level, const char *str, size_t len)
     // (see signal-safety(7))
     BUG_ON(logfd < 0);
     (void)!xwrite_all(logfd, str, len);
+    (void)!xwrite_all(logfd, "\n", 1);
 }
 
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)

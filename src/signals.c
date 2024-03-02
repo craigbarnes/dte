@@ -9,6 +9,7 @@
 #include "util/exitcode.h"
 #include "util/log.h"
 #include "util/macros.h"
+#include "util/str-util.h"
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 volatile sig_atomic_t resized = 0;
@@ -22,118 +23,82 @@ typedef enum {
     SD_WINCH,
 } SignalDispositionType;
 
-#define sig(name, type) {#name, STRLEN(#name), SIG ## name, type}
+#define entry(name, type) {"SIG" #name, type, SIG ## name}
+#define ignore(name) entry(name, SD_IGNORED)
+#define reset(name) entry(name, SD_DEFAULT)
+#define fatal(name) entry(name, SD_FATAL)
+#define winch(name) entry(name, SD_WINCH)
 
 static const struct {
-    char name[7];
-    uint8_t name_len;
+    char name[10];
+    uint8_t type; // SignalDispositionType
     int signum;
-    SignalDispositionType type;
 } signals[] = {
-    sig(INT,  SD_IGNORED), // Terminal interrupt (see: VINTR in termios(3))
-    sig(QUIT, SD_IGNORED), // Terminal quit (see: VQUIT in termios(3))
-    sig(TSTP, SD_IGNORED), // Terminal stop (see: VSUSP in termios(3))
-    sig(XFSZ, SD_IGNORED), // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
-    sig(PIPE, SD_IGNORED), // Broken pipe (see: EPIPE error in write(3))
-    sig(USR1, SD_IGNORED), // User signal 1 (terminates by default, for no good reason)
-    sig(USR2, SD_IGNORED), // User signal 2 (as above)
+    ignore(INT),  // Terminal interrupt (see: VINTR in termios(3))
+    ignore(QUIT), // Terminal quit (see: VQUIT in termios(3))
+    ignore(TSTP), // Terminal stop (see: VSUSP in termios(3))
+    ignore(XFSZ), // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
+    ignore(PIPE), // Broken pipe (see: EPIPE error in write(3))
+    ignore(USR1), // User signal 1 (terminates by default, for no good reason)
+    ignore(USR2), // User signal 2 (as above)
 
-    sig(ABRT, SD_DEFAULT), // Terminate (cleanup already done)
-    sig(CHLD, SD_DEFAULT), // Ignore (see: wait(3))
-    sig(URG,  SD_DEFAULT), // Ignore
-    sig(TTIN, SD_DEFAULT), // Stop
-    sig(TTOU, SD_DEFAULT), // Stop
-    sig(CONT, SD_DEFAULT), // Continue
+    reset(ABRT), // Terminate (cleanup already done)
+    reset(CHLD), // Ignore (see: wait(3))
+    reset(URG),  // Ignore
+    reset(TTIN), // Stop
+    reset(TTOU), // Stop
+    reset(CONT), // Continue
 
-    sig(BUS,  SD_FATAL),
-    sig(FPE,  SD_FATAL),
-    sig(ILL,  SD_FATAL),
-    sig(SEGV, SD_FATAL),
-    sig(SYS,  SD_FATAL),
-    sig(TRAP, SD_FATAL),
-    sig(XCPU, SD_FATAL),
-    sig(ALRM, SD_FATAL),
-    sig(HUP,  SD_FATAL),
-    sig(TERM, SD_FATAL),
-    sig(VTALRM, SD_FATAL),
+    fatal(BUS),
+    fatal(FPE),
+    fatal(ILL),
+    fatal(SEGV),
+    fatal(SYS),
+    fatal(TRAP),
+    fatal(XCPU),
+    fatal(ALRM),
+    fatal(HUP),
+    fatal(TERM),
+    fatal(VTALRM),
 
     #ifdef SIGPROF
-        sig(PROF, SD_FATAL),
+        fatal(PROF),
     #endif
-
     #ifdef SIGEMT
-        sig(EMT, SD_FATAL),
+        fatal(EMT),
     #endif
-
     #if defined(SIGWINCH)
-        sig(WINCH, SD_WINCH),
+        winch(WINCH),
     #endif
 };
 
 UNITTEST {
     CHECK_STRUCT_ARRAY(signals, name);
+    BUG_ON(!xstreq(signals[0].name, "SIGINT")); // NOLINT(*-assert-side-effect)
+    BUG_ON(signals[0].signum != SIGINT);
+    BUG_ON(signals[0].type != SD_IGNORED);
 }
 
-enum {
-    KNOWN_SIG_MAX = STRLEN("VTALRM") + 2,
-#if HAVE_SIG2STR
-    XSIG2STR_MAX = MAX(KNOWN_SIG_MAX, SIG2STR_MAX + 1),
-#else
-    XSIG2STR_MAX = KNOWN_SIG_MAX,
-#endif
-    SIGNAME_MAX = MAX(16, STRLEN("SIG") + XSIG2STR_MAX),
-};
-
-static int xsig2str(int signum, char buf[XSIG2STR_MAX])
+static const char *signum_to_str(int signum)
 {
-#if HAVE_SIG2STR
-    if (sig2str(signum, buf) == 0) {
-        return 0;
-    }
-#elif HAVE_SIGABBREV_NP
-    const char *abbr = sigabbrev_np(signum);
-    if (abbr) {
-        return memccpy(buf, abbr, '\0', XSIG2STR_MAX - 1) ? 0 : -1;
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if (signum >= SIGRTMIN && signum <= SIGRTMAX) {
+        return "realtime signal";
     }
 #endif
 
     for (size_t i = 0; i < ARRAYLEN(signals); i++) {
         if (signum == signals[i].signum) {
-            memcpy(buf, signals[i].name, signals[i].name_len + 1);
-            return 0;
+            return signals[i].name;
         }
     }
 
-    return -1;
-}
-
-// strsignal(3) is fine in situations where a signal is being reported
-// as terminating a process, but it tends to be confusing in most other
-// circumstances, where the signal name (not description) is usually
-// clearer
-static const char *signum_to_str(int signum, char buf[SIGNAME_MAX])
-{
-    if (xsig2str(signum, buf + 3) == 0) {
-        return memcpy(buf, "SIG", 3);
-    }
-
-#if defined(SIGRTMIN) && defined(SIGRTMAX)
-    if (signum >= SIGRTMIN && signum <= SIGRTMAX) {
-        static const char rt[] = "realtime signal";
-        static_assert(SIGNAME_MAX >= sizeof(rt));
-        return memcpy(buf, rt, sizeof(rt));
-    }
-#endif
-
-    static const char fallback[] = "unknown signal";
-    static_assert(SIGNAME_MAX >= sizeof(fallback));
-    return memcpy(buf, fallback, sizeof(fallback));
+    return "unknown signal";
 }
 
 static noreturn COLD void handle_fatal_signal(int signum)
 {
-    char buf[SIGNAME_MAX];
-    const char *signame = signum_to_str(signum, buf);
+    const char *signame = signum_to_str(signum);
     log_write(LOG_LEVEL_CRITICAL, signame, strlen(signame));
 
     // If `signum` is SIGHUP, there's no point in trying to clean up the
@@ -175,8 +140,7 @@ static void do_sigaction(int sig, const struct sigaction *action)
         return;
     }
     if (unlikely(old_action.sa_handler == SIG_IGN)) {
-        char buf[SIGNAME_MAX];
-        const char *str = signum_to_str(sig, buf);
+        const char *str = signum_to_str(sig);
         LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
     }
 }

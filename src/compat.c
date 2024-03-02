@@ -17,12 +17,6 @@ const char feature_string[] =
 #if HAVE_MKOSTEMP
     " mkostemp"
 #endif
-#if HAVE_SIG2STR
-    " sig2str"
-#endif
-#if HAVE_SIGABBREV_NP && !HAVE_SIG2STR
-    " sigabbrev_np"
-#endif
 #if HAVE_TIOCGWINSZ
     " TIOCGWINSZ"
 #endif
