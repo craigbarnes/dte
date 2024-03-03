@@ -1,7 +1,7 @@
 ---
 title: dterc
 section: 5
-date: December 2022
+date: March 2024
 description: Command and configuration language used by dte
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dte-syntax`"]
@@ -107,8 +107,8 @@ Double quoted strings may contain the following escapes:
 ## Configuration Commands
 
 Configuration commands are used to customize certain aspects of the
-editor, for example adding key bindings, setting options, etc. These
-are the only commands allowed in user config files.
+editor, for example adding [key bindings], setting [options], etc.
+These are the only commands allowed in [user config files].
 
 ### **alias** _name_ [_command_]
 
@@ -221,7 +221,7 @@ which escapes all [`regex`] special characters before performing a
 
 See also:
 
-* The ["key bindings"] section in the [`dte`] man page
+* The [key bindings] section in the [`dte`] man page
 * The [`show bind`] command (below)
 
 ### **set** [**-gl**] _option_ [_value_] ...
@@ -1563,7 +1563,9 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
-["key bindings"]: dte.html#key-bindings
+[user config files]: dte.html#files
+[key bindings]: dte.html#key-bindings
+[options]: #options
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings
 [`color/reset`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/reset

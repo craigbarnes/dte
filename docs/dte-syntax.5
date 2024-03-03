@@ -1,4 +1,4 @@
-.TH DTE\-SYNTAX 5 "May 2020"
+.TH DTE\-SYNTAX 5 "March 2024"
 .nh
 .ad l
 .
@@ -13,7 +13,7 @@ Main commands:
 .br
    \fBsyntax\fR \fIname\fR
 .br
-   \fBstate\fR \fIname\fR [\fIemit\-color\fR]
+   \fBstate\fR \fIname\fR [\fIemit\-name\fR]
 .br
    \fBdefault\fR \fIcolor\fR \fIname\fR...
 .br
@@ -47,10 +47,10 @@ Other commands:
    \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
 .br
 .SH DESCRIPTION
-A dte syntax file consists of multiple states. A state consists of optional
-conditionals and one default action. The best way understand the syntax
-is to read through some of the built\-in syntax files, which can be
-printed with \fBdte \-b\fR, for example:
+A dte syntax file consists of multiple states. A \fBstate\fR consists of
+optional conditionals and one default action. The best way understand
+the syntax is to read through some of the built\-in syntax files, which
+can be printed with \fBdte \-b\fR, for example:
 .P
 .IP
 .nf
@@ -59,11 +59,8 @@ dte\ \-b\ syntax/dte
 \f[]
 .fi
 .PP
-The basic syntax used is the same as in \fBdterc\fR(5) files, but the
-available commands are different.
-.P
-Conditionals and default actions have a destination state. The special
-destination state \fBthis\fR can be used to jump to the current state.
+The basic syntax used is the same as in \fBdterc\fR(5) files, but the available
+commands are different.
 .P
 .SH COMMANDS
 .SS Main commands
@@ -76,10 +73,10 @@ syntax file.
 See also: sub\-syntaxes.
 .P
 .RE
-\fBstate\fR \fIname\fR [\fIemit\-color\fR]
+\fBstate\fR \fIname\fR [\fIemit\-name\fR]
 .RS
-Add new state. Conditionals (if any) and one default action must
-follow. The first state is the \fBstart\fR state.
+Add new state. Conditionals (if any) and one default action
+must follow. The first state in each \fBsyntax\fR is the start state.
 .P
 .RE
 \fBdefault\fR \fIcolor\fR \fIname\fR...
@@ -98,10 +95,12 @@ default\ numeric\ oct\ dec\ hex
 If there is no color defined for \fIoct\fR, \fIdec\fR or \fIhex\fR then color
 \fInumeric\fR is used instead.
 .P
+See also: the \fBhi\fR command in \fBdterc\fR(5).
+.P
 .RE
 \fBlist\fR [\fB\-i\fR] \fIname\fR \fIstring\fR...
 .RS
-Define a list of strings.
+Define a list of strings, for use with the \fBinlist\fR command.
 .P
 Example:
 .P
@@ -112,17 +111,30 @@ list\ keyword\ if\ else\ for\ while\ do\ continue\ switch\ case
 \f[]
 .fi
 .PP
-Use the \fBinlist\fR command to test if a buffered string is in a list.
-.P
 .TP
 \fB\-i\fR
 Make list case\-insensitive
 .PP
 .RE
 .SS Conditionals
+Any number of conditionals can appear between a \fBstate\fR command
+and its final default action.
+.P
+During syntax highlighting, when a state is entered, its conditions
+are checked in the same order as authored. If a condition is met, the
+matching text is colored in accordance with the \fIemit\-name\fR argument
+and processing transitions to the \fIdestination\fR state.
+.P
+If the \fIemit\-name\fR argument of a conditional is left unspecified, the
+\fIemit\-name\fR (or \fIname\fR) of the \fIdestination\fR state is used
+instead. This can often be used to reduce verbosity.
+.P
+The special \fIdestination\fR state \fBthis\fR can be used to jump to the
+current state.
+.P
 \fBbufis\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Test if buffered bytes are same as \fIstring\fR. If they are, emit
+Test if buffered bytes are the same as \fIstring\fR. If they are, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
 .TP
@@ -132,16 +144,16 @@ Case\-insensitive
 .RE
 \fBchar\fR [\fB\-bn\fR] \fIcharacters\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Test if current byte is in the \fIcharacters\fR list. If it is then emit
-\fIemit\-color\fR and jump to \fIdestination\fR state. If \fIemit\-name\fR is not
-given then the \fIdestination\fR state's emit name is used.
+Test if the current byte appears in \fIcharacters\fR. If so, emit
+\fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
-\fIcharacters\fR is a list of strings. Ranges are supported (\fBa\-d\fR is the
-same as \fBabcd\fR).
+Character ranges can be specified by using \fB\-\fR as a delimiter.
+For example, \fBa\-f\fR is the same as \fBabcdef\fR and \fBa\-d.q\-t\-\fR is
+the same as \fBabcd.qrst\-\fR.
 .P
 .TP
 \fB\-b\fR
-Add byte to buffer
+Add byte to buffer (if matched)
 .PP
 .TP
 \fB\-n\fR
@@ -150,20 +162,20 @@ Invert character bitmap
 .RE
 \fBheredocend\fR \fIdestination\fR
 .RS
-Compare following characters to heredoc end delimiter and go to
-destination state if comparison is true.
+Compare following characters to heredoc end delimiter (as established by
+\fBheredocbegin\fR) and go to destination state, if comparison is true.
 .P
 .RE
 \fBinlist\fR \fIlist\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Test if buffered bytes are found in \fIlist\fR. If found, emit
+Test if the buffered bytes are found in \fIlist\fR. If found, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
 .RE
 \fBstr\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-See if following bytes are same as \fIstring\fR. If they are, emit
-\fIemit\-name\fR and jump to \fIdestination\fR state.
+Check if the next bytes are the same as \fIstring\fR. If so, emit
+\fIemit\-name\fR and jump to the \fIdestination\fR state.
 .P
 .TP
 \fB\-i\fR
@@ -174,8 +186,11 @@ longer than two bytes.
 .P
 .RE
 .SS Default actions
-The last command of every state must be a default action. It is an
-unconditional jump.
+The last command of every \fBstate\fR must be a default action. It
+represents an unconditional jump to a \fIdestination\fR state.
+.P
+As with conditionals, the special \fIdestination\fR state \fBthis\fR can
+be used to re\-enter the current state.
 .P
 \fBeat\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
@@ -185,15 +200,15 @@ state.
 .RE
 \fBheredocbegin\fR \fIsubsyntax\fR \fIreturn\-state\fR
 .RS
-Store buffered bytes as heredoc end delimiter and go to
-\fIsubsyntax\fR. Sub\-syntax is like any other sub\-syntax but it must
-contain a \fIheredocend\fR conditional.
+Store buffered bytes as the heredoc end delimiter and go to \fIsubsyntax\fR.
+The sub\-syntax is like any other sub\-syntax, but it must contain a
+\fBheredocend\fR conditional.
 .P
 .RE
 \fBnoeat\fR [\fB\-b\fR] \fIdestination\fR
 .RS
-Continue to \fIdestination\fR state without emitting color or
-consuming byte.
+Continue to \fIdestination\fR state without emitting color or consuming
+byte.
 .P
 .TP
 \fB\-b\fR
@@ -214,7 +229,7 @@ Sub\-syntax names must be prefixed with \fB.\fR. It's recommended to also use
 the main syntax name in the prefix. For example \fB.c\-comment\fR if \fBc\fR is
 the main syntax.
 .P
-A sub\-syntax is a syntax in which some destination state's name is
+A sub\-syntax is a syntax in which some \fIdestination\fR state name is
 \fBEND\fR. \fBEND\fR is a special state name that is replaced by the state
 specified in another syntax.
 .P
@@ -251,7 +266,7 @@ state\ c\ code
 \f[]
 .fi
 .PP
-In this example the destination state \fB.c\-comment:c\fR is a special syntax
+In this example the \fIdestination\fR state \fB.c\-comment:c\fR is a special syntax
 for calling a sub\-syntax. \fB.c\-comment\fR is the name of the sub\-syntax and
 \fBc\fR is the return state defined in the main syntax. The whole sub\-syntax
 tree is copied into the main syntax and all destination states in the
