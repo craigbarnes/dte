@@ -23,7 +23,7 @@
 }
 
 #logo {
-    margin-right: 0.3em;
+    margin-right: 0.6em;
 }
 
 #top-nav {
@@ -31,6 +31,7 @@
     flex-wrap: wrap;
     align-items: center;
     padding-top: 1em;
+    transition: padding 300ms;
 }
 
 #toc {
@@ -38,6 +39,7 @@
     border-bottom: 2px dashed #ccc;
     margin-bottom: 1.5em;
     padding-bottom: 1.8em;
+    transition: font-size 100ms ease-out;
 }
 
 #toc ul {
@@ -62,9 +64,18 @@
     margin-top: 0;
 }
 
-@media only screen and (min-width: 360px) {
+@media only screen and (min-width: 370px) {
     #main-grid > header {
         flex-direction: row;
+    }
+    #top-nav {
+        padding-top: 0;
+    }
+}
+
+@media only screen and (min-width: 700px) {
+    #top-nav {
+        padding-top: 1em;
     }
 }
 
