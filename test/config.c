@@ -29,6 +29,7 @@ static void test_builtin_configs(TestContext *ctx)
     HashMap *syntaxes = &e->syntaxes;
     size_t n;
     const BuiltinConfig *editor_builtin_configs = get_builtin_configs_array(&n);
+    set_print_errors_to_stderr(true);
 
     for (size_t i = 0; i < n; i++) {
         const BuiltinConfig cfg = editor_builtin_configs[i];
@@ -57,6 +58,7 @@ static void test_builtin_configs(TestContext *ctx)
     }
 
     update_all_syntax_styles(&e->syntaxes, &e->styles);
+    set_print_errors_to_stderr(false);
 }
 
 static void expect_files_equal(TestContext *ctx, const char *path1, const char *path2)
