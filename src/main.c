@@ -88,12 +88,12 @@ static ExitCode dump_builtin_config(const char *name)
     return write_stdout(cfg->text.data, cfg->text.length);
 }
 
-static ExitCode lint_syntax(const char *filename)
+static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 {
     EditorState *e = init_editor_state();
     int err;
     BUG_ON(e->status != EDITOR_INITIALIZING);
-    const Syntax *s = load_syntax_file(e, filename, CFG_MUST_EXIST, &err);
+    const Syntax *s = load_syntax_file(e, filename, flags | SYN_MUST_EXIST, &err);
     if (s) {
         const size_t n = s->states.count;
         const char *plural = (n == 1) ? "" : "s";
@@ -337,7 +337,7 @@ static const char usage[] =
 // NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKRVb:c:t:r:s:";
+    static const char optstring[] = "hBHKRVS:b:c:t:r:s:";
     const char *rc = NULL;
     const char *commands[8];
     const char *tags[8];
@@ -368,7 +368,8 @@ int main(int argc, char *argv[])
             rc = optarg;
             break;
         case 's':
-            return lint_syntax(optarg);
+        case 'S':
+            return lint_syntax(optarg, ch == 'S' ? SYN_LINT : 0);
         case 'R':
             read_rc = false;
             break;

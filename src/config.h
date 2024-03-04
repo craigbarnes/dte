@@ -11,7 +11,7 @@
 typedef enum {
     CFG_NOFLAGS = 0,
     CFG_MUST_EXIST = 1 << 0,
-    CFG_BUILTIN = 1 << 1
+    CFG_BUILTIN = 1 << 1,
 } ConfigFlags;
 
 typedef struct {

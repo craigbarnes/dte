@@ -5,6 +5,7 @@
 #include "state.h"
 #include "command/args.h"
 #include "command/run.h"
+#include "config.h"
 #include "error.h"
 #include "filetype.h"
 #include "syntax/merge.h"
@@ -26,7 +27,7 @@ typedef struct {
     HashMap *syntaxes;
     Syntax *current_syntax;
     State *current_state;
-    bool warn_on_unused_subsyn;
+    SyntaxLoadFlags flags;
     unsigned int saved_nr_errors; // Used to check if nr_errors changed
 } SyntaxParser;
 
@@ -164,6 +165,20 @@ static bool destination_state(SyntaxParser *sp, const char *name, State **dest)
     return true;
 }
 
+static void lint_emit_name(const SyntaxParser *sp, const char *ename, const State *dest)
+{
+    if (!(sp->flags & SYN_LINT)) {
+        return; // Verbose linting not enabled
+    }
+    if (!ename || !dest || !dest->emit_name || !streq(ename, dest->emit_name)) {
+        return;
+    }
+    error_msg (
+        "emit-name '%s' not needed (destination state uses same emit-name)",
+        ename
+    );
+}
+
 static Condition *add_condition (
     SyntaxParser *sp,
     ConditionType type,
@@ -178,6 +193,14 @@ static Condition *add_condition (
     State *d = NULL;
     if (dest && !destination_state(sp, dest, &d)) {
         return NULL;
+    }
+
+    if (
+        type != COND_HEREDOCEND
+        && type != COND_INLIST
+        && type != COND_INLIST_BUFFER
+    ) {
+        lint_emit_name(sp, emit, d);
     }
 
     Condition *c = xnew0(Condition, 1);
@@ -278,6 +301,7 @@ static bool cmd_eat(SyntaxParser *sp, const CommandArgs *a)
     }
 
     const char *emit = a->args[1];
+    lint_emit_name(sp, emit, sp->current_state->default_action.destination);
     sp->current_state->default_action.emit_name = emit ? xstrdup(emit) : NULL;
     sp->current_state->type = STATE_EAT;
     sp->current_state = NULL;
@@ -324,13 +348,13 @@ static bool cmd_heredocend(SyntaxParser *sp, const CommandArgs *a)
 }
 
 // Forward declaration, used in cmd_include() and cmd_require()
-static int read_syntax(SyntaxParser *sp, const char *filename, ConfigFlags flags);
+static int read_syntax(SyntaxParser *sp, const char *filename, SyntaxLoadFlags flags);
 
 static bool cmd_include(SyntaxParser *sp, const CommandArgs *a)
 {
-    ConfigFlags flags = CFG_MUST_EXIST;
+    SyntaxLoadFlags flags = SYN_MUST_EXIST;
     if (a->flags[0] == 'b') {
-        flags |= CFG_BUILTIN;
+        flags |= SYN_BUILTIN;
     }
     int r = read_syntax(sp, a->args[0], flags);
     return r == 0;
@@ -448,7 +472,7 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
     char *path;
     size_t path_len;
     HashSet *set;
-    ConfigFlags flags = CFG_MUST_EXIST;
+    SyntaxLoadFlags flags = SYN_MUST_EXIST;
 
     if (a->flags[0] == 'f') {
         set = &loaded_files;
@@ -458,17 +482,17 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
         set = &loaded_builtins;
         path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
         path = buf;
-        flags |= CFG_BUILTIN;
+        flags |= SYN_BUILTIN;
     }
 
     if (hashset_get(set, path, path_len)) {
         return true;
     }
 
-    bool save = sp->warn_on_unused_subsyn;
-    sp->warn_on_unused_subsyn = false;
+    const SyntaxLoadFlags save = sp->flags;
+    sp->flags &= ~SYN_WARN_ON_UNUSED_SUBSYN;
     int r = read_syntax(sp, path, flags);
-    sp->warn_on_unused_subsyn = save;
+    sp->flags = save;
     if (r != 0) {
         return false;
     }
@@ -495,7 +519,7 @@ static bool cmd_state(SyntaxParser *sp, const CommandArgs *a)
     }
 
     state->defined = true;
-    state->emit_name = xstrdup(a->args[1] ? a->args[1] : a->args[0]);
+    state->emit_name = xstrdup(a->args[1] ? a->args[1] : name);
     sp->current_state = state;
     return true;
 }
@@ -547,7 +571,7 @@ static bool cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
 
     Syntax *syntax = xnew0(Syntax, 1);
     syntax->name = xstrdup(a->args[0]);
-    if (is_subsyntax(syntax) && !sp->warn_on_unused_subsyn) {
+    if (is_subsyntax(syntax) && !(sp->flags & SYN_WARN_ON_UNUSED_SUBSYN)) {
         syntax->warned_unused_subsyntax = true;
     }
 
@@ -612,13 +636,20 @@ static CommandRunner cmdrunner_for_syntaxes(SyntaxParser *sp)
     return runner;
 }
 
-static int read_syntax(SyntaxParser *sp, const char *filename, ConfigFlags flags)
+static ConfigFlags syn_flags_to_cfg_flags(SyntaxLoadFlags flags)
 {
-    CommandRunner runner = cmdrunner_for_syntaxes(sp);
-    return read_config(&runner, filename, flags);
+    static_assert(SYN_MUST_EXIST == (SyntaxLoadFlags)CFG_MUST_EXIST);
+    static_assert(SYN_BUILTIN == (SyntaxLoadFlags)CFG_BUILTIN);
+    return (ConfigFlags)(flags & (SYN_MUST_EXIST | SYN_BUILTIN));
 }
 
-Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
+static int read_syntax(SyntaxParser *sp, const char *filename, SyntaxLoadFlags flags)
+{
+    CommandRunner runner = cmdrunner_for_syntaxes(sp);
+    return read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
+}
+
+Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags flags, int *err)
 {
     SyntaxParser sp = {
         .home_dir = &e->home_dir,
@@ -627,13 +658,13 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
         .syntaxes = &e->syntaxes,
         .current_syntax = NULL,
         .current_state = NULL,
-        .warn_on_unused_subsyn = true,
+        .flags = flags | SYN_WARN_ON_UNUSED_SUBSYN,
         .saved_nr_errors = 0,
     };
 
     const ConfigState saved = current_config;
     CommandRunner runner = cmdrunner_for_syntaxes(&sp);
-    *err = do_read_config(&runner, filename, flags);
+    *err = do_read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
     if (*err) {
         current_config = saved;
         return NULL;
@@ -670,11 +701,11 @@ Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
     int err;
 
     xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
-    Syntax *syn = load_syntax_file(e, filename, CFG_NOFLAGS, &err);
+    Syntax *syn = load_syntax_file(e, filename, 0, &err);
     if (syn || err != ENOENT) {
         return syn;
     }
 
     xsnprintf(filename, sizeof filename, "syntax/%s", filetype);
-    return load_syntax_file(e, filename, CFG_BUILTIN, &err);
+    return load_syntax_file(e, filename, SYN_BUILTIN, &err);
 }
