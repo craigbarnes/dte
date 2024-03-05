@@ -43,10 +43,23 @@ static void test_dump_handlers(TestContext *ctx)
     ASSERT_NONNULL(cmds->lookup);
 
     for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
-        const ShowHandler *handler = lookup_show_handler(handlers[i].name);
+        const char *name = handlers[i].name;
+        const ShowHandler *handler = lookup_show_handler(name);
         ASSERT_NONNULL(handler);
         ASSERT_NONNULL(handler->dump);
         String str = handler->dump(e);
+
+        if (str.len == 0) {
+            // Returning an empty string is fine in general, but none of
+            // the handlers being tested here are expected to do so
+            TEST_FAIL("'show %s' handler returned an empty String", name);
+        } else {
+            ctx->passed++;
+            // The last line of generated text must end with a newline
+            // (see comment in get_delim_str())
+            ASSERT_EQ(str.buffer[str.len - 1], '\n');
+        }
+
         for (size_t pos = 0, len = str.len; pos < len; ) {
             bool check_parse = !!(handler->flags & SHOW_DTERC);
             bool check_name = handlers[i].check_name;
@@ -67,7 +80,7 @@ static void test_dump_handlers(TestContext *ctx)
             }
 
             if (check_name) {
-                EXPECT_STREQ(arr.ptrs[0], handlers[i].name);
+                EXPECT_STREQ(arr.ptrs[0], name);
             }
 
             const Command *cmd = cmds->lookup(arr.ptrs[0]);

@@ -93,6 +93,11 @@ static inline void strn_replace_byte(char *str, size_t n, char byte, char rep)
     }
 }
 
+// Extract a substring between `buf + pos` and either the next `delim`
+// byte (if found) or `buf + size` (the remainder of the string). The
+// substring is returned as a StringView and the `posp` in-out-param
+// is set to the offset one byte after the found delimiter (or to the
+// end of the size-bounded string, if no delimiter was found).
 NONNULL_ARGS
 static inline StringView get_delim(const char *buf, size_t *posp, size_t size, int delim)
 {
@@ -107,6 +112,11 @@ static inline StringView get_delim(const char *buf, size_t *posp, size_t size, i
     return string_view(start, len);
 }
 
+// Similar to get_delim(), but returning a null-terminated substring
+// instead of a StringView, by mutating the contents of `buf` (i.e.
+// replacing the delimiter with a NUL byte). Using get_delim() should
+// be preferred, unless the substring specifically needs to be
+// null-terminated (e.g. for passing to a library function).
 NONNULL_ARGS
 static inline char *get_delim_str(char *buf, size_t *posp, size_t size, int delim)
 {
@@ -119,6 +129,11 @@ static inline char *get_delim_str(char *buf, size_t *posp, size_t size, int deli
         *found = '\0';
         *posp += (size_t)(found - start) + 1;
     } else {
+        // If no delimiter is found, write the null-terminator 1 byte
+        // beyond the `size` bound. Callers must ensure this is safe
+        // to do. Thus, when calling this function (perhaps repeatedly)
+        // to consume an entire string, either buf[size-1] must be a
+        // delim byte or buf[size] must be in-bounds, writable memory.
         start[len] = '\0';
         *posp += len;
     }

@@ -711,6 +711,39 @@ static void test_get_delim(TestContext *ctx)
     EXPECT_EQ(idx, nparts - 1);
 }
 
+static void test_get_delim_str(TestContext *ctx)
+{
+    // Note: str is not null-terminated, but the last character in bounds
+    // is a delimiter
+    char str[16] = "word1-word2-end-";
+    size_t len = sizeof(str);
+    ASSERT_EQ(str[len - 1], '-');
+
+    size_t pos = 0;
+    const char *substr = get_delim_str(str, &pos, len, '-');
+    EXPECT_STREQ(substr, "word1");
+    EXPECT_EQ(pos, 6);
+
+    substr = get_delim_str(str, &pos, len, '-');
+    EXPECT_STREQ(substr, "word2");
+    EXPECT_EQ(pos, 12);
+
+    substr = get_delim_str(str, &pos, len, '-');
+    EXPECT_STREQ(substr, "end");
+    EXPECT_EQ(pos, 16);
+
+    // Note: str2 is not null-terminated and there are no delimiters present,
+    // but there's one extra, writable byte in the buffer that falls outside
+    // the length bound
+    char str2[16] = "no delimiter...!";
+    len = sizeof(str2) - 1;
+    ASSERT_EQ(str2[len], '!');
+    pos = 0;
+    substr = get_delim_str(str2, &pos, len, '-');
+    EXPECT_STREQ(substr, "no delimiter...");
+    EXPECT_EQ(pos, len);
+}
+
 static void test_str_replace_byte(TestContext *ctx)
 {
     char str[] = " a b c  d e  f g ";
@@ -2733,6 +2766,7 @@ static const TestEntry tests[] = {
     TEST(test_string_view),
     TEST(test_strview_has_suffix),
     TEST(test_get_delim),
+    TEST(test_get_delim_str),
     TEST(test_str_replace_byte),
     TEST(test_strn_replace_byte),
     TEST(test_size_str_width),
