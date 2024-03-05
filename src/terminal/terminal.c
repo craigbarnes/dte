@@ -143,6 +143,30 @@ UNITTEST {
     }
 }
 
+// Extract the "root name" from $TERM, as defined by terminfo(5).
+// This is the initial part of the string up to the first hyphen.
+static StringView term_extract_name(const char *name, size_t len, size_t *pos)
+{
+    StringView root = get_delim(name, pos, len, '-');
+    if (*pos >= len || !strview_equal_cstring(&root, "xterm")) {
+        return root;
+    }
+
+    // Skip past phony "xterm-" prefix used by certain terminals
+    size_t tmp = *pos;
+    StringView word2 = get_delim(name, &tmp, len, '-');
+    if (
+        strview_equal_cstring(&word2, "kitty")
+        || strview_equal_cstring(&word2, "termite")
+        || strview_equal_cstring(&word2, "ghostty")
+    ) {
+        *pos = tmp;
+        return word2;
+    }
+
+    return root;
+}
+
 void term_init(Terminal *term, const char *name, const char *colorterm)
 {
     BUG_ON(name[0] == '\0');
@@ -156,24 +180,9 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
     term->ncv_attributes = 0;
     term->parse_input = term_parse_sequence;
 
-    // Strip phony "xterm-" prefix used by certain terminals
-    const char *real_name = name;
-    if (str_has_prefix(name, "xterm-")) {
-        const char *str = name + STRLEN("xterm-");
-        if (
-            str_has_prefix(str, "kitty")
-            || str_has_prefix(str, "termite")
-            || str_has_prefix(str, "ghostty")
-        ) {
-            real_name = str;
-        }
-    }
-
-    // Extract the "root name" from $TERM, as defined by terminfo(5).
-    // This is the initial part of the string up to the first hyphen.
     size_t pos = 0;
-    size_t rnlen = strlen(real_name);
-    StringView root_name = get_delim(real_name, &pos, rnlen, '-');
+    size_t name_len = strlen(name);
+    StringView root_name = term_extract_name(name, name_len, &pos);
 
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
@@ -187,8 +196,7 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
         } else if (features & LINUX) {
             term->parse_input = linux_parse_key;
         }
-        const int n = (int)root_name.length;
-        LOG_INFO("using built-in terminal support for '%.*s'", n, root_name.data);
+        LOG_INFO("using built-in terminal support for '%s'", entry->name);
     }
 
     if (colorterm) {
@@ -204,12 +212,12 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
         return;
     }
 
-    while (pos < rnlen) {
-        const StringView str = get_delim(real_name, &pos, rnlen, '-');
+    while (pos < name_len) {
+        const StringView str = get_delim(name, &pos, name_len, '-');
         for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
             const char *suffix = color_suffixes[i].suffix;
-            size_t len = color_suffixes[i].suffix_len;
-            if (strview_equal_strn(&str, suffix, len)) {
+            size_t suffix_len = color_suffixes[i].suffix_len;
+            if (strview_equal_strn(&str, suffix, suffix_len)) {
                 term->color_type = color_suffixes[i].color_type;
                 if (term->color_type == TERM_0_COLOR) {
                     term->ncv_attributes = 0;
