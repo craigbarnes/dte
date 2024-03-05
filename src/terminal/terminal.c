@@ -59,6 +59,7 @@ static const TermEntry terms[] = {
     {"dvtm", 4, TERM_8_COLOR, 0, 0},
     {"fbterm", 6, TERM_256_COLOR, DIM | UL, BCE},
     {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC},
+    {"ghostty", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC},
     {"hurd", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
     {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC},
@@ -159,7 +160,11 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
     const char *real_name = name;
     if (str_has_prefix(name, "xterm-")) {
         const char *str = name + STRLEN("xterm-");
-        if (str_has_prefix(str, "kitty") || str_has_prefix(str, "termite")) {
+        if (
+            str_has_prefix(str, "kitty")
+            || str_has_prefix(str, "termite")
+            || str_has_prefix(str, "ghostty")
+        ) {
             real_name = str;
         }
     }
