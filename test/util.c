@@ -713,11 +713,9 @@ static void test_get_delim(TestContext *ctx)
 
 static void test_get_delim_str(TestContext *ctx)
 {
-    // Note: str is not null-terminated, but the last character in bounds
-    // is a delimiter
-    char str[16] = "word1-word2-end-";
-    size_t len = sizeof(str);
-    ASSERT_EQ(str[len - 1], '-');
+    char str[] = "word1-word2-end-";
+    size_t len = sizeof(str) - 1;
+    ASSERT_EQ(str[len - 1], '-'); // Last character in bounds is a delimiter
 
     size_t pos = 0;
     const char *substr = get_delim_str(str, &pos, len, '-');
