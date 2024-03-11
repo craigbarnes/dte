@@ -506,23 +506,6 @@ void clear_lines(View *view, bool auto_indent)
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
-void delete_lines(View *view)
-{
-    long x = view_get_preferred_x(view);
-    size_t del_count;
-    if (view->selection) {
-        view->selection = SELECT_LINES;
-        del_count = prepare_selection(view);
-        unselect(view);
-    } else {
-        block_iter_bol(&view->cursor);
-        BlockIter tmp = view->cursor;
-        del_count = block_iter_eat_line(&tmp);
-    }
-    buffer_delete_bytes(view, del_count);
-    move_to_preferred_x(view, x);
-}
-
 void new_line(View *view, bool above)
 {
     if (above && block_iter_prev_line(&view->cursor) == 0) {

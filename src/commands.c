@@ -618,7 +618,22 @@ static bool cmd_delete_eol(EditorState *e, const CommandArgs *a)
 static bool cmd_delete_line(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    delete_lines(e->view);
+    View *view = e->view;
+    long x = view_get_preferred_x(view);
+    size_t del_count;
+
+    if (view->selection) {
+        view->selection = has_flag(a, 'S') ? view->selection : SELECT_LINES;
+        del_count = prepare_selection(view);
+        unselect(view);
+    } else {
+        block_iter_bol(&view->cursor);
+        BlockIter tmp = view->cursor;
+        del_count = block_iter_eat_line(&tmp);
+    }
+
+    buffer_delete_bytes(view, del_count);
+    move_to_preferred_x(view, x);
     return true;
 }
 
@@ -2468,7 +2483,7 @@ static const Command cmds[] = {
     {"def-mode", "u", true, 1, 16, cmd_def_mode},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "n", false, 0, 0, cmd_delete_eol},
-    {"delete-line", "", false, 0, 0, cmd_delete_line},
+    {"delete-line", "S", false, 0, 0, cmd_delete_line},
     {"delete-word", "s", false, 0, 0, cmd_delete_word},
     {"down", "cl", false, 0, 0, cmd_down},
     {"eof", "cl", false, 0, 0, cmd_eof},
