@@ -27,6 +27,7 @@ Checks: >
     -bugprone-macro-parentheses,
     -bugprone-sizeof-expression,
     -bugprone-not-null-terminated-result,
+    -bugprone-switch-missing-default-case,
     -readability-else-after-return,
     -readability-function-cognitive-complexity,
     -readability-identifier-length,
@@ -34,6 +35,7 @@ Checks: >
     -readability-magic-numbers,
     -readability-uppercase-literal-suffix,
     -performance-no-int-to-ptr,
+    -misc-include-cleaner,
 
 CheckOptions:
     readability-implicit-bool-conversion.AllowIntegerConditions: true
