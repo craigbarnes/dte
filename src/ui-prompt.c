@@ -39,11 +39,11 @@ static void show_dialog (
 ) {
     unsigned int question_width = u_str_width(question);
     unsigned int min_width = question_width + 2;
-    if (term->height < 12 || term->width < min_width) {
+    if (term->height < 9 || term->width < min_width) {
         return;
     }
 
-    unsigned int height = term->height / 4;
+    unsigned int height = (term->height / 4) | 1;
     unsigned int mid = term->height / 2;
     unsigned int top = mid - (height / 2);
     unsigned int bot = top + height;
