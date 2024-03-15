@@ -47,6 +47,7 @@ LICENSE text
 /tools/git-hooks/commit-msg awk
 /tools/git-hooks/pre-commit shell
 /test/data/crlf.txt -text diff
+/test/data/insert.txt whitespace=-blank-at-eol
 /test/data/syntax-lint.dterc -space-indent -whitespace
 /docs/*.[15] roff 4space generated
 /src/util/unidata.h generated

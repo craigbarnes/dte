@@ -96,6 +96,7 @@ static void test_exec_config(TestContext *ctx)
     static const char *const outfiles[] = {
         "env.txt",
         "crlf.txt",
+        "insert.txt",
         "join.txt",
         "thai-utf8.txt",
         "pipe-from.txt",

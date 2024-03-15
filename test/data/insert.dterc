@@ -1,0 +1,18 @@
+open
+set -l expand-tab true
+set -l emulate-tab false
+set -l auto-indent true
+set -l indent-width 4
+set -l tab-width 4
+
+insert -k "a\nb\n\tc\n\td\ne"
+up
+repeat 3 left
+insert -k "\n"
+up
+insert -k "\t\t\t"
+bol
+insert -k "\n\t\t\t\n"
+
+save -f build/test/insert.txt
+close
