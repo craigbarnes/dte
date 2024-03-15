@@ -8,6 +8,7 @@
 #include "options.h"
 #include "regexp.h"
 #include "selection.h"
+#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/string.h"
@@ -196,33 +197,40 @@ void erase(View *view)
 // Count spaces and tabs at or after iterator (and move beyond them)
 static size_t count_blanks_fwd(BlockIter *bi)
 {
+    block_iter_normalize(bi);
+    const char *data = bi->blk->data;
     size_t count = 0;
-    CodePoint u;
-    // TODO: Use byte-wise iteration instead of `block_iter_next_char()`;
-    // we're only operating on one line and checking for ASCII characters,
+    size_t i = bi->offset;
+
+    // We're only operating on one line and checking for ASCII characters,
     // so Block traversal and Unicode-aware decoding are both unnecessary
-    while (block_iter_next_char(bi, &u)) {
-        if (u != '\t' && u != ' ') {
+    for (size_t n = bi->blk->size; i < n; count++) {
+        unsigned char c = data[i++];
+        if (!ascii_isblank(c)) {
             break;
         }
-        count++;
     }
+
+    bi->offset = i;
     return count;
 }
 
 // Count spaces and tabs before iterator (and move to beginning of them)
 static size_t count_blanks_bwd(BlockIter *bi)
 {
+    block_iter_normalize(bi);
     size_t count = 0;
-    CodePoint u;
-    // TODO: See `count_blanks_fwd()`
-    while (block_iter_prev_char(bi, &u)) {
-        if (u != '\t' && u != ' ') {
-            block_iter_next_char(bi, &u);
+    size_t i = bi->offset;
+
+    for (const char *data = bi->blk->data; i > 0; count++) {
+        unsigned char c = data[--i];
+        if (!ascii_isblank(c)) {
+            i++;
             break;
         }
-        count++;
     }
+
+    bi->offset = i;
     return count;
 }
 
