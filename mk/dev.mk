@@ -30,15 +30,15 @@ DOCFILES = $(call GITATTRS, xml markdown)
 SPATCHNAMES = arraylen minmax tailcall wrap perf pitfalls staticbuf
 SPATCHFILES = $(foreach f, $(SPATCHNAMES), tools/coccinelle/$f.cocci)
 
-all_headers := $(shell git ls-files -- 'src/**.h' 'test/**.h')
-clang_tidy_headers := $(filter-out src/util/unidata.h, $(all_headers))
-clang_tidy_targets := $(addprefix clang-tidy-, $(clang_tidy_headers) $(all_sources))
+all_headers = $(shell git ls-files -- 'src/**.h' 'test/**.h')
+clang_tidy_headers = $(filter-out src/util/unidata.h, $(all_headers))
+clang_tidy_targets := $(addprefix clang-tidy-, $(all_sources))
 
 dist: dte-$(DISTVER).tar.gz
 dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
-check-clang-tidy: $(clang_tidy_targets)
+check-clang-tidy: check-clang-tidy-headers $(clang_tidy_targets)
 check-source: check-whitespace check-headers check-codespell check-shell-scripts
 check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
@@ -131,6 +131,17 @@ $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
 	$(Q) $(CLANGTIDY) $(CTIDYFLAGS) $* -- $(CTIDYCFLAGS) $(CTIDYFILTER)
 
+# This is done separately from $(clang_tidy_targets), because the
+# $(clang_tidy_headers) macro shells out to `git ls-files` and we don't
+# want that happening on every make invocation. The motivating reason
+# for this was to avoid git's "detected dubious ownership" warning when
+# running `sudo make install`, but it's good practice regardless.
+check-clang-tidy-headers:
+	$(Q) $(foreach f, $(clang_tidy_headers), \
+	  $(LOG) TIDY $(f); \
+	  $(CLANGTIDY) $(CTIDYFLAGS) $(f) -- $(CTIDYCFLAGS) $(CTIDYFILTER); \
+	)
+
 clang-tidy-src/config.c: build/builtin-config.h
 clang-tidy-src/editor.c: build/version.h src/compat.h
 clang-tidy-src/main.c: build/version.h
@@ -151,6 +162,6 @@ DEVMK := loaded
     dist distcheck dist-latest-release dist-all-releases portable \
     check-all check-source check-docs check-shell-scripts \
     check-whitespace check-headers check-codespell check-coccinelle \
-    check-aux check-desktop-file check-appstream \
-    check-clang-tidy check-clang-tidy-fast $(clang_tidy_targets) \
+    check-aux check-desktop-file check-appstream check-clang-tidy \
+    check-clang-tidy-headers check-clang-tidy-fast $(clang_tidy_targets) \
     git-hooks show-sizes
