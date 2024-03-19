@@ -25,7 +25,7 @@ enum {
     KEY_UNICODE_MAX = 0x10FFFF,
 
     // In addition to the 11 unused, high-order bits, there are also
-    // some unused values in the range from KEY_UNICODE_MAX + 1 to
+    // 983,042 unused values in the range from KEY_UNICODE_MAX + 1 to
     // (1 << 21) - 1, which can be used to represent special keys.
     KEY_SPECIAL_MIN = KEY_UNICODE_MAX + 1,
 
@@ -68,19 +68,20 @@ enum {
 
     KEY_SPECIAL_MAX = KEY_F20,
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
-    KEYCODE_MODIFIER_OFFSET = 24,
+
+    // In-band signalling for non-key events
+    KEY_DETECTED_PASTE = KEY_SPECIAL_MAX + 1,
+    KEY_BRACKETED_PASTE,
+    KEY_IGNORE,
 
     // Modifier bit flags (as described above)
+    KEYCODE_MODIFIER_OFFSET = 21,
     MOD_SHIFT =  1 << KEYCODE_MODIFIER_OFFSET,
     MOD_META  =  2 << KEYCODE_MODIFIER_OFFSET,
     MOD_CTRL  =  4 << KEYCODE_MODIFIER_OFFSET,
     MOD_SUPER =  8 << KEYCODE_MODIFIER_OFFSET,
     MOD_HYPER = 16 << KEYCODE_MODIFIER_OFFSET,
     MOD_MASK  = MOD_SHIFT | MOD_META | MOD_CTRL | MOD_SUPER | MOD_HYPER,
-
-    KEY_DETECTED_PASTE = 0x20000000,
-    KEY_BRACKETED_PASTE = 0x20000001,
-    KEY_IGNORE = 0x20000002,
 };
 
 typedef uint32_t KeyCode;
