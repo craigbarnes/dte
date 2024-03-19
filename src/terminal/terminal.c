@@ -31,7 +31,6 @@ enum {
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
     ITERM2 = TFLAG_ITERM2,
     CSYNC = TFLAG_SYNC_CSI,
-    DSYNC = TFLAG_SYNC_DCS,
 };
 
 enum {
@@ -43,7 +42,7 @@ enum {
 
 static const TermEntry terms[] = {
     {"Eterm", 5, TERM_8_COLOR, 0, BCE},
-    {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | DSYNC},
+    {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC},
     {"ansi", 4, TERM_8_COLOR, UL, 0},
     {"ansiterm", 8, TERM_0_COLOR, 0, 0},
     {"aterm", 5, TERM_8_COLOR, 0, BCE},

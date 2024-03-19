@@ -169,8 +169,6 @@ void term_begin_sync_update(Terminal *term)
 {
     if (term->features & TFLAG_SYNC_CSI) {
         term_put_literal(&term->obuf, "\033[?2026h");
-    } else if (term->features & TFLAG_SYNC_DCS) {
-        term_put_literal(&term->obuf, "\033P=1s\033\\");
     }
 }
 
@@ -178,8 +176,6 @@ void term_end_sync_update(Terminal *term)
 {
     if (term->features & TFLAG_SYNC_CSI) {
         term_put_literal(&term->obuf, "\033[?2026l");
-    } else if (term->features & TFLAG_SYNC_DCS) {
-        term_put_literal(&term->obuf, "\033P=2s\033\\");
     }
 }
 

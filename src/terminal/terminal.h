@@ -25,7 +25,6 @@ typedef enum {
     TFLAG_KITTY_KEYBOARD = 0x80, // Supports kitty keyboard protocol
     TFLAG_ITERM2 = 0x100, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
     TFLAG_SYNC_CSI = 0x200, // Supports synchronized updates via DECSET private mode 2026
-    TFLAG_SYNC_DCS = 0x400, // Supports synchronized updates via older DCS sequences
 } TermFeatureFlags;
 
 typedef enum {
