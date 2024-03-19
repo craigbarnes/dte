@@ -79,6 +79,7 @@ static const TermEntry terms[] = {
     {"mrxvt", 5, TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52},
     {"pcansi", 6, TERM_8_COLOR, UL, 0},
     {"putty", 5, TERM_8_COLOR, DIM | REV | UL, BCE},
+    {"rio", 3, TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC},
     {"rxvt", 4, TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52},
     {"screen", 6, TERM_8_COLOR, 0, TITLE | OSC52},
     {"st", 2, TERM_8_COLOR, 0, BCE | OSC52},
