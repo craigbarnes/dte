@@ -9,7 +9,6 @@
 #include "terminal/rxvt.h"
 #include "terminal/style.h"
 #include "terminal/terminal.h"
-#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xsnprintf.h"
@@ -448,12 +447,6 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[Q", 3, KEY_F2},
         {"\033[R", 3, KEY_F3},
         {"\033[S", 3, KEY_F4},
-        {"\033[1~", 4, KEY_HOME},
-        {"\033[2~", 4, KEY_INSERT},
-        {"\033[3~", 4, KEY_DELETE},
-        {"\033[4~", 4, KEY_END},
-        {"\033[5~", 4, KEY_PAGE_UP},
-        {"\033[6~", 4, KEY_PAGE_DOWN},
         {"\033O ", 3, KEY_SPACE},
         {"\033OA", 3, KEY_UP},
         {"\033OB", 3, KEY_DOWN},
@@ -490,6 +483,14 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033Oy", 3, '9'},
         {"\033Oz", 3, KEY_IGNORE},
         {"\033O~", 3, KEY_IGNORE},
+        {"\033[1~", 4, KEY_HOME},
+        {"\033[2~", 4, KEY_INSERT},
+        {"\033[3~", 4, KEY_DELETE},
+        {"\033[4~", 4, KEY_END},
+        {"\033[5~", 4, KEY_PAGE_UP},
+        {"\033[6~", 4, KEY_PAGE_DOWN},
+        {"\033[7~", 4, KEY_HOME},
+        {"\033[8~", 4, KEY_END},
         {"\033[10~", 5, KEY_IGNORE},
         {"\033[11~", 5, KEY_F1},
         {"\033[12~", 5, KEY_F2},
@@ -555,20 +556,48 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[ !//.$2;3u", 12, KEY_IGNORE},
         // https://sw.kovidgoyal.net/kitty/keyboard-protocol
         {"\033[27u", 5, MOD_CTRL | '['},
-        {"\033[57376u", 8, KEY_F13},
-        {"\033[57382u", 8, KEY_F19},
-        {"\033[57383u", 8, KEY_F20},
-        {"\033[57399u", 8, '0'},
-        {"\033[57405u", 8, '6'},
-        {"\033[57408u", 8, '9'},
         {"\033[57359u", 8, KEY_SCROLL_LOCK},
+        {"\033[57360u", 8, KEY_IGNORE},
         {"\033[57361u", 8, KEY_PRINT_SCREEN},
         {"\033[57362u", 8, KEY_PAUSE},
         {"\033[57363u", 8, KEY_MENU},
-        {"\033[57361;2u", 10, MOD_SHIFT | KEY_PRINT_SCREEN},
+        {"\033[57376u", 8, KEY_F13},
+        {"\033[57377u", 8, KEY_F14},
+        {"\033[57378u", 8, KEY_F15},
+        {"\033[57379u", 8, KEY_F16},
+        {"\033[57380u", 8, KEY_F17},
+        {"\033[57381u", 8, KEY_F18},
+        {"\033[57382u", 8, KEY_F19},
+        {"\033[57383u", 8, KEY_F20},
+        {"\033[57399u", 8, '0'},
+        {"\033[57400u", 8, '1'},
+        {"\033[57401u", 8, '2'},
+        {"\033[57402u", 8, '3'},
+        {"\033[57403u", 8, '4'},
+        {"\033[57404u", 8, '5'},
+        {"\033[57405u", 8, '6'},
+        {"\033[57406u", 8, '7'},
+        {"\033[57407u", 8, '8'},
+        {"\033[57408u", 8, '9'},
+        {"\033[57409u", 8, '.'},
+        {"\033[57410u", 8, '/'},
+        {"\033[57411u", 8, '*'},
+        {"\033[57412u", 8, '-'},
+        {"\033[57413u", 8, '+'},
         // TODO: {"\033[57414u", 8, KEY_ENTER},
         {"\033[57415u", 8, '='},
+        {"\033[57417u", 8, KEY_LEFT},
+        {"\033[57418u", 8, KEY_RIGHT},
+        {"\033[57419u", 8, KEY_UP},
+        {"\033[57420u", 8, KEY_DOWN},
+        {"\033[57421u", 8, KEY_PAGE_UP},
+        {"\033[57422u", 8, KEY_PAGE_DOWN},
+        {"\033[57423u", 8, KEY_HOME},
+        {"\033[57424u", 8, KEY_END},
+        {"\033[57425u", 8, KEY_INSERT},
+        {"\033[57426u", 8, KEY_DELETE},
         {"\033[57427u", 8, KEY_BEGIN},
+        {"\033[57361;2u", 10, MOD_SHIFT | KEY_PRINT_SCREEN},
         {"\033[3615:3620:97;6u", 17, MOD_CTRL | MOD_SHIFT | 'a'},
         {"\033[97;5u", 7, MOD_CTRL | 'a'},
         {"\033[97;5:1u", 9, MOD_CTRL | 'a'},
@@ -591,10 +620,12 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033]ltitle\a", 9, KEY_IGNORE},
         {"\033]Licon\a", 8, KEY_IGNORE},
     };
+
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
         const size_t seq_length = strlen(seq);
-        BUG_ON(seq_length == 0);
+        ASSERT_TRUE(seq_length > 0);
+
         KeyCode key = 0x18;
         ssize_t parsed_length = term_parse_sequence(seq, seq_length, &key);
         ssize_t expected_length = tests[i].expected_length;
@@ -604,7 +635,9 @@ static void test_term_parse_sequence(TestContext *ctx)
             IEXPECT_EQ(key, 0x18);
             continue;
         }
+
         EXPECT_KEYCODE_EQ(i, key, tests[i].expected_key, seq, seq_length);
+
         // Ensure that parsing any truncated sequence returns -1:
         key = 0x18;
         for (size_t n = expected_length - 1; n != 0; n--) {
