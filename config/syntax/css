@@ -576,15 +576,22 @@ list -i pagepseudoclass \
 list -i fontfaceproperty \
     font-family font-stretch font-style font-weight src unicode-range
 
-# TODO: Add units mentioned at https://developer.chrome.com/blog/whats-new-css-ui-2023/#dynamic_viewport_units
-# %, distance, angle, time, frequency, resolution
+# https://www.w3.org/TR/css-values-4/#relative-lengths
+# https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Values_and_Units#dimensions
+# https://developer.mozilla.org/en-US/docs/Web/CSS/length#browser_compatibility
 list -i unit \
     % fr \
-    ch cm em ex in mm pc pt px rem vh vw vmin vmax \
+    cm mm Q in pt pc px \
+    em rem ex rex cap rcap ch rch ic ric lh rlh \
+    vb vh vi vw vmax vmin \
+    cqb cqh cqi cqw cqmax cqmin \
+    dvb dvh dvi dvw dvmax dvmin \
+    lvb lvh lvi lvw lvmax lvmin \
+    svb svh svi svw svmax svmin \
     deg grad rad turn \
     ms s \
     hz khz \
-    dpcm dpi dppx
+    dpcm dpi dppx x
 
 list -i func \
     attr clip counter rect rgb
