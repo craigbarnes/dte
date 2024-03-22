@@ -253,23 +253,18 @@ error:
     return ret;
 }
 
-static bool filesize_exceeds_limit(off_t size, unsigned int limit_in_mib)
+// Convert size in bytes to size in MiB (rounded up, for any remainder)
+static uintmax_t filesize_in_mib(uintmax_t nbytes)
 {
-    BUG_ON(size < 0);
-    off_t size_in_mib = size >> 20;
-
-    // Round up to the next whole MiB (by adding 1), if there's a remainder
-    size_in_mib += ((size_in_mib << 20) != size);
-
-    return limit_in_mib > 0 && size_in_mib > limit_in_mib;
+    return (nbytes >> 20) + !!(nbytes & 0xFFFFF);
 }
 
 UNITTEST {
-    const unsigned int seven_mib = 7u << 20;
+    const uintmax_t seven_mib = 7UL << 20;
     // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(filesize_exceeds_limit(seven_mib, 7));
-    BUG_ON(!filesize_exceeds_limit(seven_mib + 1, 7));
-    BUG_ON(filesize_exceeds_limit(seven_mib, 0));
+    BUG_ON(filesize_in_mib(seven_mib) != 7);
+    BUG_ON(filesize_in_mib(seven_mib - 1) != 7);
+    BUG_ON(filesize_in_mib(seven_mib + 1) != 8);
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
@@ -306,17 +301,21 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
     }
 
     off_t size = info->size;
-    unsigned int limit_mib = gopts->filesize_limit;
     if (unlikely(size < 0)) {
         error_msg("Invalid file size: %jd", (intmax_t)size);
         goto error;
     }
-    if (unlikely(filesize_exceeds_limit(size, limit_mib))) {
-        error_msg (
-            "File size exceeds 'filesize-limit' option (%uMiB): %s",
-            limit_mib, filename
-        );
-        goto error;
+
+    unsigned int limit_mib = gopts->filesize_limit;
+    if (limit_mib > 0) {
+        uintmax_t size_mib = filesize_in_mib(size);
+        if (unlikely(size_mib > limit_mib)) {
+            error_msg (
+                "File size (%juMiB) exceeds 'filesize-limit' option (%uMiB): %s",
+                size_mib, limit_mib, filename
+            );
+            goto error;
+        }
     }
 
     if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
