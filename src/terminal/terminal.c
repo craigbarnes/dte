@@ -12,11 +12,15 @@
 #include "util/str-util.h"
 
 typedef struct {
-    const char name[12];
-    unsigned int name_len : 4;
     unsigned int color_type : 3; // TermColorCapabilityType
     unsigned int ncv_attrs : 5; // TermStyle attributes (see "ncv" in terminfo(5))
-    unsigned int features : 20; // TermFeatureFlags
+    unsigned int features : 24; // TermFeatureFlags
+} TermInfo;
+
+typedef struct {
+    const char name[11];
+    uint8_t name_len;
+    TermInfo info;
 } TermEntry;
 
 enum {
@@ -40,62 +44,72 @@ enum {
     DIM = ATTR_DIM,
 };
 
+#define t(tname, color, ncv, feat) { \
+    .name = tname, \
+    .name_len = STRLEN(tname), \
+    .info = { \
+        .color_type = color, \
+        .ncv_attrs = ncv, \
+        .features = feat, \
+    }, \
+}
+
 static const TermEntry terms[] = {
-    {"Eterm", 5, TERM_8_COLOR, 0, BCE},
-    {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC},
-    {"ansi", 4, TERM_8_COLOR, UL, 0},
-    {"ansiterm", 8, TERM_0_COLOR, 0, 0},
-    {"aterm", 5, TERM_8_COLOR, 0, BCE},
-    {"contour", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC},
-    {"cx", 2, TERM_8_COLOR, 0, 0},
-    {"cx100", 5, TERM_8_COLOR, 0, 0},
-    {"cygwin", 6, TERM_8_COLOR, 0, 0},
-    {"cygwinB19", 9, TERM_8_COLOR, UL, 0},
-    {"cygwinDBG", 9, TERM_8_COLOR, UL, 0},
-    {"decansi", 7, TERM_8_COLOR, 0, 0},
-    {"domterm", 7, TERM_8_COLOR, 0, BCE},
-    {"dtterm", 6, TERM_8_COLOR, 0, 0},
-    {"dvtm", 4, TERM_8_COLOR, 0, 0},
-    {"fbterm", 6, TERM_256_COLOR, DIM | UL, BCE},
-    {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC},
-    {"ghostty", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC},
-    {"hurd", 4, TERM_8_COLOR, DIM | UL, BCE},
-    {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
-    {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC},
-    {"iterm", 5, TERM_256_COLOR, 0, BCE},
-    {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC},
-    {"jfbterm", 7, TERM_8_COLOR, DIM | UL, BCE},
-    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52 | KITTYKBD | CSYNC},
-    {"kon", 3, TERM_8_COLOR, DIM | UL, BCE},
-    {"kon2", 4, TERM_8_COLOR, DIM | UL, BCE},
-    {"konsole", 7, TERM_8_COLOR, 0, BCE},
-    {"kterm", 5, TERM_8_COLOR, 0, 0},
-    {"linux", 5, TERM_8_COLOR, DIM | UL, LINUX | BCE},
-    {"mgt", 3, TERM_8_COLOR, 0, BCE},
-    {"mintty", 6, TERM_8_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC},
-    {"mlterm", 6, TERM_8_COLOR, 0, TITLE},
-    {"mlterm2", 7, TERM_8_COLOR, 0, TITLE},
-    {"mlterm3", 7, TERM_8_COLOR, 0, TITLE},
-    {"mrxvt", 5, TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52},
-    {"pcansi", 6, TERM_8_COLOR, UL, 0},
-    {"putty", 5, TERM_8_COLOR, DIM | REV | UL, BCE},
-    {"rio", 3, TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC},
-    {"rxvt", 4, TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52},
-    {"screen", 6, TERM_8_COLOR, 0, TITLE | OSC52},
-    {"st", 2, TERM_8_COLOR, 0, BCE | OSC52},
-    {"stterm", 6, TERM_8_COLOR, 0, BCE | OSC52},
-    {"teken", 5, TERM_8_COLOR, DIM | REV, BCE},
-    {"terminator", 10, TERM_256_COLOR, 0, BCE | TITLE},
-    {"termite", 7, TERM_8_COLOR, 0, TITLE},
+    t("Eterm", TERM_8_COLOR, 0, BCE),
+    t("alacritty", TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC),
+    t("ansi", TERM_8_COLOR, UL, 0),
+    t("ansiterm", TERM_0_COLOR, 0, 0),
+    t("aterm", TERM_8_COLOR, 0, BCE),
+    t("contour", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC),
+    t("cx", TERM_8_COLOR, 0, 0),
+    t("cx100", TERM_8_COLOR, 0, 0),
+    t("cygwin", TERM_8_COLOR, 0, 0),
+    t("cygwinB19", TERM_8_COLOR, UL, 0),
+    t("cygwinDBG", TERM_8_COLOR, UL, 0),
+    t("decansi", TERM_8_COLOR, 0, 0),
+    t("domterm", TERM_8_COLOR, 0, BCE),
+    t("dtterm", TERM_8_COLOR, 0, 0),
+    t("dvtm", TERM_8_COLOR, 0, 0),
+    t("fbterm", TERM_256_COLOR, DIM | UL, BCE),
+    t("foot", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC),
+    t("ghostty", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC),
+    t("hurd", TERM_8_COLOR, DIM | UL, BCE),
+    t("iTerm.app", TERM_256_COLOR, 0, BCE),
+    t("iTerm2.app", TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC),
+    t("iterm", TERM_256_COLOR, 0, BCE),
+    t("iterm2", TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC),
+    t("jfbterm", TERM_8_COLOR, DIM | UL, BCE),
+    t("kitty", TERM_TRUE_COLOR, 0, TITLE | OSC52 | KITTYKBD | CSYNC),
+    t("kon", TERM_8_COLOR, DIM | UL, BCE),
+    t("kon2", TERM_8_COLOR, DIM | UL, BCE),
+    t("konsole", TERM_8_COLOR, 0, BCE),
+    t("kterm", TERM_8_COLOR, 0, 0),
+    t("linux", TERM_8_COLOR, DIM | UL, LINUX | BCE),
+    t("mgt", TERM_8_COLOR, 0, BCE),
+    t("mintty", TERM_8_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC),
+    t("mlterm", TERM_8_COLOR, 0, TITLE),
+    t("mlterm2", TERM_8_COLOR, 0, TITLE),
+    t("mlterm3", TERM_8_COLOR, 0, TITLE),
+    t("mrxvt", TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52),
+    t("pcansi", TERM_8_COLOR, UL, 0),
+    t("putty", TERM_8_COLOR, DIM | REV | UL, BCE),
+    t("rio", TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC),
+    t("rxvt", TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52),
+    t("screen", TERM_8_COLOR, 0, TITLE | OSC52),
+    t("st", TERM_8_COLOR, 0, BCE | OSC52),
+    t("stterm", TERM_8_COLOR, 0, BCE | OSC52),
+    t("teken", TERM_8_COLOR, DIM | REV, BCE),
+    t("terminator", TERM_256_COLOR, 0, BCE | TITLE),
+    t("termite", TERM_8_COLOR, 0, TITLE),
     // TODO: Add REP to tmux features, when it becomes safe to assume that
     // TERM=tmux* implies tmux >= 2.6 (see commit 5fc0be50450e75)
-    {"tmux", 4, TERM_8_COLOR, 0, TITLE | OSC52},
-    {"wezterm", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC},
-    {"xfce", 4, TERM_8_COLOR, 0, BCE | TITLE},
+    t("tmux", TERM_8_COLOR, 0, TITLE | OSC52),
+    t("wezterm", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC),
+    t("xfce", TERM_8_COLOR, 0, BCE | TITLE),
     // Note: xterm supports REP, but TERM=xterm* is used by too many other
     // terminals to safely add it here
-    {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC},
-    {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
+    t("xterm", TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC),
+    t("xterm.js", TERM_8_COLOR, 0, BCE),
 };
 
 static const struct {
@@ -167,49 +181,36 @@ static StringView term_extract_name(const char *name, size_t len, size_t *pos)
     return root;
 }
 
-void term_init(Terminal *term, const char *name, const char *colorterm)
+static TermInfo term_get_info(const char *name, const char *colorterm)
 {
-    BUG_ON(name[0] == '\0');
-    LOG_INFO("TERM=%s", name);
-
-    // Initialize defaults (without touching obuf or ibuf)
-    term->color_type = TERM_8_COLOR;
-    term->width = 80;
-    term->height = 24;
-    term->features = 0;
-    term->ncv_attributes = 0;
-    term->parse_input = term_parse_sequence;
-
     size_t pos = 0;
     size_t name_len = strlen(name);
     StringView root_name = term_extract_name(name, name_len, &pos);
 
+    TermInfo info = {
+        .color_type = TERM_8_COLOR,
+        .features = 0,
+        .ncv_attrs = 0,
+    };
+
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
     if (entry) {
-        TermFeatureFlags features = entry->features;
-        term->features = features;
-        term->color_type = entry->color_type;
-        term->ncv_attributes = entry->ncv_attrs;
-        if (features & RXVT) {
-            term->parse_input = rxvt_parse_key;
-        } else if (features & LINUX) {
-            term->parse_input = linux_parse_key;
-        }
         LOG_INFO("using built-in terminal support for '%s'", entry->name);
+        info = entry->info;
     }
 
     if (colorterm) {
         if (streq(colorterm, "truecolor") || streq(colorterm, "24bit")) {
-            term->color_type = TERM_TRUE_COLOR;
+            info.color_type = TERM_TRUE_COLOR;
             LOG_INFO("24-bit color support detected (COLORTERM=%s)", colorterm);
         } else if (colorterm[0] != '\0') {
             LOG_WARNING("unknown $COLORTERM value: '%s'", colorterm);
         }
     }
 
-    if (term->color_type == TERM_TRUE_COLOR) {
-        return;
+    if (info.color_type == TERM_TRUE_COLOR) {
+        return info;
     }
 
     while (pos < name_len) {
@@ -218,14 +219,37 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
             const char *suffix = color_suffixes[i].suffix;
             size_t suffix_len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, suffix_len)) {
-                term->color_type = color_suffixes[i].color_type;
-                if (term->color_type == TERM_0_COLOR) {
-                    term->ncv_attributes = 0;
+                info.color_type = color_suffixes[i].color_type;
+                if (info.color_type == TERM_0_COLOR) {
+                    info.ncv_attrs = 0;
                 }
                 LOG_INFO("color type detected from $TERM suffix '-%s'", suffix);
-                return;
+                return info;
             }
         }
+    }
+
+    return info;
+}
+
+void term_init(Terminal *term, const char *name, const char *colorterm)
+{
+    BUG_ON(name[0] == '\0');
+    LOG_INFO("TERM=%s", name);
+
+    TermInfo info = term_get_info(name, colorterm);
+    term->color_type = info.color_type;
+    term->features = info.features;
+    term->width = 80;
+    term->height = 24;
+    term->ncv_attributes = info.ncv_attrs;
+
+    if (info.features & RXVT) {
+        term->parse_input = rxvt_parse_key;
+    } else if (info.features & LINUX) {
+        term->parse_input = linux_parse_key;
+    } else {
+        term->parse_input = term_parse_sequence;
     }
 }
 
