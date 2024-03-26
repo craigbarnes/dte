@@ -82,6 +82,11 @@ enum {
     MOD_SUPER =  8 << KEYCODE_MODIFIER_OFFSET,
     MOD_HYPER = 16 << KEYCODE_MODIFIER_OFFSET,
     MOD_MASK  = MOD_SHIFT | MOD_META | MOD_CTRL | MOD_SUPER | MOD_HYPER,
+
+    // If set, the 1 other set bit represents a TermFeatureFlags value.
+    // This bit is used within term_read_key(), but is never present in
+    // KeyCode values it returns.
+    KEYCODE_QUERY_REPLY_BIT = MOD_HYPER << 1,
 };
 
 typedef uint32_t KeyCode;

@@ -619,6 +619,28 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033]Licon\033\\", 7, KEY_IGNORE},
         {"\033]ltitle\a", 9, KEY_IGNORE},
         {"\033]Licon\a", 8, KEY_IGNORE},
+        // DECRPM replies (to DECRQM queries)
+        {"\033[?2026;0$y", 11, KEY_IGNORE},
+        {"\033[?2026;1$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC_CSI},
+        {"\033[?2026;2$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC_CSI},
+        {"\033[?2026;3$y", 11, KEY_IGNORE},
+        {"\033[?2026;4$y", 11, KEY_IGNORE},
+        {"\033[?2026;5$y", 11, KEY_IGNORE},
+        {"\033[?0;1$y", 8, KEY_IGNORE},
+        // Invalid, DECRPM-like sequences
+        {"\033[?9$y", 6, KEY_IGNORE}, // Too few params
+        {"\033[?1;2;3$y", 10, KEY_IGNORE}, // Too many params
+        {"\033[?1;2y", 7, KEY_IGNORE}, // No '$' intermediate byte
+        {"\033[1;2$y", 7, KEY_IGNORE}, // No '?' param prefix
+        // Kitty keyboard protocol query replies
+        {"\033[?5u", 5, KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD},
+        {"\033[?1u", 5, KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD},
+        {"\033[?0u", 5, KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD},
+        // Invalid, kitty-reply-like sequences
+        {"\033[?u", 4, KEY_IGNORE}, // Too few params (could be valid, in theory)
+        {"\033[?1;2u", 7, KEY_IGNORE}, // Too many params
+        {"\033[?1:2u", 7, KEY_IGNORE}, // Sub-params
+        {"\033[?1!u", 6, KEY_IGNORE}, // Intermediate '!' byte
     };
 
     FOR_EACH_I(i, tests) {

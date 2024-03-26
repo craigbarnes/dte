@@ -144,6 +144,16 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
     }
 }
 
+void term_put_queries(TermOutputBuffer *obuf)
+{
+    static const char queries[] =
+        "\033[?u" // Kitty keyboard protocol flags
+        "\033[?2026$p" // DECRQM 2026 (terminal-wg synchronized updates)
+    ;
+
+    term_put_bytes(obuf, queries, sizeof(queries) - 1);
+}
+
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer
 void term_use_alt_screen_buffer(Terminal *term)
 {

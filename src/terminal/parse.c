@@ -1,5 +1,5 @@
 // Parser for escape sequences sent by terminals to clients.
-// Copyright 2018-2023 Craig Barnes.
+// Copyright 2018-2024 Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also:
 // - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "parse.h"
+#include "terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/log.h"
@@ -24,6 +25,15 @@ typedef enum {
     BYTE_DELETE,        // 0x7F
     BYTE_OTHER,         // 0x80..0xFF
 } ByteType;
+
+// https://vt100.net/docs/vt510-rm/DECRPM
+typedef enum {
+    DECRPM_NOT_RECOGNIZED = 0,
+    DECRPM_SET = 1,
+    DECRPM_RESET = 2,
+    DECRPM_PERMANENTLY_SET = 3,
+    DECRPM_PERMANENTLY_RESET = 4,
+} TermPrivateModeStatus;
 
 static KeyCode decode_key_from_final_byte(uint8_t byte)
 {
@@ -449,20 +459,84 @@ UNITTEST {
     BUG_ON(csi.nr_intermediate != 1);
     BUG_ON(csi.intermediate[0] != '$');
     BUG_ON(csi.have_subparams);
-    // TODO: support parsing '?' as param prefix?
+    // Note: question mark param prefixes are handled in parse_csi() instead
+    // of parse_csi_params(), so the latter reports it as an unhandled byte
     BUG_ON(!csi.unhandled_bytes);
+}
+
+static const char *decrpm_status_to_str(TermPrivateModeStatus val)
+{
+    switch (val) {
+    case DECRPM_NOT_RECOGNIZED: return "not recognized";
+    case DECRPM_SET: return "set";
+    case DECRPM_RESET: return "reset";
+    case DECRPM_PERMANENTLY_SET: return "permanently set";
+    case DECRPM_PERMANENTLY_RESET: return "permanently reset";
+    }
+    return "INVALID";
+}
+
+static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
+{
+    return status == DECRPM_SET || status == DECRPM_RESET;
+}
+
+static KeyCode parse_csi_query_reply(const ControlParams *csi)
+{
+    if (unlikely(csi->have_subparams || csi->nr_intermediate > 1)) {
+        goto ignore;
+    }
+
+    uint8_t final = csi->final_byte;
+    uint8_t nparams = csi->nparams;
+    uint8_t intermediate = csi->nr_intermediate ? csi->intermediate[0] : 0;
+
+    if (final == 'y' && intermediate == '$' && nparams == 2) {
+        // DECRPM reply to DECRQM query (CSI ? Ps; Pm $ y)
+        unsigned int mode = csi->params[0][0];
+        unsigned int status = csi->params[1][0];
+        const char *desc = decrpm_status_to_str(status);
+        LOG_DEBUG("DECRPM reply for mode %u: %u (%s)", mode, status, desc);
+        if (mode == 2026 && decrpm_is_set_or_reset(status)) {
+            return KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC_CSI;
+        }
+        return KEY_IGNORE;
+    }
+
+    if (final == 'u' && intermediate == 0 && nparams == 1) {
+        // Kitty keyboard protocol flags (CSI ? flags u)
+        unsigned int flags = csi->params[0][0];
+        LOG_DEBUG("query reply for kittykbd flags: 0x%x", flags);
+        // Interpret reply with any flags to mean "supported"
+        return KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD;
+    }
+
+ignore:
+    // TODO: Log (escaped) sequence string
+    LOG_DEBUG("unknown CSI with '?' parameter prefix");
+    return KEY_IGNORE;
 }
 
 static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     ControlParams csi = {.nparams = 0};
-    i = parse_csi_params(buf, len, i, &csi);
+    bool maybe_query_reply = (i < len && buf[i] == '?');
+    i = parse_csi_params(buf, len, i + (maybe_query_reply ? 1 : 0), &csi);
 
     if (unlikely(csi.final_byte == 0)) {
         BUG_ON(i < len);
         return -1;
     }
-    if (unlikely(csi.unhandled_bytes || csi.nr_intermediate)) {
+    if (unlikely(csi.unhandled_bytes)) {
+        goto ignore;
+    }
+
+    if (maybe_query_reply) {
+        *k = parse_csi_query_reply(&csi);
+        return i;
+    }
+
+    if (unlikely(csi.nr_intermediate)) {
         goto ignore;
     }
 
@@ -627,6 +701,7 @@ ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
     case 'O': return parse_ss3(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
     case ']': return parse_osc(buf, length, 2, k);
+    // String Terminator (see https://vt100.net/emu/dec_ansi_parser#STESC)
     case '\\': *k = KEY_IGNORE; return 2;
     }
     return 0;

@@ -119,6 +119,7 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
     term_input_init(ibuf);
     term_output_init(obuf);
     term_enable_private_modes(&term);
+    term_put_queries(obuf);
     term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -524,6 +525,7 @@ loop_break:;
 
     set_view(window->views.ptrs[0]);
     ui_start(e);
+    term_put_queries(&term->obuf);
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);

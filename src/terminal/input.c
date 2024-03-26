@@ -7,6 +7,7 @@
 #include "input.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/time-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
@@ -162,6 +163,18 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
+static const char *term_feature_flag_to_str(TermFeatureFlags flag)
+{
+    // Note: this only handles a small subset of individual flags,
+    // as returned by parse_csi_query_reply()
+    if (flag == TFLAG_KITTY_KEYBOARD) {
+        return "KITTYKBD";
+    } else if (flag == TFLAG_SYNC_CSI) {
+        return "CSYNC";
+    }
+    return "??";
+}
+
 KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
 {
     TermInputBuffer *input = &term->ibuf;
@@ -176,6 +189,13 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
     if (input->buf[0] == '\033') {
         if (input->len > 1 || input->can_be_truncated) {
             KeyCode key = read_special(term);
+            if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
+                TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
+                const char *name = term_feature_flag_to_str(flag);
+                LOG_INFO("detected terminal feature '%s' via query", name);
+                BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
+                return KEY_IGNORE;
+            }
             if (key != KEY_NONE) {
                 return key;
             }
