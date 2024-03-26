@@ -62,7 +62,6 @@ DIAGNOSE_IF(!IS_POWER_OF_2(r))
 
 // This is equivalent to `(x + 1) % modulus`, given the constraints
 // imposed by BUG_ON(), but avoids expensive divisions by a non-constant
-// and/or non-power-of-2
 static inline size_t size_increment_wrapped(size_t x, size_t modulus)
 {
     BUG_ON(modulus == 0);
