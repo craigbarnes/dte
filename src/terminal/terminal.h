@@ -79,6 +79,7 @@ typedef struct Terminal {
     unsigned int width;
     unsigned int height;
     unsigned int ncv_attributes;
+    bool sync_pending; // See TFLAG_SYNC_CSI and term_end_sync_update()
     ssize_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;
