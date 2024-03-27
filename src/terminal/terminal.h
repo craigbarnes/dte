@@ -24,7 +24,7 @@ typedef enum {
     TFLAG_META_ESC = 0x40, // Try to enable {meta,alt}SendsEscape modes at startup
     TFLAG_KITTY_KEYBOARD = 0x80, // Supports kitty keyboard protocol
     TFLAG_ITERM2 = 0x100, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
-    TFLAG_SYNC_CSI = 0x200, // Supports synchronized updates via DECSET private mode 2026
+    TFLAG_SYNC = 0x200, // Supports synchronized updates via DECSET private mode 2026
 } TermFeatureFlags;
 
 typedef enum {
@@ -79,7 +79,7 @@ typedef struct Terminal {
     unsigned int width;
     unsigned int height;
     unsigned int ncv_attributes;
-    bool sync_pending; // See TFLAG_SYNC_CSI and term_end_sync_update()
+    bool sync_pending; // See TFLAG_SYNC and term_end_sync_update()
     ssize_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;

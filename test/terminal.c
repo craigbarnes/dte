@@ -621,8 +621,8 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033]Licon\a", 8, KEY_IGNORE},
         // DECRPM replies (to DECRQM queries)
         {"\033[?2026;0$y", 11, KEY_IGNORE},
-        {"\033[?2026;1$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC_CSI},
-        {"\033[?2026;2$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC_CSI},
+        {"\033[?2026;1$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC},
+        {"\033[?2026;2$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC},
         {"\033[?2026;3$y", 11, KEY_IGNORE},
         {"\033[?2026;4$y", 11, KEY_IGNORE},
         {"\033[?2026;5$y", 11, KEY_IGNORE},
@@ -1380,7 +1380,7 @@ static void test_term_begin_sync_update(TestContext *ctx)
 {
     Terminal term;
     term_init(&term, "xterm-kitty", NULL);
-    EXPECT_TRUE(term.features & TFLAG_SYNC_CSI);
+    EXPECT_TRUE(term.features & TFLAG_SYNC);
 
     static const char expected[] =
         "\033[?2026h"

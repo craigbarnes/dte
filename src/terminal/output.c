@@ -177,7 +177,7 @@ void term_show_cursor(Terminal *term)
 
 void term_begin_sync_update(Terminal *term)
 {
-    if (term->features & TFLAG_SYNC_CSI) {
+    if (term->features & TFLAG_SYNC) {
         term_put_literal(&term->obuf, "\033[?2026h");
         term->sync_pending = true;
     }
@@ -185,7 +185,7 @@ void term_begin_sync_update(Terminal *term)
 
 void term_end_sync_update(Terminal *term)
 {
-    if ((term->features & TFLAG_SYNC_CSI) && term->sync_pending) {
+    if ((term->features & TFLAG_SYNC) && term->sync_pending) {
         term_put_literal(&term->obuf, "\033[?2026l");
         term->sync_pending = false;
     }

@@ -34,7 +34,7 @@ enum {
     METAESC = TFLAG_META_ESC,
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
     ITERM2 = TFLAG_ITERM2,
-    CSYNC = TFLAG_SYNC_CSI,
+    SYNC = TFLAG_SYNC,
 };
 
 enum {
@@ -56,11 +56,11 @@ enum {
 
 static const TermEntry terms[] = {
     t("Eterm", TERM_8_COLOR, 0, BCE),
-    t("alacritty", TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC),
+    t("alacritty", TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | SYNC),
     t("ansi", TERM_8_COLOR, UL, 0),
     t("ansiterm", TERM_0_COLOR, 0, 0),
     t("aterm", TERM_8_COLOR, 0, BCE),
-    t("contour", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC),
+    t("contour", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | SYNC),
     t("cx", TERM_8_COLOR, 0, 0),
     t("cx100", TERM_8_COLOR, 0, 0),
     t("cygwin", TERM_8_COLOR, 0, 0),
@@ -71,29 +71,29 @@ static const TermEntry terms[] = {
     t("dtterm", TERM_8_COLOR, 0, 0),
     t("dvtm", TERM_8_COLOR, 0, 0),
     t("fbterm", TERM_256_COLOR, DIM | UL, BCE),
-    t("foot", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC),
-    t("ghostty", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | CSYNC),
+    t("foot", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
+    t("ghostty", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
     t("hurd", TERM_8_COLOR, DIM | UL, BCE),
     t("iTerm.app", TERM_256_COLOR, 0, BCE),
-    t("iTerm2.app", TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC),
+    t("iTerm2.app", TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | SYNC),
     t("iterm", TERM_256_COLOR, 0, BCE),
-    t("iterm2", TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | CSYNC),
+    t("iterm2", TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2 | SYNC),
     t("jfbterm", TERM_8_COLOR, DIM | UL, BCE),
-    t("kitty", TERM_TRUE_COLOR, 0, TITLE | OSC52 | KITTYKBD | CSYNC),
+    t("kitty", TERM_TRUE_COLOR, 0, TITLE | OSC52 | KITTYKBD | SYNC),
     t("kon", TERM_8_COLOR, DIM | UL, BCE),
     t("kon2", TERM_8_COLOR, DIM | UL, BCE),
     t("konsole", TERM_8_COLOR, 0, BCE),
     t("kterm", TERM_8_COLOR, 0, 0),
     t("linux", TERM_8_COLOR, DIM | UL, LINUX | BCE),
     t("mgt", TERM_8_COLOR, 0, BCE),
-    t("mintty", TERM_8_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC),
+    t("mintty", TERM_8_COLOR, 0, BCE | REP | TITLE | OSC52 | SYNC),
     t("mlterm", TERM_8_COLOR, 0, TITLE),
     t("mlterm2", TERM_8_COLOR, 0, TITLE),
     t("mlterm3", TERM_8_COLOR, 0, TITLE),
     t("mrxvt", TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52),
     t("pcansi", TERM_8_COLOR, UL, 0),
     t("putty", TERM_8_COLOR, DIM | REV | UL, BCE),
-    t("rio", TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | CSYNC),
+    t("rio", TERM_TRUE_COLOR, 0, BCE | REP | OSC52 | SYNC),
     t("rxvt", TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52),
     t("screen", TERM_8_COLOR, 0, TITLE | OSC52),
     t("st", TERM_8_COLOR, 0, BCE | OSC52),
@@ -104,7 +104,7 @@ static const TermEntry terms[] = {
     // TODO: Add REP to tmux features, when it becomes safe to assume that
     // TERM=tmux* implies tmux >= 2.6 (see commit 5fc0be50450e75)
     t("tmux", TERM_8_COLOR, 0, TITLE | OSC52),
-    t("wezterm", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | CSYNC),
+    t("wezterm", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | SYNC),
     t("xfce", TERM_8_COLOR, 0, BCE | TITLE),
     // Note: xterm supports REP, but TERM=xterm* is used by too many other
     // terminals to safely add it here

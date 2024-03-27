@@ -169,8 +169,8 @@ static const char *term_feature_flag_to_str(TermFeatureFlags flag)
     // as returned by parse_csi_query_reply()
     if (flag == TFLAG_KITTY_KEYBOARD) {
         return "KITTYKBD";
-    } else if (flag == TFLAG_SYNC_CSI) {
-        return "CSYNC";
+    } else if (flag == TFLAG_SYNC) {
+        return "SYNC";
     }
     return "??";
 }
