@@ -480,19 +480,12 @@ loop_break:;
         }
     }
 
+    // We don't want errors relating to opening files printed to stderr,
+    // since wildcard arguments (e.g. `dte *`) may expand to directory
+    // names and produce lots of "not a regular file" errors
+    unsigned int nr_stderr_errors = get_nr_errors();
     set_print_errors_to_stderr(false);
-
-    // Initialize terminal but don't update screen yet. Also display
-    // "Press any key to continue" prompt if there were any errors
-    // during reading configuration files.
-    if (!term_raw()) {
-        perror("tcsetattr");
-        return EX_IOERR;
-    }
-    if (get_nr_errors()) {
-        any_key(term, e->options.esc_timeout);
-        clear_error();
-    }
+    clear_error();
 
     e->status = EDITOR_RUNNING;
 
@@ -524,11 +517,16 @@ loop_break:;
     }
 
     set_view(window->views.ptrs[0]);
-    ui_start(e);
-    term_put_queries(&term->obuf);
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);
+    }
+
+    int exit_code = e->status;
+    if (exit_code >= 0) {
+        // If a -c command caused the editor to exit (quit, close -q, etc.),
+        // terminal init/deinit and entering the main-loop can be skipped
+        goto exit;
     }
 
     size_t opened_tags = 0;
@@ -551,15 +549,27 @@ loop_break:;
         dview = NULL;
     }
 
-    if (nr_commands + nr_tags > 0) {
-        normal_update(e);
+    if (unlikely(!term_raw())) {
+        perror("tcsetattr");
+        return EX_IOERR;
     }
 
-    int exit_code = main_loop(e);
+    if (unlikely(nr_stderr_errors > 0)) {
+        // Display "press any key to continue" prompt for stderr errors
+        any_key(term, e->options.esc_timeout);
+    }
+
+    ui_start(e);
+    term_put_queries(&term->obuf);
+    term_output_flush(&term->obuf);
+
+    exit_code = main_loop(e);
 
     term_restore_title(term);
     ui_end(e);
     term_output_flush(&term->obuf);
+
+exit:
     set_print_errors_to_stderr(true);
 
     // Unlock files and add to file history
@@ -585,6 +595,11 @@ loop_break:;
         }
         free_blocks(std_buffer);
         free(std_buffer);
+    }
+
+    size_t n = term->obuf.count;
+    if (n > 0) {
+        LOG_DEBUG("%zu unflushed bytes remaining in terminal output buffer", n);
     }
 
     free_editor_state(e);

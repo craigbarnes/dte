@@ -67,7 +67,7 @@ static const struct {
     #ifdef SIGEMT
         fatal(EMT),
     #endif
-    #if defined(SIGWINCH)
+    #ifdef SIGWINCH
         winch(WINCH),
     #endif
 };
