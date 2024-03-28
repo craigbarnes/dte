@@ -5,8 +5,8 @@
 #include "debug.h"
 #include "macros.h"
 
-#define U64 UINT64_C
-#define U32 UINT32_C
+#define U64(x) (UINT64_C(x))
+#define U32(x) (UINT32_C(x))
 
 #if GNUC_AT_LEAST(3, 4)
 #define USE_BUILTIN(fn, arg) \

@@ -2107,13 +2107,13 @@ static void test_popcount(TestContext *ctx)
     for (unsigned int i = 0; i < 32; i++) {
         IEXPECT_EQ(u32_popcount(UINT32_MAX << i), 32 - i);
         IEXPECT_EQ(u32_popcount(UINT32_MAX >> i), 32 - i);
-        IEXPECT_EQ(u32_popcount(UINT32_C(1) << i), 1);
+        IEXPECT_EQ(u32_popcount(U32(1) << i), 1);
     }
 
     for (unsigned int i = 0; i < 64; i++) {
         IEXPECT_EQ(u64_popcount(UINT64_MAX << i), 64 - i);
         IEXPECT_EQ(u64_popcount(UINT64_MAX >> i), 64 - i);
-        IEXPECT_EQ(u64_popcount(UINT64_C(1) << i), 1);
+        IEXPECT_EQ(u64_popcount(U64(1) << i), 1);
     }
 }
 
