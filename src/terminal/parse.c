@@ -498,7 +498,7 @@ static KeyCode parse_csi_query_reply(const ControlParams *csi, uint8_t prefix)
         unsigned int mode = csi->params[0][0];
         unsigned int status = csi->params[1][0];
         const char *desc = decrpm_status_to_str(status);
-        LOG_DEBUG("DECRPM reply for mode %u: %u (%s)", mode, status, desc);
+        LOG_DEBUG("DECRPM %u reply: %u (%s)", mode, status, desc);
         if (mode == 2026 && decrpm_is_set_or_reset(status)) {
             return KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC;
         }
