@@ -148,9 +148,13 @@ void term_put_queries(TermOutputBuffer *obuf)
 {
     static const char queries[] =
         "\033[?u" // Kitty keyboard protocol flags
+        "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
+        #if DEBUG >= 2 // Emitted only for logging purposes, for now
         "\033[?2026$p" // DECRQM 2026 (terminal-wg synchronized updates)
+        #endif
     ;
 
+    LOG_INFO("querying terminal");
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
 }
 
