@@ -22,6 +22,7 @@ state start code
 #    char 0 zero
 #    char 1-9 dec
     char \" .zig-string:this
+    str '\\' string-multi
 #    char \' .c-char:this
     str '//' comment
     eat this
@@ -57,6 +58,10 @@ state int-type type
     noeat start
 
 state comment
+    char "\n" start
+    eat this
+
+state string-multi string
     char "\n" start
     eat this
 
