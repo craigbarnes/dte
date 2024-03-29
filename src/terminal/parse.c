@@ -705,6 +705,20 @@ ignore:
     return i;
 }
 
+static ssize_t esc_intermediate(const char *buf, size_t len, size_t i, KeyCode *k)
+{
+    while (i < len) {
+        unsigned char ch = buf[i++];
+        ByteType type = get_byte_type(ch);
+        if (type == BYTE_INTERMEDIATE || type == BYTE_DELETE) {
+            continue;
+        }
+        *k = KEY_IGNORE;
+        return i - (ch == 0x1B); // Don't consume Esc (0x1B)
+    }
+    return -1;
+}
+
 ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
 {
     if (unlikely(length == 0 || buf[0] != '\033')) {
@@ -712,12 +726,24 @@ ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
     } else if (unlikely(length == 1)) {
         return -1;
     }
-    switch (buf[1]) {
+
+    char ch = buf[1];
+    switch (ch) {
     case 'O': return parse_ss3(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
     case ']': return parse_osc(buf, length, 2, k);
     // String Terminator (see https://vt100.net/emu/dec_ansi_parser#STESC)
     case '\\': *k = KEY_IGNORE; return 2;
     }
+
+    if (ch < 0x20) {
+        *k = KEY_IGNORE;
+        return 2;
+    }
+
+    if (ch < 0x30) {
+        return esc_intermediate(buf, length, 1, k);
+    }
+
     return 0;
 }
