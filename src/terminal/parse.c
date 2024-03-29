@@ -5,6 +5,7 @@
 // - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 // - https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 // - ECMA-48 §5.4 (https://ecma-international.org/publications-and-standards/standards/ecma-48/)
+// - https://vt100.net/emu/dec_ansi_parser
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -52,7 +53,7 @@ static KeyCode decode_key_from_final_byte(uint8_t byte)
     case 'R': return KEY_F3;
     case 'S': return KEY_F4;
     }
-    return KEY_NONE;
+    return KEY_IGNORE;
 }
 
 static KeyCode decode_key_from_param(uint32_t param)
@@ -87,7 +88,7 @@ static KeyCode decode_key_from_param(uint32_t param)
     case 33: return KEY_F19;
     case 34: return KEY_F20;
     }
-    return KEY_NONE;
+    return KEY_IGNORE;
 }
 
 static KeyCode decode_kitty_special_key(uint32_t n)
@@ -201,7 +202,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
 
     const char ch = buf[i++];
     KeyCode key = decode_key_from_final_byte(ch);
-    if (key) {
+    if (key != KEY_IGNORE) {
         *k = key;
     } else if (ch == 'X') {
         *k = '=';
@@ -616,7 +617,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             // Fallthrough
         case 1:
             key = decode_key_from_param(csi.params[0][0]);
-            if (key == 0) {
+            if (key == KEY_IGNORE) {
                 if (csi.params[0][0] == 200 && mods == 0) {
                     *k = KEY_BRACKETED_PASTE;
                     return i;
@@ -644,7 +645,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
         // Fallthrough
     case 0:
         key = decode_key_from_final_byte(csi.final_byte);
-        if (unlikely(key == 0)) {
+        if (unlikely(key == KEY_IGNORE)) {
             goto ignore;
         }
         *k = mods | key;
