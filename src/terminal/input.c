@@ -186,63 +186,67 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
         return KEY_DETECTED_PASTE;
     }
 
-    if (input->buf[0] == '\033') {
-        if (input->len > 1 || input->can_be_truncated) {
-            KeyCode key = read_special(term);
-            if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
-                TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
-                const char *name = term_feature_flag_to_str(flag);
-                LOG_INFO("detected terminal feature '%s' via query", name);
-                BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
-                return KEY_IGNORE;
-            }
-            if (key != KEY_NONE) {
-                return key;
-            }
+    if (input->buf[0] != '\033') {
+        return read_simple(input);
+    }
+
+    if (input->len > 1 || input->can_be_truncated) {
+        KeyCode key = read_special(term);
+        if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
+            TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
+            const char *name = term_feature_flag_to_str(flag);
+            LOG_INFO("detected terminal feature '%s' via query", name);
+            BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
+            return KEY_IGNORE;
         }
-        if (input->len == 1) {
-            // Sometimes alt-key gets split into two reads
-            fill_buffer_timeout(input, esc_timeout_ms);
-            if (input->len > 1 && input->buf[1] == '\033') {
-                /*
-                 * Double-esc (+ maybe some other characters)
-                 *
-                 * Treat the first esc as a single key to make
-                 * things like arrow keys work immediately after
-                 * leaving (esc) the command line.
-                 *
-                 * Special key can't start with double-esc so this
-                 * should be safe.
-                 *
-                 * This breaks the esc-key == alt-key rule for the
-                 * esc-esc case but it shouldn't matter.
-                 */
-                return read_simple(input);
-            }
+        if (key != KEY_NONE) {
+            return key;
         }
-        if (input->len > 1) {
-            // Unknown escape sequence or 'esc key' / 'alt-key'
+    }
 
-            // Throw escape away
-            consume_input(input, 1);
+    if (input->len == 1) {
+        // Sometimes alt-key gets split into two reads
+        fill_buffer_timeout(input, esc_timeout_ms);
+        if (input->len > 1 && input->buf[1] == '\033') {
+            /*
+             * Double-esc (+ maybe some other characters)
+             *
+             * Treat the first esc as a single key to make
+             * things like arrow keys work immediately after
+             * leaving (esc) the command line.
+             *
+             * Special key can't start with double-esc so this
+             * should be safe.
+             *
+             * This breaks the esc-key == alt-key rule for the
+             * esc-esc case but it shouldn't matter.
+             */
+            return read_simple(input);
+        }
+    }
 
-            KeyCode key = read_simple(input);
-            if (key == KEY_NONE) {
-                return KEY_NONE;
-            }
+    if (input->len > 1) {
+        // Unknown escape sequence or 'esc key' / 'alt-key'
 
-            if (input->len == 0 || input->buf[0] == '\033') {
-                // 'esc key' or 'alt-key'
-                if (u_is_ascii_upper(key)) {
-                    return MOD_META | MOD_SHIFT | ascii_tolower(key);
-                }
-                return MOD_META | key;
-            }
+        // Throw escape away
+        consume_input(input, 1);
 
-            // Unknown escape sequence; avoid inserting it
-            input->len = 0;
+        KeyCode key = read_simple(input);
+        if (key == KEY_NONE) {
             return KEY_NONE;
         }
+
+        if (input->len == 0 || input->buf[0] == '\033') {
+            // 'esc key' or 'alt-key'
+            if (u_is_ascii_upper(key)) {
+                return MOD_META | MOD_SHIFT | ascii_tolower(key);
+            }
+            return MOD_META | key;
+        }
+
+        // Unknown escape sequence; avoid inserting it
+        input->len = 0;
+        return KEY_NONE;
     }
 
     return read_simple(input);
