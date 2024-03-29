@@ -194,9 +194,10 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
         KeyCode key = read_special(term);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
             TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
+            BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
             const char *name = term_feature_flag_to_str(flag);
             LOG_INFO("detected terminal feature '%s' via query", name);
-            BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
+            term->features |= flag;
             return KEY_IGNORE;
         }
         if (key != KEY_NONE) {
