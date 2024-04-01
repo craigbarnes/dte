@@ -15,6 +15,7 @@ state string
 
 syntax zig
 
+# https://ziglang.org/documentation/master/#Grammar
 state start code
     char -b iu maybe-int-type
     char -b a-z_@ ident
@@ -65,40 +66,44 @@ state string-multi string
     char "\n" start
     eat this
 
-list keyword \
-    align allowzero and anyframe anytype asm async await break \
-    catch comptime const continue defer else enum errdefer error \
-    export extern fn for if inline linksection noalias nosuspend \
-    or orelse packed pub resume return struct suspend switch test \
-    threadlocal try union unreachable usingnamespace \
-    var volatile while
 
+list keyword \
+    addrspace align allowzero and anyframe anytype asm async await \
+    break callconv catch comptime const continue defer else enum \
+    errdefer error export extern fn for if inline linksection \
+    noalias noinline nosuspend opaque or orelse packed pub resume \
+    return struct suspend switch test threadlocal try union \
+    unreachable usingnamespace var volatile while
+
+# https://ziglang.org/documentation/master/#Primitive-Types
 list type \
-    bool f16 f32 f64 f128 void noreturn type anyerror promise \
-    i0 u0 isize usize comptime_int comptime_float \
-    c_short c_ushort c_int c_uint c_long c_ulong c_longlong \
-    c_ulonglong c_longdouble c_void
+    anyerror anyopaque bool c_char c_int c_long c_longdouble \
+    c_longlong c_short c_uint c_ulong c_ulonglong c_ushort \
+    comptime_float comptime_int f128 f16 f32 f64 f80 i128 i16 i32 \
+    i64 i8 isize noreturn type u128 u16 u32 u64 u8 usize void
 
 list constant \
     null undefined true false
 
+# https://ziglang.org/documentation/master/#Builtin-Functions
 list builtin \
-    @Frame @TagType @This @Type @TypeOf @Vector \
-    @addWithOverflow @alignCast @alignOf @as @asyncCall \
-    @atomicLoad @atomicRmw @atomicStore \
-    @bitCast @bitOffsetOf @bitReverse @boolToInt @breakpoint \
-    @byteOffsetOf @byteSwap @bytesToSlice @cDefine @cImport \
-    @cInclude @cUndef @call @ceil @clz @cmpxchgStrong @cmpxchgWeak \
-    @compileError @compileLog @cos @ctz @divExact @divFloor \
-    @divTrunc @embedFile @enumToInt @errSetCast @errorName \
-    @errorReturnTrace @errorToInt @exp @exp2 @export @fabs \
-    @fence @field @fieldParentPtr @floatCast @floatToInt @floor \
-    @frame @frameAddress @hasDecl @hasField @import @intCast \
-    @intToEnum @intToError @intToFloat @intToPtr @log @log2 @log10 \
-    @memcpy @memset @mod @mulAdd @mulWithOverflow @panic \
-    @popCount @ptrCast @ptrToInt @reduce @rem @returnAddress @round \
+    @This @Type @TypeOf @Vector @abs @addWithOverflow @addrSpaceCast \
+    @alignCast @alignOf @as @atomicLoad @atomicRmw @atomicStore \
+    @bitCast @bitOffsetOf @bitReverse @bitSizeOf @breakpoint \
+    @byteSwap @cDefine @cImport @cInclude @cUndef @cVaArg @cVaCopy \
+    @cVaEnd @cVaStart @call @ceil @clz @cmpxchgStrong @cmpxchgWeak \
+    @compileError @compileLog @constCast @cos @ctz @divExact \
+    @divFloor @divTrunc @embedFile @enumFromInt @errorCast \
+    @errorFromInt @errorName @errorReturnTrace @exp @exp2 @export \
+    @extern @fence @field @fieldParentPtr @floatCast @floatFromInt \
+    @floor @frameAddress @hasDecl @hasField @import @inComptime \
+    @intCast @intFromBool @intFromEnum @intFromError @intFromFloat \
+    @intFromPtr @log @log10 @log2 @max @memcpy @memset @min @mod \
+    @mulAdd @mulWithOverflow @offsetOf @panic @popCount @prefetch \
+    @ptrCast @ptrFromInt @reduce @rem @returnAddress @round @select \
     @setAlignStack @setCold @setEvalBranchQuota @setFloatMode \
-    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact \
-    @shuffle @splat @sin @src @sizeOf @sliceToBytes @sqrt \
-    @subWithOverflow @tagName @trunc @truncate \
-    @typeInfo @typeName @unionInit @wasmMemorySize @wasmMemoryGrow
+    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact @shuffle \
+    @sin @sizeOf @splat @sqrt @src @subWithOverflow @tagName @tan \
+    @trap @trunc @truncate @typeInfo @typeName @unionInit \
+    @volatileCast @wasmMemoryGrow @wasmMemorySize @workGroupId \
+    @workGroupSize @workItemId
