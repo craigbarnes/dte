@@ -114,30 +114,26 @@ state zero numeric
     noeat check-suffix
 
 state dec-check numeric
-    char Ee dec-e
+    char Ee float-exp
     char . .zig-dec-int:dec-frac
     noeat check-suffix
 
-state dec-e numeric
-    char +- .zig-dec-int:check-suffix
-    noeat .zig-dec-int:check-suffix
-
 state dec-frac numeric
-    char Ee dec-e
+    char Ee float-exp
     noeat check-suffix
 
 state hex-check numeric
-    char Pp hex-p
+    char Pp float-exp
     char . .zig-hex-int:hex-frac
     noeat check-suffix
 
-state hex-p numeric
+state hex-frac numeric
+    char Pp float-exp
+    noeat check-suffix
+
+state float-exp numeric
     char +- .zig-dec-int:check-suffix
     noeat .zig-dec-int:check-suffix
-
-state hex-frac numeric
-    char Pp hex-p
-    noeat check-suffix
 
 state bin numeric
     char 0-1 bin_
