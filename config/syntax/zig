@@ -13,6 +13,43 @@ state string
     char "\\" .zig-esc:this
     eat this
 
+# From `hex_int` rule in Zig grammar
+syntax .zig-hex-int
+
+state hex numeric
+    char 0-9A-Fa-f hex_
+    noeat END
+
+state hex_ numeric
+    char 0-9A-Fa-f this
+    char _ hex
+    noeat END
+
+# From `dec_int` rule in Zig grammar
+syntax .zig-dec-int
+
+state dec numeric
+    char 0-9 dec_
+    noeat END
+
+state dec_ numeric
+    char 0-9 this
+    char _ dec
+    noeat END
+
+# Like `.zig-dec-int`, but starting with the `dec_` state, instead of `dec`
+# (for cases where a value digit has already been consumed)
+syntax .zig-dec_-int
+
+state dec_ numeric
+    char 0-9 this
+    char _ dec
+    noeat END
+
+state dec numeric
+    char 0-9 dec_
+    noeat END
+
 syntax zig
 
 # https://ziglang.org/documentation/master/#Grammar
@@ -20,8 +57,8 @@ state start code
     char -b iu maybe-int-type
     char -b a-z_@ ident
     char -b A-Z ident-upper
-#    char 0 zero
-#    char 1-9 dec
+    char 0 zero
+    char 1-9 .zig-dec_-int:dec-check
     char \" .zig-string:this
     str '\\' string-multi
 #    char \' .c-char:this
@@ -66,6 +103,67 @@ state string-multi string
     char "\n" start
     eat this
 
+# See INTEGER and FLOAT rules in Zig grammar
+state zero numeric
+    char _ .zig-dec-int:dec-check
+    char 0-9 .zig-dec_-int:dec-check
+    char b bin
+    char o oct
+    char x .zig-hex-int:hex-check
+    char . .zig-dec-int:dec-frac
+    noeat check-suffix
+
+state dec-check numeric
+    char Ee dec-e
+    char . .zig-dec-int:dec-frac
+    noeat check-suffix
+
+state dec-e numeric
+    char +- .zig-dec-int:check-suffix
+    noeat .zig-dec-int:check-suffix
+
+state dec-frac numeric
+    char Ee dec-e
+    noeat check-suffix
+
+state hex-check numeric
+    char Pp hex-p
+    char . .zig-hex-int:hex-frac
+    noeat check-suffix
+
+state hex-p numeric
+    char +- .zig-dec-int:check-suffix
+    noeat .zig-dec-int:check-suffix
+
+state hex-frac numeric
+    char Pp hex-p
+    noeat check-suffix
+
+state bin numeric
+    char 0-1 bin_
+    noeat check-suffix
+
+state bin_ numeric
+    char 0-1 this
+    char _ bin
+    noeat check-suffix
+
+state oct numeric
+    char 0-7 oct_
+    noeat check-suffix
+
+state oct_ numeric
+    char 0-7 this
+    char _ oct
+    noeat check-suffix
+
+# TODO: Use `char -b` for matching bytes that can't appear at the end of a
+# numeric literal (or a run of dec/hex digits, in floats) and highlight as
+# errors using `bufis` and `recolor`
+state check-suffix error
+    # TODO: Eat Unicode chars?
+    char a-zA-Z0-9_ this
+    noeat start
 
 list keyword \
     addrspace align allowzero and anyframe anytype asm async await \
