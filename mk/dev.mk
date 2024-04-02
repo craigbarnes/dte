@@ -15,6 +15,7 @@ WSCHECK = $(AWK) -f tools/wscheck.awk
 HCHECK = $(AWK) -f tools/hdrcheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
+TYPOS ?= typos
 CLANGTIDY ?= clang-tidy
 MUSLGCC ?= ccache musl-gcc
 SPATCH ?= spatch
@@ -64,8 +65,12 @@ check-headers:
 	$(Q) $(HCHECK) $$(git ls-files -- '**.[ch]') >&2
 
 check-codespell:
-	$(E) CODESPL '*.md $(filter-out %.md, $(DOCFILES))'
-	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES) >&2
+	$(E) CODESPL 'src/ mk/ *.md *.xml'
+	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES)
+
+check-typos:
+	$(E) TYPOS 'src/ mk/ *.md *.xml'
+	$(Q) $(TYPOS) --format brief src/ mk/ $(DOCFILES)
 
 check-desktop-file:
 	$(E) LINT share/dte.desktop
@@ -160,8 +165,8 @@ DEVMK := loaded
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases portable \
-    check-all check-source check-docs check-shell-scripts \
-    check-whitespace check-headers check-codespell check-coccinelle \
+    check-all check-source check-docs check-shell-scripts check-headers \
+    check-whitespace check-codespell check-typos check-coccinelle \
     check-aux check-desktop-file check-appstream check-clang-tidy \
     check-clang-tidy-headers check-clang-tidy-fast $(clang_tidy_targets) \
     git-hooks show-sizes

@@ -1,0 +1,10 @@
+[type.c]
+extend-glob = ["*.c", "*.h"]
+extend-ignore-words-re = [
+    "^BRE|clen|doas|ede|mak$",
+    "^(?i:iterm)$",
+]
+
+[type.devmk]
+extend-glob = ["dev.mk"]
+extend-ignore-words-re = ["^clen|ede$"]
