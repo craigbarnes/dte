@@ -167,6 +167,8 @@ EditorState *init_editor_state(void)
     term_input_init(&e->terminal.ibuf);
     term_output_init(&e->terminal.obuf);
     hashmap_init(&e->aliases, 32);
+    hashset_init(&e->required_syntax_files, 0, false);
+    hashset_init(&e->required_syntax_builtins, 0, false);
 
     HashMap *modes = &e->modes;
     e->normal_mode = new_mode(modes, xstrdup("normal"), &normal_commands);
@@ -210,6 +212,8 @@ void free_editor_state(EditorState *e)
     hashmap_free(&e->modes, FREE_FUNC(free_mode_handler));
     hashmap_free(&e->styles.other, free);
     hashmap_free(&e->aliases, free);
+    hashset_free(&e->required_syntax_files);
+    hashset_free(&e->required_syntax_builtins);
 
     free_interned_strings();
     free_interned_regexps();

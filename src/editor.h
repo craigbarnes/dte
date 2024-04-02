@@ -23,6 +23,7 @@
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
+#include "util/hashset.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -62,6 +63,8 @@ typedef struct EditorState {
     HashMap compilers;
     HashMap modes;
     HashMap syntaxes;
+    HashSet required_syntax_files;
+    HashSet required_syntax_builtins;
     StyleMap styles;
     CommandMacroState macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];

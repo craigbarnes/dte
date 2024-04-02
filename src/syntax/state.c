@@ -11,6 +11,7 @@
 #include "syntax/merge.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/hashset.h"
 #include "util/intern.h"
 #include "util/log.h"
 #include "util/macros.h"
@@ -25,6 +26,8 @@ typedef struct {
     const char *user_config_dir;
     const StyleMap *styles;
     HashMap *syntaxes;
+    HashSet *required_files;
+    HashSet *required_builtins;
     Syntax *current_syntax;
     State *current_state;
     SyntaxLoadFlags flags;
@@ -461,13 +464,6 @@ static bool cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
 
 static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
 {
-    static HashSet loaded_files;
-    static HashSet loaded_builtins;
-    if (!loaded_files.table_size) {
-        hashset_init(&loaded_files, 8, false);
-        hashset_init(&loaded_builtins, 8, false);
-    }
-
     char buf[8192];
     char *path;
     size_t path_len;
@@ -475,11 +471,11 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
     SyntaxLoadFlags flags = SYN_MUST_EXIST;
 
     if (a->flags[0] == 'f') {
-        set = &loaded_files;
+        set = sp->required_files;
         path = a->args[0];
         path_len = strlen(path);
     } else {
-        set = &loaded_builtins;
+        set = sp->required_builtins;
         path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
         path = buf;
         flags |= SYN_BUILTIN;
@@ -660,6 +656,8 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags f
         .current_state = NULL,
         .flags = flags | SYN_WARN_ON_UNUSED_SUBSYN,
         .saved_nr_errors = 0,
+        .required_files = &e->required_syntax_files,
+        .required_builtins = &e->required_syntax_builtins,
     };
 
     const ConfigState saved = current_config;
