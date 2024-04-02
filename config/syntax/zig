@@ -18,24 +18,24 @@ syntax .zig-hex-int
 
 state hex numeric
     char 0-9A-Fa-f hex_
-    noeat END
+    noeat -b END
 
 state hex_ numeric
     char 0-9A-Fa-f this
-    char _ hex
-    noeat END
+    char -b _ hex
+    noeat -b END
 
 # From `dec_int` rule in Zig grammar
 syntax .zig-dec-int
 
 state dec numeric
     char 0-9 dec_
-    noeat END
+    noeat -b END
 
 state dec_ numeric
     char 0-9 this
-    char _ dec
-    noeat END
+    char -b _ dec
+    noeat -b END
 
 # Like `.zig-dec-int`, but starting with the `dec_` state, instead of `dec`
 # (for cases where a value digit has already been consumed)
@@ -43,12 +43,12 @@ syntax .zig-dec_-int
 
 state dec_ numeric
     char 0-9 this
-    char _ dec
-    noeat END
+    char -b _ dec
+    noeat -b END
 
 state dec numeric
     char 0-9 dec_
-    noeat END
+    noeat -b END
 
 syntax zig
 
@@ -105,58 +105,61 @@ state string-multi string
 
 # See INTEGER and FLOAT rules in Zig grammar
 state zero numeric
-    char _ .zig-dec-int:dec-check
+    char -b _ .zig-dec-int:dec-check
     char 0-9 .zig-dec_-int:dec-check
-    char b bin
-    char o oct
-    char x .zig-hex-int:hex-check
-    char . .zig-dec-int:dec-frac
-    noeat check-suffix
+    char -b b bin
+    char -b o oct
+    char -b x .zig-hex-int:hex-check
+    char -b . .zig-dec-int:dec-frac
+    noeat -b check-suffix
 
 state dec-check numeric
-    char Ee float-exp
-    char . .zig-dec-int:dec-frac
-    noeat check-suffix
+    bufis _ check-suffix error
+    char -b Ee float-exp
+    char -b . .zig-dec-int:dec-frac
+    noeat -b check-suffix
 
 state dec-frac numeric
-    char Ee float-exp
-    noeat check-suffix
+    char -b Ee float-exp
+    noeat -b check-suffix
 
 state hex-check numeric
-    char Pp float-exp
-    char . .zig-hex-int:hex-frac
-    noeat check-suffix
+    bufis _ check-suffix error
+    char -b Pp float-exp
+    char -b . .zig-hex-int:hex-frac
+    noeat -b check-suffix
 
 state hex-frac numeric
-    char Pp float-exp
-    noeat check-suffix
+    char -b Pp float-exp
+    noeat -b check-suffix
 
 state float-exp numeric
-    char +- .zig-dec-int:check-suffix
-    noeat .zig-dec-int:check-suffix
+    char -b +- .zig-dec-int:check-suffix
+    noeat -b .zig-dec-int:check-suffix
 
 state bin numeric
     char 0-1 bin_
-    noeat check-suffix
+    noeat -b check-suffix
 
 state bin_ numeric
     char 0-1 this
-    char _ bin
-    noeat check-suffix
+    char -b _ bin
+    noeat -b check-suffix
 
 state oct numeric
     char 0-7 oct_
-    noeat check-suffix
+    noeat -b check-suffix
 
 state oct_ numeric
     char 0-7 this
-    char _ oct
-    noeat check-suffix
+    char -b _ oct
+    noeat -b check-suffix
 
-# TODO: Use `char -b` for matching bytes that can't appear at the end of a
-# numeric literal (or a run of dec/hex digits, in floats) and highlight as
-# errors using `bufis` and `recolor`
 state check-suffix error
+    # If there's any buffered characters at this point, they're an invalid
+    # way to finish a numeric literal and should be recolored as an error,
+    # in addition to any trailing ident characters
+    recolor error
     # TODO: Eat Unicode chars?
     char a-zA-Z0-9_ this
     noeat start
