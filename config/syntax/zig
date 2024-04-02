@@ -157,11 +157,14 @@ state oct_ numeric
     noeat -b check-suffix
 
 state check-suffix error
-    # If there's any buffered characters at this point, they're an invalid
-    # way to finish a numeric literal and should be recolored as an error,
-    # in addition to any trailing ident characters
+    # If there are any buffered characters at this point, they're an
+    # invalid way to finish a numeric literal and should be recolored
+    # as an error, in addition to any trailing ident characters
     recolor error
-    # TODO: Eat Unicode chars?
+    noeat eat-suffix
+
+state eat-suffix error
+    # TODO: Eat Unicode ident chars?
     char a-zA-Z0-9_ this
     noeat start
 
