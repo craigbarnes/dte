@@ -120,6 +120,7 @@ state dec-check numeric
     noeat -b check-suffix
 
 state dec-frac numeric
+    bufis _ check-suffix error
     char -b Ee float-exp
     noeat -b check-suffix
 
