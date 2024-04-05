@@ -125,11 +125,12 @@ EditorState *init_editor_state(void)
 
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
-    e->home_dir = strview_intern(home ? home : "");
+    home = home ? home : "";
+    e->home_dir = strview_intern(home);
     if (dte_home) {
         e->user_config_dir = xstrdup(dte_home);
     } else {
-        e->user_config_dir = xasprintf("%s/.dte", e->home_dir.data);
+        e->user_config_dir = xstrjoin(home, "/.dte");
     }
 
     LOG_INFO("dte version: " VERSION);
