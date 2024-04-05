@@ -10,7 +10,7 @@ const void *mem_intern(const void *data, size_t len)
         hashset_init(&interned_strings, 32, false);
     }
 
-    HashSetEntry *e = hashset_add(&interned_strings, data, len);
+    HashSetEntry *e = hashset_insert(&interned_strings, data, len);
     return e->str;
 }
 

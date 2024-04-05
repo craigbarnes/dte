@@ -386,7 +386,7 @@ static bool cmd_list(SyntaxParser *sp, const CommandArgs *a)
     hashset_init(set, a->nr_args - 1, icase);
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
         const char *str = args[i];
-        hashset_add(set, str, strlen(str));
+        hashset_insert(set, str, strlen(str));
     }
     return true;
 }
@@ -493,7 +493,7 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
         return false;
     }
 
-    hashset_add(set, path, path_len);
+    hashset_insert(set, path, path_len);
     return true;
 }
 

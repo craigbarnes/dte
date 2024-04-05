@@ -1932,7 +1932,7 @@ static void test_hashset(TestContext *ctx)
     EXPECT_EQ(set.nr_entries, 0);
     EXPECT_NULL(hashset_get(&set, "foo", 3));
     FOR_EACH_I(i, strings) {
-        hashset_add(&set, strings[i], strlen(strings[i]));
+        hashset_insert(&set, strings[i], strlen(strings[i]));
     }
 
     EXPECT_EQ(set.nr_entries, ARRAYLEN(strings));
@@ -1959,23 +1959,23 @@ static void test_hashset(TestContext *ctx)
     hashset_free(&set);
     hashset_init(&set, 0, true);
     EXPECT_EQ(set.nr_entries, 0);
-    hashset_add(&set, STRN("foo"));
-    hashset_add(&set, STRN("Foo"));
+    hashset_insert(&set, STRN("foo"));
+    hashset_insert(&set, STRN("Foo"));
     EXPECT_EQ(set.nr_entries, 1);
     EXPECT_NONNULL(hashset_get(&set, STRN("foo")));
     EXPECT_NONNULL(hashset_get(&set, STRN("FOO")));
     EXPECT_NONNULL(hashset_get(&set, STRN("fOO")));
     hashset_free(&set);
 
-    // Check that hashset_add() returns existing entries instead of
+    // Check that hashset_insert() returns existing entries instead of
     // inserting duplicates
     hashset_init(&set, 0, false);
     EXPECT_EQ(set.nr_entries, 0);
-    HashSetEntry *e1 = hashset_add(&set, STRN("foo"));
+    HashSetEntry *e1 = hashset_insert(&set, STRN("foo"));
     EXPECT_EQ(e1->str_len, 3);
     EXPECT_STREQ(e1->str, "foo");
     EXPECT_EQ(set.nr_entries, 1);
-    HashSetEntry *e2 = hashset_add(&set, STRN("foo"));
+    HashSetEntry *e2 = hashset_insert(&set, STRN("foo"));
     EXPECT_PTREQ(e1, e2);
     EXPECT_EQ(set.nr_entries, 1);
     hashset_free(&set);
@@ -1987,7 +1987,7 @@ static void test_hashset(TestContext *ctx)
         char buf[4];
         size_t len = buf_uint_to_str(i, buf);
         ASSERT_TRUE(len < sizeof(buf));
-        hashset_add(&set, buf, len);
+        hashset_insert(&set, buf, len);
     }
     EXPECT_EQ(set.nr_entries, 80);
     EXPECT_NONNULL(hashset_get(&set, STRN("1")));

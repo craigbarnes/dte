@@ -94,7 +94,7 @@ static void rehash(HashSet *set, size_t newsize)
     free(oldtable);
 }
 
-HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len)
+HashSetEntry *hashset_insert(HashSet *set, const char *str, size_t str_len)
 {
     HashSetEntry *h = hashset_get(set, str, str_len);
     if (h) {
