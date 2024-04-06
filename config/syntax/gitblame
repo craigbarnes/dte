@@ -1,0 +1,32 @@
+syntax gitblame
+
+state start
+    char '0-9A-Fa-f' commit
+    char ^ commit boundary-marker
+    noeat error
+
+state commit
+    char '0-9A-Fa-f' this
+    char " \t" space
+    noeat error
+
+state space
+    char " \t" this
+    noeat meta
+
+state meta
+    char ) text meta
+    char "\n" start
+    eat this
+
+state text
+    char "\n" start
+    eat this
+
+state error
+    char "\n" start
+    eat this
+
+default string commit
+default comment meta
+default label boundary-marker
