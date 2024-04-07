@@ -189,6 +189,7 @@ list keyword \
 
 # These keywords could be in the same list as above but they are kept
 # separate here to allow the option of highlighting with a different color
+# (e.g. with `hi ruby.true-false-nil cyan bold`)
 list true-false-nil \
     true false nil
 
