@@ -68,6 +68,6 @@ state meta-header
     noeat .coccinelle-meta:code
 
 default keyword meta-keyword
-default diff.header meta-header
-default diff.added added
-default diff.removed removed
+default diff-header meta-header
+default diff-added added
+default diff-removed removed

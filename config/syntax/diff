@@ -1,46 +1,10 @@
+# Note that `require` (without flags) loads built-in syntaxes with the
+# `syntax/inc/` prefix, so there's no circular reference here
+require diff
+
 syntax diff
 
-state headers header
-    str 'diff ' header
-    str 'index ' header
-    str 'new ' header
-    str -- '--- ' header
-    str '+++ ' header
-    str '@@ ' chunk
-    char # comment
-    noeat text
-
-state header
-    char "\n" headers
-    eat this
-
-state chunk
-    char "\n" diff chunk
-    eat this
-
-state diff code
-    char ' ' context
-    char + added
-    char -- - removed
-    str '@@ ' chunk
-    noeat headers
-
-state context
-    char "\n" diff
-    eat this
-
-state added
-    char "\n" diff
-    eat this
-
-state removed
-    char "\n" diff
-    eat this
-
-state comment
-    char "\n" headers
-    eat this
-
-state text
-    char "\n" headers
-    eat this
+state start
+    # The `.diff` sub-syntax has no `END` destination states, so the return
+    # state here just uses a dummy value (`this`)
+    noeat .diff:this

@@ -20,6 +20,10 @@ hi char magenta
 hi label bold red
 hi notice bold red
 hi error black yellow
+hi diff-header cyan
+hi diff-chunk magenta
+hi diff-added bold green
+hi diff-removed bold red
 hi -c comment 245
 hi -c linenumber 250 237
 
@@ -39,8 +43,4 @@ hi html.tag bold magenta
 hi html.attr magenta
 hi xml.tag bold magenta
 hi xml.attr magenta
-hi diff.header cyan
-hi diff.chunk magenta
-hi diff.added bold green
-hi diff.removed bold red
 hi zig.builtin cyan

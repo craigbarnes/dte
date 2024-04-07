@@ -1,3 +1,5 @@
+require diff
+
 syntax gitcommit
 
 state start text
@@ -15,7 +17,18 @@ state comment-start comment
     str ' Changes to be committed:' comment added
     str ' Changed but not updated:' comment modified
     str ' Untracked files:' comment untracked
+    str ' -' maybe-scissors
     eat comment
+
+state maybe-scissors comment
+    char - this
+    str ' >8 ' scissors
+    noeat comment
+
+state scissors comment
+    char ' -' this
+    char "\n" .diff:this
+    noeat comment
 
 state comment
     char "\n" start

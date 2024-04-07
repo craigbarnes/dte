@@ -29,6 +29,11 @@ hi special 3/5/2
 hi comment 242
 hi error 232 216
 hi variable 0/4/5
+hi diff-header 255
+hi diff-chunk 250 239
+hi diff-added 0/3/5
+hi diff-removed 5/1/1
+hi diff-context keep keep
 
 hi c.preproc 0/3/5
 hi c.preproccond 27
@@ -36,11 +41,6 @@ hi css.id 0/2/5
 hi css.class 0/3/5
 hi css.pseudoclass 5/2/5
 hi css.pseudoelement 0/5/0
-hi diff.header 255
-hi diff.chunk 250 239
-hi diff.added 0/3/5
-hi diff.removed 5/1/1
-hi diff.context keep keep
 hi gitcommit.added 0/3/5
 hi gitcommit.modified 202
 hi gitcommit.untracked 202
