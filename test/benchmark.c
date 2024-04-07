@@ -262,6 +262,19 @@ static void bench_u_set_char_raw(void)
 
 int main(void)
 {
+    struct timespec res;
+    if (clock_getres(CLOCK_MONOTONIC, &res) != 0) {
+        fail("clock_getres: %s", strerror(errno));
+    }
+
+    uintmax_t res_ns = timespec_to_ns(&res);
+    if (res_ns >= 100) {
+        // This doesn't necessarily mean anything, since clock_gettime()
+        // is only called twice per benchmark and divided by the number
+        // of iterations
+        fprintf(stderr, "%s:%d: timer resolution: %juns\n", __FILE__, __LINE__, res_ns);
+    }
+
     bench_find_ft();
     bench_get_indent();
     bench_parse_rgb();
