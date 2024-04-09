@@ -528,7 +528,7 @@ static void test_command_struct_layout(TestContext *ctx)
     const Command *cmd = find_normal_command("open");
     EXPECT_STREQ(cmd->name, "open");
     EXPECT_STREQ(cmd->flags, "e=gt");
-    EXPECT_FALSE(cmd->allow_in_rc);
+    EXPECT_FALSE(cmd->cmdopts & CMDOPT_ALLOW_IN_RC);
     EXPECT_UINT_EQ(cmd->min_args, 0);
     EXPECT_UINT_EQ(cmd->max_args, 0xFF);
 

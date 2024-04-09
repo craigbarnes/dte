@@ -17,12 +17,19 @@ typedef struct {
     uint8_t nr_flag_args; // Number of flag args
 } CommandArgs;
 
+// A set of flags associated with a Command that define how it may be
+// used in certain contexts (completely unrelated to CommandArgs::flags
+// or Command::flags, despite the terminology being somewhat ambiguous)
+typedef enum {
+    CMDOPT_ALLOW_IN_RC = 1 << 0,
+} CommandOptions;
+
 typedef bool (*CommandFunc)(void *userdata, const CommandArgs *args);
 
 typedef struct {
     const char name[15];
     const char flags[14];
-    bool allow_in_rc;
+    uint8_t cmdopts; // CommandOptions
     uint8_t min_args;
     uint8_t max_args; // 0xFF here means "no limit" (effectively SIZE_MAX)
     CommandFunc cmd;

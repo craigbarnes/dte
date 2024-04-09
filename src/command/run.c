@@ -50,7 +50,7 @@ static bool run_command(CommandRunner *runner, char **av)
         return r;
     }
 
-    if (unlikely(current_config.file && !cmd->allow_in_rc)) {
+    if (unlikely(current_config.file && !(cmd->cmdopts & CMDOPT_ALLOW_IN_RC))) {
         return error_msg("Command %s not allowed in config file", cmd->name);
     }
 

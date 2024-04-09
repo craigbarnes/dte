@@ -577,24 +577,29 @@ static bool cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
     return true;
 }
 
+enum {
+    // Short aliases for CommandOptions:
+    RC = CMDOPT_ALLOW_IN_RC,
+};
+
 IGNORE_WARNING("-Wincompatible-pointer-types")
 
 static const Command cmds[] = {
-    {"bufis", "i", true, 2, 3, cmd_bufis},
-    {"char", "bn", true, 2, 3, cmd_char},
-    {"default", "", true, 2, -1, cmd_default},
-    {"eat", "", true, 1, 2, cmd_eat},
-    {"heredocbegin", "", true, 2, 2, cmd_heredocbegin},
-    {"heredocend", "", true, 1, 2, cmd_heredocend},
-    {"include", "b", true, 1, 1, cmd_include},
-    {"inlist", "b", true, 2, 3, cmd_inlist},
-    {"list", "i", true, 2, -1, cmd_list},
-    {"noeat", "b", true, 1, 1, cmd_noeat},
-    {"recolor", "", true, 1, 2, cmd_recolor},
-    {"require", "f", true, 1, 1, cmd_require},
-    {"state", "", true, 1, 2, cmd_state},
-    {"str", "i", true, 2, 3, cmd_str},
-    {"syntax", "", true, 1, 1, cmd_syntax},
+    {"bufis", "i", RC, 2, 3, cmd_bufis},
+    {"char", "bn", RC, 2, 3, cmd_char},
+    {"default", "", RC, 2, -1, cmd_default},
+    {"eat", "", RC, 1, 2, cmd_eat},
+    {"heredocbegin", "", RC, 2, 2, cmd_heredocbegin},
+    {"heredocend", "", RC, 1, 2, cmd_heredocend},
+    {"include", "b", RC, 1, 1, cmd_include},
+    {"inlist", "b", RC, 2, 3, cmd_inlist},
+    {"list", "i", RC, 2, -1, cmd_list},
+    {"noeat", "b", RC, 1, 1, cmd_noeat},
+    {"recolor", "", RC, 1, 2, cmd_recolor},
+    {"require", "f", RC, 1, 1, cmd_require},
+    {"state", "", RC, 1, 2, cmd_state},
+    {"str", "i", RC, 2, 3, cmd_str},
+    {"syntax", "", RC, 1, 1, cmd_syntax},
 };
 
 UNIGNORE_WARNINGS
