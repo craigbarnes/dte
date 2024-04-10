@@ -138,6 +138,12 @@ def-mode -u vi-normal-goto vi-esc
 alias ngmap 'bind -T vi-normal-goto'
 ngmap t 'next; mode vi-normal'
 ngmap T 'prev; mode vi-normal'
+# TODO: Extend `undo -m` (and `redo`) to allow supporting these two
+# bindings (and also because it'd be useful in general, even outside
+# the context of vim emulation):
+# > `g,` - go to newer position in change list
+# > `g;` - go to older position in change list
+# (See also: https://vim.rtorr.com/)
 
 # The above bindings were "adapted" (subject to my ignorance of vi) from
 # the list at https://hea-www.harvard.edu/~fine/Tech/vi.html. Most of the
