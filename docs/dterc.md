@@ -868,12 +868,12 @@ below the cursor.
 `-m`
 :   Move after the pasted text
 
-### **undo**
+### **undo** [**-m**]
 
 Undo latest change.
 
 `-m`
-:   Move to the change, without undoing it
+:   Move to the change location, without undoing it
 
 ### **redo** [_choice_]
 

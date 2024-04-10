@@ -142,7 +142,7 @@ Editing Commands:
 .br
    \fBpaste\fR [\fB\-m\fR] [\fB\-a\fR|\fB\-c\fR]
 .br
-   \fBundo\fR
+   \fBundo\fR [\fB\-m\fR]
 .br
    \fBredo\fR [\fIchoice\fR]
 .br
@@ -1383,13 +1383,13 @@ whole lines (instead of below/above the cursor)
 Move after the pasted text
 .PP
 .RE
-\fBundo\fR
+\fBundo\fR [\fB\-m\fR]
 .RS
 Undo latest change.
 .P
 .TP
 \fB\-m\fR
-Move to the change, without undoing it
+Move to the change location, without undoing it
 .PP
 .RE
 \fBredo\fR [\fIchoice\fR]
