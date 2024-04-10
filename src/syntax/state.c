@@ -582,27 +582,23 @@ enum {
     RC = CMDOPT_ALLOW_IN_RC,
 };
 
-IGNORE_WARNING("-Wincompatible-pointer-types")
-
 static const Command cmds[] = {
-    {"bufis", "i", RC, 2, 3, cmd_bufis},
-    {"char", "bn", RC, 2, 3, cmd_char},
-    {"default", "", RC, 2, -1, cmd_default},
-    {"eat", "", RC, 1, 2, cmd_eat},
-    {"heredocbegin", "", RC, 2, 2, cmd_heredocbegin},
-    {"heredocend", "", RC, 1, 2, cmd_heredocend},
-    {"include", "b", RC, 1, 1, cmd_include},
-    {"inlist", "b", RC, 2, 3, cmd_inlist},
-    {"list", "i", RC, 2, -1, cmd_list},
-    {"noeat", "b", RC, 1, 1, cmd_noeat},
-    {"recolor", "", RC, 1, 2, cmd_recolor},
-    {"require", "f", RC, 1, 1, cmd_require},
-    {"state", "", RC, 1, 2, cmd_state},
-    {"str", "i", RC, 2, 3, cmd_str},
-    {"syntax", "", RC, 1, 1, cmd_syntax},
+    CMD("bufis", "i", RC, 2, 3, cmd_bufis),
+    CMD("char", "bn", RC, 2, 3, cmd_char),
+    CMD("default", "", RC, 2, -1, cmd_default),
+    CMD("eat", "", RC, 1, 2, cmd_eat),
+    CMD("heredocbegin", "", RC, 2, 2, cmd_heredocbegin),
+    CMD("heredocend", "", RC, 1, 2, cmd_heredocend),
+    CMD("include", "b", RC, 1, 1, cmd_include),
+    CMD("inlist", "b", RC, 2, 3, cmd_inlist),
+    CMD("list", "i", RC, 2, -1, cmd_list),
+    CMD("noeat", "b", RC, 1, 1, cmd_noeat),
+    CMD("recolor", "", RC, 1, 2, cmd_recolor),
+    CMD("require", "f", RC, 1, 1, cmd_require),
+    CMD("state", "", RC, 1, 2, cmd_state),
+    CMD("str", "i", RC, 2, 3, cmd_str),
+    CMD("syntax", "", RC, 1, 1, cmd_syntax),
 };
-
-UNIGNORE_WARNINGS
 
 UNITTEST {
     CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
