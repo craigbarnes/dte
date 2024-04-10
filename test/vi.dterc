@@ -6,43 +6,102 @@ alias wq 'save; quit'
 # Show current mode in the statusline (%i)
 set statusline-left ' %i%S%f%s%m%s%r%s%M'
 
-# Create "vi-normal" mode, with text insertion for normal keys disabled (-u)
-def-mode -u vi-normal
+# Create a "fallthrough" mode, to contain bindings shared by multiple
+# other modes (roughly corresponding to vim's `:map`)
+# See also: https://dev.to/iggredible/basic-vim-mapping-5ahj#different-mode-mapping
+def-mode -u vi-move
+
+# Create `vi-normal` mode, with text insertion for normal keys disabled
+# (-u) and using the fallthrough mode from above for keys not bound in
+# the top-level mode
+def-mode -u vi-normal vi-move
 
 # Go into "vi-normal" mode at startup
 mode vi-normal
+
+# Create another fallthrough mode, with a single key binding (makes Esc
+# switch back to vi-normal mode)
+def-mode -u vi-esc
+bind -T vi-esc ^[ 'mode vi-normal'
 
 # Create "vi-insert" mode, which "falls through" to dte's built-in "normal"
 # mode for unbound keys (note: the ability to remove/rename built-in modes
 # will be implemented eventually, to avoid confusion with e.g. "normal" vs
 # "vi-normal")
-def-mode vi-insert normal
-bind -T vi-insert ^[ 'mode vi-normal'
+def-mode vi-insert vi-esc normal
 
-# Create an alias for setting up bindings, to minimize verbosity below
+# Create some aliases for setting up bindings, to minimize verbosity below
+alias map 'bind -T vi-move'
 alias nmap 'bind -T vi-normal'
+alias xmap 'bind -T vi-visual'
 
-nmap left left
-nmap right right
-nmap up up
-nmap down down
-nmap home bol
-nmap end eol
-nmap pgup pgup
-nmap pgdown pgdown
+map ^[ 'unselect; mode vi-normal'
+map left left
+map right right
+map up up
+map down down
+map home bol
+map end eol
+map pgup pgup
+map pgdown pgdown
+map C-left 'word-bwd -s'
+map C-right 'word-fwd -s'
+map C-up up
+map C-down down
+map M-left bol
+map M-right eol
+map M-up pgup
+map M-down pgdown
+map b word-bwd
+map e word-fwd
+map h left
+map j down
+map k up
+map l right
+map G eof
+map 0 bol
+map { blkup
+map } blkdown
+map % match-bracket
+map C-b pgup
+map \$ eol
+map | bol
+map ^ 'bol; bol -t'
+map _ 'bol; bol -t'
+map - 'up; bol; bol -t'
+map + 'down; bol; bol -t'
+map enter 'down; bol; bol -t'
+map space right
+map C-? left
+map C-d 'scroll-pgdown -h'
+map C-e scroll-down
+map C-f pgdown
+map C-h left
+map C-j down
+map C-l refresh
+map C-m 'down; bol; bol -t'
+map C-n down
+map C-p up
+map C-u 'scroll-pgup -h'
+map C-y scroll-up
+
+# TODO: Move the subset of these commands allowed in visual mode to a
+# separate fallthrough mode, which should be something like the `vi-move`
+# mode but with `; mode vi-normal` after every command. Eventually another,
+# built-in mechanism should be added to allow switching modes automatically
+# (after a binding is found and executed).
 nmap delete delete
 nmap a 'right; mode vi-insert'
-nmap b word-bwd
-nmap e word-fwd
-nmap h left
+nmap g 'mode vi-normal-goto'
 nmap i 'mode vi-insert'
-nmap j down
-nmap k up
-nmap l right
+# TODO: Make the `search` command keep (and extend) the selection while in
+# (dte's) `select` mode (like vim's visual mode does)
 nmap n 'search -n'
 nmap o 'new-line; mode vi-insert'
+nmap p paste
 nmap s 'delete; mode vi-insert'
 nmap u undo
+nmap v 'select; mode vi-visual'
 nmap w 'word-fwd -s'
 nmap x delete
 nmap A 'eol; mode vi-insert'
@@ -52,43 +111,33 @@ nmap I 'bol; bol -t; mode vi-insert'
 nmap J join
 nmap N 'search -p'
 nmap O 'new-line -a; mode vi-insert'
+nmap P 'paste -a'
 nmap S 'clear; mode vi-insert'
+# TODO: Does this actually correspond to what vi does?
+#nmap U redo
+nmap V 'select -l; mode vi-visual-line'
 nmap X erase
-nmap 0 bol
-nmap space right
+nmap Y copy
+# TODO: What does this key do in vim, in visual mode?
 nmap : 'mode command'
-nmap ^ 'bol; bol -t'
-nmap _ 'bol; bol -t'
-nmap -- - 'up; bol; bol -t'
-nmap + 'down; bol; bol -t'
-nmap \$ eol
-nmap | bol
 nmap / search
 nmap ? 'search -r'
 nmap > 'shift 1'
 nmap < 'shift -- -1'
 nmap ~ case
-nmap { blkup
-nmap } blkdown
-nmap % match-bracket
 nmap C-] tag
-nmap C-b pgup
-nmap C-d 'scroll-pgdown -h'
-nmap C-e scroll-down
-nmap C-f pgdown
-nmap C-h left
-nmap C-? left
-nmap C-j down
-nmap C-l refresh
-nmap C-m 'down; bol; bol -t'
-nmap C-u 'scroll-pgup -h'
-nmap enter 'down; bol; bol -t'
-nmap C-n down
-nmap C-p up
 nmap C-t 'tag -r'
-nmap C-y scroll-up
 nmap C-z suspend
 
+def-mode -u vi-visual vi-move
+def-mode -u vi-visual-line vi-visual
+xmap y 'copy; mode vi-normal'
+xmap d 'erase; mode vi-normal'
+
+def-mode -u vi-normal-goto vi-esc
+alias ngmap 'bind -T vi-normal-goto'
+ngmap t 'next; mode vi-normal'
+ngmap T 'prev; mode vi-normal'
 
 # The above bindings were "adapted" (subject to my ignorance of vi) from
 # the list at https://hea-www.harvard.edu/~fine/Tech/vi.html. Most of the
@@ -136,18 +185,13 @@ nmap C-z suspend
 # c   change command   (cursor motion command)
 # d   delete command   (cursor motion command)
 # m   mark current line and position   (mark character tag (a-z))
-# p   put buffer after cursor
 # y   yank command   (cursor motion command)
 # z   position current line   (CR = top; "." = center; "-"=bottom)
 # B   move back one Word  (N.B.: "word" and "Word" are two different things in vi)
-# P   put buffer before cursor
-# Q   leave visual mode (go into "ex" mode)
 # R   replace mode - replaces through end of current line, then inserts   (text, ESC)
 # U   restores line to state when cursor was moved into it
-# Y   yank entire line
 # !   shell command filter   (cursor motion command, shell command)
 # @   vi eval   (buffer name (a-z))
-# &   repeat last ex substitution (":s ...") not including modifiers
 # (   move to previous sentence
 # )   move to next sentence
 # [   move to previous "{...}" section   ("[")
@@ -156,5 +200,4 @@ nmap C-z suspend
 # `   move to marked line, memorized column   (character tag (a-z))
 # "   access numbered buffer; load or access lettered buffer   (1-9,a-z)
 # .   repeat last text-changing command
-# ^\  leave visual mode (go into "ex" mode)
 # ^^  switch file buffers
