@@ -12,7 +12,7 @@ set statusline-left ' %i%S%f%s%m%s%r%s%M'
 def-mode -u vi-move
 
 # Create `vi-normal` mode, with text insertion for normal keys disabled
-# (-u) and using the fallthrough mode from above for keys not bound in
+# (-u) and using the fallthrough mode from above, for keys not bound in
 # the top-level mode
 def-mode -u vi-normal vi-move
 

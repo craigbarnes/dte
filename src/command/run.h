@@ -35,15 +35,6 @@ typedef struct {
     CommandFunc cmd;
 } Command;
 
-#define CMD(cname, flagstr, opts, min, max, func) { \
-    .name = cname, \
-    .flags = flagstr, \
-    .cmdopts = opts, \
-    .min_args = min, \
-    .max_args = max, \
-    .cmd = (CommandFunc)func, \
-}
-
 typedef struct {
     const Command* (*lookup)(const char *name);
     void (*macro_record)(const Command *cmd, char **args, void *userdata);

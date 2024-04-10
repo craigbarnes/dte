@@ -577,27 +577,25 @@ static bool cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
     return true;
 }
 
-enum {
-    // Short aliases for CommandOptions:
-    RC = CMDOPT_ALLOW_IN_RC,
-};
+#define CMD(name, flags, min, max, func) \
+    {name, flags, CMDOPT_ALLOW_IN_RC, min, max, (CommandFunc)func}
 
 static const Command cmds[] = {
-    CMD("bufis", "i", RC, 2, 3, cmd_bufis),
-    CMD("char", "bn", RC, 2, 3, cmd_char),
-    CMD("default", "", RC, 2, -1, cmd_default),
-    CMD("eat", "", RC, 1, 2, cmd_eat),
-    CMD("heredocbegin", "", RC, 2, 2, cmd_heredocbegin),
-    CMD("heredocend", "", RC, 1, 2, cmd_heredocend),
-    CMD("include", "b", RC, 1, 1, cmd_include),
-    CMD("inlist", "b", RC, 2, 3, cmd_inlist),
-    CMD("list", "i", RC, 2, -1, cmd_list),
-    CMD("noeat", "b", RC, 1, 1, cmd_noeat),
-    CMD("recolor", "", RC, 1, 2, cmd_recolor),
-    CMD("require", "f", RC, 1, 1, cmd_require),
-    CMD("state", "", RC, 1, 2, cmd_state),
-    CMD("str", "i", RC, 2, 3, cmd_str),
-    CMD("syntax", "", RC, 1, 1, cmd_syntax),
+    CMD("bufis", "i", 2, 3, cmd_bufis),
+    CMD("char", "bn", 2, 3, cmd_char),
+    CMD("default", "", 2, -1, cmd_default),
+    CMD("eat", "", 1, 2, cmd_eat),
+    CMD("heredocbegin", "", 2, 2, cmd_heredocbegin),
+    CMD("heredocend", "", 1, 2, cmd_heredocend),
+    CMD("include", "b", 1, 1, cmd_include),
+    CMD("inlist", "b", 2, 3, cmd_inlist),
+    CMD("list", "i", 2, -1, cmd_list),
+    CMD("noeat", "b", 1, 1, cmd_noeat),
+    CMD("recolor", "", 1, 2, cmd_recolor),
+    CMD("require", "f", 1, 1, cmd_require),
+    CMD("state", "", 1, 2, cmd_state),
+    CMD("str", "i", 2, 3, cmd_str),
+    CMD("syntax", "", 1, 1, cmd_syntax),
 };
 
 UNITTEST {

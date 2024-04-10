@@ -476,12 +476,6 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     return found;
 }
 
-enum {
-    // This is used to set Command::cmdopts fields to 0, while keeping
-    // min_args and max_args initializers clearly delineated
-    NA = 0,
-};
-
 // Note that some of the `Command::flags` entries here aren't actually
 // used in the `cmd` handler and are only included to mirror commands
 // of the same name in normal mode. This is done as a convenience for
@@ -489,39 +483,42 @@ enum {
 // to be used, instead of needing 2 different commands (with and without
 // the `-k` flag for normal vs. command/search modes).
 
+#define CMD(name, flags, min, max, func) \
+    {name, flags, 0, min, max, (CommandFunc)func}
+
 static const Command common_cmds[] = {
-    CMD("bol", "st", NA, 0, 0, cmd_bol), // Ignored flags: s, t
-    CMD("cancel", "", NA, 0, 0, cmd_cancel),
-    CMD("clear", "i", NA, 0, 0, cmd_clear), // Ignored flag: i
-    CMD("copy", "bikp", NA, 0, 0, cmd_copy), // Ignored flag: k
-    CMD("delete", "", NA, 0, 0, cmd_delete),
-    CMD("delete-eol", "n", NA, 0, 0, cmd_delete_eol), // Ignored flag: n
-    CMD("delete-word", "s", NA, 0, 0, cmd_delete_word), // Ignored flag: s
-    CMD("eol", "", NA, 0, 0, cmd_eol),
-    CMD("erase", "", NA, 0, 0, cmd_erase),
-    CMD("erase-bol", "", NA, 0, 0, cmd_erase_bol),
-    CMD("erase-word", "s", NA, 0, 0, cmd_erase_word), // Ignored flag: s
-    CMD("left", "", NA, 0, 0, cmd_left),
-    CMD("paste", "acm", NA, 0, 0, cmd_paste), // Ignored flags: a, c
-    CMD("right", "", NA, 0, 0, cmd_right),
-    CMD("toggle", "gv", NA, 1, -1, cmd_toggle), // Ignored flag: v
-    CMD("word-bwd", "s", NA, 0, 0, cmd_word_bwd), // Ignored flag: s
-    CMD("word-fwd", "s", NA, 0, 0, cmd_word_fwd), // Ignored flag: s
+    CMD("bol", "st", 0, 0, cmd_bol), // Ignored flags: s, t
+    CMD("cancel", "", 0, 0, cmd_cancel),
+    CMD("clear", "i", 0, 0, cmd_clear), // Ignored flag: i
+    CMD("copy", "bikp", 0, 0, cmd_copy), // Ignored flag: k
+    CMD("delete", "", 0, 0, cmd_delete),
+    CMD("delete-eol", "n", 0, 0, cmd_delete_eol), // Ignored flag: n
+    CMD("delete-word", "s", 0, 0, cmd_delete_word), // Ignored flag: s
+    CMD("eol", "", 0, 0, cmd_eol),
+    CMD("erase", "", 0, 0, cmd_erase),
+    CMD("erase-bol", "", 0, 0, cmd_erase_bol),
+    CMD("erase-word", "s", 0, 0, cmd_erase_word), // Ignored flag: s
+    CMD("left", "", 0, 0, cmd_left),
+    CMD("paste", "acm", 0, 0, cmd_paste), // Ignored flags: a, c
+    CMD("right", "", 0, 0, cmd_right),
+    CMD("toggle", "gv", 1, -1, cmd_toggle), // Ignored flag: v
+    CMD("word-bwd", "s", 0, 0, cmd_word_bwd), // Ignored flag: s
+    CMD("word-fwd", "s", 0, 0, cmd_word_fwd), // Ignored flag: s
 };
 
 static const Command search_cmds[] = {
-    CMD("accept", "eH", NA, 0, 0, cmd_search_mode_accept),
-    CMD("direction", "", NA, 0, 0, cmd_direction),
-    CMD("history-next", "", NA, 0, 0, cmd_search_history_next),
-    CMD("history-prev", "", NA, 0, 0, cmd_search_history_prev),
+    CMD("accept", "eH", 0, 0, cmd_search_mode_accept),
+    CMD("direction", "", 0, 0, cmd_direction),
+    CMD("history-next", "", 0, 0, cmd_search_history_next),
+    CMD("history-prev", "", 0, 0, cmd_search_history_prev),
 };
 
 static const Command command_cmds[] = {
-    CMD("accept", "H", NA, 0, 0, cmd_command_mode_accept),
-    CMD("complete-next", "", NA, 0, 0, cmd_complete_next),
-    CMD("complete-prev", "", NA, 0, 0, cmd_complete_prev),
-    CMD("history-next", "", NA, 0, 0, cmd_command_history_next),
-    CMD("history-prev", "", NA, 0, 0, cmd_command_history_prev),
+    CMD("accept", "H", 0, 0, cmd_command_mode_accept),
+    CMD("complete-next", "", 0, 0, cmd_complete_next),
+    CMD("complete-prev", "", 0, 0, cmd_complete_prev),
+    CMD("history-next", "", 0, 0, cmd_command_history_next),
+    CMD("history-prev", "", 0, 0, cmd_command_history_prev),
 };
 
 static const Command *find_cmd_mode_command(const char *name)

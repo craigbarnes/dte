@@ -2465,6 +2465,9 @@ enum {
     RC = CMDOPT_ALLOW_IN_RC,
 };
 
+#define CMD(name, flags, opts, min, max, func) \
+    {name, flags, opts, min, max, (CommandFunc)func}
+
 static const Command cmds[] = {
     CMD("alias", "-", RC, 1, 2, cmd_alias),
     CMD("bind", "-cnsT=", RC, 1, 2, cmd_bind),
