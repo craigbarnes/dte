@@ -17,6 +17,10 @@ typedef enum {
     FT_FILENAME,
 } FileDetectionType;
 
+enum {
+    FILETYPE_NAME_MAX = 63,
+};
+
 bool is_valid_filetype_name_sv(const StringView *name) PURE NONNULL_ARGS;
 
 static inline bool is_valid_filetype_name(const char *name)

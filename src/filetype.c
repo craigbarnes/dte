@@ -7,9 +7,11 @@
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
+#include "util/xmemmem.h"
 
 static int ft_compare(const void *key, const void *elem)
 {
@@ -38,6 +40,7 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(basenames, name, strcmp);
     CHECK_BSEARCH_ARRAY(extensions, ext, strcmp);
     CHECK_BSEARCH_ARRAY(interpreters, key, strcmp);
+    CHECK_BSEARCH_ARRAY(emacs_modes, name, strcmp);
     CHECK_BSEARCH_STR_ARRAY(ignored_extensions, strcmp);
     CHECK_BSEARCH_STR_ARRAY(builtin_filetype_names, strcmp);
 
@@ -335,7 +338,7 @@ bool is_valid_filetype_name_sv(const StringView *name)
 {
     const char *data = name->data;
     const size_t len = name->length;
-    if (unlikely(len == 0 || len > 63 || data[0] == '-')) {
+    if (unlikely(len == 0 || len > FILETYPE_NAME_MAX || data[0] == '-')) {
         return false;
     }
 

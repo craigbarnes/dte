@@ -27,7 +27,7 @@ function error(msg) {
 
 # Exclude Markdown-style indented code blocks (with 4 space indents)
 # from maximum line length check
-/^ {4}[^ ]/ {
+/^ {4,}[^ ]/ {
     if (++LINES <= 2) {
         error("this line shouldn't be indented")
     }
