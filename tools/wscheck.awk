@@ -9,7 +9,7 @@ FNR == 1 {
     print FILENAME ":" FNR ": tab in indent"
 }
 
-/[ \t]+$/ && FILENAME !~ /\.md$/ {
+/[ \t]+$/ {
     w++
     print FILENAME ":" FNR ": trailing whitespace"
 }
