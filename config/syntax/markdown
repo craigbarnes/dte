@@ -62,6 +62,7 @@ state text
     char [ reference
     str '**' double-asterisk
     char * asterisk
+    str "\\\n" line-start special
     char "\\" .markdown-escape:this
     eat this
 
