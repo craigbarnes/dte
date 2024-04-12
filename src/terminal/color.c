@@ -69,9 +69,10 @@ UNITTEST {
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
 {
-    uint8_t r, g, b;
     BUG_ON(!color_is_rgb(color));
-    color_split_rgb(color, &r, &g, &b);
+    uint8_t r = color_r(color);
+    uint8_t g = color_g(color);
+    uint8_t b = color_b(color);
 
     // Calculate closest 6x6x6 RGB cube color
     static const uint8_t color_stops[6] = {0, 95, 135, 175, 215, 255};

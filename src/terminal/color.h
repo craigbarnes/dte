@@ -54,11 +54,19 @@ static inline bool color_is_valid(int32_t color)
     return palette || rgb;
 }
 
-static inline void color_split_rgb(int32_t c, uint8_t *r, uint8_t *g, uint8_t *b)
+static inline uint8_t color_r(int32_t rgb)
 {
-    *r = (c >> 16) & 0xff;
-    *g = (c >> 8) & 0xff;
-    *b = c & 0xff;
+    return (rgb >> 16) & 0xFF;
+}
+
+static inline uint8_t color_g(int32_t rgb)
+{
+    return (rgb >> 8) & 0xFF;
+}
+
+static inline uint8_t color_b(int32_t rgb)
+{
+    return rgb & 0xFF;
 }
 
 int32_t parse_rgb(const char *str, size_t len);

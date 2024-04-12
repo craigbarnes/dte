@@ -170,14 +170,13 @@ size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
         return buf_u8_to_str((uint8_t)color, buf);
     }
 
-    buf[0] = '#';
-    buf[1] = hextab_lower[(color >> 20) & 0xF];
-    buf[2] = hextab_lower[(color >> 16) & 0xF];
-    buf[3] = hextab_lower[(color >> 12) & 0xF];
-    buf[4] = hextab_lower[(color >> 8) & 0xF];
-    buf[5] = hextab_lower[(color >> 4) & 0xF];
-    buf[6] = hextab_lower[(color >> 0) & 0xF];
-    return 7;
+    size_t i = 0;
+    buf[i++] = '#';
+    i += hex_encode_byte(buf + i, color_r(color));
+    i += hex_encode_byte(buf + i, color_g(color));
+    i += hex_encode_byte(buf + i, color_b(color));
+    BUG_ON(i != 7);
+    return i;
 }
 
 const char *term_style_to_string(char buf[TERM_STYLE_BUFSIZE], const TermStyle *style)

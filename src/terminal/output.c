@@ -399,14 +399,12 @@ static size_t set_color_suffix(char *buf, int32_t color)
         return i + buf_u8_to_str(color, buf + i);
     }
 
-    uint8_t r, g, b;
-    color_split_rgb(color, &r, &g, &b);
     size_t i = copyliteral(buf, "8;2;");
-    i += buf_u8_to_str(r, buf + i);
+    i += buf_u8_to_str(color_r(color), buf + i);
     buf[i++] = ';';
-    i += buf_u8_to_str(g, buf + i);
+    i += buf_u8_to_str(color_g(color), buf + i);
     buf[i++] = ';';
-    i += buf_u8_to_str(b, buf + i);
+    i += buf_u8_to_str(color_b(color), buf + i);
     return i;
 }
 
@@ -533,14 +531,12 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
         i += copyliteral(buf + i, "\033]112");
     } else {
         // Set RGB color with OSC 12
-        uint8_t r, g, b;
-        color_split_rgb(s.color, &r, &g, &b);
         i += copyliteral(buf + i, "\033]12;rgb:");
-        i += hex_encode_byte(buf + i, r);
+        i += hex_encode_byte(buf + i, color_r(s.color));
         buf[i++] = '/';
-        i += hex_encode_byte(buf + i, g);
+        i += hex_encode_byte(buf + i, color_g(s.color));
         buf[i++] = '/';
-        i += hex_encode_byte(buf + i, b);
+        i += hex_encode_byte(buf + i, color_b(s.color));
     }
 
     buf[i++] = '\033';
