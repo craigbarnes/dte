@@ -13,7 +13,8 @@ error() {
     exit 1
 }
 
-alias abort='error "$LINENO"'
+alias abort='error "${LINENO:-1}"'
+set -u
 
 for cmd in git gcc clang ccache awk pandoc mkdir cp basename diff; do
     if ! command -v "$cmd" >/dev/null; then
@@ -33,12 +34,9 @@ set -e
 git checkout-index --prefix="$TMPDIR/" -a
 trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
-# Generated files that are checked into the repository have an
-# "is-generated" attribute (set via .gitattributes):
-GENERATED=''
-for G in $(git ls-files --error-unmatch ':(attr:is-generated)'); do
-    GENERATED="$GENERATED $TMPDIR/$G"
-done
+# Generated files that are checked into the repository have an "is-generated"
+# attribute (set via .gitattributes):
+GENERATED=$(git ls-files --format="$TMPDIR/%(path)" --error-unmatch ':(attr:is-generated)')
 
 # ...snapshot and re-generate these files:
 mkdir -p "$TMPDIR/GEN/"
