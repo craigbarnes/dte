@@ -516,15 +516,11 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
 
     const size_t maxlen = STRLEN("E[7 qE]12;rgb:aa/bb/ccST");
     char *buf = obuf_need_space(obuf, maxlen);
-    size_t i = 0;
 
     // Set shape with DECSCUSR
     BUG_ON(s.type < 0 || s.type > 9);
-    buf[i++] = '\033';
-    buf[i++] = '[';
-    buf[i++] = '0' + s.type;
-    buf[i++] = ' ';
-    buf[i++] = 'q';
+    const char seq[] = {'\033', '[', '0' + s.type, ' ', 'q'};
+    size_t i = copystrn(buf, seq, sizeof(seq));
 
     if (s.color == COLOR_DEFAULT) {
         // Reset color with OSC 112
