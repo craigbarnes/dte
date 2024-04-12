@@ -16,7 +16,7 @@ htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
 $(html-man): public/%.html: docs/%.md
-public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md | public/screenshot.png
+public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md
 public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
 public/logo.svg: share/dte.svg
@@ -26,25 +26,21 @@ public/releases.html: private PDHTML += -L docs/releases.lua
 public/dterc.html public/dte-syntax.html: private PDHTML += -L docs/fix-anchors.lua
 public/dte.html: private PDHTML += --indented-code-classes=sh
 
-docs/%.1: docs/%.md docs/pdman.lua
+docs/%.1: docs/%.md docs/pdman.lua build/docs/pdman.flags
 	$(E) PANDOC $@
 	$(Q) $(PDMAN) -o $@ $<
 
-docs/%.5: docs/%.md docs/pdman.lua
+docs/%.5: docs/%.md docs/pdman.lua build/docs/pdman.flags
 	$(E) PANDOC $@
 	$(Q) $(PDMAN) -o $@ $<
 
-public/dte.pdf: $(man) | public/
-	$(E) GROFF $@
-	$(Q) groff -mandoc -Tpdf $^ > $@
+$(html): docs/template.html build/docs/pdhtml.flags | $(css) $(img)
+	$(E) PANDOC $@
+	$(Q) $(PDHTML) -o $@ $(filter %.md %.yml, $^)
 
 build/docs/index.md: docs/index.sed README.md | build/docs/
 	$(E) GEN $@
 	$(Q) sed -f $^ > $@
-
-$(html): docs/template.html | public/style.css public/logo.svg
-	$(E) PANDOC $@
-	$(Q) $(PDHTML) -o $@ $(filter-out %.html %.lua, $^)
 
 public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
@@ -57,6 +53,16 @@ $(img): | public/
 public/%.gz: public/%
 	$(E) GZIP $@
 	$(Q) gzip -9 < $< > $@
+
+public/dte.pdf: $(man) | public/
+	$(E) GROFF $@
+	$(Q) groff -mandoc -Tpdf $^ > $@
+
+build/docs/pdman.flags: FORCE | build/docs/
+	@$(OPTCHECK) '$(PDMAN)' $@
+
+build/docs/pdhtml.flags: FORCE | build/docs/
+	@$(OPTCHECK) '$(PDHTML)' $@
 
 public/:
 	$(Q) mkdir -p $@
