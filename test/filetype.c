@@ -188,6 +188,32 @@ static void test_find_ft_firstline(TestContext *ctx)
         {" ", NULL},
         {" <?xml", NULL},
         {"\0<?xml", NULL},
+
+        // Emacs style file-local variables
+        {"<!--*-xml-*-->", "xml"},
+        {"% -*-latex-*-", "tex"},
+        {"# -*-shell-script-*-", "sh"},
+        {"// -*- c -*-", "c"},
+        {".. -*-rst-*-", "rst"},
+        {";; -*-scheme-*-", "scheme"},
+        {"-- -*-lua-*-", "lua"},
+        {"\\input texinfo @c -*-texinfo-*-", "texinfo"},
+
+        // Not yet handled
+        {".. -*- mode: rst -*-", NULL},
+        {".. -*- Mode: rst -*-", NULL},
+        {".. -*- mode: rst; -*-", NULL},
+        {".. -*- coding: utf-8; mode: rst; fill-column: 75; -*- ", NULL},
+        {";; -*- mode: Lisp; fill-column: 75; comment-column: 50; -*-", NULL},
+        {";; -*-  mode:  fallback ; mode:  lisp  -*- ", NULL},
+
+        // These could be handled, but currently aren't (mostly due to heuristics
+        // intended to avoid doing extra work, if unlikely to detect anything)
+        {" <!--*-xml-*-->", NULL},
+        {"~ -*- c -*-", NULL},
+        {"xyz -*- c -*-", NULL},
+        {"d -*- c -*-", NULL},
+
         // Hashbangs
         {"#!/usr/bin/ash", "sh"},
         {"#!/usr/bin/awk", "awk"},
