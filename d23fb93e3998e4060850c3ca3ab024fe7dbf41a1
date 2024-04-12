@@ -1,0 +1,4 @@
+The example command here should have been:
+
+    make docs PANDOC=/usr/bin/pandoc
+    #    ^^^^^
