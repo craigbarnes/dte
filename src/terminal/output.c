@@ -10,6 +10,7 @@
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/numtostr.h"
+#include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
