@@ -13,6 +13,14 @@ error() {
     exit 1
 }
 
+changed_files() {
+    git diff-index --cached --name-only --diff-filter=ACMR HEAD -- "$@"
+}
+
+generated_files() {
+    git ls-files --error-unmatch ':(attr:is-generated)' "$@"
+}
+
 alias abort='error "${LINENO:-1}"'
 set -u
 
@@ -27,8 +35,6 @@ test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists"
 MAKE="$(command -v gmake || command -v make)"
 test -x "$MAKE" || abort 'unable to find GNU Make command'
 MAKE="$MAKE --no-print-directory -C $TMPDIR -j$(mk/nproc.sh)"
-export MAKEFLAGS='DEBUG=3 WERROR=1'
-export CFLAGS='-g -Og -pipe'
 
 set -e
 git checkout-index --prefix="$TMPDIR/" -a
@@ -36,7 +42,7 @@ trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
 # Generated files that are checked into the repository have an "is-generated"
 # attribute (set via .gitattributes):
-generated=$(git ls-files --format="$TMPDIR/%(path)" --error-unmatch ':(attr:is-generated)')
+generated=$(generated_files --format="$TMPDIR/%(path)")
 
 # ...snapshot and re-generate these files:
 mkdir -p "$TMPDIR/GEN/"
@@ -56,9 +62,33 @@ for file in $generated; do
     fi
 done
 
+changed_indented_files=$(changed_files ':(attr:space-indent)')
+changed_shell_files=$(changed_files ':(attr:shell)')
+changed_c_files=$(changed_files '**.[ch]')
+
+# Check for whitespace errors in changed files (if applicable)
+if test "$changed_indented_files"; then
+    # shellcheck disable=SC2086
+    tools/wscheck.awk $changed_indented_files
+fi
+
+# Check for header-related errors in changed C files
+if test "$changed_c_files"; then
+    # shellcheck disable=SC2086
+    tools/hdrcheck.awk $changed_c_files
+fi
+
+# Run shellcheck(1) on changed shell scripts
+if test "$changed_shell_files"; then
+    # shellcheck disable=SC2086
+    shellcheck -fgcc $changed_shell_files
+fi
+
 # Build and test with various configurations and compilers:
-for CC in gcc clang; do
-    export CC="ccache $CC"
+export CFLAGS='-g -Og -pipe -Werror'
+export DEBUG=3
+for compiler in gcc clang; do
+    export CC="ccache $compiler"
     $MAKE check
     $MAKE check ICONV_DISABLE=1
     $MAKE check DEBUG=0
