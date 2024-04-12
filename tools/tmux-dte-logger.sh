@@ -29,8 +29,8 @@ done
 shift $((OPTIND - 1))
 
 info="$(tmux splitw -hdP -F '#{pane_tty},#{pane_id}' cat -v)"
-pane_tty="$(echo $info | cut -d, -f1)"
-pane_id="$(echo $info | cut -d, -f2)"
+pane_tty=$(echo "$info" | cut -d, -f1)
+pane_id=$(echo "$info" | cut -d, -f2)
 
 DTE_LOG="$pane_tty" ${DTE:-./dte} "$@"
 
