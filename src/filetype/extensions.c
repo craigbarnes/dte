@@ -15,6 +15,7 @@ static const struct FileExtensionMap {
     {"awk", AWK},
     {"bash", SH},
     {"bat", BATCH},
+    {"bats", SH}, // https://github.com/bats-core/bats-core
     {"bbl", TEX},
     {"bib", BIBTEX},
     {"btm", BATCH},

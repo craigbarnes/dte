@@ -5,6 +5,7 @@ static const struct FileInterpreterMap {
     {"ash", SH},
     {"awk", AWK},
     {"bash", SH},
+    {"bats", SH}, // https://github.com/bats-core/bats-core
     {"bigloo", SCHEME},
     {"ccl", LISP},
     {"chicken", SCHEME},
