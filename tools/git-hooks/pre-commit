@@ -36,21 +36,23 @@ trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
 # Generated files that are checked into the repository have an "is-generated"
 # attribute (set via .gitattributes):
-GENERATED=$(git ls-files --format="$TMPDIR/%(path)" --error-unmatch ':(attr:is-generated)')
+generated=$(git ls-files --format="$TMPDIR/%(path)" --error-unmatch ':(attr:is-generated)')
 
 # ...snapshot and re-generate these files:
 mkdir -p "$TMPDIR/GEN/"
 # shellcheck disable=SC2086
-cp $GENERATED "$TMPDIR/GEN/"
+cp $generated "$TMPDIR/GEN/"
 $MAKE -B man
 
 # ...and then check the freshly generated files are identical to the
 # ones that are to be committed:
-for F in $GENERATED; do
-    B=$(basename "$F")
-    if ! diff "$F" "$TMPDIR/GEN/$B" >/dev/null; then
+for file in $generated; do
+    base=$(basename "$file")
+    orig="$TMPDIR/GEN/$base"
+    echo "   CHECK  $orig"
+    if ! diff "$file" "$orig" >/dev/null; then
         # shellcheck disable=SC2295
-        abort "re-generate '${F##${TMPDIR}/}' before committing"
+        abort "re-generate '${file##${TMPDIR}/}' before committing"
     fi
 done
 
