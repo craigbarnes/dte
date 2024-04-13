@@ -10,8 +10,9 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - run: brew install make
+            - run: gmake build/feature.h
+            - run: cat build/feature.h build/feature/*.log
             - run: gmake check V=1 DEBUG=3 WERROR=1 TESTFLAGS=-ct
-            - run: cat build/feature.h && echo && cat build/feature/*.log
             - run: gmake bench CFLAGS=-O3
 
     linux:
@@ -21,6 +22,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
+            - run: make build/feature.h
+            - run: cat build/feature.h build/feature/*.log
             - run: make check V=1 DEBUG=3 WERROR=1 TESTFLAGS=-ct
-            - run: cat build/feature.h && echo && cat build/feature/*.log
             - run: make bench CFLAGS=-O3
