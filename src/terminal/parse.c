@@ -1,11 +1,11 @@
 // Parser for escape sequences sent by terminals to clients.
-// Copyright 2018-2024 Craig Barnes.
+// Copyright © 2018-2024 Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also:
-// - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-// - https://sw.kovidgoyal.net/kitty/keyboard-protocol/
-// - ECMA-48 §5.4 (https://ecma-international.org/publications-and-standards/standards/ecma-48/)
-// - https://vt100.net/emu/dec_ansi_parser
+// • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+// • https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+// • ECMA-48 §5.4 (https://ecma-international.org/publications-and-standards/standards/ecma-48/)
+// • https://vt100.net/emu/dec_ansi_parser
 
 #include <stdbool.h>
 #include <stdint.h>

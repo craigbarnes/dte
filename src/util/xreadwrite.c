@@ -13,9 +13,9 @@
     // value than SSIZE_MAX, not because it's actually needed for
     // correct functioning of xread_all().
     // See also:
-    // - https://man7.org/linux/man-pages/man2/read.2.html#NOTES
-    // - https://man7.org/linux/man-pages/man2/write.2.html#NOTES
-    // - https://stackoverflow.com/a/70370002
+    // • https://man7.org/linux/man-pages/man2/read.2.html#NOTES
+    // • https://man7.org/linux/man-pages/man2/write.2.html#NOTES
+    // • https://stackoverflow.com/a/70370002
     #define MAX_RW_COUNT ((size_t)0x7ffff000)
 #else
     #define MAX_RW_COUNT ((size_t)SSIZE_MAX)
@@ -113,10 +113,10 @@ int xclose(int fd)
     // where there's no risk of a concurrent open() call reusing the
     // same file descriptor.
     //
-    // * http://www.daemonology.net/blog/2011-12-17-POSIX-close-is-broken.html
-    // * https://ewontfix.com/4/
-    // * https://sourceware.org/bugzilla/show_bug.cgi?id=14627
-    // * https://www.austingroupbugs.net/view.php?id=529#c1200
+    // • http://www.daemonology.net/blog/2011-12-17-POSIX-close-is-broken.html
+    // • https://ewontfix.com/4/
+    // • https://sourceware.org/bugzilla/show_bug.cgi?id=14627
+    // • https://www.austingroupbugs.net/view.php?id=529#c1200
     if (r && errno == EBADF) {
         r = 0;
     }

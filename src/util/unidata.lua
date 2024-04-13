@@ -1,6 +1,6 @@
 --[[
  Code generator for Unicode category tables.
- Copyright 2019-2022 Craig Barnes.
+ Copyright © 2019-2022 Craig Barnes.
  SPDX-License-Identifier: GPL-2.0-only
 
  Note: to download the required database files and generate the
