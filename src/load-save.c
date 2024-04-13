@@ -131,7 +131,7 @@ static void fixup_blocks(Buffer *buffer)
     }
 }
 
-static int xmadvise_sequential(void *addr, size_t len)
+static int advise_sequential(void *addr, size_t len)
 {
     BUG_ON(!addr);
     BUG_ON(len == 0);
@@ -184,7 +184,7 @@ bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
         // NOTE: size must be greater than 0
         buf = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
         if (buf != MAP_FAILED) {
-            xmadvise_sequential(buf, size);
+            advise_sequential(buf, size);
             mapped = true;
             goto decode;
         }
