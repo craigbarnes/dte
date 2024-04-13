@@ -1,4 +1,6 @@
+#include "compat.h"
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -12,23 +14,20 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-static const char *current_filename; // For sorting tags
-
 static bool tag_is_local_to_file(const Tag *tag, const char *path)
 {
     return tag->local && !!path && strview_equal_cstring(&tag->filename, path);
 }
 
-static int visibility_cmp(const Tag *a, const Tag *b)
+static int visibility_cmp(const Tag *a, const Tag *b, const char *filename)
 {
     if (!a->local && !b->local) {
         return 0;
     }
 
     // Is tag visibility limited to the current file?
-    bool a_this_file = tag_is_local_to_file(a, current_filename);
-    bool b_this_file = tag_is_local_to_file(b, current_filename);
+    bool a_this_file = tag_is_local_to_file(a, filename);
+    bool b_this_file = tag_is_local_to_file(b, filename);
 
     // Tags local to other file than current are not interesting
     if (a->local && !a_this_file) {
@@ -87,11 +86,12 @@ static int kind_cmp(const Tag *a, const Tag *b)
     return 0;
 }
 
-static int tag_cmp(const void *ap, const void *bp)
+static int tag_cmp_r(const void *ap, const void *bp, void *userdata)
 {
     const Tag *const *a = ap;
     const Tag *const *b = bp;
-    int r = visibility_cmp(*a, *b);
+    const char *filename = userdata;
+    int r = visibility_cmp(*a, *b, filename);
     return r ? r : kind_cmp(*a, *b);
 }
 
@@ -221,6 +221,14 @@ static const char *path_slice_relative(const char *filename, const StringView di
     return NULL;
 }
 
+#if !HAVE_QSORT_R
+static const char *current_filename_global; // NOLINT(*-non-const-global-variables)
+static int tag_cmp(const void *ap, const void *bp)
+{
+    return tag_cmp_r(ap, bp, (char*)current_filename_global);
+}
+#endif
+
 static void tag_file_find_tags (
     const TagFile *tf,
     const char *filename,
@@ -235,14 +243,25 @@ static void tag_file_find_tags (
     }
     free(t);
 
-    if (!filename) {
-        current_filename = NULL;
-    } else {
-        StringView dir = path_slice_dirname(tf->filename);
-        current_filename = path_slice_relative(filename, dir);
+    if (tags->count < 2) {
+        return;
     }
-    ptr_array_sort(tags, tag_cmp);
-    current_filename = NULL;
+
+    if (filename) {
+        StringView dir = path_slice_dirname(tf->filename);
+        filename = path_slice_relative(filename, dir);
+    }
+
+    void **ptrs = tags->ptrs;
+    BUG_ON(!ptrs);
+
+#if HAVE_QSORT_R
+    qsort_r(ptrs, tags->count, sizeof(*ptrs), tag_cmp_r, (char*)filename);
+#else
+    current_filename_global = filename;
+    qsort(ptrs, tags->count, sizeof(*ptrs), tag_cmp);
+    current_filename_global = NULL;
+#endif
 }
 
 // Note: this moves ownership of tag->pattern to the generated Message

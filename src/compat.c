@@ -14,6 +14,9 @@ const char feature_string[] =
 #if HAVE_MEMMEM
     " memmem"
 #endif
+#if HAVE_QSORT_R
+    " qsort_r"
+#endif
 #if HAVE_MKOSTEMP
     " mkostemp"
 #endif

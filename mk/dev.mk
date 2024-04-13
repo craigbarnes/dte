@@ -153,6 +153,7 @@ clang-tidy-src/main.c: build/version.h
 clang-tidy-src/compat.c: src/compat.h
 clang-tidy-src/load-save.c: src/compat.h
 clang-tidy-src/signals.c: src/compat.h
+clang-tidy-src/tag.c: src/compat.h
 clang-tidy-src/util/fd.c: src/compat.h
 clang-tidy-src/util/xmemmem.c: src/compat.h
 clang-tidy-src/terminal/ioctl.c: src/compat.h
