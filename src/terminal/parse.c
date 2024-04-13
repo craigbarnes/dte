@@ -559,8 +559,8 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
      * This handles the basic CSI u ("fixterms") encoding and also the
      * extended kitty keyboard encoding.
      *
-     * - https://www.leonerd.org.uk/hacks/fixterms/
-     * - https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+     * • https://www.leonerd.org.uk/hacks/fixterms/
+     * • https://sw.kovidgoyal.net/kitty/keyboard-protocol/
      *
      * kitty params: key:unshifted-key:base-layout-key ; mods:event-type ; text
      */

@@ -17,8 +17,8 @@ expression arg1;
  * expanded comma will likely interact with in unexpected ways.
  *
  * See also:
- * - https://gitlab.com/craigbarnes/dte/-/commit/77bec65e5f43ded39239a96cf8c26a5a599c31eb
- * - ISO C99 §7.1.4p1
+ * • https://gitlab.com/craigbarnes/dte/-/commit/77bec65e5f43ded39239a96cf8c26a5a599c31eb
+ * • ISO C99 §7.1.4p1
  */
 
 * func(arg1, <+...STRN(...)...+>)
