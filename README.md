@@ -59,7 +59,7 @@ installed:
 * [GNU Make] 4.0+
 * [iconv] library (usually provided by libc on Linux/FreeBSD)
 
-...then download and unpack the latest release tarball:
+...then download and unpack the latest [release] tarball:
 
     curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1.tar.gz
     tar -xzf dte-1.11.1.tar.gz
@@ -79,20 +79,16 @@ For example:
 Documentation
 -------------
 
-After installing, you can access the documentation in man page format
-via `man 1 dte`, `man 5 dterc` and `man 5 dte-syntax`.
+After installing, you can access the documentation in man page format:
 
-Online documentation is also available at <https://craigbarnes.gitlab.io/dte/>.
+* [`man dte`]
+* [`man dterc`]
+* [`man dte-syntax`]
 
-Packaging
----------
+See also:
 
-See [`docs/packaging.md`](https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md).
-
-Contributing
-------------
-
-See [`docs/contributing.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md).
+* [Contributor guidelines]
+* [Packaging information]
 
 Contact
 -------
@@ -137,6 +133,7 @@ Public License version 2 for more details.
 [key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
 [screenshot]: https://craigbarnes.gitlab.io/dte/screenshot.png
+[release]: https://craigbarnes.gitlab.io/dte/releases.html
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 [kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [synchronized updates]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
@@ -163,6 +160,11 @@ Public License version 2 for more details.
 [pkgsrc]: https://cdn.netbsd.org/pub/pkgsrc/current/pkgsrc/editors/dte/index.html
 [`brew`]: https://brew.sh/
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
+[`man dte`]: https://craigbarnes.gitlab.io/dte/dte.html
+[`man dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
+[`man dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
+[Contributor guidelines]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md
+[Packaging information]: https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [Libera.Chat]: https://libera.chat/

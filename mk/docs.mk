@@ -16,7 +16,7 @@ htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
 $(html-man): public/%.html: docs/%.md
-public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md
+public/index.html: docs/index.yml README.md docs/gitlab.md
 public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
 public/logo.svg: share/dte.svg
@@ -37,10 +37,6 @@ docs/%.5: docs/%.md docs/pdman.lua build/docs/pdman.flags
 $(html): docs/template.html build/docs/pdhtml.flags | $(css) $(img)
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -o $@ $(filter %.md %.yml, $^)
-
-build/docs/index.md: docs/index.sed README.md | build/docs/
-	$(E) GEN $@
-	$(Q) sed -f $^ > $@
 
 public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@

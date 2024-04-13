@@ -24,7 +24,7 @@ should ideally be avoided, where possible, for performance reasons.
 
 The exceptions listed above are either deemed acceptable uses of
 division that can't be optimized away or are known to be amenable to
-some form of optimzation (e.g. inlining with constant propagation)
+some form of optimization (e.g. inlining with constant propagation)
 whereby no actual division instructions are generated.
 */
 
