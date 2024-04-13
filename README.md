@@ -97,8 +97,11 @@ See [`docs/contributing.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/do
 Contact
 -------
 
-Questions and patches may be sent by email to <craigbarnes@protonmail.com>,
-although GitLab [issue reports] and [merge requests] are usually preferred,
+Questions and patches may be sent by email, to the address printed by:
+
+    echo ofmisnmfbqgzdfchcbamilkoca | tr zka-hm-t @.m-ta-h
+
+...although GitLab [issue reports] and [merge requests] are preferred,
 when possible.
 
 For general discussion, we also have a `#dte` channel on the [Libera.Chat]
