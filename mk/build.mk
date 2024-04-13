@@ -246,7 +246,7 @@ build/feature.h: mk/feature-test/defs.h $(feature_tests)
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c
 	$(E) DETECT $@
-	$(Q) if $(CC) $(filter-out --coverage, $(CFLAGS_ALL)) -o $(@:.h=.o) $< 2>$(@:.h=.log); then \
+	$(Q) if $(CC) $(filter-out --coverage, $(CFLAGS_ALL)) -Werror -o $(@:.h=.o) $< 2>$(@:.h=.log); then \
 	  echo '$(call featuredef,$@) 1' > $@ ; \
 	else \
 	  echo '$(call featuredef,$@) 0' > $@ ; \
