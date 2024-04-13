@@ -175,6 +175,16 @@ static const char *term_feature_flag_to_str(TermFeatureFlags flag)
     return "??";
 }
 
+static KeyCode handle_query_reply(Terminal *term, KeyCode key)
+{
+    TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
+    BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
+    const char *name = term_feature_flag_to_str(flag);
+    LOG_INFO("detected terminal feature '%s' via query", name);
+    term->features |= flag;
+    return KEY_IGNORE;
+}
+
 KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
 {
     TermInputBuffer *input = &term->ibuf;
@@ -193,12 +203,7 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
     if (input->len > 1 || input->can_be_truncated) {
         KeyCode key = read_special(term);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
-            TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
-            BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
-            const char *name = term_feature_flag_to_str(flag);
-            LOG_INFO("detected terminal feature '%s' via query", name);
-            term->features |= flag;
-            return KEY_IGNORE;
+            return handle_query_reply(term, key);
         }
         if (key != KEY_NONE) {
             return key;
