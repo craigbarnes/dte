@@ -260,9 +260,12 @@ void term_enable_private_modes(Terminal *term)
     if (features & METAESC) {
         term_put_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
     }
+
     if (features & KITTYKBD) {
+        // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
         term_put_literal(obuf, "\033[>5u");
     } else if (features & ITERM2) {
+        // https://gitlab.com/craigbarnes/dte/-/issues/130#note_864453071
         term_put_literal(obuf, "\033[>1u");
     } else {
         // Try to use "modifyOtherKeys" mode

@@ -163,7 +163,7 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-static const char *term_feature_flag_to_str(TermFeatureFlags flag)
+static const char *tflag_to_str(TermFeatureFlags flag)
 {
     // Note: this only handles a small subset of individual flags,
     // as returned by parse_csi_query_reply()
@@ -179,8 +179,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
     TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
     BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
-    const char *name = term_feature_flag_to_str(flag);
-    LOG_INFO("detected terminal feature '%s' via query", name);
+    LOG_INFO("detected terminal feature '%s' via query", tflag_to_str(flag));
     term->features |= flag;
     return KEY_IGNORE;
 }

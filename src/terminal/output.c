@@ -216,6 +216,8 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 void term_save_title(Terminal *term)
 {
     if (term->features & TFLAG_SET_WINDOW_TITLE) {
+        // "Save xterm window title on stack" (XTWINOPS)
+        // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         term_put_literal(&term->obuf, "\033[22;2t");
     }
 }
@@ -223,6 +225,7 @@ void term_save_title(Terminal *term)
 void term_restore_title(Terminal *term)
 {
     if (term->features & TFLAG_SET_WINDOW_TITLE) {
+        // "Restore xterm window title from stack" (XTWINOPS)
         term_put_literal(&term->obuf, "\033[23;2t");
     }
 }
