@@ -188,6 +188,9 @@ static void test_find_ft_firstline(TestContext *ctx)
         {" ", NULL},
         {" <?xml", NULL},
         {"\0<?xml", NULL},
+        {"#autoload", "sh"},
+        {"#compdef dte", "sh"},
+        {"#compdef", NULL},
 
         // Emacs style file-local variables
         {"<!--*-xml-*-->", "xml"},

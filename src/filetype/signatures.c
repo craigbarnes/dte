@@ -80,9 +80,15 @@ static FileTypeEnum filetype_from_signature(const StringView line)
             return YAML;
         }
         break; // % -*-latex-*-
+    case '#':
+        if (strview_has_prefix(&line, "#compdef ")) {
+            return SH;
+        } else if (strview_has_prefix(&line, "#autoload")) {
+            return SH;
+        }
+        break; // # -*-shell-script-*-
     case 'd':
         return strview_has_prefix(&line, "diff --git") ? DIFF : NONE;
-    case '#': // # -*-shell-script-*-
     case '/': // /* -*-c-*-
     case '.': // .. -*-rst-*-
     case ';': // ;; -*-scheme-*-
