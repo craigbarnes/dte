@@ -66,8 +66,9 @@ bool history_search_forward (
     const char *text
 ) {
     const HistoryEntry *start = *pos ? (*pos)->prev : history->last;
+    const bool always_match = (text[0] == '\0');
     for (const HistoryEntry *e = start; e; e = e->prev) {
-        if (str_has_prefix(e->text, text)) {
+        if (always_match || str_has_prefix(e->text, text)) {
             *pos = e;
             return true;
         }
@@ -81,8 +82,9 @@ bool history_search_backward (
     const char *text
 ) {
     const HistoryEntry *start = *pos ? (*pos)->next : history->first;
+    const bool always_match = (text[0] == '\0');
     for (const HistoryEntry *e = start; e; e = e->next) {
-        if (str_has_prefix(e->text, text)) {
+        if (always_match || str_has_prefix(e->text, text)) {
             *pos = e;
             return true;
         }

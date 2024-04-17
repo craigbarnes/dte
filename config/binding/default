@@ -159,6 +159,8 @@ bind -cs C-f right
 bind -cs C-g cancel
 bind -cs C-h erase
 bind -cs C-k delete-eol
+bind -cs C-n 'history-next -S'
+bind -cs C-p 'history-prev -S'
 bind -cs C-u erase-bol
 bind -cs C-w erase-word
 bind -cs C-? erase

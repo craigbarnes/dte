@@ -220,14 +220,15 @@ static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static bool do_history_prev(const History *hist, CommandLine *c)
+static bool do_history_prev(const History *hist, CommandLine *c, bool prefix_search)
 {
     if (!c->search_pos) {
         free(c->search_text);
         c->search_text = string_clone_cstring(&c->buf);
     }
 
-    if (history_search_forward(hist, &c->search_pos, c->search_text)) {
+    const char *search_text = prefix_search ? c->search_text : "";
+    if (history_search_forward(hist, &c->search_pos, search_text)) {
         BUG_ON(!c->search_pos);
         set_text(c, c->search_pos->text);
     }
@@ -236,13 +237,14 @@ static bool do_history_prev(const History *hist, CommandLine *c)
     return true;
 }
 
-static bool do_history_next(const History *hist, CommandLine *c)
+static bool do_history_next(const History *hist, CommandLine *c, bool prefix_search)
 {
     if (!c->search_pos) {
         goto out;
     }
 
-    if (history_search_backward(hist, &c->search_pos, c->search_text)) {
+    const char *search_text = prefix_search ? c->search_text : "";
+    if (history_search_backward(hist, &c->search_pos, search_text)) {
         BUG_ON(!c->search_pos);
         set_text(c, c->search_pos->text);
     } else {
@@ -258,25 +260,29 @@ out:
 static bool cmd_search_history_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    return do_history_next(&e->search_history, &e->cmdline);
+    bool prefix_search = !cmdargs_has_flag(a, 'S');
+    return do_history_next(&e->search_history, &e->cmdline, prefix_search);
 }
 
 static bool cmd_search_history_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    return do_history_prev(&e->search_history, &e->cmdline);
+    bool prefix_search = !cmdargs_has_flag(a, 'S');
+    return do_history_prev(&e->search_history, &e->cmdline, prefix_search);
 }
 
 static bool cmd_command_history_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    return do_history_next(&e->command_history, &e->cmdline);
+    bool prefix_search = !cmdargs_has_flag(a, 'S');
+    return do_history_next(&e->command_history, &e->cmdline, prefix_search);
 }
 
 static bool cmd_command_history_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    return do_history_prev(&e->command_history, &e->cmdline);
+    bool prefix_search = !cmdargs_has_flag(a, 'S');
+    return do_history_prev(&e->command_history, &e->cmdline, prefix_search);
 }
 
 static bool cmd_left(EditorState *e, const CommandArgs *a)
@@ -509,16 +515,16 @@ static const Command common_cmds[] = {
 static const Command search_cmds[] = {
     CMD("accept", "eH", 0, 0, cmd_search_mode_accept),
     CMD("direction", "", 0, 0, cmd_direction),
-    CMD("history-next", "", 0, 0, cmd_search_history_next),
-    CMD("history-prev", "", 0, 0, cmd_search_history_prev),
+    CMD("history-next", "S", 0, 0, cmd_search_history_next),
+    CMD("history-prev", "S", 0, 0, cmd_search_history_prev),
 };
 
 static const Command command_cmds[] = {
     CMD("accept", "H", 0, 0, cmd_command_mode_accept),
     CMD("complete-next", "", 0, 0, cmd_complete_next),
     CMD("complete-prev", "", 0, 0, cmd_complete_prev),
-    CMD("history-next", "", 0, 0, cmd_command_history_next),
-    CMD("history-prev", "", 0, 0, cmd_command_history_prev),
+    CMD("history-next", "S", 0, 0, cmd_command_history_next),
+    CMD("history-prev", "S", 0, 0, cmd_command_history_prev),
 };
 
 static const Command *find_cmd_mode_command(const char *name)
