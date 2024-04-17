@@ -57,12 +57,20 @@ void cmdline_set_text(CommandLine *c, const char *text)
     set_text(c, text);
 }
 
+// Reset command completion and history search state (after cursor
+// position or buffer is changed)
+static bool cmdline_soft_reset(CommandLine *c)
+{
+    c->search_pos = NULL;
+    maybe_reset_completion(c);
+    return true;
+}
+
 static bool cmd_bol(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->cmdline.pos = 0;
-    reset_completion(&e->cmdline);
-    return true;
+    return cmdline_soft_reset(&e->cmdline);
 }
 
 static bool cmd_cancel(EditorState *e, const CommandArgs *a)
@@ -112,9 +120,7 @@ static bool cmd_delete(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     cmdline_delete(c);
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_delete_eol(EditorState *e, const CommandArgs *a)
@@ -122,9 +128,7 @@ static bool cmd_delete_eol(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     c->buf.len = c->pos;
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
@@ -148,10 +152,7 @@ static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
     }
 
     string_remove(&c->buf, c->pos, i - c->pos);
-
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_eol(EditorState *e, const CommandArgs *a)
@@ -159,8 +160,7 @@ static bool cmd_eol(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     c->pos = c->buf.len;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_erase(EditorState *e, const CommandArgs *a)
@@ -171,9 +171,7 @@ static bool cmd_erase(EditorState *e, const CommandArgs *a)
         u_prev_char(c->buf.buffer, &c->pos);
         cmdline_delete(c);
     }
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_erase_bol(EditorState *e, const CommandArgs *a)
@@ -182,9 +180,7 @@ static bool cmd_erase_bol(EditorState *e, const CommandArgs *a)
     CommandLine *c = &e->cmdline;
     string_remove(&c->buf, 0, c->pos);
     c->pos = 0;
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
@@ -215,9 +211,7 @@ static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
 
     string_remove(&c->buf, i, c->pos - i);
     c->pos = i;
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool do_history_prev(const History *hist, CommandLine *c, bool prefix_search)
@@ -233,7 +227,7 @@ static bool do_history_prev(const History *hist, CommandLine *c, bool prefix_sea
         set_text(c, c->search_pos->text);
     }
 
-    reset_completion(c);
+    maybe_reset_completion(c);
     return true;
 }
 
@@ -253,7 +247,7 @@ static bool do_history_next(const History *hist, CommandLine *c, bool prefix_sea
     }
 
 out:
-    reset_completion(c);
+    maybe_reset_completion(c);
     return true;
 }
 
@@ -292,8 +286,7 @@ static bool cmd_left(EditorState *e, const CommandArgs *a)
     if (c->pos) {
         u_prev_char(c->buf.buffer, &c->pos);
     }
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_paste(EditorState *e, const CommandArgs *a)
@@ -304,9 +297,7 @@ static bool cmd_paste(EditorState *e, const CommandArgs *a)
     if (cmdargs_has_flag(a, 'm')) {
         c->pos += clip->len;
     }
-    c->search_pos = NULL;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_right(EditorState *e, const CommandArgs *a)
@@ -316,8 +307,7 @@ static bool cmd_right(EditorState *e, const CommandArgs *a)
     if (c->pos < c->buf.len) {
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
     }
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_toggle(EditorState *e, const CommandArgs *a)
@@ -339,7 +329,7 @@ static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
     CommandLine *c = &e->cmdline;
     if (c->pos <= 1) {
         c->pos = 0;
-        return true;
+        return cmdline_soft_reset(c);
     }
 
     const unsigned char *const buf = c->buf.buffer;
@@ -358,8 +348,7 @@ static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
     }
 
     c->pos = i;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
@@ -379,8 +368,7 @@ static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
     }
 
     c->pos = i;
-    reset_completion(c);
-    return true;
+    return cmdline_soft_reset(c);
 }
 
 static bool cmd_complete_next(EditorState *e, const CommandArgs *a)

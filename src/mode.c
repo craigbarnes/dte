@@ -70,8 +70,9 @@ static bool handle_input_single(EditorState *e, const ModeHandler *handler, KeyC
                 CommandLine *c = &e->cmdline;
                 c->pos += string_insert_codepoint(&c->buf, c->pos, key);
                 if (cmds == &cmd_mode_commands) {
-                    reset_completion(c);
+                    maybe_reset_completion(c);
                 }
+                c->search_pos = NULL;
                 return true;
             }
         }

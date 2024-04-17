@@ -126,7 +126,7 @@ static void test_complete_command(TestContext *ctx)
     CommandLine *c = &e->cmdline;
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "alias");
-    reset_completion(c);
+    maybe_reset_completion(c);
 
     cmdline_set_text(c, "bind C-invalidkey");
     complete_command_next(e);
