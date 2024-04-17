@@ -74,26 +74,27 @@ static FileTypeEnum filetype_from_signature(const StringView line)
         } else if (strview_has_prefix(&line, "<?xml")) {
             return XML;
         }
-        break; // <!--*-xml-*-->
+        break;
     case '%':
         if (strview_has_prefix(&line, "%YAML")) {
             return YAML;
         }
-        break; // % -*-latex-*-
+        break;
     case '#':
         if (strview_has_prefix(&line, "#compdef ")) {
             return SH;
         } else if (strview_has_prefix(&line, "#autoload")) {
             return SH;
         }
-        break; // # -*-shell-script-*-
+        break;
     case 'd':
         return strview_has_prefix(&line, "diff --git") ? DIFF : NONE;
-    case '/': // /* -*-c-*-
-    case '.': // .. -*-rst-*-
-    case ';': // ;; -*-scheme-*-
-    case '-': // -- -*-lua-*-
-    case '\\': // \input texinfo @c -*-texinfo-*-
+    case '/':
+    case '.':
+    case ';':
+    case '-':
+    case '\\':
+        // See: "emacs style file-local variables" in test_find_ft_firstline()
         break;
     default:
         return NONE;
