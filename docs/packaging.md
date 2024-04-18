@@ -10,6 +10,7 @@ targets:
 * `install-bin`: Install `dte` binary
 * `install-man`: Install man pages
 * `install-bash-completion`: Install bash auto-completion script
+* `install-zsh-completion`: Install zsh auto-completion script
 * `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
 * `install-icons`: Install SVG/PNG icon files (excluded on macOS)
 * `install-appstream`: Install [AppStream] metadata (excluded on macOS)
@@ -29,6 +30,7 @@ The following Make variables may be useful when packaging `dte`:
 * `bindir`: Installation prefix for `dte` binary
 * `mandir`: Installation prefix for manual pages
 * `bashcompletiondir`: Installation prefix for bash auto-completion script
+* `zshcompletiondir`: Installation prefix for zsh auto-completion script
 * `appdir`: Installation prefix for [desktop entry] file
 * `metainfodir`: Installation prefix for [AppStream] metadata file
 * `DESTDIR`: Standard variable used for [staged installs]

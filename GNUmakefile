@@ -24,6 +24,7 @@ icondir ?= $(datarootdir)/icons
 hicolordir ?= $(icondir)/hicolor
 metainfodir ?= $(datarootdir)/metainfo
 bashcompletiondir ?= $(datarootdir)/bash-completion/completions
+zshcompletiondir ?= $(datarootdir)/zsh/site-functions
 appid = dte
 
 INSTALL = install
@@ -54,7 +55,7 @@ CONTRIB_SCRIPTS = \
     fzf.sh git-changes.sh lf-wrapper.sh longest-line.awk \
     open-c-header.sh ranger-wrapper.sh xtag.sh
 
-INSTALL_TARGETS_BASIC := bin man bash-completion
+INSTALL_TARGETS_BASIC := bin man bash-completion zsh-completion
 INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) icons desktop-file appstream
 
 ifeq "$(KERNEL)" "Darwin"
@@ -102,6 +103,14 @@ install-bash-completion:
 
 uninstall-bash-completion:
 	$(RM) '$(DESTDIR)$(bashcompletiondir)/$(dte)'
+
+install-zsh-completion:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(zshcompletiondir)'
+	$(E) INSTALL '$(DESTDIR)$(zshcompletiondir)/_$(dte)'
+	$(Q) $(INSTALL_DATA) share/completion.zsh '$(DESTDIR)$(zshcompletiondir)/_$(dte)'
+
+uninstall-zsh-completion:
+	$(RM) '$(DESTDIR)$(zshcompletiondir)/_$(dte)'
 
 install-desktop-file:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(appdir)'
