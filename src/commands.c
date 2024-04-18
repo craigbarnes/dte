@@ -2562,7 +2562,11 @@ static const Command cmds[] = {
 static bool allow_macro_recording(const Command *cmd, char **args)
 {
     CommandFunc fn = cmd->cmd;
-    if (fn == (CommandFunc)cmd_macro || fn == (CommandFunc)cmd_command) {
+    if (
+        fn == (CommandFunc)cmd_macro
+        || fn == (CommandFunc)cmd_command
+        || fn == (CommandFunc)cmd_mode
+    ) {
         return false;
     }
 
