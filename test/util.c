@@ -189,18 +189,6 @@ static void test_str_has_suffix(TestContext *ctx)
     EXPECT_FALSE(str_has_suffix("a", "aa"));
 }
 
-static void test_substr_len(TestContext *ctx)
-{
-    static const char str[] = "123456789";
-    EXPECT_EQ(substr_len(str, str), 0);
-    EXPECT_EQ(substr_len(str, str + 1), 1);
-    EXPECT_EQ(substr_len(str, str + 4), 4);
-    EXPECT_EQ(substr_len(str, str + sizeof(str) - 1), sizeof(str) - 1);
-    size_t n = substr_len(str, strchr(str, '7'));
-    EXPECT_EQ(n, 6);
-    EXPECT_EQ(str[n], '7');
-}
-
 static void test_hex_decode(TestContext *ctx)
 {
     EXPECT_EQ(hex_decode('0'), 0);
@@ -2766,7 +2754,6 @@ static const TestEntry tests[] = {
     TEST(test_xstreq),
     TEST(test_str_has_prefix),
     TEST(test_str_has_suffix),
-    TEST(test_substr_len),
     TEST(test_hex_decode),
     TEST(test_hex_encode_byte),
     TEST(test_ascii),

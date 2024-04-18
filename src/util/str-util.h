@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h> // SIZE_MAX
 #include <stdlib.h>
 #include <string.h>
 #include "debug.h"
@@ -68,18 +67,6 @@ NONNULL_ARGS
 static inline bool strn_has_strview_prefix(const char *s, size_t n, const StringView *p)
 {
     return n >= p->length && mem_equal(s, p->data, p->length);
-}
-
-// This exists both to incorporate BUG_ON() assertions and to self-document
-// the parts of the codebase where 2 string pointers are used to calculate
-// the length of a sub-string
-NONNULL_ARGS
-static inline size_t substr_len(const char *start, const char *end)
-{
-    BUG_ON(start > end);
-    ptrdiff_t len = end - start;
-    BUG_ON(len > SIZE_MAX);
-    return (size_t)len;
 }
 
 // Replaces all occurrences of a specific byte with a replacement byte
