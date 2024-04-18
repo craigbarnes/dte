@@ -40,8 +40,6 @@ Editor Commands:
 .br
    \fBcommand\fR [\fItext\fR]
 .br
-   \fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
-.br
    \fBrefresh\fR
 .br
 .P
@@ -124,6 +122,8 @@ Movement Commands:
    \fBcenter\-view\fR
 .br
    \fBmatch\-bracket\fR
+.br
+   \fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .br
    \fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .br
@@ -879,32 +879,6 @@ Enter command mode. If \fItext\fR is given then it is written to the command
 line (see the default \fB^L\fR key binding for why this is useful).
 .P
 .RE
-\fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
-.RS
-If no flags or just \fB\-r\fR and no \fIpattern\fR given then dte changes to
-search mode where you can type a regular expression to search.
-.P
-.TP
-\fB\-H\fR
-Don't add \fIpattern\fR to search history
-.PP
-.TP
-\fB\-n\fR
-Search next
-.PP
-.TP
-\fB\-p\fR
-Search previous
-.PP
-.TP
-\fB\-r\fR
-Start searching backwards
-.PP
-.TP
-\fB\-w\fR
-Search word under cursor
-.PP
-.RE
 \fBrefresh\fR
 .RS
 Trigger a full redraw of the screen.
@@ -1249,6 +1223,32 @@ Center view to cursor.
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of \fB{}[]()<>\fR.
 .P
+.RE
+\fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
+.RS
+If no flags or just \fB\-r\fR and no \fIpattern\fR given then dte changes to
+search mode, where you can type a regular expression to search.
+.P
+.TP
+\fB\-H\fR
+Don't add \fIpattern\fR to search history
+.PP
+.TP
+\fB\-n\fR
+Search next
+.PP
+.TP
+\fB\-p\fR
+Search previous
+.PP
+.TP
+\fB\-r\fR
+Start searching backwards
+.PP
+.TP
+\fB\-w\fR
+Search word under cursor
+.PP
 .RE
 \fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .RS
