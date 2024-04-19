@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "parse.h"
+#include "query.h"
 #include "terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -717,7 +718,7 @@ static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
                 *k = KEY_IGNORE;
                 return i;
             case 0x1B: // ESC (https://vt100.net/emu/dec_ansi_parser#STESC)
-                *k = KEY_IGNORE;
+                *k = parse_dcs_query_reply(data, pos, pos >= sizeof(data));
                 return i - 1;
             }
             continue;

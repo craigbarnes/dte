@@ -151,6 +151,9 @@ void term_put_queries(TermOutputBuffer *obuf)
         "\033[?u" // Kitty keyboard protocol flags
         "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
         "\033[?2026$p" // DECRQM 2026 (terminal-wg synchronized updates)
+        "\033P+q626365\033\\" // XTGETTCAP "bce"
+        "\033P+q726570\033\\" // XTGETTCAP "rep"
+        "\033P+q74736C\033\\" // XTGETTCAP "tsl"
     ;
 
     LOG_INFO("querying terminal");

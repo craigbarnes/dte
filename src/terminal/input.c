@@ -165,12 +165,14 @@ static bool is_text(const char *str, size_t len)
 
 static const char *tflag_to_str(TermFeatureFlags flag)
 {
-    // Note: this only handles a small subset of individual flags,
-    // as returned by parse_csi_query_reply()
-    if (flag == TFLAG_KITTY_KEYBOARD) {
-        return "KITTYKBD";
-    } else if (flag == TFLAG_SYNC) {
-        return "SYNC";
+    // This only handles a subset of individual flags, as returned
+    // by parse_csi_query_reply() and parse_dcs_query_reply()
+    switch ((unsigned int)flag) {
+    case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
+    case TFLAG_SYNC: return "SYNC";
+    case TFLAG_BACK_COLOR_ERASE: return "BCE";
+    case TFLAG_ECMA48_REPEAT: return "REP";
+    case TFLAG_SET_WINDOW_TITLE: return "TITLE";
     }
     return "??";
 }
@@ -179,7 +181,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
     TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
     BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
-    LOG_INFO("detected terminal feature '%s' via query", tflag_to_str(flag));
+    LOG_INFO("detected terminal feature %s via query", tflag_to_str(flag));
     term->features |= flag;
     return KEY_IGNORE;
 }
