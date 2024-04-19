@@ -19,5 +19,6 @@ typedef struct {
 } ControlParams;
 
 ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k) WARN_UNUSED_RESULT;
+size_t term_parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi) WARN_UNUSED_RESULT;
 
 #endif

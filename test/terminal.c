@@ -402,6 +402,91 @@ static void test_same_cursor(TestContext *ctx)
     EXPECT_TRUE(same_cursor(&a, &b));
 }
 
+static void test_term_parse_csi_params(TestContext *ctx)
+{
+    ControlParams csi = {.nparams = 0};
+    StringView s = STRING_VIEW("\033[901;0;55mx");
+    size_t n = term_parse_csi_params(s.data, s.length, 2, &csi);
+    EXPECT_EQ(n, s.length - 1);
+    EXPECT_EQ(csi.nparams, 3);
+    EXPECT_EQ(csi.params[0][0], 901);
+    EXPECT_EQ(csi.params[1][0], 0);
+    EXPECT_EQ(csi.params[2][0], 55);
+    EXPECT_EQ(csi.nr_intermediate, 0);
+    EXPECT_EQ(csi.final_byte, 'm');
+    EXPECT_FALSE(csi.have_subparams);
+    EXPECT_FALSE(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[123;09;56:78:99m");
+    n = term_parse_csi_params(s.data, s.length, 2, &csi);
+    EXPECT_EQ(n, s.length);
+    EXPECT_EQ(csi.nparams, 3);
+    static_assert(ARRAYLEN(csi.nsub) >= 4);
+    static_assert(ARRAYLEN(csi.nsub) == ARRAYLEN(csi.params));
+    EXPECT_EQ(csi.nsub[0], 1);
+    EXPECT_EQ(csi.nsub[1], 1);
+    EXPECT_EQ(csi.nsub[2], 3);
+    EXPECT_EQ(csi.nsub[3], 0);
+    EXPECT_EQ(csi.params[0][0], 123);
+    EXPECT_EQ(csi.params[1][0], 9);
+    EXPECT_EQ(csi.params[2][0], 56);
+    EXPECT_EQ(csi.params[2][1], 78);
+    EXPECT_EQ(csi.params[2][2], 99);
+    EXPECT_EQ(csi.params[3][0], 0);
+    EXPECT_EQ(csi.nr_intermediate, 0);
+    EXPECT_EQ(csi.final_byte, 'm');
+    EXPECT_TRUE(csi.have_subparams);
+    EXPECT_FALSE(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[1:2:3;44:55;;6~");
+    n = term_parse_csi_params(s.data, s.length, 2, &csi);
+    EXPECT_EQ(n, s.length);
+    EXPECT_EQ(csi.nparams, 4);
+    EXPECT_EQ(csi.nsub[0], 3);
+    EXPECT_EQ(csi.nsub[1], 2);
+    EXPECT_EQ(csi.nsub[2], 1);
+    EXPECT_EQ(csi.params[0][0], 1);
+    EXPECT_EQ(csi.params[0][1], 2);
+    EXPECT_EQ(csi.params[0][2], 3);
+    EXPECT_EQ(csi.params[1][0], 44);
+    EXPECT_EQ(csi.params[1][1], 55);
+    EXPECT_EQ(csi.params[2][0], 0);
+    EXPECT_EQ(csi.params[3][0], 6);
+    EXPECT_EQ(csi.nr_intermediate, 0);
+    EXPECT_EQ(csi.final_byte, '~');
+    EXPECT_TRUE(csi.have_subparams);
+    EXPECT_FALSE(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[+2p");
+    n = term_parse_csi_params(s.data, s.length, 2, &csi);
+    EXPECT_EQ(n, s.length);
+    EXPECT_EQ(csi.nparams, 1);
+    EXPECT_EQ(csi.nsub[0], 1);
+    EXPECT_EQ(csi.params[0][0], 2);
+    EXPECT_EQ(csi.nr_intermediate, 1);
+    EXPECT_EQ(csi.intermediate[0], '+');
+    EXPECT_EQ(csi.final_byte, 'p');
+    EXPECT_FALSE(csi.have_subparams);
+    EXPECT_FALSE(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[?47;1$y");
+    n = term_parse_csi_params(s.data, s.length, 2, &csi);
+    EXPECT_EQ(n, s.length);
+    EXPECT_EQ(csi.nparams, 2);
+    EXPECT_EQ(csi.params[0][0], 47);
+    EXPECT_EQ(csi.params[1][0], 1);
+    EXPECT_EQ(csi.nr_intermediate, 1);
+    EXPECT_EQ(csi.intermediate[0], '$');
+    EXPECT_FALSE(csi.have_subparams);
+    // Note: question mark param prefixes are handled in parse_csi() instead
+    // of term_parse_csi_params(), so the latter reports it as an unhandled byte
+    EXPECT_TRUE(csi.unhandled_bytes);
+}
+
 static void test_term_parse_sequence(TestContext *ctx)
 {
     static const struct {
@@ -1420,6 +1505,7 @@ static const TestEntry tests[] = {
     TEST(test_cursor_color_from_str),
     TEST(test_cursor_color_to_str),
     TEST(test_same_cursor),
+    TEST(test_term_parse_csi_params),
     TEST(test_term_parse_sequence),
     TEST(test_term_parse_sequence2),
     TEST(test_rxvt_parse_key),

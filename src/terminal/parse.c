@@ -253,7 +253,7 @@ static void unhandled(bool *var, int line, const char *fmt, ...)
     }
 }
 
-static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi)
+size_t term_parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi)
 {
     size_t nparams = 0;
     size_t nr_intermediate = 0;
@@ -359,97 +359,12 @@ exit_loop:
     return i;
 }
 
-// NOLINTNEXTLINE(readability-function-size)
-UNITTEST {
-    ControlParams csi = {.nparams = 0};
-    StringView s = STRING_VIEW("\033[901;0;55mx");
-    size_t n = parse_csi_params(s.data, s.length, 2, &csi);
-    BUG_ON(n != s.length - 1);
-    BUG_ON(csi.nparams != 3);
-    BUG_ON(csi.params[0][0] != 901);
-    BUG_ON(csi.params[1][0] != 0);
-    BUG_ON(csi.params[2][0] != 55);
-    BUG_ON(csi.nr_intermediate != 0);
-    BUG_ON(csi.final_byte != 'm');
-    BUG_ON(csi.have_subparams);
-    BUG_ON(csi.unhandled_bytes);
-
-    csi = (ControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[123;09;56:78:99m");
-    n = parse_csi_params(s.data, s.length, 2, &csi);
-    BUG_ON(n != s.length);
-    BUG_ON(csi.nparams != 3);
-    static_assert(ARRAYLEN(csi.nsub) >= 4);
-    static_assert(ARRAYLEN(csi.nsub) == ARRAYLEN(csi.params));
-    BUG_ON(csi.nsub[0] != 1);
-    BUG_ON(csi.nsub[1] != 1);
-    BUG_ON(csi.nsub[2] != 3);
-    BUG_ON(csi.nsub[3] != 0);
-    BUG_ON(csi.params[0][0] != 123);
-    BUG_ON(csi.params[1][0] != 9);
-    BUG_ON(csi.params[2][0] != 56);
-    BUG_ON(csi.params[2][1] != 78);
-    BUG_ON(csi.params[2][2] != 99);
-    BUG_ON(csi.params[3][0] != 0);
-    BUG_ON(csi.nr_intermediate != 0);
-    BUG_ON(csi.final_byte != 'm');
-    BUG_ON(!csi.have_subparams);
-    BUG_ON(csi.unhandled_bytes);
-
-    csi = (ControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[1:2:3;44:55;;6~");
-    n = parse_csi_params(s.data, s.length, 2, &csi);
-    BUG_ON(n != s.length);
-    BUG_ON(csi.nparams != 4);
-    BUG_ON(csi.nsub[0] != 3);
-    BUG_ON(csi.nsub[1] != 2);
-    BUG_ON(csi.nsub[2] != 1);
-    BUG_ON(csi.params[0][0] != 1);
-    BUG_ON(csi.params[0][1] != 2);
-    BUG_ON(csi.params[0][2] != 3);
-    BUG_ON(csi.params[1][0] != 44);
-    BUG_ON(csi.params[1][1] != 55);
-    BUG_ON(csi.params[2][0] != 0);
-    BUG_ON(csi.params[3][0] != 6);
-    BUG_ON(csi.nr_intermediate != 0);
-    BUG_ON(csi.final_byte != '~');
-    BUG_ON(!csi.have_subparams);
-    BUG_ON(csi.unhandled_bytes);
-
-    csi = (ControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[+2p");
-    n = parse_csi_params(s.data, s.length, 2, &csi);
-    BUG_ON(n != s.length);
-    BUG_ON(csi.nparams != 1);
-    BUG_ON(csi.nsub[0] != 1);
-    BUG_ON(csi.params[0][0] != 2);
-    BUG_ON(csi.nr_intermediate != 1);
-    BUG_ON(csi.intermediate[0] != '+');
-    BUG_ON(csi.final_byte != 'p');
-    BUG_ON(csi.have_subparams);
-    BUG_ON(csi.unhandled_bytes);
-
-    csi = (ControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[?47;1$y");
-    n = parse_csi_params(s.data, s.length, 2, &csi);
-    BUG_ON(n != s.length);
-    BUG_ON(csi.nparams != 2);
-    BUG_ON(csi.params[0][0] != 47);
-    BUG_ON(csi.params[1][0] != 1);
-    BUG_ON(csi.nr_intermediate != 1);
-    BUG_ON(csi.intermediate[0] != '$');
-    BUG_ON(csi.have_subparams);
-    // Note: question mark param prefixes are handled in parse_csi() instead
-    // of parse_csi_params(), so the latter reports it as an unhandled byte
-    BUG_ON(!csi.unhandled_bytes);
-}
-
 static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     ControlParams csi = {.nparams = 0};
     bool maybe_query_reply = (i < len && buf[i] >= '<' && buf[i] <= '?');
     uint8_t param_prefix = maybe_query_reply ? buf[i] : 0;
-    i = parse_csi_params(buf, len, i + (maybe_query_reply ? 1 : 0), &csi);
+    i = term_parse_csi_params(buf, len, i + (maybe_query_reply ? 1 : 0), &csi);
 
     if (unlikely(csi.final_byte == 0)) {
         BUG_ON(i < len);
