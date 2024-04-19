@@ -669,7 +669,7 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
             case 0x18: // CAN
             case 0x1A: // SUB
                 goto ignore;
-            case 0x1B: // ESC
+            case 0x1B: // ESC (https://vt100.net/emu/dec_ansi_parser#STESC)
                 i--;
                 // Fallthrough
             case 0x07: // BEL
@@ -677,7 +677,7 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
             }
             continue;
         }
-        // Consume 0x20..0xFF (UTF-8 allowed)
+        // Collect 0x20..0xFF (UTF-8 allowed)
         if (likely(pos < sizeof(data))) {
             data[pos++] = ch;
         }
@@ -697,12 +697,39 @@ complete:
         const char *type = (prefix == 'l') ? "title" : "icon";
         LOG_DEBUG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
     } else {
-        LOG_WARNING("unknown OSC string%s: %.*s", note, (int)pos, data);
+        LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)pos, data);
     }
 
 ignore:
     *k = KEY_IGNORE;
     return i;
+}
+
+static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
+{
+    char data[4096];
+    for (size_t pos = 0; i < len; ) {
+        unsigned char ch = buf[i++];
+        if (unlikely(ch < 0x20 || ch == 0x7F)) {
+            switch (ch) {
+            case 0x18: // CAN
+            case 0x1A: // SUB
+                *k = KEY_IGNORE;
+                return i;
+            case 0x1B: // ESC (https://vt100.net/emu/dec_ansi_parser#STESC)
+                *k = KEY_IGNORE;
+                return i - 1;
+            }
+            continue;
+        }
+        // Collect 0x20..0xFF (excluding 0x7F)
+        if (likely(pos < sizeof(data))) {
+            data[pos++] = ch;
+        }
+    }
+
+    // Unterminated sequence (possibly truncated)
+    return -1;
 }
 
 ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
@@ -712,12 +739,15 @@ ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
     } else if (unlikely(length == 1)) {
         return -1;
     }
+
     switch (buf[1]) {
     case 'O': return parse_ss3(buf, length, 2, k);
+    case 'P': return parse_dcs(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
     case ']': return parse_osc(buf, length, 2, k);
-    // String Terminator (see https://vt100.net/emu/dec_ansi_parser#STESC)
+    // String Terminator (https://vt100.net/emu/dec_ansi_parser#STESC)
     case '\\': *k = KEY_IGNORE; return 2;
     }
+
     return 0;
 }
