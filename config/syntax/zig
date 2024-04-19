@@ -110,12 +110,14 @@ state zero numeric
     char -b b bin
     char -b o oct
     char -b x .zig-hex-int:hex-check
+    str .. start
     char -b . .zig-dec-int:dec-frac
     noeat -b check-suffix
 
 state dec-check numeric
     bufis _ check-suffix error
     char -b Ee float-exp
+    str .. start
     char -b . .zig-dec-int:dec-frac
     noeat -b check-suffix
 
@@ -127,6 +129,7 @@ state dec-frac numeric
 state hex-check numeric
     bufis _ check-suffix error
     char -b Pp float-exp
+    str .. start
     char -b . .zig-hex-int:hex-frac
     noeat -b check-suffix
 
