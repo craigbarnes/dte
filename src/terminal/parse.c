@@ -7,8 +7,6 @@
 // • ECMA-48 §5.4 (https://ecma-international.org/publications-and-standards/standards/ecma-48/)
 // • https://vt100.net/emu/dec_ansi_parser
 
-#include <stdbool.h>
-#include <stdint.h>
 #include "parse.h"
 #include "query.h"
 #include "terminal.h"
@@ -27,15 +25,6 @@ typedef enum {
     BYTE_DELETE,        // 0x7F
     BYTE_OTHER,         // 0x80..0xFF
 } ByteType;
-
-// https://vt100.net/docs/vt510-rm/DECRPM
-typedef enum {
-    DECRPM_NOT_RECOGNIZED = 0,
-    DECRPM_SET = 1,
-    DECRPM_RESET = 2,
-    DECRPM_PERMANENTLY_SET = 3,
-    DECRPM_PERMANENTLY_RESET = 4,
-} TermPrivateModeStatus;
 
 static KeyCode decode_key_from_final_byte(uint8_t byte)
 {
@@ -264,17 +253,6 @@ static void unhandled(bool *var, int line, const char *fmt, ...)
     }
 }
 
-typedef struct {
-    uint32_t params[4][4];
-    uint8_t nsub[4]; // Lengths for params arrays (sub-params)
-    uint8_t intermediate[4];
-    uint8_t nparams;
-    uint8_t nr_intermediate;
-    uint8_t final_byte;
-    bool have_subparams;
-    bool unhandled_bytes;
-} ControlParams;
-
 static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi)
 {
     size_t nparams = 0;
@@ -464,72 +442,6 @@ UNITTEST {
     // Note: question mark param prefixes are handled in parse_csi() instead
     // of parse_csi_params(), so the latter reports it as an unhandled byte
     BUG_ON(!csi.unhandled_bytes);
-}
-
-static const char *decrpm_status_to_str(TermPrivateModeStatus val)
-{
-    switch (val) {
-    case DECRPM_NOT_RECOGNIZED: return "not recognized";
-    case DECRPM_SET: return "set";
-    case DECRPM_RESET: return "reset";
-    case DECRPM_PERMANENTLY_SET: return "permanently set";
-    case DECRPM_PERMANENTLY_RESET: return "permanently reset";
-    }
-    return "INVALID";
-}
-
-static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
-{
-    return status == DECRPM_SET || status == DECRPM_RESET;
-}
-
-static KeyCode parse_csi_query_reply(const ControlParams *csi, uint8_t prefix)
-{
-    if (unlikely(csi->have_subparams || csi->nr_intermediate > 1)) {
-        goto ignore;
-    }
-
-    // NOTE: The conditions below must check ALL of these values, in
-    // addition to the prefix byte
-    uint8_t final = csi->final_byte;
-    uint8_t nparams = csi->nparams;
-    uint8_t intermediate = csi->nr_intermediate ? csi->intermediate[0] : 0;
-
-    if (prefix == '?' && final == 'y' && intermediate == '$' && nparams == 2) {
-        // DECRPM reply to DECRQM query (CSI ? Ps; Pm $ y)
-        unsigned int mode = csi->params[0][0];
-        unsigned int status = csi->params[1][0];
-        const char *desc = decrpm_status_to_str(status);
-        LOG_DEBUG("DECRPM %u reply: %u (%s)", mode, status, desc);
-        if (mode == 2026 && decrpm_is_set_or_reset(status)) {
-            return KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC;
-        }
-        return KEY_IGNORE;
-    }
-
-    if (prefix == '?' && final == 'u' && intermediate == 0 && nparams == 1) {
-        // Kitty keyboard protocol flags (CSI ? flags u)
-        unsigned int flags = csi->params[0][0];
-        LOG_DEBUG("query reply for kittykbd flags: 0x%x", flags);
-        // Interpret reply with any flags to mean "supported"
-        return KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD;
-    }
-
-    if (prefix == '>' && final == 'm' && intermediate == 0 && nparams >= 1) {
-        unsigned int code = csi->params[0][0];
-        if (code == 4 && nparams <= 2) {
-            // XTMODKEYS 4 reply to XTQMODKEYS 4 query (CSI > 4 ; Pv m)
-            unsigned int val = (nparams == 1) ? 0 : csi->params[1][0];
-            LOG_DEBUG("XTMODKEYS 4 reply: modifyOtherKeys=%u", val);
-            return KEY_IGNORE;
-        }
-        LOG_DEBUG("XTMODKEYS %u reply with %u params", code, nparams);
-        return KEY_IGNORE;
-    }
-
-ignore:
-    LOG_DEBUG("unhandled CSI with '%c' parameter prefix", prefix);
-    return KEY_IGNORE;
 }
 
 static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)

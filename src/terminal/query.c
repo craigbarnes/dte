@@ -5,6 +5,81 @@
 #include "util/string-view.h"
 #include "util/strtonum.h"
 
+// https://vt100.net/docs/vt510-rm/DECRPM
+typedef enum {
+    DECRPM_NOT_RECOGNIZED = 0,
+    DECRPM_SET = 1,
+    DECRPM_RESET = 2,
+    DECRPM_PERMANENTLY_SET = 3,
+    DECRPM_PERMANENTLY_RESET = 4,
+} TermPrivateModeStatus;
+
+static const char *decrpm_status_to_str(TermPrivateModeStatus val)
+{
+    switch (val) {
+    case DECRPM_NOT_RECOGNIZED: return "not recognized";
+    case DECRPM_SET: return "set";
+    case DECRPM_RESET: return "reset";
+    case DECRPM_PERMANENTLY_SET: return "permanently set";
+    case DECRPM_PERMANENTLY_RESET: return "permanently reset";
+    }
+    return "INVALID";
+}
+
+static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
+{
+    return status == DECRPM_SET || status == DECRPM_RESET;
+}
+
+KeyCode parse_csi_query_reply(const ControlParams *csi, uint8_t prefix)
+{
+    if (unlikely(csi->have_subparams || csi->nr_intermediate > 1)) {
+        goto ignore;
+    }
+
+    // NOTE: The conditions below must check ALL of these values, in
+    // addition to the prefix byte
+    uint8_t final = csi->final_byte;
+    uint8_t nparams = csi->nparams;
+    uint8_t intermediate = csi->nr_intermediate ? csi->intermediate[0] : 0;
+
+    if (prefix == '?' && final == 'y' && intermediate == '$' && nparams == 2) {
+        // DECRPM reply to DECRQM query (CSI ? Ps; Pm $ y)
+        unsigned int mode = csi->params[0][0];
+        unsigned int status = csi->params[1][0];
+        const char *desc = decrpm_status_to_str(status);
+        LOG_DEBUG("DECRPM %u reply: %u (%s)", mode, status, desc);
+        if (mode == 2026 && decrpm_is_set_or_reset(status)) {
+            return KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC;
+        }
+        return KEY_IGNORE;
+    }
+
+    if (prefix == '?' && final == 'u' && intermediate == 0 && nparams == 1) {
+        // Kitty keyboard protocol flags (CSI ? flags u)
+        unsigned int flags = csi->params[0][0];
+        LOG_DEBUG("query reply for kittykbd flags: 0x%x", flags);
+        // Interpret reply with any flags to mean "supported"
+        return KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD;
+    }
+
+    if (prefix == '>' && final == 'm' && intermediate == 0 && nparams >= 1) {
+        unsigned int code = csi->params[0][0];
+        if (code == 4 && nparams <= 2) {
+            // XTMODKEYS 4 reply to XTQMODKEYS 4 query (CSI > 4 ; Pv m)
+            unsigned int val = (nparams == 1) ? 0 : csi->params[1][0];
+            LOG_DEBUG("XTMODKEYS 4 reply: modifyOtherKeys=%u", val);
+            return KEY_IGNORE;
+        }
+        LOG_DEBUG("XTMODKEYS %u reply with %u params", code, nparams);
+        return KEY_IGNORE;
+    }
+
+ignore:
+    LOG_DEBUG("unhandled CSI with '%c' parameter prefix", prefix);
+    return KEY_IGNORE;
+}
+
 KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 {
     const char *note = "";
