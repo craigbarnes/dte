@@ -46,7 +46,6 @@ generated=$(generated_files --format="$TMPDIR/%(path)")
 
 # ...snapshot and re-generate these files:
 mkdir -p "$TMPDIR/GEN/"
-# shellcheck disable=SC2086
 cp $generated "$TMPDIR/GEN/"
 $MAKE -B man
 
@@ -68,19 +67,16 @@ changed_c_files=$(changed_files '**.[ch]')
 
 # Check for whitespace errors in changed files (if applicable)
 if test "$changed_indented_files"; then
-    # shellcheck disable=SC2086
     tools/wscheck.awk $changed_indented_files
 fi
 
 # Check for header-related errors in changed C files
 if test "$changed_c_files"; then
-    # shellcheck disable=SC2086
     tools/hdrcheck.awk $changed_c_files
 fi
 
 # Run shellcheck(1) on changed shell scripts
 if test "$changed_shell_files"; then
-    # shellcheck disable=SC2086
     shellcheck -fgcc $changed_shell_files
 fi
 

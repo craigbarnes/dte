@@ -1,0 +1,7 @@
+# SC2064: Use single quotes in "trap" command
+# SC2086: Double quote to prevent globbing and word splitting
+disable=SC2064,SC2086
+
+# See: shellcheck --list-optional
+enable=check-set-e-suppressed
+enable=deprecate-which
