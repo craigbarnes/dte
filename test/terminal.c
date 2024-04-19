@@ -404,7 +404,7 @@ static void test_same_cursor(TestContext *ctx)
 
 static void test_term_parse_csi_params(TestContext *ctx)
 {
-    ControlParams csi = {.nparams = 0};
+    TermControlParams csi = {.nparams = 0};
     StringView s = STRING_VIEW("\033[901;0;55mx");
     size_t n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length - 1);
@@ -417,7 +417,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_FALSE(csi.have_subparams);
     EXPECT_FALSE(csi.unhandled_bytes);
 
-    csi = (ControlParams){.nparams = 0};
+    csi = (TermControlParams){.nparams = 0};
     s = strview_from_cstring("\033[123;09;56:78:99m");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
@@ -439,7 +439,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_TRUE(csi.have_subparams);
     EXPECT_FALSE(csi.unhandled_bytes);
 
-    csi = (ControlParams){.nparams = 0};
+    csi = (TermControlParams){.nparams = 0};
     s = strview_from_cstring("\033[1:2:3;44:55;;6~");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
@@ -459,7 +459,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_TRUE(csi.have_subparams);
     EXPECT_FALSE(csi.unhandled_bytes);
 
-    csi = (ControlParams){.nparams = 0};
+    csi = (TermControlParams){.nparams = 0};
     s = strview_from_cstring("\033[+2p");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
@@ -472,7 +472,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_FALSE(csi.have_subparams);
     EXPECT_FALSE(csi.unhandled_bytes);
 
-    csi = (ControlParams){.nparams = 0};
+    csi = (TermControlParams){.nparams = 0};
     s = strview_from_cstring("\033[?47;1$y");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);

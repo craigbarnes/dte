@@ -7,6 +7,7 @@
 #include "key.h"
 #include "util/macros.h"
 
+// Representation of parameters (and other info) extracted from CSI sequences
 typedef struct {
     uint32_t params[4][4];
     uint8_t nsub[4]; // Lengths for params arrays (sub-params)
@@ -16,9 +17,9 @@ typedef struct {
     uint8_t final_byte;
     bool have_subparams;
     bool unhandled_bytes;
-} ControlParams;
+} TermControlParams;
 
 ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k) WARN_UNUSED_RESULT;
-size_t term_parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi) WARN_UNUSED_RESULT;
+size_t term_parse_csi_params(const char *buf, size_t len, size_t i, TermControlParams *csi) WARN_UNUSED_RESULT;
 
 #endif

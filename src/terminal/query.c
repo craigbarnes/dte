@@ -31,7 +31,7 @@ static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
     return status == DECRPM_SET || status == DECRPM_RESET;
 }
 
-KeyCode parse_csi_query_reply(const ControlParams *csi, uint8_t prefix)
+KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
 {
     if (unlikely(csi->have_subparams || csi->nr_intermediate > 1)) {
         goto ignore;

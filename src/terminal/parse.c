@@ -253,7 +253,7 @@ static void unhandled(bool *var, int line, const char *fmt, ...)
     }
 }
 
-size_t term_parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi)
+size_t term_parse_csi_params(const char *buf, size_t len, size_t i, TermControlParams *csi)
 {
     size_t nparams = 0;
     size_t nr_intermediate = 0;
@@ -361,7 +361,7 @@ exit_loop:
 
 static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 {
-    ControlParams csi = {.nparams = 0};
+    TermControlParams csi = {.nparams = 0};
     bool maybe_query_reply = (i < len && buf[i] >= '<' && buf[i] <= '?');
     uint8_t param_prefix = maybe_query_reply ? buf[i] : 0;
     i = term_parse_csi_params(buf, len, i + (maybe_query_reply ? 1 : 0), &csi);
