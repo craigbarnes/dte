@@ -11,6 +11,7 @@
 #include "terminal/terminal.h"
 #include "util/str-util.h"
 #include "util/unicode.h"
+#include "util/utf8.h"
 #include "util/xsnprintf.h"
 
 #define EXPECT_KEYCODE_EQ(idx, a, b, seq, seq_len) EXPECT(keycode_eq, idx, a, b, seq, seq_len)
@@ -35,7 +36,7 @@ static void expect_keycode_eq (
     char seq_str[64];
     keycode_to_string(a, a_str);
     keycode_to_string(b, b_str);
-    make_printable_mem(seq, seq_len, seq_str, sizeof seq_str);
+    u_make_printable_mem(seq, seq_len, seq_str, sizeof seq_str);
 
     test_fail(
         ctx, file, line,

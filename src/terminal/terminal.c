@@ -196,7 +196,7 @@ static TermInfo term_get_info(const char *name, const char *colorterm)
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
     if (entry) {
-        LOG_INFO("using built-in terminal support for '%s'", entry->name);
+        LOG_INFO("using built-in terminal info for '%s'", entry->name);
         info = entry->info;
     }
 

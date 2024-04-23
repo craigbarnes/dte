@@ -24,17 +24,6 @@ static bool make_printable_str(const char **s1, const char **s2, bool cond)
     return cond;
 }
 
-size_t make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize)
-{
-    BUG_ON(destsize < 16);
-    size_t len = 0;
-    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
-        len += u_set_char(dest + len, u_get_char(src, src_len, &i));
-    }
-    dest[len] = '\0';
-    return len;
-}
-
 void test_fail(TestContext *ctx, const char *file, int line, const char *format, ...)
 {
     fprintf(stderr, "%s:%d: ", file, line);
@@ -65,8 +54,8 @@ void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, 
         return;
     }
     char buf1[256], buf2[256];
-    make_printable_mem(m1, len, buf1, sizeof buf1);
-    make_printable_mem(m2, len, buf2, sizeof buf2);
+    u_make_printable_mem(m1, len, buf1, sizeof buf1);
+    u_make_printable_mem(m2, len, buf2, sizeof buf2);
     test_fail(ctx, file, line, "Bytes not equal:  %s  %s", buf1, buf2);
 }
 

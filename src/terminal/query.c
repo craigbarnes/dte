@@ -2,8 +2,10 @@
 #include "cursor.h"
 #include "terminal.h"
 #include "util/log.h"
+#include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
+#include "util/utf8.h"
 
 // https://vt100.net/docs/vt510-rm/DECRPM
 typedef enum {
@@ -31,6 +33,12 @@ static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
     return status == DECRPM_SET || status == DECRPM_RESET;
 }
 
+static KeyCode tflag(TermFeatureFlags flag)
+{
+    BUG_ON(!IS_POWER_OF_2(flag));
+    return KEYCODE_QUERY_REPLY_BIT | flag;
+}
+
 KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
 {
     if (unlikely(csi->have_subparams || csi->nr_intermediate > 1)) {
@@ -50,7 +58,7 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         const char *desc = decrpm_status_to_str(status);
         LOG_DEBUG("DECRPM %u reply: %u (%s)", mode, status, desc);
         if (mode == 2026 && decrpm_is_set_or_reset(status)) {
-            return KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC;
+            return tflag(TFLAG_SYNC);
         }
         return KEY_IGNORE;
     }
@@ -60,7 +68,7 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         unsigned int flags = csi->params[0][0];
         LOG_DEBUG("query reply for kittykbd flags: 0x%x", flags);
         // Interpret reply with any flags to mean "supported"
-        return KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD;
+        return tflag(TFLAG_KITTY_KEYBOARD);
     }
 
     if (prefix == '>' && final == 'm' && intermediate == 0 && nparams >= 1) {
@@ -80,6 +88,65 @@ ignore:
     return KEY_IGNORE;
 }
 
+static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
+{
+    StringView empty = STRING_VIEW_INIT;
+    size_t n = input.length;
+    if (n == 0 || n & 1 || n / 2 > bufsize) {
+        return empty;
+    }
+
+    for (size_t i = 0, j = 0; i < n; ) {
+        unsigned int a = hex_decode(input.data[i++]);
+        unsigned int b = hex_decode(input.data[i++]);
+        if (unlikely((a | b) > 0xF)) {
+            return empty;
+        }
+        outbuf[j++] = (unsigned char)((a << 4) | b);
+    }
+
+    return string_view(outbuf, n / 2);
+}
+
+static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
+{
+    size_t pos = 3;
+    StringView empty = STRING_VIEW_INIT;
+    StringView cap_hex = (pos < len) ? get_delim(data, &pos, len, '=') : empty;
+    StringView val_hex = (pos < len) ? string_view(data + pos, len - pos) : empty;
+
+    char cbuf[8], vbuf[64];
+    StringView cap = hex_decode_str(cap_hex, cbuf, sizeof(cbuf));
+    StringView val = hex_decode_str(val_hex, vbuf, sizeof(vbuf));
+
+    if (data[0] == '1' && cap.length >= 3) {
+        if (strview_equal_cstring(&cap, "bce") && val.length == 0) {
+            return tflag(TFLAG_BACK_COLOR_ERASE);
+        }
+        if (strview_equal_cstring(&cap, "tsl") && strview_equal_cstring(&val, "\033]2;")) {
+            return tflag(TFLAG_SET_WINDOW_TITLE);
+        }
+        if (strview_equal_cstring(&cap, "rep") && strview_has_suffix(&val, "b")) {
+            return tflag(TFLAG_ECMA48_REPEAT);
+        }
+    }
+
+    char ucbuf[4 * sizeof(cbuf)];
+    char uvbuf[4 * sizeof(vbuf)];
+    u_make_printable_mem(cap.data, cap.length, ucbuf, sizeof(ucbuf));
+    u_make_printable_mem(val.data, val.length, uvbuf, sizeof(uvbuf));
+
+    LOG_DEBUG (
+        "unhandled XTGETTCAP reply: %.*s (%s%s%s)",
+        (int)len, data,
+        ucbuf,
+        val.length ? "=" : "",
+        uvbuf
+    );
+
+    return KEY_IGNORE;
+}
+
 KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 {
     const char *note = "";
@@ -89,23 +156,8 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     }
 
     StringView seq = string_view(data, len);
-    if (strview_has_prefix(&seq, "1+r")) {
-        strview_remove_prefix(&seq, 3);
-        if (strview_equal_cstring(&seq, "626365")) { // "bce"
-            return KEYCODE_QUERY_REPLY_BIT | TFLAG_BACK_COLOR_ERASE;
-        }
-        if (strview_equal_cstring_icase(&seq, "74736C=1B5D323B")) { // "tsl=\e]2;"
-            return KEYCODE_QUERY_REPLY_BIT | TFLAG_SET_WINDOW_TITLE;
-        }
-        if (
-            strview_has_prefix(&seq, "726570=") // "rep="
-            && strview_has_suffix(&seq, "62") // "b"
-            && (seq.length & 1) // Odd length (2x even hex strings + "=")
-        ) {
-            return KEYCODE_QUERY_REPLY_BIT | TFLAG_ECMA48_REPEAT;
-        }
-        LOG_DEBUG("unhandled XTGETTCAP reply: %.*s", (int)len, data);
-        return KEY_IGNORE;
+    if (strview_has_prefix(&seq, "1+r") || strview_has_prefix(&seq, "0+r")) {
+        return parse_xtgettcap_reply(data, len);
     }
 
     if (strview_has_prefix(&seq, "1$r")) {
@@ -123,11 +175,6 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
         // TODO: To facilitate the above, convert Terminal::color_type to TermFeatureFlags bits
         LOG_DEBUG("unhandled DECRQSS reply: %.*s", (int)len, data);
         return KEY_IGNORE;
-    }
-
-    if (strview_has_prefix(&seq, "0+r")) {
-        note = " (XTGETTCAP; 'invalid request')";
-        goto unhandled;
     }
 
     if (strview_equal_cstring(&seq, "0$r")) {

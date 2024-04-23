@@ -31,6 +31,7 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
 size_t u_set_char_raw(char *buf, CodePoint u);
 size_t u_set_char(char *buf, CodePoint u);
 size_t u_set_hex(char *buf, CodePoint u);
+size_t u_make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize) NONNULL_ARG(3);
 
 /*
  * Total width of skipped characters is stored back to @width.
