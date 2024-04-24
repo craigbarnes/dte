@@ -38,15 +38,6 @@ static bool path_component(const char *path, size_t pos)
     return path[pos] == '\0' || pos == 0 || path[pos - 1] == '/';
 }
 
-static size_t str_common_prefix_length(const char *a, const char *b)
-{
-    size_t n = 0;
-    while (a[n] && a[n] == b[n]) {
-        n++;
-    }
-    return n;
-}
-
 const char *path_slice_relative(const char *abs, const char *cwd)
 {
     BUG_ON(!path_is_absolute(cwd));
@@ -81,12 +72,7 @@ char *path_relative(const char *abs, const char *cwd)
         return xstrdup(abs[1] == '\0' ? abs : abs + 1);
     }
 
-    // Length of common path
-    size_t clen = 0;
-    while (cwd[clen] && cwd[clen] == abs[clen]) {
-        clen++;
-    }
-
+    size_t clen = str_common_prefix_length(cwd, abs);
     if (cwd[clen] == '\0') {
         switch (abs[clen]) {
         case '\0':

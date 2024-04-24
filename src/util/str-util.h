@@ -69,6 +69,16 @@ static inline bool strn_has_strview_prefix(const char *s, size_t n, const String
     return n >= p->length && mem_equal(s, p->data, p->length);
 }
 
+NONNULL_ARGS
+static inline size_t str_common_prefix_length(const char *a, const char *b)
+{
+    size_t n = 0;
+    while (a[n] && a[n] == b[n]) {
+        n++;
+    }
+    return n;
+}
+
 // Replaces all occurrences of a specific byte with a replacement byte
 // and returns the length of the string (like strlen(str))
 NONNULL_ARGS
