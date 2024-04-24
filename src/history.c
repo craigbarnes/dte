@@ -154,7 +154,7 @@ String history_dump(const History *history)
     const size_t size = round_size_to_next_multiple(16 * nr_entries, 4096);
     String buf = string_new(size);
     size_t n = 0;
-    for (HistoryEntry *e = history->first; e; e = e->next, n++) {
+    for (const HistoryEntry *e = history->first; e; e = e->next, n++) {
         string_append_cstring(&buf, e->text);
         string_append_byte(&buf, '\n');
     }

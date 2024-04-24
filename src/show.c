@@ -313,14 +313,19 @@ static bool show_wsplit(EditorState *e, const char *name, bool cflag)
     return true;
 }
 
-String dump_command_history(EditorState *e)
+static String dump_command_history(EditorState *e)
 {
     return history_dump(&e->command_history);
 }
 
-String dump_search_history(EditorState *e)
+static String dump_search_history(EditorState *e)
 {
     return history_dump(&e->search_history);
+}
+
+static String dump_file_history(EditorState *e)
+{
+    return file_history_dump(&e->file_history);
 }
 
 typedef struct {
@@ -569,6 +574,7 @@ static const ShowHandler show_handlers[] = {
     {"include", 0, do_dump_builtin_configs, show_builtin, do_collect_builtin_includes},
     {"macro", DTERC, do_dump_macro, NULL, NULL},
     {"msg", MSGLINE, do_dump_messages, NULL, NULL},
+    {"open", LASTLINE, dump_file_history, NULL, NULL},
     {"option", DTERC, dump_options_and_fileopts, show_option, collect_all_options},
     {"search", LASTLINE, dump_search_history, NULL, NULL},
     {"set", DTERC, do_dump_options, show_option, collect_all_options},

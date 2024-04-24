@@ -25,7 +25,5 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag) NONNULL
 void collect_show_subcommands(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix) NONNULL_ARGS;
 const ShowHandler *lookup_show_handler(const char *name) NONNULL_ARGS;
-String dump_command_history(EditorState *e) NONNULL_ARGS;
-String dump_search_history(EditorState *e) NONNULL_ARGS;
 
 #endif

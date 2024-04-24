@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include "file-history.h"
 #include "error.h"
 #include "util/debug.h"
+#include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
@@ -150,4 +152,43 @@ void file_history_free(FileHistory *history)
     history->filename = NULL;
     history->first = NULL;
     history->last = NULL;
+}
+
+String file_history_dump(const FileHistory *history)
+{
+    size_t nr_entries = history->entries.count;
+    size_t size = round_size_to_next_multiple(64 * nr_entries, 4096);
+    String buf = string_new(size);
+    size_t n = 0;
+
+    for (const FileHistoryEntry *e = history->first; e; e = e->next, n++) {
+        string_append_cstring(&buf, e->filename);
+        string_append_byte(&buf, '\n');
+    }
+
+    BUG_ON(n != nr_entries);
+    return buf;
+}
+
+String file_history_dump_relative(const FileHistory *history)
+{
+    char cwdbuf[8192];
+    const char *cwd = getcwd(cwdbuf, sizeof(cwdbuf));
+    if (unlikely(!cwd)) {
+        return file_history_dump(history);
+    }
+
+    size_t nr_entries = history->entries.count;
+    size_t size = round_size_to_next_multiple(16 * nr_entries, 4096);
+    String buf = string_new(size);
+    size_t n = 0;
+
+    for (const FileHistoryEntry *e = history->first; e; e = e->next, n++) {
+        const char *relative = path_slice_relative(e->filename, cwd);
+        string_append_cstring(&buf, relative);
+        string_append_byte(&buf, '\n');
+    }
+
+    BUG_ON(n != nr_entries);
+    return buf;
 }

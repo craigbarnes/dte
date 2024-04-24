@@ -101,5 +101,6 @@ char *path_absolute(const char *path) MALLOC NONNULL_ARGS;
 char *path_relative(const char *absolute, const char *cwd) XSTRDUP;
 char *short_filename(const char *absolute, const StringView *home_dir) XSTRDUP;
 char *short_filename_cwd(const char *absolute, const char *cwd, const StringView *home_dir) XSTRDUP;
+const char *path_slice_relative(const char *abs, const char *cwd) NONNULL_ARGS RETURNS_NONNULL;
 
 #endif

@@ -46,7 +46,8 @@ static const struct {
     [EXEC_LINE] = {"line", IN},
     [EXEC_MSG] = {"msg", IN | OUT},
     [EXEC_NULL] = {"null", ALL},
-    [EXEC_OPEN] = {"open", OUT},
+    [EXEC_OPEN] = {"open", IN | OUT},
+    [EXEC_OPENREL] = {"openrel", IN},
     [EXEC_SEARCH] = {"search", IN},
     [EXEC_TAG] = {"tag", OUT},
     [EXEC_TTY] = {"tty", ALL},
@@ -289,13 +290,25 @@ ssize_t handle_exec (
         break;
     }
     case EXEC_COMMAND: {
-        String hist = dump_command_history(e);
+        String hist = history_dump(&e->command_history);
         ctx.input = strview_from_string(&hist);
         alloc = hist.buffer;
         break;
     }
     case EXEC_SEARCH: {
-        String hist = dump_search_history(e);
+        String hist = history_dump(&e->search_history);
+        ctx.input = strview_from_string(&hist);
+        alloc = hist.buffer;
+        break;
+    }
+    case EXEC_OPEN: {
+        String hist = file_history_dump(&e->file_history);
+        ctx.input = strview_from_string(&hist);
+        alloc = hist.buffer;
+        break;
+    }
+    case EXEC_OPENREL: {
+        String hist = file_history_dump_relative(&e->file_history);
         ctx.input = strview_from_string(&hist);
         alloc = hist.buffer;
         break;
@@ -305,7 +318,6 @@ ssize_t handle_exec (
         break;
     // These can't be used as input actions and should be prevented by
     // the validity checks in cmd_exec():
-    case EXEC_OPEN:
     case EXEC_TAG:
     case EXEC_EVAL:
     case EXEC_ERRMSG:
@@ -375,6 +387,7 @@ ssize_t handle_exec (
     case EXEC_COMMAND:
     case EXEC_ERRMSG:
     case EXEC_LINE:
+    case EXEC_OPENREL:
     case EXEC_SEARCH:
     case EXEC_WORD:
     case EXEC_INVALID:

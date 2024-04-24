@@ -270,7 +270,7 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "cursor default block keep");
     reset_completion(c);
 
-    cmdline_set_text(c, "show op");
+    cmdline_set_text(c, "show opt");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "show option ");
     complete_command_next(e);

@@ -206,7 +206,7 @@ static void free_tags(PointerArray *tags)
 }
 
 // Both parameters must be absolute and clean
-static const char *path_slice_relative(const char *filename, const StringView dir)
+static const char *slice_relative(const char *filename, const StringView dir)
 {
     if (strncmp(filename, dir.data, dir.length) != 0) {
         // Filename doesn't start with dir
@@ -249,7 +249,7 @@ static void tag_file_find_tags (
 
     if (filename) {
         StringView dir = path_slice_dirname(tf->filename);
-        filename = path_slice_relative(filename, dir);
+        filename = slice_relative(filename, dir);
     }
 
     void **ptrs = tags->ptrs;
