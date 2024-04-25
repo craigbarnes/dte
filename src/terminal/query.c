@@ -135,7 +135,7 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     StringView cap = hex_decode_str(cap_hex, cbuf, sizeof(cbuf));
     StringView val = hex_decode_str(val_hex, vbuf, sizeof(vbuf));
 
-    if (data[0] == '1' && cap.length >= 3) {
+    if (data[0] == '1' && cap.length >= 2) {
         if (strview_equal_cstring(&cap, "bce") && val.length == 0) {
             return tflag(TFLAG_BACK_COLOR_ERASE);
         }
@@ -144,6 +144,12 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
         }
         if (strview_equal_cstring(&cap, "rep") && strview_has_suffix(&val, "b")) {
             return tflag(TFLAG_ECMA48_REPEAT);
+        }
+        if (strview_equal_cstring(&cap, "Ms") && val.length >= 6) {
+            // All 65 entries with this cap in the ncurses terminfo database
+            // use OSC 52, with only slight differences (BEL vs. ST), so
+            // there's really no reason to check the value
+            return tflag(TFLAG_OSC52_COPY);
         }
     }
 

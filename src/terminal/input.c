@@ -173,6 +173,7 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_BACK_COLOR_ERASE: return "BCE";
     case TFLAG_ECMA48_REPEAT: return "REP";
     case TFLAG_SET_WINDOW_TITLE: return "TITLE";
+    case TFLAG_OSC52_COPY: return "OSC52";
     }
     return "??";
 }

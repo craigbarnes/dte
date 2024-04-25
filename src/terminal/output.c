@@ -154,6 +154,7 @@ void term_put_queries(TermOutputBuffer *obuf)
         "\033P+q626365\033\\" // XTGETTCAP "bce"
         "\033P+q726570\033\\" // XTGETTCAP "rep"
         "\033P+q74736C\033\\" // XTGETTCAP "tsl"
+        "\033P+q4D73\033\\" // XTGETTCAP "Ms"
     ;
 
     LOG_INFO("querying terminal");
