@@ -166,7 +166,7 @@ static bool is_text(const char *str, size_t len)
 static const char *tflag_to_str(TermFeatureFlags flag)
 {
     // This only handles a subset of individual flags, as returned
-    // by parse_csi_query_reply() and parse_dcs_query_reply()
+    // by parse_csi_query_reply() and parse_xtgettcap_reply()
     switch ((unsigned int)flag) {
     case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
     case TFLAG_SYNC: return "SYNC";

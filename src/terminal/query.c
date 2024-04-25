@@ -108,6 +108,22 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
     return string_view(outbuf, n / 2);
 }
 
+// This is similar to u_make_printable_mem(), but replacing C0 control
+// characters with Unicode "control picture" symbols, instead of using
+// the (potentially ambiguous) caret notation
+static size_t make_printable_ctlseq(const char *src, size_t src_len, char *dest, size_t destsize)
+{
+    BUG_ON(destsize < 16);
+    size_t len = 0;
+    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
+        CodePoint u = u_get_char(src, src_len, &i);
+        u = (u < 0x20) ? u + 0x2400 : (u == 0x7F ? 0x2421 : u);
+        len += u_set_char(dest + len, u);
+    }
+    dest[len] = '\0';
+    return len;
+}
+
 static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
 {
     size_t pos = 3;
@@ -131,17 +147,23 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
         }
     }
 
-    char ucbuf[4 * sizeof(cbuf)];
-    char uvbuf[4 * sizeof(vbuf)];
-    u_make_printable_mem(cap.data, cap.length, ucbuf, sizeof(ucbuf));
-    u_make_printable_mem(val.data, val.length, uvbuf, sizeof(uvbuf));
+    char ebuf[8 + (4 * sizeof(cbuf)) + (4 * sizeof(vbuf))];
+    size_t i = 0;
+    if (cap.length) {
+        ebuf[i++] = ' ';
+        ebuf[i++] = '(';
+        i += make_printable_ctlseq(cap.data, cap.length, ebuf + i, sizeof(ebuf) - i);
+        if (val.length) {
+            ebuf[i++] = '=';
+            i += make_printable_ctlseq(val.data, val.length, ebuf + i, sizeof(ebuf) - i);
+        }
+        ebuf[i++] = ')';
+    }
 
     LOG_DEBUG (
-        "unhandled XTGETTCAP reply: %.*s (%s%s%s)",
-        (int)len, data,
-        ucbuf,
-        val.length ? "=" : "",
-        uvbuf
+        "unhandled XTGETTCAP reply: %.*s%.*s",
+        (int)len, data, // Original, hex-encoded string (no control chars)
+        (int)i, ebuf // Decoded string (with control chars escaped)
     );
 
     return KEY_IGNORE;
