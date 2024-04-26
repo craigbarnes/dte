@@ -19,7 +19,7 @@ typedef enum {
     EXEC_MSG,
     EXEC_NULL,
     EXEC_OPEN,
-    EXEC_OPENREL,
+    EXEC_OPEN_REL,
     EXEC_SEARCH,
     EXEC_TAG,
     EXEC_TTY,
