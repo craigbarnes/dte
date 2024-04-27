@@ -475,6 +475,7 @@ loop_break:;
         file_history_load(&e->file_history, path_join(cfgdir, "file-history"), size_limit);
         history_load(&e->command_history, path_join(cfgdir, "command-history"), size_limit);
         history_load(&e->search_history, path_join(cfgdir, "search-history"), size_limit);
+        e->flags |= EFLAG_SAVE_ALL_HIST;
         if (e->search_history.last) {
             search_set_regexp(&e->search, e->search_history.last->text);
         }
@@ -575,9 +576,13 @@ exit:
     // Unlock files and add to file history
     frame_remove(e, e->root_frame);
 
-    if (load_and_save_history) {
+    if (e->flags & EFLAG_SAVE_CMD_HIST) {
         history_save(&e->command_history);
+    }
+    if (e->flags & EFLAG_SAVE_SEARCH_HIST) {
         history_save(&e->search_history);
+    }
+    if (e->flags & EFLAG_SAVE_FILE_HIST) {
         file_history_save(&e->file_history);
     }
 

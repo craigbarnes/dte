@@ -556,7 +556,7 @@ static void test_cmdargs_flagset_idx(TestContext *ctx)
     }
 }
 
-static void test_cmdargs_convert_flags(TestContext *ctx)
+static void test_cmdargs_convert_flags_1(TestContext *ctx)
 {
     static const FlagMapping map[] = {
         {'b', REPLACE_BASIC},
@@ -571,6 +571,31 @@ static void test_cmdargs_convert_flags(TestContext *ctx)
 
     ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL);
+}
+
+static void test_cmdargs_convert_flags_2(TestContext *ctx)
+{
+    static const FlagMapping map[] = {
+        {'C', EFLAG_SAVE_CMD_HIST},
+        {'S', EFLAG_SAVE_SEARCH_HIST},
+        {'F', EFLAG_SAVE_FILE_HIST},
+        {'H', EFLAG_SAVE_ALL_HIST},
+    };
+
+    CommandArgs a = {.flag_set = cmdargs_flagset_value('C')};
+    EditorFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
+    EXPECT_EQ(flags, EFLAG_SAVE_CMD_HIST);
+
+    a.flag_set |= cmdargs_flagset_value('F');
+    flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
+    EXPECT_EQ(flags, EFLAG_SAVE_CMD_HIST | EFLAG_SAVE_FILE_HIST);
+
+    a.flag_set |= cmdargs_flagset_value('S');
+    flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
+    EXPECT_EQ(flags, EFLAG_SAVE_ALL_HIST);
+
+    a.flag_set = cmdargs_flagset_value('H');
+    EXPECT_EQ(flags, cmdargs_convert_flags(&a, map, ARRAYLEN(map)));
 }
 
 static void test_add_alias(TestContext *ctx)
@@ -598,7 +623,8 @@ static const TestEntry tests[] = {
     TEST(test_string_append_escaped_arg),
     TEST(test_command_struct_layout),
     TEST(test_cmdargs_flagset_idx),
-    TEST(test_cmdargs_convert_flags),
+    TEST(test_cmdargs_convert_flags_1),
+    TEST(test_cmdargs_convert_flags_2),
     TEST(test_add_alias),
 };
 

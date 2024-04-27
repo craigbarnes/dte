@@ -38,6 +38,13 @@ typedef enum {
     EDITOR_EXIT_MAX = 125,
 } EditorStatus;
 
+typedef enum {
+    EFLAG_SAVE_CMD_HIST = 1u << 0,
+    EFLAG_SAVE_SEARCH_HIST = 1u << 1,
+    EFLAG_SAVE_FILE_HIST = 1u << 2,
+    EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1,
+} EditorFlags;
+
 typedef struct EditorState {
     EditorStatus status;
     ModeHandler *mode; // Current mode
@@ -52,6 +59,7 @@ typedef struct EditorState {
     StringView home_dir;
     const char *user_config_dir;
     mode_t new_file_mode;
+    EditorFlags flags;
     bool child_controls_terminal;
     bool everything_changed;
     bool cursor_style_changed;

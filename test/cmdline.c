@@ -470,7 +470,7 @@ static void test_complete_command(TestContext *ctx)
 
     cmdline_set_text(c, "quit 1 -");
     complete_command_next(e);
-    EXPECT_STRING_EQ(c->buf, "quit 1 -f");
+    EXPECT_STRING_EQ(c->buf, "quit 1 -C");
     reset_completion(c);
 
     cmdline_set_text(c, "quit 1 2 -");

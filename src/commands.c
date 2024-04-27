@@ -1414,6 +1414,13 @@ static size_t count_modified_buffers(const PointerArray *buffers, View **first)
 
 static bool cmd_quit(EditorState *e, const CommandArgs *a)
 {
+    static const FlagMapping fmap[] = {
+        {'C', EFLAG_SAVE_CMD_HIST},
+        {'S', EFLAG_SAVE_SEARCH_HIST},
+        {'F', EFLAG_SAVE_FILE_HIST},
+        {'H', EFLAG_SAVE_ALL_HIST},
+    };
+
     int exit_code = EDITOR_EXIT_OK;
     if (a->nr_args) {
         if (!str_to_int(a->args[0], &exit_code)) {
@@ -1457,10 +1464,11 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
     if (dialog_prompt(e, question, "ny") != 'y') {
         return false;
     }
-
     LOG_INFO("quit prompt accepted with %zu modified buffer%s", n, plural);
 
-exit:
+exit:;
+    EditorFlags histflags = cmdargs_convert_flags(a, fmap, ARRAYLEN(fmap));
+    e->flags &= ~histflags;
     e->status = exit_code;
     return true;
 }
@@ -2521,7 +2529,7 @@ static const Command cmds[] = {
     CMD("pgdown", "cl", NA, 0, 0, cmd_pgdown),
     CMD("pgup", "cl", NA, 0, 0, cmd_pgup),
     CMD("prev", "", NA, 0, 0, cmd_prev),
-    CMD("quit", "fp", NA, 0, 1, cmd_quit),
+    CMD("quit", "CFHSfp", NA, 0, 1, cmd_quit),
     CMD("redo", "", NA, 0, 1, cmd_redo),
     CMD("refresh", "", NA, 0, 0, cmd_refresh),
     CMD("repeat", "-", NA, 2, -1, cmd_repeat),
