@@ -16,8 +16,8 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - run: brew install make
-            - run: gmake build/feature.h
-            - run: cat build/feature.h build/feature/*.log
+            - run: gmake build/gen/feature.h
+            - run: cat build/gen/feature.h build/feature/*.log
             - run: gmake -Otarget check
             - run: gmake bench CFLAGS=-O3 DEBUG=0
 
@@ -28,7 +28,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
-            - run: make build/feature.h
-            - run: cat build/feature.h build/feature/*.log
+            - run: make build/gen/feature.h
+            - run: cat build/gen/feature.h build/feature/*.log
             - run: make -Otarget check
             - run: make bench CFLAGS=-O3 DEBUG=0

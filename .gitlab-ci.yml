@@ -22,7 +22,7 @@ default:
     needs: []
     script:
         - make
-        - cat build/feature.h
+        - cat build/gen/feature.h
         - ldd dte
         - make check
         - make check LDFLAGS=-static
@@ -69,11 +69,11 @@ debian-stable:
         - make installcheck
 
         # Ensure build works with no detected features (test fallbacks)
-        - cat build/feature.h
-        - sed 's/ 1$/ 0/' build/feature.h > build/feature-tmp.h
-        - mv build/feature-tmp.h build/feature.h
+        - cat build/gen/feature.h
+        - sed 's/ 1$/ 0/' build/gen/feature.h > build/gen/feature-tmp.h
+        - mv build/gen/feature-tmp.h build/gen/feature.h
         - make check
-        - cat build/feature.h
+        - cat build/gen/feature.h
 
         # Build with ARM cross-compilers
         - make CC='ccache arm-linux-gnueabihf-gcc'
@@ -94,7 +94,7 @@ android:
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
     script:
         - make CC="$CC_AARCH64"
-        - cat build/feature.h
+        - cat build/gen/feature.h
         - make CC="$CC_ARMV7A"
         - make CC="$CC_I686"
         - make CC="$CC_X86_64"

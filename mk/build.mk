@@ -186,8 +186,8 @@ $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
 $(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
 build/convert.o: build/convert.cflags
-build/gen/builtin-config.h: build/builtin-config.mk
-build/gen/test-data.h: build/test/data.mk
+build/gen/builtin-config.h: build/gen/builtin-config.mk
+build/gen/test-data.h: build/gen/test-data.mk
 build/config.o: build/gen/builtin-config.h
 build/test/config.o: build/gen/test-data.h
 build/main.o: build/gen/version.h
@@ -226,10 +226,10 @@ build/%.cflags: FORCE | build/
 build/gen/version.h: FORCE | build/gen/
 	@$(OPTCHECK) '$(HASH)define VERSION "$(VERSION)"' $@
 
-build/builtin-config.mk: FORCE | build/
+build/gen/builtin-config.mk: FORCE | build/gen/
 	@$(OPTCHECK) '$(@:.mk=.h): $(BUILTIN_CONFIGS)' $@
 
-build/test/data.mk: FORCE | build/test/
+build/gen/test-data.mk: FORCE | build/gen/
 	@$(OPTCHECK) '$(@:.mk=.h): $(TEST_CONFIGS)' $@
 
 build/gen/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/gen/
