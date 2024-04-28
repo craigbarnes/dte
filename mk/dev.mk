@@ -22,7 +22,7 @@ SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
 SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
 CTIDYFLAGS ?= -quiet
-CTIDYCFLAGS ?= -std=gnu11 -Isrc -DDEBUG=3
+CTIDYCFLAGS ?= -std=gnu11 -Isrc -Ibuild/gen -DDEBUG=3
 CTIDYFILTER = 2>&1 | sed -E '/^[0-9]+ warnings? generated\.$$/d' >&2
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
@@ -147,9 +147,9 @@ check-clang-tidy-headers:
 	  $(CLANGTIDY) $(CTIDYFLAGS) $(f) -- $(CTIDYCFLAGS) $(CTIDYFILTER); \
 	)
 
-clang-tidy-src/config.c: build/builtin-config.h
-clang-tidy-src/editor.c: build/version.h src/compat.h
-clang-tidy-src/main.c: build/version.h
+clang-tidy-src/config.c: build/gen/builtin-config.h
+clang-tidy-src/editor.c: build/gen/version.h src/compat.h
+clang-tidy-src/main.c: build/gen/version.h
 clang-tidy-src/compat.c: src/compat.h
 clang-tidy-src/load-save.c: src/compat.h
 clang-tidy-src/signals.c: src/compat.h
@@ -157,7 +157,7 @@ clang-tidy-src/tag.c: src/compat.h
 clang-tidy-src/util/fd.c: src/compat.h
 clang-tidy-src/util/xmemmem.c: src/compat.h
 clang-tidy-src/terminal/ioctl.c: src/compat.h
-clang-tidy-test/config.c: build/test/data.h
+clang-tidy-test/config.c: build/gen/test-data.h
 
 
 CLEANFILES += dte-*.tar.gz

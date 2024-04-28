@@ -31,7 +31,7 @@
 #include "util/log.h"
 #include "util/xmalloc.h"
 #include "util/xstdio.h"
-#include "../build/version.h"
+#include "version.h"
 
 static void set_and_check_locale(void)
 {

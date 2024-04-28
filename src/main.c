@@ -43,9 +43,9 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
+#include "version.h"
 #include "view.h"
 #include "window.h"
-#include "../build/version.h"
 
 static void term_cleanup(EditorState *e)
 {

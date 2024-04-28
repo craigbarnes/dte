@@ -19,7 +19,7 @@ The following points should be observed when adding new feature tests:
 * If the feature being detected depends on [`feature_test_macros(7)`], the
   required definitions should be added to [`defs.h`] and `#include "defs.h"`
   should be added at the top of the `*.c` file. The contents of [`defs.h`]
-  is concatenated into `build/feature.h` by the build system, along with the
+  is concatenated into `build/gen/feature.h` by the build system, along with the
   generated headers from `build/feature/*.h`, to ensure the code under [`src/`]
   sees the same macro definitions as the feature tests.
 * Source files under [`src/`] that use constructs like e.g. `#if HAVE_EXAMPLE`

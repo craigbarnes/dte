@@ -1,7 +1,7 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#include "../build/feature.h"
+#include "feature.h"
 
 extern const char feature_string[];
 

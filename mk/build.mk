@@ -81,7 +81,7 @@ feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
     posix_madvise qsort_r ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
-build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/
+build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/ build/gen/
 
 editor_sources := $(patsubst build/%.o, src/%.c, $(editor_objects))
 test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
@@ -156,7 +156,7 @@ endif
 
 BASIC_CFLAGS += $(CSTD) $(CWARNS)
 BASIC_CPPFLAGS += -D_FILE_OFFSET_BITS=64
-$(all_objects): BASIC_CPPFLAGS += -Isrc
+$(all_objects): BASIC_CPPFLAGS += -Isrc -Ibuild/gen
 
 OPTCHECK = mk/optcheck.sh $(if $(MAKE_S),-s)
 
@@ -186,20 +186,20 @@ $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
 $(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
 build/convert.o: build/convert.cflags
-build/builtin-config.h: build/builtin-config.mk
-build/test/data.h: build/test/data.mk
-build/config.o: build/builtin-config.h
-build/test/config.o: build/test/data.h
-build/main.o: build/version.h
-build/editor.o: build/version.h build/feature.h
-build/load-save.o: build/feature.h
-build/signals.o: build/feature.h
-build/tag.o: build/feature.h
-build/util/fd.o: build/feature.h
-build/util/xmemmem.o: build/feature.h
-build/terminal/ioctl.o: build/feature.h
-build/compat.o: build/feature.h
-src/compat.h: build/feature.h
+build/gen/builtin-config.h: build/builtin-config.mk
+build/gen/test-data.h: build/test/data.mk
+build/config.o: build/gen/builtin-config.h
+build/test/config.o: build/gen/test-data.h
+build/main.o: build/gen/version.h
+build/editor.o: build/gen/version.h build/gen/feature.h
+build/load-save.o: build/gen/feature.h
+build/signals.o: build/gen/feature.h
+build/tag.o: build/gen/feature.h
+build/util/fd.o: build/gen/feature.h
+build/util/xmemmem.o: build/gen/feature.h
+build/terminal/ioctl.o: build/gen/feature.h
+build/compat.o: build/gen/feature.h
+src/compat.h: build/gen/feature.h
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
@@ -223,7 +223,7 @@ build/all.ldflags: FORCE | build/
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CFLAGS_ALL)' $@
 
-build/version.h: FORCE | build/
+build/gen/version.h: FORCE | build/gen/
 	@$(OPTCHECK) '$(HASH)define VERSION "$(VERSION)"' $@
 
 build/builtin-config.mk: FORCE | build/
@@ -232,15 +232,15 @@ build/builtin-config.mk: FORCE | build/
 build/test/data.mk: FORCE | build/test/
 	@$(OPTCHECK) '$(@:.mk=.h): $(TEST_CONFIGS)' $@
 
-build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
+build/gen/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/gen/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
-build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
+build/gen/test-data.h: $(TEST_CONFIGS) mk/config2c.awk | build/gen/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
-build/feature.h: mk/feature-test/defs.h $(feature_tests)
+build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 	$(E) GEN $@
 	$(Q) cat $^ > $@
 

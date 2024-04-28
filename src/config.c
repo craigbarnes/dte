@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "config.h"
+#include "builtin-config.h"
 #include "commands.h"
 #include "editor.h"
 #include "error.h"
@@ -11,7 +12,6 @@
 #include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
-#include "../build/builtin-config.h"
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 ConfigState current_config;
