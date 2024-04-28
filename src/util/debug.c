@@ -43,7 +43,7 @@ static void cleanup(void)
 }
 
 #ifdef ASAN_ENABLED
-#include <sanitizer/asan_interface.h>
+#include <sanitizer/asan_interface.h> // NOLINT(*-restrict-system-includes)
 
 const char *__asan_default_options(void)
 {
@@ -63,7 +63,7 @@ void __asan_on_error(void)
 static void print_stack_trace(void)
 {
     #ifdef ASAN_ENABLED
-        fputs("\nStack trace:\n", stderr);
+        (void)!fputs("\nStack trace:\n", stderr);
         __sanitizer_print_stack_trace();
     #endif
 }

@@ -20,6 +20,7 @@ Checks: >
     -clang-analyzer-core.NonNullParamChecker,
     -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
     -clang-analyzer-unix.Malloc,
+    -clang-analyzer-valist.Uninitialized,
     -cert-err33-c,
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
