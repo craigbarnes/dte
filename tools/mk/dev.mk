@@ -1,6 +1,8 @@
 # This makefile contains various targets that are only useful for
 # development purposes and is NOT included in release tarballs
 
+include tools/mk/coverage.mk
+
 RELEASE_VERSIONS = \
     1.11.1 1.11 \
     1.10 \
