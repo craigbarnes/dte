@@ -1,13 +1,20 @@
 CLANGTIDY ?= clang-tidy
 CTIDYFLAGS ?= -quiet
-CTIDYCFLAGS ?= -std=gnu11 -Isrc -Ibuild/gen -DDEBUG=3
 CTIDYFILTER = 2>&1 | sed -E '/^[0-9]+ warnings? generated\.$$/d' >&2
+
+CTIDYCFLAGS = \
+    -std=gnu11 -O2 -Wall -Wextra -DDEBUG=3 -D_FILE_OFFSET_BITS=64 \
+    -Isrc -Itools/mock-headers -Ibuild/gen
 
 all_headers = $(shell git ls-files -- 'src/**.h' 'test/**.h')
 clang_tidy_headers = $(filter-out src/util/unidata.h, $(all_headers))
 clang_tidy_targets := $(addprefix clang-tidy-, $(all_sources))
 
 check-clang-tidy: check-clang-tidy-headers $(clang_tidy_targets)
+tidy: check-clang-tidy
+tidy-fast: check-clang-tidy-fast
+clang-tidy-src/config.c: build/gen/builtin-config.h
+clang-tidy-test/config.c: build/gen/test-data.h
 
 # Excluding analyzer checks makes this target complete in ~12s instead of ~58s
 check-clang-tidy-fast: CTIDYFLAGS = -quiet --checks='-clang-analyzer-*'
@@ -28,19 +35,7 @@ check-clang-tidy-headers:
 	  $(CLANGTIDY) $(CTIDYFLAGS) $(f) -- $(CTIDYCFLAGS) $(CTIDYFILTER); \
 	)
 
-clang-tidy-src/config.c: build/gen/builtin-config.h
-clang-tidy-src/editor.c: build/gen/version.h src/compat.h
-clang-tidy-src/main.c: build/gen/version.h
-clang-tidy-src/compat.c: src/compat.h
-clang-tidy-src/load-save.c: src/compat.h
-clang-tidy-src/signals.c: src/compat.h
-clang-tidy-src/tag.c: src/compat.h
-clang-tidy-src/util/fd.c: src/compat.h
-clang-tidy-src/util/xmemmem.c: src/compat.h
-clang-tidy-src/terminal/ioctl.c: src/compat.h
-clang-tidy-test/config.c: build/gen/test-data.h
-
 
 .PHONY: \
-    check-clang-tidy check-clang-tidy-headers check-clang-tidy-fast \
-    $(clang_tidy_targets)
+    tidy tidy-fast check-clang-tidy check-clang-tidy-fast \
+    check-clang-tidy-headers $(clang_tidy_targets)
