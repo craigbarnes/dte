@@ -53,7 +53,7 @@ arch:
     needs: []
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
     script:
-        - make check-source check check-clang-tidy-fast
+        - make check-source check check-clang-tidy
         - *objsize_and_bench
 
 debian-stable:

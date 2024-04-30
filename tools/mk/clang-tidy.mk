@@ -10,15 +10,15 @@ all_headers = $(shell git ls-files -- 'src/**.h' 'test/**.h')
 clang_tidy_headers = $(filter-out src/util/unidata.h, $(all_headers))
 clang_tidy_targets := $(addprefix clang-tidy-, $(all_sources))
 
-check-clang-tidy: check-clang-tidy-headers $(clang_tidy_targets)
+check-clang-tidy-full: check-clang-tidy-headers $(clang_tidy_targets)
 tidy: check-clang-tidy
-tidy-fast: check-clang-tidy-fast
+tidy-full: check-clang-tidy-full
 clang-tidy-src/config.c: build/gen/builtin-config.h
 clang-tidy-test/config.c: build/gen/test-data.h
 
 # Excluding analyzer checks makes this target complete in ~12s instead of ~58s
-check-clang-tidy-fast: CTIDYFLAGS = -quiet --checks='-clang-analyzer-*'
-check-clang-tidy-fast: check-clang-tidy
+check-clang-tidy: CTIDYFLAGS = -quiet --checks='-clang-analyzer-*'
+check-clang-tidy: check-clang-tidy-full
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
@@ -37,5 +37,5 @@ check-clang-tidy-headers:
 
 
 .PHONY: \
-    tidy tidy-fast check-clang-tidy check-clang-tidy-fast \
+    tidy tidy-full check-clang-tidy check-clang-tidy-full \
     check-clang-tidy-headers $(clang_tidy_targets)
