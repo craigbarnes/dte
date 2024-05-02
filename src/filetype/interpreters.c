@@ -15,6 +15,7 @@ static const struct FileInterpreterMap {
     {"csh", CSH},
     {"dart", DART},
     {"dash", SH},
+    {"deno", TYPESCRIPT},
     {"ecl", LISP},
     {"elixir", ELIXIR},
     {"escript", ERLANG},
@@ -40,11 +41,13 @@ static const struct FileInterpreterMap {
     {"nawk", AWK},
     {"nft", NFTABLES},
     {"node", JAVASCRIPT},
+    {"nodejs", JAVASCRIPT},
     {"ocaml", OCAML},
     {"pdksh", SH},
     {"perl", PERL},
     {"php", PHP},
     {"pwsh", POWERSHELL},
+    {"pypy", PYTHON},
     {"python", PYTHON},
     {"qjs", JAVASCRIPT},
     {"r6rs", SCHEME},
@@ -61,6 +64,7 @@ static const struct FileInterpreterMap {
     {"tcc", C},
     {"tclsh", TCL},
     {"tcsh", CSH},
+    {"ts-node", TYPESCRIPT},
     {"wish", TCL},
     {"zsh", SH},
 };
@@ -76,6 +80,8 @@ static FileTypeEnum filetype_from_interpreter(const StringView name)
             return SH;
         } else if (strview_equal_cstring(&name, "runhaskell")) {
             return HASKELL;
+        } else if (strview_equal_cstring(&name, "rust-script")) {
+            return RUST;
         }
         return NONE;
     }
