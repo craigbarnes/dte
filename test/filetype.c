@@ -70,6 +70,7 @@ static void test_find_ft_filename(TestContext *ctx)
         {"test.bats", "sh"},
         {"test.tlv", "tl-verilog"},
         {"test.typ", "typst"},
+        {"test.weechatlog", "weechatlog"},
         {"makefile", "make"},
         {"GNUmakefile", "make"},
         {".file.yml", "yaml"},

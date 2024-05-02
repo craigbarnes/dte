@@ -1,0 +1,24 @@
+syntax weechatlog
+
+state timestamp
+    char "\t" username
+    eat this
+
+state username
+    char -bn "\n\t" this
+    inlist arrow status
+    char "\t" message
+    eat timestamp
+
+state message
+    char "\n" timestamp
+    eat this
+
+state status
+    char "\n" timestamp
+    eat this
+
+list -- arrow --> <-- --
+default comment timestamp arrow status
+default special username
+default text message

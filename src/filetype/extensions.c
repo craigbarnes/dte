@@ -221,6 +221,7 @@ static const struct FileExtensionMap {
     {"vhd", VHDL},
     {"vhdl", VHDL},
     {"vim", VIML},
+    {"weechatlog", WEECHATLOG},
     {"wsgi", PYTHON},
     {"xhtml", HTML},
     {"xml", XML},
