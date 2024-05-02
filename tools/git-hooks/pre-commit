@@ -80,6 +80,11 @@ if test "$changed_shell_files"; then
     shellcheck -fgcc $changed_shell_files
 fi
 
+if test -z "$changed_c_files"; then
+    printf ' %7s  %s\n' NOTE 'No C files changed; skipping "make check"' >&2
+    exit 0
+fi
+
 # Build and test with various configurations and compilers:
 export CFLAGS='-g -Og -pipe -Werror'
 export DEBUG=3
