@@ -196,6 +196,7 @@ static const struct FileExtensionMap {
     {"tcl", TCL},
     {"tcsh", CSH},
     {"tcshrc", CSH},
+    {"terminfo", TERMINFO},
     {"tex", TEX},
     {"texi", TEXINFO},
     {"texinfo", TEXINFO},
