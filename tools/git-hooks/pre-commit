@@ -17,8 +17,8 @@ changed_files() {
     git diff-index --cached --name-only --diff-filter=ACMR HEAD -- "$@"
 }
 
-generated_files() {
-    git ls-files --error-unmatch ':(attr:is-generated)' "$@"
+git_ls() {
+    git ls-files --error-unmatch "$@"
 }
 
 alias abort='error "${LINENO:-1}"'
@@ -40,26 +40,26 @@ set -e
 git checkout-index --prefix="$TMPDIR/" -a
 trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
-# Generated files that are checked into the repository have an "is-generated"
-# attribute (set via .gitattributes):
-generated=$(generated_files --format="$TMPDIR/%(path)")
+changed_doc_source_files=$(changed_files 'docs/dte*.md')
+if test "$changed_doc_source_files"; then
+    # Snapshot and re-generate man pages, if any Markdown source file changed
+    manpages=$(git_ls --format="$TMPDIR/%(path)" -- 'docs/dte*.[15]')
+    mkdir -p "$TMPDIR/GEN/"
+    cp $manpages "$TMPDIR/GEN/"
+    $MAKE -B man
 
-# ...snapshot and re-generate these files:
-mkdir -p "$TMPDIR/GEN/"
-cp $generated "$TMPDIR/GEN/"
-$MAKE -B man
-
-# ...and then check the freshly generated files are identical to the
-# ones that are to be committed:
-for file in $generated; do
-    base=$(basename "$file")
-    orig="$TMPDIR/GEN/$base"
-    echo "   CHECK  $orig"
-    if ! diff "$file" "$orig" >/dev/null; then
-        # shellcheck disable=SC2295
-        abort "re-generate '${file##${TMPDIR}/}' before committing"
-    fi
-done
+    # ...then check that the freshly generated files are identical to the
+    # ones to be committed
+    for file in $manpages; do
+        base=$(basename "$file")
+        orig="$TMPDIR/GEN/$base"
+        echo "   CHECK  $orig"
+        if ! diff "$file" "$orig" >/dev/null; then
+            # shellcheck disable=SC2295
+            abort "re-generate '${file##${TMPDIR}/}' before committing"
+        fi
+    done
+fi
 
 changed_indented_files=$(changed_files ':(attr:space-indent)')
 changed_shell_files=$(changed_files ':(attr:shell)')
