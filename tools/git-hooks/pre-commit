@@ -2,7 +2,7 @@
 
 # This pre-commit hook creates a fresh, temporary checkout of the index
 # (i.e. not including unstaged/dirty changes from the working tree)
-# and then performs a full build.
+# and then performs various checks, depending on what changed.
 
 export POSIXLY_CORRECT=1
 TMPDIR='.pre-commit-test'
@@ -70,27 +70,22 @@ if test "$changed_indented_files"; then
     tools/wscheck.awk $changed_indented_files
 fi
 
-# Check for header-related errors in changed C files
-if test "$changed_c_files"; then
-    tools/hdrcheck.awk $changed_c_files
-fi
-
 # Run shellcheck(1) on changed shell scripts
 if test "$changed_shell_files"; then
     shellcheck -fgcc $changed_shell_files
 fi
 
-if test -z "$changed_c_files"; then
-    printf ' %7s  %s\n' NOTE 'No C files changed; skipping "make check"' >&2
-    exit 0
-fi
+if test "$changed_c_files"; then
+    # Check for header-related errors in changed C files
+    tools/hdrcheck.awk $changed_c_files
 
-# Build and test with various configurations and compilers:
-export CFLAGS='-g -Og -pipe -Werror'
-export DEBUG=3
-for compiler in gcc clang; do
-    export CC="ccache $compiler"
-    $MAKE check
-    $MAKE check ICONV_DISABLE=1
-    $MAKE check DEBUG=0
-done
+    # Build and test with various configurations and compilers:
+    export CFLAGS='-g -Og -pipe -Werror'
+    export DEBUG=3
+    for compiler in gcc clang; do
+        export CC="ccache $compiler"
+        $MAKE check
+        $MAKE check ICONV_DISABLE=1
+        $MAKE check DEBUG=0
+    done
+fi
