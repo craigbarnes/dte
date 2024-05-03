@@ -3,7 +3,16 @@
 # This is the script used to generate the list of HTML5 entities
 # in config/syntax/html
 
-# Insert indents, line continuations and final newline
+# Extract the subset of entities with no final semicolon, then
+# remove leading ampersands
+jq_filter='
+    keys_unsorted
+    | .[]
+    | select(endswith(";") | not)
+    | sub("^&"; "")
+'
+
+# Insert indents, line continuations and a final newline
 sed_filter='
     s/^/    /
     $ {
@@ -14,9 +23,8 @@ sed_filter='
 '
 
 curl https://html.spec.whatwg.org/entities.json |
-    sed -n 's/^ *"&\([A-Za-z0-9]\+\)":.*/\1/p' |
+    jq -r "$jq_filter" |
     sort |
-    uniq |
     tr '\n' ' ' |
     fold -sw68 |
     sed "$sed_filter"

@@ -15,7 +15,7 @@ jq_filter='
     | .[].property
 '
 
-# Insert indents, line continuations and final newline
+# Insert indents, line continuations and a final newline
 sed_filter='
     s/^/    /
     $ {
