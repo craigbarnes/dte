@@ -21,7 +21,7 @@ WARNINGS_EXTRA = \
     -Walloca -Walloc-zero -Wnull-dereference -Wformat-signedness \
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
     -Wcast-align=strict -Wduplicated-branches -Wduplicated-cond \
-    -Wlogical-op -Wcomma
+    -Wlogical-op -Wcomma -Wmissing-noreturn -Wdate-time
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config css ctags d diff docker dte gcode gitblame \
