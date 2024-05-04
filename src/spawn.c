@@ -39,7 +39,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
             return;
         }
 
-        int8_t mi = p->capture_index[ERRFMT_MESSAGE];
+        int mi = p->capture_index[ERRFMT_MESSAGE];
         if (m[mi].rm_so < 0) {
             mi = 0;
         }
@@ -47,7 +47,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
         Message *msg = new_message(str + m[mi].rm_so, m[mi].rm_eo - m[mi].rm_so);
         msg->loc = new_file_location(NULL, 0, 0, 0);
 
-        int8_t fi = p->capture_index[ERRFMT_FILE];
+        int fi = p->capture_index[ERRFMT_FILE];
         if (fi >= 0 && m[fi].rm_so >= 0) {
             msg->loc->filename = xstrslice(str, m[fi].rm_so, m[fi].rm_eo);
 
@@ -61,7 +61,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
             static_assert(ERRFMT_COLUMN == 2);
 
             for (size_t j = ERRFMT_LINE; j < ARRAYLEN(ptrs); j++) {
-                int8_t ci = p->capture_index[j];
+                int ci = p->capture_index[j];
                 if (ci >= 0 && m[ci].rm_so >= 0) {
                     size_t len = m[ci].rm_eo - m[ci].rm_so;
                     unsigned long val;
