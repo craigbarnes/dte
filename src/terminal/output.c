@@ -157,14 +157,13 @@ void term_put_queries(Terminal *term)
     LOG_INFO("querying terminal");
 
     TermFeatureFlags features = term->features;
-    if (!(features & TFLAG_SYNC)) {
-        term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
-    }
-
-    if (features & TFLAG_NO_DCS_QUERIES) {
+    if (features & TFLAG_LIMIT_QUERIES) {
         return;
     }
 
+    if (!(features & TFLAG_SYNC)) {
+        term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
+    }
     if (!(features & TFLAG_BACK_COLOR_ERASE)) {
         term_put_literal(obuf, "\033P+q626365\033\\"); // XTGETTCAP "bce"
     }
