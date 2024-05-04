@@ -145,20 +145,38 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
     }
 }
 
-void term_put_queries(TermOutputBuffer *obuf)
+void term_put_queries(Terminal *term)
 {
     static const char queries[] =
         "\033[?u" // Kitty keyboard protocol flags
         "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
-        "\033[?2026$p" // DECRQM 2026 (terminal-wg synchronized updates)
-        "\033P+q626365\033\\" // XTGETTCAP "bce"
-        "\033P+q726570\033\\" // XTGETTCAP "rep"
-        "\033P+q74736C\033\\" // XTGETTCAP "tsl"
-        "\033P+q4D73\033\\" // XTGETTCAP "Ms"
     ;
 
-    LOG_INFO("querying terminal");
+    TermOutputBuffer *obuf = &term->obuf;
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
+    LOG_INFO("querying terminal");
+
+    TermFeatureFlags features = term->features;
+    if (!(features & TFLAG_SYNC)) {
+        term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
+    }
+
+    if (features & TFLAG_NO_DCS_QUERIES) {
+        return;
+    }
+
+    if (!(features & TFLAG_BACK_COLOR_ERASE)) {
+        term_put_literal(obuf, "\033P+q626365\033\\"); // XTGETTCAP "bce"
+    }
+    if (!(features & TFLAG_ECMA48_REPEAT)) {
+        term_put_literal(obuf, "\033P+q726570\033\\"); // XTGETTCAP "rep"
+    }
+    if (!(features & TFLAG_SET_WINDOW_TITLE)) {
+        term_put_literal(obuf, "\033P+q74736C\033\\"); // XTGETTCAP "tsl"
+    }
+    if (!(features & TFLAG_OSC52_COPY)) {
+        term_put_literal(obuf, "\033P+q4D73\033\\"); // XTGETTCAP "Ms"
+    }
 }
 
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer
