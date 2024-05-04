@@ -2224,8 +2224,8 @@ static void test_path_absolute(TestContext *ctx)
     EXPECT_STREQ(path, "/dev");
     free(path);
 
-    path = path_absolute("///dev///..///dev//null");
-    EXPECT_STREQ(path, "/dev/null");
+    path = path_absolute("///dev///..///dev//");
+    EXPECT_STREQ(path, "/dev");
     free(path);
 
     path = path_absolute("///dev//n0nexist3nt-file");
