@@ -425,6 +425,7 @@ loop_break:;
 
     const char *colorterm = getenv("COLORTERM");
     if (use_showkey) {
+        LOG_INFO("entering \"showkey\" mode (dte -K)");
         return showkey_loop(term_name, colorterm);
     }
 
