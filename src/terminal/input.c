@@ -184,7 +184,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
     BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
     LOG_INFO("detected terminal feature %s via query", tflag_to_str(flag));
     term->features |= flag;
-    return KEY_IGNORE;
+    return KEY_NONE;
 }
 
 KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
@@ -206,6 +206,9 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
         KeyCode key = read_special(term);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
             return handle_query_reply(term, key);
+        }
+        if (key == KEY_IGNORE) {
+            return KEY_NONE;
         }
         if (key != KEY_NONE) {
             return key;
