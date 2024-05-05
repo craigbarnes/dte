@@ -1,4 +1,3 @@
-#include "compat.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -10,6 +9,7 @@
 #include <unistd.h>
 #include "block.h"
 #include "commands.h"
+#include "compat.h"
 #include "compiler.h"
 #include "config.h"
 #include "editor.h"

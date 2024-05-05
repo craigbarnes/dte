@@ -1,4 +1,4 @@
-#include "compat.h"
+#include "feature.h"
 #include <string.h>
 #include "xmemmem.h"
 #include "debug.h"

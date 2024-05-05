@@ -19,9 +19,9 @@ FNR == 1 {
     print "  HCHECK  " FILENAME
 }
 
-FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"compat.h"/ {
+FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"feature.h"/ {
     h++
-    warn("\"compat.h\" include not on line 1")
+    warn("\"feature.h\" include not on line 1")
 }
 
 /^#ifndef / && FILENAME ~ /\.h$/ && ifndef_line == -1 {
@@ -43,7 +43,7 @@ FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"compat.h"/ {
 
 END {
     if (h) {
-        print "Error: " h " misplaced \"compat.h\" include" plural(h)
+        print "Error: " h " misplaced \"feature.h\" include" plural(h)
     }
     if (H) {
         print "Error: " H " unexpected header guard" plural(H)

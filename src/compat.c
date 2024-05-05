@@ -1,3 +1,4 @@
+#include "feature.h"
 #include "compat.h"
 
 const char feature_string[] =

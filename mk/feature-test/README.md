@@ -23,8 +23,8 @@ The following points should be observed when adding new feature tests:
   generated headers from `build/feature/*.h`, to ensure the code under [`src/`]
   sees the same macro definitions as the feature tests.
 * Source files under [`src/`] that use constructs like e.g. `#if HAVE_EXAMPLE`
-  should use `#include "compat.h"` before any other includes and should be
-  given an explicit dependency on `src/compat.h` in [`mk/build.mk`].
+  should use `#include "feature.h"` before any other includes and should be
+  given an explicit dependency on `src/feature.h` in [`mk/build.mk`].
 * Some platforms implement stubs for some extended functions, which simply
   fail at runtime and set [`errno`] to `ENOSYS`. See `xpipe2()` in
   [`src/util/fd.c`] for an example of how to handle this.

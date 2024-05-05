@@ -1,4 +1,4 @@
-#include "compat.h"
+#include "feature.h"
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
