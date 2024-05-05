@@ -2715,12 +2715,7 @@ static void test_timespec_to_str(TestContext *ctx)
     EXPECT_NULL(timespec_to_str(&ts, buf, size));
     EXPECT_EQ(errno, EINVAL);
 
-    if (unlikely(timezone != 0 || daylight != 0)) {
-        // Note: $TZ is set to "UTC" in test_init()
-        LOG_WARNING("non-zero timezone/daylight; skipping TZ-dependent tests");
-        return;
-    }
-
+    // Note: $TZ is set to "UTC" in test_init()
     ts.tv_sec = 4321;
     ts.tv_nsec = 9876;
     const char *r = timespec_to_str(&ts, buf, size);
