@@ -1,3 +1,4 @@
+#include "compat.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -417,6 +418,9 @@ loop_break:;
     if (unlikely(r != EX_OK)) {
         return r;
     }
+
+    LOG_INFO("dte version: " VERSION);
+    LOG_INFO("features:%s", feature_string);
 
     if (!term_mode_init()) {
         perror("tcgetattr");

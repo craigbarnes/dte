@@ -1,4 +1,3 @@
-#include "compat.h"
 #include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
@@ -132,9 +131,6 @@ EditorState *init_editor_state(void)
     } else {
         e->user_config_dir = xstrjoin(home, "/.dte");
     }
-
-    LOG_INFO("dte version: " VERSION);
-    LOG_INFO("features:%s", feature_string);
 
     pid_t pid = getpid();
     bool leader = pid == getsid(0);

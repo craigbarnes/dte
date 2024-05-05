@@ -191,8 +191,8 @@ build/gen/builtin-config.h: build/gen/builtin-config.mk
 build/gen/test-data.h: build/gen/test-data.mk
 build/config.o: build/gen/builtin-config.h
 build/test/config.o: build/gen/test-data.h
-build/main.o: build/gen/version.h
-build/editor.o: build/gen/version.h build/gen/feature.h
+build/main.o: build/gen/version.h build/gen/feature.h
+build/editor.o: build/gen/version.h
 build/load-save.o: build/gen/feature.h
 build/signals.o: build/gen/feature.h
 build/tag.o: build/gen/feature.h
