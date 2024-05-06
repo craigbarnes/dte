@@ -1,7 +1,6 @@
 #ifndef UTIL_LIST_H
 #define UTIL_LIST_H
 
-#include <stddef.h> // offsetof
 #include <stdbool.h>
 #include "macros.h"
 
@@ -37,8 +36,7 @@ static inline void list_del(ListHead *entry)
 {
     entry->next->prev = entry->prev;
     entry->prev->next = entry->next;
-    entry->next = (void*)0x00100100;
-    entry->prev = (void*)0x00200200;
+    *entry = (ListHead){NULL, NULL};
 }
 
 static inline bool list_empty(const ListHead *head)
