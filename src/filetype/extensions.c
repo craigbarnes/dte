@@ -172,6 +172,7 @@ static const struct FileExtensionMap {
     {"rockspec", LUA},
     {"roff", ROFF},
     {"rs", RUST},
+    {"rss", XML},
     {"rst", RST},
     {"ru", RUBY},
     {"sarif", JSON},

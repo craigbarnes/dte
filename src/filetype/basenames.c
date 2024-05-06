@@ -1,6 +1,6 @@
 static const struct FileBasenameMap {
     const char name[16];
-    const uint8_t filetype; // FileTypeEnum
+    uint8_t filetype; // FileTypeEnum
     bool dotfile; // If true, name is matched with or without a leading dot
 } basenames[] = {
     {"APKBUILD", SH, false},
@@ -135,10 +135,6 @@ static const struct FileBasenameMap {
 
 static FileTypeEnum filetype_from_basename(StringView name)
 {
-    if (name.length >= ARRAYLEN(basenames[0].name)) {
-        return strview_equal_cstring(&name, "meson_options.txt") ? MESON : NONE;
-    }
-
     size_t dotprefix = 0;
     if (strview_has_prefix(&name, ".")) {
         dotprefix = 1;
@@ -151,10 +147,15 @@ static FileTypeEnum filetype_from_basename(StringView name)
         return NONE;
     }
 
-    const struct FileBasenameMap *e = BSEARCH(&name, basenames, ft_compare);
-    if (e && (dotprefix == 0 || e->dotfile)) {
-        return e->filetype;
+    if (name.length >= ARRAYLEN(basenames[0].name)) {
+        if (strview_equal_cstring(&name, "meson_options.txt")) {
+            return dotprefix ? NONE : MESON;
+        } else if (strview_equal_cstring(&name, "git-blame-ignore-revs")) {
+            return dotprefix ? CONFIG : NONE;
+        }
+        return NONE;
     }
 
-    return NONE;
+    const struct FileBasenameMap *e = BSEARCH(&name, basenames, ft_compare);
+    return (e && (dotprefix == 0 || e->dotfile)) ? e->filetype : NONE;
 }
