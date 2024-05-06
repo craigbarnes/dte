@@ -2,7 +2,7 @@ syntax .xml-entity
 
 state entity
     char # hash
-    char -b a-zA-Z0-9 name
+    char -b a-zA-Z:_ name
     recolor error 1
     char "\n" END
     eat END error
@@ -26,17 +26,17 @@ state dec entity
     char ";" END entity
     eat END error
 
-state name error
-    char -b a-zA-Z0-9 this
-    inlist entity semicolon
-    noeat semicolon
-
-state semicolon error
-    char ";" END entity
+state name entity
+    char -b a-zA-Z0-9:_.- this
+    char -b ";" maybe-predef
+    recolor error
     eat END error
 
-list entity \
-    quot apos amp lt gt
+state maybe-predef
+    inlist predefined-entity END
+    noeat END
+
+list predefined-entity '&quot;' '&apos;' '&amp;' '&lt;' '&gt;'
 
 syntax xml
 
@@ -57,16 +57,29 @@ state xml comment
     char < line2 error
     eat this
 
+# TODO: Conform more strictly to the spec for `doctypedecl`:
+# https://www.w3.org/TR/2008/REC-xml-20081126/#NT-doctypedecl
 state doctype comment
+    char " \t\r\nA-Za-z:_.-" this
+    char [ markupdecl
     char > text comment
     char < text error
     eat this
+
+state markupdecl comment
+    char ] maybe-markupdecl-end
+    eat this
+
+state maybe-markupdecl-end comment
+    char " \t\r\n" this
+    char > text comment
+    noeat markupdecl
 
 state text
     str "<!" maybe-comment-or-cdata
     char < tag-start
     char > this error
-    char "&" .xml-entity:this
+    char -b "&" .xml-entity:this
     eat this
 
 state maybe-comment-or-cdata comment
@@ -142,15 +155,15 @@ state attr-eq attr
 state dq string
     char \" attrs string
     char "\n" attrs
-    char "&" .xml-entity:this
+    char -b "&" .xml-entity:this
     eat this
 
 state sq string
     char \' attrs string
     char "\n" attrs
-    char "&" .xml-entity:this
+    char -b "&" .xml-entity:this
     eat this
 
-default special entity
+default numeric entity predefined-entity
 default text cdata
 default constant cdata-delim
