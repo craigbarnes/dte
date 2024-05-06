@@ -52,6 +52,7 @@ option lua indent-regex '(then|do|repeat|else) *$|function *[A-Za-z0-9_.:]* *\([
 option php indent-regex '^[ \t]*(case|default|do|else|for|foreach|if|while)[ (]'
 option python indent-regex ':[ \t]*(#.*)?$'
 option sh indent-regex '(^|;)[ \t]*(do|else|then) *$'
+option html,xml indent-regex '(^[ \t]*>|<[A-Za-z]>|<[^/][^<]*[^/]>)[ \t]*$'
 
 # Don't highlight whitespace errors in diff and mail files
 option diff,mail ws-error 0
