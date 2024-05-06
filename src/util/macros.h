@@ -88,19 +88,21 @@
     #define HAS_WARNING(x) 0
 #endif
 
+// https://gcc.gnu.org/gcc-14/changes.html#c-family (TODO: Link to GCC 14 manual, when released)
 // https://clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60512
 #ifdef __has_feature
-    // Supported by Clang
+    // Supported by GCC 14+ and Clang
     #define HAS_FEATURE(x) __has_feature(x)
 #else
     #define HAS_FEATURE(x) 0
 #endif
 
+// https://gcc.gnu.org/gcc-14/changes.html#c-family (TODO: As above)
 // https://clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
 #ifdef __has_extension
-    // __has_extension() is a Clang 3.0+ macro used to determine if a feature
-    // is available even if not standardized in the current `-std=...` mode
+    // __has_extension() is a Clang 3.0+ (and GCC 14+) macro that can
+    // be used to check whether a feature is available, even if not
+    // standardized in the current -std= mode
     #define HAS_EXTENSION(x) __has_extension(x)
 #else
     // Clang versions prior to 3.0 only supported __has_feature()
