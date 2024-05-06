@@ -1,7 +1,9 @@
 dte
 ===
 
-A small and easy to use console text editor.
+A small and easy to use terminal text editor.
+
+[![screenshot]][screenshot]
 
 Features
 --------
@@ -25,11 +27,6 @@ Features
 * Minimal dependencies (just libc on most systems)
 * Portable (to any [POSIX] 2008 operating system)
 * Fast startup (~10ms)
-
-Screenshot
-----------
-
-[![screenshot]][screenshot]
 
 Installing
 ----------
