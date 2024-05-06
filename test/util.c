@@ -118,6 +118,8 @@ static void test_is_power_of_2(TestContext *ctx)
     }
 }
 
+// Note: some of these tests are more for the sake of AddressSanitizer
+// coverage than making actual assertions about the code
 static void test_xmalloc(TestContext *ctx)
 {
     char *str = xmalloc(8);
@@ -135,6 +137,7 @@ static void test_xmalloc(TestContext *ctx)
     free(str);
 
     str = xcalloc(4, 1);
+    ASSERT_NONNULL(str);
     EXPECT_MEMEQ(str, "\0\0\0\0", 4);
     free(str);
 
@@ -144,6 +147,15 @@ static void test_xmalloc(TestContext *ctx)
 
     str = xstrjoin("foo", "-bar");
     EXPECT_STREQ(str, "foo-bar");
+    free(str);
+
+    str = xnew0(char, 4);
+    ASSERT_NONNULL(str);
+    EXPECT_EQ(str[3], 0);
+    str = xrenew(str, 64);
+    ASSERT_NONNULL(str);
+    str[63] = 'p';
+    EXPECT_EQ(str[63], 'p');
     free(str);
 }
 
