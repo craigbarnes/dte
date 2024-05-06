@@ -24,6 +24,7 @@ Features
 * Jump to [compiler error]
 * [Copy] to system clipboard (using [OSC 52], which works over SSH)
 * [EditorConfig] support
+* Extensible via [external commands] and [stdio]
 * Minimal dependencies (just libc on most systems)
 * Portable (to any [POSIX] 2008 operating system)
 * Fast startup (~10ms)
@@ -129,6 +130,8 @@ Public License version 2 for more details.
 [color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
+[external commands]: https://craigbarnes.gitlab.io/dte/dterc.html#external-commands
+[stdio]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [screenshot]: https://craigbarnes.gitlab.io/dte/screenshot.png
 [release]: https://craigbarnes.gitlab.io/dte/releases.html
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys

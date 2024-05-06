@@ -1049,7 +1049,7 @@ Cancel selection.
 
 ### **exec** [**-pstmn**] [**-ioe** _action_]... _command_ [_argument_]...
 
-Execute external _command_, with custom actions for standard streams.
+Execute external _command_, with custom actions for [standard streams].
 The `-i`, `-o` and `-e` options represent standard input, output and
 error respectively and each one can be given a specific _action_, as
 described below.
@@ -1569,6 +1569,7 @@ errors should be highlighted. Set to `""` to disable.
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings
 [`color/reset`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/reset
+[standard streams]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [external scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/contrib
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
