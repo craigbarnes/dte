@@ -1774,6 +1774,8 @@ static void test_list(TestContext *ctx)
     EXPECT_PTREQ(a.prev, &c);
     EXPECT_PTREQ(c.next, &a);
     EXPECT_PTREQ(c.prev, &a);
+    EXPECT_NULL(b.next);
+    EXPECT_NULL(b.prev);
 }
 
 static void test_hashmap(TestContext *ctx)
