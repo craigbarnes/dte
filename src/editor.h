@@ -39,10 +39,10 @@ typedef enum {
 } EditorStatus;
 
 typedef enum {
-    EFLAG_SAVE_CMD_HIST = 1u << 0,
-    EFLAG_SAVE_SEARCH_HIST = 1u << 1,
-    EFLAG_SAVE_FILE_HIST = 1u << 2,
-    EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1,
+    EFLAG_SAVE_CMD_HIST = 1u << 0, // Update command history on quit
+    EFLAG_SAVE_SEARCH_HIST = 1u << 1, // Update search history on quit
+    EFLAG_SAVE_FILE_HIST = 1u << 2, // Update file history on quit
+    EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1, // All of the above
 } EditorFlags;
 
 typedef struct EditorState {
