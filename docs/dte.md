@@ -212,7 +212,8 @@ The following environment variables are inspected at startup:
     to determine the default value for `DTE_HOME`.
 
 `XDG_RUNTIME_DIR`
-:   Directory used to store lock files. Defaults to `$DTE_HOME` if not set.
+:   Directory used to store [lock files][`lock-files`]. Defaults to
+    `$DTE_HOME` if not set.
 
 `TERM`
 :   Terminal identifier. Used to determine which terminal capabilities are
@@ -250,7 +251,7 @@ The following environment variables are set by dte:
 
 `DTE_VERSION`
 :   Editor version string. This is set at startup to the same version
-    string as shown by `dte -V`.
+    string as shown by `dte -V | head -n1`.
 
 `PWD`
 :   Absolute path of the current working directory; set when changing
