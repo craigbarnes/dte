@@ -262,4 +262,3 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
 
     return read_simple(input);
 }
-

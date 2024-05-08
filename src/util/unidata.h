@@ -1205,4 +1205,3 @@ static const CodepointRange unprintable[] = {
     {0xe0080, 0xe00ff},
     {0xe01f0, 0x10ffff},
 };
-
