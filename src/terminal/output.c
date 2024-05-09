@@ -1,3 +1,16 @@
+// Terminal output and control functions.
+// Copyright © 2018-2024 Craig Barnes.
+// Copyright © 2010-2015 Timo Hirvonen.
+// SPDX-License-Identifier: GPL-2.0-only
+// See also:
+// • ECMA-48 5th edition, §8.3 (CUP, ED, EL, REP, SGR)
+// • DEC Manual EK-VT510-RM, Chapter 5 (CUP, ED, EL, SGR, DECRQM, DECSCUSR, DECTCEM)
+// • XTerm's ctlseqs.html (XTWINOPS, XTQMODKEYS, XTGETTCAP, OSC 12, OSC 112)
+// • https://ecma-international.org/publications-and-standards/standards/ecma-48/
+// • https://vt100.net/docs/vt510-rm/contents.html
+// • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+// • https://sw.kovidgoyal.net/kitty/keyboard-protocol/ (CSI ? u)
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
