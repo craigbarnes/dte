@@ -25,7 +25,7 @@ ssize_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
         mods = MOD_SHIFT;
         final:
         if (length < 3) {
-            return -1;
+            return TPARSE_PARTIAL_MATCH;
         }
         switch (buf[2]) {
         case 'a': // Up

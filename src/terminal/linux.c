@@ -9,7 +9,7 @@ ssize_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
     }
 
     if (unlikely(length == 3)) {
-        return -1;
+        return TPARSE_PARTIAL_MATCH;
     }
 
     // Letters A-E represent keys F1-F5

@@ -187,7 +187,7 @@ static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
 static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
 {
     if (unlikely(i >= length)) {
-        return -1;
+        return TPARSE_PARTIAL_MATCH;
     }
 
     const char ch = buf[i++];
@@ -368,7 +368,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 
     if (unlikely(csi.final_byte == 0)) {
         BUG_ON(i < len);
-        return -1;
+        return TPARSE_PARTIAL_MATCH;
     }
     if (unlikely(csi.unhandled_bytes)) {
         goto ignore;
@@ -512,7 +512,7 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
     }
 
     // Unterminated sequence (possibly truncated)
-    return -1;
+    return TPARSE_PARTIAL_MATCH;
 
 complete:
     if (unlikely(pos == 0)) {
@@ -557,7 +557,7 @@ static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
     }
 
     // Unterminated sequence (possibly truncated)
-    return -1;
+    return TPARSE_PARTIAL_MATCH;
 }
 
 ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
@@ -565,7 +565,7 @@ ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
     if (unlikely(length == 0 || buf[0] != '\033')) {
         return 0;
     } else if (unlikely(length == 1)) {
-        return -1;
+        return TPARSE_PARTIAL_MATCH;
     }
 
     switch (buf[1]) {

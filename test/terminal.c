@@ -506,19 +506,19 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[1;8H", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
         {"\033[1;8H~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
         {"\033[1;8H~_", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
-        {"\033", -1, 0},
-        {"\033[", -1, 0},
-        {"\033]", -1, 0},
-        {"\033[1", -1, 0},
-        {"\033[9", -1, 0},
-        {"\033[1;", -1, 0},
+        {"\033", TPARSE_PARTIAL_MATCH, 0},
+        {"\033[", TPARSE_PARTIAL_MATCH, 0},
+        {"\033]", TPARSE_PARTIAL_MATCH, 0},
+        {"\033[1", TPARSE_PARTIAL_MATCH, 0},
+        {"\033[9", TPARSE_PARTIAL_MATCH, 0},
+        {"\033[1;", TPARSE_PARTIAL_MATCH, 0},
         {"\033[1[", 4, KEY_IGNORE},
-        {"\033[1;2", -1, 0},
-        {"\033[1;8", -1, 0},
-        {"\033[1;9", -1, 0},
+        {"\033[1;2", TPARSE_PARTIAL_MATCH, 0},
+        {"\033[1;8", TPARSE_PARTIAL_MATCH, 0},
+        {"\033[1;9", TPARSE_PARTIAL_MATCH, 0},
         {"\033[1;_", 5, KEY_IGNORE},
         {"\033[1;8Z", 6, KEY_IGNORE},
-        {"\033O", -1, 0},
+        {"\033O", TPARSE_PARTIAL_MATCH, 0},
         {"\033[\033", 2, KEY_IGNORE},
         {"\033[\030", 3, KEY_IGNORE},
         {"\033[A", 3, KEY_UP},
@@ -746,11 +746,12 @@ static void test_term_parse_sequence(TestContext *ctx)
 
         EXPECT_KEYCODE_EQ(i, key, tests[i].expected_key, seq, seq_length);
 
-        // Ensure that parsing any truncated sequence returns -1:
+        // Ensure that parsing any truncated sequence returns
+        // TPARSE_PARTIAL_MATCH:
         key = 0x18;
         for (size_t n = expected_length - 1; n != 0; n--) {
             parsed_length = term_parse_sequence(seq, n, &key);
-            IEXPECT_EQ(parsed_length, -1);
+            IEXPECT_EQ(parsed_length, TPARSE_PARTIAL_MATCH);
             IEXPECT_EQ(key, 0x18);
         }
     }
@@ -851,7 +852,7 @@ static void test_term_parse_sequence2(TestContext *ctx)
             key = 25;
             for (size_t n = seq_length - 1; n != 0; n--) {
                 parsed_length = term_parse_sequence(seq, n, &key);
-                EXPECT_EQ(parsed_length, -1);
+                EXPECT_EQ(parsed_length, TPARSE_PARTIAL_MATCH);
                 EXPECT_EQ(key, 25);
             }
             // Overlength
@@ -913,7 +914,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
             for (size_t n = seq_length - 1; n != 0; n--) {
                 key = 25;
                 parsed_length = rxvt_parse_key(seq, n, &key);
-                EXPECT_EQ(parsed_length, -1);
+                EXPECT_EQ(parsed_length, TPARSE_PARTIAL_MATCH);
                 EXPECT_EQ(key, 25);
             }
 
@@ -921,7 +922,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
             for (size_t n = seq_length - 2; n != 0; n--) {
                 key = 25;
                 parsed_length = rxvt_parse_key(seq + 1, n, &key);
-                EXPECT_EQ(parsed_length, -1);
+                EXPECT_EQ(parsed_length, TPARSE_PARTIAL_MATCH);
                 EXPECT_EQ(key, 25);
             }
         }
@@ -937,18 +938,18 @@ static void test_rxvt_parse_key(TestContext *ctx)
         {STRN("\033Ob"), 3, MOD_CTRL | KEY_DOWN},
         {STRN("\033Oc"), 3, MOD_CTRL | KEY_RIGHT},
         {STRN("\033Od"), 3, MOD_CTRL | KEY_LEFT},
-        {STRN("\033O"), -1, 0},
+        {STRN("\033O"), TPARSE_PARTIAL_MATCH, 0},
         {STRN("\033[a"), 3, MOD_SHIFT | KEY_UP},
         {STRN("\033[b"), 3, MOD_SHIFT | KEY_DOWN},
         {STRN("\033[c"), 3, MOD_SHIFT | KEY_RIGHT},
         {STRN("\033[d"), 3, MOD_SHIFT | KEY_LEFT},
-        {STRN("\033["), -1, 0},
+        {STRN("\033["), TPARSE_PARTIAL_MATCH, 0},
         {STRN("\033[1;5A"), 6, MOD_CTRL | KEY_UP},
-        {STRN("\033[1;5"), -1, 0},
+        {STRN("\033[1;5"), TPARSE_PARTIAL_MATCH, 0},
         {STRN("\033\033[@"), 4, KEY_IGNORE},
-        {STRN("\033\033["), -1, 0},
-        {STRN("\033\033"), -1, 0},
-        {STRN("\033"), -1, 0},
+        {STRN("\033\033["), TPARSE_PARTIAL_MATCH, 0},
+        {STRN("\033\033"), TPARSE_PARTIAL_MATCH, 0},
+        {STRN("\033"), TPARSE_PARTIAL_MATCH, 0},
     };
 
     FOR_EACH_I(i, tests) {
@@ -977,9 +978,9 @@ static void test_linux_parse_key(TestContext *ctx)
         {STRN("\033[[D"), 4, KEY_F4},
         {STRN("\033[[E"), 4, KEY_F5},
         {STRN("\033[[F"), 0, 0},
-        {STRN("\033[["), -1, 0},
-        {STRN("\033["), -1, 0},
-        {STRN("\033"), -1, 0},
+        {STRN("\033[["), TPARSE_PARTIAL_MATCH, 0},
+        {STRN("\033["), TPARSE_PARTIAL_MATCH, 0},
+        {STRN("\033"), TPARSE_PARTIAL_MATCH, 0},
     };
 
     FOR_EACH_I(i, tests) {
