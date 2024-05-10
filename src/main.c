@@ -65,9 +65,9 @@ static ExitCode write_stdout(const char *str, size_t len)
 {
     if (xwrite_all(STDOUT_FILENO, str, len) < 0) {
         perror("write");
-        return EX_IOERR;
+        return EC_IO_ERROR;
     }
-    return EX_OK;
+    return EC_OK;
 }
 
 static ExitCode list_builtin_configs(void)
@@ -84,7 +84,7 @@ static ExitCode dump_builtin_config(const char *name)
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
-        return EX_USAGE;
+        return EC_USAGE_ERROR;
     }
     return write_stdout(cfg->text.data, cfg->text.length);
 }
@@ -103,14 +103,14 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
         error_msg("%s: no default syntax found", filename);
     }
     free_editor_state(e);
-    return get_nr_errors() ? EX_DATAERR : EX_OK;
+    return get_nr_errors() ? EC_DATA_ERROR : EC_OK;
 }
 
 static ExitCode showkey_loop(const char *term_name, const char *colorterm)
 {
     if (unlikely(!term_raw())) {
         perror("tcsetattr");
-        return EX_IOERR;
+        return EC_IO_ERROR;
     }
 
     Terminal term;
@@ -149,7 +149,7 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
     term_cooked();
     term_input_free(ibuf);
     term_output_free(obuf);
-    return EX_OK;
+    return EC_OK;
 }
 
 static ExitCode init_std_fds(int std_fds[2])
@@ -166,7 +166,7 @@ static ExitCode init_std_fds(int std_fds[2])
             int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
             if (fd == -1 && errno != EBADF) {
                 perror("fcntl");
-                return EX_OSERR;
+                return EC_OS_ERROR;
             }
             std_fds[i] = fd;
         }
@@ -176,7 +176,7 @@ static ExitCode init_std_fds(int std_fds[2])
         if (unlikely(!freopen("/dev/tty", i ? "w" : "r", streams[i]))) {
             const char *err = strerror(errno);
             fprintf(stderr, "Failed to open /dev/tty for fd %d: %s\n", i, err);
-            return EX_IOERR;
+            return EC_IO_ERROR;
         }
 
         int new_fd = fileno(streams[i]);
@@ -186,16 +186,16 @@ static ExitCode init_std_fds(int std_fds[2])
             // POSIX requires a successful call to open() to return the
             // lowest available file descriptor.
             fprintf(stderr, "freopen() changed fd from %d to %d\n", i, new_fd);
-            return EX_OSERR;
+            return EC_OS_ERROR;
         }
 
         if (unlikely(!is_controlling_tty(new_fd))) {
             perror("tcgetpgrp");
-            return EX_OSERR;
+            return EC_OS_ERROR;
         }
     }
 
-    return EX_OK;
+    return EC_OK;
 }
 
 static Buffer *init_std_buffer(EditorState *e, int fds[2])
@@ -237,16 +237,16 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 static ExitCode init_logging(const char *filename, const char *req_level_str)
 {
     if (!filename || filename[0] == '\0') {
-        return EX_OK;
+        return EC_OK;
     }
 
     LogLevel req_level = log_level_from_str(req_level_str);
     if (req_level == LOG_LEVEL_NONE) {
-        return EX_OK;
+        return EC_OK;
     }
     if (req_level == LOG_LEVEL_INVALID) {
         fprintf(stderr, "Invalid $DTE_LOG_LEVEL value: '%s'\n", req_level_str);
-        return EX_USAGE;
+        return EC_USAGE_ERROR;
     }
 
     // https://no-color.org/
@@ -256,7 +256,7 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
         fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", filename, err);
-        return EX_IOERR;
+        return EC_IO_ERROR;
     }
 
     const char *got_level_str = log_level_to_str(got_level);
@@ -278,7 +278,7 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
     } else {
         LOG_ERRNO("uname");
     }
-    return EX_OK;
+    return EC_OK;
 }
 
 static void log_config_counts(const EditorState *e)
@@ -355,14 +355,14 @@ int main(int argc, char *argv[])
         case 'c':
             if (unlikely(nr_commands >= ARRAYLEN(commands))) {
                 fputs("Error: too many -c options used\n", stderr);
-                return EX_USAGE;
+                return EC_USAGE_ERROR;
             }
             commands[nr_commands++] = optarg;
             break;
         case 't':
             if (unlikely(nr_tags >= ARRAYLEN(tags))) {
                 fputs("Error: too many -t options used\n", stderr);
-                return EX_USAGE;
+                return EC_USAGE_ERROR;
             }
             tags[nr_tags++] = optarg;
             break;
@@ -389,9 +389,9 @@ int main(int argc, char *argv[])
             return write_stdout(copyright, sizeof(copyright));
         case 'h':
             printf(usage, progname(argc, argv, "dte"));
-            return EX_OK;
+            return EC_OK;
         default:
-            return EX_USAGE;
+            return EC_USAGE_ERROR;
         }
     }
 
@@ -402,7 +402,7 @@ loop_break:;
         fputs("Error: $TERM not set\n", stderr);
         // This is considered a "usage" error, because the program
         // must be started from a properly configured terminal
-        return EX_USAGE;
+        return EC_USAGE_ERROR;
     }
 
     // This must be done before calling init_logging(), otherwise an
@@ -410,12 +410,12 @@ loop_break:;
     // cause the logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
     ExitCode r = init_std_fds(std_fds);
-    if (unlikely(r != EX_OK)) {
+    if (unlikely(r != EC_OK)) {
         return r;
     }
 
     r = init_logging(getenv("DTE_LOG"), getenv("DTE_LOG_LEVEL"));
-    if (unlikely(r != EX_OK)) {
+    if (unlikely(r != EC_OK)) {
         return r;
     }
 
@@ -424,7 +424,7 @@ loop_break:;
 
     if (!term_mode_init()) {
         perror("tcgetattr");
-        return EX_IOERR;
+        return EC_IO_ERROR;
     }
 
     const char *colorterm = getenv("COLORTERM");
@@ -557,7 +557,7 @@ loop_break:;
 
     if (unlikely(!term_raw())) {
         perror("tcsetattr");
-        return EX_IOERR;
+        return EC_IO_ERROR;
     }
 
     if (unlikely(nr_stderr_errors > 0)) {
@@ -598,7 +598,7 @@ exit:
             if (xwrite_all(fd, blk->data, blk->size) < 0) {
                 error_msg_errno("failed to write (stdout) buffer");
                 if (exit_code == EDITOR_EXIT_OK) {
-                    exit_code = EX_IOERR;
+                    exit_code = EC_IO_ERROR;
                 }
                 break;
             }

@@ -122,7 +122,7 @@ static noreturn COLD void handle_fatal_signal(int signum)
     // This is here just to make extra certain the handler never returns.
     // If everything is working correctly, this code should be unreachable.
     raise(SIGKILL);
-    _exit(EX_OSERR);
+    _exit(EC_OS_ERROR);
 }
 
 static void handle_sigwinch(int UNUSED_ARG(signum))

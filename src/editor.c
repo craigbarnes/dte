@@ -57,7 +57,7 @@ static void set_and_check_locale(void)
 
     LOG_ERROR("no UTF-8 fallback locales found");
     fputs("setlocale() failed\n", stderr);
-    exit(EX_CONFIG);
+    exit(EC_CONFIG_ERROR);
 }
 
 static mode_t get_umask(void)

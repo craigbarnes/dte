@@ -290,10 +290,10 @@ int main(int argc, char *argv[])
             break;
         case 'h':
             usage(stdout, argc, argv);
-            return EX_OK;
+            return EC_OK;
         default:
             usage(stderr, argc, argv);
-            return EX_USAGE;
+            return EC_USAGE_ERROR;
         }
     }
 
