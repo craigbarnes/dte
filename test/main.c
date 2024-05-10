@@ -52,6 +52,12 @@ static void test_process_sanity(TestContext *ctx)
     // message, since there's no stderr for test_fail() to use
     ASSERT_TRUE(fd_is_valid(STDERR_FILENO));
 
+    if (access("test/data/crlf.dterc", F_OK) != 0) {
+        TEST_FAIL("test binary executed from incorrect working directory; exiting");
+        exit(1);
+    }
+
+    ctx->passed++;
     ASSERT_NONNULL(freopen("/dev/null", "r", stdin));
     ASSERT_NONNULL(freopen("/dev/null", "w", stdout));
 }
