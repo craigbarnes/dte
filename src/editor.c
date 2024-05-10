@@ -144,7 +144,7 @@ EditorState *init_editor_state(void)
 
     mode_t mask = get_umask();
     e->new_file_mode = 0666 & ~mask;
-    LOG_INFO("umask: %04o", 0777u & mask);
+    LOG_INFO("umask: %04o", 0777u & (unsigned int)mask);
 
     set_and_check_locale();
     init_file_locks_context(e->user_config_dir, pid);
