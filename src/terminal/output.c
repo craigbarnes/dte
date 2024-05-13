@@ -169,6 +169,12 @@ void term_put_queries(Terminal *term)
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
     LOG_INFO("querying terminal");
 
+    if (!xgetenv("DTE_TERM_QUERY")) {
+        // Terminal querying is a work-in-progress and not suitable
+        // for general use yet
+        return;
+    }
+
     TermFeatureFlags features = term->features;
     if (!(features & TFLAG_SYNC)) {
         term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
@@ -185,11 +191,6 @@ void term_put_queries(Terminal *term)
     if (!(features & TFLAG_OSC52_COPY)) {
         term_put_literal(obuf, "\033P+q4D73\033\\"); // XTGETTCAP "Ms"
     }
-
-    // Erase whole line (EL 2), in case the terminal doesn't parse DCS
-    // sequences and/or CSI intermediates properly (i.e. according to
-    // ECMA-48) and instead prints part of them to the screen
-    term_put_literal(obuf, "\033[2K");
 }
 
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer

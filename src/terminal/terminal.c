@@ -35,7 +35,6 @@ enum {
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
     ITERM2 = TFLAG_ITERM2,
     SYNC = TFLAG_SYNC,
-    LQUERIES = TFLAG_LIMIT_QUERIES,
 };
 
 enum {
@@ -108,9 +107,8 @@ static const TermEntry terms[] = {
     t("wezterm", TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | SYNC),
     t("xfce", TERM_8_COLOR, 0, BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too
-    // many other terminals to safely add it here. LQUERIES is also set, for
-    // much the same reason.
-    t("xterm", TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC | LQUERIES),
+    // many other terminals to safely add it here.
+    t("xterm", TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC),
     t("xterm.js", TERM_8_COLOR, 0, BCE),
 };
 
