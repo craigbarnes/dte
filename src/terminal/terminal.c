@@ -258,6 +258,7 @@ void term_enable_private_modes(Terminal *term)
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
     if (features & METAESC) {
+        // XTSAVE and DECSET {meta,alt}SendsEscape
         term_put_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
     }
 
@@ -287,7 +288,7 @@ void term_restore_private_modes(Terminal *term)
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
     if (features & METAESC) {
-        term_put_literal(obuf, "\033[?1036;1039r");
+        term_put_literal(obuf, "\033[?1036;1039r"); // XTRESTORE
     }
     if (features & (KITTYKBD | ITERM2)) {
         term_put_literal(obuf, "\033[<u");

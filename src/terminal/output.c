@@ -106,6 +106,7 @@ static void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
         return;
     }
 
+    // ECMA-48 REP (CSI Pn b)
     const size_t maxlen = STRLEN("_E[30000b");
     char *buf = obuf_need_space(obuf, maxlen);
     size_t i = 0;
@@ -196,28 +197,28 @@ void term_put_queries(Terminal *term)
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer
 void term_use_alt_screen_buffer(Terminal *term)
 {
-    term_put_literal(&term->obuf, "\033[?1049h");
+    term_put_literal(&term->obuf, "\033[?1049h"); // DECSET 1049
 }
 
 void term_use_normal_screen_buffer(Terminal *term)
 {
-    term_put_literal(&term->obuf, "\033[?1049l");
+    term_put_literal(&term->obuf, "\033[?1049l"); // DECRST 1049
 }
 
 void term_hide_cursor(Terminal *term)
 {
-    term_put_literal(&term->obuf, "\033[?25l");
+    term_put_literal(&term->obuf, "\033[?25l"); // DECRST 25 (DECTCEM)
 }
 
 void term_show_cursor(Terminal *term)
 {
-    term_put_literal(&term->obuf, "\033[?25h");
+    term_put_literal(&term->obuf, "\033[?25h"); // DECSET 25 (DECTCEM)
 }
 
 void term_begin_sync_update(Terminal *term)
 {
     if (term->features & TFLAG_SYNC) {
-        term_put_literal(&term->obuf, "\033[?2026h");
+        term_put_literal(&term->obuf, "\033[?2026h"); // DECSET 2026
         term->sync_pending = true;
     }
 }
@@ -225,13 +226,14 @@ void term_begin_sync_update(Terminal *term)
 void term_end_sync_update(Terminal *term)
 {
     if ((term->features & TFLAG_SYNC) && term->sync_pending) {
-        term_put_literal(&term->obuf, "\033[?2026l");
+        term_put_literal(&term->obuf, "\033[?2026l"); // DECRST 2026
         term->sync_pending = false;
     }
 }
 
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 {
+    // ECMA-48 CUP (CSI Pl ; Pc H)
     const size_t maxlen = STRLEN("E[;H") + (2 * DECIMAL_STR_MAX(x));
     char *buf = obuf_need_space(obuf, maxlen);
     size_t i = copyliteral(buf, "\033[");
@@ -250,7 +252,7 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 void term_save_title(Terminal *term)
 {
     if (term->features & TFLAG_SET_WINDOW_TITLE) {
-        // "Save xterm window title on stack" (XTWINOPS)
+        // Save window title on stack (XTWINOPS)
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         term_put_literal(&term->obuf, "\033[22;2t");
     }
@@ -259,7 +261,7 @@ void term_save_title(Terminal *term)
 void term_restore_title(Terminal *term)
 {
     if (term->features & TFLAG_SET_WINDOW_TITLE) {
-        // "Restore xterm window title from stack" (XTWINOPS)
+        // Restore window title from stack (XTWINOPS)
         term_put_literal(&term->obuf, "\033[23;2t");
     }
 }
@@ -283,7 +285,7 @@ void term_clear_eol(Terminal *term)
 
     if (term_can_clear_eol_with_el_sequence(term)) {
         obuf->x = end;
-        term_put_literal(obuf, "\033[K");
+        term_put_literal(obuf, "\033[K"); // Erase to end of line (EL 0)
         return;
     }
 
@@ -294,9 +296,9 @@ void term_clear_screen(TermOutputBuffer *obuf)
 {
     term_put_literal (
         obuf,
-        "\033[0m" // Reset colors and attributes
-        "\033[H"  // Move cursor to 1,1 (done only to mimic terminfo(5) "clear")
-        "\033[2J" // Clear whole screen (regardless of cursor position)
+        "\033[0m" // Reset colors and attributes (SGR 0)
+        "\033[H"  // Move cursor to 1,1 (CUP; done only to mimic terminfo(5) "clear")
+        "\033[2J" // Clear whole screen (ED 2)
     );
 }
 
