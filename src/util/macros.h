@@ -265,6 +265,12 @@
     #define NONSTRING
 #endif
 
+#if HAS_ATTRIBUTE(counted_by)
+    #define COUNTED_BY(member) __attribute__((counted_by(member)))
+#else
+    #define COUNTED_BY(member)
+#endif
+
 #if HAS_ATTRIBUTE(diagnose_if)
     #define DIAGNOSE_IF(x) __attribute__((diagnose_if((x), (#x), "error")))
 #else

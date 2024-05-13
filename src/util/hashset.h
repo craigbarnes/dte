@@ -20,7 +20,7 @@ typedef struct {
 typedef struct HashSetEntry {
     struct HashSetEntry *next;
     size_t str_len;
-    char str[];
+    char str[] COUNTED_BY(str_len);
 } HashSetEntry;
 
 void hashset_init(HashSet *set, size_t initial_size, bool icase);
