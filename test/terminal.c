@@ -27,7 +27,7 @@ static void expect_keycode_eq (
     size_t seq_len
 ) {
     if (likely(a == b)) {
-        ctx->passed++;
+        test_pass(ctx);
         return;
     }
 

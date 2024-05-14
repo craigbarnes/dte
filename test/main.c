@@ -57,7 +57,7 @@ static void test_process_sanity(TestContext *ctx)
         exit(1);
     }
 
-    ctx->passed++;
+    test_pass(ctx);
     ASSERT_NONNULL(freopen("/dev/null", "r", stdin));
     ASSERT_NONNULL(freopen("/dev/null", "w", stdout));
 }

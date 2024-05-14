@@ -54,7 +54,7 @@ static void test_dump_handlers(TestContext *ctx)
             // the handlers being tested here are expected to do so
             TEST_FAIL("'show %s' handler returned an empty String", name);
         } else {
-            ctx->passed++;
+            test_pass(ctx);
             // The last line of generated text must end with a newline
             // (see comment in get_delim_str())
             ASSERT_EQ(str.buffer[str.len - 1], '\n');

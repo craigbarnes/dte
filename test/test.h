@@ -63,6 +63,11 @@ typedef struct {
 #define ASSERT_TRUE(x) ASSERT(true, x)
 #define ASSERT_NONNULL(ptr) ASSERT(nonnull, ptr)
 
+static inline void test_pass(TestContext *ctx)
+{
+    ctx->passed++;
+}
+
 void test_fail(TestContext *ctx, const char *file, int line, const char *format, ...) COLD PRINTF(4);
 void expect_streq(TestContext *ctx, const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, const void *p2);

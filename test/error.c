@@ -136,7 +136,7 @@ static void test_normal_command_errors(TestContext *ctx)
         // Check for substring in error message (ignoring capitalization)
         const char *found = strstr(msg, substr + 1);
         if (likely(found && found != msg)) {
-            ctx->passed++;
+            test_pass(ctx);
             EXPECT_EQ(ascii_tolower(found[-1]), substr[0]);
         } else {
             TEST_FAIL (

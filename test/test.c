@@ -6,7 +6,7 @@
 #include "util/str-util.h"
 #include "util/utf8.h"
 
-#define expect(cond, ctx, ...) if (cond) ctx->passed++; else test_fail(ctx, __VA_ARGS__)
+#define expect(cond, ctx, ...) if (cond) test_pass(ctx); else test_fail(ctx, __VA_ARGS__)
 
 static void abort_if_false(bool cond)
 {
@@ -50,7 +50,7 @@ void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, 
 void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, const void *m2, size_t len)
 {
     if (likely(mem_equal(m1, m2, len))) {
-        ctx->passed++;
+        test_pass(ctx);
         return;
     }
     char buf1[256], buf2[256];

@@ -2269,7 +2269,7 @@ static void test_path_absolute(TestContext *ctx)
         TEST_FAIL("symlink() failed: %s", strerror(errno));
         return;
     }
-    ctx->passed++;
+    test_pass(ctx);
 
     path = path_absolute(linkpath);
     EXPECT_EQ(unlink(linkpath), 0);
