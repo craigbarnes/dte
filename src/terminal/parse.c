@@ -128,22 +128,6 @@ static KeyCode decode_kitty_special_key(uint32_t n)
     return KEY_IGNORE;
 }
 
-static KeyCode decode_modifiers(uint32_t n)
-{
-    n--;
-    if (unlikely(n > 15)) {
-        return 0;
-    }
-
-    static_assert(1 == MOD_SHIFT >> KEYCODE_MODIFIER_OFFSET);
-    static_assert(2 == MOD_META >> KEYCODE_MODIFIER_OFFSET);
-    static_assert(4 == MOD_CTRL >> KEYCODE_MODIFIER_OFFSET);
-
-    // Decode Meta (bit 4) and/or Alt (bit 2) as MOD_META
-    KeyCode mods = (n & 7) | ((n & 8) >> 2);
-    return mods << KEYCODE_MODIFIER_OFFSET;
-}
-
 // See: https://sw.kovidgoyal.net/kitty/keyboard-protocol/#modifiers
 // ----------------------------
 // Shift     0b1         (1)
@@ -155,13 +139,16 @@ static KeyCode decode_modifiers(uint32_t n)
 // Capslock  0b1000000   (64)
 // Numlock   0b10000000  (128)
 // ----------------------------
-static KeyCode decode_extended_modifiers(uint32_t n)
+static KeyCode decode_modifiers(uint32_t n)
 {
     n--;
     if (unlikely(n > 255)) {
-        return 0;
+        return KEY_IGNORE;
     }
 
+    static_assert(1 == MOD_SHIFT >> KEYCODE_MODIFIER_OFFSET);
+    static_assert(2 == MOD_META >> KEYCODE_MODIFIER_OFFSET);
+    static_assert(4 == MOD_CTRL >> KEYCODE_MODIFIER_OFFSET);
     static_assert(8 == MOD_SUPER >> KEYCODE_MODIFIER_OFFSET);
     static_assert(16 == MOD_HYPER >> KEYCODE_MODIFIER_OFFSET);
     static_assert(31 == MOD_MASK >> KEYCODE_MODIFIER_OFFSET);
@@ -407,8 +394,8 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
                 // Key release event
                 goto ignore;
             }
-            mods = decode_extended_modifiers(csi.params[1][0]);
-            if (unlikely(mods == 0)) {
+            mods = decode_modifiers(csi.params[1][0]);
+            if (unlikely(mods == KEY_IGNORE)) {
                 goto ignore;
             }
             // Fallthrough
@@ -431,7 +418,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
                 goto ignore;
             }
             mods = decode_modifiers(csi.params[1][0]);
-            if (unlikely(mods == 0)) {
+            if (unlikely(mods == KEY_IGNORE)) {
                 goto ignore;
             }
             key = csi.params[2][0];
@@ -439,7 +426,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             return i;
         case 2:
             mods = decode_modifiers(csi.params[1][0]);
-            if (unlikely(mods == 0)) {
+            if (unlikely(mods == KEY_IGNORE)) {
                 goto ignore;
             }
             // Fallthrough
@@ -467,7 +454,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
     switch (csi.nparams) {
     case 2:
         mods = decode_modifiers(csi.params[1][0]);
-        if (unlikely(mods == 0 || csi.params[0][0] != 1)) {
+        if (unlikely(mods == KEY_IGNORE || csi.params[0][0] != 1)) {
             goto ignore;
         }
         // Fallthrough

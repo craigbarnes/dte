@@ -805,7 +805,7 @@ static void test_term_parse_sequence2(TestContext *ctx)
         char mod_str[4];
         KeyCode mask;
     } modifiers[] = {
-        {"0", 0},
+        {"0", KEY_IGNORE},
         {"1", 0},
         {"2", MOD_SHIFT},
         {"3", MOD_META},
@@ -814,18 +814,24 @@ static void test_term_parse_sequence2(TestContext *ctx)
         {"6", MOD_SHIFT | MOD_CTRL},
         {"7", MOD_META | MOD_CTRL},
         {"8", MOD_SHIFT | MOD_META | MOD_CTRL},
-        {"9", MOD_META},
-        {"10", MOD_META | MOD_SHIFT},
-        {"11", MOD_META},
-        {"12", MOD_META | MOD_SHIFT},
-        {"13", MOD_META | MOD_CTRL},
-        {"14", MOD_META | MOD_CTRL | MOD_SHIFT},
-        {"15", MOD_META | MOD_CTRL},
-        {"16", MOD_META | MOD_CTRL | MOD_SHIFT},
-        {"17", 0},
-        {"18", 0},
-        {"400", 0},
+        {"9", MOD_SUPER},
+        {"10", MOD_SUPER | MOD_SHIFT},
+        {"11", MOD_SUPER | MOD_META},
+        {"12", MOD_SUPER | MOD_META | MOD_SHIFT},
+        {"13", MOD_SUPER | MOD_CTRL},
+        {"14", MOD_SUPER | MOD_CTRL | MOD_SHIFT},
+        {"15", MOD_SUPER | MOD_META | MOD_CTRL},
+        {"16", MOD_SUPER | MOD_META | MOD_CTRL | MOD_SHIFT},
+        {"17", MOD_HYPER},
+        {"18", MOD_HYPER | MOD_SHIFT},
+        {"255", MOD_HYPER | MOD_SUPER | MOD_META | MOD_CTRL},
+        {"256", MOD_MASK},
+        {"257", KEY_IGNORE},
+        {"400", KEY_IGNORE},
     };
+
+    static_assert(KEY_IGNORE != 0);
+    static_assert((KEY_IGNORE & MOD_MASK) == 0);
 
     FOR_EACH_I(i, templates) {
         FOR_EACH_I(j, modifiers) {
@@ -840,12 +846,8 @@ static void test_term_parse_sequence2(TestContext *ctx)
             );
             KeyCode key = 24;
             ssize_t parsed_length = term_parse_sequence(seq, seq_length, &key);
-            if (modifiers[j].mask == 0) {
-                EXPECT_EQ(parsed_length, seq_length);
-                EXPECT_EQ(key, KEY_IGNORE);
-                continue;
-            }
-            KeyCode expected_key = modifiers[j].mask | templates[i].key;
+            KeyCode mods = modifiers[j].mask;
+            KeyCode expected_key = mods | (mods == KEY_IGNORE ? 0 : templates[i].key);
             IEXPECT_EQ(parsed_length, seq_length);
             EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
             // Truncated
