@@ -1,7 +1,6 @@
 #ifndef SYNTAX_STATE_H
 #define SYNTAX_STATE_H
 
-#include "editor.h"
 #include "syntax/syntax.h"
 
 typedef enum {
@@ -11,7 +10,16 @@ typedef enum {
     SYN_LINT = 1 << 3, // Perform extra linting (see: lint_emit_name())
 } SyntaxLoadFlags;
 
-Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags flags, int *err);
-Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype);
+typedef struct {
+    Syntax *current_syntax;
+    State *current_state;
+    SyntaxLoadFlags flags;
+    unsigned int saved_nr_errors; // Used to check if nr_errors changed
+} SyntaxLoadState;
+
+struct EditorState;
+
+Syntax *load_syntax_file(struct EditorState *e, const char *filename, SyntaxLoadFlags flags, int *err);
+Syntax *load_syntax_by_filetype(struct EditorState *e, const char *filetype);
 
 #endif

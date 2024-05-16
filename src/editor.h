@@ -18,6 +18,7 @@
 #include "regexp.h"
 #include "search.h"
 #include "syntax/color.h"
+#include "syntax/state.h"
 #include "tag.h"
 #include "terminal/cursor.h"
 #include "terminal/terminal.h"
@@ -74,6 +75,7 @@ typedef struct EditorState {
     HashSet required_syntax_files;
     HashSet required_syntax_builtins;
     StyleMap styles;
+    SyntaxLoadState syn;
     CommandMacroState macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];
     Frame *root_frame;
