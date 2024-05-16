@@ -104,11 +104,11 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(normal_vars, name, strcmp);
 }
 
-char *expand_normal_var(const char *name, const void *userdata)
+char *expand_normal_var(const EditorState *e, const char *name)
 {
     const BuiltinVar *var = BSEARCH(name, normal_vars, vstrcmp);
     if (var) {
-        return var->expand(userdata);
+        return var->expand(e);
     }
     const char *str = xgetenv(name);
     return str ? xstrdup(str) : NULL;

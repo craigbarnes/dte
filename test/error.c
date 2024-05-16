@@ -3,10 +3,13 @@
 #include "editor.h"
 #include "error.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "window.h"
 
-static const char *dummy_lookup_alias(const char* UNUSED_ARG(name), void* UNUSED_ARG(ud))
+static const char *dummy_lookup_alias(const EditorState *e, const char *name)
 {
+    BUG_ON(!e);
+    BUG_ON(!name);
     return "insert \"...";
 }
 

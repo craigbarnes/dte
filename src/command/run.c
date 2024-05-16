@@ -24,7 +24,7 @@ static bool run_command(CommandRunner *runner, char **av)
             return error_msg("No such command: %s", name);
         }
 
-        const char *alias_value = runner->lookup_alias(name, runner->userdata);
+        const char *alias_value = runner->lookup_alias(runner->e, name);
         if (unlikely(!alias_value)) {
             return error_msg("No such command or alias: %s", name);
         }
@@ -57,7 +57,7 @@ static bool run_command(CommandRunner *runner, char **av)
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
     if (runner->allow_recording && runner->cmds->macro_record) {
-        runner->cmds->macro_record(cmd, av + 1, runner->userdata);
+        runner->cmds->macro_record(runner->e, cmd, av + 1);
     }
 
     // By default change can't be merged with previous one.
@@ -66,7 +66,7 @@ static bool run_command(CommandRunner *runner, char **av)
 
     CommandArgs a = cmdargs_new(av + 1);
     current_command = cmd;
-    bool r = likely(parse_args(cmd, &a)) && cmd->cmd(runner->userdata, &a);
+    bool r = likely(parse_args(cmd, &a)) && cmd->cmd(runner->e, &a);
     current_command = NULL;
 
     end_change();

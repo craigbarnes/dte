@@ -94,7 +94,7 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
 
     if (runner->expand_variable) {
         char *name = xstrcut(cmd, n);
-        char *value = runner->expand_variable(name, runner->userdata);
+        char *value = runner->expand_variable(runner->e, name);
         free(name);
         if (value) {
             string_append_cstring(buf, value);

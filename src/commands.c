@@ -222,7 +222,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
 
     CommandRunner runner = {
         .home_dir = &e->home_dir,
-        .userdata = e,
+        .e = e,
     };
 
     for (size_t i = 0; i < nmodes; i++) {
@@ -2639,12 +2639,11 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
-static void record_command(const Command *cmd, char **args, void *userdata)
+static void record_command(EditorState *e, const Command *cmd, char **args)
 {
     if (!allow_macro_recording(cmd, args)) {
         return;
     }
-    EditorState *e = userdata;
     macro_command_hook(&e->macro, cmd->name, args);
 }
 
@@ -2658,9 +2657,8 @@ const CommandSet normal_commands = {
     .macro_record = record_command,
 };
 
-const char *find_normal_alias(const char *name, void *userdata)
+const char *find_normal_alias(const EditorState *e, const char *name)
 {
-    EditorState *e = userdata;
     return find_alias(&e->aliases, name);
 }
 

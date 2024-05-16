@@ -19,7 +19,7 @@ static void test_parse_command_arg(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     const CommandRunner runner = normal_mode_cmdrunner(e, false);
-    ASSERT_PTREQ(runner.userdata, e);
+    ASSERT_PTREQ(runner.e, e);
     ASSERT_PTREQ(runner.cmds, &normal_commands);
     EXPECT_PTREQ(runner.lookup_alias, find_normal_alias);
     EXPECT_PTREQ(runner.home_dir, &e->home_dir);

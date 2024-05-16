@@ -787,7 +787,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
     CompletionState *cs = &e->cmdline.completion;
     const CommandRunner runner = normal_mode_cmdrunner(e, false);
     BUG_ON(cs->orig);
-    BUG_ON(runner.userdata != e);
+    BUG_ON(runner.e != e);
     BUG_ON(!runner.lookup_alias);
 
     const size_t cmdline_pos = cmdline->pos;
@@ -826,7 +826,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
 
         if (semicolon + 1 == array.count) {
             char *name = xstrslice(cmd, pos, end);
-            const char *value = runner.lookup_alias(name, runner.userdata);
+            const char *value = runner.lookup_alias(runner.e, name);
             if (value) {
                 size_t save = array.count;
                 if (parse_commands(&runner, &array, value) != CMDERR_NONE) {

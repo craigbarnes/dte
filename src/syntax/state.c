@@ -595,10 +595,9 @@ static const Command *find_syntax_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
-static char *expand_syntax_var(const char *name, const void *userdata)
+static char *expand_syntax_var(const EditorState *e, const char *name)
 {
     if (streq(name, "DTE_HOME")) {
-        const EditorState *e = userdata;
         return xstrdup(e->user_config_dir);
     }
     return NULL;
@@ -613,7 +612,7 @@ static CommandRunner cmdrunner_for_syntaxes(EditorState *e)
     CommandRunner runner = {
         .cmds = &syntax_commands,
         .home_dir = &e->home_dir,
-        .userdata = e,
+        .e = e,
         .expand_variable = expand_syntax_var,
     };
     return runner;

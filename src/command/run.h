@@ -24,7 +24,9 @@ typedef enum {
     CMDOPT_ALLOW_IN_RC = 1 << 0,
 } CommandOptions;
 
-typedef bool (*CommandFunc)(void *userdata, const CommandArgs *args);
+struct EditorState;
+
+typedef bool (*CommandFunc)(struct EditorState *e, const CommandArgs *args);
 
 typedef struct {
     const char name[15];
@@ -37,15 +39,15 @@ typedef struct {
 
 typedef struct {
     const Command* (*lookup)(const char *name);
-    void (*macro_record)(const Command *cmd, char **args, void *userdata);
+    void (*macro_record)(struct EditorState *e, const Command *cmd, char **args);
 } CommandSet;
 
 typedef struct {
     const CommandSet *cmds;
-    const char* (*lookup_alias)(const char *name, void *userdata);
-    char* (*expand_variable)(const char *name, const void *userdata);
+    const char* (*lookup_alias)(const struct EditorState *e, const char *name);
+    char* (*expand_variable)(const struct EditorState *e, const char *name);
     const StringView *home_dir;
-    void *userdata;
+    struct EditorState *e;
     unsigned int recursion_count;
     bool allow_recording;
 } CommandRunner;

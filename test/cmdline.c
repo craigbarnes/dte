@@ -25,7 +25,7 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "a\xF0\x9F\xA6\x99");
 
     CommandRunner runner = cmdrunner(e, &cmd_mode_commands, false);
-    EXPECT_PTREQ(runner.userdata, e);
+    EXPECT_PTREQ(runner.e, e);
     EXPECT_PTREQ(runner.cmds, &cmd_mode_commands);
     EXPECT_NULL(runner.lookup_alias);
     EXPECT_EQ(runner.recursion_count, 0);

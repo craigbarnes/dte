@@ -135,7 +135,7 @@ static inline CommandRunner cmdrunner (
         .lookup_alias = normal ? find_normal_alias : NULL,
         .expand_variable = normal ? expand_normal_var : NULL,
         .home_dir = &e->home_dir,
-        .userdata = e,
+        .e = e,
         .allow_recording = allow_recording,
     };
 }
