@@ -59,7 +59,7 @@ void ptr_array_move(PointerArray *array, size_t from, size_t to)
     p[to] = tmp;
 }
 
-// Call a FreeFunction declared with an arbirary pointer parameter type
+// Call a FreeFunction declared with an arbitrary pointer parameter type
 // without -fsanitize=function pedantry
 NO_SANITIZE("undefined")
 static void do_free_ptr(FreeFunction free_ptr, void *ptr)
