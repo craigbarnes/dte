@@ -566,7 +566,7 @@ static bool cmd_syntax(EditorState *e, const CommandArgs *a)
 }
 
 #define CMD(name, flags, min, max, func) \
-    {name, flags, CMDOPT_ALLOW_IN_RC, min, max, (CommandFunc)func}
+    {name, flags, CMDOPT_ALLOW_IN_RC, min, max, func}
 
 static const Command cmds[] = {
     CMD("bufis", "i", 2, 3, cmd_bufis),

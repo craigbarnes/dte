@@ -1582,7 +1582,7 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
     }
 
     CommandFunc fn = cmd->cmd;
-    if (count > 1 && fn == (CommandFunc)cmd_insert && !has_flag(&a2, 'k')) {
+    if (count > 1 && fn == cmd_insert && !has_flag(&a2, 'k')) {
         // Use optimized implementation for repeated "insert"
         return repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
     }
@@ -2474,7 +2474,7 @@ enum {
 };
 
 #define CMD(name, flags, opts, min, max, func) \
-    {name, flags, opts, min, max, (CommandFunc)func}
+    {name, flags, opts, min, max, func}
 
 static const Command cmds[] = {
     CMD("alias", "-", RC, 1, 2, cmd_alias),
@@ -2570,15 +2570,11 @@ static const Command cmds[] = {
 static bool allow_macro_recording(const Command *cmd, char **args)
 {
     CommandFunc fn = cmd->cmd;
-    if (
-        fn == (CommandFunc)cmd_macro
-        || fn == (CommandFunc)cmd_command
-        || fn == (CommandFunc)cmd_mode
-    ) {
+    if (fn == cmd_macro || fn == cmd_command || fn == cmd_mode) {
         return false;
     }
 
-    if (fn == (CommandFunc)cmd_search) {
+    if (fn == cmd_search) {
         char **args_copy = copy_string_array(args, string_array_length(args));
         CommandArgs a = cmdargs_new(args_copy);
         bool ret = true;
@@ -2594,7 +2590,7 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         return ret;
     }
 
-    if (fn == (CommandFunc)cmd_exec) {
+    if (fn == cmd_exec) {
         // TODO: don't record -o with open/tag/eval/msg
     }
 

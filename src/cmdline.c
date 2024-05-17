@@ -478,7 +478,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 // the `-k` flag for normal vs. command/search modes).
 
 #define CMD(name, flags, min, max, func) \
-    {name, flags, 0, min, max, (CommandFunc)func}
+    {name, flags, 0, min, max, func}
 
 static const Command common_cmds[] = {
     CMD("bol", "st", 0, 0, cmd_bol), // Ignored flags: s, t
