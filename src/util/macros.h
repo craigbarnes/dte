@@ -271,6 +271,12 @@
     #define COUNTED_BY(member)
 #endif
 
+#if HAS_ATTRIBUTE(no_sanitize)
+    #define NO_SANITIZE(...) __attribute__((no_sanitize(__VA_ARGS__)))
+#else
+    #define NO_SANITIZE(...)
+#endif
+
 #if HAS_ATTRIBUTE(diagnose_if)
     #define DIAGNOSE_IF(x) __attribute__((diagnose_if((x), (#x), "error")))
 #else
