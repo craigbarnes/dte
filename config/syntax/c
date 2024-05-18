@@ -87,6 +87,7 @@ state preproc
     char -b a-zA-Z_ preproc-ident
     noeat preproc-misc
 
+# TODO: C23 #embed
 state preproc-ident preproc
     char -b a-zA-Z0-9_ this
     bufis 'include' preproc-include
@@ -174,6 +175,7 @@ state label
 state ident
     char -b a-zA-Z0-9_ this
     inlist keyword c
+    inlist c23-keyword c
     inlist c11-keyword c
     inlist type c
     inlist common-typedef c
@@ -287,9 +289,15 @@ list keyword \
     asm const static inline register extern volatile auto restrict sizeof \
     typedef
 
+# Note: "noreturn" isn't actually a keyword, but it expands to one when the
+# C11 <stdnoreturn.h> header (marked "obsolescent" in C23) is included
 list c11-keyword \
-    _Alignas _Alignof _Noreturn \
-    alignas alignof noreturn
+    _Alignas _Alignof _Generic _Noreturn _Static_assert _Thread_local \
+    noreturn
+
+list c23-keyword \
+    alignas alignof constexpr nullptr static_assert thread_local typeof \
+    typeof_unqual
 
 list type \
     char short int long float double void signed unsigned enum struct union \
@@ -300,7 +308,8 @@ list type \
     int16_t uint16_t int_fast16_t uint_fast16_t int_least16_t uint_least16_t \
     int32_t uint32_t int_fast32_t uint_fast32_t int_least32_t uint_least32_t \
     int64_t uint64_t int_fast64_t uint_fast64_t int_least64_t uint_least64_t \
-    intptr_t uintptr_t intmax_t uintmax_t __int128 char32_t char16_t char8_t
+    intptr_t uintptr_t intmax_t uintmax_t __int128 char32_t char16_t char8_t \
+    _Atomic _BitInt _Decimal32 _Decimal64 _Decimal128 nullptr_t
 
 list common-typedef \
     u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 s8 s16 s32 s64 s128 \
@@ -333,23 +342,23 @@ list constant \
     ETIMEDOUT ETXTBSY EWOULDBLOCK EXDEV ENOTBLK
 
 list preproccond \
-    elif else endif if ifdef ifndef
+    if else elif endif ifdef ifndef elifdef elifndef
 
 list -i numeric-suffix \
     ULL UL U LLU LU LL L
 
 list cpp-keyword \
     and and_eq bitand bitor catch class compl const_cast concept \
-    consteval constexpr constinit const_cast \
+    consteval constinit const_cast \
     co_await co_return co_yield \
     decltype delete dynamic_cast explicit export friend \
-    mutable namespace new noexcept not not_eq nullptr \
+    mutable namespace new noexcept not not_eq \
     operator or or_eq \
     private protected public \
     reinterpret_cast requires static_cast template this throw try \
     typeid typename using virtual xor xor_eq
 
 default ident class-name
-default keyword c11-keyword cpp-keyword
+default keyword c11-keyword c23-keyword cpp-keyword
 default preproc preproccond
 default type posix-type
