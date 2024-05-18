@@ -1177,7 +1177,8 @@ static void test_term_put_str(TestContext *ctx)
     ASSERT_TRUE(256 <= TERM_OUTBUF_SIZE);
     memset(obuf->buf, 0, 256);
 
-    term_put_str(obuf, "this should write nothing because obuf.width == 0");
+    obuf->width = 0;
+    term_put_str(obuf, "this should write nothing because obuf->width == 0");
     EXPECT_EQ(obuf->count, 0);
     EXPECT_EQ(obuf->x, 0);
 
@@ -1210,7 +1211,9 @@ static void test_term_clear_eol(TestContext *ctx)
     TermOutputBuffer *obuf = &term.obuf;
     term_output_init(obuf);
 
+    // BCE with non-default bg
     term.features |= TFLAG_BACK_COLOR_ERASE;
+    obuf->style = (TermStyle){.bg = COLOR_RED};
     term_output_reset(&term, 0, 80, 0);
     term_clear_eol(&term);
     EXPECT_EQ(obuf->count, 3);
@@ -1218,13 +1221,44 @@ static void test_term_clear_eol(TestContext *ctx)
     EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
     ASSERT_TRUE(clear_obuf(obuf));
 
+    // No BCE with non-default bg
     term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    obuf->style = (TermStyle){.bg = COLOR_RED};
     term_output_reset(&term, 0, 80, 0);
     term_clear_eol(&term);
     EXPECT_EQ(obuf->count, 80);
     EXPECT_EQ(obuf->x, 80);
     EXPECT_EQ(obuf->buf[0], ' ');
     EXPECT_EQ(obuf->buf[79], ' ');
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    // No BCE with default bg/attrs
+    term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    obuf->style = (TermStyle){.bg = COLOR_DEFAULT};
+    term_output_reset(&term, 0, 80, 0);
+    term_clear_eol(&term);
+    EXPECT_EQ(obuf->count, 3);
+    EXPECT_EQ(obuf->x, 80);
+    EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    // No BCE with ATTR_REVERSE
+    term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    obuf->style = (TermStyle){.bg = COLOR_DEFAULT, .attr = ATTR_REVERSE};
+    term_output_reset(&term, 0, 80, 0);
+    term_clear_eol(&term);
+    EXPECT_EQ(obuf->count, 80);
+    EXPECT_EQ(obuf->x, 80);
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    // x >= scroll_x + width
+    term_output_reset(&term, 0, 20, 10);
+    EXPECT_EQ(obuf->width, 20);
+    EXPECT_EQ(obuf->scroll_x, 10);
+    obuf->x = 30;
+    term_clear_eol(&term);
+    EXPECT_EQ(obuf->count, 0);
+    EXPECT_EQ(obuf->x, 30);
     ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);

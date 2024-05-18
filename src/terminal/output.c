@@ -31,13 +31,34 @@
 void term_output_init(TermOutputBuffer *obuf)
 {
     *obuf = (TermOutputBuffer) {
-        .buf = xmalloc(TERM_OUTBUF_SIZE)
+        .buf = xmalloc(TERM_OUTBUF_SIZE),
+        .width = 0, // To ensure term_output_reset() is called
+        .tab_mode = TAB_CONTROL,
+        .tab_width = 8,
+        .style = {
+            .fg = COLOR_DEFAULT,
+            .bg = COLOR_DEFAULT,
+        },
+        .cursor_style = {
+            .type = CURSOR_DEFAULT,
+            .color = COLOR_DEFAULT,
+        },
     };
 }
 
 void term_output_free(TermOutputBuffer *obuf)
 {
     free(obuf->buf);
+    *obuf = (TermOutputBuffer) {
+        .style = {
+            .fg = COLOR_INVALID,
+            .bg = COLOR_INVALID,
+        },
+        .cursor_style = {
+            .type = CURSOR_INVALID,
+            .color = COLOR_INVALID,
+        },
+    };
 }
 
 static char *obuf_need_space(TermOutputBuffer *obuf, size_t count)

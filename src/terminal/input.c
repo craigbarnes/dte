@@ -22,6 +22,7 @@ void term_input_init(TermInputBuffer *ibuf)
 void term_input_free(TermInputBuffer *ibuf)
 {
     free(ibuf->buf);
+    *ibuf = (TermInputBuffer){.buf = NULL};
 }
 
 static void consume_input(TermInputBuffer *input, size_t len)

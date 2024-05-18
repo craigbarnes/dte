@@ -178,11 +178,11 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(obuf->scroll_x, 0);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_EQ(obuf->width, 0);
-    EXPECT_EQ(obuf->style.fg, 0);
-    EXPECT_EQ(obuf->style.bg, 0);
+    EXPECT_EQ(obuf->style.fg, COLOR_DEFAULT);
+    EXPECT_EQ(obuf->style.bg, COLOR_DEFAULT);
     EXPECT_EQ(obuf->style.attr, 0);
-    EXPECT_EQ(obuf->cursor_style.type, 0);
-    EXPECT_EQ(obuf->cursor_style.color, 0);
+    EXPECT_EQ(obuf->cursor_style.type, CURSOR_DEFAULT);
+    EXPECT_EQ(obuf->cursor_style.color, COLOR_DEFAULT);
 
     ASSERT_NONNULL(e->view);
     ASSERT_NONNULL(e->buffer);
