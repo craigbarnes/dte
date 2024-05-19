@@ -239,7 +239,7 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
         unsigned int passed = ctx->passed - prev_passed;
         unsigned int failed = ctx->failed - prev_failed;
 
-        fprintf(stderr, "   CHECK  %-35s  %4u passed", t->name, passed);
+        fprintf(stderr, "   CHECK  %-35s  %5u passed", t->name, passed);
 
         if (unlikely(failed > 0)) {
             fprintf(stderr, " %s%4u FAILED%s", ctx->boldred, failed, ctx->sgr0);
@@ -251,6 +251,9 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
 
         fputc('\n', stderr);
     }
+
+    ctx->nfuncs += g->nr_tests;
+    ctx->ngroups += 1;
 }
 
 static const TestEntry itests[] = {
@@ -275,8 +278,6 @@ static void usage(FILE *stream, int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     TestContext ctx = {
-        .passed = 0,
-        .failed = 0,
         .timing = false,
         .boldred = "\033[1;31m",
         .dim = "\033[2m",
@@ -351,6 +352,7 @@ int main(int argc, char *argv[])
     );
 
     if (timing) {
+        fprintf(stderr, " (%u functions, %u groups)", ctx.nfuncs, ctx.ngroups);
         print_timing(&ctx, times);
     }
 

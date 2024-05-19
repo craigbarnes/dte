@@ -11,6 +11,8 @@
 typedef struct {
     unsigned int passed;
     unsigned int failed;
+    unsigned int nfuncs;
+    unsigned int ngroups;
     void *userdata;
     char boldred[8];
     char dim[5];
