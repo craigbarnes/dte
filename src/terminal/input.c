@@ -5,6 +5,7 @@
 #include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
 #include "input.h"
+#include "output.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/log.h"
@@ -175,6 +176,7 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_ECMA48_REPEAT: return "REP";
     case TFLAG_SET_WINDOW_TITLE: return "TITLE";
     case TFLAG_OSC52_COPY: return "OSC52";
+    case TFLAG_QUERY: return "QUERY";
     }
     return "??";
 }
@@ -184,6 +186,12 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
     TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
     BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
     LOG_INFO("detected terminal feature %s via query", tflag_to_str(flag));
+
+    if (flag == TFLAG_QUERY && !(term->features & TFLAG_QUERY)) {
+        term_put_extra_queries(term);
+        term_output_flush(&term->obuf);
+    }
+
     term->features |= flag;
     return KEY_NONE;
 }

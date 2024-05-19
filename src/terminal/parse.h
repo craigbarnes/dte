@@ -7,10 +7,15 @@
 #include "key.h"
 #include "util/macros.h"
 
+// TODO: Use separate arrays for params and sub-params. We may need to
+// store 16 or so params for e.g. DA1 replies, but sub-params are only
+// needed for the first 2 (for the Kitty Keyboard Protocol; see related
+// comment in parse_csi()).
+
 // Representation of parameters (and other info) extracted from CSI sequences
 typedef struct {
-    uint32_t params[4][4];
-    uint8_t nsub[4]; // Lengths for params arrays (sub-params)
+    uint32_t params[16][4];
+    uint8_t nsub[16]; // Lengths for params arrays (sub-params)
     uint8_t intermediate[4];
     uint8_t nparams;
     uint8_t nr_intermediate;

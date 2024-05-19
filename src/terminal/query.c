@@ -41,15 +41,29 @@ static KeyCode tflag(TermFeatureFlags flag)
 
 KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
 {
+    // NOTE: The main conditions below must check ALL of these values, in
+    // addition to the prefix byte
+    uint8_t intermediate = csi->nr_intermediate ? csi->intermediate[0] : 0;
+    uint8_t final = csi->final_byte;
+    unsigned int nparams = csi->nparams;
+
     if (unlikely(csi->have_subparams || csi->nr_intermediate > 1)) {
         goto ignore;
     }
 
-    // NOTE: The conditions below must check ALL of these values, in
-    // addition to the prefix byte
-    uint8_t final = csi->final_byte;
-    uint8_t nparams = csi->nparams;
-    uint8_t intermediate = csi->nr_intermediate ? csi->intermediate[0] : 0;
+    // https://vt100.net/docs/vt510-rm/DA1.html
+    // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+    if (prefix == '?' && final == 'c' && intermediate == 0 && nparams >= 1) {
+        unsigned int code = csi->params[0][0];
+        LOG_DEBUG("DA1 reply with service class %u", code);
+        if (code >= 1 && code <= 12) {
+            return tflag(TFLAG_QUERY);
+        } else if (code >= 62 && code <= 65) {
+            // TODO: Handle extra param 22 as indicating TERM_8_COLOR support
+            return tflag(TFLAG_QUERY);
+        }
+        goto ignore;
+    }
 
     if (prefix == '?' && final == 'y' && intermediate == '$' && nparams == 2) {
         // DECRPM reply to DECRQM query (CSI ? Ps; Pm $ y)
@@ -84,7 +98,8 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
     }
 
 ignore:
-    LOG_DEBUG("unhandled CSI with '%c' parameter prefix", prefix);
+    // TODO: Also log intermediate and nparams
+    LOG_DEBUG("unhandled CSI with '%c' param prefix and final byte '%c'", prefix, (char)final);
     return KEY_IGNORE;
 }
 
@@ -184,6 +199,11 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     }
 
     StringView seq = string_view(data, len);
+    if (strview_has_prefix(&seq, ">|")) {
+        LOG_DEBUG("XTVERSION reply: %.*s", (int)len - 2, data + 2);
+        return KEY_IGNORE;
+    }
+
     if (strview_has_prefix(&seq, "1+r") || strview_has_prefix(&seq, "0+r")) {
         return parse_xtgettcap_reply(data, len);
     }
