@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include "color.h"
 #include "key.h"
 #include "style.h"
 #include "util/macros.h"
@@ -26,6 +25,10 @@ typedef enum {
     TFLAG_ITERM2 = 0x100, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
     TFLAG_SYNC = 0x200, // Supports synchronized updates via DECSET private mode 2026
     TFLAG_QUERY = 0x400, // Supports or tolerates queries sent by term_put_extra_queries()
+    TFLAG_8_COLOR = 0x800, // Supports ECMA-48 palette colors (e.g. SGR 30)
+    TFLAG_16_COLOR = 0x1000, // Supports aixterm-style "bright" palette colors (e.g. SGR 90)
+    TFLAG_256_COLOR = 0x2000, // Supports xterm-style (ISO 8613-6) indexed colors (e.g. SGR 38;5;255)
+    TFLAG_TRUE_COLOR = 0x4000, // Supports 24-bit RGB ("direct") colors (e.g. SGR 38;2;50;60;70)
 } TermFeatureFlags;
 
 typedef enum {
@@ -75,7 +78,6 @@ typedef struct {
 } TermInputBuffer;
 
 typedef struct Terminal {
-    TermColorCapabilityType color_type;
     TermFeatureFlags features;
     unsigned int width;
     unsigned int height;

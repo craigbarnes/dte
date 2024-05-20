@@ -146,25 +146,27 @@ static uint8_t color_256_to_16(uint8_t color)
     return table[color];
 }
 
-int32_t color_to_nearest(int32_t c, TermColorCapabilityType type, bool optimize)
+// Quantize a color to the nearest value supported by the terminal
+int32_t color_to_nearest(int32_t c, TermFeatureFlags flags, bool optimize)
 {
-    static const int32_t limits[] = {
-        [TERM_0_COLOR] = COLOR_DEFAULT,
-        [TERM_8_COLOR] = COLOR_GRAY,
-        [TERM_16_COLOR] = COLOR_WHITE,
-        [TERM_256_COLOR] = 255,
-        [TERM_TRUE_COLOR] = COLOR_RGB(0xFFFFFF),
-    };
-
     BUG_ON(!color_is_valid(c));
-    BUG_ON(type < 0 || type >= ARRAYLEN(limits));
-    BUG_ON(optimize && type < TERM_TRUE_COLOR);
+    BUG_ON(optimize && !(flags & TFLAG_TRUE_COLOR));
 
-    // If `optimize` is true, the effective type changes from TERM_TRUE_COLOR
-    // to TERM_256_COLOR as far as the condition below is concerned
-    TermColorCapabilityType limit_type = type - (optimize ? 1 : 0);
+    // Note that higher color capabilities are taken as implying support for
+    // the lower ones (because no terminal supports e.g. true color but not
+    // palette colors)
+    int32_t limit = COLOR_DEFAULT;
+    if (flags & TFLAG_TRUE_COLOR) {
+        limit = optimize ? 255 : COLOR_RGB(0xFFFFFF);
+    } else if (flags & TFLAG_256_COLOR) {
+        limit = 255;
+    } else if (flags & TFLAG_16_COLOR) {
+        limit = COLOR_WHITE;
+    } else if (flags & TFLAG_8_COLOR) {
+        limit = COLOR_GRAY;
+    }
 
-    if (likely(c <= limits[limit_type])) {
+    if (likely(c <= limit)) {
         // Color is already within the supported range
         return c;
     }
@@ -174,9 +176,9 @@ int32_t color_to_nearest(int32_t c, TermColorCapabilityType type, bool optimize)
 
     bool exact = true;
     int32_t tmp = rgb ? color_rgb_to_256(c, &exact) : c;
-    c = (type <= TERM_256_COLOR || exact) ? tmp : c;
-    c = (type <= TERM_16_COLOR) ? color_256_to_16(c) : c;
-    c = (type <= TERM_8_COLOR) ? (c & 7) : c;
-    c = (type == TERM_0_COLOR) ? COLOR_DEFAULT : c;
+    c = (!(flags & TFLAG_TRUE_COLOR) || exact) ? tmp : c;
+    c = (limit <= COLOR_WHITE) ? color_256_to_16(c) : c;
+    c = (limit <= COLOR_GRAY) ? (c & 7) : c;
+    c = (limit <= COLOR_DEFAULT) ? COLOR_DEFAULT : c;
     return c;
 }

@@ -159,9 +159,8 @@ static void test_deinit(TestContext *ctx)
     const Terminal *term = &e->terminal;
     EXPECT_EQ(term->width, 80);
     EXPECT_EQ(term->height, 24);
-    EXPECT_EQ(term->color_type, TERM_8_COLOR);
     EXPECT_EQ(term->ncv_attributes, 0);
-    EXPECT_EQ(term->features, 0);
+    EXPECT_EQ(term->features, TFLAG_8_COLOR);
     EXPECT_EQ(term->ibuf.len, 0);
     EXPECT_NONNULL(term->ibuf.buf);
 

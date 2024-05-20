@@ -4,17 +4,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "terminal.h"
 #include "util/macros.h"
 
 #define COLOR_RGB(x) (COLOR_FLAG_RGB | (x))
-
-typedef enum {
-    TERM_0_COLOR,
-    TERM_8_COLOR,
-    TERM_16_COLOR,
-    TERM_256_COLOR,
-    TERM_TRUE_COLOR
-} TermColorCapabilityType;
 
 enum {
     COLOR_INVALID = -3,
@@ -70,6 +63,6 @@ static inline uint8_t color_b(int32_t rgb)
 }
 
 int32_t parse_rgb(const char *str, size_t len);
-int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optimize);
+int32_t color_to_nearest(int32_t color, TermFeatureFlags flags, bool optimize);
 
 #endif

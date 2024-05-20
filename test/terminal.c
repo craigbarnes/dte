@@ -206,12 +206,12 @@ static void test_color_to_nearest(TestContext *ctx)
 
     FOR_EACH_I(i, tests) {
         const int32_t c = tests[i].input;
-        IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR, false), c);
-        IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR, true), tests[i].expected_rgb);
-        IEXPECT_EQ(color_to_nearest(c, TERM_256_COLOR, false), tests[i].expected_256);
-        IEXPECT_EQ(color_to_nearest(c, TERM_16_COLOR, false), tests[i].expected_16);
-        IEXPECT_EQ(color_to_nearest(c, TERM_8_COLOR, false), tests[i].expected_16 & 7);
-        IEXPECT_EQ(color_to_nearest(c, TERM_0_COLOR, false), COLOR_DEFAULT);
+        IEXPECT_EQ(color_to_nearest(c, TFLAG_TRUE_COLOR, false), c);
+        IEXPECT_EQ(color_to_nearest(c, TFLAG_TRUE_COLOR, true), tests[i].expected_rgb);
+        IEXPECT_EQ(color_to_nearest(c, TFLAG_256_COLOR, false), tests[i].expected_256);
+        IEXPECT_EQ(color_to_nearest(c, TFLAG_16_COLOR, false), tests[i].expected_16);
+        IEXPECT_EQ(color_to_nearest(c, TFLAG_8_COLOR, false), tests[i].expected_16 & 7);
+        IEXPECT_EQ(color_to_nearest(c, 0, false), COLOR_DEFAULT);
     }
 
     static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
@@ -223,7 +223,7 @@ static void test_color_to_nearest(TestContext *ctx)
         uint8_t mid = min + ((max - min) / 2);
         for (unsigned int b = min; b <= max; b++, count++) {
             int32_t orig = COLOR_RGB(b);
-            int32_t nearest = color_to_nearest(orig, TERM_256_COLOR, false);
+            int32_t nearest = color_to_nearest(orig, TFLAG_256_COLOR, false);
             size_t nearest_stop_idx = (b < mid) ? i - 1 : i;
             EXPECT_TRUE(nearest >= 16);
             EXPECT_TRUE(nearest <= 255);
@@ -237,7 +237,7 @@ static void test_color_to_nearest(TestContext *ctx)
             }
             if (nearest == min || nearest == max) {
                 EXPECT_EQ(nearest, b);
-                EXPECT_EQ(nearest, color_to_nearest(orig, TERM_TRUE_COLOR, true));
+                EXPECT_EQ(nearest, color_to_nearest(orig, TFLAG_TRUE_COLOR, true));
             }
             EXPECT_EQ(nearest_stop_idx, ((uint8_t)b - (b < 75 ? 7 : 35)) / 40);
         }
@@ -1148,17 +1148,32 @@ static bool clear_obuf(TermOutputBuffer *obuf)
 
 static void test_term_init(TestContext *ctx)
 {
+    const TermFeatureFlags expected_xterm_flags =
+        TFLAG_256_COLOR |
+        TFLAG_16_COLOR |
+        TFLAG_8_COLOR |
+        TFLAG_BACK_COLOR_ERASE |
+        TFLAG_SET_WINDOW_TITLE |
+        TFLAG_OSC52_COPY |
+        TFLAG_META_ESC
+    ;
+
     Terminal term;
     term_init(&term, "xterm-256color", NULL);
-    EXPECT_EQ(term.color_type, TERM_256_COLOR);
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, 0);
     EXPECT_PTREQ(term.parse_input, term_parse_sequence);
-    EXPECT_TRUE(term.features & (TFLAG_SET_WINDOW_TITLE | TFLAG_META_ESC));
+    EXPECT_EQ(term.features, expected_xterm_flags);
+
+    term_init(&term, "ansi", NULL);
+    EXPECT_EQ(term.width, 80);
+    EXPECT_EQ(term.height, 24);
+    EXPECT_EQ(term.ncv_attributes, ATTR_UNDERLINE);
+    EXPECT_PTREQ(term.parse_input, term_parse_sequence);
+    EXPECT_EQ(term.features, TFLAG_8_COLOR);
 
     term_init(&term, "ansi-m", NULL);
-    EXPECT_EQ(term.color_type, TERM_0_COLOR);
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, 0);
@@ -1319,9 +1334,9 @@ static void test_term_set_bytes(TestContext *ctx)
 
 static void test_term_set_style(TestContext *ctx)
 {
-    Terminal term = {.color_type = TERM_8_COLOR};
+    Terminal term = {.features = TFLAG_8_COLOR};
     term_init(&term, "tmux", "truecolor");
-    EXPECT_EQ(term.color_type, TERM_TRUE_COLOR);
+    EXPECT_TRUE(term.features & TFLAG_TRUE_COLOR);
     EXPECT_EQ(term.ncv_attributes, 0);
 
     TermOutputBuffer *obuf = &term.obuf;
@@ -1447,7 +1462,6 @@ static void test_term_set_cursor_style(TestContext *ctx)
     Terminal term = {
         .width = 80,
         .height = 24,
-        .color_type = TERM_TRUE_COLOR,
     };
 
     TermCursorStyle style = {
@@ -1479,7 +1493,6 @@ static void test_term_restore_cursor_style(TestContext *ctx)
     Terminal term = {
         .width = 80,
         .height = 24,
-        .color_type = TERM_TRUE_COLOR,
     };
 
     static const char expected[] = "\033[0 q\033]112\033\\";
