@@ -55,14 +55,16 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
     // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
     if (prefix == '?' && final == 'c' && intermediate == 0 && nparams >= 1) {
         unsigned int code = csi->params[0][0];
-        LOG_DEBUG("DA1 reply with service class %u", code);
-        if (code >= 1 && code <= 12) {
-            return tflag(TFLAG_QUERY);
-        } else if (code >= 62 && code <= 65) {
+        if (code >= 61 && code <= 65) {
+            unsigned int lvl = code - 60;
+            LOG_DEBUG("DA1 reply with P=%u (device level %u)", code, lvl);
             // TODO: Handle extra param 22 as indicating TERM_8_COLOR support
             return tflag(TFLAG_QUERY);
         }
-        goto ignore;
+        bool vt100 = (code >= 1 && code <= 12);
+        const char *desc = vt100 ? "VT100 series" : "unknown";
+        LOG_DEBUG("DA1 reply with P=%u (%s)", code, desc);
+        return KEY_IGNORE;
     }
 
     if (prefix == '?' && final == 'y' && intermediate == '$' && nparams == 2) {
