@@ -52,12 +52,6 @@ static void test_process_sanity(TestContext *ctx)
     // message, since there's no stderr for test_fail() to use
     ASSERT_TRUE(fd_is_valid(STDERR_FILENO));
 
-    if (access("test/data/crlf.dterc", F_OK) != 0) {
-        TEST_FAIL("test binary executed from incorrect working directory; exiting");
-        exit(1);
-    }
-
-    test_pass(ctx);
     ASSERT_NONNULL(freopen("/dev/null", "r", stdin));
     ASSERT_NONNULL(freopen("/dev/null", "w", stdout));
 }
@@ -270,6 +264,50 @@ static const TestEntry dtests[] = {
 static const TestGroup init_tests = TEST_GROUP(itests);
 static const TestGroup deinit_tests = TEST_GROUP(dtests);
 
+static void init_working_directory(int argc, char *argv[])
+{
+    static const char testfile[] = "test/data/crlf.dterc";
+    if (likely(access(testfile, F_OK) == 0)) {
+        // Working directory already correct
+        return;
+    }
+
+    char *abs = NULL;
+    if (argc < 1 || !argv || !argv[0]) {
+        fputs("argv[0] not set\n", stderr);
+        goto error;
+    }
+
+    abs = path_absolute(argv[0]);
+    if (!abs) {
+        perror("path_absolute");
+        goto error;
+    }
+
+    StringView path = path_slice_dirname(abs);
+    if (!path_parent(&path) || !path_parent(&path)) {
+        goto error;
+    }
+
+    abs[path.length] = '\0';
+    if (chdir(abs) != 0) {
+        perror("chdir");
+        goto error;
+    }
+
+    if (access(testfile, F_OK) != 0) {
+        goto error;
+    }
+
+    free(abs);
+    return;
+
+error:
+    free(abs);
+    fputs("test binary executed from incorrect working directory; exiting", stderr);
+    exit(1);
+}
+
 static void usage(FILE *stream, int argc, char *argv[])
 {
     fprintf(stream, "Usage: %s [-cCth]\n", progname(argc, argv, NULL));
@@ -305,6 +343,8 @@ int main(int argc, char *argv[])
     }
 
     setvbuf(stderr, NULL, _IOLBF, 0);
+    init_working_directory(argc, argv);
+
     if (!color) {
         ctx.boldred[0] = '\0';
         ctx.dim[0] = '\0';

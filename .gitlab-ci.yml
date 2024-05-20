@@ -54,6 +54,7 @@ arch:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
     script:
         - make check-source check check-clang-tidy
+        - (cd build/ && test/test)
         - *objsize_and_bench
 
 debian-stable:
