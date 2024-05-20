@@ -116,6 +116,8 @@ static const struct FileExtensionMap {
     {"lsp", LISP},
     {"ltx", TEX},
     {"lua", LUA},
+    {"m3u", CONFIG},
+    {"m3u8", CONFIG},
     {"m4", M4},
     {"mak", MAKE},
     {"make", MAKE},
