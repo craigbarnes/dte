@@ -98,7 +98,7 @@ Questions and patches may be sent by email, to the address printed by:
 ...although GitLab [issue reports] and [merge requests] are preferred,
 when possible.
 
-For general discussion, we also have a `#dte` channel on the [Libera.Chat]
+For general discussion, we also have a [`#dte` channel] on the [Libera.Chat]
 IRC network.
 
 Donations
@@ -167,5 +167,6 @@ Public License version 2 for more details.
 [Packaging information]: https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
+[`#dte` channel]: https://web.libera.chat/?channels=#dte
 [Libera.Chat]: https://libera.chat/
 [Liberapay]: https://liberapay.com/craigbarnes/donate
