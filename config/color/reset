@@ -25,4 +25,7 @@ hi -c errormsg bold red
 hi -c infomsg bold blue
 hi -c tabbar black gray
 hi -c inactivetab black gray
+hi -c dialog gray red bold
+
+# For terminals that support at least 16 colors:
 hi -c dialog white red bold
