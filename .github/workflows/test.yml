@@ -15,7 +15,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
-              with: {filter: tree:0, fetch-tags: true}
+              with: {filter: "tree:0", fetch-tags: true}
             - run: brew install make
             - run: gmake vars
             - run: gmake build/gen/feature.h
@@ -30,7 +30,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
-              with: {filter: tree:0, fetch-tags: true}
+              with: {filter: "tree:0", fetch-tags: true}
             - run: make vars
             - run: make build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
