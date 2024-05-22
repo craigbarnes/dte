@@ -182,12 +182,6 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
 
 void term_put_queries(Terminal *term)
 {
-    if (!xgetenv("DTE_TERM_QUERY")) {
-        // Terminal querying is a work-in-progress and not suitable
-        // for general use yet
-        return;
-    }
-
     // ECMA-48 DA (Device Attributes; referred to as "DA1" in other contexts)
     term_put_literal(&term->obuf, "\033[c");
     LOG_INFO("sending DA1 query to terminal");
