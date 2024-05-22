@@ -11,11 +11,12 @@ jobs:
     macos:
         strategy:
             matrix:
-                os: [macos-12, macos-11]
+                os: [macos-14, macos-13, macos-12]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
             - run: brew install make
+            - run: gmake vars
             - run: gmake build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
             - run: gmake -Otarget check
@@ -24,10 +25,11 @@ jobs:
     linux:
         strategy:
             matrix:
-                os: [ubuntu-22.04, ubuntu-20.04]
+                os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
+            - run: gmake vars
             - run: make build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
             - run: make -Otarget check
