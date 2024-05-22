@@ -2,6 +2,7 @@
 #define UTIL_LIST_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "macros.h"
 
 typedef struct ListHead {

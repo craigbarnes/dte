@@ -284,6 +284,7 @@ static void init_working_directory(int argc, char *argv[])
     }
 
     StringView path = path_slice_dirname(abs);
+    // NOLINTNEXTLINE(misc-redundant-expression)
     if (!path_parent(&path) || !path_parent(&path)) {
         goto error;
     }
