@@ -202,7 +202,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 
     StringView seq = string_view(data, len);
     if (strview_has_prefix(&seq, ">|")) {
-        LOG_DEBUG("XTVERSION reply: %.*s", (int)len - 2, data + 2);
+        LOG_INFO("XTVERSION reply: %.*s", (int)len - 2, data + 2);
         return KEY_IGNORE;
     }
 
