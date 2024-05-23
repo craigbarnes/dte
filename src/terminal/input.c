@@ -167,8 +167,10 @@ static bool is_text(const char *str, size_t len)
 
 static const char *tflag_to_str(TermFeatureFlags flag)
 {
-    // This only handles a subset of individual flags, as returned
-    // by parse_csi_query_reply() and parse_xtgettcap_reply()
+    // This function only handles single flags. Values with multiple
+    // bits set should be handled as appropriate, by the caller.
+    WARN_ON(!IS_POWER_OF_2(flag));
+
     switch ((unsigned int)flag) {
     case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
     case TFLAG_SYNC: return "SYNC";
@@ -177,22 +179,46 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_SET_WINDOW_TITLE: return "TITLE";
     case TFLAG_OSC52_COPY: return "OSC52";
     case TFLAG_QUERY: return "QUERY";
+    case TFLAG_8_COLOR: return "C8";
+    case TFLAG_16_COLOR: return "C16";
+    case TFLAG_256_COLOR: return "C256";
+    case TFLAG_TRUE_COLOR: return "TC";
     }
+
     return "??";
+}
+
+static void log_detected_feature(const Terminal *term, TermFeatureFlags flag)
+{
+    const char *name = tflag_to_str(flag);
+    const char *extra = (term->features & flag) ? " (was already set)" : "";
+    LOG_INFO("detected terminal feature %s via query%s", name, extra);
 }
 
 static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
-    TermFeatureFlags flag = key & ~KEYCODE_QUERY_REPLY_BIT;
-    BUG_ON(!IS_POWER_OF_2(flag)); // Only 1 flag should be set
-    LOG_INFO("detected terminal feature %s via query", tflag_to_str(flag));
+    unsigned int qrbit = KEYCODE_QUERY_REPLY_BIT;
+    TermFeatureFlags flags = key & ~qrbit;
 
-    if (flag == TFLAG_QUERY && !(term->features & TFLAG_QUERY)) {
+    if (likely(IS_POWER_OF_2(flags))) {
+        // Single flag (common case)
+        log_detected_feature(term, flags);
+    } else {
+        // Multiple flags; loop over and log each one
+        for (unsigned int mask = qrbit >> 1; mask; mask >>= 1) {
+            TermFeatureFlags flag = flags & mask;
+            if (flag) {
+                log_detected_feature(term, flag);
+            }
+        }
+    }
+
+    if ((flags & TFLAG_QUERY) && !(term->features & TFLAG_QUERY)) {
         term_put_extra_queries(term);
         term_output_flush(&term->obuf);
     }
 
-    term->features |= flag;
+    term->features |= flags;
     return KEY_NONE;
 }
 

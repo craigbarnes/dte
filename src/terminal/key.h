@@ -83,10 +83,11 @@ enum {
     MOD_HYPER = 16 << KEYCODE_MODIFIER_OFFSET,
     MOD_MASK  = MOD_SHIFT | MOD_META | MOD_CTRL | MOD_SUPER | MOD_HYPER,
 
-    // If set, the 1 other set bit represents a TermFeatureFlags value.
-    // This bit is used within term_read_key(), but is never present in
-    // KeyCode values it returns.
-    KEYCODE_QUERY_REPLY_BIT = MOD_HYPER << 1,
+    // If this bit is set, all other bits correspond to TermFeatureFlags.
+    // This is used by the functions in query.c to communicate replies to
+    // term_read_key(), although such values are handled entirely within
+    // that function and are never present in KeyCode values it returns.
+    KEYCODE_QUERY_REPLY_BIT = 1u << 30,
 };
 
 typedef uint32_t KeyCode;

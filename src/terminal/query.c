@@ -33,10 +33,20 @@ static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
     return status == DECRPM_SET || status == DECRPM_RESET;
 }
 
-static KeyCode tflag(TermFeatureFlags flag)
+static KeyCode tflag(TermFeatureFlags flags)
 {
-    BUG_ON(!IS_POWER_OF_2(flag));
-    return KEYCODE_QUERY_REPLY_BIT | flag;
+    BUG_ON(flags & KEYCODE_QUERY_REPLY_BIT);
+    return KEYCODE_QUERY_REPLY_BIT | flags;
+}
+
+static bool csi_has_param(const TermControlParams *csi, uint32_t param, size_t start)
+{
+    for (size_t i = start, n = csi->nparams; i < n; i++) {
+        if (csi->params[i][0] == param) {
+            return true;
+        }
+    }
+    return false;
 }
 
 KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
@@ -58,8 +68,8 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         if (code >= 61 && code <= 65) {
             unsigned int lvl = code - 60;
             LOG_DEBUG("DA1 reply with P=%u (device level %u)", code, lvl);
-            // TODO: Handle extra param 22 as indicating TERM_8_COLOR support
-            return tflag(TFLAG_QUERY);
+            TermFeatureFlags c8 = csi_has_param(csi, 22, 1) ? TFLAG_8_COLOR : 0;
+            return tflag(TFLAG_QUERY | c8);
         }
         bool vt100 = (code >= 1 && code <= 12);
         const char *desc = vt100 ? "VT100 series" : "unknown";
@@ -222,7 +232,6 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
             }
         }
         // TODO: Detect RGB and italic support from DECRQSS "1$r0;3;38:2::60:70:80m" reply
-        // TODO: To facilitate the above, convert Terminal::color_type to TermFeatureFlags bits
         LOG_DEBUG("unhandled DECRQSS reply: %.*s", (int)len, data);
         return KEY_IGNORE;
     }

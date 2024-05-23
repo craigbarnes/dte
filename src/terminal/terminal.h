@@ -13,6 +13,8 @@ enum {
     TERM_OUTBUF_SIZE = 8192,
 };
 
+// Bit flags representing supported terminal features
+// See also: KEYCODE_QUERY_REPLY_BIT
 typedef enum {
     TFLAG_BACK_COLOR_ERASE = 0x01, // Can erase with specific background color
     TFLAG_ECMA48_REPEAT = 0x02, // Supports ECMA-48 "REP" (repeat character; §8.3.103)
