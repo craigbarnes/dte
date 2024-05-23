@@ -192,12 +192,23 @@ void term_put_extra_queries(Terminal *term)
     static const char queries[] =
         "\033[>0q" // XTVERSION (terminal name and version)
         "\033[?u" // Kitty keyboard protocol flags
+    ;
+
+    static const char debug_queries[] =
+        "\033[>c" // DA2 (Secondary Device Attributes)
+        "\033[=c" // DA3 (Tertiary Device Attributes)
         "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
     ;
 
+    LOG_INFO("sending additional queries to terminal");
+
     TermOutputBuffer *obuf = &term->obuf;
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
-    LOG_INFO("sending additional queries to terminal");
+
+    // Debug query responses are used purely for logging/informational purposes
+    if (DEBUG >= 2 && log_level_enabled(LOG_LEVEL_DEBUG)) {
+        term_put_bytes(obuf, debug_queries, sizeof(debug_queries) - 1);
+    }
 
     TermFeatureFlags features = term->features;
     if (!(features & TFLAG_SYNC)) {

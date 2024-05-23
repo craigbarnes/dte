@@ -64,7 +64,7 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
     }
 
     // https://vt100.net/docs/vt510-rm/DA1.html
-    // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+    // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=(-,Primary%20DA,-)
     if (prefix == '?' && final == 'c' && intermediate == 0 && nparams >= 1) {
         unsigned int code = csi->params[0][0];
         if (code >= 61 && code <= 65) {
@@ -74,6 +74,16 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         bool vt100 = (code >= 1 && code <= 12);
         const char *desc = vt100 ? "VT100 series" : "unknown";
         LOG_DEBUG("DA1 reply with P=%u (%s)", code, desc);
+        return KEY_IGNORE;
+    }
+
+    // https://vt100.net/docs/vt510-rm/DA2.html
+    // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=(-,Secondary%20DA,-)
+    if (prefix == '>' && final == 'c' && intermediate == 0 && nparams == 3) {
+        unsigned int type = csi->params[0][0];
+        unsigned int firmware = csi->params[1][0];
+        unsigned int pc = csi->params[2][0];
+        LOG_DEBUG("DA2 reply: %u; %u; %u", type, firmware, pc);
         return KEY_IGNORE;
     }
 
@@ -213,6 +223,13 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     StringView seq = string_view(data, len);
     if (strview_has_prefix(&seq, ">|")) {
         LOG_INFO("XTVERSION reply: %.*s", (int)len - 2, data + 2);
+        return KEY_IGNORE;
+    }
+
+    // https://vt100.net/docs/vt510-rm/DA3.html
+    // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=(-,Tertiary%20DA,-)
+    if (strview_has_prefix(&seq, "!|")) {
+        LOG_DEBUG("DA3 reply: %.*s", (int)len - 2, data + 2);
         return KEY_IGNORE;
     }
 
