@@ -39,14 +39,16 @@ static KeyCode tflag(TermFeatureFlags flags)
     return KEYCODE_QUERY_REPLY_BIT | flags;
 }
 
-static bool csi_has_param(const TermControlParams *csi, uint32_t param, size_t start)
+static TermFeatureFlags da1_params_to_features(const TermControlParams *csi)
 {
-    for (size_t i = start, n = csi->nparams; i < n; i++) {
-        if (csi->params[i][0] == param) {
-            return true;
+    TermFeatureFlags flags = 0;
+    for (size_t i = 1, n = csi->nparams; i < n; i++) {
+        unsigned int p = csi->params[i][0];
+        if (p == 22) {
+            flags |= TFLAG_8_COLOR;
         }
     }
-    return false;
+    return flags;
 }
 
 KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
@@ -66,10 +68,8 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
     if (prefix == '?' && final == 'c' && intermediate == 0 && nparams >= 1) {
         unsigned int code = csi->params[0][0];
         if (code >= 61 && code <= 65) {
-            unsigned int lvl = code - 60;
-            LOG_DEBUG("DA1 reply with P=%u (device level %u)", code, lvl);
-            TermFeatureFlags c8 = csi_has_param(csi, 22, 1) ? TFLAG_8_COLOR : 0;
-            return tflag(TFLAG_QUERY | c8);
+            LOG_DEBUG("DA1 reply with P=%u (device level %u)", code, code - 60);
+            return tflag(TFLAG_QUERY | da1_params_to_features(csi));
         }
         bool vt100 = (code >= 1 && code <= 12);
         const char *desc = vt100 ? "VT100 series" : "unknown";
