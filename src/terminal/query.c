@@ -212,6 +212,40 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     return KEY_IGNORE;
 }
 
+static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
+{
+    LOG_DEBUG("DECRQSS SGR reply: %.*s", (int)len, data);
+
+    TermFeatureFlags flags = 0;
+    for (size_t pos = 0; pos < len; ) {
+        // These SGR params correspond to the ones in term_put_extra_queries()
+        StringView s = get_delim(data, &pos, len, ';');
+        if (strview_equal_cstring(&s, "48:5:255")) {
+            flags |= TFLAG_256_COLOR;
+            continue;
+        }
+
+        if (
+            strview_equal_cstring(&s, "38:2::60:70:80") // xterm, foot
+            || strview_equal_cstring(&s, "38:2:60:70:80") // kitty
+        ) {
+            flags |= TFLAG_TRUE_COLOR;
+            continue;
+        }
+
+        if (strview_equal_cstring(&s, "0") && pos <= 2) {
+            continue;
+        }
+
+        LOG_WARNING (
+            "unrecognized parameter substring in DECRQSS SGR reply: %.*s",
+            (int)s.length, s.data
+        );
+    }
+
+    return flags ? tflag(flags) : KEY_IGNORE;
+}
+
 KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 {
     const char *note = "";
@@ -248,13 +282,18 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
                 return KEY_IGNORE;
             }
         }
-        // TODO: Detect RGB and italic support from DECRQSS "1$r0;3;38:2::60:70:80m" reply
+
+        if (strview_has_suffix(&seq, "m")) {
+            seq.length--;
+            return handle_decrqss_sgr_reply(seq.data, seq.length);
+        }
+
         LOG_DEBUG("unhandled DECRQSS reply: %.*s", (int)len, data);
         return KEY_IGNORE;
     }
 
     if (strview_equal_cstring(&seq, "0$r")) {
-        note = " (DECRQSS; 'invalid request')";
+        note = " (DECRQSS; invalid request)";
         goto unhandled;
     }
 

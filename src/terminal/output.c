@@ -189,15 +189,23 @@ void term_put_queries(Terminal *term)
 
 void term_put_extra_queries(Terminal *term)
 {
+    // Note: the correct (according to ISO 8613-6) format for the SGR
+    // sequence here would be "\033[0;38:2::60:70:80;48:5:255m", but we
+    // use the standards-incorrect (but de facto more widely supported)
+    // format because that's what is actually used in term_set_style()
     static const char queries[] =
         "\033[>0q" // XTVERSION (terminal name and version)
         "\033[?u" // Kitty keyboard protocol flags
+        "\033[0;38;2;60;70;80;48;5;255m" // SGR with direct/indexed fg/bg
+        "\033P$qm\033\\" // DECRQSS SGR (check support for SGR params above)
+        "\033[0m" // SGR 0
     ;
 
     static const char debug_queries[] =
         "\033[>c" // DA2 (Secondary Device Attributes)
         "\033[=c" // DA3 (Tertiary Device Attributes)
         "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
+        "\033P$q q\033\\" // DECRQSS DECSCUSR (cursor style)
     ;
 
     LOG_INFO("sending additional queries to terminal");
