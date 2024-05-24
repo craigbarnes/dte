@@ -112,6 +112,12 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         unsigned int status = csi->params[1][0];
         const char *desc = decrpm_status_to_str(status);
         LOG_DEBUG("DECRPM %u reply: %u (%s)", mode, status, desc);
+        if (mode == 1036 && status == DECRPM_RESET) {
+            return tflag(TFLAG_META_ESC);
+        }
+        if (mode == 1039 && status == DECRPM_RESET) {
+            return tflag(TFLAG_ALT_ESC);
+        }
         if (mode == 2026 && decrpm_is_set_or_reset(status)) {
             return tflag(TFLAG_SYNC);
         }

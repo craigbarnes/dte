@@ -1154,8 +1154,7 @@ static void test_term_init(TestContext *ctx)
         TFLAG_8_COLOR |
         TFLAG_BACK_COLOR_ERASE |
         TFLAG_SET_WINDOW_TITLE |
-        TFLAG_OSC52_COPY |
-        TFLAG_META_ESC
+        TFLAG_OSC52_COPY
     ;
 
     Terminal term;

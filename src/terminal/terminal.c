@@ -31,7 +31,6 @@ enum {
     RXVT = TFLAG_RXVT,
     LINUX = TFLAG_LINUX,
     OSC52 = TFLAG_OSC52_COPY,
-    METAESC = TFLAG_META_ESC,
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
     ITERM2 = TFLAG_ITERM2,
     SYNC = TFLAG_SYNC,
@@ -111,7 +110,7 @@ static const TermEntry terms[] = {
     t("xfce", 0, C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too
     // many other terminals to safely add it here.
-    t("xterm", 0, C8 | BCE | TITLE | OSC52 | METAESC),
+    t("xterm", 0, C8 | BCE | TITLE | OSC52),
     t("xterm.js", 0, C8 | BCE),
 };
 
@@ -261,9 +260,11 @@ void term_enable_private_modes(Terminal *term)
 {
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
-    if (features & METAESC) {
-        // XTSAVE and DECSET {meta,alt}SendsEscape
-        term_put_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
+    if (features & TFLAG_META_ESC) {
+        term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
+    }
+    if (features & TFLAG_ALT_ESC) {
+        term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
     }
 
     if (features & KITTYKBD) {
@@ -291,8 +292,11 @@ void term_restore_private_modes(Terminal *term)
 {
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
-    if (features & METAESC) {
-        term_put_literal(obuf, "\033[?1036;1039r"); // XTRESTORE
+    if (features & TFLAG_META_ESC) {
+        term_put_literal(obuf, "\033[?1036l"); // DECRST 1036 (metaSendsEscape)
+    }
+    if (features & TFLAG_ALT_ESC) {
+        term_put_literal(obuf, "\033[?1039l"); // DECRST 1039 (altSendsEscape)
     }
     if (features & (KITTYKBD | ITERM2)) {
         term_put_literal(obuf, "\033[<u");

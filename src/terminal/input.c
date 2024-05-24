@@ -183,6 +183,8 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_16_COLOR: return "C16";
     case TFLAG_256_COLOR: return "C256";
     case TFLAG_TRUE_COLOR: return "TC";
+    case TFLAG_META_ESC: return "METAESC";
+    case TFLAG_ALT_ESC: return "ALTESC";
     }
 
     return "??";
@@ -213,9 +215,22 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         }
     }
 
+    TermOutputBuffer *obuf = &term->obuf;
+    bool flush = false;
     if ((flags & TFLAG_QUERY) && !(term->features & TFLAG_QUERY)) {
         term_put_extra_queries(term);
-        term_output_flush(&term->obuf);
+        flush = true;
+    }
+    if ((flags & TFLAG_META_ESC) && !(term->features & TFLAG_META_ESC)) {
+        term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
+        flush = true;
+    }
+    if ((flags & TFLAG_ALT_ESC) && !(term->features & TFLAG_ALT_ESC)) {
+        term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
+        flush = true;
+    }
+    if (flush) {
+        term_output_flush(obuf);
     }
 
     term->features |= flags;
