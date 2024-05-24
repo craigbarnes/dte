@@ -199,8 +199,8 @@ void term_put_extra_queries(Terminal *term)
         "\033[0;38;2;60;70;80;48;5;255m" // SGR with direct/indexed fg/bg
         "\033P$qm\033\\" // DECRQSS SGR (check support for SGR params above)
         "\033[0m" // SGR 0
-        "\033[?1036$p" // DECRQM 1036 (metaSendsEscape)
-        "\033[?1039$p" // DECRQM 1039 (altSendsEscape)
+        "\033[?1036$p" // DECRQM 1036 (metaSendsEscape; must be after kitty query)
+        "\033[?1039$p" // DECRQM 1039 (altSendsEscape; must be after kitty query)
     ;
 
     static const char debug_queries[] =

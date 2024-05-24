@@ -194,7 +194,7 @@ static void log_detected_feature(const Terminal *term, TermFeatureFlags flag)
 {
     const char *name = tflag_to_str(flag);
     const char *extra = (term->features & flag) ? " (was already set)" : "";
-    LOG_INFO("detected terminal feature %s via query%s", name, extra);
+    LOG_INFO("terminal feature %s detected via query%s", name, extra);
 }
 
 static KeyCode handle_query_reply(Terminal *term, KeyCode key)
@@ -213,6 +213,14 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
                 log_detected_feature(term, flag);
             }
         }
+    }
+
+    TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
+    if ((flags & escflags) && (term->features & TFLAG_KITTY_KEYBOARD)) {
+        const char *name = tflag_to_str(flags);
+        const char *ovr = tflag_to_str(TFLAG_KITTY_KEYBOARD);
+        LOG_INFO("terminal feature %s overridden by %s", name, ovr);
+        flags &= ~escflags;
     }
 
     TermOutputBuffer *obuf = &term->obuf;
