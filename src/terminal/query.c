@@ -51,6 +51,24 @@ static TermFeatureFlags da1_params_to_features(const TermControlParams *csi)
     return flags;
 }
 
+static const char *da2_param_to_name(unsigned int type_param)
+{
+    switch (type_param) {
+    case 0: return "VT100";
+    case 1: return "VT220";
+    case 2: return "VT240"; // "VT240 or VT241"
+    case 18: return "VT330";
+    case 19: return "VT340";
+    case 24: return "VT320";
+    case 32: return "VT382";
+    case 41: return "VT420";
+    case 61: return "VT510";
+    case 64: return "VT520";
+    case 65: return "VT525";
+    }
+    return "unknown";
+}
+
 KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
 {
     // NOTE: The main conditions below must check ALL of these values, in
@@ -83,7 +101,8 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         unsigned int type = csi->params[0][0];
         unsigned int firmware = csi->params[1][0];
         unsigned int pc = csi->params[2][0];
-        LOG_DEBUG("DA2 reply: %u; %u; %u", type, firmware, pc);
+        const char *name = da2_param_to_name(type);
+        LOG_DEBUG("DA2 reply: %u (%s); %u; %u", type, name, firmware, pc);
         return KEY_IGNORE;
     }
 
