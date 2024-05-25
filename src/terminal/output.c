@@ -208,6 +208,10 @@ void term_put_extra_queries(Terminal *term)
         "\033[=c" // DA3 (Tertiary Device Attributes)
         "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
         "\033P$q q\033\\" // DECRQSS DECSCUSR (cursor style)
+        "\033[?25$p" // DECRQM 25 (DECTCEM; cursor visibility)
+        "\033[?67$p" // DECRQM 67 (DECBKM; backspace key sends BS)
+        "\033[?1049$p" // DECRQM 1049 (alternate screen buffer)
+        "\033[?2004$p" // DECRQM 2004 (bracketed paste)
     ;
 
     LOG_INFO("sending additional queries to terminal");
