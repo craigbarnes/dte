@@ -7,20 +7,15 @@
 #include "ascii.h"
 #include "macros.h"
 
-#define FNV_32_INIT UINT32_C(2166136261)
-#define FNV_64_INIT UINT64_C(14695981039346656037)
-#define FNV_32_PRIME UINT32_C(16777619)
-#define FNV_64_PRIME UINT64_C(1099511628211)
-
 static inline size_t fnv_1a_init(void)
 {
     static_assert(8 * CHAR_BIT == 64);
-    return (sizeof(size_t) >= 8) ? FNV_64_INIT : FNV_32_INIT;
+    return (sizeof(size_t) >= 8) ? 14695981039346656037ULL : 2166136261U;
 }
 
 static inline size_t fnv_1a_prime(void)
 {
-    return (sizeof(size_t) >= 8) ? FNV_64_PRIME : FNV_32_PRIME;
+    return (sizeof(size_t) >= 8) ? 1099511628211ULL : 16777619U;
 }
 
 static inline size_t fnv_1a_hash(const unsigned char *str, size_t n)
