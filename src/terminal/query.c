@@ -28,6 +28,38 @@ static const char *decrpm_status_to_str(TermPrivateModeStatus val)
     return "INVALID";
 }
 
+static const char *decrpm_mode_to_str(unsigned int mode_param)
+{
+    switch (mode_param) {
+    case 25: return "cursor visibility";
+    case 67: return "backspace sends BS";
+    case 1036: return "metaSendsEscape";
+    case 1039: return "altSendsEscape";
+    case 1049: return "alternate screen buffer";
+    case 2004: return "bracketed paste";
+    case 2026: return "synchronized updates";
+    }
+    return "unknown";
+}
+
+static const char *da2_param_to_name(unsigned int type_param)
+{
+    switch (type_param) {
+    case 0: return "VT100";
+    case 1: return "VT220";
+    case 2: return "VT240"; // "VT240 or VT241"
+    case 18: return "VT330";
+    case 19: return "VT340";
+    case 24: return "VT320";
+    case 32: return "VT382";
+    case 41: return "VT420";
+    case 61: return "VT510";
+    case 64: return "VT520";
+    case 65: return "VT525";
+    }
+    return "unknown";
+}
+
 static bool decrpm_is_set_or_reset(TermPrivateModeStatus status)
 {
     return status == DECRPM_SET || status == DECRPM_RESET;
@@ -49,24 +81,6 @@ static TermFeatureFlags da1_params_to_features(const TermControlParams *csi)
         }
     }
     return flags;
-}
-
-static const char *da2_param_to_name(unsigned int type_param)
-{
-    switch (type_param) {
-    case 0: return "VT100";
-    case 1: return "VT220";
-    case 2: return "VT240"; // "VT240 or VT241"
-    case 18: return "VT330";
-    case 19: return "VT340";
-    case 24: return "VT320";
-    case 32: return "VT382";
-    case 41: return "VT420";
-    case 61: return "VT510";
-    case 64: return "VT520";
-    case 65: return "VT525";
-    }
-    return "unknown";
 }
 
 KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
@@ -110,8 +124,9 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         // DECRPM reply to DECRQM query (CSI ? Ps; Pm $ y)
         unsigned int mode = csi->params[0][0];
         unsigned int status = csi->params[1][0];
-        const char *desc = decrpm_status_to_str(status);
-        LOG_DEBUG("DECRPM %u reply: %u (%s)", mode, status, desc);
+        const char *mstr = decrpm_mode_to_str(mode);
+        const char *sstr = decrpm_status_to_str(status);
+        LOG_DEBUG("DECRPM %u (%s) reply: %u (%s)", mode, mstr, status, sstr);
         if (mode == 1036 && status == DECRPM_RESET) {
             return tflag(TFLAG_META_ESC);
         }
