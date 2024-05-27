@@ -9,17 +9,23 @@
 #define U32(x) (UINT32_C(x))
 
 // https://gcc.gnu.org/onlinedocs/gcc-3.4.6/gcc/Other-Builtins.html#Other-Builtins
-#if GNUC_AT_LEAST(3, 4)
-#define USE_BUILTIN(fn, arg) \
-    if (__builtin_types_compatible_p(__typeof__(arg), unsigned long long)) { \
-        return __builtin_ ## fn ## ll(arg); \
-    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned long)) { \
-        return __builtin_ ## fn ## l(arg); \
-    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned int)) { \
-        return __builtin_ ## fn(arg); \
-    }
+#if GNUC_AT_LEAST(3, 4) || HAS_BUILTIN(__builtin_types_compatible_p)
+    #define HAS_COMPATIBLE_BUILTIN(arg, type, fn) \
+        (GNUC_AT_LEAST(3, 4) || HAS_BUILTIN(__builtin_ ## fn)) \
+        && __builtin_types_compatible_p(__typeof__(arg), type)
+
+    // If there's an appropriate built-in function for `arg`, emit
+    // a call to it (and eliminate everything below it as dead code)
+    #define USE_BUILTIN(fn, arg) \
+        if (HAS_COMPATIBLE_BUILTIN(arg, unsigned long long, fn ## ll)) { \
+            return __builtin_ ## fn ## ll(arg); \
+        } else if (HAS_COMPATIBLE_BUILTIN(arg, unsigned long, fn ## l)) { \
+            return __builtin_ ## fn ## l(arg); \
+        } else if (HAS_COMPATIBLE_BUILTIN(arg, unsigned int, fn)) { \
+            return __builtin_ ## fn(arg); \
+        }
 #else
-#define USE_BUILTIN(fn, arg)
+    #define USE_BUILTIN(fn, arg)
 #endif
 
 // Population count (cardinality) of set bits
