@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h> // ffs()
 #include <sys/select.h> // NOLINT(portability-restrict-system-includes)
 #include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
@@ -190,29 +191,25 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     return "??";
 }
 
-static void log_detected_feature(const Terminal *term, TermFeatureFlags flag)
+static void COLD log_detected_features(const Terminal *term, TermFeatureFlags flags)
 {
-    const char *name = tflag_to_str(flag);
-    const char *extra = (term->features & flag) ? " (was already set)" : "";
-    LOG_INFO("terminal feature %s detected via query%s", name, extra);
+    while (flags > 0) {
+        unsigned int lsb = ffs(flags);
+        BUG_ON(lsb == 0 || lsb > BITSIZE(flags));
+        TermFeatureFlags flag = 1u << (lsb - 1);
+        BUG_ON(!(flags & flag));
+        const char *name = tflag_to_str(flag);
+        const char *extra = (term->features & flag) ? " (was already set)" : "";
+        LOG_INFO("terminal feature %s detected via query%s", name, extra);
+        flags &= ~flag;
+    }
 }
 
 static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
-    unsigned int qrbit = KEYCODE_QUERY_REPLY_BIT;
-    TermFeatureFlags flags = key & ~qrbit;
-
-    if (likely(IS_POWER_OF_2(flags))) {
-        // Single flag (common case)
-        log_detected_feature(term, flags);
-    } else {
-        // Multiple flags; loop over and log each one
-        for (unsigned int mask = qrbit >> 1; mask; mask >>= 1) {
-            TermFeatureFlags flag = flags & mask;
-            if (flag) {
-                log_detected_feature(term, flag);
-            }
-        }
+    TermFeatureFlags flags = key & ~KEYCODE_QUERY_REPLY_BIT;
+    if (unlikely(log_level_enabled(LOG_LEVEL_INFO))) {
+        log_detected_features(term, flags);
     }
 
     TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
