@@ -10,8 +10,9 @@
 #include "macros.h"
 
 // A non-owning, length-bounded "view" into another string, similar to
-// the C++17 string_view class. The .data member will usually *not* be
-// null-terminated and the underlying string *must* outlive the view.
+// the C++17 string_view class or what many languages call a "slice".
+// The .data member will usually *not* be null-terminated and the
+// underlying string *must* outlive the view.
 typedef struct {
     const unsigned char NONSTRING *data;
     size_t length;
