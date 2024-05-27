@@ -103,9 +103,11 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
             LOG_DEBUG("DA1 reply with P=%u (device level %u)", code, code - 60);
             return tflag(TFLAG_QUERY | da1_params_to_features(csi));
         }
-        bool vt100 = (code >= 1 && code <= 12);
-        const char *desc = vt100 ? "VT100 series" : "unknown";
-        LOG_DEBUG("DA1 reply with P=%u (%s)", code, desc);
+        if (code >= 1 && code <= 12) {
+            LOG_DEBUG("DA1 reply with P=%u (VT100 series)", code);
+            return xgetenv("DTE_XQUERY") ? tflag(TFLAG_QUERY) : KEY_IGNORE;
+        }
+        LOG_DEBUG("DA1 reply with P=%u (unknown)", code);
         return KEY_IGNORE;
     }
 
