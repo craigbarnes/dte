@@ -1,13 +1,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h> // ffs()
 #include <sys/select.h> // NOLINT(portability-restrict-system-includes)
 #include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
 #include "input.h"
 #include "output.h"
 #include "util/ascii.h"
+#include "util/bit.h"
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/time-util.h"
@@ -194,7 +194,7 @@ static const char *tflag_to_str(TermFeatureFlags flag)
 static void COLD log_detected_features(const Terminal *term, TermFeatureFlags flags)
 {
     while (flags > 0) {
-        unsigned int lsb = ffs(flags);
+        unsigned int lsb = u32_ffs(flags);
         BUG_ON(lsb == 0 || lsb > BITSIZE(flags));
         TermFeatureFlags flag = 1u << (lsb - 1);
         BUG_ON(!(flags & flag));

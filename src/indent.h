@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <strings.h>
 #include "block-iter.h"
 #include "options.h"
+#include "util/bit.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/string-view.h"
@@ -22,13 +22,13 @@ typedef struct {
 } IndentInfo;
 
 // Divide `x` by `d`, to obtain the number of whole indent levels.
-// If `d` is a power of 2, shift right by `ffs(d) - 1` instead, to
+// If `d` is a power of 2, shift right by `u32_ctz(d)` instead, to
 // avoid the expensive divide operation. This optimization applies
 // to widths of 1, 2, 4 and 8, which covers all of the sensible ones.
 static inline size_t indent_level(size_t x, size_t d)
 {
     BUG_ON(d - 1 > 7);
-    return likely(IS_POWER_OF_2(d)) ? x >> (ffs(d) - 1) : x / d;
+    return likely(IS_POWER_OF_2(d)) ? x >> u32_ctz(d) : x / d;
 }
 
 static inline size_t indent_remainder(size_t x, size_t m)

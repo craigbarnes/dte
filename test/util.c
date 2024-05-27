@@ -2131,6 +2131,37 @@ static void test_popcount(TestContext *ctx)
     }
 }
 
+static void test_ctz(TestContext *ctx)
+{
+    EXPECT_EQ(u32_ctz(1), 0);
+    EXPECT_EQ(u32_ctz(11), 0);
+    EXPECT_EQ(u32_ctz(127), 0);
+    EXPECT_EQ(u32_ctz(128), 7);
+    EXPECT_EQ(u32_ctz(129), 0);
+    EXPECT_EQ(u32_ctz(130), 1);
+    EXPECT_EQ(u32_ctz(255), 0);
+    EXPECT_EQ(u32_ctz(UINT32_MAX), 0);
+    EXPECT_EQ(u32_ctz(UINT32_MAX - 1), 1);
+    EXPECT_EQ(u32_ctz(U32(0xE10F02C9)), 0);
+    EXPECT_EQ(u32_ctz(U32(0xE10F02CC)), 2);
+}
+
+static void test_ffs(TestContext *ctx)
+{
+    EXPECT_EQ(u32_ffs(0), 0);
+    EXPECT_EQ(u32_ffs(1), 1);
+    EXPECT_EQ(u32_ffs(6), 2);
+    EXPECT_EQ(u32_ffs(8), 4);
+    EXPECT_EQ(u32_ffs(255), 1);
+    EXPECT_EQ(u32_ffs(256), 9);
+    EXPECT_EQ(u32_ffs(~U32(255)), 9);
+    EXPECT_EQ(u32_ffs(UINT32_MAX), 1);
+    EXPECT_EQ(u32_ffs(UINT32_MAX - 1), 2);
+    EXPECT_EQ(u32_ffs(U32(1) << 31), 32);
+    EXPECT_EQ(u32_ffs(U32(1) << 30), 31);
+    EXPECT_EQ(u32_ffs(U32(1) << 18), 19);
+}
+
 static void test_path_dirname_and_path_basename(TestContext *ctx)
 {
     static const struct {
@@ -2816,6 +2847,8 @@ static const TestEntry tests[] = {
     TEST(test_round_size_to_next_multiple),
     TEST(test_round_size_to_next_power_of_2),
     TEST(test_popcount),
+    TEST(test_ctz),
+    TEST(test_ffs),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_path_relative),
     TEST(test_short_filename_cwd),

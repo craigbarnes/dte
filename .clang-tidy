@@ -105,7 +105,6 @@ CheckOptions:
         stdio.h,
         stdlib.h,
         string.h,
-        strings.h,
         sys/ioctl.h,
         sys/mman.h,
         sys/stat.h,
