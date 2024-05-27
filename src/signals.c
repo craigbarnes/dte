@@ -173,7 +173,16 @@ static SignalHandler get_sig_handler(SignalDispositionType type)
 void set_signal_handlers(void)
 {
     struct sigaction action = {.sa_handler = handle_fatal_signal};
-    sigfillset(&action.sa_mask);
+    if (sigfillset(&action.sa_mask) != 0) {
+        // This can never happen in glibc/musl/OpenBSD and there's no
+        // sane reason why it *ever* should, but we return here instead
+        // of potentially registering signal handlers without a correct
+        // sa_mask. Not having SIGWINCH handling and terminal cleanup
+        // for fatal signals is merely inconvenient, whereas having an
+        // incorrect sa_mask could potentially lead to UB.
+        LOG_ERRNO("sigfillset");
+        return;
+    }
 
     // "The default actions for the realtime signals in the range SIGRTMIN
     // to SIGRTMAX shall be to terminate the process abnormally."
@@ -189,9 +198,15 @@ void set_signal_handlers(void)
         do_sigaction(signals[i].signum, &action);
     }
 
-    // Set signal mask explicitly, to avoid any possibility of
-    // inheriting blocked signals
     sigset_t mask;
-    sigemptyset(&mask);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
+    if (sigemptyset(&mask) != 0) {
+        LOG_ERRNO("sigemptyset");
+        return;
+    }
+
+    // Set signal mask explicitly, to avoid any possibility of inheriting
+    // blocked signals
+    if (sigprocmask(SIG_SETMASK, &mask, NULL) != 0) {
+        LOG_ERRNO("sigprocmask");
+    }
 }
