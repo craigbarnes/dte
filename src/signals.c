@@ -1,3 +1,4 @@
+#include "feature.h"
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
@@ -198,15 +199,22 @@ void set_signal_handlers(void)
         do_sigaction(signals[i].signum, &action);
     }
 
-    sigset_t mask;
+    sigset_t mask, prev_mask;
     if (sigemptyset(&mask) != 0) {
         LOG_ERRNO("sigemptyset");
         return;
     }
 
-    // Set signal mask explicitly, to avoid any possibility of inheriting
-    // blocked signals
-    if (sigprocmask(SIG_SETMASK, &mask, NULL) != 0) {
+    // Set signal mask explicitly, in case the parent process exec'd us
+    // with blocked signals (bad practice, but not uncommon)
+    if (sigprocmask(SIG_SETMASK, &mask, &prev_mask) != 0) {
         LOG_ERRNO("sigprocmask");
+        return;
     }
+
+#if HAVE_SIGISEMPTYSET
+    if (sigisemptyset(&prev_mask) != 1) {
+        LOG_WARNING("non-empty signal mask was inherited (and cleared)");
+    }
+#endif
 }
