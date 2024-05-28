@@ -9,6 +9,7 @@
 #include "util/intern.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 static bool state_is_valid(const State *st)
 {

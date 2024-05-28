@@ -154,6 +154,9 @@ const char *string_borrow_cstring(String *s)
 
 void string_remove(String *s, size_t pos, size_t len)
 {
+    if (len == 0) {
+        return;
+    }
     size_t oldlen = s->len;
     BUG_ON(pos + len > oldlen);
     s->len -= len;

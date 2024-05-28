@@ -9,6 +9,7 @@
 #include "macros.h"
 #include "string-view.h"
 #include "xmalloc.h"
+#include "xstring.h"
 
 #define copyliteral(dest, lit) copystrn(dest, lit, STRLEN(lit))
 
@@ -16,24 +17,6 @@ static inline size_t copystrn(char *dest, const char *src, size_t len)
 {
     memcpy(dest, src, len);
     return len;
-}
-
-PURE NONNULL_ARGS
-static inline bool streq(const char *a, const char *b)
-{
-    return strcmp(a, b) == 0;
-}
-
-PURE
-static inline bool xstreq(const char *a, const char *b)
-{
-    return (a == b) || (a && b && streq(a, b));
-}
-
-PURE NONNULL_ARGS
-static inline bool mem_equal(const void *s1, const void *s2, size_t n)
-{
-    return memcmp(s1, s2, n) == 0;
 }
 
 static inline bool str_is_null_or_empty(const char *str)

@@ -90,19 +90,6 @@ static inline bool ascii_streq_icase(const char *s1, const char *s2)
     return ascii_strcmp_icase(s1, s2) == 0;
 }
 
-NONNULL_ARGS
-static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
-{
-    const unsigned char *s1 = p1;
-    const unsigned char *s2 = p2;
-    while (n--) {
-        if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 static inline size_t ascii_blank_prefix_length(const char *str, size_t len)
 {
     size_t i = 0;

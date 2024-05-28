@@ -7,6 +7,7 @@
 #include "hash.h"
 #include "str-util.h"
 #include "xmalloc.h"
+#include "xstring.h"
 
 static void alloc_table(HashSet *set, size_t size)
 {

@@ -399,18 +399,6 @@ static void test_ascii(TestContext *ctx)
     EXPECT_EQ(ascii_strcmp_icase("\x80\xFF\x01", "\x80"), 0xFF);
     EXPECT_EQ(ascii_strcmp_icase("\x80", "\x80\xFF\x01"), -0xFF);
 
-    const char s1[8] = "Ctrl+Up";
-    const char s2[8] = "CTRL+U_";
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 0));
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 1));
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 2));
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 3));
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 4));
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 5));
-    EXPECT_TRUE(mem_equal_icase(s1, s2, 6));
-    EXPECT_FALSE(mem_equal_icase(s1, s2, 7));
-    EXPECT_FALSE(mem_equal_icase(s1, s2, 8));
-
     // Query the current locale
     const char *locale = setlocale(LC_CTYPE, NULL);
     ASSERT_NONNULL(locale);
@@ -447,6 +435,22 @@ static void test_ascii(TestContext *ctx)
     // Restore the original locale
     ASSERT_NONNULL(setlocale(LC_CTYPE, saved_locale));
     free(saved_locale);
+}
+
+static void test_mem_equal_icase(TestContext *ctx)
+{
+    const char s1[8] = "Ctrl+Up";
+    const char s2[8] = "CTRL+U_";
+    EXPECT_TRUE(mem_equal_icase(NULL, NULL, 0));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 0));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 1));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 2));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 3));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 4));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 5));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 6));
+    EXPECT_FALSE(mem_equal_icase(s1, s2, 7));
+    EXPECT_FALSE(mem_equal_icase(s1, s2, 8));
 }
 
 static void test_base64_decode(TestContext *ctx)
@@ -623,6 +627,22 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.alloc, 0);
     EXPECT_STREQ(cstr, "12foo3123");
     free(cstr);
+
+    // This is mostly for UBSan coverage
+    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
+    s = string_new(0);
+    EXPECT_NULL(s.buffer);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    string_append_buf(&s, NULL, 0);
+    string_insert_buf(&s, 0, NULL, 0);
+    string_append_memset(&s, 'q', 0);
+    string_replace_byte(&s, 'q', 'z');
+    string_remove(&s, 0, 0);
+    EXPECT_NULL(s.buffer);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    string_free(&s);
 }
 
 static void test_string_view(TestContext *ctx)
@@ -668,6 +688,11 @@ static void test_string_view(TestContext *ctx)
     EXPECT_FALSE(strview_contains_char_type(&sv, ASCII_DIGIT));
     EXPECT_TRUE(strview_isblank(&sv));
     EXPECT_EQ(strview_trim_left(&sv), 0);
+    EXPECT_TRUE(strview_equal_cstring(&sv, ""));
+    EXPECT_TRUE(strview_equal_cstring_icase(&sv, ""));
+    EXPECT_TRUE(strview_has_prefix(&sv, ""));
+    EXPECT_TRUE(strview_has_suffix(&sv, ""));
+    EXPECT_TRUE(strview_has_prefix_icase(&sv, ""));
 
     // Call these 3 for ASan/UBSan coverage:
     strview_trim_right(&sv);
@@ -2797,6 +2822,7 @@ static const TestEntry tests[] = {
     TEST(test_hex_decode),
     TEST(test_hex_encode_byte),
     TEST(test_ascii),
+    TEST(test_mem_equal_icase),
     TEST(test_base64_decode),
     TEST(test_base64_encode_block),
     TEST(test_base64_encode_final),

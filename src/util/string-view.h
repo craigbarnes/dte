@@ -8,6 +8,7 @@
 #include "ascii.h"
 #include "debug.h"
 #include "macros.h"
+#include "xstring.h"
 
 // A non-owning, length-bounded "view" into another string, similar to
 // the C++17 string_view class or what many languages call a "slice".
@@ -45,7 +46,7 @@ NONNULL_ARGS
 static inline bool strview_equal(const StringView *a, const StringView *b)
 {
     size_t n = a->length;
-    return n == b->length && (n == 0 || memcmp(a->data, b->data, n) == 0);
+    return n == b->length && mem_equal(a->data, b->data, n);
 }
 
 NONNULL_ARGS
@@ -54,7 +55,7 @@ static inline bool strview_equal_strn (
     const char *str,
     size_t len
 ) {
-    return len == sv->length && memcmp(sv->data, str, len) == 0;
+    return len == sv->length && mem_equal(sv->data, str, len);
 }
 
 NONNULL_ARGS
@@ -81,7 +82,7 @@ static inline bool strview_equal_cstring_icase(const StringView *sv, const char 
 NONNULL_ARGS
 static inline bool strview_has_strn_prefix(const StringView *sv, const char *p, size_t n)
 {
-    return sv->length >= n && memcmp(sv->data, p, n) == 0;
+    return sv->length >= n && mem_equal(sv->data, p, n);
 }
 
 NONNULL_ARGS
@@ -102,7 +103,7 @@ static inline bool strview_has_suffix(const StringView *sv, const char *suf)
 {
     size_t len = sv->length;
     size_t suflen = strlen(suf);
-    return len >= suflen && memcmp(sv->data + len - suflen, suf, suflen) == 0;
+    return len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen);
 }
 
 NONNULL_ARGS
