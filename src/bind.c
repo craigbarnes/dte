@@ -41,7 +41,8 @@ bool handle_binding(EditorState *e, const ModeHandler *handler, KeyCode key)
     // If the command isn't cached or a macro is being recorded
     if (!binding->cmd || (cmds->macro_record && macro_is_recording(&e->macro))) {
         // Parse and run command string
-        CommandRunner runner = cmdrunner(e, cmds, true);
+        CommandRunner runner = cmdrunner(e, cmds);
+        runner.allow_recording = true;
         return handle_command(&runner, binding->cmd_str);
     }
 

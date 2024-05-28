@@ -21,7 +21,7 @@ static void test_add_binding(TestContext *ctx)
     ASSERT_NONNULL(insert_cmd);
 
     static const char cmd_str[] = "insert xyz";
-    CommandRunner runner = normal_mode_cmdrunner(e, false);
+    CommandRunner runner = normal_mode_cmdrunner(e);
     CachedCommand *cc = cached_command_new(&runner, cmd_str);
     ASSERT_NONNULL(cc);
 

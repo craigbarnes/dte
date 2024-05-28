@@ -220,11 +220,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    CommandRunner runner = {
-        .home_dir = &e->home_dir,
-        .e = e,
-    };
-
+    CommandRunner runner = cmdrunner(e, NULL);
     for (size_t i = 0; i < nmodes; i++) {
         runner.cmds = modes[i]->cmds;
         CachedCommand *cc = cached_command_new(&runner, cmd);
@@ -2660,19 +2656,20 @@ const char *find_normal_alias(const EditorState *e, const char *name)
 
 bool handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
 {
-    CommandRunner runner = normal_mode_cmdrunner(e, allow_recording);
+    CommandRunner runner = normal_mode_cmdrunner(e);
+    runner.allow_recording = allow_recording;
     return handle_command(&runner, cmd);
 }
 
 void exec_normal_config(EditorState *e, StringView config)
 {
-    CommandRunner runner = normal_mode_cmdrunner(e, false);
+    CommandRunner runner = normal_mode_cmdrunner(e);
     exec_config(&runner, config);
 }
 
 int read_normal_config(EditorState *e, const char *filename, ConfigFlags flags)
 {
-    CommandRunner runner = normal_mode_cmdrunner(e, false);
+    CommandRunner runner = normal_mode_cmdrunner(e);
     return read_config(&runner, filename, flags);
 }
 

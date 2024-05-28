@@ -133,8 +133,9 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
 {
     StringView esc = cs->escaped;
     if (strview_has_prefix(&esc, "~/")) {
-        CommandRunner runner = normal_mode_cmdrunner(e, false);
-        char *str = parse_command_arg(&runner, esc.data, esc.length, false);
+        CommandRunner runner = normal_mode_cmdrunner(e);
+        runner.expand_tilde_slash = false;
+        char *str = parse_command_arg(&runner, esc.data, esc.length);
         const char *slash = strrchr(str, '/');
         BUG_ON(!slash);
         cs->tilde_expanded = true;
@@ -785,7 +786,7 @@ static int strptrcmp(const void *v1, const void *v2)
 static void init_completion(EditorState *e, const CommandLine *cmdline)
 {
     CompletionState *cs = &e->cmdline.completion;
-    const CommandRunner runner = normal_mode_cmdrunner(e, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e);
     BUG_ON(cs->orig);
     BUG_ON(runner.e != e);
     BUG_ON(!runner.lookup_alias);
@@ -835,17 +836,17 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
                         array.ptrs[i] = NULL;
                     }
                     array.count = save;
-                    ptr_array_append(&array, parse_command_arg(&runner, name, end - pos, true));
+                    ptr_array_append(&array, parse_command_arg(&runner, name, end - pos));
                 } else {
                     // Remove NULL
                     array.count--;
                 }
             } else {
-                ptr_array_append(&array, parse_command_arg(&runner, name, end - pos, true));
+                ptr_array_append(&array, parse_command_arg(&runner, name, end - pos));
             }
             free(name);
         } else {
-            ptr_array_append(&array, parse_command_arg(&runner, cmd + pos, end - pos, true));
+            ptr_array_append(&array, parse_command_arg(&runner, cmd + pos, end - pos));
         }
         pos = end;
     }
@@ -860,7 +861,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
         free(name);
     } else {
         cs->escaped = string_view(str, len);
-        cs->parsed = parse_command_arg(&runner, str, len, true);
+        cs->parsed = parse_command_arg(&runner, str, len);
         cs->add_space_after_single_match = true;
         size_t count = array.count;
         char **args = count ? (char**)array.ptrs + 1 + semicolon : NULL;

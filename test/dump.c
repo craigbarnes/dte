@@ -37,7 +37,7 @@ static void test_dump_handlers(TestContext *ctx)
     ASSERT_NONNULL(e->window);
     ASSERT_NONNULL(e->view);
     ASSERT_NONNULL(e->buffer);
-    const CommandRunner runner = normal_mode_cmdrunner(e, false);
+    const CommandRunner runner = normal_mode_cmdrunner(e);
     const CommandSet *cmds = runner.cmds;
     ASSERT_NONNULL(cmds);
     ASSERT_NONNULL(cmds->lookup);

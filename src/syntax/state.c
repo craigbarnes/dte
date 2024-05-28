@@ -609,12 +609,8 @@ static const CommandSet syntax_commands = {
 
 static CommandRunner cmdrunner_for_syntaxes(EditorState *e)
 {
-    CommandRunner runner = {
-        .cmds = &syntax_commands,
-        .home_dir = &e->home_dir,
-        .e = e,
-        .expand_variable = expand_syntax_var,
-    };
+    CommandRunner runner = cmdrunner(e, &syntax_commands);
+    runner.expand_variable = expand_syntax_var;
     return runner;
 }
 

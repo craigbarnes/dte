@@ -155,7 +155,7 @@ static void test_normal_command_errors(TestContext *ctx)
     // Special case errors produced by run_command():
     // ----------------------------------------------
 
-    CommandRunner runner = normal_mode_cmdrunner(e, false);
+    CommandRunner runner = normal_mode_cmdrunner(e);
     runner.lookup_alias = NULL;
     clear_error();
     EXPECT_FALSE(handle_command(&runner, "_xyz"));

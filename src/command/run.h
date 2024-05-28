@@ -50,6 +50,7 @@ typedef struct {
     struct EditorState *e;
     unsigned int recursion_count;
     bool allow_recording;
+    bool expand_tilde_slash;
 } CommandRunner;
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)

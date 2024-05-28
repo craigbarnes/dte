@@ -24,12 +24,13 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_EQ(c->pos, 5);
     EXPECT_STRING_EQ(c->buf, "a\xF0\x9F\xA6\x99");
 
-    CommandRunner runner = cmdrunner(e, &cmd_mode_commands, false);
+    CommandRunner runner = cmdrunner(e, &cmd_mode_commands);
     EXPECT_PTREQ(runner.e, e);
     EXPECT_PTREQ(runner.cmds, &cmd_mode_commands);
     EXPECT_NULL(runner.lookup_alias);
     EXPECT_EQ(runner.recursion_count, 0);
     EXPECT_FALSE(runner.allow_recording);
+    EXPECT_TRUE(runner.expand_tilde_slash);
 
     // Delete at end-of-line should do nothing
     CommandRunner *r = &runner;

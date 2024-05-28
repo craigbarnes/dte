@@ -105,12 +105,12 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
     return n;
 }
 
-char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len, bool tilde)
+char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len)
 {
     String buf;
     size_t pos = 0;
 
-    if (tilde && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {
+    if (runner->expand_tilde_slash && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {
         buf = string_new(len + runner->home_dir->length);
         string_append_strview(&buf, runner->home_dir);
         string_append_byte(&buf, '/');
@@ -234,7 +234,7 @@ CommandParseError parse_commands(const CommandRunner *runner, PointerArray *arra
             return err;
         }
 
-        ptr_array_append(array, parse_command_arg(runner, cmd + pos, end - pos, true));
+        ptr_array_append(array, parse_command_arg(runner, cmd + pos, end - pos));
         pos = end;
     }
 

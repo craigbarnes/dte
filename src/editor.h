@@ -124,11 +124,8 @@ static inline void pop_input_mode(EditorState *e)
     set_input_mode(e, e->prev_mode);
 }
 
-static inline CommandRunner cmdrunner (
-    EditorState *e,
-    const CommandSet *cmds,
-    bool allow_recording
-) {
+static inline CommandRunner cmdrunner(EditorState *e, const CommandSet *cmds)
+{
     bool normal = (cmds == &normal_commands);
     return (CommandRunner) {
         .cmds = cmds,
@@ -136,13 +133,14 @@ static inline CommandRunner cmdrunner (
         .expand_variable = normal ? expand_normal_var : NULL,
         .home_dir = &e->home_dir,
         .e = e,
-        .allow_recording = allow_recording,
+        .allow_recording = false,
+        .expand_tilde_slash = true,
     };
 }
 
-static inline CommandRunner normal_mode_cmdrunner(EditorState *e, bool allow_recording)
+static inline CommandRunner normal_mode_cmdrunner(EditorState *e)
 {
-    return cmdrunner(e, &normal_commands, allow_recording);
+    return cmdrunner(e, &normal_commands);
 }
 
 EditorState *init_editor_state(void) RETURNS_NONNULL;
