@@ -105,13 +105,9 @@ bool add_filetype(PointerArray *filetypes, const char *name, const char *str, Fi
 
 static StringView path_extension(StringView filename)
 {
-    StringView ext = STRING_VIEW_INIT;
-    ext.data = strview_memrchr(&filename, '.');
-    if (!ext.data || ext.data == filename.data) {
-        return ext;
-    }
-    ext.data++;
-    ext.length = filename.length - (ext.data - filename.data);
+    StringView ext = filename;
+    ssize_t pos = strview_memrchr_idx(&ext, '.');
+    strview_remove_prefix(&ext, pos > 0 ? pos + 1 : ext.length);
     return ext;
 }
 
