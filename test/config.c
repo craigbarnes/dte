@@ -162,7 +162,7 @@ static void test_detect_indent(TestContext *ctx)
     EXPECT_TRUE(handle_normal_command(e, "close", false));
 }
 
-static void test_global_state(TestContext *ctx)
+static void test_editor_state(TestContext *ctx)
 {
     const EditorState *e = ctx->userdata;
     const Buffer *buffer = e->buffer;
@@ -269,7 +269,7 @@ static void test_macro_record(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
-    TEST(test_global_state),
+    TEST(test_editor_state),
     TEST(test_handle_normal_command),
     TEST(test_builtin_configs),
     TEST(test_exec_config),
