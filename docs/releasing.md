@@ -1,5 +1,8 @@
-dte Release Checklist
-=====================
+Releasing dte
+=============
+
+Checklist
+---------
 
 1. Create release commit
    1. Update summary of changes in `CHANGELOG.md`
@@ -20,7 +23,7 @@ dte Release Checklist
    5. Commit tarball and generated signature/checksums to [releases repo]
    6. Push [releases repo] and wait for [GitLab Pages job] to finish
    7. Check tarball link in `README.md` works
-   8. Push tag to remotes
+   8. Push tag to remotes (`git push origin v${VER}`)
 
 3. Create post-release commit
    1. Reset `VERSION` and `CFLAGS`
@@ -39,6 +42,12 @@ dte Release Checklist
    7. `git checkout master`
    8. Update URL for [portable builds] in `CHANGELOG.md`
 
+See Also
+--------
+
+* Example release commit: [`892aade3b33f`]
+* Example post-release commit: [`4a8e255ef18a`]
+
 
 [releases repo]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/tree/master/public/dist/dte
 [GitLab Pages job]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/pipelines
@@ -47,3 +56,5 @@ dte Release Checklist
 [AUR package]: https://aur.archlinux.org/packages/dte/
 [portable builds]: https://gitlab.com/craigbarnes/dte/-/blob/master/CHANGELOG.md#portable-builds-for-linux
 [`musl-gcc`]: https://www.musl-libc.org/how.html
+[`892aade3b33f`]: https://gitlab.com/craigbarnes/dte/-/commit/892aade3b33fce047b89d5daaff3c5775b50452f
+[`4a8e255ef18a`]: https://gitlab.com/craigbarnes/dte/-/commit/4a8e255ef18a5a12b18df37dcc99cd7e5f375639

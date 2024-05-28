@@ -143,7 +143,7 @@ state preproc-error error
     eat this
 
 # TODO: C23 [[attribute]] syntax
-# TODO: C23 digit separators (e.g. 125'000'000)
+# TODO: C23 digit separators (e.g. 125'000'000, 0xAB'CD'00'FF, 1.765'203'490)
 state c code
     char -b a-z_ ident
     char -b A-Z ident-upper
