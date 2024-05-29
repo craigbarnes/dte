@@ -397,14 +397,6 @@ int main(int argc, char *argv[])
 
 loop_break:;
 
-    const char *term_name = xgetenv("TERM");
-    if (!term_name) {
-        fputs("Error: $TERM not set\n", stderr);
-        // This is considered a "usage" error, because the program
-        // must be started from a properly configured terminal
-        return EC_USAGE_ERROR;
-    }
-
     // This must be done before calling init_logging(), otherwise an
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
     // cause the logging fd to be opened as STDIN_FILENO
@@ -427,6 +419,7 @@ loop_break:;
         return EC_IO_ERROR;
     }
 
+    const char *term_name = getenv("TERM");
     const char *colorterm = getenv("COLORTERM");
     if (use_showkey) {
         LOG_INFO("entering \"showkey\" mode (dte -K)");

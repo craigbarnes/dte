@@ -185,14 +185,21 @@ static StringView term_extract_name(const char *name, size_t len, size_t *pos)
 
 static TermInfo term_get_info(const char *name, const char *colorterm)
 {
-    size_t pos = 0;
-    size_t name_len = strlen(name);
-    StringView root_name = term_extract_name(name, name_len, &pos);
-
     TermInfo info = {
         .features = TFLAG_8_COLOR,
         .ncv_attrs = 0,
     };
+
+    if (!name || name[0] == '\0') {
+        LOG_NOTICE("$TERM unset; skipping terminal info lookup");
+        return info;
+    }
+
+    LOG_INFO("TERM=%s", name);
+
+    size_t pos = 0;
+    size_t name_len = strlen(name);
+    StringView root_name = term_extract_name(name, name_len, &pos);
 
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
@@ -238,9 +245,6 @@ static TermInfo term_get_info(const char *name, const char *colorterm)
 
 void term_init(Terminal *term, const char *name, const char *colorterm)
 {
-    BUG_ON(name[0] == '\0');
-    LOG_INFO("TERM=%s", name);
-
     TermInfo info = term_get_info(name, colorterm);
     term->features = info.features;
     term->width = 80;
