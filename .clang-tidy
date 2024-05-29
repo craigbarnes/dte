@@ -65,6 +65,13 @@ CheckOptions:
     readability-identifier-naming.UnionCase: CamelCase
     readability-identifier-naming.VariableCase: lower_case
 
+    # Note that this configuration produces warnings like "side effect in
+    # BUG_ON() condition discarded in release builds", but that message isn't
+    # actually accurate with our usage. The BUG_ON() condition is never
+    # discarded and we're simply using this check to restrict function calls
+    # to a small list that are either known to be eliminated as dead code or
+    # prevented from running in release builds through some other means (e.g.
+    # ifdef or early return). See the definition of BUG() for more context.
     bugprone-assert-side-effect.AssertMacros: BUG_ON
     bugprone-assert-side-effect.CheckFunctionCalls: true
     bugprone-assert-side-effect.IgnoredFunctions: >
