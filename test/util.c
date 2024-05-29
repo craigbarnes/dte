@@ -1452,17 +1452,17 @@ static void test_u_is_unprintable(TestContext *ctx)
     // There are three ranges of private-use characters in the standard.
     // The main range in the BMP is U+E000..U+F8FF, containing 6,400
     // private-use characters.
-    EXPECT_TRUE(u_is_unprintable(0xE000));
-    EXPECT_TRUE(u_is_unprintable(0xF8FF));
+    EXPECT_FALSE(u_is_unprintable(0xE000));
+    EXPECT_FALSE(u_is_unprintable(0xF8FF));
 
     // ... there are also two large ranges of supplementary private-use
     // characters, consisting of most of the code points on planes 15
     // and 16: U+F0000..U+FFFFD and U+100000..U+10FFFD. Together those
     // ranges allocate another 131,068 private-use characters.
-    EXPECT_TRUE(u_is_unprintable(0xF0000));
-    EXPECT_TRUE(u_is_unprintable(0xFFFFD));
-    EXPECT_TRUE(u_is_unprintable(0x100000));
-    EXPECT_TRUE(u_is_unprintable(0x10FFFD));
+    EXPECT_FALSE(u_is_unprintable(0xF0000));
+    EXPECT_FALSE(u_is_unprintable(0xFFFFD));
+    EXPECT_FALSE(u_is_unprintable(0x100000));
+    EXPECT_FALSE(u_is_unprintable(0x10FFFD));
 
     // Non-characters --------------------------------------------------
     // (https://www.unicode.org/faq/private_use.html#noncharacters)

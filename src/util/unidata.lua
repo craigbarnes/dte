@@ -96,7 +96,6 @@ local mappings = {
     Zp = special_whitespace, -- Paragraph_Separator (U+2029 only)
     Cc = unprintable, -- Control
     Cs = unprintable, -- Surrogate
-    Co = unprintable, -- Private_Use
     Cn = unprintable, -- Unassigned
     Me = nonspacing_mark, -- Enclosing_Mark
     Mn = nonspacing_mark, -- Nonspacing_Mark
