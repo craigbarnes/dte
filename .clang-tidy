@@ -70,6 +70,7 @@ CheckOptions:
     bugprone-assert-side-effect.IgnoredFunctions: >
         block_iter_is_bol;
         block_iter_is_eof;
+        buffer_contains_block;
         color_is_rgb;
         color_is_valid;
         cond_type_has_destination;
