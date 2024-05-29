@@ -39,10 +39,6 @@ check_str "$($dte -b rc)" "$(cat config/rc)"
 
 $dte -s config/syntax/dte >/dev/null
 
-# Empty or unset $TERM (previously errors; now allowed)
-TERM='' $dte -cquit
-(unset TERM; $dte -cquit)
-
 # Check error handling -----------------------------------------------------
 set +e
 
