@@ -205,6 +205,15 @@ static void COLD log_detected_features(const Terminal *term, TermFeatureFlags fl
     }
 }
 
+static bool is_newly_detected_feature (
+    const Terminal *term,
+    TermFeatureFlags detected_features,
+    TermFeatureFlags feature
+) {
+    BUG_ON(!IS_POWER_OF_2(feature));
+    return ((detected_features & feature) && !(term->features & feature));
+}
+
 static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
     TermFeatureFlags flags = key & ~KEYCODE_QUERY_REPLY_BIT;
@@ -222,15 +231,19 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 
     TermOutputBuffer *obuf = &term->obuf;
     bool flush = false;
-    if ((flags & TFLAG_QUERY) && !(term->features & TFLAG_QUERY)) {
+    if (is_newly_detected_feature(term, flags, TFLAG_QUERY)) {
         term_put_extra_queries(term);
         flush = true;
     }
-    if ((flags & TFLAG_META_ESC) && !(term->features & TFLAG_META_ESC)) {
+    if (is_newly_detected_feature(term, flags, TFLAG_KITTY_KEYBOARD)) {
+        term_put_literal(obuf, "\033[>5u");
+        flush = true;
+    }
+    if (is_newly_detected_feature(term, flags, TFLAG_META_ESC)) {
         term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
         flush = true;
     }
-    if ((flags & TFLAG_ALT_ESC) && !(term->features & TFLAG_ALT_ESC)) {
+    if (is_newly_detected_feature(term, flags, TFLAG_ALT_ESC)) {
         term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
         flush = true;
     }
