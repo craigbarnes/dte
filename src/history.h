@@ -17,7 +17,7 @@ typedef struct HistoryEntry {
 // entries, in a way similar to the Java LinkedHashMap class. The
 // HashMap allows duplicates to be found and re-inserted at the end
 // of the list in O(1) time and the doubly-linked entries allow
-// ordered traversal.
+// insertion-ordered traversal.
 typedef struct {
     char *filename;
     HashMap entries;

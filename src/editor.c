@@ -221,21 +221,25 @@ void free_editor_state(EditorState *e)
     free(e);
 }
 
+static bool buffer_contains_block(const Buffer *buffer, const Block *ref)
+{
+    const Block *blk;
+    block_for_each(blk, &buffer->blocks) {
+        if (blk == ref) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static void sanity_check(const View *view)
 {
     if (DEBUG < 1) {
         return;
     }
-
-    const Block *blk;
-    block_for_each(blk, &view->buffer->blocks) {
-        if (blk == view->cursor.blk) {
-            BUG_ON(view->cursor.offset > view->cursor.blk->size);
-            return;
-        }
-    }
-
-    BUG("cursor not seen");
+    const BlockIter *cursor = &view->cursor;
+    BUG_ON(!buffer_contains_block(view->buffer, cursor->blk));
+    BUG_ON(cursor->offset > cursor->blk->size);
 }
 
 void any_key(Terminal *term, unsigned int esc_timeout)
