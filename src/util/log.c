@@ -25,9 +25,9 @@ static const struct llmap {
     [LOG_LEVEL_CRITICAL] = {"crit", "crit", "\033[1;31m"},
     [LOG_LEVEL_ERROR] = {"error", " err", "\033[31m"},
     [LOG_LEVEL_WARNING] = {"warning", "warn", "\033[33m"},
-    [LOG_LEVEL_NOTICE] = {"notice", "ntce", "\033[34m"},
+    [LOG_LEVEL_NOTICE] = {"notice", "note", "\033[34m"},
     [LOG_LEVEL_INFO] = {"info", "info", ""},
-    [LOG_LEVEL_DEBUG] = {"debug", " dbg", ""},
+    [LOG_LEVEL_DEBUG] = {"debug", "dbug", ""},
     [LOG_LEVEL_TRACE] = {"trace", "trce", ""},
 };
 
