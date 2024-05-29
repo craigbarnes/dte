@@ -40,8 +40,10 @@ set -e
 git checkout-index --prefix="$TMPDIR/" -a
 trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
-changed_doc_source_files=$(changed_files 'docs/dte*.md')
-if test "$changed_doc_source_files"; then
+changed_base_makefiles=$(changed_files GNUmakefile mk/compat.mk mk/util.mk)
+changed_doc_files=$(changed_files 'docs/dte*.md' mk/docs.mk)
+
+if test "${changed_doc_files}${changed_base_makefiles}"; then
     # Snapshot and re-generate man pages, if any Markdown source file changed
     manpages=$(git_ls --format="$TMPDIR/%(path)" -- 'docs/dte*.[15]')
     mkdir -p "$TMPDIR/GEN/"
@@ -64,6 +66,8 @@ fi
 changed_indented_files=$(changed_files ':(attr:space-indent)')
 changed_shell_files=$(changed_files ':(attr:shell)')
 changed_c_files=$(changed_files '**.[ch]')
+changed_build_mk=$(changed_files 'mk/build.mk')
+changed_syntax_files=$(changed_files 'config/syntax/')
 
 # Check for whitespace errors in changed files (if applicable)
 if test "$changed_indented_files"; then
@@ -75,7 +79,7 @@ if test "$changed_shell_files"; then
     shellcheck -fgcc $changed_shell_files
 fi
 
-if test "$changed_c_files"; then
+if test "${changed_c_files}${changed_base_makefiles}${changed_build_mk}"; then
     # Check for header-related errors in changed C files
     tools/hdrcheck.awk $changed_c_files
 
@@ -88,4 +92,8 @@ if test "$changed_c_files"; then
         $MAKE check ICONV_DISABLE=1
         $MAKE check DEBUG=0
     done
+elif test "$changed_syntax_files"; then
+    # If no C files or makefiles have changed but syntax files have, run
+    # a single `make check` to ensure test_builtin_configs() passes
+    $MAKE check CC='ccache gcc' CFLAGS='-g -Og -pipe -Werror' DEBUG=3
 fi
