@@ -263,6 +263,8 @@ static const TestEntry dtests[] = {
 static const TestGroup init_tests = TEST_GROUP(itests);
 static const TestGroup deinit_tests = TEST_GROUP(dtests);
 
+// Change to the expected working directory, in case the test binary
+// wasn't executed via `make check` (or `build/test/test`).
 static void init_working_directory(int argc, char *argv[])
 {
     static const char testfile[] = "test/data/crlf.dterc";
