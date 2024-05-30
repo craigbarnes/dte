@@ -40,11 +40,11 @@ set -e
 git checkout-index --prefix="$TMPDIR/" -a
 trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
-changed_base_makefiles=$(changed_files GNUmakefile mk/compat.mk mk/util.mk)
-changed_doc_files=$(changed_files 'docs/dte*.md' mk/docs.mk)
+changed_doc_regen_files=$(changed_files ':(attr:change-triggers-doc-regen-check)')
 
-if test "${changed_doc_files}${changed_base_makefiles}"; then
-    # Snapshot and re-generate man pages, if any Markdown source file changed
+if test "$changed_doc_regen_files"; then
+    # Snapshot and re-generate man pages, if any Markdown sources
+    # (or `make man` dependencies) were changed
     manpages=$(git_ls --format="$TMPDIR/%(path)" -- 'docs/dte*.[15]')
     mkdir -p "$TMPDIR/GEN/"
     cp $manpages "$TMPDIR/GEN/"
@@ -66,8 +66,8 @@ fi
 changed_indented_files=$(changed_files ':(attr:space-indent)')
 changed_shell_files=$(changed_files ':(attr:shell)')
 changed_c_files=$(changed_files '**.[ch]')
-changed_build_mk=$(changed_files 'mk/build.mk')
-changed_syntax_files=$(changed_files 'config/syntax/')
+changed_full_check_files=$(changed_files ':(attr:change-triggers-full-check)')
+changed_basic_check_files=$(changed_files ':(attr:change-triggers-basic-check)')
 
 # Check for whitespace errors in changed files (if applicable)
 if test "$changed_indented_files"; then
@@ -79,10 +79,12 @@ if test "$changed_shell_files"; then
     shellcheck -fgcc $changed_shell_files
 fi
 
-if test "${changed_c_files}${changed_base_makefiles}${changed_build_mk}"; then
-    # Check for header-related errors in changed C files
+# Check for header-related errors in changed C files
+if test "$changed_c_files"; then
     tools/hdrcheck.awk $changed_c_files
+fi
 
+if test "$changed_full_check_files"; then
     # Build and test with various configurations and compilers:
     export CFLAGS='-g -Og -pipe -Werror'
     export DEBUG=3
@@ -92,8 +94,6 @@ if test "${changed_c_files}${changed_base_makefiles}${changed_build_mk}"; then
         $MAKE check ICONV_DISABLE=1
         $MAKE check DEBUG=0
     done
-elif test "$changed_syntax_files"; then
-    # If no C files or makefiles have changed but syntax files have, run
-    # a single `make check` to ensure test_builtin_configs() passes
+elif test "$changed_basic_check_files"; then
     $MAKE check CC='ccache gcc' CFLAGS='-g -Og -pipe -Werror' DEBUG=3
 fi

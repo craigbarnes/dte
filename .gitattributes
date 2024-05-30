@@ -51,3 +51,24 @@ LICENSE text
 /test/data/syntax-lint.dterc -space-indent -whitespace
 /docs/*.[15] roff 4space generated
 /src/util/unidata.h generated
+
+# See: tools/git-hooks/pre-commit
+[attr]ctfull change-triggers-full-check
+[attr]ctbasic change-triggers-basic-check
+[attr]ctdoc change-triggers-doc-regen-check
+/tools/git-hooks/pre-commit ctfull ctdoc
+/GNUmakefile ctfull ctdoc
+/mk/compat.mk ctfull ctdoc
+/mk/util.mk ctfull ctdoc
+/mk/build.mk ctfull
+/mk/docs.mk ctdoc
+/mk/optcheck.sh ctfull ctdoc
+/mk/*.sh ctfull
+/mk/*.awk ctfull
+/mk/feature-test/** ctfull
+/src/**.[ch] ctfull
+/test/** ctfull
+/config/** ctbasic
+/docs/dte*.md ctdoc
+/docs/pdman.lua ctdoc
+README.md -ctfull -ctbasic -ctdoc
