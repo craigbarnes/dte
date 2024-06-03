@@ -95,5 +95,7 @@ if test "$changed_full_check_files"; then
         $MAKE check DEBUG=0
     done
 elif test "$changed_basic_check_files"; then
+    # If the code and build system weren't changed but syntax files were,
+    # run a single `make check` to ensure test_builtin_configs() passes
     $MAKE check CC='ccache gcc' CFLAGS='-g -Og -pipe -Werror' DEBUG=3
 fi

@@ -273,26 +273,20 @@ static void init_working_directory(int argc, char *argv[])
         return;
     }
 
-    char *abs = NULL;
     if (argc < 1 || !argv || !argv[0]) {
-        fputs("argv[0] not set\n", stderr);
         goto error;
     }
 
-    abs = path_absolute(argv[0]);
-    if (!abs) {
-        perror("path_absolute");
+    char dir[8192];
+    StringView progdir = path_slice_dirname(argv[0]);
+    if (progdir.length >= sizeof(dir) - 8) {
         goto error;
     }
 
-    StringView path = path_slice_dirname(abs);
-    // NOLINTNEXTLINE(misc-redundant-expression)
-    if (!path_parent(&path) || !path_parent(&path)) {
-        goto error;
-    }
+    memcpy(dir, progdir.data, progdir.length);
+    copyliteral(dir + progdir.length, "/../..\0");
 
-    abs[path.length] = '\0';
-    if (chdir(abs) != 0) {
+    if (chdir(dir) != 0) {
         perror("chdir");
         goto error;
     }
@@ -301,11 +295,9 @@ static void init_working_directory(int argc, char *argv[])
         goto error;
     }
 
-    free(abs);
     return;
 
 error:
-    free(abs);
     fputs("test binary executed from incorrect working directory; exiting", stderr);
     exit(1);
 }
