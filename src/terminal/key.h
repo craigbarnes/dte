@@ -70,8 +70,8 @@ enum {
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
 
     // In-band signalling for non-key events
-    KEY_DETECTED_PASTE = KEY_SPECIAL_MAX + 1,
-    KEY_BRACKETED_PASTE,
+    KEYCODE_DETECTED_PASTE = KEY_SPECIAL_MAX + 1,
+    KEYCODE_BRACKETED_PASTE,
     KEY_IGNORE,
 
     // Modifier bit flags (as described above)
@@ -85,7 +85,7 @@ enum {
 
     // If this bit is set, all other bits correspond to TermFeatureFlags.
     // This is used by the functions in query.c to communicate replies to
-    // term_read_key(), although such values are handled entirely within
+    // term_read_input(), although such values are handled entirely within
     // that function and are never present in KeyCode values it returns.
     KEYCODE_QUERY_REPLY_BIT = 1u << 30,
 };

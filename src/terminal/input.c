@@ -255,7 +255,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
     return KEY_NONE;
 }
 
-KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
+KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
 {
     TermInputBuffer *input = &term->ibuf;
     if (!input->len && !fill_buffer(input)) {
@@ -263,7 +263,7 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout_ms)
     }
 
     if (input->len > 4 && is_text(input->buf, input->len)) {
-        return KEY_DETECTED_PASTE;
+        return KEYCODE_DETECTED_PASTE;
     }
 
     if (input->buf[0] != '\033') {

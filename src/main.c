@@ -126,14 +126,14 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
 
     char buf[KEYCODE_STR_MAX + 4];
     for (bool loop = true; loop; ) {
-        KeyCode key = term_read_key(&term, 100);
+        KeyCode key = term_read_input(&term, 100);
         switch (key) {
         case KEY_NONE:
         case KEY_IGNORE:
             continue;
-        case KEY_BRACKETED_PASTE:
-        case KEY_DETECTED_PASTE:
-            term_discard_paste(ibuf, key == KEY_BRACKETED_PASTE);
+        case KEYCODE_BRACKETED_PASTE:
+        case KEYCODE_DETECTED_PASTE:
+            term_discard_paste(ibuf, key == KEYCODE_BRACKETED_PASTE);
             continue;
         case MOD_CTRL | 'd':
             loop = false;

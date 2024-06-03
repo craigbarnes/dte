@@ -246,11 +246,11 @@ void any_key(Terminal *term, unsigned int esc_timeout)
 {
     KeyCode key;
     xfputs("Press any key to continue\r\n", stderr);
-    while ((key = term_read_key(term, esc_timeout)) == KEY_NONE) {
+    while ((key = term_read_input(term, esc_timeout)) == KEY_NONE) {
         ;
     }
-    bool bracketed_paste = key == KEY_BRACKETED_PASTE;
-    if (bracketed_paste || key == KEY_DETECTED_PASTE) {
+    bool bracketed_paste = key == KEYCODE_BRACKETED_PASTE;
+    if (bracketed_paste || key == KEYCODE_DETECTED_PASTE) {
         term_discard_paste(&term->ibuf, bracketed_paste);
     }
 }
@@ -307,7 +307,7 @@ int main_loop(EditorState *e)
             ui_resize(e);
         }
 
-        KeyCode key = term_read_key(&e->terminal, e->options.esc_timeout);
+        KeyCode key = term_read_input(&e->terminal, e->options.esc_timeout);
         if (unlikely(key == KEY_NONE)) {
             continue;
         }

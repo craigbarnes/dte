@@ -434,7 +434,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             key = decode_key_from_param(csi.params[0][0]);
             if (key == KEY_IGNORE) {
                 if (csi.params[0][0] == 200 && mods == 0) {
-                    *k = KEY_BRACKETED_PASTE;
+                    *k = KEYCODE_BRACKETED_PASTE;
                     return i;
                 }
                 goto ignore;

@@ -5,14 +5,14 @@
 
 static char get_choice(Terminal *term, const char *choices, unsigned int esc_timeout)
 {
-    KeyCode key = term_read_key(term, esc_timeout);
+    KeyCode key = term_read_input(term, esc_timeout);
 
     switch (key) {
     case KEY_NONE:
         return 0;
-    case KEY_BRACKETED_PASTE:
-    case KEY_DETECTED_PASTE:
-        term_discard_paste(&term->ibuf, key == KEY_BRACKETED_PASTE);
+    case KEYCODE_BRACKETED_PASTE:
+    case KEYCODE_DETECTED_PASTE:
+        term_discard_paste(&term->ibuf, key == KEYCODE_BRACKETED_PASTE);
         return 0;
     case MOD_CTRL | 'c':
     case MOD_CTRL | 'g':

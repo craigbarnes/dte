@@ -45,8 +45,8 @@ static bool insert_paste(EditorState *e, const ModeHandler *handler, bool bracke
 
 static bool handle_input_single(EditorState *e, const ModeHandler *handler, KeyCode key)
 {
-    if (key == KEY_DETECTED_PASTE || key == KEY_BRACKETED_PASTE) {
-        return insert_paste(e, handler, key == KEY_BRACKETED_PASTE);
+    if (key == KEYCODE_DETECTED_PASTE || key == KEYCODE_BRACKETED_PASTE) {
+        return insert_paste(e, handler, key == KEYCODE_BRACKETED_PASTE);
     }
 
     const CommandSet *cmds = handler->cmds;
