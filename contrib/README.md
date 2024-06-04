@@ -39,7 +39,7 @@ Create an [`alias`] that runs `man dterc` and jumps directly to the part
 describing a specific command:
 
 ```sh
-alias help 'exec $DTE_HOME/scripts/help'
+alias help 'exec $DTE_HOME/scripts/help.sh'
 alias example1 'help insert'
 alias example2 'help exec'
 ```

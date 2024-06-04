@@ -51,7 +51,7 @@ define POSTINSTALL_ICONS
 endef
 
 CONTRIB_SCRIPTS = \
-    fzf.sh git-changes.sh lf-wrapper.sh longest-line.awk \
+    fzf.sh git-changes.sh help.sh lf-wrapper.sh longest-line.awk \
     open-c-header.sh ranger-wrapper.sh xtag.sh
 
 INSTALL_TARGETS_BASIC := bin man bash-completion zsh-completion
