@@ -11,18 +11,18 @@
 // is an unsigned integer and sizeof(x) >= sizeof(int)
 #define UNSIGNED_MAX_VALUE(x) (~((x) ^ (x)))
 
-#if HAS_BUILTIN(__builtin_mul_overflow) || GNUC_AT_LEAST(5, 0)
-    #define CHECKED_MUL(a, b, res) return __builtin_mul_overflow(a, b, res)
-#else
-    #define CHECKED_MUL(a, b, res) \
-        if (unlikely(a > 0 && b > UNSIGNED_MAX_VALUE(a) / a)) return true; else {*res = a * b; return false;}
-#endif
-
-#if HAS_BUILTIN(__builtin_add_overflow) || GNUC_AT_LEAST(5, 0)
+#if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_mul_overflow)
     #define CHECKED_ADD(a, b, res) return __builtin_add_overflow(a, b, res)
+    #define CHECKED_MUL(a, b, res) return __builtin_mul_overflow(a, b, res)
+#elif __STDC_VERSION__ >= 202311L
+    #include <stdckdint.h>
+    #define CHECKED_ADD(a, b, res) return ckd_add(res, a, b)
+    #define CHECKED_MUL(a, b, res) return ckd_mul(res, a, b)
 #else
     #define CHECKED_ADD(a, b, res) \
         if (unlikely(b > UNSIGNED_MAX_VALUE(a) - a)) return true; else {*res = a + b; return false;}
+    #define CHECKED_MUL(a, b, res) \
+        if (unlikely(a > 0 && b > UNSIGNED_MAX_VALUE(a) / a)) return true; else {*res = a * b; return false;}
 #endif
 
 static inline bool umax_multiply_overflows(uintmax_t a, uintmax_t b, uintmax_t *result)
