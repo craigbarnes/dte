@@ -35,6 +35,15 @@ Bind Ctrl+o to run a customized `fzf` file picker and open the selected files
 bind C-o 'exec -o eval $DTE_HOME/scripts/fzf.sh'
 ```
 
+Create an [`alias`] that runs `man dterc` and jumps directly to the part
+describing a specific command:
+
+```sh
+alias help 'exec $DTE_HOME/scripts/help'
+alias example1 'help insert'
+alias example2 'help exec'
+```
+
 Create an [`alias`] that jumps to the tag under the cursor, or opens an
 `fzf` menu if there are multiple matching tags:
 
