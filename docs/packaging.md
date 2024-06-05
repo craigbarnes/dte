@@ -73,7 +73,9 @@ to a `Config.mk` file, for example:
     V = 1
 
 The `Config.mk` file should be in the project base directory alongside
-[`GNUmakefile`] and *must* be valid GNU make syntax.
+[`GNUmakefile`] and *must* be valid GNU make syntax. This can be considered
+a stable aspect of the build system and will *not* be renamed or removed
+unless the major version number is bumped.
 
 Stable release tarballs
 -----------------------
