@@ -8,6 +8,7 @@ include tools/mk/lint.mk
 include tools/mk/portable.mk
 include tools/mk/show-sizes.mk
 
+CTAGS ?= ctags
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 
 git-hooks: $(GIT_HOOKS)
@@ -16,6 +17,9 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
 	$(Q) cp $< $@
 
+tags:
+	$(CTAGS) src/*.[ch] src/*/*.[ch] test/*.[ch]
+
 
 DEVMK := loaded
-.PHONY: git-hooks
+.PHONY: git-hooks tags

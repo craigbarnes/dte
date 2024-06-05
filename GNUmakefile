@@ -172,9 +172,6 @@ bench: $(bench)
 	$(E) EXEC '$(bench)'
 	$(Q) ./$(bench)
 
-tags:
-	ctags src/*.[ch] src/*/*.[ch] test/*.[ch]
-
 clean:
 	$(RM) $(CLEANFILES)
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
@@ -182,7 +179,7 @@ clean:
 
 INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic contrib
 .DEFAULT_GOAL = all
-.PHONY: all clean tags install uninstall
+.PHONY: all clean install uninstall
 .PHONY: check check-tests check-opts installcheck bench
 .PHONY: $(foreach T, $(INSTALL_TARGETS_ALL), install-$(T) uninstall-$(T))
 .DELETE_ON_ERROR:
