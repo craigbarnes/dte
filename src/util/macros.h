@@ -88,7 +88,7 @@
     #define HAS_WARNING(x) 0
 #endif
 
-// https://gcc.gnu.org/gcc-14/changes.html#c-family (TODO: Link to GCC 14 manual, when released)
+// https://gcc.gnu.org/onlinedocs/gcc-14.1.0/cpp/_005f_005fhas_005ffeature.html
 // https://clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
 #ifdef __has_feature
     // Supported by GCC 14+ and Clang
@@ -97,7 +97,7 @@
     #define HAS_FEATURE(x) 0
 #endif
 
-// https://gcc.gnu.org/gcc-14/changes.html#c-family (TODO: As above)
+// https://gcc.gnu.org/onlinedocs/gcc-14.1.0/cpp/_005f_005fhas_005fextension.html
 // https://clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
 #ifdef __has_extension
     // __has_extension() is a Clang 3.0+ (and GCC 14+) macro that can
