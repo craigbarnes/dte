@@ -43,7 +43,19 @@ static inline bool fd_set_nonblock(int fd, bool nonblock)
 WARN_UNUSED_RESULT
 static inline bool is_controlling_tty(int fd)
 {
-    return tcgetpgrp(fd) != -1;
+    /*
+     * POSIX requires tcgetpgrp() to return -1 and set errno to ENOTTY if
+     * `fd` isn't the controlling terminal, so this check alone should be
+     * sufficient here. However, OpenBSD 7.5 and FreeBSD 14.0 don't seem
+     * to conform to this requirement, so as a best-effort workaround we
+     * also check isatty(). This means that the function name used here
+     * isn't entirely accurate on those platforms, although it'd take a
+     * very unusual set of stdio(3) redirections for it to be a problem
+     * in practice (for the use cases in this codebase).
+     *
+     * See also: https://gitlab.com/craigbarnes/dte/-/issues/216#note_1939534295
+     */
+    return isatty(fd) && tcgetpgrp(fd) != -1;
 }
 
 int xpipe2(int fd[2], int flags) WARN_UNUSED_RESULT;
