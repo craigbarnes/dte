@@ -108,6 +108,7 @@ static const struct FileExtensionMap {
     {"json", JSON},
     {"jsonl", JSON},
     {"jspre", JAVASCRIPT},
+    {"kdl", KDL},
     {"kml", XML},
     {"ksh", SH},
     {"kt", KOTLIN},
