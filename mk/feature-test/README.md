@@ -25,6 +25,13 @@ The following points should be observed when adding new feature tests:
 * Source files under [`src/`] that use constructs like e.g. `#if HAVE_EXAMPLE`
   should use `#include "feature.h"` before any other includes and should be
   given an explicit dependency on `src/feature.h` in [`mk/build.mk`].
+* Pre-processor `#if` or `#ifdef` guard blocks should be kept as small as
+  is reasonably possible; ideally to just the single line where an extended
+  feature is used (i.e. to avoid undefined symbol errors). Early `return`
+  (and the resulting dead code elimination) should be used in all other
+  cases, so that less code is hidden by these guard blocks and more code is
+  checked by the compiler, regardless of which pre-processor defines are in
+  effect.
 * Some platforms implement stubs for some extended functions, which simply
   fail at runtime and set [`errno`] to `ENOSYS`. See `xpipe2()` in
   [`src/util/fd.c`] for an example of how to handle this.
