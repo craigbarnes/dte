@@ -1,4 +1,4 @@
-DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
+DISTRO = $(shell (. /etc/os-release 2>/dev/null && echo "$$NAME $$VERSION_ID") || uname -o)
 ARCH = $(shell uname -m 2>/dev/null)
 _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
