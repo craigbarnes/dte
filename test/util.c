@@ -2554,7 +2554,7 @@ static void test_read_file(TestContext *ctx)
 
     buf = NULL;
     errno = 0;
-    EXPECT_EQ(read_file("/", &buf, 64), -1);
+    EXPECT_EQ(read_file("test/data/", &buf, 64), -1);
     EXPECT_EQ(errno, EISDIR);
     EXPECT_NULL(buf);
     free(buf);
