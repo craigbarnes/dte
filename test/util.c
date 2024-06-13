@@ -1084,6 +1084,28 @@ static void test_buf_umax_to_hex_str(TestContext *ctx)
     EXPECT_STREQ(buf, "FFFFFFFFFFFFFFFF");
 }
 
+static void test_parse_filesize(TestContext *ctx)
+{
+    EXPECT_EQ(parse_filesize("0"), 0);
+    EXPECT_EQ(parse_filesize("1"), 1);
+    EXPECT_EQ(parse_filesize("1K"), 1024);
+    EXPECT_EQ(parse_filesize("4G"), 4ULL << 30);
+    EXPECT_EQ(parse_filesize("4096M"), 4ULL << 30);
+    EXPECT_EQ(parse_filesize("1234567890"), 1234567890ULL);
+    EXPECT_EQ(parse_filesize("9Gi"), 9ULL << 30);
+    EXPECT_EQ(parse_filesize("1GiB"), 1ULL << 30);
+    EXPECT_EQ(parse_filesize("0GiB"), 0);
+    EXPECT_EQ(parse_filesize("0K"), 0);
+
+    EXPECT_EQ(parse_filesize("4i"), -EINVAL);
+    EXPECT_EQ(parse_filesize("4B"), -EINVAL);
+    EXPECT_EQ(parse_filesize("4GB"), -EINVAL);
+    EXPECT_EQ(parse_filesize("G4"), -EINVAL);
+    EXPECT_EQ(parse_filesize("4G_"), -EINVAL);
+    EXPECT_EQ(parse_filesize(" 4G"), -EINVAL);
+    EXPECT_EQ(parse_filesize("4G "), -EINVAL);
+}
+
 static void test_umax_to_str(TestContext *ctx)
 {
     EXPECT_STREQ(umax_to_str(0), "0");
@@ -2842,6 +2864,7 @@ static const TestEntry tests[] = {
     TEST(test_str_to_size),
     TEST(test_str_to_filepos),
     TEST(test_buf_umax_to_hex_str),
+    TEST(test_parse_filesize),
     TEST(test_umax_to_str),
     TEST(test_uint_to_str),
     TEST(test_ulong_to_str),

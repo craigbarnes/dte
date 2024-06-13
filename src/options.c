@@ -27,11 +27,12 @@ typedef enum {
     OPT_BOOL,
     OPT_FLAG,
     OPT_REGEX,
+    OPT_FILESIZE,
 } OptionType;
 
 typedef union {
     const char *str_val; // OPT_STR, OPT_REGEX
-    unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG
+    unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG, OPT_FILESIZE
     bool bool_val; // OPT_BOOL
 } OptionValue;
 
@@ -98,6 +99,13 @@ typedef struct {
     OLG \
     .name = _name, \
     .type = OPT_REGEX, \
+    .on_change = _on_change, \
+}
+
+#define FSIZE_OPT(_name, OLG, _on_change) { \
+    .name = _name, \
+    .type = OPT_FILESIZE, \
+    OLG \
     .on_change = _on_change, \
 }
 
@@ -409,6 +417,38 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     return buf;
 }
 
+static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), const char *str, OptionValue *value)
+{
+    unsigned int x;
+    if (str_to_uint(str, &x)) {
+        // Values with no suffix are interpreted as MiB
+        value->uint_val = x;
+        return true;
+    }
+
+    intmax_t bytes = parse_filesize(str);
+    if (likely(bytes >= 0)) {
+        // Convert bytes to MiB and round up remainder
+        uintmax_t mib = (bytes >> 20) + !!(bytes & 0xFFFFF);
+        if (likely(mib <= UINT_MAX)) {
+            value->uint_val = mib;
+            return true;
+        }
+    }
+
+    error_msg("Invalid filesize: '%s'", str);
+    return false;
+}
+
+static const char *fsize_string(const OptionDesc* UNUSED_ARG(d), OptionValue value)
+{
+    // TODO: Count trailing zeros and use GiB/TiB/etc. when appropriate
+    static char buf[DECIMAL_STR_MAX(value.uint_val) + 4];
+    size_t ndigits = buf_uint_to_str(value.uint_val, buf);
+    copyliteral(buf + ndigits, "MiB");
+    return buf;
+}
+
 static const struct {
     OptionValue (*get)(const OptionDesc *desc, void *ptr);
     void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
@@ -422,6 +462,7 @@ static const struct {
     [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals},
     [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals},
     [OPT_REGEX] = {re_get, re_set, re_parse, str_string, re_equals},
+    [OPT_FILESIZE] = {uint_get, uint_set, fsize_parse, fsize_string, uint_equals},
 };
 
 static const char *const bool_enum[] = {"false", "true", NULL};
@@ -459,7 +500,7 @@ static const OptionDesc option_desc[] = {
     UINT_OPT("esc-timeout", G(esc_timeout), 0, 2000, NULL),
     BOOL_OPT("expand-tab", C(expand_tab), redraw_buffer),
     BOOL_OPT("file-history", C(file_history), NULL),
-    UINT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
+    FSIZE_OPT("filesize-limit", G(filesize_limit), NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
     BOOL_OPT("fsync", C(fsync), NULL),
     REGEX_OPT("indent-regex", L(indent_regex), NULL),
@@ -521,8 +562,10 @@ UNITTEST {
         [OPT_BOOL] = {ALIGNOF(bool), sizeof(bool)},
         [OPT_FLAG] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
         [OPT_REGEX] = {ALIGNOF(const InternedRegexp*), sizeof(const InternedRegexp*)},
+        [OPT_FILESIZE] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
     };
 
+    static_assert(ARRAYLEN(map) == ARRAYLEN(option_ops));
     GlobalOptions gopts = {.tab_bar = true};
     LocalOptions lopts = {.filetype = NULL};
 
@@ -837,6 +880,7 @@ static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
         BUG_ON(val.str_val && !regexp_is_interned(val.str_val));
         return;
     case OPT_BOOL:
+    case OPT_FILESIZE:
         return;
     }
     // NOLINTEND(bugprone-assert-side-effect)
@@ -924,7 +968,7 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
     }
 
     OptionType type = desc->type;
-    if (type == OPT_STR || type == OPT_UINT || type == OPT_REGEX) {
+    if (type == OPT_STR || type == OPT_UINT || type == OPT_REGEX || type == OPT_FILESIZE) {
         return;
     }
 

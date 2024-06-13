@@ -1,7 +1,9 @@
+#include <errno.h>
 #include <string.h>
 #include "strtonum.h"
 #include "arith.h"
 #include "ascii.h"
+#include "xstring.h"
 
 enum {
     A = 0xA, B = 0xB, C = 0xC,
@@ -228,4 +230,57 @@ size_t size_str_width(size_t x)
         width++;
     } while (x);
     return width;
+}
+
+// Return left shift corresponding to multiplier for KiB/MiB/GiB/etc. suffix
+// or 0 for invalid strings
+static unsigned int parse_filesize_suffix(const char *s)
+{
+    BUG_ON(s[0] == '\0');
+    if (unlikely(s[1] != '\0' && !streq(s + 1, "i") && !streq(s + 1, "iB"))) {
+        // Only accept suffixes in the form "K", "Ki" or "KiB" (or "MiB", etc.)
+        return 0;
+    }
+
+    switch (s[0]) {
+    case 'K': return 10;
+    case 'M': return 20;
+    case 'G': return 30;
+    case 'T': return 40;
+    case 'P': return 50;
+    case 'E': return 60;
+    }
+
+    return 0;
+}
+
+// Convert a string of decimal digits with an optional KiB/MiB/GiB/etc.
+// suffix to an intmax_t value representing the number of bytes, or a
+// negated <errno.h> value in the case of errors
+intmax_t parse_filesize(const char *str)
+{
+    uintmax_t x;
+    size_t len = strlen(str);
+    size_t ndigits = buf_parse_uintmax(str, len, &x);
+    if (unlikely(ndigits == 0)) {
+        return -EINVAL;
+    }
+
+    const char *suffix = str + ndigits;
+    if (ndigits == len) {
+        // No suffix; value in bytes
+        return x;
+    }
+
+    unsigned int shift = parse_filesize_suffix(suffix);
+    if (unlikely(shift == 0)) {
+        return -EINVAL;
+    }
+
+    uintmax_t val = x << shift;
+    if (unlikely(val >> shift != x || x > INTMAX_MAX)) {
+        return -EOVERFLOW;
+    }
+
+    return val;
 }
