@@ -100,14 +100,14 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
     if (prefix == '?' && final == 'c' && intermediate == 0 && nparams >= 1) {
         unsigned int code = csi->params[0][0];
         if (code >= 61 && code <= 65) {
-            LOG_DEBUG("DA1 reply with P=%u (device level %u)", code, code - 60);
+            LOG_INFO("DA1 reply with P=%u (device level %u)", code, code - 60);
             return tflag(TFLAG_QUERY | da1_params_to_features(csi));
         }
         if (code >= 1 && code <= 12) {
-            LOG_DEBUG("DA1 reply with P=%u (VT100 series)", code);
+            LOG_INFO("DA1 reply with P=%u (VT100 series)", code);
             return xgetenv("DTE_XQUERY") ? tflag(TFLAG_QUERY) : KEY_IGNORE;
         }
-        LOG_DEBUG("DA1 reply with P=%u (unknown)", code);
+        LOG_INFO("DA1 reply with P=%u (unknown)", code);
         return KEY_IGNORE;
     }
 
@@ -118,7 +118,7 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         unsigned int firmware = csi->params[1][0];
         unsigned int pc = csi->params[2][0];
         const char *name = da2_param_to_name(type);
-        LOG_DEBUG("DA2 reply: %u (%s); %u; %u", type, name, firmware, pc);
+        LOG_INFO("DA2 reply: %u (%s); %u; %u", type, name, firmware, pc);
         return KEY_IGNORE;
     }
 
@@ -163,7 +163,7 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
 
 ignore:
     // TODO: Also log intermediate and nparams
-    LOG_DEBUG("unhandled CSI with '%c' param prefix and final byte '%c'", prefix, (char)final);
+    LOG_INFO("unhandled CSI with '%c' param prefix and final byte '%c'", prefix, (char)final);
     return KEY_IGNORE;
 }
 
@@ -245,7 +245,7 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
         ebuf[i++] = ')';
     }
 
-    LOG_DEBUG (
+    LOG_INFO (
         "unhandled XTGETTCAP reply: %.*s%.*s",
         (int)len, data, // Original, hex-encoded string (no control chars)
         (int)i, ebuf // Decoded string (with control chars escaped)
@@ -305,7 +305,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     // https://vt100.net/docs/vt510-rm/DA3.html
     // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=(-,Tertiary%20DA,-)
     if (strview_has_prefix(&seq, "!|")) {
-        LOG_DEBUG("DA3 reply: %.*s", (int)len - 2, data + 2);
+        LOG_INFO("DA3 reply: %.*s", (int)len - 2, data + 2);
         return KEY_IGNORE;
     }
 
@@ -330,7 +330,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
             return handle_decrqss_sgr_reply(seq.data, seq.length);
         }
 
-        LOG_DEBUG("unhandled DECRQSS reply: %.*s", (int)len, data);
+        LOG_INFO("unhandled DECRQSS reply: %.*s", (int)len, data);
         return KEY_IGNORE;
     }
 
@@ -340,6 +340,6 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     }
 
 unhandled:
-    LOG_DEBUG("unhandled DCS string%s: %.*s", note, (int)len, data);
+    LOG_INFO("unhandled DCS string%s: %.*s", note, (int)len, data);
     return KEY_IGNORE;
 }
