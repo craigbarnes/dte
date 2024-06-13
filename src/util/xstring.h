@@ -7,12 +7,14 @@
 #include "debug.h"
 #include "macros.h"
 
+// Return true if null-terminated strings a and b are identical
 NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)
 {
     return strcmp(a, b) == 0;
 }
 
+// Like streq(), but allowing one or both parameters to be NULL
 static inline bool xstreq(const char *a, const char *b)
 {
     return (a == b) || (a && b && streq(a, b));
