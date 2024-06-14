@@ -234,15 +234,17 @@ size_t size_str_width(size_t x)
 
 // Return left shift corresponding to multiplier for KiB/MiB/GiB/etc. suffix
 // or 0 for invalid strings
-static unsigned int parse_filesize_suffix(const char *s)
+static unsigned int parse_filesize_suffix(const char *suffix, size_t len)
 {
-    BUG_ON(s[0] == '\0');
-    if (unlikely(s[1] != '\0' && !streq(s + 1, "i") && !streq(s + 1, "iB"))) {
-        // Only accept suffixes in the form "K", "Ki" or "KiB" (or "MiB", etc.)
-        return 0;
+    // Only accept suffixes in the form "K", "Ki" or "KiB" (or "MiB", etc.)
+    switch (len) {
+    case 3: if (suffix[2] != 'B') return 0; // Fallthrough
+    case 2: if (suffix[1] != 'i') return 0; // Fallthrough
+    case 1: break;
+    default: return 0;
     }
 
-    switch (s[0]) {
+    switch (suffix[0]) {
     case 'K': return 10;
     case 'M': return 20;
     case 'G': return 30;
@@ -262,17 +264,19 @@ intmax_t parse_filesize(const char *str)
     uintmax_t x;
     size_t len = strlen(str);
     size_t ndigits = buf_parse_uintmax(str, len, &x);
+    BUG_ON(ndigits > len);
     if (unlikely(ndigits == 0)) {
         return -EINVAL;
     }
 
     const char *suffix = str + ndigits;
-    if (ndigits == len) {
+    size_t suffix_len = len - ndigits;
+    if (suffix_len == 0) {
         // No suffix; value in bytes
         return x;
     }
 
-    unsigned int shift = parse_filesize_suffix(suffix);
+    unsigned int shift = parse_filesize_suffix(suffix, suffix_len);
     if (unlikely(shift == 0)) {
         return -EINVAL;
     }
