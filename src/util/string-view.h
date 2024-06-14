@@ -103,6 +103,10 @@ static inline bool strview_has_suffix(const StringView *sv, const char *suf)
 {
     size_t len = sv->length;
     size_t suflen = strlen(suf);
+    if (suflen == 0) {
+        // See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
+        return true;
+    }
     return len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen);
 }
 
