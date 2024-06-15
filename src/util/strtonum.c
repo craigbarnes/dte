@@ -238,8 +238,8 @@ static unsigned int parse_filesize_suffix(const char *suffix, size_t len)
 {
     // Only accept suffixes in the form "K", "Ki" or "KiB" (or "MiB", etc.)
     switch (len) {
-    case 3: if (suffix[2] != 'B') return 0; // Fallthrough
-    case 2: if (suffix[1] != 'i') return 0; // Fallthrough
+    case 3: if (suffix[2] != 'B') {return 0;} // Fallthrough
+    case 2: if (suffix[1] != 'i') {return 0;} // Fallthrough
     case 1: break;
     default: return 0;
     }
