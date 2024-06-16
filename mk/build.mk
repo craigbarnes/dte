@@ -115,7 +115,7 @@ else ifeq "$(KERNEL)" "NetBSD"
   BASIC_LDFLAGS += -L/usr/pkg/lib
 endif
 
-ifeq "$(ICONV_DISABLE)" "1"
+ifneq "$(ICONV_DISABLE)" "1"
   LDLIBS += $(LDLIBS_ICONV)
 endif
 
