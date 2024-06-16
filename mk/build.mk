@@ -98,23 +98,6 @@ CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
 $(call make-lazy,CWARNS)
 $(call make-lazy,CSTD)
 
-ifeq "$(KERNEL)" "Darwin"
-  LDLIBS_ICONV = -liconv
-else ifeq "$(OS)" "Cygwin"
-  LDLIBS_ICONV = -liconv
-  EXEC_SUFFIX = .exe
-else ifeq "$(KERNEL)" "OpenBSD"
-  LDLIBS_ICONV = -liconv
-  BASIC_CPPFLAGS += -I/usr/local/include
-  BASIC_LDFLAGS += -L/usr/local/lib
-else ifeq "$(KERNEL)" "NetBSD"
-  ifeq ($(shell expr "`uname -r`" : '[01]\.'),2)
-    LDLIBS_ICONV = -liconv
-  endif
-  BASIC_CPPFLAGS += -I/usr/pkg/include
-  BASIC_LDFLAGS += -L/usr/pkg/lib
-endif
-
 ifneq "$(ICONV_DISABLE)" "1"
   LDLIBS += $(LDLIBS_ICONV)
 endif
@@ -244,6 +227,10 @@ build/gen/test-data.h: $(TEST_CONFIGS) mk/config2c.awk | build/gen/
 build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 	$(E) GEN $@
 	$(Q) cat $^ > $@
+
+build/gen/platform.mk: mk/platform.sh | build/gen/
+	$(E) GEN $@
+	$(Q) mk/platform.sh > $@
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c
 	$(E) DETECT $@

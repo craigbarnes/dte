@@ -21,7 +21,6 @@ XARGS_P = $(XARGS) $(XARGS_P_FLAG)
 
 MAKEFLAGS += -r
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
-OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))
 
 ifneq "$(MAKE_S)" ""

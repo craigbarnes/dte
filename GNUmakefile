@@ -3,6 +3,7 @@ include mk/util.mk
 ifneq "$(NO_CONFIG_MK)" "1"
 -include Config.mk
 endif
+include build/gen/platform.mk
 include mk/build.mk
 include mk/docs.mk
 include mk/gen.mk
