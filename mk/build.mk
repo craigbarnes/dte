@@ -116,8 +116,6 @@ else ifeq "$(KERNEL)" "NetBSD"
 endif
 
 ifeq "$(ICONV_DISABLE)" "1"
-  build/convert.o: BASIC_CPPFLAGS += -DICONV_DISABLE=1
-else
   LDLIBS += $(LDLIBS_ICONV)
 endif
 
@@ -186,14 +184,14 @@ $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
 $(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
-build/convert.o: build/convert.cflags
+build/convert.o: build/gen/buildvar-iconv.h
 build/gen/builtin-config.h: build/gen/builtin-config.mk
 build/gen/test-data.h: build/gen/test-data.mk
 build/config.o: build/gen/builtin-config.h
 build/test/config.o: build/gen/test-data.h
 build/main.o: build/gen/version.h
 build/editor.o: build/gen/version.h
-build/compat.o: build/gen/feature.h
+build/compat.o: build/gen/feature.h build/gen/buildvar-iconv.h
 build/load-save.o: build/gen/feature.h
 build/signals.o: build/gen/feature.h
 build/tag.o: build/gen/feature.h
@@ -225,6 +223,9 @@ build/%.cflags: FORCE | build/
 
 build/gen/version.h: FORCE | build/gen/
 	@$(OPTCHECK) '$(HASH)define VERSION "$(VERSION)"' $@
+
+build/gen/buildvar-iconv.h: FORCE | build/gen/
+	@$(OPTCHECK) '$(HASH)define ICONV_DISABLE $(if $(call streq,$(ICONV_DISABLE),1),1,0)' $@
 
 build/gen/builtin-config.mk: FORCE | build/gen/
 	@$(OPTCHECK) '$(@:.mk=.h): $(BUILTIN_CONFIGS)' $@

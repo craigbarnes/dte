@@ -412,7 +412,7 @@ loop_break:;
     }
 
     LOG_INFO("dte version: " VERSION);
-    LOG_INFO("features:%s", feature_string);
+    LOG_INFO("build vars:%s", buildvar_string);
 
     if (!term_mode_init()) {
         perror("tcgetattr");

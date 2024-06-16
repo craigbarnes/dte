@@ -1,13 +1,12 @@
 #include "feature.h" // HAVE_*
 #include <regex.h> // REG_STARTEND, REG_ENHANCED (macOS)
 #include <sys/stat.h> // S_ISVTX
+#include "buildvar-iconv.h" // ICONV_DISABLE
 #include "compat.h"
 #include "util/macros.h" // ASAN_ENABLED, MSAN_ENABLED
 #include "util/unicode.h" // SANE_WCTYPE
 
-// TODO: ICONV_DISABLE
-
-const char feature_string[] =
+const char buildvar_string[] =
     ""
 // Features detected via compilation tests (mk/feature-test/*.c)
 #if HAVE_DUP3
@@ -50,6 +49,9 @@ const char feature_string[] =
 #endif
 #ifdef S_ISVTX
     " S_ISVTX"
+#endif
+#if ICONV_DISABLE == 1
+    " ICONV_DISABLE"
 #endif
 #ifdef SANE_WCTYPE
     " SANE_WCTYPE"

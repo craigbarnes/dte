@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "convert.h"
+#include "buildvar-iconv.h"
 #include "encoding.h"
 #include "util/debug.h"
 #include "util/intern.h"
@@ -75,7 +76,7 @@ static size_t unix_to_dos (
     return d;
 }
 
-#ifdef ICONV_DISABLE // iconv not available; use basic, UTF-8 implementation:
+#if ICONV_DISABLE == 1 // iconv not available; use basic, UTF-8 implementation:
 
 bool conversion_supported_by_iconv (
     const char* UNUSED_ARG(from),
@@ -141,7 +142,7 @@ bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
     return read_utf8_line(dec, linep, lenp);
 }
 
-#else // ICONV_DISABLE is undefined; use full iconv implementation:
+#else // ICONV_DISABLE != 1; use full iconv implementation:
 
 #include <iconv.h>
 
