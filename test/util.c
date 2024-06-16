@@ -1088,14 +1088,18 @@ static void test_parse_filesize(TestContext *ctx)
 {
     EXPECT_EQ(parse_filesize("0"), 0);
     EXPECT_EQ(parse_filesize("1"), 1);
-    EXPECT_EQ(parse_filesize("1K"), 1024);
-    EXPECT_EQ(parse_filesize("4G"), 4ULL << 30);
-    EXPECT_EQ(parse_filesize("4096M"), 4ULL << 30);
-    EXPECT_EQ(parse_filesize("1234567890"), 1234567890ULL);
-    EXPECT_EQ(parse_filesize("9Gi"), 9ULL << 30);
-    EXPECT_EQ(parse_filesize("1GiB"), 1ULL << 30);
+    EXPECT_EQ(parse_filesize("1KiB"), 1024);
+    EXPECT_EQ(parse_filesize("4GiB"), 4LL << 30);
+    EXPECT_EQ(parse_filesize("4096MiB"), 4LL << 30);
+    EXPECT_EQ(parse_filesize("1234567890"), 1234567890LL);
+    EXPECT_EQ(parse_filesize("9GiB"), 9LL << 30);
+    EXPECT_EQ(parse_filesize("1GiB"), 1LL << 30);
     EXPECT_EQ(parse_filesize("0GiB"), 0);
-    EXPECT_EQ(parse_filesize("0K"), 0);
+    EXPECT_EQ(parse_filesize("0KiB"), 0);
+    EXPECT_EQ(parse_filesize("1MiB"), 1LL << 20);
+    EXPECT_EQ(parse_filesize("1TiB"), 1LL << 40);
+    EXPECT_EQ(parse_filesize("1PiB"), 1LL << 50);
+    EXPECT_EQ(parse_filesize("1EiB"), 1LL << 60);
 
     EXPECT_EQ(parse_filesize("4i"), -EINVAL);
     EXPECT_EQ(parse_filesize("4B"), -EINVAL);
@@ -1104,6 +1108,21 @@ static void test_parse_filesize(TestContext *ctx)
     EXPECT_EQ(parse_filesize("4G_"), -EINVAL);
     EXPECT_EQ(parse_filesize(" 4G"), -EINVAL);
     EXPECT_EQ(parse_filesize("4G "), -EINVAL);
+    EXPECT_EQ(parse_filesize("1K"), -EINVAL);
+    EXPECT_EQ(parse_filesize("4G"), -EINVAL);
+    EXPECT_EQ(parse_filesize("4096M"), -EINVAL);
+    EXPECT_EQ(parse_filesize("9Gi"), -EINVAL);
+    EXPECT_EQ(parse_filesize("0K"), -EINVAL);
+
+    char buf[DECIMAL_STR_MAX(uintmax_t) + 4];
+    xsnprintf(buf, sizeof buf, "%jd", INTMAX_MAX);
+    EXPECT_EQ(parse_filesize(buf), INTMAX_MAX);
+    xsnprintf(buf, sizeof buf, "%jdKiB", INTMAX_MAX);
+    EXPECT_EQ(parse_filesize(buf), -EOVERFLOW);
+    xsnprintf(buf, sizeof buf, "%jdEiB", INTMAX_MAX);
+    EXPECT_EQ(parse_filesize(buf), -EOVERFLOW);
+    xsnprintf(buf, sizeof buf, "%ju", UINTMAX_MAX);
+    EXPECT_EQ(parse_filesize(buf), -EOVERFLOW);
 }
 
 static void test_umax_to_str(TestContext *ctx)
