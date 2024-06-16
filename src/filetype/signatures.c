@@ -93,6 +93,8 @@ static FileTypeEnum filetype_from_signature(const StringView line)
             return SH;
         }
         break;
+    case 'I':
+        return strview_has_prefix(&line, "ISO-10303-21;") ? STEP : NONE;
     case 'd':
         return strview_has_prefix(&line, "diff --git") ? DIFF : NONE;
     case '/':

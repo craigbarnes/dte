@@ -190,6 +190,7 @@ static void test_find_ft_firstline(TestContext *ctx)
         {"<!DOCTYPE busconfig", "xml"},
         {"<!doctype busconfig", NULL},
         {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "xml"},
+        {"ISO-10303-21;", "step"},
         {"%YAML 1.1", "yaml"},
         {"%YamL", NULL},
         {"[wrap-file]", "ini"},
