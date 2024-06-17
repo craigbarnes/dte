@@ -8,6 +8,7 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 #include "block.h"
+#include "command/cache.h"
 #include "commands.h"
 #include "compat.h"
 #include "compiler.h"
@@ -288,9 +289,15 @@ static void log_config_counts(const EditorState *e)
     }
 
     size_t nbinds = 0;
-    for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
-        const ModeHandler *mode = it.entry->value;
-        nbinds += mode->key_bindings.count;
+    size_t nbinds_cached = 0;
+    for (HashMapIter modeiter = hashmap_iter(&e->modes); hashmap_next(&modeiter); ) {
+        const ModeHandler *mode = modeiter.entry->value;
+        const IntMap *binds = &mode->key_bindings;
+        nbinds += binds->count;
+        for (IntMapIter binditer = intmap_iter(binds); intmap_next(&binditer); ) {
+            const CachedCommand *cc = binditer.entry->value;
+            nbinds_cached += !!cc->cmd;
+        }
     }
 
     size_t nerrorfmts = 0;
@@ -300,8 +307,9 @@ static void log_config_counts(const EditorState *e)
     }
 
     LOG_INFO (
-        "binds=%zu aliases=%zu hi=%zu ft=%zu option=%zu errorfmt=%zu(%zu)",
+        "bind=%zu(%zu) alias=%zu hi=%zu ft=%zu option=%zu errorfmt=%zu(%zu)",
         nbinds,
+        nbinds_cached,
         e->aliases.count,
         e->styles.other.count + NR_BSE,
         e->filetypes.count,
