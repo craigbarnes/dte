@@ -155,8 +155,18 @@ static void test_parse_command_arg(TestContext *ctx)
     free(arg);
 
     // Built-in vars (expand to nothing; buffer isn't initialized yet)
-    arg = parse_command_arg(&runner, STRN("$COLNO' '$FILE' '$FILEDIR' '$FILETYPE' '$LINENO' '$WORD"));
-    EXPECT_STREQ(arg, "     ");
+    static const char vars[] =
+        "' '$FILE"
+        "' '$FILEDIR"
+        "' '$RFILE"
+        "' '$RFILEDIR"
+        "' '$FILETYPE"
+        "' '$LINENO"
+        "' '$COLNO"
+        "' '$WORD"
+    ;
+    arg = parse_command_arg(&runner, vars, sizeof(vars) - 1);
+    EXPECT_STREQ(arg, "        ");
     free(arg);
 
     // Built-in $DTE_HOME var (expands to user config dir)

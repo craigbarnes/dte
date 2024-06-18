@@ -50,6 +50,27 @@ static char *expand_rfile(const EditorState *e)
     return likely(cwd) ? path_relative(abs, cwd) : xstrdup(abs);
 }
 
+static char *expand_rfiledir(const EditorState *e)
+{
+    char *rfile = expand_rfile(e);
+    if (!rfile) {
+        return NULL;
+    }
+
+    StringView dir = path_slice_dirname(rfile);
+    if (rfile != (char*)dir.data) {
+        // rfile contains no directory part (i.e. no slashes), so there's
+        // nothing to "slice" and we simply return "." instead
+        free(rfile);
+        return xstrdup(".");
+    }
+
+    // Overwrite the last slash in rfile with a null terminator, so as
+    // to remove the last path component (the filename)
+    rfile[dir.length] = '\0';
+    return rfile;
+}
+
 static char *expand_filetype(const EditorState *e)
 {
     return e->buffer ? xstrdup(e->buffer->options.filetype) : NULL;
@@ -97,6 +118,7 @@ static const BuiltinVar normal_vars[] = {
     {"LINENO", expand_lineno},
     {"MSGPOS", expand_msgpos},
     {"RFILE", expand_rfile},
+    {"RFILEDIR", expand_rfiledir},
     {"WORD", expand_word},
 };
 
