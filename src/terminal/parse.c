@@ -475,20 +475,20 @@ ignore:
 static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     char data[4096];
-    size_t pos = 0;
-
-    while (i < len) {
-        const unsigned char ch = buf[i++];
+    for (size_t pos = 0; i < len; ) {
+        unsigned char ch = buf[i++];
         if (unlikely(ch < 0x20)) {
             switch (ch) {
             case 0x18: // CAN
             case 0x1A: // SUB
-                goto ignore;
+                *k = KEY_IGNORE;
+                return i;
             case 0x1B: // ESC (https://vt100.net/emu/dec_ansi_parser#STESC)
                 i--;
                 // Fallthrough
             case 0x07: // BEL
-                goto complete;
+                *k = parse_osc_query_reply(data, pos, pos >= sizeof(data));
+                return i;
             }
             continue;
         }
@@ -500,24 +500,6 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
 
     // Unterminated sequence (possibly truncated)
     return TPARSE_PARTIAL_MATCH;
-
-complete:
-    if (unlikely(pos == 0)) {
-        goto ignore;
-    }
-
-    const char *note = unlikely(pos >= sizeof(data)) ? " (truncated)" : "";
-    char prefix = data[0];
-    if (prefix == 'L' || prefix == 'l') {
-        const char *type = (prefix == 'l') ? "title" : "icon";
-        LOG_DEBUG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
-    } else {
-        LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)pos, data);
-    }
-
-ignore:
-    *k = KEY_IGNORE;
-    return i;
 }
 
 static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)

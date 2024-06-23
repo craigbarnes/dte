@@ -343,3 +343,21 @@ unhandled:
     LOG_INFO("unhandled DCS string%s: %.*s", note, (int)len, data);
     return KEY_IGNORE;
 }
+
+KeyCode parse_osc_query_reply(const char *data, size_t len, bool truncated)
+{
+    if (unlikely(len == 0)) {
+        return KEY_IGNORE;
+    }
+
+    const char *note = truncated ? " (truncated)" : "";
+    char prefix = data[0];
+    if (prefix == 'L' || prefix == 'l') {
+        const char *type = (prefix == 'l') ? "title" : "icon";
+        LOG_DEBUG("window %s%s: %.*s", type, note, (int)len - 1, data + 1);
+        return KEY_IGNORE;
+    }
+
+    LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)len, data);
+    return KEY_IGNORE;
+}
