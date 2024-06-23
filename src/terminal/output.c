@@ -1,6 +1,6 @@
 // Terminal output and control functions.
-// Copyright © 2018-2024 Craig Barnes.
-// Copyright © 2010-2015 Timo Hirvonen.
+// Copyright © Craig Barnes.
+// Copyright © Timo Hirvonen.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also:
 // • ECMA-48 5th edition, §8.3 (CUP, ED, EL, REP, SGR)

@@ -1,5 +1,5 @@
 // Parser for escape sequences sent by terminals to clients.
-// Copyright © 2018-2024 Craig Barnes.
+// Copyright © Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also:
 // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html

@@ -1,3 +1,7 @@
+// Locale-independent integer to string conversion.
+// Copyright © Craig Barnes.
+// SPDX-License-Identifier: GPL-2.0-only
+
 #include <sys/stat.h>
 #include "numtostr.h"
 #include "arith.h"
