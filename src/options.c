@@ -566,6 +566,8 @@ UNITTEST {
     };
 
     static_assert(ARRAYLEN(map) == ARRAYLEN(option_ops));
+    static_assert(offsetof(CommonOptions, syntax) == offsetof(GlobalOptions, syntax));
+    static_assert(offsetof(CommonOptions, syntax) == offsetof(LocalOptions, syntax));
     GlobalOptions gopts = {.tab_bar = true};
     LocalOptions lopts = {.filetype = NULL};
 
