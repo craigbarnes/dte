@@ -378,7 +378,7 @@ KeyCode parse_xtwinops_query_reply(const TermControlParams *csi)
     switch (type) {
     case 4: typestr = "text area size in pixels"; break;
     case 6: typestr = "cell size in pixels"; break;
-    case 8: typestr = "text area size in cells"; break;
+    case 8: typestr = "text area size in \"characters\""; break;
     }
 
     LOG_INFO("XTWINOPS %u (%s) reply: %ux%u", type, typestr, width, height);

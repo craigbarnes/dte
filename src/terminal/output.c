@@ -212,6 +212,7 @@ void term_put_extra_queries(Terminal *term)
         "\033[?67$p" // DECRQM 67 (DECBKM; backspace key sends BS)
         "\033[?1049$p" // DECRQM 1049 (alternate screen buffer)
         "\033[?2004$p" // DECRQM 2004 (bracketed paste)
+        "\033[18t" // XTWINOPS 18 (text area size in "characters"/cells)
     ;
 
     LOG_INFO("sending additional queries to terminal");
