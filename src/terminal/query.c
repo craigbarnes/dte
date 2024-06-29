@@ -361,3 +361,26 @@ KeyCode parse_osc_query_reply(const char *data, size_t len, bool truncated)
     LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)len, data);
     return KEY_IGNORE;
 }
+
+KeyCode parse_xtwinops_query_reply(const TermControlParams *csi)
+{
+    if (unlikely(csi->nparams != 3)) {
+        LOG_INFO("XTWINOPS sequence with unrecognized number of params");
+        return KEY_IGNORE;
+    }
+
+    // CSI type ; height ; width t
+    const char *typestr = "unknown";
+    unsigned int type = csi->params[0][0];
+    unsigned int height = csi->params[1][0];
+    unsigned int width = csi->params[2][0];
+
+    switch (type) {
+    case 4: typestr = "text area size in pixels"; break;
+    case 6: typestr = "cell size in pixels"; break;
+    case 8: typestr = "text area size in cells"; break;
+    }
+
+    LOG_INFO("XTWINOPS %u (%s) reply: %ux%u", type, typestr, height, width);
+    return KEY_IGNORE;
+}

@@ -443,6 +443,9 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             return i;
         }
         goto ignore;
+    case 't':
+        *k = parse_xtwinops_query_reply(&csi);
+        return i;
     case 'Z':
         if (unlikely(csi.nparams != 0)) {
             goto ignore;
