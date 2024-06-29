@@ -381,6 +381,6 @@ KeyCode parse_xtwinops_query_reply(const TermControlParams *csi)
     case 8: typestr = "text area size in cells"; break;
     }
 
-    LOG_INFO("XTWINOPS %u (%s) reply: %ux%u", type, typestr, height, width);
+    LOG_INFO("XTWINOPS %u (%s) reply: %ux%u", type, typestr, width, height);
     return KEY_IGNORE;
 }
