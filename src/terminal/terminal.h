@@ -16,7 +16,7 @@ enum {
 // Bit flags representing supported terminal features
 // See also: KEYCODE_QUERY_REPLY_BIT
 typedef enum {
-    TFLAG_BACK_COLOR_ERASE = 0x01, // Can erase with specific background color
+    TFLAG_BACK_COLOR_ERASE = 0x01, // Can erase line/area with non-default background color
     TFLAG_ECMA48_REPEAT = 0x02, // Supports ECMA-48 "REP" (repeat character; §8.3.103)
     TFLAG_SET_WINDOW_TITLE = 0x04, // Supports xterm sequences for setting window title
     TFLAG_RXVT = 0x08, // Emits rxvt-specific sequences for some key combos (see rxvt.c)
@@ -82,9 +82,9 @@ typedef struct {
 
 typedef struct Terminal {
     TermFeatureFlags features;
-    unsigned int width;
-    unsigned int height;
-    unsigned int ncv_attributes;
+    unsigned int width; // Terminal width (in columns)
+    unsigned int height; // Terminal height (in rows)
+    unsigned int ncv_attributes; // See "no_color_video" terminfo(5) capability
     bool sync_pending; // See TFLAG_SYNC and term_end_sync_update()
     ssize_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
