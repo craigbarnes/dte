@@ -434,9 +434,9 @@ Released on 2017-12-20.
 * Added built-in support for `st` and `rxvt` terminals.
 * Fixed some built-in regex patterns to avoid non-portable features.
 * Fixed compiler warnings on NetBSD.
-* Removed tilde expansion of `~username` from command mode, in order to
-  avoid using `getpwnam(3)` and thereby allow static linking with GNU
-  libc on Linux.
+* Removed tilde expansion of `~username/` from [`dterc`] commands, in
+  order to avoid using `getpwnam(3)` and thereby allow static linking
+  with [glibc] on Linux.
 
 **Downloads:**
 
@@ -610,6 +610,7 @@ system except a somewhat recent kernel.
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 [GNU Make]: https://www.gnu.org/software/make/
 [GCC]: https://gcc.gnu.org/
+[glibc]: https://sourceware.org/glibc/
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [`REG_ENHANCED`]: https://www.unix.com/man-page/osx/7/re_format/
