@@ -127,10 +127,6 @@ table thead th {
     text-align: center;
 }
 
-img {
-    max-width: 100%;
-}
-
 main code {
     margin: 0 2px;
     padding: 0 5px;

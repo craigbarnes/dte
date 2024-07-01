@@ -3,6 +3,10 @@
     color: #222;
 }
 
+#main-grid > main img {
+    max-width: 100%;
+}
+
 #main-grid > header {
     grid-area: header;
     display: flex;
