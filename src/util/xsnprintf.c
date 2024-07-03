@@ -10,10 +10,11 @@
  * "If an output error was encountered, these functions shall return
  * a negative value and set errno to indicate the error."
  *
- * The mandated errors of particular interest are:
+ * The mandated errors of interest are:
  *
- * - [EOVERFLOW] The value of n is greater than INT_MAX
- * - [EOVERFLOW] The value to be returned is greater than INT_MAX
+ * - EILSEQ: A wide-character code does not correspond to a valid character
+ * - EOVERFLOW: The value of n is greater than INT_MAX
+ * - EOVERFLOW: The value to be returned is greater than INT_MAX
  *
  * ISO C11 states:
  *
