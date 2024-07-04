@@ -1600,16 +1600,17 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
     };
 
     const char *pattern = a->args[0];
+    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     char *alloc = NULL;
     if (has_flag(a, 'e')) {
         size_t len = strlen(pattern);
         if (strn_contains_char_type(pattern, len, ASCII_REGEX)) {
             pattern = alloc = regexp_escape(pattern, len);
         }
+        flags &= ~REPLACE_BASIC;
     }
 
     const char *replacement = a->args[1] ? a->args[1] : "";
-    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     bool r = reg_replace(e->view, pattern, replacement, flags);
     free(alloc);
     return r;
