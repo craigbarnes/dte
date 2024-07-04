@@ -191,7 +191,7 @@ void search_set_regexp(SearchState *search, const char *pattern)
     search->pattern = xstrdup(pattern);
 }
 
-static bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
+bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
     if (!search->pattern) {
         return error_msg("No previous search pattern");
@@ -224,22 +224,4 @@ static bool do_search_next(View *view, SearchState *search, SearchCaseSensitivit
     }
 
     return error_msg("Pattern '%s' not found", search->pattern);
-}
-
-bool search_prev(View *view, SearchState *search, SearchCaseSensitivity cs)
-{
-    toggle_search_direction(search);
-    bool r = search_next(view, search, cs);
-    toggle_search_direction(search);
-    return r;
-}
-
-bool search_next(View *view, SearchState *search, SearchCaseSensitivity cs)
-{
-    return do_search_next(view, search, cs, false);
-}
-
-bool search_next_word(View *view, SearchState *search, SearchCaseSensitivity cs)
-{
-    return do_search_next(view, search, cs, true);
 }

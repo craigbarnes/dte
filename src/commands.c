@@ -2024,13 +2024,8 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         }
     }
 
-    bool found;
     search_set_regexp(search, pattern);
-    if (use_word_under_cursor) {
-        found = search_next_word(view, search, cs);
-    } else {
-        found = search_next(view, search, cs);
-    }
+    bool found = do_search_next(view, search, cs, use_word_under_cursor);
 
     if (!has_flag(a, 'H')) {
         history_append(&e->search_history, pattern);
