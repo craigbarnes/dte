@@ -1599,9 +1599,20 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
         {'i', REPLACE_IGNORE_CASE},
     };
 
+    const char *pattern = a->args[0];
+    char *alloc = NULL;
+    if (has_flag(a, 'e')) {
+        size_t len = strlen(pattern);
+        if (strn_contains_char_type(pattern, len, ASCII_REGEX)) {
+            pattern = alloc = regexp_escape(pattern, len);
+        }
+    }
+
     const char *replacement = a->args[1] ? a->args[1] : "";
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    return reg_replace(e->view, a->args[0], replacement, flags);
+    bool r = reg_replace(e->view, pattern, replacement, flags);
+    free(alloc);
+    return r;
 }
 
 static bool cmd_right(EditorState *e, const CommandArgs *a)
@@ -2004,6 +2015,14 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         return true;
     }
 
+    char *alloc = NULL;
+    if (!use_word_under_cursor && has_flag(a, 'e')) {
+        size_t len = strlen(pattern);
+        if (strn_contains_char_type(pattern, len, ASCII_REGEX)) {
+            pattern = alloc = regexp_escape(pattern, len);
+        }
+    }
+
     bool found;
     search_set_regexp(search, pattern);
     if (use_word_under_cursor) {
@@ -2016,6 +2035,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         history_append(&e->search_history, pattern);
     }
 
+    free(alloc);
     return found;
 }
 
@@ -2529,14 +2549,14 @@ static const Command cmds[] = {
     CMD("redo", "", NA, 0, 1, cmd_redo),
     CMD("refresh", "", NA, 0, 0, cmd_refresh),
     CMD("repeat", "-", NA, 2, -1, cmd_repeat),
-    CMD("replace", "bcgi", NA, 1, 2, cmd_replace),
+    CMD("replace", "bcegi", NA, 1, 2, cmd_replace),
     CMD("right", "cl", NA, 0, 0, cmd_right),
     CMD("save", "Bbde=fpu", NA, 0, 1, cmd_save),
     CMD("scroll-down", "", NA, 0, 0, cmd_scroll_down),
     CMD("scroll-pgdown", "h", NA, 0, 0, cmd_scroll_pgdown),
     CMD("scroll-pgup", "h", NA, 0, 0, cmd_scroll_pgup),
     CMD("scroll-up", "", NA, 0, 0, cmd_scroll_up),
-    CMD("search", "Hnprw", NA, 0, 1, cmd_search),
+    CMD("search", "Henprw", NA, 0, 1, cmd_search),
     CMD("select", "kl", NA, 0, 0, cmd_select),
     CMD("select-block", "", NA, 0, 0, cmd_select_block),
     CMD("set", "gl", RC, 1, -1, cmd_set),

@@ -120,13 +120,7 @@ static inline bool strview_isblank(const StringView *sv)
 NONNULL_ARGS
 static inline bool strview_contains_char_type(const StringView *sv, AsciiCharType mask)
 {
-    const unsigned char *data = sv->data;
-    for (size_t i = 0, n = sv->length; i < n; i++) {
-        if (ascii_test(data[i], mask)) {
-            return true;
-        }
-    }
-    return false;
+    return strn_contains_char_type(sv->data, sv->length, mask);
 }
 
 NONNULL_ARGS

@@ -378,6 +378,8 @@ static void test_complete_command(TestContext *ctx)
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "replace -c");
     complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -e");
+    complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "replace -g");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "replace -i");
@@ -395,14 +397,14 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "left -c; replace -b -c");
     reset_completion(c);
 
-    cmdline_set_text(c, "replace -bci -");
+    cmdline_set_text(c, "replace -bcei -");
     complete_command_next(e);
-    EXPECT_STRING_EQ(c->buf, "replace -bci -g ");
+    EXPECT_STRING_EQ(c->buf, "replace -bcei -g ");
     reset_completion(c);
 
-    cmdline_set_text(c, "replace -bcgi -");
+    cmdline_set_text(c, "replace -bcegi -");
     complete_command_next(e);
-    EXPECT_STRING_EQ(c->buf, "replace -bcgi -");
+    EXPECT_STRING_EQ(c->buf, "replace -bcegi -");
     reset_completion(c);
 
     cmdline_set_text(c, "replace -i");

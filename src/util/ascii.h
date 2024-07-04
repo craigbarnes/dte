@@ -99,4 +99,14 @@ static inline size_t ascii_blank_prefix_length(const char *str, size_t len)
     return i;
 }
 
+static inline bool strn_contains_char_type(const char *str, size_t len, AsciiCharType mask)
+{
+    for (size_t i = 0; i < len; i++) {
+        if (ascii_test(str[i], mask)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 #endif

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "regexp.h"
 #include "error.h"
+#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
 #include "util/str-util.h"
@@ -102,6 +103,29 @@ bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
     }
 
     return false;
+}
+
+size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen)
+{
+    BUG_ON(buflen < (2 * plen) + 1);
+    size_t o = 0;
+    for (size_t i = 0; i < plen; i++) {
+        char ch = pat[i];
+        if (is_regex_special_char(ch)) {
+            buf[o++] = '\\';
+        }
+        buf[o++] = ch;
+    }
+    buf[o] = '\0';
+    return o;
+}
+
+char *regexp_escape(const char *pattern, size_t len)
+{
+    size_t buflen = size_multiply(2, len) + 1;
+    char *buf = xmalloc(buflen);
+    regexp_escapeb(buf, buflen, pattern, len);
+    return buf;
 }
 
 const InternedRegexp *regexp_intern(const char *pattern)

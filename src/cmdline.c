@@ -9,6 +9,7 @@
 #include "editor.h"
 #include "history.h"
 #include "options.h"
+#include "regexp.h"
 #include "search.h"
 #include "terminal/osc52.h"
 #include "util/ascii.h"
@@ -414,20 +415,17 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 {
     CommandLine *c = &e->cmdline;
     if (cmdargs_has_flag(a, 'e')) {
-        if (c->buf.len == 0) {
+        String *s = &c->buf;
+        size_t len = s->len;
+        if (len == 0) {
             return true;
         }
         // Escape the regex; to match as plain text
-        char *original = string_clone_cstring(&c->buf);
-        size_t len = c->buf.len;
-        string_clear(&c->buf);
-        for (size_t i = 0; i < len; i++) {
-            char ch = original[i];
-            if (is_regex_special_char(ch)) {
-                string_append_byte(&c->buf, '\\');
-            }
-            string_append_byte(&c->buf, ch);
-        }
+        char *original = string_clone_cstring(s);
+        string_clear(s);
+        size_t bufsize = size_multiply(2, len) + 1;
+        char *buf = string_reserve_space(s, bufsize);
+        s->len = regexp_escapeb(buf, bufsize, original, len);
         free(original);
     }
 
