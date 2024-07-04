@@ -122,7 +122,7 @@ size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen)
 
 char *regexp_escape(const char *pattern, size_t len)
 {
-    size_t buflen = size_multiply(2, len) + 1;
+    size_t buflen = xmul(2, len) + 1;
     char *buf = xmalloc(buflen);
     regexp_escapeb(buf, buflen, pattern, len);
     return buf;

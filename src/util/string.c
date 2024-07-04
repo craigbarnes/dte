@@ -20,7 +20,7 @@ static COLD void string_grow(String *s, size_t min_alloc)
 char *string_reserve_space(String *s, size_t more)
 {
     BUG_ON(more == 0);
-    size_t min_alloc = size_add(s->len, more);
+    size_t min_alloc = xadd(s->len, more);
     if (unlikely(s->alloc < min_alloc)) {
         string_grow(s, min_alloc);
     }

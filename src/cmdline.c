@@ -423,7 +423,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         // Escape the regex; to match as plain text
         char *original = string_clone_cstring(s);
         string_clear(s);
-        size_t bufsize = size_multiply(2, len) + 1;
+        size_t bufsize = xmul(2, len) + 1;
         char *buf = string_reserve_space(s, bufsize);
         s->len = regexp_escapeb(buf, bufsize, original, len);
         free(original);

@@ -2531,21 +2531,21 @@ static void test_size_add_overflows(TestContext *ctx)
     EXPECT_TRUE(size_add_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
 }
 
-static void test_size_multiply(TestContext *ctx)
+static void test_xmul(TestContext *ctx)
 {
     const size_t halfmax = SIZE_MAX / 2;
-    EXPECT_UINT_EQ(size_multiply(2, halfmax), 2 * halfmax);
-    EXPECT_UINT_EQ(size_multiply(8, 8), 64);
-    EXPECT_UINT_EQ(size_multiply(1, SIZE_MAX), SIZE_MAX);
-    EXPECT_UINT_EQ(size_multiply(2000, 1), 2000);
+    EXPECT_UINT_EQ(xmul(2, halfmax), 2 * halfmax);
+    EXPECT_UINT_EQ(xmul(8, 8), 64);
+    EXPECT_UINT_EQ(xmul(1, SIZE_MAX), SIZE_MAX);
+    EXPECT_UINT_EQ(xmul(2000, 1), 2000);
 }
 
-static void test_size_add(TestContext *ctx)
+static void test_xadd(TestContext *ctx)
 {
     const size_t nearmax = SIZE_MAX - 1;
-    EXPECT_UINT_EQ(size_add(nearmax, 1), nearmax + 1);
-    EXPECT_UINT_EQ(size_add(8, 8), 16);
-    EXPECT_UINT_EQ(size_add(0, 0), 0);
+    EXPECT_UINT_EQ(xadd(nearmax, 1), nearmax + 1);
+    EXPECT_UINT_EQ(xadd(8, 8), 16);
+    EXPECT_UINT_EQ(xadd(0, 0), 0);
 }
 
 static void test_size_ssub(TestContext *ctx)
@@ -2928,8 +2928,8 @@ static const TestEntry tests[] = {
     TEST(test_size_decrement_wrapped),
     TEST(test_size_multiply_overflows),
     TEST(test_size_add_overflows),
-    TEST(test_size_multiply),
-    TEST(test_size_add),
+    TEST(test_xmul),
+    TEST(test_xadd),
     TEST(test_size_ssub),
     TEST(test_mem_intern),
     TEST(test_read_file),

@@ -7,7 +7,7 @@
 #include "macros.h"
 
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
-#define xnew(type, n) xmalloc(size_multiply(sizeof(type), (n)))
+#define xnew(type, n) xmalloc(xmul(sizeof(type), (n)))
 #define xnew0(type, n) xcalloc((n), sizeof(type))
 #define xrenew(mem, n) xreallocarray(mem, (n), sizeof(*mem))
 
@@ -16,10 +16,10 @@ void *xcalloc(size_t nmemb, size_t size) XMALLOC ALLOC_SIZE(1, 2);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
-size_t do_size_multiply(size_t a, size_t b);
-size_t size_add(size_t a, size_t b);
+size_t xmul_(size_t a, size_t b);
+size_t xadd(size_t a, size_t b);
 
-static inline size_t size_multiply(size_t a, size_t b)
+static inline size_t xmul(size_t a, size_t b)
 {
     // If either argument is known at compile-time to be 1, the multiplication
     // can't overflow and is thus safe to be inlined without checks
@@ -27,13 +27,13 @@ static inline size_t size_multiply(size_t a, size_t b)
         return a * b; // GCOVR_EXCL_LINE
     }
     // Otherwise, emit a call to the checked implementation
-    return do_size_multiply(a, b);
+    return xmul_(a, b);
 }
 
 RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2, 3)
 static inline void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 {
-    return xrealloc(ptr, size_multiply(nmemb, size));
+    return xrealloc(ptr, xmul(nmemb, size));
 }
 
 NONNULL_ARGS_AND_RETURN ALLOC_SIZE(2)
@@ -61,7 +61,7 @@ static inline char *xstrjoin(const char *s1, const char *s2)
 {
     size_t n1 = strlen(s1);
     size_t n2 = strlen(s2);
-    char *joined = xmalloc(size_add(n1, n2 + 1));
+    char *joined = xmalloc(xadd(n1, n2 + 1));
     memcpy(joined, s1, n1);
     memcpy(joined + n1, s2, n2 + 1);
     return joined;

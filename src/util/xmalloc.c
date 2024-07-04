@@ -15,7 +15,7 @@ static void *check_alloc(void *alloc)
     return alloc;
 }
 
-size_t do_size_multiply(size_t a, size_t b)
+size_t xmul_(size_t a, size_t b)
 {
     size_t result;
     if (unlikely(size_multiply_overflows(a, b, &result))) {
@@ -24,7 +24,7 @@ size_t do_size_multiply(size_t a, size_t b)
     return result;
 }
 
-size_t size_add(size_t a, size_t b)
+size_t xadd(size_t a, size_t b)
 {
     size_t result;
     if (unlikely(size_add_overflows(a, b, &result))) {
@@ -44,7 +44,7 @@ void *xcalloc(size_t nmemb, size_t size)
     if (__STDC_VERSION__ < 202311L) {
         // ISO C23 (§7.24.3.2) requires calloc() to check for integer
         // overflow in `nmemb * size`, but older C standards don't
-        size_multiply(nmemb, size);
+        xmul(nmemb, size);
     }
 
     BUG_ON(nmemb == 0 || size == 0);
