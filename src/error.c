@@ -8,18 +8,22 @@
 #include "util/log.h"
 #include "util/xstdio.h"
 
-// These are not accessed from signal handlers or multiple threads
-// and are considered an acceptable use of non-const globals:
+typedef struct {
+    char buf[512];
+    unsigned int nr_errors;
+    bool is_error;
+    bool print_to_stderr;
+} ErrorBuffer;
+
+// This is not accessed from signal handlers or multiple threads and
+// is considered an acceptable use of non-const globals:
 // NOLINTBEGIN(*-avoid-non-const-global-variables)
-static char error_buf[512];
-static unsigned int nr_errors;
-static bool msg_is_error;
-static bool print_errors_to_stderr;
+static ErrorBuffer err;
 // NOLINTEND(*-avoid-non-const-global-variables)
 
 void clear_error(void)
 {
-    error_buf[0] = '\0';
+    err.buf[0] = '\0';
 }
 
 bool error_msg(const char *format, ...)
@@ -27,15 +31,15 @@ bool error_msg(const char *format, ...)
     const char *cmd = current_command ? current_command->name : NULL;
     const char *file = current_config.file;
     const unsigned int line = current_config.line;
-    const size_t size = sizeof(error_buf);
+    const size_t size = sizeof(err.buf);
     int pos = 0;
 
     if (file && cmd) {
-        pos = snprintf(error_buf, size, "%s:%u: %s: ", file, line, cmd);
+        pos = snprintf(err.buf, size, "%s:%u: %s: ", file, line, cmd);
     } else if (file) {
-        pos = snprintf(error_buf, size, "%s:%u: ", file, line);
+        pos = snprintf(err.buf, size, "%s:%u: ", file, line);
     } else if (cmd) {
-        pos = snprintf(error_buf, size, "%s: ", cmd);
+        pos = snprintf(err.buf, size, "%s: ", cmd);
     }
 
     if (unlikely(pos < 0)) {
@@ -47,21 +51,21 @@ bool error_msg(const char *format, ...)
     if (likely(pos < (size - 3))) {
         va_list ap;
         va_start(ap, format);
-        vsnprintf(error_buf + pos, size - pos, format, ap);
+        vsnprintf(err.buf + pos, size - pos, format, ap);
         va_end(ap);
     } else {
         LOG_WARNING("no buffer space left for error message");
     }
 
-    msg_is_error = true;
-    nr_errors++;
+    err.is_error = true;
+    err.nr_errors++;
 
-    if (print_errors_to_stderr) {
-        xfputs(error_buf, stderr);
+    if (err.print_to_stderr) {
+        xfputs(err.buf, stderr);
         xfputc('\n', stderr);
     }
 
-    LOG_INFO("%s", error_buf);
+    LOG_INFO("%s", err.buf);
 
     // Always return false, to allow tail-calling as `return error_msg(...);`
     // from command handlers, instead of `error_msg(...); return false;`
@@ -77,23 +81,23 @@ void info_msg(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    vsnprintf(error_buf, sizeof(error_buf), format, ap);
+    vsnprintf(err.buf, sizeof(err.buf), format, ap);
     va_end(ap);
-    msg_is_error = false;
+    err.is_error = false;
 }
 
 const char *get_msg(bool *is_error)
 {
-    *is_error = msg_is_error;
-    return error_buf;
+    *is_error = err.is_error;
+    return err.buf;
 }
 
 unsigned int get_nr_errors(void)
 {
-    return nr_errors;
+    return err.nr_errors;
 }
 
-void set_print_errors_to_stderr(bool enable)
+void errors_to_stderr(bool enable)
 {
-    print_errors_to_stderr = enable;
+    err.print_to_stderr = enable;
 }

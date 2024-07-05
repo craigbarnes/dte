@@ -10,6 +10,6 @@ void info_msg(const char *format, ...) PRINTF(1);
 void clear_error(void);
 const char *get_msg(bool *is_error) NONNULL_ARGS;
 unsigned int get_nr_errors(void);
-void set_print_errors_to_stderr(bool enable);
+void errors_to_stderr(bool enable);
 
 #endif

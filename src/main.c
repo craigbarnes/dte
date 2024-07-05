@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
-    set_print_errors_to_stderr(true);
+    errors_to_stderr(true);
 
     for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
@@ -525,7 +525,7 @@ loop_break:;
     // since wildcard arguments (e.g. `dte *`) may expand to directory
     // names and produce lots of "not a regular file" errors
     unsigned int nr_stderr_errors = get_nr_errors();
-    set_print_errors_to_stderr(false);
+    errors_to_stderr(false);
     clear_error();
 
     e->status = EDITOR_RUNNING;
@@ -611,7 +611,7 @@ loop_break:;
     term_output_flush(&term->obuf);
 
 exit:
-    set_print_errors_to_stderr(true);
+    errors_to_stderr(true);
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
