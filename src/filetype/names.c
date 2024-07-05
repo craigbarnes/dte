@@ -43,6 +43,7 @@ typedef enum {
     GRAPHQL,
     GROOVY,
     HASKELL,
+    HCL,
     HTML,
     INDENT,
     INI,
@@ -163,6 +164,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [GRAPHQL] = "graphql",
     [GROOVY] = "groovy",
     [HASKELL] = "haskell",
+    [HCL] = "hcl", // https://github.com/hashicorp/hcl
     [HTML] = "html",
     [INDENT] = "indent",
     [INI] = "ini",

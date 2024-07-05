@@ -614,7 +614,7 @@ loop_break:;
     /*
      * This is normally followed immediately by term_cooked() in other
      * contexts, but in this case we want to switch back to cooked mode
-     * as late as possible. On underpowered machines unlocking files and
+     * as late as possible. On underpowered machines, unlocking files and
      * writing history may take some time. If cooked mode were switched
      * to here it'd leave a window of time where we've switched back to
      * the normal screen buffer and reset the termios ECHO flag while
