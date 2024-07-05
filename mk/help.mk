@@ -72,6 +72,7 @@ ifeq "$(DEVMK)" "loaded"
 	$P check-source 'Equivalent to "make check-{whitespace,headers,codespell,shell-scripts}"'
 	$P check-aux 'Equivalent to "make check-{desktop-file,appstream}"'
 	$P distcheck 'Run "make check" on the unpacked "make dist" tarball'
+	$P 'check TESTFLAGS=-t' 'Same as "make check", but also showing timing info'
 	@echo
 endif
 

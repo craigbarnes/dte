@@ -40,6 +40,7 @@ See Also
 * [`docs/README.md`]
 * [`docs/packaging.md`]
 * [`docs/releasing.md`]
+* `make help`
 
 
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues
