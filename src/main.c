@@ -235,7 +235,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     return buffer;
 }
 
-static bool write_stdout_buffer(Buffer *buffer, int fd)
+static bool buffer_write_blocks_and_free(Buffer *buffer, int fd)
 {
     bool r = true;
     Block *blk;
@@ -247,6 +247,8 @@ static bool write_stdout_buffer(Buffer *buffer, int fd)
         }
     }
 
+    // Note: the other allocations for buffer should have already been
+    // freed by free_buffer()
     free_blocks(buffer);
     free(buffer);
     return r;
@@ -616,7 +618,7 @@ exit:
     write_history_files(e);
 
     if (std_buffer && std_buffer->stdout_buffer) {
-        bool ok = write_stdout_buffer(std_buffer, std_fds[STDOUT_FILENO]);
+        bool ok = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
         if (!ok && exit_code == EDITOR_EXIT_OK) {
             exit_code = EC_IO_ERROR;
         }

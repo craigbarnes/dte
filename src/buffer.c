@@ -119,6 +119,18 @@ void free_buffer(Buffer *buffer)
     free(buffer->abs_filename);
 
     if (buffer->stdout_buffer) {
+        /*
+         * If this buffer is to be piped to stdout on exit, retain just
+         * the blocks and the buffer itself. After this point, the pointer
+         * in main() takes ownership and is responsible for freeing the
+         * remaining allocations.
+         *
+         * See also:
+         * - init_std_buffer()
+         * - buffer_write_blocks_and_free()
+         * - main()
+         * - cmd_save()
+         */
         return;
     }
 
