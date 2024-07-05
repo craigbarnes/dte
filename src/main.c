@@ -319,6 +319,32 @@ static void log_config_counts(const EditorState *e)
     );
 }
 
+static void read_history_files(EditorState *e)
+{
+    const char *dir = e->user_config_dir;
+    size_t size_limit = 64u << 20; // 64 MiB
+    file_history_load(&e->file_history, path_join(dir, "file-history"), size_limit);
+    history_load(&e->command_history, path_join(dir, "command-history"), size_limit);
+    history_load(&e->search_history, path_join(dir, "search-history"), size_limit);
+    e->flags |= EFLAG_SAVE_ALL_HIST;
+    if (e->search_history.last) {
+        search_set_regexp(&e->search, e->search_history.last->text);
+    }
+}
+
+static void write_history_files(const EditorState *e)
+{
+    if (e->flags & EFLAG_SAVE_CMD_HIST) {
+        history_save(&e->command_history);
+    }
+    if (e->flags & EFLAG_SAVE_SEARCH_HIST) {
+        history_save(&e->search_history);
+    }
+    if (e->flags & EFLAG_SAVE_FILE_HIST) {
+        file_history_save(&e->file_history);
+    }
+}
+
 static const char copyright[] =
     "dte " VERSION "\n"
     "(C) 2013-2024 Craig Barnes\n"
@@ -477,14 +503,7 @@ loop_break:;
     set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
-        size_t size_limit = 64u << 20; // 64 MiB
-        file_history_load(&e->file_history, path_join(cfgdir, "file-history"), size_limit);
-        history_load(&e->command_history, path_join(cfgdir, "command-history"), size_limit);
-        history_load(&e->search_history, path_join(cfgdir, "search-history"), size_limit);
-        e->flags |= EFLAG_SAVE_ALL_HIST;
-        if (e->search_history.last) {
-            search_set_regexp(&e->search, e->search_history.last->text);
-        }
+        read_history_files(e);
     }
 
     // We don't want errors relating to opening files printed to stderr,
@@ -578,19 +597,8 @@ loop_break:;
 
 exit:
     set_print_errors_to_stderr(true);
-
-    // Unlock files and add to file history
-    frame_remove(e, e->root_frame);
-
-    if (e->flags & EFLAG_SAVE_CMD_HIST) {
-        history_save(&e->command_history);
-    }
-    if (e->flags & EFLAG_SAVE_SEARCH_HIST) {
-        history_save(&e->search_history);
-    }
-    if (e->flags & EFLAG_SAVE_FILE_HIST) {
-        file_history_save(&e->file_history);
-    }
+    frame_remove(e, e->root_frame); // Unlock files and add to file history
+    write_history_files(e);
 
     if (have_stdout_buffer) {
         int fd = std_fds[STDOUT_FILENO];
