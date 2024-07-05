@@ -235,6 +235,23 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     return buffer;
 }
 
+static bool write_stdout_buffer(Buffer *buffer, int fd)
+{
+    bool r = true;
+    Block *blk;
+    block_for_each(blk, &buffer->blocks) {
+        if (xwrite_all(fd, blk->data, blk->size) < 0) {
+            error_msg_errno("failed to write (stdout) buffer");
+            r = false;
+            break;
+        }
+    }
+
+    free_blocks(buffer);
+    free(buffer);
+    return r;
+}
+
 static ExitCode init_logging(const char *filename, const char *req_level_str)
 {
     if (!filename || filename[0] == '\0') {
@@ -463,9 +480,7 @@ loop_break:;
     EditorState *e = init_editor_state();
     Terminal *term = &e->terminal;
     term_init(term, term_name, colorterm);
-
     Buffer *std_buffer = init_std_buffer(e, std_fds);
-    bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
     // Create this early (needed if "lock-files" is true)
     const char *cfgdir = e->user_config_dir;
@@ -600,25 +615,11 @@ exit:
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
-    if (have_stdout_buffer) {
-        int fd = std_fds[STDOUT_FILENO];
-        Block *blk;
-        block_for_each(blk, &std_buffer->blocks) {
-            if (xwrite_all(fd, blk->data, blk->size) < 0) {
-                error_msg_errno("failed to write (stdout) buffer");
-                if (exit_code == EDITOR_EXIT_OK) {
-                    exit_code = EC_IO_ERROR;
-                }
-                break;
-            }
+    if (std_buffer && std_buffer->stdout_buffer) {
+        bool ok = write_stdout_buffer(std_buffer, std_fds[STDOUT_FILENO]);
+        if (!ok && exit_code == EDITOR_EXIT_OK) {
+            exit_code = EC_IO_ERROR;
         }
-        free_blocks(std_buffer);
-        free(std_buffer);
-    }
-
-    size_t n = term->obuf.count;
-    if (n > 0) {
-        LOG_DEBUG("%zu unflushed bytes remaining in terminal output buffer", n);
     }
 
     free_editor_state(e);
