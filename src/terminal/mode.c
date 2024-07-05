@@ -49,7 +49,7 @@ static bool xtcsetattr(const struct termios *t)
 
     int r;
     do {
-        r = tcsetattr(STDIN_FILENO, TCSANOW, t);
+        r = tcsetattr(STDIN_FILENO, TCSAFLUSH, t);
     } while (unlikely(r != 0 && errno == EINTR));
 
     return (r == 0);

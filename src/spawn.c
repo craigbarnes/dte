@@ -217,6 +217,7 @@ static void yield_terminal(EditorState *e, bool quiet)
     } else {
         e->child_controls_terminal = true;
         ui_end(e);
+        term_cooked();
     }
 }
 

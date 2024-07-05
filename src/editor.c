@@ -301,7 +301,6 @@ void ui_end(EditorState *e)
     term_use_normal_screen_buffer(term);
     term_end_sync_update(term);
     term_output_flush(obuf);
-    term_cooked();
 }
 
 int main_loop(EditorState *e)

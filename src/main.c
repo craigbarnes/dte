@@ -54,6 +54,7 @@ static void term_cleanup(EditorState *e)
     set_fatal_error_cleanup_handler(NULL, NULL);
     if (!e->child_controls_terminal) {
         ui_end(e);
+        term_cooked();
     }
 }
 
@@ -566,9 +567,11 @@ loop_break:;
     }
 
     int exit_code = e->status;
+    bool skipped_mainloop = false;
     if (exit_code >= 0) {
         // If a -c command caused the editor to exit (quit, close -q, etc.),
         // terminal init/deinit and entering the main-loop can be skipped
+        skipped_mainloop = true;
         goto exit;
     }
 
@@ -605,12 +608,21 @@ loop_break:;
     ui_start(e);
     term_put_queries(term);
     term_output_flush(&term->obuf);
-
     exit_code = main_loop(e);
-
     term_restore_title(term);
+
+    /*
+     * This is normally followed immediately by term_cooked() in other
+     * contexts, but in this case we want to switch back to cooked mode
+     * as late as possible. On underpowered machines unlocking files and
+     * writing history may take some time. If cooked mode were switched
+     * to here it'd leave a window of time where we've switched back to
+     * the normal screen buffer and reset the termios ECHO flag while
+     * still being the foreground process, which would cause any input
+     * to be echoed to the terminal (before the shell takes over again
+     * and prints its prompt).
+     */
     ui_end(e);
-    term_output_flush(&term->obuf);
 
 exit:
     errors_to_stderr(true);
@@ -627,5 +639,9 @@ exit:
     free_editor_state(e);
     LOG_INFO("exiting with status %d", exit_code);
     log_close();
+    if (!skipped_mainloop) {
+        term_cooked();
+    }
+
     return exit_code;
 }
