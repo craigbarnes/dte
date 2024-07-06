@@ -484,6 +484,7 @@ loop_break:;
     Terminal *term = &e->terminal;
     term_init(term, term_name, colorterm);
     Buffer *std_buffer = init_std_buffer(e, std_fds);
+    bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
     // Create this early (needed if "lock-files" is true)
     const char *cfgdir = e->user_config_dir;
@@ -629,7 +630,7 @@ exit:
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
-    if (std_buffer && std_buffer->stdout_buffer) {
+    if (have_stdout_buffer) {
         bool ok = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
         if (!ok && exit_code == EDITOR_EXIT_OK) {
             exit_code = EC_IO_ERROR;
