@@ -2,7 +2,7 @@
 # development purposes and is NOT included in release tarballs
 
 GCOVR ?= gcovr
-GCOVRFLAGS ?= -j$(NPROC) --config gcovr.cfg --sort uncovered-percent
+GCOVRFLAGS ?= -j$(NPROC) --config gcovr.cfg --sort uncovered-percent --sort-reverse
 
 coverage-report: gcovr-html
 gcovr-html: public/coverage/index.html
