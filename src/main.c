@@ -110,6 +110,7 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 
 static ExitCode showkey_loop(const char *term_name, const char *colorterm)
 {
+    LOG_INFO("entering 'showkey' mode (dte -K)");
     if (unlikely(!term_raw())) {
         perror("tcsetattr");
         return EC_IO_ERROR;
@@ -339,6 +340,20 @@ static void log_config_counts(const EditorState *e)
     );
 }
 
+static void exec_user_rc(EditorState *e, const char *filename)
+{
+    ConfigFlags flags = CFG_NOFLAGS;
+    char buf[8192];
+    if (filename) {
+        flags |= CFG_MUST_EXIST;
+    } else {
+        xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
+        filename = buf;
+    }
+    LOG_INFO("loading configuration from %s", filename);
+    read_normal_config(e, filename, flags);
+}
+
 static void read_history_files(EditorState *e)
 {
     const char *dir = e->user_config_dir;
@@ -476,7 +491,6 @@ loop_break:;
     const char *term_name = getenv("TERM");
     const char *colorterm = getenv("COLORTERM");
     if (use_showkey) {
-        LOG_INFO("entering \"showkey\" mode (dte -K)");
         return showkey_loop(term_name, colorterm);
     }
 
@@ -499,16 +513,7 @@ loop_break:;
     exec_builtin_rc(e);
 
     if (read_rc) {
-        ConfigFlags flags = CFG_NOFLAGS;
-        char buf[8192];
-        if (rc) {
-            flags |= CFG_MUST_EXIST;
-        } else {
-            xsnprintf(buf, sizeof buf, "%s/%s", cfgdir, "rc");
-            rc = buf;
-        }
-        LOG_INFO("loading configuration from %s", rc);
-        read_normal_config(e, rc, flags);
+        exec_user_rc(e, rc);
     }
 
     log_config_counts(e);
