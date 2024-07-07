@@ -1,15 +1,4 @@
 {
-   static HashSet in cmd_require()
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   ...
-   fun:hashset_*
-   ...
-   fun:cmd_require
-   ...
-}
-
-{
    static TermStyle** in highlight_line()
    Memcheck:Leak
    match-leak-kinds: reachable
