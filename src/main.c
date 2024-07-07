@@ -563,10 +563,10 @@ loop_break:;
         dview = window_open_empty_buffer(window);
         BUG_ON(!dview);
         BUG_ON(window->views.count != 1);
-        BUG_ON(dview != window->views.ptrs[0]);
+        BUG_ON(dview != window_get_first_view(window));
     }
 
-    set_view(window->views.ptrs[0]);
+    set_view(window_get_first_view(window));
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);

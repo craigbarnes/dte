@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "buffer.h"
 #include "frame.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "view.h"
@@ -37,6 +38,12 @@ typedef struct Window {
         long last;
     } line_numbers;
 } Window;
+
+static inline View *window_get_first_view(const Window *window)
+{
+    BUG_ON(window->views.count == 0);
+    return window->views.ptrs[0];
+}
 
 struct EditorState;
 

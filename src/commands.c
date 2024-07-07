@@ -1399,7 +1399,7 @@ static size_t count_modified_buffers(const PointerArray *buffers, View **first)
         }
         nr_modified++;
         if (!modified) {
-            modified = buffer->views.ptrs[0];
+            modified = buffer_get_first_view(buffer);
         }
     }
 

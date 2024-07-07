@@ -141,7 +141,7 @@ View *window_get_view(Window *window, Buffer *buffer)
     if (!view) {
         // Open the buffer in other window to this window
         view = window_add_buffer(window, buffer);
-        view->cursor = ((View*)buffer->views.ptrs[0])->cursor;
+        view->cursor = buffer_get_first_view(buffer)->cursor;
     }
     return view;
 }

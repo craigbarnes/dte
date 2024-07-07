@@ -10,6 +10,7 @@
 #include "change.h"
 #include "options.h"
 #include "syntax/syntax.h"
+#include "util/debug.h"
 #include "util/list.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -76,6 +77,12 @@ static inline void mark_all_lines_changed(Buffer *buffer)
 static inline bool buffer_modified(const Buffer *buffer)
 {
     return buffer->saved_change != buffer->cur_change && !buffer->temporary;
+}
+
+static inline struct View *buffer_get_first_view(const Buffer *buffer)
+{
+    BUG_ON(buffer->views.count == 0);
+    return buffer->views.ptrs[0];
 }
 
 static inline BlockIter block_iter(Buffer *buffer)

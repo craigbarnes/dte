@@ -186,6 +186,8 @@ static void test_editor_state(TestContext *ctx)
     ASSERT_EQ(e->buffers.count, 1);
     ASSERT_PTREQ(window->views.ptrs[0], view);
     ASSERT_PTREQ(buffer->views.ptrs[0], view);
+    ASSERT_PTREQ(window_get_first_view(window), view);
+    ASSERT_PTREQ(buffer_get_first_view(buffer), view);
     ASSERT_PTREQ(e->buffers.ptrs[0], buffer);
 
     ASSERT_NONNULL(buffer->encoding);

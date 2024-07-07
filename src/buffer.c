@@ -8,7 +8,6 @@
 #include "filetype.h"
 #include "lock.h"
 #include "syntax/state.h"
-#include "util/debug.h"
 #include "util/intern.h"
 #include "util/numtostr.h"
 #include "util/path.h"
