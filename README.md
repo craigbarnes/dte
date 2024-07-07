@@ -85,7 +85,6 @@ After installing, you can access the documentation in man page format:
 
 See also:
 
-* `make help`
 * [Contributor guidelines]
 * [Packaging information]
 
