@@ -62,9 +62,11 @@ static inline StringView strview_from_string(const String *s)
     return string_view(s->buffer, s->len);
 }
 
-static inline void string_clear(String *s)
+static inline size_t string_clear(String *s)
 {
+    size_t oldlen = s->len;
     s->len = 0;
+    return oldlen;
 }
 
 char *string_reserve_space(String *s, size_t more) NONNULL_ARGS_AND_RETURN;

@@ -36,8 +36,8 @@ static void test_spawn(TestContext *ctx)
     EXPECT_EQ(err->len, 4);
     EXPECT_STREQ(string_borrow_cstring(out), "IN-OUT\n");
     EXPECT_STREQ(string_borrow_cstring(err), "ERR\n");
-    string_clear(out);
-    string_clear(err);
+    EXPECT_EQ(string_clear(out), 7);
+    EXPECT_EQ(string_clear(err), 4);
 
     sc.actions[STDIN_FILENO] = SPAWN_NULL;
     sc.actions[STDERR_FILENO] = SPAWN_NULL;
@@ -45,16 +45,16 @@ static void test_spawn(TestContext *ctx)
     EXPECT_EQ(out->len, 4);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "OUT\n");
-    string_clear(out);
-    string_clear(err);
+    EXPECT_EQ(string_clear(out), 4);
+    EXPECT_EQ(string_clear(err), 0);
 
     args[2] = "printf 'xyz 123'; exit 37";
     EXPECT_EQ(spawn(&sc), 37);
     EXPECT_EQ(out->len, 7);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "xyz 123");
-    string_clear(out);
-    string_clear(err);
+    EXPECT_EQ(string_clear(out), 7);
+    EXPECT_EQ(string_clear(err), 0);
 
     // Make sure zero-length input with one SPAWN_PIPE action
     // doesn't deadlock

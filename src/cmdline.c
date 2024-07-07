@@ -414,48 +414,46 @@ static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
 static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 {
     CommandLine *c = &e->cmdline;
-    if (cmdargs_has_flag(a, 'e')) {
-        String *s = &c->buf;
-        size_t len = s->len;
-        if (len == 0) {
-            return true;
-        }
-        // Escape the regex; to match as plain text
-        char *original = string_clone_cstring(s);
-        string_clear(s);
-        size_t bufsize = xmul(2, len) + 1;
-        char *buf = string_reserve_space(s, bufsize);
-        s->len = regexp_escapeb(buf, bufsize, original, len);
-        free(original);
-    }
-
-    const char *str = NULL;
     bool add_to_history = !cmdargs_has_flag(a, 'H');
+    const char *pat = NULL;
+
     if (c->buf.len > 0) {
-        str = string_borrow_cstring(&c->buf);
-        BUG_ON(!str);
-        search_set_regexp(&e->search, str);
+        String *s = &c->buf;
+        if (cmdargs_has_flag(a, 'e')) {
+            // Escape the regex; to match as plain text
+            char *original = string_clone_cstring(s);
+            size_t origlen = string_clear(s);
+            size_t bufsize = xmul(2, origlen) + 1;
+            char *buf = string_reserve_space(s, bufsize);
+            s->len = regexp_escapeb(buf, bufsize, original, origlen);
+            BUG_ON(s->len < origlen);
+            free(original);
+        }
+
+        pat = string_borrow_cstring(s);
+        search_set_regexp(&e->search, pat);
         if (add_to_history) {
-            history_append(&e->search_history, str);
+            history_append(&e->search_history, pat);
         }
     }
 
     if (e->macro.recording) {
         const char *args[5];
         size_t i = 0;
-        if (str) {
-            if (e->search.reverse) {
+        bool reverse = e->search.reverse;
+        if (pat) {
+            if (reverse) {
                 args[i++] = "-r";
             }
             if (!add_to_history) {
                 args[i++] = "-H";
             }
-            if (unlikely(str[0] == '-')) {
+            if (unlikely(pat[0] == '-')) {
                 args[i++] = "--";
             }
-            args[i++] = str;
+            args[i++] = pat;
         } else {
-            args[i++] = e->search.reverse ? "-p" : "-n";
+            args[i++] = reverse ? "-p" : "-n";
         }
         args[i] = NULL;
         macro_command_hook(&e->macro, "search", (char**)args);

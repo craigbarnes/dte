@@ -562,13 +562,13 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.len, 4);
     EXPECT_STREQ(string_borrow_cstring(&s), "test");
 
-    string_clear(&s);
+    EXPECT_EQ(string_clear(&s), 4);
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(string_insert_codepoint(&s, 0, 0x0E01), 3);
     EXPECT_EQ(s.len, 3);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xE0\xB8\x81");
 
-    string_clear(&s);
+    EXPECT_EQ(string_clear(&s), 3);
     string_sprintf(&s, "%d %s\n", 88, "test");
     EXPECT_EQ(s.len, 8);
     EXPECT_STREQ(string_borrow_cstring(&s), "88 test\n");
