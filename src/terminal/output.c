@@ -266,17 +266,20 @@ void term_show_cursor(Terminal *term)
 
 void term_begin_sync_update(Terminal *term)
 {
+    TermOutputBuffer *obuf = &term->obuf;
+    WARN_ON(obuf->sync_pending);
     if (term->features & TFLAG_SYNC) {
-        term_put_literal(&term->obuf, "\033[?2026h"); // DECSET 2026
-        term->sync_pending = true;
+        term_put_literal(obuf, "\033[?2026h"); // DECSET 2026
+        obuf->sync_pending = true;
     }
 }
 
 void term_end_sync_update(Terminal *term)
 {
-    if ((term->features & TFLAG_SYNC) && term->sync_pending) {
-        term_put_literal(&term->obuf, "\033[?2026l"); // DECRST 2026
-        term->sync_pending = false;
+    TermOutputBuffer *obuf = &term->obuf;
+    if ((term->features & TFLAG_SYNC) && obuf->sync_pending) {
+        term_put_literal(obuf, "\033[?2026l"); // DECRST 2026
+        obuf->sync_pending = false;
     }
 }
 

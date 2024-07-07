@@ -70,6 +70,7 @@ typedef struct {
     uint8_t tab_mode; // See TermTabOutputMode
     uint8_t tab_width; // See LocalOptions::tab_width
     bool can_clear; // Whether lines can be cleared with EL (Erase in Line) sequence
+    bool sync_pending; // See TFLAG_SYNC and term_end_sync_update()
     TermStyle style; // The style currently active in the terminal
     TermCursorStyle cursor_style; // The cursor style currently active in the terminal
 } TermOutputBuffer;
@@ -85,7 +86,6 @@ typedef struct Terminal {
     unsigned int width; // Terminal width (in columns)
     unsigned int height; // Terminal height (in rows)
     unsigned int ncv_attributes; // See "no_color_video" terminfo(5) capability
-    bool sync_pending; // See TFLAG_SYNC and term_end_sync_update()
     ssize_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;
