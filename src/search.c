@@ -128,14 +128,6 @@ bool search_tag(View *view, const char *pattern)
     return true;
 }
 
-static void free_regex(SearchState *search)
-{
-    if (search->re_flags) {
-        regfree(&search->regex);
-        search->re_flags = 0;
-    }
-}
-
 static bool has_upper(const char *str)
 {
     for (size_t i = 0; str[i]; i++) {
@@ -148,40 +140,33 @@ static bool has_upper(const char *str)
 
 static bool update_regex(SearchState *search, SearchCaseSensitivity cs)
 {
-    int re_flags = REG_NEWLINE;
-    switch (cs) {
-    case CSS_TRUE:
-        break;
-    case CSS_FALSE:
-        re_flags |= REG_ICASE;
-        break;
-    case CSS_AUTO:
-        if (!has_upper(search->pattern)) {
-            re_flags |= REG_ICASE;
-        }
-        break;
-    default:
-        BUG("unhandled case sensitivity value");
-    }
-
-    if (re_flags == search->re_flags) {
+    const char *pattern = search->pattern;
+    bool icase = (cs == CSS_FALSE) || (cs == CSS_AUTO && !has_upper(pattern));
+    int flags = REG_NEWLINE | (icase ? REG_ICASE : 0);
+    if (flags == search->re_flags) {
         return true;
     }
 
-    free_regex(search);
+    if (search->re_flags) {
+        regfree(&search->regex);
+        search->re_flags = 0;
+    }
 
-    search->re_flags = re_flags;
-    if (regexp_compile(&search->regex, search->pattern, search->re_flags)) {
+    if (regexp_compile(&search->regex, pattern, flags)) {
+        search->re_flags = flags;
         return true;
     }
 
-    free_regex(search);
+    regfree(&search->regex);
     return false;
 }
 
 void search_free_regexp(SearchState *search)
 {
-    free_regex(search);
+    if (search->re_flags) {
+        regfree(&search->regex);
+        search->re_flags = 0;
+    }
     free(search->pattern);
 }
 
