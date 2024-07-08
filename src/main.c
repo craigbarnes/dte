@@ -108,9 +108,12 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
     return get_nr_errors() ? EC_DATA_ERROR : EC_OK;
 }
 
-static ExitCode showkey_loop(const char *term_name, const char *colorterm)
+static ExitCode showkey_loop(void)
 {
-    LOG_INFO("entering 'showkey' mode (dte -K)");
+    if (!term_mode_init()) {
+        perror("tcgetattr");
+        return EC_IO_ERROR;
+    }
     if (unlikely(!term_raw())) {
         perror("tcsetattr");
         return EC_IO_ERROR;
@@ -119,7 +122,7 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
     Terminal term;
     TermOutputBuffer *obuf = &term.obuf;
     TermInputBuffer *ibuf = &term.ibuf;
-    term_init(&term, term_name, colorterm);
+    term_init(&term, getenv("TERM"), getenv("COLORTERM"));
     term_input_init(ibuf);
     term_output_init(obuf);
     term_enable_private_modes(&term);
@@ -415,7 +418,6 @@ int main(int argc, char *argv[])
     size_t nr_commands = 0;
     size_t nr_tags = 0;
     bool read_rc = true;
-    bool use_showkey = false;
     bool load_and_save_history = true;
     errors_to_stderr(true);
 
@@ -452,8 +454,7 @@ int main(int argc, char *argv[])
             load_and_save_history = false;
             break;
         case 'K':
-            use_showkey = true;
-            goto loop_break;
+            return showkey_loop();
         case 'V':
             return write_stdout(copyright, sizeof(copyright));
         case 'h':
@@ -463,8 +464,6 @@ int main(int argc, char *argv[])
             return EC_USAGE_ERROR;
         }
     }
-
-loop_break:;
 
     // This must be done before calling init_logging(), otherwise an
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
@@ -488,15 +487,9 @@ loop_break:;
         return EC_IO_ERROR;
     }
 
-    const char *term_name = getenv("TERM");
-    const char *colorterm = getenv("COLORTERM");
-    if (use_showkey) {
-        return showkey_loop(term_name, colorterm);
-    }
-
     EditorState *e = init_editor_state();
     Terminal *term = &e->terminal;
-    term_init(term, term_name, colorterm);
+    term_init(term, getenv("TERM"), getenv("COLORTERM"));
     Buffer *std_buffer = init_std_buffer(e, std_fds);
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
