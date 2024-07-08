@@ -48,8 +48,8 @@ static inline View *window_get_first_view(const Window *window)
 struct EditorState;
 
 Window *new_window(struct EditorState *e) NONNULL_ARGS_AND_RETURN;
-View *window_add_buffer(Window *window, Buffer *buffer);
-View *window_open_empty_buffer(Window *window);
+View *window_add_buffer(Window *window, Buffer *buffer) NONNULL_ARGS_AND_RETURN;
+View *window_open_empty_buffer(Window *window) NONNULL_ARGS_AND_RETURN;
 View *window_open_buffer(Window *window, const char *filename, bool must_exist, const char *encoding);
 View *window_get_view(Window *window, Buffer *buffer);
 View *window_find_view(Window *window, Buffer *buffer);

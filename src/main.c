@@ -561,9 +561,6 @@ loop_break:;
     if (window->views.count == 0) {
         // Open a default buffer, if none were opened for arguments
         dview = window_open_empty_buffer(window);
-        BUG_ON(!dview);
-        BUG_ON(window->views.count != 1);
-        BUG_ON(dview != window_get_first_view(window));
     }
 
     set_view(window_get_first_view(window));
