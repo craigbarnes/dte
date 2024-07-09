@@ -103,8 +103,8 @@ size_t ptr_array_index(const PointerArray *array, const void *ptr)
 
     // If `ptr` isn't found in the array, return -1 (SIZE_MAX). Callers
     // should check that the returned index is less than `array->count`
-    // before indexing `array->ptrs` with it or use a BUG_ON() assertion
-    // for the same condition if `ptr` is always expected to be found.
+    // before indexing `array->ptrs` with it or use ptr_array_xindex()
+    // instead, if applicable.
     return -1;
 }
 
