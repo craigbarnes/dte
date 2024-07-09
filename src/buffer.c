@@ -404,7 +404,7 @@ void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
 {
     uintmax_t blocks = 0;
     uintmax_t bytes = 0;
-    Block *blk;
+    const Block *blk;
     block_for_each(blk, &buffer->blocks) {
         blocks += 1;
         bytes += blk->size;

@@ -256,7 +256,7 @@ ssize_t handle_exec (
         if (view->selection) {
             ctx.input.length = prepare_selection(view);
         } else {
-            Block *blk;
+            const Block *blk;
             block_for_each(blk, &view->buffer->blocks) {
                 ctx.input.length += blk->size;
             }

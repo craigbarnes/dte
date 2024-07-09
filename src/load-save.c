@@ -346,7 +346,7 @@ static bool write_buffer (
         }
     }
 
-    Block *blk;
+    const Block *blk;
     block_for_each(blk, &buffer->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {

@@ -9,8 +9,8 @@
 
 void view_update_cursor_y(View *view)
 {
-    Buffer *buffer = view->buffer;
-    Block *blk;
+    const Buffer *buffer = view->buffer;
+    const Block *blk;
     size_t nl = 0;
     block_for_each(blk, &buffer->blocks) {
         if (blk == view->cursor.blk) {

@@ -243,7 +243,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 static bool buffer_write_blocks_and_free(Buffer *buffer, int fd)
 {
     bool r = true;
-    Block *blk;
+    const Block *blk;
     block_for_each(blk, &buffer->blocks) {
         if (xwrite_all(fd, blk->data, blk->size) < 0) {
             error_msg_errno("failed to write (stdout) buffer");
