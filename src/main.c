@@ -625,6 +625,13 @@ exit:
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
+    // This must be done before calling buffer_write_blocks_and_free(), since
+    // output modes need to be restored to get proper line ending translation
+    // and std_fds[STDOUT_FILENO] may be a pipe to the terminal
+    if (!skipped_mainloop) {
+        term_cooked();
+    }
+
     if (have_stdout_buffer) {
         bool ok = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
         if (!ok && exit_code == EDITOR_EXIT_OK) {
@@ -635,9 +642,6 @@ exit:
     free_editor_state(e);
     LOG_INFO("exiting with status %d", exit_code);
     log_close();
-    if (!skipped_mainloop) {
-        term_cooked();
-    }
 
     return exit_code;
 }
