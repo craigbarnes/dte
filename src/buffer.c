@@ -413,7 +413,7 @@ void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
     counts[1] = bytes;
 }
 
-String dump_buffer(const Buffer *buffer)
+String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
 {
     uintmax_t counts[2];
     buffer_count_blocks_and_bytes(buffer, counts);
@@ -453,28 +453,38 @@ String dump_buffer(const Buffer *buffer)
         string_sprintf(&buf, "    Views: %zu\n", buffer->views.count);
     }
 
-    if (!buffer->abs_filename) {
-        return buf;
+    if (buffer->abs_filename) {
+        const FileInfo *file = &buffer->file;
+        const struct timespec *mtime = &file->mtime;
+        unsigned int perms = file->mode & 07777;
+        char tstr[64], modestr[12];
+        string_sprintf (
+            &buf,
+            "\nLast stat:\n----------\n\n"
+            "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
+            "     Path:", buffer->abs_filename,
+            " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
+            "     Mode:", filemode_to_str(file->mode, modestr), perms,
+            "     User:", (intmax_t)file->uid,
+            "    Group:", (intmax_t)file->gid,
+            "     Size:", (uintmax_t)file->size,
+            "   Device:", (intmax_t)file->dev,
+            "    Inode:", (uintmax_t)file->ino
+        );
     }
 
-    const FileInfo *file = &buffer->file;
-    const struct timespec *mtime = &file->mtime;
-    unsigned int perms = file->mode & 07777;
-    char tstr[64], modestr[12];
-
-    string_sprintf (
-        &buf,
-        "\nLast stat:\n----------\n\n"
-        "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
-        "     Path:", buffer->abs_filename,
-        " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
-        "     Mode:", filemode_to_str(file->mode, modestr), perms,
-        "     User:", (intmax_t)file->uid,
-        "    Group:", (intmax_t)file->gid,
-        "     Size:", (uintmax_t)file->size,
-        "   Device:", (intmax_t)file->dev,
-        "    Inode:", (uintmax_t)file->ino
-    );
+    if (DEBUG >= 1) {
+        string_append_cstring(&buf, "\nBlocks:\n-------\n\n");
+        size_t i = 1;
+        const Block *b;
+        block_for_each(b, &buffer->blocks) {
+            string_sprintf(&buf, "%4zu: %zu/%zu nl=%zu", i++, b->size, b->alloc, b->nl);
+            if (b == cursor->blk) {
+                string_sprintf(&buf, " (cursor; offset=%zu)", cursor->offset);
+            }
+            string_append_byte(&buf, '\n');
+        }
+    }
 
     return buf;
 }

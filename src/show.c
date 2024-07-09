@@ -548,7 +548,7 @@ static String do_dump_macro(EditorState *e)
 
 static String do_dump_buffer(EditorState *e)
 {
-    return dump_buffer(e->buffer);
+    return dump_buffer(e->buffer, &e->view->cursor);
 }
 
 // Shorter aliases for ShowHandlerFlags
