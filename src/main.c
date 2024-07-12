@@ -639,9 +639,14 @@ exit:
         }
     }
 
-    free_editor_state(e);
+    if (DEBUG >= 1 || ASAN_ENABLED == 1 || xgetenv("LD_PRELOAD")) {
+        // Only free EditorState in debug builds or when a library/tool is
+        // checking for leaks; otherwise it's pointless to do so immediately
+        // before exiting. $LD_PRELOAD is used by valgrind's vgpreload_* libs.
+        free_editor_state(e);
+    }
+
     LOG_INFO("exiting with status %d", exit_code);
     log_close();
-
     return exit_code;
 }

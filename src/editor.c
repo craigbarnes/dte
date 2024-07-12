@@ -188,11 +188,6 @@ static void free_mode_handler(ModeHandler *handler)
 
 void free_editor_state(EditorState *e)
 {
-    size_t n = e->terminal.obuf.count;
-    if (n > 0) {
-        LOG_DEBUG("%zu unflushed bytes remaining in terminal output buffer", n);
-    }
-
     free(e->clipboard.buf);
     free_file_options(&e->file_options);
     free_filetypes(&e->filetypes);
