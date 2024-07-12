@@ -9,7 +9,7 @@ Checklist
    2. Add link to release tarball and GPG signature in [`CHANGELOG.md`]
    3. Update tarball name in [`README.md`]
    4. Hard code `VERSION` variable in [`mk/build.mk`] to release version
-   5. Update `RELEASE_VERSIONS` in [`tools/mk/dev.mk`]
+   5. Update `RELEASE_VERSIONS` in [`tools/mk/dist.mk`]
    6. Update `<releases>` in [`share/dte.appdata.xml`]
    7. Remove `-g` from default [`CFLAGS`]
    8. Check `make vars` output
@@ -62,6 +62,6 @@ See Also
 [`CHANGELOG.md`]: ../CHANGELOG.md
 [`README.md`]: ../README.md
 [`mk/build.mk`]: ../mk/build.mk
-[`tools/mk/dev.mk`]: ../tools/mk/dev.mk
+[`tools/mk/dist.mk`]: ../tools/mk/dist.mk
 [`share/dte.appdata.xml`]: ../share/dte.appdata.xml
 [`CFLAGS`]: ../mk/build.mk
