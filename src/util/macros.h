@@ -111,10 +111,14 @@
 
 #if defined(__SANITIZE_ADDRESS__) || HAS_FEATURE(address_sanitizer)
     #define ASAN_ENABLED 1
+#else
+    #define ASAN_ENABLED 0
 #endif
 
 #if defined(__SANITIZE_MEMORY__) || HAS_FEATURE(memory_sanitizer)
     #define MSAN_ENABLED 1
+#else
+    #define MSAN_ENABLED 0
 #endif
 
 #if __STDC_VERSION__ >= 202311L

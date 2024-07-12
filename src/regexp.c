@@ -56,7 +56,7 @@ bool regexp_exec (
     BUG_ON(!pmatch);
 
 // ASan's __interceptor_regexec() doesn't support REG_STARTEND
-#if defined(REG_STARTEND) && !defined(ASAN_ENABLED) && !defined(MSAN_ENABLED)
+#if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
     pmatch[0].rm_so = 0;
     pmatch[0].rm_eo = size;
     return !regexec(re, buf, nmatch, pmatch, flags | REG_STARTEND);

@@ -42,7 +42,7 @@ static void cleanup(void)
     sigprocmask(SIG_SETMASK, &oldmask, NULL);
 }
 
-#ifdef ASAN_ENABLED
+#if ASAN_ENABLED == 1
 #include <sanitizer/asan_interface.h> // NOLINT(*-restrict-system-includes)
 
 const char *__asan_default_options(void)
@@ -62,7 +62,7 @@ void __asan_on_error(void)
 
 static void print_stack_trace(void)
 {
-    #ifdef ASAN_ENABLED
+    #if ASAN_ENABLED == 1
         (void)!fputs("\nStack trace:\n", stderr);
         __sanitizer_print_stack_trace();
     #endif
