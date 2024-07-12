@@ -1,13 +1,13 @@
 stages: [test, dist]
 
-variables:
-    GIT_FETCH_EXTRA_FLAGS: --tags
-
 default:
     interruptible: true
     before_script:
         - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-ct
         - export CC="ccache ${CC:-gcc}"
+        # Ensure upstream tags are present, regardless of whether this
+        # job is running for a fork or the upstream repo
+        - git pull --tags https://gitlab.com/craigbarnes/dte.git
         - make vars
 
 .fragment-1:
@@ -82,11 +82,7 @@ debian-stable:
         - make CC='ccache aarch64-linux-gnu-gcc'
         - make CC='ccache aarch64-linux-gnu-gcc' LDFLAGS=-static
 
-        # Build and check `make dist` tarball
-        # (allowed to fail on forked repos, since git tags may be missing)
-        - echo "$CI_PROJECT_NAMESPACE"
-        - (make clean && make distcheck) || test "$CI_PROJECT_NAMESPACE" != craigbarnes
-
+        - make clean && make distcheck
         - make bench DEBUG=0 CFLAGS=-O3
 
 android:
