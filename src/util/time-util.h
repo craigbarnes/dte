@@ -18,6 +18,7 @@ static inline const struct timespec *get_stat_mtime(const struct stat *st)
 #if defined(__APPLE__)
     return &st->st_mtimespec;
 #else
+    // https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html#tag_13_61_03
     return &st->st_mtim;
 #endif
 }
