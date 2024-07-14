@@ -33,6 +33,18 @@
     #define BUG(...) UNREACHABLE()
 #endif
 
+// This environment variable is used by e.g. Valgrind to replace malloc(), etc.
+// See the various setup_client_env() functions in the following files:
+// https://sourceware.org/git/?p=valgrind.git;a=tree;f=coregrind/m_initimg;h=b1ef93371d8647b79e99076fab541dc6447cbcb2;hb=797c4b049e7b49176f4f155e00353837e4197d69
+static inline const char *ld_preload_env_var(void)
+{
+#ifdef __APPLE__
+    return "DYLD_INSERT_LIBRARIES";
+#else
+    return "LD_PRELOAD";
+#endif
+}
+
 typedef void (*CleanupHandler)(void *userdata);
 
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
