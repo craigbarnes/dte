@@ -21,7 +21,8 @@ typedef struct {
 // used in certain contexts (completely unrelated to CommandArgs::flags
 // or Command::flags, despite the terminology being somewhat ambiguous)
 typedef enum {
-    CMDOPT_ALLOW_IN_RC = 1 << 0,
+    CMDOPT_ALLOW_IN_RC = 1 << 0, // Allow command in rc files
+    CMDOPT_NO_FLAGS_AFTER_ARGS = 1 << 1, // Stop parsing flags after first positional arg
 } CommandOptions;
 
 struct EditorState;

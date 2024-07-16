@@ -622,14 +622,12 @@ static bool collect_command_flags (
     const char *prefix
 ) {
     BUG_ON(prefix[0] != '-');
-    const char *flags = cmd->flags;
-    bool flags_after_nonflags = (flags[0] != '-');
-
+    bool flags_after_nonflags = !(cmd->cmdopts & CMDOPT_NO_FLAGS_AFTER_ARGS);
     if (!can_collect_flags(args, argc, a->nr_flag_args, flags_after_nonflags)) {
         return false;
     }
 
-    flags += flags_after_nonflags ? 0 : 1;
+    const char *flags = cmd->flags;
     if (ascii_isalnum(prefix[1]) && prefix[2] == '\0') {
         if (strchr(flags, prefix[1])) {
             ptr_array_append(array, xmemdup(prefix, 3));

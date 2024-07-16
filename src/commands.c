@@ -2484,14 +2484,15 @@ enum {
     // Short aliases for CommandOptions:
     NA = 0,
     RC = CMDOPT_ALLOW_IN_RC,
+    NFAA = CMDOPT_NO_FLAGS_AFTER_ARGS,
 };
 
 #define CMD(name, flags, opts, min, max, func) \
     {name, flags, opts, min, max, func}
 
 static const Command cmds[] = {
-    CMD("alias", "-", RC, 1, 2, cmd_alias),
-    CMD("bind", "-cnsT=", RC, 1, 2, cmd_bind),
+    CMD("alias", "", RC | NFAA, 1, 2, cmd_alias),
+    CMD("bind", "cnsT=", RC | NFAA, 1, 2, cmd_bind),
     CMD("blkdown", "cl", NA, 0, 0, cmd_blkdown),
     CMD("blkup", "cl", NA, 0, 0, cmd_blkup),
     CMD("bof", "cl", NA, 0, 0, cmd_bof),
@@ -2503,8 +2504,8 @@ static const Command cmds[] = {
     CMD("center-view", "", NA, 0, 0, cmd_center_view),
     CMD("clear", "i", NA, 0, 0, cmd_clear),
     CMD("close", "fpqw", NA, 0, 0, cmd_close),
-    CMD("command", "-", NA, 0, 1, cmd_command),
-    CMD("compile", "-1ps", NA, 2, -1, cmd_compile),
+    CMD("command", "", NFAA, 0, 1, cmd_command),
+    CMD("compile", "1ps", NFAA, 2, -1, cmd_compile),
     CMD("copy", "bikp", NA, 0, 1, cmd_copy),
     CMD("cursor", "", RC, 0, 3, cmd_cursor),
     CMD("cut", "", NA, 0, 0, cmd_cut),
@@ -2521,9 +2522,9 @@ static const Command cmds[] = {
     CMD("erase-bol", "", NA, 0, 0, cmd_erase_bol),
     CMD("erase-word", "s", NA, 0, 0, cmd_erase_word),
     CMD("errorfmt", "i", RC, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt),
-    CMD("exec", "-e=i=o=lmnpst", NA, 1, -1, cmd_exec),
-    CMD("ft", "-bcfi", RC, 2, -1, cmd_ft),
-    CMD("hi", "-c", RC, 0, -1, cmd_hi),
+    CMD("exec", "e=i=o=lmnpst", NFAA, 1, -1, cmd_exec),
+    CMD("ft", "bcfi", RC | NFAA, 2, -1, cmd_ft),
+    CMD("hi", "c", RC | NFAA, 0, -1, cmd_hi),
     CMD("include", "bq", RC, 1, 1, cmd_include),
     CMD("insert", "km", NA, 1, 1, cmd_insert),
     CMD("join", "", NA, 0, 1, cmd_join),
@@ -2537,7 +2538,7 @@ static const Command cmds[] = {
     CMD("new-line", "a", NA, 0, 0, cmd_new_line),
     CMD("next", "", NA, 0, 0, cmd_next),
     CMD("open", "e=gt", NA, 0, -1, cmd_open),
-    CMD("option", "-r", RC, 3, -1, cmd_option),
+    CMD("option", "r", RC | NFAA, 3, -1, cmd_option),
     CMD("paste", "acm", NA, 0, 0, cmd_paste),
     CMD("pgdown", "cl", NA, 0, 0, cmd_pgdown),
     CMD("pgup", "cl", NA, 0, 0, cmd_pgup),
@@ -2545,7 +2546,7 @@ static const Command cmds[] = {
     CMD("quit", "CFHSfp", NA, 0, 1, cmd_quit),
     CMD("redo", "", NA, 0, 1, cmd_redo),
     CMD("refresh", "", NA, 0, 0, cmd_refresh),
-    CMD("repeat", "-", NA, 2, -1, cmd_repeat),
+    CMD("repeat", "", NFAA, 2, -1, cmd_repeat),
     CMD("replace", "bcegi", NA, 1, 2, cmd_replace),
     CMD("right", "cl", NA, 0, 0, cmd_right),
     CMD("save", "Bbde=fpu", NA, 0, 1, cmd_save),
@@ -2703,9 +2704,9 @@ UNITTEST {
         const char *const flags = cmds[i].flags;
         BUG_ON(flags[ARRAYLEN(cmds[0].flags) - 1] != '\0');
 
-        // Count number of real flags (i.e. not including '-' or '=')
+        // Count number of real flags (i.e. not including '=')
         size_t nr_real_flags = 0;
-        for (size_t j = (flags[0] == '-' ? 1 : 0); flags[j]; j++) {
+        for (size_t j = 0; flags[j]; j++) {
             unsigned char flag = flags[j];
             if (ascii_isalnum(flag)) {
                 nr_real_flags++;
