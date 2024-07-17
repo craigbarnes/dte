@@ -24,11 +24,13 @@ Checks: >
     -cert-err33-c,
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
-    -bugprone-narrowing-conversions,
     -bugprone-macro-parentheses,
-    -bugprone-sizeof-expression,
+    -bugprone-multi-level-implicit-pointer-conversion,
+    -bugprone-narrowing-conversions,
     -bugprone-not-null-terminated-result,
+    -bugprone-sizeof-expression,
     -bugprone-switch-missing-default-case,
+    -readability-avoid-nested-conditional-operator,
     -readability-else-after-return,
     -readability-function-cognitive-complexity,
     -readability-identifier-length,
@@ -54,6 +56,7 @@ CheckOptions:
     readability-identifier-naming.EnumConstantCase: UPPER_CASE
     readability-identifier-naming.EnumConstantIgnoredRegexp: '[a-z]'
     readability-identifier-naming.FunctionCase: lower_case
+    readability-identifier-naming.FunctionIgnoredRegexp: '^[a-z][a-z_]*_$'
     readability-identifier-naming.LocalVariableCase: lower_case
     readability-identifier-naming.LocalVariableIgnoredRegexp: '[A-Z]'
     readability-identifier-naming.MacroDefinitionCase: aNy_CasE
@@ -61,6 +64,7 @@ CheckOptions:
     readability-identifier-naming.ParameterCase: lower_case
     readability-identifier-naming.ParameterIgnoredRegexp: '[A-Z]'
     readability-identifier-naming.StructCase: CamelCase
+    readability-identifier-naming.StructIgnoredRegexp: '^(cconv|llmap)$'
     readability-identifier-naming.TypedefCase: CamelCase
     readability-identifier-naming.UnionCase: CamelCase
     readability-identifier-naming.VariableCase: lower_case
@@ -122,3 +126,4 @@ CheckOptions:
         termios.h,
         time.h,
         unistd.h,
+        sanitizer/asan_interface.h,

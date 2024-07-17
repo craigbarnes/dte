@@ -3,5 +3,6 @@ Checks: -android-cloexec-open
 CheckOptions:
     portability-restrict-system-includes.Includes: '*'
     readability-function-size.LineThreshold: '2000'
-    readability-function-size.StatementThreshold: '2000'
     readability-function-size.ParameterThreshold: '8'
+    readability-function-size.StatementThreshold: '2000'
+    readability-identifier-naming.StructCase: aNy_CasE

@@ -43,7 +43,7 @@ static void cleanup(void)
 }
 
 #if ASAN_ENABLED == 1
-#include <sanitizer/asan_interface.h> // NOLINT(*-restrict-system-includes)
+#include <sanitizer/asan_interface.h>
 
 const char *__asan_default_options(void)
 {
