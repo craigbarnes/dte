@@ -62,14 +62,18 @@ static inline char *xstrslice(const char *str, size_t pos, size_t end)
 }
 
 XSTRDUP
+static inline void *xmemjoin(const void *p1, size_t n1, const void *p2, size_t n2)
+{
+    char *joined = xmalloc(xadd(n1, n2));
+    memcpy(joined, p1, n1);
+    memcpy(joined + n1, p2, n2);
+    return joined;
+}
+
+XSTRDUP
 static inline char *xstrjoin(const char *s1, const char *s2)
 {
-    size_t n1 = strlen(s1);
-    size_t n2 = strlen(s2);
-    char *joined = xmalloc(xadd(n1, n2 + 1));
-    memcpy(joined, s1, n1);
-    memcpy(joined + n1, s2, n2 + 1);
-    return joined;
+    return xmemjoin(s1, strlen(s1), s2, strlen(s2) + 1);
 }
 
 #endif

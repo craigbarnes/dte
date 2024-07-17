@@ -104,12 +104,8 @@ char *path_relative(const char *abs, const char *cwd)
         }
     }
 
-    size_t hlen = 3 * dotdot;
-    size_t tlen = strlen(abs + clen) + 1;
-    char *filename = xmalloc(hlen + tlen);
-    memcpy(filename, "../../", hlen);
-    memcpy(filename + hlen, abs + clen, tlen);
-    return filename;
+    const char *tail = abs + clen;
+    return xmemjoin("../../", 3 * dotdot, tail, strlen(tail) + 1);
 }
 
 static bool path_has_dir_prefix(const char *path, size_t pathlen, const StringView *dir)

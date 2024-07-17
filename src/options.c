@@ -990,11 +990,7 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
     for (size_t i = 0; values[i]; i++) {
         const char *str = values[i];
         if (str_has_prefix(str, prefix + prefix_len)) {
-            size_t str_len = strlen(str);
-            char *completion = xmalloc(prefix_len + str_len + 1);
-            memcpy(completion, prefix, prefix_len);
-            memcpy(completion + prefix_len, str, str_len + 1);
-            ptr_array_append(a, completion);
+            ptr_array_append(a, xmemjoin(prefix, prefix_len, str, strlen(str) + 1));
         }
     }
 }
