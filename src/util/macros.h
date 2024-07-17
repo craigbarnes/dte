@@ -121,6 +121,13 @@
     #define MSAN_ENABLED 0
 #endif
 
+#if defined(__TINYC__) && defined(__attribute__)
+    // Work around some stupidity in the glibc <sys/cdefs.h> header,
+    // so that __attribute__ can be used with TCC.
+    // https://lists.nongnu.org/archive/html/tinycc-devel/2018-04/msg00008.html
+    #undef __attribute__
+#endif
+
 #if __STDC_VERSION__ >= 202311L
     #define UNUSED [[__maybe_unused__]]
 #elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
@@ -129,7 +136,7 @@
     #define UNUSED
 #endif
 
-#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned)
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned) || defined(__TINYC__)
     #define ALIGNED(x) __attribute__((__aligned__(x)))
 #else
     #define ALIGNED(x)
@@ -153,7 +160,7 @@
     #define CONST_FN WARN_UNUSED_RESULT
 #endif
 
-#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(constructor)
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(constructor) || defined(__TINYC__)
     #define CONSTRUCTOR __attribute__((__constructor__))
 #else
     #define CONSTRUCTOR UNUSED
@@ -207,7 +214,7 @@
     #define NOINLINE
 #endif
 
-#if GNUC_AT_LEAST(3, 1) || HAS_ATTRIBUTE(always_inline)
+#if GNUC_AT_LEAST(3, 1) || HAS_ATTRIBUTE(always_inline) || defined(__TINYC__)
     #define ALWAYS_INLINE __attribute__((__always_inline__))
 #else
     #define ALWAYS_INLINE
@@ -304,7 +311,7 @@
 
 #if __STDC_VERSION__ >= 201112L
     #define noreturn _Noreturn
-#elif GNUC_AT_LEAST(3, 0)
+#elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(noreturn) || defined(__TINYC__)
     #define noreturn __attribute__((__noreturn__))
 #else
     #define noreturn
