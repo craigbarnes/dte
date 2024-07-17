@@ -1,0 +1,1 @@
+#define ICONV_DISABLE 0
