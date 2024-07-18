@@ -17,9 +17,8 @@ typedef struct {
 
 // This is not accessed from signal handlers or multiple threads and
 // is considered an acceptable use of non-const globals:
-// NOLINTBEGIN(*-avoid-non-const-global-variables)
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static ErrorBuffer err;
-// NOLINTEND(*-avoid-non-const-global-variables)
 
 void clear_error(void)
 {
