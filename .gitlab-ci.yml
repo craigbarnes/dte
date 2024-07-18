@@ -5,9 +5,9 @@ default:
     before_script:
         - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-ct
         - export CC="ccache ${CC:-gcc}"
-        # Ensure upstream tags are present, regardless of whether this
-        # job is running for a fork or the upstream repo
-        - git pull --tags https://gitlab.com/craigbarnes/dte.git
+        # Ensure upstream "v*" tags are present, regardless of whether
+        # this job is running for a fork or the upstream repo
+        - git fetch https://gitlab.com/craigbarnes/dte.git 'refs/tags/v*:refs/tags/v*'
         - make vars
 
 .fragment-1:
