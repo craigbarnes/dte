@@ -41,7 +41,7 @@ static void expect_keycode_eq (
     test_fail(
         ctx, file, line,
         "Test #%zu: key codes not equal: 0x%02x, 0x%02x (%s, %s); input: %s",
-        idx, a, b, a_str, b_str, seq_str
+        ++idx, a, b, a_str, b_str, seq_str
     );
 }
 
