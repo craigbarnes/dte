@@ -10,7 +10,7 @@ extern const char hextab_lower[16];
 extern const char hextab_upper[16];
 
 // Encodes a byte of data as 2 hexadecimal digits
-static inline size_t hex_encode_byte(char *out, uint8_t byte)
+static inline size_t hex_encode_byte(char out[2], uint8_t byte)
 {
     out[0] = hextab_lower[byte >> 4];
     out[1] = hextab_lower[byte & 0xF];
