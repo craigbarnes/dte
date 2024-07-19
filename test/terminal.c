@@ -773,7 +773,7 @@ static void test_term_parse_sequence2(TestContext *ctx)
         {"1", 'H', KEY_HOME},
         {"1", 'P', KEY_F1},
         {"1", 'Q', KEY_F2},
-        {"1", 'R', KEY_F3},
+        {"1", 'R', KEY_F3}, // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#:~:text=CSI%20R
         {"1", 'S', KEY_F4},
         {"2", '~', KEY_INSERT},
         {"3", '~', KEY_DELETE},
