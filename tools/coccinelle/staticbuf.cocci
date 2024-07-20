@@ -1,5 +1,10 @@
 @disable optional_qualifier@
-identifier func != {lines_and_columns_env, signum_to_str, umax_to_str};
+identifier func != {
+    fsize_string
+    lines_and_columns_env,
+    signum_to_str,
+    umax_to_str,
+};
 identifier buf;
 @@
 
