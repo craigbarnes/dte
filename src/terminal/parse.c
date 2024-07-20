@@ -532,6 +532,18 @@ static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
     return TPARSE_PARTIAL_MATCH;
 }
 
+/*
+ * Some terminals emit output resembling CSI/SS3 sequences without properly
+ * conforming to ECMA-48 §5.4, so we use an approach that accommodates
+ * terminal-specific special cases. This more or less precludes the use of
+ * a state machine (like e.g. the "dec_ansi_parser" mentioned at the top of
+ * this file). There's no real standard for "terminal to host" communications,
+ * although conforming to ECMA-48 §5.4 has been a de facto standard since the
+ * DEC VTs, with only a few (unnecessary and most likely not deliberate)
+ * exceptions in some emulators.
+ *
+ * See also: rxvt.c and linux.c
+ */
 ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
 {
     if (unlikely(length == 0 || buf[0] != '\033')) {
