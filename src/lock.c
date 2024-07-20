@@ -44,7 +44,8 @@ void init_file_locks_context(const char *fallback_dir, pid_t pid)
         LOG_WARNING("$XDG_RUNTIME_DIR invalid (not an absolute path)");
         dir = fallback_dir;
     } else {
-        // Set sticky bit (see XDG Base Directory Specification)
+        // Set sticky bit
+        // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html#:~:text=sticky
         #ifdef S_ISVTX
             ctx.locks_mode |= S_ISVTX;
         #endif
