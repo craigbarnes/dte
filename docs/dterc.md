@@ -29,7 +29,7 @@ quotes), which will be expanded just before the command is executed.
 
 Example:
 
-    alias x "run chmod 755 $FILE"
+    alias x "exec -s chmod 755 $FILE"
 
 `$FILE` is expanded when the alias _x_ is executed. The command works even
 if `$FILE` contains whitespace.
