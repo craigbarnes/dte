@@ -266,7 +266,7 @@ void ui_resize(EditorState *e)
     update_screen_size(&e->terminal, e->root_frame);
 
     const ScreenState dummyval = {.id = 0};
-    e->screen_update |= UPD_ALL;
+    e->screen_update |= UPDATE_ALL;
     update_screen(e, &dummyval);
 }
 

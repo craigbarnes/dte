@@ -46,19 +46,20 @@ typedef enum {
     EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1, // All of the above
 } EditorFlags;
 
-// Used to track which parts of the screen have changed since the last redraw
+// Used to track which parts of the screen have changed since the last
+// call to update_screen()
 typedef enum {
-    UPD_TERM_TITLE = 1u << 0, // update_term_title()
-    UPD_CURSOR_STYLE = 1u << 1, // update_cursor_style()
+    UPDATE_TERM_TITLE = 1u << 0, // update_term_title()
+    UPDATE_CURSOR_STYLE = 1u << 1, // update_cursor_style()
 
     // TODO: Set this when the buffer contents changes or when the cursor
     // position changes in a way that requires a redraw (e.g. a change of line
     // affected by `hi currentline`, `set ws-error trailing`, scrolling, etc.),
     // then handle it accordingly in update_screen()
-    UPD_CURRENT_BUFFER = 1u << 2,
+    UPDATE_CURRENT_BUFFER = 1u << 2,
 
-    UPD_ALL_WINDOWS = 1u << 3, // update_all_windows()
-    UPD_ALL = (UPD_ALL_WINDOWS << 1) - 1, // All of the above
+    UPDATE_ALL_WINDOWS = 1u << 3, // update_all_windows()
+    UPDATE_ALL = (UPDATE_ALL_WINDOWS << 1) - 1, // All of the above
 } ScreenUpdateFlags;
 
 typedef struct EditorState {
@@ -112,7 +113,7 @@ static inline void set_input_mode(EditorState *e, ModeHandler *mode)
 {
     if (e->mode != mode) {
         e->mode = mode;
-        e->screen_update |= UPD_CURSOR_STYLE;
+        e->screen_update |= UPDATE_CURSOR_STYLE;
     }
 }
 

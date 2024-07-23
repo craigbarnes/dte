@@ -151,7 +151,7 @@ static void syntax_changed(EditorState *e, bool global)
 static void overwrite_changed(EditorState *e, bool global)
 {
     if (!global) {
-        e->screen_update |= UPD_CURSOR_STYLE;
+        e->screen_update |= UPDATE_CURSOR_STYLE;
     }
 }
 
@@ -173,7 +173,7 @@ static void redraw_buffer(EditorState *e, bool global)
 static void redraw_screen(EditorState *e, bool global)
 {
     BUG_ON(!global);
-    e->screen_update |= UPD_ALL_WINDOWS;
+    e->screen_update |= UPDATE_ALL_WINDOWS;
 }
 
 static bool validate_statusline_format(const char *value)

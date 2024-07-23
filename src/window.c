@@ -503,6 +503,6 @@ void window_close(Window *window)
     e->window = NULL;
     set_view(next_or_prev->view);
 
-    e->screen_update |= UPD_ALL;
+    e->screen_update |= UPDATE_ALL;
     frame_debug(e->root_frame);
 }

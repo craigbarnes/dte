@@ -145,7 +145,7 @@ void update_screen(EditorState *e, const ScreenState *s)
     ScreenUpdateFlags flags = e->screen_update;
     start_update(term);
 
-    if (flags & UPD_ALL_WINDOWS) {
+    if (flags & UPDATE_ALL_WINDOWS) {
         update_all_windows(e);
     } else {
         View *view = e->view;
@@ -161,23 +161,23 @@ void update_screen(EditorState *e, const ScreenState *s)
             }
             if (s->is_modified != buffer_modified(buffer)) {
                 buffer_mark_tabbars_changed(buffer);
-                flags |= UPD_TERM_TITLE;
+                flags |= UPDATE_TERM_TITLE;
             }
         } else {
             e->window->update_tabbar = true;
             mark_all_lines_changed(buffer);
-            flags |= UPD_TERM_TITLE;
+            flags |= UPDATE_TERM_TITLE;
         }
         update_buffer_windows(e, buffer);
     }
 
-    if (flags & UPD_TERM_TITLE) {
+    if (flags & UPDATE_TERM_TITLE) {
         update_term_title(term, buffer, e->options.set_window_title);
     }
 
     update_command_line(e);
 
-    if (flags & UPD_CURSOR_STYLE) {
+    if (flags & UPDATE_CURSOR_STYLE) {
         update_cursor_style(e);
     }
 

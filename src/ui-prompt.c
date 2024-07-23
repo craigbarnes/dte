@@ -102,14 +102,14 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         term_output_flush(obuf);
     }
 
-    e->screen_update |= UPD_ALL;
+    e->screen_update |= UPDATE_ALL;
     return (choice >= 'a') ? choice : 0;
 }
 
 char status_prompt(EditorState *e, const char *question, const char *choices)
 {
     const ScreenState dummyval = {.id = 0};
-    e->screen_update |= UPD_CURRENT_BUFFER | UPD_TERM_TITLE;
+    e->screen_update |= UPDATE_CURRENT_BUFFER | UPDATE_TERM_TITLE;
     info_msg("%s", question);
     update_screen(e, &dummyval);
 
