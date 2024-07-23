@@ -334,6 +334,7 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
     }
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
+    e->screen_update |= UPD_TERM_TITLE;
     return true;
 }
 
@@ -495,7 +496,7 @@ static bool cmd_cursor(EditorState *e, const CommandArgs *a)
         for (CursorInputMode m = 0; m < ARRAYLEN(e->cursor_styles); m++) {
             e->cursor_styles[m] = get_default_cursor_style(m);
         }
-        e->cursor_style_changed = true;
+        e->screen_update |= UPD_CURSOR_STYLE;
         return true;
     }
 
@@ -520,7 +521,7 @@ static bool cmd_cursor(EditorState *e, const CommandArgs *a)
     }
 
     e->cursor_styles[mode] = style;
-    e->cursor_style_changed = true;
+    e->screen_update |= UPD_CURSOR_STYLE;
     return true;
 }
 
@@ -835,7 +836,7 @@ update:
     // right after config has been loaded
     if (e->status != EDITOR_INITIALIZING) {
         update_all_syntax_styles(&e->syntaxes, &e->styles);
-        mark_everything_changed(e);
+        e->screen_update |= UPD_ALL_WINDOWS;
     }
     return true;
 }
@@ -1489,7 +1490,7 @@ static bool cmd_redo(EditorState *e, const CommandArgs *a)
 static bool cmd_refresh(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL;
     return true;
 }
 
@@ -1863,6 +1864,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         free(buffer->abs_filename);
         buffer->abs_filename = absolute;
         buffer_update_short_filename(buffer, &e->home_dir);
+        e->screen_update |= UPD_TERM_TITLE;
 
         // Filename change is not detected (only buffer_modified() change)
         buffer_mark_tabbars_changed(buffer);
@@ -2194,8 +2196,10 @@ static bool cmd_title(EditorState *e, const CommandArgs *a)
     if (buffer->abs_filename) {
         return error_msg("saved buffers can't be retitled");
     }
+
     buffer_set_display_filename(buffer, xstrdup(a->args[0]));
     buffer_mark_tabbars_changed(buffer);
+    e->screen_update |= UPD_TERM_TITLE;
     return true;
 }
 
@@ -2302,7 +2306,7 @@ static bool cmd_wflip(EditorState *e, const CommandArgs *a)
         return false;
     }
     frame->parent->vertical ^= 1;
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL_WINDOWS;
     return true;
 }
 
@@ -2311,7 +2315,7 @@ static bool cmd_wnext(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     e->window = window_next(e->window);
     set_view(e->window->view);
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL;
     frame_debug(e->root_frame);
     return true;
 }
@@ -2339,7 +2343,7 @@ static bool cmd_wprev(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     e->window = window_next(e->window);
     set_view(e->window->view);
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL;
     frame_debug(e->root_frame);
     return true;
 }
@@ -2394,7 +2398,7 @@ static bool cmd_wresize(EditorState *e, const CommandArgs *a)
         frame_equalize_sizes(window->frame->parent);
     }
 
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL_WINDOWS;
     frame_debug(e->root_frame);
     // TODO: return false if resize failed?
     return true;
@@ -2433,7 +2437,7 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
     e->window = frame->window;
     e->view = NULL;
     e->buffer = NULL;
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL;
 
     View *view;
     if (empty) {
@@ -2476,7 +2480,7 @@ static bool cmd_wswap(EditorState *e, const CommandArgs *a)
     size_t current = ptr_array_xindex(pframes, frame);
     size_t next = size_increment_wrapped(current, pframes->count);
     ptr_array_swap(pframes, current, next);
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL_WINDOWS;
     return true;
 }
 

@@ -31,7 +31,6 @@ void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);
 void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s);
 void start_update(Terminal *term);
 void end_update(EditorState *e);
-void normal_update(EditorState *e);
 void restore_cursor(EditorState *e);
 
 // ui-cmdline.c

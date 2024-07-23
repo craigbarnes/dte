@@ -46,6 +46,21 @@ typedef enum {
     EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1, // All of the above
 } EditorFlags;
 
+// Used to track which parts of the screen have changed since the last redraw
+typedef enum {
+    UPD_TERM_TITLE = 1u << 0, // update_term_title()
+    UPD_CURSOR_STYLE = 1u << 1, // update_cursor_style()
+
+    // TODO: Set this when the buffer contents changes or when the cursor
+    // position changes in a way that requires a redraw (e.g. a change of line
+    // affected by `hi currentline`, `set ws-error trailing`, scrolling, etc.),
+    // then handle it accordingly in update_screen()
+    UPD_CURRENT_BUFFER = 1u << 2,
+
+    UPD_ALL_WINDOWS = 1u << 3, // update_all_windows()
+    UPD_ALL = (UPD_ALL_WINDOWS << 1) - 1, // All of the above
+} ScreenUpdateFlags;
+
 typedef struct EditorState {
     EditorStatus status;
     ModeHandler *mode; // Current mode
@@ -61,9 +76,8 @@ typedef struct EditorState {
     const char *user_config_dir;
     mode_t new_file_mode;
     EditorFlags flags;
+    ScreenUpdateFlags screen_update;
     bool child_controls_terminal;
-    bool everything_changed;
-    bool cursor_style_changed;
     bool session_leader;
     size_t cmdline_x;
     Clipboard clipboard;
@@ -94,16 +108,11 @@ typedef struct EditorState {
     const char *version;
 } EditorState;
 
-static inline void mark_everything_changed(EditorState *e)
-{
-    e->everything_changed = true;
-}
-
 static inline void set_input_mode(EditorState *e, ModeHandler *mode)
 {
     if (e->mode != mode) {
         e->mode = mode;
-        e->cursor_style_changed = true;
+        e->screen_update |= UPD_CURSOR_STYLE;
     }
 }
 

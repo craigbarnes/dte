@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "error.h"
 #include "signals.h"
 #include "terminal/input.h"
 #include "terminal/paste.h"
@@ -77,10 +78,12 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
 
-    normal_update(e);
-    term_hide_cursor(term);
+    start_update(term);
+    update_term_title(term, e->buffer, e->options.set_window_title);
+    update_all_windows(e);
     show_dialog(term, styles, style, question);
     show_message(term, styles, question, false);
+    term_end_sync_update(term);
     term_output_flush(obuf);
 
     unsigned int esc_timeout = e->options.esc_timeout;
@@ -89,47 +92,37 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         if (!resized) {
             continue;
         }
-        ui_resize(e);
-        term_hide_cursor(term);
+        resized = 0;
+        update_screen_size(&e->terminal, e->root_frame);
+        term_begin_sync_update(term);
+        update_all_windows(e);
         show_dialog(term, styles, style, question);
         show_message(term, styles, question, false);
+        term_end_sync_update(term);
         term_output_flush(obuf);
     }
 
-    mark_everything_changed(e);
+    e->screen_update |= UPD_ALL;
     return (choice >= 'a') ? choice : 0;
 }
 
 char status_prompt(EditorState *e, const char *question, const char *choices)
 {
-    // update_buffer_windows() assumes these have been called for current view
-    view_update_cursor_x(e->view);
-    view_update_cursor_y(e->view);
-    view_update(e->view, e->options.scroll_margin);
-
-    // Set changed_line_min and changed_line_max before calling update_range()
-    mark_all_lines_changed(e->buffer);
+    const ScreenState dummyval = {.id = 0};
+    e->screen_update |= UPD_CURRENT_BUFFER | UPD_TERM_TITLE;
+    info_msg("%s", question);
+    update_screen(e, &dummyval);
 
     Terminal *term = &e->terminal;
-    start_update(term);
-    update_term_title(term, e->buffer, e->options.set_window_title);
-    update_buffer_windows(e, e->buffer);
-    show_message(term, &e->styles, question, false);
-    end_update(e);
-
     unsigned int esc_timeout = e->options.esc_timeout;
     char choice;
+
     while ((choice = get_choice(term, choices, esc_timeout)) == 0) {
-        if (!resized) {
-            continue;
+        if (resized) {
+            ui_resize(e);
         }
-        ui_resize(e);
-        term_hide_cursor(term);
-        show_message(term, &e->styles, question, false);
-        restore_cursor(e);
-        term_show_cursor(term);
-        term_output_flush(&term->obuf);
     }
 
+    clear_error();
     return (choice >= 'a') ? choice : 0;
 }

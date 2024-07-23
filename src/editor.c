@@ -261,9 +261,13 @@ void ui_resize(EditorState *e)
     if (e->status == EDITOR_INITIALIZING) {
         return;
     }
+
     resized = 0;
     update_screen_size(&e->terminal, e->root_frame);
-    normal_update(e);
+
+    const ScreenState dummyval = {.id = 0};
+    e->screen_update |= UPD_ALL;
+    update_screen(e, &dummyval);
 }
 
 void ui_start(EditorState *e)

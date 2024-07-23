@@ -45,7 +45,6 @@ static void update_cursor_style(EditorState *e)
         style.color = def.color;
     }
 
-    e->cursor_style_changed = false;
     if (!same_cursor(&style, &e->terminal.obuf.cursor_style)) {
         term_set_cursor_style(&e->terminal, style);
     }
@@ -139,57 +138,52 @@ void update_screen_size(Terminal *term, Frame *root_frame)
     LOG_INFO("terminal size: %ux%u", w, h);
 }
 
-NOINLINE
-void normal_update(EditorState *e)
-{
-    Terminal *term = &e->terminal;
-    start_update(term);
-    update_term_title(term, e->buffer, e->options.set_window_title);
-    update_all_windows(e);
-    update_command_line(e);
-    update_cursor_style(e);
-    end_update(e);
-}
-
 void update_screen(EditorState *e, const ScreenState *s)
 {
-    if (e->everything_changed) {
-        e->everything_changed = false;
-        normal_update(e);
-        return;
-    }
-
     Buffer *buffer = e->buffer;
-    View *view = e->view;
-    view_update_cursor_x(view);
-    view_update_cursor_y(view);
-    view_update(view, e->options.scroll_margin);
+    Terminal *term = &e->terminal;
+    ScreenUpdateFlags flags = e->screen_update;
+    start_update(term);
 
-    if (s->id == buffer->id) {
-        if (s->vx != view->vx || s->vy != view->vy) {
-            mark_all_lines_changed(buffer);
-        } else {
-            // Because of trailing whitespace highlighting and highlighting
-            // current line in different color, the lines cy (old cursor y) and
-            // view->cy need to be updated. Always update at least current line.
-            buffer_mark_lines_changed(buffer, s->cy, view->cy);
-        }
-        if (s->is_modified != buffer_modified(buffer)) {
-            buffer_mark_tabbars_changed(buffer);
-        }
+    if (flags & UPD_ALL_WINDOWS) {
+        update_all_windows(e);
+        flags &= ~UPD_CURRENT_BUFFER;
     } else {
-        e->window->update_tabbar = true;
-        mark_all_lines_changed(buffer);
+        View *view = e->view;
+        view_update_cursor_x(view);
+        view_update_cursor_y(view);
+        view_update(view, e->options.scroll_margin);
+        if (s->id == buffer->id) {
+            if (s->vx != view->vx || s->vy != view->vy) {
+                mark_all_lines_changed(buffer);
+            } else {
+                // Because of trailing whitespace highlighting and highlighting
+                // current line in different color, the lines cy (old cursor y) and
+                // view->cy need to be updated. Always update at least current line.
+                buffer_mark_lines_changed(buffer, s->cy, view->cy);
+            }
+            if (s->is_modified != buffer_modified(buffer)) {
+                buffer_mark_tabbars_changed(buffer);
+                flags |= UPD_TERM_TITLE;
+            }
+        } else {
+            e->window->update_tabbar = true;
+            mark_all_lines_changed(buffer);
+            flags |= UPD_TERM_TITLE;
+        }
+        update_buffer_windows(e, buffer);
     }
 
-    start_update(&e->terminal);
-    if (e->window->update_tabbar) {
-        update_term_title(&e->terminal, e->buffer, e->options.set_window_title);
+    if (flags & UPD_TERM_TITLE) {
+        update_term_title(term, buffer, e->options.set_window_title);
     }
-    update_buffer_windows(e, buffer);
+
     update_command_line(e);
-    if (e->cursor_style_changed) {
+
+    if (flags & UPD_CURSOR_STYLE) {
         update_cursor_style(e);
     }
+
+    e->screen_update = 0;
     end_update(e);
 }
