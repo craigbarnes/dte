@@ -101,8 +101,6 @@ static void test_hl_line(TestContext *ctx)
     BlockIter tmp = block_iter(buffer);
     hl_fill_start_states(syn, lss, styles, &tmp, buffer->nl);
     block_iter_goto_line(&view->cursor, line_nr - 1);
-    view_update_cursor_x(view);
-    view_update_cursor_y(view);
     view_update(view, 0);
     ASSERT_EQ(view->cx, 0);
     ASSERT_EQ(view->cy, line_nr - 1);

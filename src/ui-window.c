@@ -76,8 +76,6 @@ static void update_window_full(Window *window, void* UNUSED_ARG(data))
 {
     EditorState *e = window->editor;
     View *view = window->view;
-    view_update_cursor_x(view);
-    view_update_cursor_y(view);
     view_update(view, e->options.scroll_margin);
     if (e->options.tab_bar) {
         print_tabbar(&e->terminal, &e->styles, window);
@@ -131,9 +129,7 @@ void update_buffer_windows(EditorState *e, const Buffer *buffer)
             view->cursor.blk = BLOCK(view->buffer->blocks.next);
             block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
 
-            // These have already been updated for current view
-            view_update_cursor_x(view);
-            view_update_cursor_y(view);
+            // This has already been done for the current view
             view_update(view, e->options.scroll_margin);
         }
         update_window(e, view->window);

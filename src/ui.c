@@ -147,11 +147,8 @@ void update_screen(EditorState *e, const ScreenState *s)
 
     if (flags & UPD_ALL_WINDOWS) {
         update_all_windows(e);
-        flags &= ~UPD_CURRENT_BUFFER;
     } else {
         View *view = e->view;
-        view_update_cursor_x(view);
-        view_update_cursor_y(view);
         view_update(view, e->options.scroll_margin);
         if (s->id == buffer->id) {
             if (s->vx != view->vx || s->vy != view->vy) {

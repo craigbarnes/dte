@@ -108,6 +108,8 @@ static void view_update_vy(View *v, unsigned int scroll_margin)
 
 void view_update(View *v, unsigned int scroll_margin)
 {
+    view_update_cursor_x(v);
+    view_update_cursor_y(v);
     view_update_vx(v);
     if (v->force_center || (v->center_on_scroll && view_is_cursor_visible(v))) {
         view_center_to_cursor(v);
