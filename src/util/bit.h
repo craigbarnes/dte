@@ -5,6 +5,13 @@
 #include "debug.h"
 #include "macros.h"
 
+#if __STDC_VERSION__ >= 202311L || HAS_INCLUDE(<stdbit.h>)
+    #include <stdbit.h>
+    #define USE_STDBIT(fn, arg) return fn(arg)
+#else
+    #define USE_STDBIT(fn, arg)
+#endif
+
 #define U64(x) (UINT64_C(x))
 #define U32(x) (UINT32_C(x))
 
@@ -31,7 +38,7 @@
 // Population count (cardinality) of set bits
 static inline unsigned int u64_popcount(uint64_t n)
 {
-    // C23: stdc_count_ones(n)
+    USE_STDBIT(stdc_count_ones, n);
     USE_BUILTIN(popcount, n);
     n -= ((n >> 1) & U64(0x5555555555555555));
     n = (n & U64(0x3333333333333333)) + ((n >> 2) & U64(0x3333333333333333));
@@ -41,6 +48,7 @@ static inline unsigned int u64_popcount(uint64_t n)
 
 static inline unsigned int u32_popcount(uint32_t n)
 {
+    USE_STDBIT(stdc_count_ones, n);
     USE_BUILTIN(popcount, n);
     n -= ((n >> 1) & U32(0x55555555));
     n = (n & U32(0x33333333)) + ((n >> 2) & U32(0x33333333));
@@ -51,8 +59,8 @@ static inline unsigned int u32_popcount(uint32_t n)
 // Count trailing zeros
 static inline unsigned int u32_ctz(uint32_t n)
 {
-    // C23: stdc_trailing_zeros(n)
     BUG_ON(n == 0);
+    USE_STDBIT(stdc_trailing_zeros, n);
     USE_BUILTIN(ctz, n);
     return u32_popcount(~n & (n - 1));
 }
