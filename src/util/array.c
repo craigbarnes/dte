@@ -1,4 +1,5 @@
 #include "array.h"
+#include "str-util.h"
 #include "xmalloc.h"
 
 // This can be used to collect all prefix-matched strings from a "flat" array

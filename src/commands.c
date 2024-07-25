@@ -41,7 +41,6 @@
 #include "show.h"
 #include "spawn.h"
 #include "syntax/color.h"
-#include "syntax/state.h"
 #include "syntax/syntax.h"
 #include "tag.h"
 #include "terminal/cursor.h"
@@ -63,7 +62,6 @@
 #include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
-#include "vars.h"
 #include "view.h"
 #include "window.h"
 

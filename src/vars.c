@@ -2,7 +2,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "vars.h"
-#include "buffer.h"
 #include "editor.h"
 #include "selection.h"
 #include "util/array.h"

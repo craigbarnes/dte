@@ -20,7 +20,6 @@
 #include "terminal/color.h"
 #include "terminal/input.h"
 #include "terminal/key.h"
-#include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/paste.h"
 #include "ui.h"

@@ -2,7 +2,6 @@
 #define STATUS_H
 
 #include <stddef.h>
-#include "editor.h"
 #include "mode.h"
 #include "options.h"
 #include "window.h"

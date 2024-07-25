@@ -3,7 +3,7 @@
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/intern.h"
-#include "util/str-util.h"
+#include "util/xstring.h"
 
 typedef struct {
     const char alias[8];

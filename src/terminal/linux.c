@@ -1,6 +1,6 @@
 #include "linux.h"
 #include "parse.h"
-#include "util/str-util.h"
+#include "util/xstring.h"
 
 ssize_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
 {

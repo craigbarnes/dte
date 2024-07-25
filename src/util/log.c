@@ -4,8 +4,8 @@
 #include "log.h"
 #include "array.h"
 #include "fd.h"
-#include "str-util.h"
 #include "xreadwrite.h"
+#include "xstring.h"
 
 // These are initialized during early startup and then never changed,
 // so they're deemed an acceptable use of non-const globals:

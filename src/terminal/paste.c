@@ -9,7 +9,6 @@
 #include "util/string-view.h"
 #include "util/xmemmem.h"
 #include "util/xreadwrite.h"
-#include "util/xstdio.h"
 
 static String term_read_detected_paste(TermInputBuffer *input)
 {

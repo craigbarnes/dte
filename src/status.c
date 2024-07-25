@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "status.h"
+#include "cmdline.h"
 #include "search.h"
 #include "selection.h"
 #include "util/debug.h"

@@ -1,7 +1,6 @@
 #ifndef COMMAND_PARSE_H
 #define COMMAND_PARSE_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "command/run.h"
 #include "util/macros.h"

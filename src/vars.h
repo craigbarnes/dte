@@ -1,7 +1,6 @@
 #ifndef VARS_H
 #define VARS_H
 
-#include <stdbool.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
 

@@ -5,9 +5,9 @@
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "util/xstring.h"
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static HashMap interned_regexps;

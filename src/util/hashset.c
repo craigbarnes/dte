@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashset.h"
-#include "ascii.h"
 #include "debug.h"
 #include "hash.h"
-#include "str-util.h"
 #include "xmalloc.h"
 #include "xstring.h"
 

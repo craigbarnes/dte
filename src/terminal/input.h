@@ -4,7 +4,6 @@
 #include "key.h"
 #include "terminal.h"
 #include "util/macros.h"
-#include "util/string.h"
 
 void term_input_init(TermInputBuffer *ibuf) NONNULL_ARGS;
 void term_input_free(TermInputBuffer *ibuf) NONNULL_ARGS;

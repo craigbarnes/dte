@@ -11,9 +11,9 @@
 #include "util/intern.h"
 #include "util/numtostr.h"
 #include "util/path.h"
-#include "util/str-util.h"
 #include "util/time-util.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 void buffer_set_display_filename(Buffer *buffer, char *name)
 {

@@ -9,7 +9,7 @@
 #include "util/exitcode.h"
 #include "util/log.h"
 #include "util/macros.h"
-#include "util/str-util.h"
+#include "util/xstring.h"
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 volatile sig_atomic_t resized = 0;

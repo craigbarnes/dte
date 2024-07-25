@@ -9,9 +9,9 @@
 #include "lock.h"
 #include "move.h"
 #include "util/path.h"
-#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 Window *new_window(EditorState *e)
 {

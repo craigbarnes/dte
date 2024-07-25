@@ -6,7 +6,6 @@
 #include "command/macro.h"
 #include "completion.h"
 #include "editor.h"
-#include "error.h"
 #include "misc.h"
 #include "shift.h"
 #include "terminal/paste.h"

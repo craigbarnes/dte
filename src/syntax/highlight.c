@@ -4,10 +4,8 @@
 #include "highlight.h"
 #include "syntax/merge.h"
 #include "util/arith.h"
-#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/intern.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xstring.h"
 

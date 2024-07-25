@@ -10,7 +10,7 @@
 #include "util/string.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
-#include "util/str-util.h"
+#include "util/xstring.h"
 
 enum {
     MAX_FILESIZE = 32u << 20, // 32 MiB

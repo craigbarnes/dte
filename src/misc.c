@@ -4,7 +4,6 @@
 #include "buffer.h"
 #include "change.h"
 #include "indent.h"
-#include "move.h"
 #include "options.h"
 #include "regexp.h"
 #include "selection.h"

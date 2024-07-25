@@ -4,6 +4,7 @@
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
+#include "util/str-util.h"
 #include "util/utf8.h"
 
 // Note: these strings must be kept in sync with the enum in key.h

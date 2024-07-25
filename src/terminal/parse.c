@@ -9,11 +9,9 @@
 
 #include "parse.h"
 #include "query.h"
-#include "terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/log.h"
-#include "util/string-view.h"
 #include "util/unicode.h"
 
 typedef enum {

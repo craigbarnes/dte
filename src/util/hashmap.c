@@ -4,7 +4,7 @@
 #include "hashmap.h"
 #include "debug.h"
 #include "hash.h"
-#include "str-util.h"
+#include "xstring.h"
 
 enum {
     MIN_SIZE = 8,

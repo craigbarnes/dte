@@ -4,8 +4,8 @@
 #include "syntax/highlight.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/str-util.h"
 #include "util/utf8.h"
+#include "util/xstring.h"
 
 typedef struct {
     const View *view;

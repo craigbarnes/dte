@@ -19,7 +19,6 @@
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/time-util.h"
-#include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
 static void add_block(Buffer *buffer, Block *blk)

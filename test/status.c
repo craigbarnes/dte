@@ -1,5 +1,8 @@
 #include "test.h"
+#include "cmdline.h"
+#include "commands.h"
 #include "encoding.h"
+#include "search.h"
 #include "status.h"
 #include "util/utf8.h"
 

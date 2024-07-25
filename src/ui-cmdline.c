@@ -1,6 +1,5 @@
 #include "ui.h"
 #include "error.h"
-#include "search.h"
 
 static void print_message(Terminal *term, const StyleMap *styles, const char *msg, bool is_error)
 {

@@ -17,10 +17,10 @@
 #include "util/log.h"
 #include "util/macros.h"
 #include "util/path.h"
-#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "util/xstring.h"
 
 static bool in_syntax(const EditorState *e)
 {

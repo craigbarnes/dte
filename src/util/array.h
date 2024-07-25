@@ -6,7 +6,7 @@
 #include "debug.h"
 #include "macros.h"
 #include "ptr-array.h"
-#include "str-util.h"
+#include "xstring.h"
 
 #define static_assert_flat_string_array(a) do { \
     static_assert_incompatible_types(a[0], const char*); \

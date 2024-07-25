@@ -8,11 +8,10 @@
 #include "tag.h"
 #include "error.h"
 #include "util/debug.h"
-#include "util/log.h"
 #include "util/path.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
+#include "util/xstring.h"
 
 static bool tag_is_local_to_file(const Tag *tag, const char *path)
 {

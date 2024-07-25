@@ -14,7 +14,6 @@
 #include "move.h"
 #include "msg.h"
 #include "selection.h"
-#include "show.h"
 #include "tag.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
