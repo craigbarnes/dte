@@ -17,6 +17,7 @@
 
 /.* export-ignore
 /docs/README.md export-ignore
+/docs/TODO.md export-ignore
 /docs/contributing.md export-ignore
 /docs/releasing.md export-ignore
 /tools export-ignore
