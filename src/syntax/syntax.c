@@ -82,8 +82,6 @@ static void free_syntax_cb(Syntax *syn)
     free(syn);
 }
 
-// This function is only called by the test binary, just to ensure
-// the various free_*() functions get exercised by ASan/UBSan
 void free_syntaxes(HashMap *syntaxes)
 {
     hashmap_free(syntaxes, FREE_FUNC(free_syntax_cb));
