@@ -111,6 +111,7 @@ CheckOptions:
         regex.h,
         signal.h,
         stdarg.h,
+        stdbit.h,
         stdbool.h,
         stddef.h,
         stdint.h,
