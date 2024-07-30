@@ -31,7 +31,9 @@ static const char *decrpm_status_to_str(TermPrivateModeStatus val)
 static const char *decrpm_mode_to_str(unsigned int mode_param)
 {
     switch (mode_param) {
+    case 7: return "auto-wrap mode";
     case 25: return "cursor visibility";
+    case 45: return "reverse-wraparound mode";
     case 67: return "backspace sends BS";
     case 1036: return "metaSendsEscape";
     case 1039: return "altSendsEscape";
