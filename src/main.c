@@ -47,18 +47,14 @@
 #include "view.h"
 #include "window.h"
 
-static void term_cleanup(EditorState *e)
+static void cleanup_handler(void *userdata)
 {
+    EditorState *e = userdata;
     set_fatal_error_cleanup_handler(NULL, NULL);
     if (!e->child_controls_terminal) {
         ui_end(e);
         term_cooked();
     }
-}
-
-static void cleanup_handler(void *userdata)
-{
-    term_cleanup(userdata);
 }
 
 static ExitCode write_stdout(const char *str, size_t len)
@@ -485,6 +481,7 @@ int main(int argc, char *argv[])
         return EC_IO_ERROR;
     }
 
+    set_basic_signal_dispositions();
     EditorState *e = init_editor_state();
     Terminal *term = &e->terminal;
     term_init(term, getenv("TERM"), getenv("COLORTERM"));
@@ -513,9 +510,6 @@ int main(int argc, char *argv[])
     Window *window = new_window(e);
     e->window = window;
     e->root_frame = new_root_frame(window);
-
-    set_signal_handlers();
-    set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
         read_history_files(e);
@@ -588,6 +582,10 @@ int main(int argc, char *argv[])
         remove_view(dview);
         dview = NULL;
     }
+
+    set_fatal_error_cleanup_handler(cleanup_handler, e);
+    set_fatal_signal_handlers();
+    set_sigwinch_handler();
 
     if (unlikely(!term_raw())) {
         perror("tcsetattr");

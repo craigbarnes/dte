@@ -6,6 +6,8 @@
 // NOLINTNEXTLINE(*-non-const-global-variables)
 extern volatile sig_atomic_t resized;
 
-void set_signal_handlers(void);
+void set_basic_signal_dispositions(void);
+void set_fatal_signal_handlers(void);
+void set_sigwinch_handler(void);
 
 #endif

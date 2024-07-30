@@ -11,72 +11,54 @@
 #include "util/macros.h"
 #include "util/xstring.h"
 
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-volatile sig_atomic_t resized = 0;
+volatile sig_atomic_t resized = 0; // NOLINT(*-avoid-non-const-global-variables)
 
-typedef void (*SignalHandler)(int signum);
-
-typedef enum {
-    SD_IGNORED,
-    SD_DEFAULT,
-    SD_FATAL,
-    SD_WINCH,
-} SignalDispositionType;
-
-#define entry(name, type) {"SIG" #name, type, SIG ## name}
-#define ignore(name) entry(name, SD_IGNORED)
-#define reset(name) entry(name, SD_DEFAULT)
-#define fatal(name) entry(name, SD_FATAL)
-#define winch(name) entry(name, SD_WINCH)
+static void handle_sigwinch(int UNUSED_ARG(signum))
+{
+    resized = 1;
+}
 
 static const struct {
     char name[10];
-    uint8_t type; // SignalDispositionType
     int signum;
-} signals[] = {
-    ignore(INT),  // Terminal interrupt (see: VINTR in termios(3))
-    ignore(QUIT), // Terminal quit (see: VQUIT in termios(3))
-    ignore(TSTP), // Terminal stop (see: VSUSP in termios(3))
-    ignore(XFSZ), // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
-    ignore(PIPE), // Broken pipe (see: EPIPE error in write(3))
-    ignore(USR1), // User signal 1 (terminates by default, for no good reason)
-    ignore(USR2), // User signal 2 (as above)
-
-    reset(ABRT), // Terminate (cleanup already done)
-    reset(CHLD), // Ignore (see: wait(3))
-    reset(URG),  // Ignore
-    reset(TTIN), // Stop
-    reset(TTOU), // Stop
-    reset(CONT), // Continue
-
-    fatal(BUS),
-    fatal(FPE),
-    fatal(ILL),
-    fatal(SEGV),
-    fatal(SYS),
-    fatal(TRAP),
-    fatal(XCPU),
-    fatal(ALRM),
-    fatal(HUP),
-    fatal(TERM),
-    fatal(VTALRM),
-
-    #ifdef SIGPROF
-        fatal(PROF),
-    #endif
-    #ifdef SIGEMT
-        fatal(EMT),
-    #endif
-    #ifdef SIGWINCH
-        winch(WINCH),
-    #endif
+} signames[] = {
+    {"SIGINT", SIGINT},
+    {"SIGQUIT", SIGQUIT},
+    {"SIGTSTP", SIGTSTP},
+    {"SIGXFSZ", SIGXFSZ},
+    {"SIGPIPE", SIGPIPE},
+    {"SIGUSR1", SIGUSR1},
+    {"SIGUSR2", SIGUSR2},
+    {"SIGABRT", SIGABRT},
+    {"SIGCHLD", SIGCHLD},
+    {"SIGURG", SIGURG},
+    {"SIGTTIN", SIGTTIN},
+    {"SIGTTOU", SIGTTOU},
+    {"SIGCONT", SIGCONT},
+    {"SIGBUS", SIGBUS},
+    {"SIGFPE", SIGFPE},
+    {"SIGILL", SIGILL},
+    {"SIGSEGV", SIGSEGV},
+    {"SIGSYS", SIGSYS},
+    {"SIGTRAP", SIGTRAP},
+    {"SIGXCPU", SIGXCPU},
+    {"SIGALRM", SIGALRM},
+    {"SIGHUP", SIGHUP},
+    {"SIGTERM", SIGTERM},
+    {"SIGVTALRM", SIGVTALRM},
+#ifdef SIGPROF
+    {"SIGPROF", SIGPROF},
+#endif
+#ifdef SIGEMT
+    {"SIGEMT", SIGEMT},
+#endif
+#ifdef SIGWINCH
+    {"SIGWINCH", SIGWINCH},
+#endif
 };
 
 UNITTEST {
-    CHECK_STRUCT_ARRAY(signals, name);
-    BUG_ON(!xstreq(signals[0].name, "SIGINT")); // NOLINT(*-assert-side-effect)
-    BUG_ON(signals[0].signum != SIGINT);
-    BUG_ON(signals[0].type != SD_IGNORED);
+    CHECK_STRUCT_ARRAY(signames, name);
 }
 
 static const char *signum_to_str(int signum)
@@ -87,13 +69,74 @@ static const char *signum_to_str(int signum)
     }
 #endif
 
-    for (size_t i = 0; i < ARRAYLEN(signals); i++) {
-        if (signum == signals[i].signum) {
-            return signals[i].name;
+    for (size_t i = 0; i < ARRAYLEN(signames); i++) {
+        if (signum == signames[i].signum) {
+            return signames[i].name;
         }
     }
 
     return "unknown signal";
+}
+
+static void xsigaction(int sig, const struct sigaction *action)
+{
+    struct sigaction old_action;
+    if (unlikely(sigaction(sig, action, &old_action) != 0)) {
+        const char *err = strerror(errno);
+        LOG_ERROR("failed to set disposition for signal %d: %s", sig, err);
+        return;
+    }
+    if (unlikely(old_action.sa_handler == SIG_IGN)) {
+        const char *str = signum_to_str(sig);
+        LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
+    }
+}
+
+void set_sigwinch_handler(void)
+{
+#ifdef SIGWINCH
+    struct sigaction action = {.sa_handler = handle_sigwinch};
+    sigemptyset(&action.sa_mask);
+    LOG_INFO("setting SIGWINCH handler");
+    xsigaction(SIGWINCH, &action);
+#endif
+}
+
+void set_basic_signal_dispositions(void)
+{
+    // Ignored signals
+    struct sigaction action = {.sa_handler = SIG_IGN};
+    sigemptyset(&action.sa_mask);
+    xsigaction(SIGINT, &action);  // Terminal interrupt (see: VINTR in termios(3))
+    xsigaction(SIGQUIT, &action); // Terminal quit (see: VQUIT in termios(3))
+    xsigaction(SIGTSTP, &action); // Terminal stop (see: VSUSP in termios(3))
+    xsigaction(SIGXFSZ, &action); // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
+    xsigaction(SIGPIPE, &action); // Broken pipe (see: EPIPE error in write(3))
+    xsigaction(SIGUSR1, &action); // User signal 1 (terminates by default, for no good reason)
+    xsigaction(SIGUSR2, &action); // User signal 2 (as above)
+
+    // Default signals
+    action.sa_handler = SIG_DFL;
+    xsigaction(SIGABRT, &action); // Terminate (cleanup already done)
+    xsigaction(SIGCHLD, &action); // Ignore (see: wait(3))
+    xsigaction(SIGURG, &action);  // Ignore
+    xsigaction(SIGTTIN, &action); // Stop
+    xsigaction(SIGTTOU, &action); // Stop
+    xsigaction(SIGCONT, &action); // Continue
+
+    // Set signal mask explicitly, in case the parent process exec'd us
+    // with blocked signals (bad practice, but not uncommon)
+    sigset_t mask, prev_mask;
+    if (sigemptyset(&mask) || sigprocmask(SIG_SETMASK, &mask, &prev_mask)) {
+        LOG_ERRNO("setting signal mask failed");
+        return;
+    }
+
+#if HAVE_SIGISEMPTYSET
+    if (!sigisemptyset(&prev_mask)) {
+        LOG_WARNING("non-empty signal mask was inherited (and cleared)");
+    }
+#endif
 }
 
 static noreturn COLD void handle_fatal_signal(int signum)
@@ -126,43 +169,6 @@ static noreturn COLD void handle_fatal_signal(int signum)
     _exit(EC_OS_ERROR);
 }
 
-static void handle_sigwinch(int UNUSED_ARG(signum))
-{
-    resized = 1;
-}
-
-static void do_sigaction(int sig, const struct sigaction *action)
-{
-    struct sigaction old_action;
-    if (unlikely(sigaction(sig, action, &old_action) != 0)) {
-        const char *err = strerror(errno);
-        LOG_ERROR("failed to set disposition for signal %d: %s", sig, err);
-        return;
-    }
-    if (unlikely(old_action.sa_handler == SIG_IGN)) {
-        const char *str = signum_to_str(sig);
-        LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
-    }
-}
-
-static SignalHandler get_sig_handler(SignalDispositionType type)
-{
-    switch (type) {
-    case SD_IGNORED:
-        return SIG_IGN;
-    case SD_DEFAULT:
-        return SIG_DFL;
-    case SD_WINCH:
-        LOG_INFO("setting SIGWINCH handler");
-        return handle_sigwinch;
-    case SD_FATAL:
-        return handle_fatal_signal;
-    }
-
-    BUG("invalid signal disposition type: %d", (int)type);
-    return SIG_DFL;
-}
-
 /*
  * "A program that uses these functions should be written to catch all
  * signals and take other appropriate actions to ensure that when the
@@ -171,50 +177,44 @@ static SignalHandler get_sig_handler(SignalDispositionType type)
  *
  * (https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html)
  */
-void set_signal_handlers(void)
+void set_fatal_signal_handlers(void)
 {
     struct sigaction action = {.sa_handler = handle_fatal_signal};
     if (sigfillset(&action.sa_mask) != 0) {
         // This can never happen in glibc/musl/OpenBSD and there's no
-        // sane reason why it *ever* should, but we return here instead
-        // of potentially registering signal handlers without a correct
-        // sa_mask. Not having SIGWINCH handling and terminal cleanup
-        // for fatal signals is merely inconvenient, whereas having an
-        // incorrect sa_mask could potentially lead to UB.
+        // sane reason why it ever should, but we return here instead
+        // of registering signal handlers without a correct sa_mask.
+        // Not having terminal cleanup for fatal signals is merely
+        // inconvenient, whereas an incorrect mask could lead to UB.
         LOG_ERRNO("sigfillset");
         return;
     }
+
+    xsigaction(SIGHUP, &action);
+    xsigaction(SIGTERM, &action);
+    xsigaction(SIGALRM, &action);
+    xsigaction(SIGSEGV, &action);
+    xsigaction(SIGBUS, &action);
+    xsigaction(SIGTRAP, &action);
+    xsigaction(SIGFPE, &action);
+    xsigaction(SIGILL, &action);
+    xsigaction(SIGSYS, &action);
+    xsigaction(SIGXCPU, &action);
+
+#ifdef SIGPROF
+    xsigaction(SIGPROF, &action);
+#endif
+
+#ifdef SIGEMT
+    xsigaction(SIGEMT, &action);
+#endif
 
     // "The default actions for the realtime signals in the range SIGRTMIN
     // to SIGRTMAX shall be to terminate the process abnormally."
     // (POSIX.1-2017 §2.4.3)
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
     for (int s = SIGRTMIN, max = SIGRTMAX; s <= max; s++) {
-        do_sigaction(s, &action);
-    }
-#endif
-
-    for (size_t i = 0; i < ARRAYLEN(signals); i++) {
-        action.sa_handler = get_sig_handler(signals[i].type);
-        do_sigaction(signals[i].signum, &action);
-    }
-
-    sigset_t mask, prev_mask;
-    if (sigemptyset(&mask) != 0) {
-        LOG_ERRNO("sigemptyset");
-        return;
-    }
-
-    // Set signal mask explicitly, in case the parent process exec'd us
-    // with blocked signals (bad practice, but not uncommon)
-    if (sigprocmask(SIG_SETMASK, &mask, &prev_mask) != 0) {
-        LOG_ERRNO("sigprocmask");
-        return;
-    }
-
-#if HAVE_SIGISEMPTYSET
-    if (sigisemptyset(&prev_mask) != 1) {
-        LOG_WARNING("non-empty signal mask was inherited (and cleared)");
+        xsigaction(s, &action);
     }
 #endif
 }
