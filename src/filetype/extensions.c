@@ -104,6 +104,7 @@ static const struct FileExtensionMap {
     {"html", HTML},
     {"hxx", CPLUSPLUS},
     {"ini", INI},
+    {"ino", CPLUSPLUS}, // https://arduino.github.io/arduino-cli/1.0/sketch-build-process/#pre-processing
     {"ins", TEX},
     {"java", JAVA},
     {"jl", JULIA},
