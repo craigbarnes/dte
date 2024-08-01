@@ -2154,6 +2154,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
     ui_end(e);
     term_cooked();
     LOG_INFO("suspending");
+
     bool suspended = !kill(0, SIGSTOP);
     if (suspended) {
         LOG_INFO("resumed");

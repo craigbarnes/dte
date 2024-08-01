@@ -8,7 +8,6 @@
 #include "debug.h"
 #include "macros.h"
 #include "string-view.h"
-#include "xmalloc.h"
 #include "xstring.h"
 
 #define copyliteral(dest, lit) copystrn(dest, lit, STRLEN(lit))
