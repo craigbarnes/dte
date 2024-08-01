@@ -182,8 +182,9 @@ build/terminal/ioctl.o: build/gen/feature.h
 build/util/fd.o: build/gen/feature.h
 build/util/xmemmem.o: build/gen/feature.h
 
-CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
-LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
+CFLAGS_FILTERED = $(filter-out -fexceptions, $(CFLAGS))
+CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS_FILTERED) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
+LDFLAGS_ALL = $(CFLAGS_FILTERED) $(LDFLAGS) $(BASIC_LDFLAGS)
 featuredef = $(HASH)define HAVE_$(call toupper,$(notdir $(basename $(1))))
 
 $(dte) $(test) $(bench): build/all.ldflags
