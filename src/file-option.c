@@ -11,6 +11,7 @@
 #include "regexp.h"
 #include "util/debug.h"
 #include "util/intern.h"
+#include "util/str-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 

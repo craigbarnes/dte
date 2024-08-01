@@ -2,7 +2,8 @@
 #include <string.h>
 #include "args.h"
 #include "error.h"
-#include "util/str-util.h"
+#include "util/str-array.h"
+#include "util/xstring.h"
 
 /*
  * Flags and first "--" are removed.

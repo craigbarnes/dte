@@ -34,6 +34,7 @@
 #include "util/log.h"
 #include "util/numtostr.h"
 #include "util/path.h"
+#include "util/str-array.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/string.h"

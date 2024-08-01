@@ -15,10 +15,12 @@
 #include "util/bsearch.h"
 #include "util/intern.h"
 #include "util/numtostr.h"
+#include "util/str-array.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 typedef enum {
     OPT_STR,

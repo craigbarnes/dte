@@ -5,7 +5,7 @@
 #include "parse.h"
 #include "util/log.h"
 #include "util/ptr-array.h"
-#include "util/str-util.h"
+#include "util/str-array.h"
 #include "util/xmalloc.h"
 
 // Takes a command string and returns a struct containing the resolved

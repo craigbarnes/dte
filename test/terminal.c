@@ -9,7 +9,7 @@
 #include "terminal/rxvt.h"
 #include "terminal/style.h"
 #include "terminal/terminal.h"
-#include "util/str-util.h"
+#include "util/str-array.h"
 #include "util/unicode.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
