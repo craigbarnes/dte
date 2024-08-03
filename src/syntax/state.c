@@ -76,13 +76,14 @@ static State *reference_state(EditorState *e, const char *name)
     }
 
     State *state = find_or_add_state(e, name);
-    if (unlikely(state == e->syn.current_state)) {
-        LOG_WARNING (
+    if (unlikely((e->syn.flags & SYN_LINT) && state == e->syn.current_state)) {
+        error_msg (
             "destination '%s' can be optimized to 'this' in '%s' syntax",
             name,
             e->syn.current_syntax->name
         );
     }
+
     return state;
 }
 
