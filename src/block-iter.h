@@ -81,9 +81,8 @@ void block_iter_goto_line(BlockIter *bi, size_t line);
 size_t block_iter_get_offset(const BlockIter *bi) WARN_UNUSED_RESULT;
 size_t block_iter_get_char(const BlockIter *bi, CodePoint *up) WARN_UNUSED_RESULT;
 char *block_iter_get_bytes(const BlockIter *bi, size_t len) WARN_UNUSED_RESULT;
-
-void fill_line_ref(BlockIter *bi, StringView *line);
-void fill_line_nl_ref(BlockIter *bi, StringView *line);
+StringView block_iter_get_line(BlockIter *bi);
+StringView block_iter_get_line_with_nl(BlockIter *bi);
 size_t fetch_this_line(const BlockIter *bi, StringView *line);
 
 #endif

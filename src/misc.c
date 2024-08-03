@@ -257,8 +257,7 @@ static bool find_non_empty_line_bwd(BlockIter *bi)
 {
     block_iter_bol(bi);
     do {
-        StringView line;
-        fill_line_ref(bi, &line);
+        StringView line = block_iter_get_line(bi);
         if (!ws_only(&line)) {
             return true;
         }
@@ -287,14 +286,13 @@ static void insert_nl(View *view)
         // Current line will be split at cursor position
         BlockIter bi = view->cursor;
         size_t len = block_iter_bol(&bi);
-        StringView line;
-        fill_line_ref(&bi, &line);
+        StringView line = block_iter_get_line(&bi);
         line.length = len;
         if (ws_only(&line)) {
             // This line is (or will become) white space only; find previous,
             // non whitespace only line
             if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
-                fill_line_ref(&bi, &line);
+                line = block_iter_get_line(&bi);
                 ins = get_indent_for_next_line(options, &line);
             }
         } else {
@@ -346,9 +344,8 @@ void insert_ch(View *view, CodePoint ch)
         del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
     } else if (ch == '}' && options->auto_indent && options->brace_indent) {
         BlockIter bi = view->cursor;
-        StringView curlr;
         block_iter_bol(&bi);
-        fill_line_ref(&bi, &curlr);
+        StringView curlr = block_iter_get_line(&bi);
         if (ws_only(&curlr)) {
             int width = get_indent_of_matching_brace(view);
             if (width >= 0) {
@@ -483,8 +480,7 @@ void clear_lines(View *view, bool auto_indent)
     if (auto_indent) {
         BlockIter bi = view->cursor;
         if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
-            StringView line;
-            fill_line_ref(&bi, &line);
+            StringView line = block_iter_get_line(&bi);
             indent = get_indent_for_next_line(&view->buffer->options, &line);
         }
     }
@@ -529,8 +525,7 @@ void new_line(View *view, bool above)
     if (options->auto_indent) {
         BlockIter bi = view->cursor;
         if (find_non_empty_line_bwd(&bi)) {
-            StringView line;
-            fill_line_ref(&bi, &line);
+            StringView line = block_iter_get_line(&bi);
             ins = get_indent_for_next_line(options, &line);
         }
     }
@@ -603,9 +598,8 @@ static bool in_paragraph (
 static size_t paragraph_size(View *view)
 {
     BlockIter bi = view->cursor;
-    StringView line;
     block_iter_bol(&bi);
-    fill_line_ref(&bi, &line);
+    StringView line = block_iter_get_line(&bi);
     if (is_paragraph_separator(&line)) {
         // Not in paragraph
         return 0;
@@ -616,7 +610,7 @@ static size_t paragraph_size(View *view)
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
-        fill_line_ref(&bi, &line);
+        line = block_iter_get_line(&bi);
         if (!in_paragraph(&line, para_indent_width, tab_width)) {
             block_iter_eat_line(&bi);
             break;
@@ -632,7 +626,7 @@ static size_t paragraph_size(View *view)
             break;
         }
         size += bytes;
-        fill_line_ref(&bi, &line);
+        line = block_iter_get_line(&bi);
     } while (in_paragraph(&line, para_indent_width, tab_width));
     return size;
 }

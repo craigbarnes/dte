@@ -408,8 +408,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
         obuf->x = 0;
         term_move_cursor(obuf, edit_x, edit_y + i);
 
-        StringView line;
-        fill_line_nl_ref(&bi, &line);
+        StringView line = block_iter_get_line_with_nl(&bi);
         bool next_changed;
         const TermStyle **styles = hl_line(syn, lss, &e->styles, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, styles);

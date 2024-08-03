@@ -297,9 +297,8 @@ static ssize_t fill_hole (
     ssize_t idx = sidx;
 
     while (idx < eidx) {
-        StringView line;
         State *st;
-        fill_line_nl_ref(bi, &line);
+        StringView line = block_iter_get_line_with_nl(bi);
         block_iter_eat_line(bi);
         highlight_line(syn, ptrs[idx++], sm, &line, &st);
 
@@ -368,8 +367,7 @@ void hl_fill_start_states (
     // Add new
     block_iter_move_down(bi, s->count - 1 - current_line);
     while (s->count - 1 < line_nr) {
-        StringView line;
-        fill_line_nl_ref(bi, &line);
+        StringView line = block_iter_get_line_with_nl(bi);
         highlight_line (
             syn,
             states[s->count - 1],

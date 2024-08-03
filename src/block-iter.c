@@ -294,32 +294,33 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
 }
 
 // bi should be at bol
-void fill_line_nl_ref(BlockIter *bi, StringView *line)
+StringView block_iter_get_line_with_nl(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    line->data = bi->blk->data + bi->offset;
+    StringView line = {.data = bi->blk->data + bi->offset};
     const size_t max = bi->blk->size - bi->offset;
     if (unlikely(max == 0)) {
         // Cursor at end of last block
-        line->length = 0;
-        return;
+        return line;
     }
     if (bi->blk->nl == 1) {
-        BUG_ON(line->data[max - 1] != '\n');
-        line->length = max;
-        return;
+        BUG_ON(line.data[max - 1] != '\n');
+        line.length = max;
+        return line;
     }
-    const unsigned char *nl = memchr(line->data, '\n', max);
+    const unsigned char *nl = memchr(line.data, '\n', max);
     BUG_ON(!nl);
-    line->length = (size_t)(nl - line->data + 1);
-    BUG_ON(line->length == 0);
+    line.length = (size_t)(nl - line.data + 1);
+    BUG_ON(line.length == 0);
+    return line;
 }
 
-void fill_line_ref(BlockIter *bi, StringView *line)
+StringView block_iter_get_line(BlockIter *bi)
 {
-    fill_line_nl_ref(bi, line);
+    StringView line = block_iter_get_line_with_nl(bi);
     // Trim the newline
-    line->length -= (line->length > 0);
+    line.length -= (line.length > 0);
+    return line;
 }
 
 // Set the `line` argument to point to the current line and return
@@ -329,6 +330,6 @@ size_t fetch_this_line(const BlockIter *bi, StringView *line)
 {
     BlockIter tmp = *bi;
     size_t count = block_iter_bol(&tmp);
-    fill_line_ref(&tmp, line);
+    *line = block_iter_get_line(&tmp);
     return count;
 }

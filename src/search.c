@@ -18,8 +18,7 @@ static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
         }
 
         regmatch_t match;
-        StringView line;
-        fill_line_ref(bi, &line);
+        StringView line = block_iter_get_line(bi);
 
         // NOTE: If this is the first iteration then line.data contains
         // partial line (text starting from the cursor position) and
@@ -60,12 +59,11 @@ static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx,
 
     do {
         regmatch_t match;
-        StringView line;
         int flags = 0;
         regoff_t offset = -1;
         regoff_t pos = 0;
+        StringView line = block_iter_get_line(bi);
 
-        fill_line_ref(bi, &line);
         while (
             pos <= line.length
             && regexp_exec(regex, line.data + pos, line.length - pos, 1, &match, flags)

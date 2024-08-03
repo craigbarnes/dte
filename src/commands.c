@@ -1245,7 +1245,7 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
     fetch_this_line(&view->cursor, &line);
     if (strview_isblank(&line)) {
         while (block_iter_next_line(&view->cursor)) {
-            fill_line_ref(&view->cursor, &line);
+            line = block_iter_get_line(&view->cursor);
             if (!strview_isblank(&line)) {
                 break;
             }
@@ -1254,7 +1254,7 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 
     // Skip past non-blank lines
     while (block_iter_next_line(&view->cursor)) {
-        fill_line_ref(&view->cursor, &line);
+        line = block_iter_get_line(&view->cursor);
         if (strview_isblank(&line)) {
             break;
         }
@@ -1287,7 +1287,7 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
     fetch_this_line(&view->cursor, &line);
     if (strview_isblank(&line)) {
         while (block_iter_prev_line(&view->cursor)) {
-            fill_line_ref(&view->cursor, &line);
+            line = block_iter_get_line(&view->cursor);
             if (!strview_isblank(&line)) {
                 break;
             }
@@ -1296,7 +1296,7 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 
     // Skip past non-blank lines
     while (block_iter_prev_line(&view->cursor)) {
-        fill_line_ref(&view->cursor, &line);
+        line = block_iter_get_line(&view->cursor);
         if (strview_isblank(&line)) {
             break;
         }

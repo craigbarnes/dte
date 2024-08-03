@@ -178,7 +178,7 @@ bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes)
     StringView line = STRING_VIEW_INIT;
     if (BLOCK(buffer->blocks.next)->size) {
         BlockIter bi = block_iter(buffer);
-        fill_line_ref(&bi, &line);
+        line = block_iter_get_line(&bi);
     } else if (!buffer->abs_filename) {
         return false;
     }
@@ -330,8 +330,7 @@ static bool detect_indent(Buffer *buffer)
     BUG_ON((bitset & ((1u << INDENT_WIDTH_MAX) - 1)) != bitset);
 
     for (size_t i = 0, j = 1; i < 200 && j > 0; i++, j = block_iter_next_line(&bi)) {
-        StringView line;
-        fill_line_ref(&bi, &line);
+        StringView line = block_iter_get_line(&bi);
         bool tab;
         int indent = indent_len(line, bitset, &tab);
         switch (indent) {

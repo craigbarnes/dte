@@ -196,8 +196,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
     unsigned int nr_substitutions = 0;
     size_t nr_lines = 0;
     while (1) {
-        StringView line;
-        fill_line_ref(&bi, &line);
+        StringView line = block_iter_get_line(&bi);
 
         // Number of bytes to process
         size_t count = line.length;

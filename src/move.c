@@ -16,10 +16,9 @@ typedef enum {
 void move_to_preferred_x(View *view, long preferred_x)
 {
     const LocalOptions *options = &view->buffer->options;
-    StringView line;
     view->preferred_x = preferred_x;
     block_iter_bol(&view->cursor);
-    fill_line_ref(&view->cursor, &line);
+    StringView line = block_iter_get_line(&view->cursor);
 
     if (options->emulate_tab && view->preferred_x < line.length) {
         const size_t iw = options->indent_width;

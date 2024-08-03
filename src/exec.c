@@ -241,9 +241,8 @@ ssize_t handle_exec (
         if (view->selection) {
             ctx.input.length = prepare_selection(view);
         } else {
-            StringView line;
             move_bol(view);
-            fill_line_ref(&view->cursor, &line);
+            StringView line = block_iter_get_line(&view->cursor);
             ctx.input.length = line.length;
         }
         replace_input = true;
