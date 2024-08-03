@@ -38,12 +38,12 @@ state brace1 variable
     eat this
 
 state brace2 variable
-    char } brace1 variable
+    char } brace1
     str '${' brace3
     eat this
 
 state brace3 variable
-    char } brace2 variable
+    char } brace2
     str '${' END error
     eat this
 

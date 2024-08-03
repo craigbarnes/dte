@@ -259,9 +259,9 @@ state atrule code
     # Selectors
     inlist atkeyword start
     # @import { URI | string } [ media type, ...];
-    bufis -i "@import" .css-import:start atkeyword
+    bufis -i "@import" .css-import:start
     # @namespace [prefix] { URI | string };
-    bufis -i "@namespace" .css-namespace:start atkeyword
+    bufis -i "@namespace" .css-namespace:start
     bufis -i @media mediatypes atkeyword
     noeat start
 

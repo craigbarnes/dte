@@ -107,7 +107,7 @@ state code
     eat this
 
 state bracket string
-    char [ .lua-long-string:code string
+    char [ .lua-long-string:code
     char -b = bracket-equals
     recolor default 1
     noeat code
@@ -149,7 +149,7 @@ state dash-dash comment
     eat line-comment comment
 
 state dash-dash-bracket comment
-    char [ .lua-long-comment:code comment
+    char [ .lua-long-comment:code
     char -b = dash-dash-bracket-equals comment
     eat line-comment
 
@@ -160,7 +160,7 @@ state dash-dash-bracket-equals
 
 state line-comment comment
     char "\n" code
-    eat this comment
+    eat this
 
 state zero numeric
     char 0-9 decimal

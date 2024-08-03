@@ -1,7 +1,7 @@
 # "simple" variable inside string
 syntax .php-strvar
 
-state start
+state start strvar
     char a-zA-Z_ strvar
     noeat END
 
@@ -55,8 +55,8 @@ state bol string
 state string
     char "\n" bol
     char \\ esc
-    char \$ .php-strvar:this strvar
-    str '{$' .php-strcurly:this strvar
+    char \$ .php-strvar:this
+    str '{$' .php-strcurly:this
     eat this
 
 state esc special
@@ -148,8 +148,8 @@ state this-keyword
 state dq string
     char \" code string
     char \\ dqesc
-    char \$ .php-strvar:this strvar
-    str '{$' .php-strcurly:this strvar
+    char \$ .php-strvar:this
+    str '{$' .php-strcurly:this
     eat this
 
 state dqesc special
