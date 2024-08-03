@@ -13,7 +13,7 @@ typedef struct {
     bool swapped;
 } SelectionInfo;
 
-void init_selection(const View *view, SelectionInfo *info);
+SelectionInfo init_selection(const View *view);
 size_t prepare_selection(View *view);
 char *view_get_selection(View *view, size_t *size);
 size_t get_nr_selected_lines(const SelectionInfo *info);

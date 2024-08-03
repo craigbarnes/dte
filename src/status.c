@@ -224,8 +224,7 @@ static void add_misc_status(Formatter *f)
         return;
     }
 
-    SelectionInfo si;
-    init_selection(view, &si);
+    SelectionInfo si = init_selection(view);
     bool is_lines = (view->selection == SELECT_LINES);
     size_t n = is_lines ? get_nr_selected_lines(&si) : get_nr_selected_chars(&si);
     const char *unit = is_lines ? "line" : "char";

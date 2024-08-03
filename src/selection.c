@@ -22,45 +22,49 @@ static bool include_cursor_char_in_selection(const View *view)
     return !(type == CURSOR_STEADY_BAR || type == CURSOR_BLINKING_BAR);
 }
 
-void init_selection(const View *view, SelectionInfo *info)
+SelectionInfo init_selection(const View *view)
 {
-    info->so = view->sel_so;
-    info->eo = block_iter_get_offset(&view->cursor);
-    info->si = view->cursor;
-    block_iter_goto_offset(&info->si, info->so);
-    info->swapped = false;
-    if (info->so > info->eo) {
-        size_t o = info->so;
-        info->so = info->eo;
-        info->eo = o;
-        info->si = view->cursor;
-        info->swapped = true;
+    SelectionInfo info = {
+        .si = view->cursor,
+        .so = view->sel_so,
+        .eo = block_iter_get_offset(&view->cursor),
+        .swapped = false,
+    };
+
+    block_iter_goto_offset(&info.si, info.so);
+    if (info.so > info.eo) {
+        size_t o = info.so;
+        info.so = info.eo;
+        info.eo = o;
+        info.si = view->cursor;
+        info.swapped = true;
     }
 
-    BlockIter ei = info->si;
-    block_iter_skip_bytes(&ei, info->eo - info->so);
+    BlockIter ei = info.si;
+    block_iter_skip_bytes(&ei, info.eo - info.so);
     if (block_iter_is_eof(&ei)) {
-        if (info->so == info->eo) {
-            return;
+        if (info.so == info.eo) {
+            return info;
         }
         CodePoint u;
-        info->eo -= block_iter_prev_char(&ei, &u);
+        info.eo -= block_iter_prev_char(&ei, &u);
     }
 
     if (view->selection == SELECT_LINES) {
-        info->so -= block_iter_bol(&info->si);
-        info->eo += block_iter_eat_line(&ei);
+        info.so -= block_iter_bol(&info.si);
+        info.eo += block_iter_eat_line(&ei);
     } else {
         if (include_cursor_char_in_selection(view)) {
-            info->eo += block_iter_next_column(&ei);
+            info.eo += block_iter_next_column(&ei);
         }
     }
+
+    return info;
 }
 
 size_t prepare_selection(View *view)
 {
-    SelectionInfo info;
-    init_selection(view, &info);
+    SelectionInfo info = init_selection(view);
     view->cursor = info.si;
     return info.eo - info.so;
 }

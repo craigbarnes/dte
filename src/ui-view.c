@@ -261,13 +261,9 @@ static WhitespaceErrorFlags get_wse_flags(const LocalOptions *opts)
     return opts->ws_error | ((opts->ws_error & WSE_AUTO_INDENT) ? extra : 0);
 }
 
-static void line_info_init (
-    LineInfo *info,
-    const View *view,
-    const BlockIter *bi,
-    size_t line_nr
-) {
-    *info = (LineInfo) {
+static LineInfo line_info_init(const View *view, const BlockIter *bi, size_t line_nr)
+{
+    LineInfo info = {
         .view = view,
         .line_nr = line_nr,
         .offset = block_iter_get_offset(bi),
@@ -275,19 +271,20 @@ static void line_info_init (
     };
 
     if (!view->selection) {
-        info->sel_so = -1;
-        info->sel_eo = -1;
+        info.sel_so = -1;
+        info.sel_eo = -1;
     } else if (view->sel_eo != SEL_EO_RECALC) {
         // Already calculated
-        info->sel_so = view->sel_so;
-        info->sel_eo = view->sel_eo;
-        BUG_ON(info->sel_so > info->sel_eo);
+        info.sel_so = view->sel_so;
+        info.sel_eo = view->sel_eo;
+        BUG_ON(info.sel_so > info.sel_eo);
     } else {
-        SelectionInfo sel;
-        init_selection(view, &sel);
-        info->sel_so = sel.so;
-        info->sel_eo = sel.eo;
+        SelectionInfo sel = init_selection(view);
+        info.sel_so = sel.so;
+        info.sel_eo = sel.eo;
     }
+
+    return info;
 }
 
 static void line_info_set_line (
@@ -391,8 +388,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
     }
     block_iter_bol(&bi);
 
-    LineInfo info;
-    line_info_init(&info, view, &bi, y1);
+    LineInfo info = line_info_init(view, &bi, y1);
 
     y1 -= view->vy;
     y2 -= view->vy;

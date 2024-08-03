@@ -703,8 +703,7 @@ void change_case(View *view, char mode)
     bool move = true;
     size_t text_len;
     if (view->selection) {
-        SelectionInfo info;
-        init_selection(view, &info);
+        SelectionInfo info = init_selection(view);
         view->cursor = info.si;
         text_len = info.eo - info.so;
         unselect(view);

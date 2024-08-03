@@ -174,8 +174,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
     size_t nr_bytes;
     bool swapped = false;
     if (view->selection) {
-        SelectionInfo info;
-        init_selection(view, &info);
+        SelectionInfo info = init_selection(view);
         view->cursor = info.si;
         view->sel_so = info.so;
         view->sel_eo = info.eo;

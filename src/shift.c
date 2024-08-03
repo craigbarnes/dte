@@ -120,9 +120,8 @@ void shift_lines(View *view, int count)
         goto out;
     }
 
-    SelectionInfo info;
     view->selection = SELECT_LINES;
-    init_selection(view, &info);
+    SelectionInfo info = init_selection(view);
     view->cursor = info.si;
     size_t nr_lines = get_nr_selected_lines(&info);
     if (unlikely(nr_lines == 0)) {
