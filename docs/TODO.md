@@ -29,9 +29,6 @@ Features
 * Retain the last 10 or so recorded macros and allow them to be viewed
   (with e.g. `show macro 7`) and executed (with e.g. `macro play 7`)
 
-* Add a command-line flag that allows e.g. `ls | dte -X` to open each
-  word/line of `stdin` as if it were a file argument
-
 * Allow multiple tags to be specified when using e.g. `dte -t A -t B`,
   `tag A B` or `exec -s -o tag echo "A\nB\n"` (if specifying one tag
   can create multiple messages, we may as well use the same mechanism
