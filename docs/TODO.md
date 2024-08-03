@@ -68,6 +68,13 @@ Features
 * Bind `tab` to auto-complete search history in `search` mode (similar to
   the existing `up`/`down` bindings)
 
+* Suggest programs found in `$PATH` (or a cached list thereof) when
+  auto-completing e.g. `exec <Tab>`
+
+* Allow highlighting auto-completion prefix with a different color. For
+  example, if `:wra<Tab>` expands to `:wrap-paragraph`, the first 3 letters
+  should be demarcated as the prefix.
+
 Documentation
 -------------
 
@@ -102,6 +109,11 @@ Documentation
 * Make website sidebar inset (with nested flexbox) instead of occupying
   part of the `max-width` for the entire height of the main content
   (see also: https://stackoverflow.com/a/36879080)
+
+* Document `$DTE_LOG` and `$DTE_LOG_LEVEL`
+
+* Mention GNU Coding Standards §4.4 in `errorfmt` documentation
+  (see: https://www.gnu.org/prep/standards/html_node/Errors.html)
 
 Efficiency Improvements
 -----------------------
