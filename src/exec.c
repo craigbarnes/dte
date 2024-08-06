@@ -261,7 +261,7 @@ ssize_t handle_exec (
     bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
     bool replace_input = false;
 
-    // This could be left unitialized, but doing so makes some old compilers
+    // This could be left uninitialized, but doing so makes some old compilers
     // produce false-positive "-Wmaybe-uninitialized" warnings
     SelectionInfo info = {.si = view->cursor};
 
