@@ -156,6 +156,44 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     activate_current_message_save(msgs, &e->bookmarks, e->view);
 }
 
+static void insert_output (
+    View *view,
+    const String *output,
+    const StringView *input,
+    SelectionInfo *info,
+    bool replace_input
+) {
+    if (!view->selection) {
+        size_t del_count = replace_input ? input->length : 0;
+        buffer_replace_bytes(view, del_count, output->buffer, output->len);
+        return;
+    }
+
+    if (!replace_input) {
+        // There's a selection but it wasn't used for stdin in this case,
+        // so SelectionInfo needs to be initialized here
+        *info = init_selection(view);
+        view->cursor = info->si;
+    }
+
+    size_t del_count = info->eo - info->so;
+    buffer_replace_bytes(view, del_count, output->buffer, output->len);
+
+    if (output->len == 0) {
+        // If the selection was replaced with 0 bytes then there's nothing
+        // new to select, so just unselect instead
+        unselect(view);
+        return;
+    }
+
+    // Keep the selection and adjust the size to the newly inserted text
+    size_t so = info->so;
+    size_t eo = so + (output->len - 1);
+    block_iter_goto_offset(&view->cursor, info->swapped ? so : eo);
+    view->sel_so = info->swapped ? eo : so;
+    view->sel_eo = SEL_EO_RECALC;
+}
+
 static const char **lines_and_columns_env(const Window *window)
 {
     static char lines[DECIMAL_STR_MAX(window->edit_h)];
@@ -222,6 +260,7 @@ ssize_t handle_exec (
     char *alloc = NULL;
     bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
     bool replace_input = false;
+    SelectionInfo info;
 
     SpawnContext ctx = {
         .editor = e,
@@ -239,7 +278,9 @@ ssize_t handle_exec (
     switch (actions[STDIN_FILENO]) {
     case EXEC_LINE:
         if (view->selection) {
-            ctx.input.length = prepare_selection(view);
+            info = init_selection(view);
+            view->cursor = info.si;
+            ctx.input.length = info.eo - info.so;
         } else {
             move_bol(view);
             StringView line = block_iter_get_line(&view->cursor);
@@ -252,7 +293,9 @@ ssize_t handle_exec (
         break;
     case EXEC_BUFFER:
         if (view->selection) {
-            ctx.input.length = prepare_selection(view);
+            info = init_selection(view);
+            view->cursor = info.si;
+            ctx.input.length = info.eo - info.so;
         } else {
             const Block *blk;
             block_for_each(blk, &view->buffer->blocks) {
@@ -264,7 +307,9 @@ ssize_t handle_exec (
         goto get_bytes;
     case EXEC_WORD:
         if (view->selection) {
-            ctx.input.length = prepare_selection(view);
+            info = init_selection(view);
+            view->cursor = info.si;
+            ctx.input.length = info.eo - info.so;
             replace_input = true;
         } else {
             StringView line;
@@ -358,13 +403,7 @@ ssize_t handle_exec (
 
     switch (actions[STDOUT_FILENO]) {
     case EXEC_BUFFER:
-        if (replace_input || view->selection) {
-            size_t del_count = replace_input ? ctx.input.length : prepare_selection(view);
-            buffer_replace_bytes(view, del_count, output->buffer, output->len);
-            unselect(view);
-        } else {
-            buffer_insert_bytes(view, output->buffer, output->len);
-        }
+        insert_output(view, output, &ctx.input, &info, replace_input);
         break;
     case EXEC_MSG:
         parse_and_activate_message(e, output);
