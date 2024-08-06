@@ -260,7 +260,10 @@ ssize_t handle_exec (
     char *alloc = NULL;
     bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
     bool replace_input = false;
-    SelectionInfo info;
+
+    // This could be left unitialized, but doing so makes some old compilers
+    // produce false-positive "-Wmaybe-uninitialized" warnings
+    SelectionInfo info = {.si = view->cursor};
 
     SpawnContext ctx = {
         .editor = e,
