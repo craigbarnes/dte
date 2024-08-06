@@ -343,9 +343,8 @@ void insert_ch(View *view, CodePoint ch)
         BlockIter bi = view->cursor;
         del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
     } else if (ch == '}' && options->auto_indent && options->brace_indent) {
-        BlockIter bi = view->cursor;
-        block_iter_bol(&bi);
-        StringView curlr = block_iter_get_line(&bi);
+        StringView curlr;
+        fetch_this_line(&view->cursor, &curlr);
         if (ws_only(&curlr)) {
             int width = get_indent_of_matching_brace(view);
             if (width >= 0) {
