@@ -54,17 +54,18 @@ static bool line_has_closing_brace(StringView line)
  */
 void select_block(View *view)
 {
-    BlockIter sbi, ebi, bi = view->cursor;
+    BlockIter bi = view->cursor;
     StringView line;
-    int level = 0;
+    fetch_this_line(&bi, &line);
 
     // If current line does not match \{\s*$ but matches ^\s*\} then
     // cursor is likely at end of the block you want to select
-    fetch_this_line(&bi, &line);
     if (!line_has_opening_brace(line) && line_has_closing_brace(line)) {
         block_iter_prev_line(&bi);
     }
 
+    BlockIter sbi;
+    int level = 0;
     while (1) {
         fetch_this_line(&bi, &line);
         if (line_has_opening_brace(line)) {
@@ -83,6 +84,7 @@ void select_block(View *view)
         }
     }
 
+    BlockIter ebi;
     while (1) {
         fetch_this_line(&bi, &line);
         if (line_has_closing_brace(line)) {
@@ -104,7 +106,6 @@ void select_block(View *view)
     view->sel_so = block_iter_get_offset(&ebi);
     view->sel_eo = SEL_EO_RECALC;
     view->selection = SELECT_LINES;
-
     mark_all_lines_changed(view->buffer);
 }
 
@@ -267,11 +268,8 @@ static bool find_non_empty_line_bwd(BlockIter *bi)
 
 static void insert_nl(View *view)
 {
-    size_t del_count = 0;
-    size_t ins_count = 1;
-    char *ins = NULL;
-
     // Prepare deleted text (selection or whitespace around cursor)
+    size_t del_count = 0;
     if (view->selection) {
         del_count = prepare_selection(view);
         unselect(view);
@@ -282,6 +280,7 @@ static void insert_nl(View *view)
 
     // Prepare inserted indentation
     const LocalOptions *options = &view->buffer->options;
+    char *ins = NULL;
     if (options->auto_indent) {
         // Current line will be split at cursor position
         BlockIter bi = view->cursor;
@@ -300,23 +299,23 @@ static void insert_nl(View *view)
         }
     }
 
+    size_t ins_count;
     begin_change(CHANGE_MERGE_NONE);
+
     if (ins) {
-        // Add newline before indent
         ins_count = strlen(ins);
         memmove(ins + 1, ins, ins_count);
-        ins[0] = '\n';
+        ins[0] = '\n'; // Add newline before indent
         ins_count++;
-
         buffer_replace_bytes(view, del_count, ins, ins_count);
         free(ins);
     } else {
+        ins_count = 1;
         buffer_replace_bytes(view, del_count, "\n", ins_count);
     }
-    end_change();
 
-    // Move after inserted text
-    block_iter_skip_bytes(&view->cursor, ins_count);
+    end_change();
+    block_iter_skip_bytes(&view->cursor, ins_count); // Move after inserted text
 }
 
 void insert_ch(View *view, CodePoint ch)
@@ -383,14 +382,13 @@ void insert_ch(View *view, CodePoint ch)
 static void join_selection(View *view, const char *delim, size_t delim_len)
 {
     size_t count = prepare_selection(view);
-    size_t len = 0, join = 0;
-    BlockIter bi;
+    BlockIter bi = view->cursor;
+    size_t len = 0;
+    size_t join = 0;
     CodePoint ch = 0;
-
     unselect(view);
-    bi = view->cursor;
-
     begin_change_chain();
+
     while (count > 0) {
         if (!len) {
             view->cursor = bi;
@@ -429,6 +427,7 @@ static void join_selection(View *view, const char *delim, size_t delim_len)
             buffer_replace_bytes(view, len, " ", 1);
         }
     }
+
     end_change_chain(view);
 }
 
@@ -689,10 +688,10 @@ void format_paragraph(View *view, size_t text_width)
     if (pf.buf.len) {
         block_iter_skip_bytes(&view->cursor, pf.buf.len - 1);
     }
+
     string_free(&pf.buf);
     free(pf.indent);
     free(sel);
-
     unselect(view);
 }
 

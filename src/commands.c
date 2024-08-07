@@ -537,9 +537,8 @@ static bool cmd_cut(EditorState *e, const CommandArgs *a)
         }
         unselect(view);
     } else {
-        BlockIter tmp;
         block_iter_bol(&view->cursor);
-        tmp = view->cursor;
+        BlockIter tmp = view->cursor;
         cut(&e->clipboard, view, block_iter_eat_line(&tmp), true);
         move_to_preferred_x(view, x);
     }
