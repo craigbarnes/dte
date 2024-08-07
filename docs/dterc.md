@@ -1024,6 +1024,30 @@ This command merges the selection into one paragraph. To format
 multiple paragraphs use the external `fmt` program with the
 [`filter`] command, e.g. `filter fmt -w 60`.
 
+### **macro** _action_
+
+Record and replay command macros.
+
+The _action_ argument can be one of:
+
+`record`
+:   Begin recording
+
+`stop`
+:   Stop recording
+
+`toggle`
+:   Toggle recording on/off
+
+`cancel`
+:   Stop recording, without overwriting the previous macro
+
+`play`
+:   Replay the previously recorded macro
+
+Once a macro has been recorded, it can be viewed in text form
+by running [`show macro`].
+
 ### **select** [**-kl**]
 
 Enter selection mode. All basic movement commands while in this mode
@@ -1253,30 +1277,6 @@ same name and some _type_ arguments don't take any _key_ argument.
 `-c`
 :   write output to the command line (for most _type_ arguments) or to
     the current buffer (when _type_ is `errorfmt` or `include`)
-
-### **macro** _action_
-
-Record and replay command macros.
-
-The _action_ argument can be one of:
-
-`record`
-:   Begin recording
-
-`stop`
-:   Stop recording
-
-`toggle`
-:   Toggle recording on/off
-
-`cancel`
-:   Stop recording, without overwriting the previous macro
-
-`play`
-:   Replay the previously recorded macro
-
-Once a macro has been recorded, it can be viewed in text form
-by running [`show macro`].
 
 # Options
 

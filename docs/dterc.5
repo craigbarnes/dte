@@ -176,6 +176,8 @@ Editing Commands:
 .br
    \fBwrap\-paragraph\fR [\fIwidth\fR]
 .br
+   \fBmacro\fR \fIaction\fR
+.br
    \fBselect\fR [\fB\-kl\fR]
 .br
    \fBunselect\fR
@@ -195,8 +197,6 @@ Other Commands:
    \fBtoggle\fR [\fB\-gv\fR] \fIoption\fR [\fIvalues\fR]...
 .br
    \fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
-.br
-   \fBmacro\fR \fIaction\fR
 .br
 .P
 Options:
@@ -1584,6 +1584,36 @@ multiple paragraphs use the external \fBfmt\fR(1) program with the
 \fBfilter\fR command, e.g. \fBfilter fmt \-w 60\fR.
 .P
 .RE
+\fBmacro\fR \fIaction\fR
+.RS
+Record and replay command macros.
+.P
+The \fIaction\fR argument can be one of:
+.P
+.TP
+\fBrecord\fR
+Begin recording
+.PP
+.TP
+\fBstop\fR
+Stop recording
+.PP
+.TP
+\fBtoggle\fR
+Toggle recording on/off
+.PP
+.TP
+\fBcancel\fR
+Stop recording, without overwriting the previous macro
+.PP
+.TP
+\fBplay\fR
+Replay the previously recorded macro
+.PP
+Once a macro has been recorded, it can be viewed in text form
+by running \fBshow macro\fR.
+.P
+.RE
 \fBselect\fR [\fB\-kl\fR]
 .RS
 Enter selection mode. All basic movement commands while in this mode
@@ -1879,36 +1909,6 @@ same name and some \fItype\fR arguments don't take any \fIkey\fR argument.
 write output to the command line (for most \fItype\fR arguments) or to
 the current buffer (when \fItype\fR is \fBerrorfmt\fR or \fBinclude\fR)
 .PP
-.RE
-\fBmacro\fR \fIaction\fR
-.RS
-Record and replay command macros.
-.P
-The \fIaction\fR argument can be one of:
-.P
-.TP
-\fBrecord\fR
-Begin recording
-.PP
-.TP
-\fBstop\fR
-Stop recording
-.PP
-.TP
-\fBtoggle\fR
-Toggle recording on/off
-.PP
-.TP
-\fBcancel\fR
-Stop recording, without overwriting the previous macro
-.PP
-.TP
-\fBplay\fR
-Replay the previously recorded macro
-.PP
-Once a macro has been recorded, it can be viewed in text form
-by running \fBshow macro\fR.
-.P
 .RE
 .SH OPTIONS
 Options can be changed using the \fBset\fR command. Enumerated options can
