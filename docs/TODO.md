@@ -75,8 +75,28 @@ Features
   example, if `:wra<Tab>` expands to `:wrap-paragraph`, the first 3 letters
   should be demarcated as the prefix.
 
+* Add a command to allow explicitly grouping `Change`s together, similar
+  to ne's [AtomicUndo]
+
+* Add built-in syntax highlighters for:
+  * [Typst]
+  * [Rust]
+  * [TOML]
+  * [YAML]
+
+* Handle codepoints from [Unicode categories] `Ps`, `Pe`, `Pi` and `Pf`
+  in `cmd_match_bracket()` (see also: [EU's list of quotation marks] and
+  Unicode's [`BidiBrackets.txt`])
+
+* Add an option to convert U+2103 (℃ ) into U+00B0 U+0043 (°C) when
+  rendering to the terminal and perhaps do likewise for some other
+  "ambiguous" width characters (see also: [foot#1665] and the related
+  todo item below)
+
 Documentation
 -------------
+
+* Improve documentation for `search` command
 
 * For the `hi` command, mention that `gray`, `darkgray` and `white` are
   different from the names used by some other applications and perhaps
@@ -114,6 +134,11 @@ Documentation
 
 * Mention GNU Coding Standards §4.4 in `errorfmt` documentation
   (see: https://www.gnu.org/prep/standards/html_node/Errors.html)
+
+* Document the Unicode features that don't map well to the terminal's
+  "grid of cells" display model and/or multi-process division of
+  responsibilities (e.g. ambiguous display width codepoints, the
+  U+2103 [example][foot#1665] mentioned above, ZWJ sequences, etc.)
 
 Efficiency Improvements
 -----------------------
@@ -153,6 +178,57 @@ Efficiency Improvements
   code for handling mutually exclusive subsets of `Command` flags
   (e.g. `save [-b|-B]`, `paste [-a|-c]`, etc.)
 
+* Make use of [`fstatvfs(3)`], [`posix_fallocate(3)`], [`vmsplice(2)`]
+  and [`tee(2)`][] (when available)
 
+Testing/Debugging
+-----------------
+
+* Set up continuous testing on OpenBSD, FreeBSD and NetBSD
+
+* Remove `#if` guards in `test/*.c`, so that "passed" count stays the same
+  regardless of compiler/platform
+  (see: https://lists.nongnu.org/archive/html/tinycc-devel/2023-09/msg00033.html)
+
+* Add test runner option for generating JUnit XML report for GitLab CI
+  * https://docs.gitlab.com/ee/ci/testing/unit_test_reports.html
+  * https://gitlab.com/craigbarnes/dte/-/pipelines/1404353439/test_report
+
+* Write a `LOG_*()` message every time a new file is opened, including the
+  `Buffer::id`, and then mention the `id` in other log messages relating
+  to that buffer (thus allowing logged actions to be correlated to specific
+  files without spamming long filenames repeatedly)
+
+* Improve test coverage for:
+  * `u_get_nonascii()`
+  * `u_skip_chars()`
+  * `u_make_printable_mem()`
+  * `path_slice_relative()`
+  * `timespec_subtract()`
+  * `log_write()`
+  * `handle_exec()`
+  * `spawn_compiler()`
+  * `dump_buffer()`
+  * `src/cmdline.c`
+  * `src/load-save.c`
+  * `src/misc.c`
+  * `src/show.c`
+  * `src/tag.c`
+  * `src/view.c`
+
+
+[AtomicUndo]: https://ne.di.unimi.it/docs/AtomicUndo.html
+[Typst]: https://typst.app/docs/reference/syntax/
+[Rust]: https://doc.rust-lang.org/reference/
+[TOML]: https://toml.io/en/v1.0.0
+[YAML]: https://yaml.org/spec/1.2.2/
+[Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
+[EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
+[`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
+[foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
 [`gperf`]: https://www.gnu.org/software/gperf/
 [`ltrace(1)`]: https://man7.org/linux/man-pages/man1/ltrace.1.html
+[`fstatvfs(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/fstatvfs.html
+[`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
+[`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
+[`tee(2)`]: https://man7.org/linux/man-pages/man2/tee.2.html

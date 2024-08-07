@@ -971,10 +971,6 @@ static bool cmd_match_bracket(EditorState *e, const CommandArgs *a)
     size_t level = 0;
     CodePoint u = 0;
 
-    // TODO: Expand support to other "paired" punctuation characters
-    // in Unicode; see general categories Open_Punctuation (Ps) and
-    // Close_Punctuation (Pe) in UnicodeData.txt
-
     switch (cursor_char) {
     case '<':
     case '[':

@@ -32,28 +32,20 @@ Coding Style
 See Also
 --------
 
-* [`src/README.md`]
-* [`config/README.md`]
-* [`mk/README.md`]
-* [`mk/feature-test/README.md`]
-* [`tools/README.md`]
-* [`docs/README.md`]
-* [`docs/packaging.md`]
-* [`docs/releasing.md`]
+* [`src/README.md`](../src/README.md)
+* [`config/README.md`](../config/README.md)
+* [`mk/README.md`](../mk/README.md)
+* [`mk/feature-test/README.md`](../mk/feature-test/README.md)
+* [`tools/README.md`](../tools/README.md)
+* [`docs/README.md`](README.md)
+* [`docs/TODO.md`](TODO.md)
+* [`docs/packaging.md`](packaging.md)
+* [`docs/releasing.md`](releasing.md)
 * `make help`
 
 
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-spans-and-blocks
-
 [`pre-commit`]: ../tools/git-hooks/pre-commit
 [`commit-msg`]: ../tools/git-hooks/commit-msg
-[`src/README.md`]: ../src/README.md
-[`config/README.md`]: ../config/README.md
-[`mk/README.md`]: ../mk/README.md
-[`mk/feature-test/README.md`]: ../mk/feature-test/README.md
-[`tools/README.md`]: ../tools/README.md
-[`docs/README.md`]: README.md
-[`docs/packaging.md`]: packaging.md
-[`docs/releasing.md`]: releasing.md
