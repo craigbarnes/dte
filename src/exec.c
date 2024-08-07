@@ -156,26 +156,11 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     activate_current_message_save(msgs, &e->bookmarks, e->view);
 }
 
-static void insert_output (
+static void insert_to_selection (
     View *view,
     const String *output,
-    const StringView *input,
-    SelectionInfo *info,
-    bool replace_input
+    const SelectionInfo *info
 ) {
-    if (!view->selection) {
-        size_t del_count = replace_input ? input->length : 0;
-        buffer_replace_bytes(view, del_count, output->buffer, output->len);
-        return;
-    }
-
-    if (!replace_input) {
-        // There's a selection but it wasn't used for stdin in this case,
-        // so SelectionInfo needs to be initialized here
-        *info = init_selection(view);
-        view->cursor = info->si;
-    }
-
     size_t del_count = info->eo - info->so;
     buffer_replace_bytes(view, del_count, output->buffer, output->len);
 
@@ -259,11 +244,8 @@ ssize_t handle_exec (
     const ssize_t saved_sel_eo = view->sel_eo;
     char *alloc = NULL;
     bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
-    bool replace_input = false;
-
-    // This could be left uninitialized, but doing so makes some old compilers
-    // produce false-positive "-Wmaybe-uninitialized" warnings
-    SelectionInfo info = {.si = view->cursor};
+    bool input_from_buffer = false;
+    bool replace_unselected_input = false;
 
     SpawnContext ctx = {
         .editor = e,
@@ -280,41 +262,28 @@ ssize_t handle_exec (
 
     switch (actions[STDIN_FILENO]) {
     case EXEC_LINE:
-        if (view->selection) {
-            info = init_selection(view);
-            view->cursor = info.si;
-            ctx.input.length = info.eo - info.so;
-        } else {
+        input_from_buffer = true;
+        if (!view->selection) {
             move_bol(view);
             StringView line = block_iter_get_line(&view->cursor);
             ctx.input.length = line.length;
+            replace_unselected_input = true;
         }
-        replace_input = true;
-        get_bytes:
-        alloc = block_iter_get_bytes(&view->cursor, ctx.input.length);
-        ctx.input.data = alloc;
         break;
     case EXEC_BUFFER:
-        if (view->selection) {
-            info = init_selection(view);
-            view->cursor = info.si;
-            ctx.input.length = info.eo - info.so;
-        } else {
+        input_from_buffer = true;
+        if (!view->selection) {
             const Block *blk;
             block_for_each(blk, &view->buffer->blocks) {
                 ctx.input.length += blk->size;
             }
             move_bof(view);
+            replace_unselected_input = true;
         }
-        replace_input = true;
-        goto get_bytes;
+        break;
     case EXEC_WORD:
-        if (view->selection) {
-            info = init_selection(view);
-            view->cursor = info.si;
-            ctx.input.length = info.eo - info.so;
-            replace_input = true;
-        } else {
+        input_from_buffer = true;
+        if (!view->selection) {
             StringView line;
             size_t offset = fetch_this_line(&view->cursor, &line);
             StringView word = get_word_under_cursor(line, offset);
@@ -328,7 +297,7 @@ ssize_t handle_exec (
             view->cursor.offset += offset;
             BUG_ON(view->cursor.offset >= view->cursor.blk->size);
         }
-        goto get_bytes;
+        break;
     case EXEC_MSG: {
         String messages = dump_messages(&e->messages);
         ctx.input = strview_from_string(&messages);
@@ -373,6 +342,23 @@ ssize_t handle_exec (
         return -1;
     }
 
+    // This could be left uninitialized, but doing so makes some old compilers
+    // produce false-positive "-Wmaybe-uninitialized" warnings
+    SelectionInfo info = {.si = view->cursor};
+
+    if (view->selection && (input_from_buffer || output_to_buffer)) {
+        info = init_selection(view);
+        view->cursor = info.si;
+        if (input_from_buffer) {
+            ctx.input.length = info.eo - info.so;
+        }
+    }
+
+    if (input_from_buffer) {
+        alloc = block_iter_get_bytes(&view->cursor, ctx.input.length);
+        ctx.input.data = alloc;
+    }
+
     int err = spawn(&ctx);
     free(alloc);
     if (err != 0) {
@@ -406,7 +392,12 @@ ssize_t handle_exec (
 
     switch (actions[STDOUT_FILENO]) {
     case EXEC_BUFFER:
-        insert_output(view, output, &ctx.input, &info, replace_input);
+        if (view->selection) {
+            insert_to_selection(view, output, &info);
+        } else {
+            size_t del_count = replace_unselected_input ? ctx.input.length : 0;
+            buffer_replace_bytes(view, del_count, output->buffer, output->len);
+        }
         break;
     case EXEC_MSG:
         parse_and_activate_message(e, output);
