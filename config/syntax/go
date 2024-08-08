@@ -90,13 +90,14 @@ state ident
 
 state zero numeric
     char xX hex
-    char 0-7 oct
+    char oO0-7 oct
     char . float
     noeat check-imag
 
+# TODO: Underscores in numeric literals (https://go.dev/ref/spec#int_lit)
 state oct numeric
     char 0-7 this
-    noeat check-suffix
+    noeat check-imag
 
 state dec numeric
     char 0-9 this
@@ -104,9 +105,10 @@ state dec numeric
     char . float
     noeat check-imag
 
+# TODO: Hex float literals (https://go.dev/ref/spec#hex_float_lit)
 state hex numeric
     char 0-9a-fA-F this
-    noeat check-suffix
+    noeat check-imag
 
 state check-suffix error
     char a-zA-Z0-9_ this
@@ -121,16 +123,19 @@ state dot numeric
     recolor code 1
     noeat go
 
+# TODO: Rename to dec-float (to distinguish from hex floats)
 state float numeric
     char 0-9 this
     char eE exp
     noeat check-imag
 
+# TODO: Rename to dec-exp
 state exp numeric
     char +- exp-digit
     char 0-9 exp-digit
     noeat check-imag
 
+# TODO: Rename to dec-exp-digit
 state exp-digit numeric
     char 0-9 this
     noeat check-imag
