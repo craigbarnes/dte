@@ -5,8 +5,10 @@ AWK = awk
 VERSION = $(shell mk/version.sh 1.11.1)
 
 # These options are used unconditionally, since they've been supported
-# by GCC since at least the minimum required version (GCC 4.6).
-# <https://gcc.gnu.org/onlinedocs/gcc-4.6.4/gcc/Warning-Options.html>
+# by GCC since at least the minimum required version (GCC 4.8) and are
+# also supported by Clang.
+# - https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Warning-Options.html
+# - https://clang.llvm.org/docs/DiagnosticsReference.html
 WARNINGS = \
     -Wall -Wextra -Wformat -Wformat-security -Wformat-nonliteral \
     -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings \
@@ -15,13 +17,6 @@ WARNINGS = \
     -Wpointer-arith -Wnested-externs -Winit-self -Wbad-function-cast \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
-
-# These options are only used if $(CC) appears to support them
-WARNINGS_EXTRA = \
-    -Walloca -Walloc-zero -Wnull-dereference -Wformat-signedness \
-    -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
-    -Wcast-align=strict -Wduplicated-branches -Wduplicated-cond \
-    -Wlogical-op -Wcomma -Wmissing-noreturn -Wdate-time
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config css ctags d diff docker dte gcode gitblame \
@@ -93,11 +88,6 @@ ifeq "$(WERROR)" "1"
   WARNINGS += -Werror
 endif
 
-CWARNS = $(WARNINGS) $(foreach W,$(WARNINGS_EXTRA),$(call cc-option,$(W)))
-CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
-$(call make-lazy,CWARNS)
-$(call make-lazy,CSTD)
-
 ifneq "$(ICONV_DISABLE)" "1"
   LDLIBS += $(LDLIBS_ICONV)
 endif
@@ -136,7 +126,7 @@ else
   BASIC_CPPFLAGS += -DDEBUG=$(DEBUG)
 endif
 
-BASIC_CFLAGS += $(CSTD) $(CWARNS)
+BASIC_CFLAGS += -std=gnu11 $(WARNINGS)
 BASIC_CPPFLAGS += -D_FILE_OFFSET_BITS=64
 $(all_objects): BASIC_CPPFLAGS += -Isrc -Ibuild/gen
 
