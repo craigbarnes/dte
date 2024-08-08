@@ -181,6 +181,12 @@ Efficiency Improvements
 * Make use of [`fstatvfs(3)`], [`posix_fallocate(3)`], [`vmsplice(2)`]
   and [`tee(2)`][] (when available)
 
+* Convert uses of `$(call cc-option, ...)` macro in `mk/build.mk` to
+  generated `$(OPTCHECK)` pseudo-dependencies, so as to lower the
+  overhead of a "no-op" build. The compiler version/target can also
+  be tracked in a file and used as a dependency of all other such
+  dependencies.
+
 Testing/Debugging
 -----------------
 
