@@ -24,20 +24,19 @@ static bool include_cursor_char_in_selection(const View *view)
 
 SelectionInfo init_selection(const View *view)
 {
+    size_t so = view->sel_so;
+    size_t eo = block_iter_get_offset(&view->cursor);
+    bool swapped = (so > eo);
+
     SelectionInfo info = {
         .si = view->cursor,
-        .so = view->sel_so,
-        .eo = block_iter_get_offset(&view->cursor),
-        .swapped = false,
+        .so = swapped ? eo : so,
+        .eo = swapped ? so : eo,
+        .swapped = swapped,
     };
 
-    block_iter_goto_offset(&info.si, info.so);
-    if (info.so > info.eo) {
-        size_t o = info.so;
-        info.so = info.eo;
-        info.eo = o;
-        info.si = view->cursor;
-        info.swapped = true;
+    if (!swapped) {
+        block_iter_goto_offset(&info.si, so);
     }
 
     BlockIter ei = info.si;
