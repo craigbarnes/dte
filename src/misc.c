@@ -383,49 +383,46 @@ static void join_selection(View *view, const char *delim, size_t delim_len)
 {
     size_t count = prepare_selection(view);
     BlockIter bi = view->cursor;
-    size_t len = 0;
+    size_t ws_len = 0;
     size_t join = 0;
     CodePoint ch = 0;
     unselect(view);
     begin_change_chain();
 
     while (count > 0) {
-        if (!len) {
+        if (!ws_len) {
             view->cursor = bi;
         }
 
-        count -= block_iter_next_char(&bi, &ch);
-        if (ch == '\t' || ch == ' ') {
-            len++;
-        } else if (ch == '\n') {
-            len++;
-            join++;
-        } else {
-            if (join) {
-                buffer_replace_bytes(view, len, delim, delim_len);
-                // Skip the delimiter we inserted and the char we read last
-                block_iter_skip_bytes(&view->cursor, delim_len);
-                block_iter_next_char(&view->cursor, &ch);
-                bi = view->cursor;
-            }
-            len = 0;
-            join = 0;
+        size_t n = block_iter_next_char(&bi, &ch);
+        count -= MIN(n, count);
+        if (ch == '\n' || ch == '\t' || ch == ' ') {
+            join += (ch == '\n');
+            ws_len++;
+            continue;
         }
+
+        if (join) {
+            buffer_replace_bytes(view, ws_len, delim, delim_len);
+            // Skip the delimiter we inserted and the char we read last
+            block_iter_skip_bytes(&view->cursor, delim_len);
+            block_iter_next_char(&view->cursor, &ch);
+            bi = view->cursor;
+        }
+
+        ws_len = 0;
+        join = 0;
     }
 
-    // Don't replace last \n that is at end of the selection
     if (join && ch == '\n') {
+        // Don't replace last newline at end of selection
         join--;
-        len--;
+        ws_len--;
     }
 
     if (join) {
-        if (ch == '\n') {
-            // Don't add space to end of line
-            buffer_delete_bytes(view, len);
-        } else {
-            buffer_replace_bytes(view, len, " ", 1);
-        }
+        size_t ins_len = (ch == '\n') ? 0 : delim_len; // Don't add delim, if at eol
+        buffer_replace_bytes(view, ws_len, delim, ins_len);
     }
 
     end_change_chain(view);
