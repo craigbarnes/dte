@@ -154,8 +154,8 @@ Public License version 2 for more details.
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
 [SlackBuilds]: https://slackbuilds.org/repository/15.0/development/dte/
 [SlackBuild Usage HOWTO]: https://slackbuilds.org/howto/
-[FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
-[DPorts]: https://gitweb.dragonflybsd.org/dports.git/tree/HEAD:/editors/dte
+[FreeBSD]: https://cgit.freebsd.org/ports/tree/editors/dte
+[DPorts]: https://github.com/DragonFlyBSD/DPorts/tree/master/editors/dte
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
 [pkgsrc]: https://cdn.netbsd.org/pub/pkgsrc/current/pkgsrc/editors/dte/index.html
 [`brew`]: https://brew.sh/
