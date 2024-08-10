@@ -219,9 +219,9 @@ build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 	$(E) GEN $@
 	$(Q) cat $^ > $@
 
-build/gen/platform.mk: mk/platform.sh | build/gen/
+build/gen/platform.mk: mk/platform.sh mk/nproc.sh | build/gen/
 	$(E) GEN $@
-	$(Q) mk/platform.sh > $@
+	$(Q) mk/platform.sh >$@ 2>$(@:.mk=.log)
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c
 	$(E) DETECT $@

@@ -12,8 +12,6 @@ echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 # See also: https://blog.jgc.org/2016/07/lazy-gnu-make-variables.html
 make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
 
-NPROC = $(or $(shell sh mk/nproc.sh), 1)
-$(call make-lazy,NPROC)
 XARGS = xargs
 XARGS_P_FLAG = $(call try-run, printf "1\n2" | $(XARGS) -P2 -I@ echo '@', -P$(NPROC))
 $(call make-lazy,XARGS_P_FLAG)

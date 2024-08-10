@@ -1,10 +1,10 @@
 include mk/compat.mk
+ifneq "$(MAKECMDGOALS)" "clean"
+  include build/gen/platform.mk
+endif
 include mk/util.mk
 ifneq "$(NO_CONFIG_MK)" "1"
   -include Config.mk
-endif
-ifneq "$(MAKECMDGOALS)" "clean"
-  include build/gen/platform.mk
 endif
 include mk/build.mk
 include mk/docs.mk
