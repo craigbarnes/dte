@@ -108,6 +108,7 @@ static const struct FileExtensionMap {
     {"ins", TEX},
     {"java", JAVA},
     {"jl", JULIA},
+    {"jq", JQ},
     {"js", JAVASCRIPT},
     {"jslib", JAVASCRIPT},
     {"json", JSON},
