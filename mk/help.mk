@@ -2,9 +2,6 @@ DISTRO = $(shell (. /etc/os-release 2>/dev/null && echo "$$NAME $$VERSION_ID") |
 ARCH = $(shell uname -m 2>/dev/null)
 _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
-CC_VERSION = $(or \
-    $(shell $(CC) --version 2>/dev/null | head -n1), \
-    $(shell $(CC) -v 2>&1 | grep version) )
 CC_TARGET = $(shell $(CC) -dumpmachine 2>/dev/null)
 PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
 PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')

@@ -1,11 +1,5 @@
 include mk/compat.mk
-ifneq "$(MAKECMDGOALS)" "clean"
-  include build/gen/platform.mk
-endif
-include mk/util.mk
-ifneq "$(NO_CONFIG_MK)" "1"
-  -include Config.mk
-endif
+include mk/prelude.mk
 include mk/build.mk
 include mk/docs.mk
 include mk/gen.mk
@@ -189,7 +183,7 @@ INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic contrib
 
 NON_PARALLEL_TARGETS += clean install% uninstall%
 
-ifeq "" "$(filter $(NON_PARALLEL_TARGETS), $(or $(MAKECMDGOALS),all))"
+ifeq "" "$(call filter-cmdgoals, $(NON_PARALLEL_TARGETS))"
   ifeq "" "$(filter -j%, $(MAKEFLAGS))"
     MAKEFLAGS += -j$(NPROC)
   endif

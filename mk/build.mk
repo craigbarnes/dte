@@ -34,6 +34,10 @@ BUILTIN_CONFIGS = $(addprefix config/, \
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf insert join pipe redo replace shift repeat fuzz1 fuzz2 ))
 
+CC_VERSION = $(or \
+    $(shell $(CC) --version 2>/dev/null | head -n1), \
+    $(shell $(CC) -v 2>&1 | grep version) )
+
 util_objects := $(call prefix-obj, build/util/, \
     array ascii base64 debug fd fork-exec hashmap hashset intern intmap \
     log numtostr path ptr-array readfile string strtonum time-util unicode \
@@ -84,6 +88,10 @@ test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
 bench_sources := $(patsubst build/test/%.o, test/%.c, $(bench_objects))
 all_sources := $(editor_sources) $(test_sources) $(bench_sources)
 
+dte = dte$(EXEC_SUFFIX)
+test = build/test/test$(EXEC_SUFFIX)
+bench = build/test/bench$(EXEC_SUFFIX)
+
 ifeq "$(WERROR)" "1"
   WARNINGS += -Werror
 endif
@@ -96,19 +104,11 @@ ifeq "$(SANE_WCTYPE)" "1"
   BASIC_CPPFLAGS += -DSANE_WCTYPE=1
 endif
 
-dte = dte$(EXEC_SUFFIX)
-test = build/test/test$(EXEC_SUFFIX)
-bench = build/test/bench$(EXEC_SUFFIX)
-
 ifeq "$(USE_SANITIZER)" "1"
-  SANITIZER_FLAGS := \
-    -fsanitize=address,undefined -fsanitize-address-use-after-scope \
-    -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-common
-  CC_SANITIZER_FLAGS := $(or \
-    $(call cc-option,$(SANITIZER_FLAGS)), \
-    $(warning USE_SANITIZER set but compiler doesn't support ASan/UBSan) )
-  $(all_objects): BASIC_CFLAGS += $(CC_SANITIZER_FLAGS)
-  $(dte) $(test) $(bench): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
+  ifneq "" "$(CC_SANITIZER_FLAGS)"
+    $(all_objects): BASIC_CFLAGS += $(CC_SANITIZER_FLAGS)
+    $(dte) $(test) $(bench): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
+  endif
   DEBUG = 3
 else
   # 0: Disable debugging
@@ -119,18 +119,14 @@ else
 endif
 
 ifeq "$(DEBUG)" "0"
-  UNWIND = $(call cc-option,-fno-asynchronous-unwind-tables)
-  $(call make-lazy,UNWIND)
-  BASIC_CFLAGS += $(UNWIND)
+  BASIC_CFLAGS += $(NO_UNWIND_TABLES)
 else
   BASIC_CPPFLAGS += -DDEBUG=$(DEBUG)
 endif
 
-BASIC_CFLAGS += -std=gnu11 $(WARNINGS)
+BASIC_CFLAGS += $(WARNINGS)
 BASIC_CPPFLAGS += -D_FILE_OFFSET_BITS=64
 $(all_objects): BASIC_CPPFLAGS += -Isrc -Ibuild/gen
-
-OPTCHECK = mk/optcheck.sh $(if $(MAKE_S),-s)
 
 # If "make install*" with no other named targets
 ifeq "" "$(filter-out install%,$(or $(MAKECMDGOALS),all))"
@@ -139,11 +135,6 @@ ifeq "" "$(filter-out install%,$(or $(MAKECMDGOALS),all))"
 endif
 
 ifndef NO_DEPS
-  ifneq '' '$(call cc-option,-MMD -MP -MF /dev/null)'
-    $(all_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
-  else ifneq '' '$(call cc-option,-MD -MF /dev/null)'
-    $(all_objects): DEPFLAGS = -MD -MF $(patsubst %.o, %.mk, $@)
-  endif
   -include $(patsubst %.o, %.mk, $(all_objects))
 endif
 
@@ -156,6 +147,7 @@ $(editorconfig_objects): | build/editorconfig/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
+$(all_objects) $(feature_tests): build/gen/platform.mk build/gen/compiler.mk
 $(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
 build/convert.o: build/gen/buildvar-iconv.h
 build/gen/builtin-config.h: build/gen/builtin-config.mk
@@ -195,6 +187,9 @@ build/all.ldflags: FORCE | build/
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CFLAGS_ALL)' $@
 
+build/gen/cc-version.txt: FORCE | build/gen/
+	@$(OPTCHECK) '$(CC) => $(CC_VERSION)' $@
+
 build/gen/version.h: FORCE | build/gen/
 	@$(OPTCHECK) '$(HASH)define VERSION "$(VERSION)"' $@
 
@@ -222,6 +217,10 @@ build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 build/gen/platform.mk: mk/platform.sh mk/nproc.sh | build/gen/
 	$(E) GEN $@
 	$(Q) mk/platform.sh >$@ 2>$(@:.mk=.log)
+
+build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
+	$(E) GEN $@
+	$(Q) mk/compiler.sh '$(CC)' >$@ 2>$(@:.mk=.log)
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c
 	$(E) DETECT $@

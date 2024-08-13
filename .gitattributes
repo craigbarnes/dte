@@ -60,6 +60,7 @@ LICENSE text
 /tools/git-hooks/pre-commit ctfull ctdoc
 /GNUmakefile ctfull ctdoc
 /mk/compat.mk ctfull ctdoc
+/mk/prelude.mk ctfull ctdoc
 /mk/util.mk ctfull ctdoc
 /mk/build.mk ctfull
 /mk/docs.mk ctdoc
