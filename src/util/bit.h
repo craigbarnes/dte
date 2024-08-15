@@ -5,7 +5,17 @@
 #include "debug.h"
 #include "macros.h"
 
-#if __STDC_VERSION__ >= 202311L || HAS_INCLUDE(<stdbit.h>)
+/*
+ * The default C compiler on FreeBSD 14.1 (Clang 18.1.5) accepts the
+ * -std=gnu23 command-line option and then defines __STDC_VERSION__ as
+ * 202311L, while not actually providing a C23 conforming libc (the
+ * <stdbit.h> header is missing). This guard condition originally used
+ * `||` instead of `&&`, but it was changed so as to work around this
+ * disregard for standards. Fortunately this doesn't really have any
+ * downsides, since __has_include() was adopted by C23 (originally
+ * from Clang) and the use of <stdbit.h> is optional here.
+ */
+#if __STDC_VERSION__ >= 202311L && HAS_INCLUDE(<stdbit.h>)
     #include <stdbit.h>
     #define USE_STDBIT(fn, arg) return fn(arg)
 #else
