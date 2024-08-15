@@ -12,8 +12,8 @@
  * <stdbit.h> header is missing). This guard condition originally used
  * `||` instead of `&&`, but it was changed so as to work around this
  * disregard for standards. Fortunately this doesn't really have any
- * downsides, since __has_include() was adopted by C23 (originally
- * from Clang) and the use of <stdbit.h> is optional here.
+ * downsides for other platforms, since __has_include() is also part
+ * of C23.
  */
 #if __STDC_VERSION__ >= 202311L && HAS_INCLUDE(<stdbit.h>)
     #include <stdbit.h>

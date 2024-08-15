@@ -73,6 +73,7 @@
 
 // https://gcc.gnu.org/onlinedocs/gcc-9.5.0/cpp/_005f_005fhas_005finclude.html
 // https://clang.llvm.org/docs/LanguageExtensions.html#has-include
+// https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2799.pdf
 #ifdef __has_include
     // Supported by GCC 9+ and Clang
     #define HAS_INCLUDE(x) __has_include(x)
