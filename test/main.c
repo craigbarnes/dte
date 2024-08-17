@@ -138,6 +138,10 @@ static void test_init(TestContext *ctx)
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
     LOG_NOTICE("%s: testing LOG_NOTICE()", __func__);
     LOG_INFO("%s: testing LOG_INFO()", __func__);
+    LOG_DEBUG("%s: testing LOG_DEBUG()", __func__);
+    LOG_TRACE("%s: testing LOG_TRACE()", __func__);
+    log_write(LOG_LEVEL_WARNING, STRN("testing log_write()"));
+    log_write(LOG_LEVEL_INFO, STRN("testing log_write()"));
 
     EditorState *e = init_editor_state();
     ctx->userdata = e;

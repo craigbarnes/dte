@@ -28,8 +28,8 @@ static inline void timespec_subtract (
     const struct timespec *rhs,
     struct timespec *res
 ) {
-    BUG_ON(lhs->tv_nsec > NS_PER_SECOND);
-    BUG_ON(rhs->tv_nsec > NS_PER_SECOND);
+    BUG_ON(lhs->tv_nsec >= NS_PER_SECOND);
+    BUG_ON(rhs->tv_nsec >= NS_PER_SECOND);
     res->tv_sec = lhs->tv_sec - rhs->tv_sec;
     res->tv_nsec = lhs->tv_nsec - rhs->tv_nsec;
     if (res->tv_nsec < 0) {

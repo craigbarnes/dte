@@ -2790,6 +2790,21 @@ static void test_log_level_to_str(TestContext *ctx)
     EXPECT_STREQ(log_level_to_str(LOG_LEVEL_TRACE), "trace");
 }
 
+static void test_timespec_subtract(TestContext *ctx)
+{
+    struct timespec a = {.tv_sec = 3, .tv_nsec = 5497};
+    struct timespec b = {.tv_sec = 1, .tv_nsec = NS_PER_SECOND - 1};
+    struct timespec r;
+    timespec_subtract(&a, &b, &r);
+    EXPECT_EQ(r.tv_sec, 1);
+    EXPECT_EQ(r.tv_nsec, 5498);
+
+    b.tv_nsec = 501;
+    timespec_subtract(&a, &b, &r);
+    EXPECT_EQ(r.tv_sec, 2);
+    EXPECT_EQ(r.tv_nsec, 4996);
+}
+
 static void test_timespec_cmp(TestContext *ctx)
 {
     struct timespec a = {.tv_sec = 42, .tv_nsec = 980};
@@ -2941,6 +2956,7 @@ static const TestEntry tests[] = {
     TEST(test_xmemmem),
     TEST(test_log_level_from_str),
     TEST(test_log_level_to_str),
+    TEST(test_timespec_subtract),
     TEST(test_timespec_cmp),
     TEST(test_timespec_to_str),
     TEST(test_progname),

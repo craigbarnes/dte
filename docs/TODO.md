@@ -148,8 +148,6 @@ Efficiency Improvements
   so that pointers can be mass-appended directly instead of via
   `ptr_array_append()`
 
-* Replace most uses of `BSEARCH()` with [`gperf`]-generated "perfect" hashes
-
 * Optimize `COND_CHAR` case in `highlight_line()` to use `memchr(3)`, if
   `ConditionData::bitset` population count is 255 and the destination is
   the current state (i.e. as set by `char -n . this`)
@@ -186,6 +184,8 @@ Testing/Debugging
 -----------------
 
 * Set up continuous testing on OpenBSD, FreeBSD and NetBSD
+  (see https://hub.docker.com/r/madworx/netbsd/ for one possible
+  approach to this)
 
 * Remove `#if` guards in `test/*.c`, so that "passed" count stays the same
   regardless of compiler/platform
@@ -205,8 +205,6 @@ Testing/Debugging
   * `u_skip_chars()`
   * `u_make_printable_mem()`
   * `path_slice_relative()`
-  * `timespec_subtract()`
-  * `log_write()`
   * `handle_exec()`
   * `spawn_compiler()`
   * `dump_buffer()`
@@ -228,7 +226,6 @@ Testing/Debugging
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
 [foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
-[`gperf`]: https://www.gnu.org/software/gperf/
 [`ltrace(1)`]: https://man7.org/linux/man-pages/man1/ltrace.1.html
 [`fstatvfs(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/fstatvfs.html
 [`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
