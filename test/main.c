@@ -34,6 +34,7 @@ extern const TestGroup frame_tests;
 extern const TestGroup history_tests;
 extern const TestGroup indent_tests;
 extern const TestGroup option_tests;
+extern const TestGroup regexp_tests;
 extern const TestGroup shift_tests;
 extern const TestGroup spawn_tests;
 extern const TestGroup status_tests;
@@ -355,6 +356,7 @@ int main(int argc, char *argv[])
     run_tests(&ctx, &init_tests);
     run_tests(&ctx, &util_tests);
     run_tests(&ctx, &indent_tests);
+    run_tests(&ctx, &regexp_tests);
     run_tests(&ctx, &command_tests);
     run_tests(&ctx, &option_tests);
     run_tests(&ctx, &editorconfig_tests);

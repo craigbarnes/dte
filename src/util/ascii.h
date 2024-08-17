@@ -12,7 +12,7 @@ typedef enum {
     ASCII_SPACE = 0x01,
     ASCII_DIGIT = 0x02,
     ASCII_CNTRL = 0x04,
-    ASCII_REGEX = 0x08,
+    ASCII_REGEX = 0x08, // [$()*+.?[^{|\]
     ASCII_LOWER = 0x10,
     ASCII_UPPER = 0x20,
     ASCII_UNDERSCORE = 0x40,
