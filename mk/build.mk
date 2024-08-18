@@ -32,7 +32,8 @@ BUILTIN_CONFIGS = $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
-    env thai crlf insert join pipe redo replace shift repeat fuzz1 fuzz2 ))
+    env thai crlf insert join change pipe redo replace shift repeat \
+    fuzz1 fuzz2 ))
 
 CC_VERSION = $(or \
     $(shell $(CC) --version 2>/dev/null | head -n1), \

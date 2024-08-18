@@ -1,0 +1,17 @@
+open
+insert "test the CHANGE_MERGE_{DELETE,ERASE} conditions in record_delete()"
+undo
+
+insert "123456789\n"
+repeat 4 right
+erase
+erase
+delete
+delete
+copy
+undo
+undo
+paste
+
+save -f build/test/change.txt
+close -f

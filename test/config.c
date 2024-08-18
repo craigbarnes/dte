@@ -98,6 +98,7 @@ static void test_exec_config(TestContext *ctx)
         "crlf.txt",
         "insert.txt",
         "join.txt",
+        "change.txt",
         "thai-utf8.txt",
         "pipe-from.txt",
         "pipe-to.txt",
