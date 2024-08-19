@@ -15,6 +15,7 @@ Features
 * Customizable [color schemes] (including 24-bit RGB)
 * Customizable [key bindings]
 * [Command language] with auto-completion
+* [Macro] recording
 * Unicode 15 compatible text rendering
 * Support for all xterm key combos (including [`modifyOtherKeys`])
 * Support for [kitty's keyboard protocol]
@@ -130,6 +131,7 @@ Public License version 2 for more details.
 [color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
+[Macro]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
 [external commands]: https://craigbarnes.gitlab.io/dte/dterc.html#external-commands
 [stdio]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [screenshot]: https://craigbarnes.gitlab.io/dte/screenshot.png
