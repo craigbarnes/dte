@@ -107,8 +107,10 @@ static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx,
 
 bool search_tag(View *view, const char *pattern)
 {
+    // DEFAULT_REGEX_FLAGS is not used here because pattern has been
+    // escaped by parse_ex_pattern() for use as a POSIX BRE
     regex_t regex;
-    if (!regexp_compile_basic(&regex, pattern, REG_NEWLINE)) {
+    if (!regexp_compile_internal(&regex, pattern, REG_NEWLINE)) {
         return false;
     }
 

@@ -43,12 +43,6 @@ static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
 }
 
 WARN_UNUSED_RESULT
-static inline bool regexp_compile_basic(regex_t *re, const char *pattern, int flags)
-{
-    return regexp_compile_internal(re, pattern, flags);
-}
-
-WARN_UNUSED_RESULT
 static inline bool regexp_is_valid(const char *pattern, int flags)
 {
     regex_t re;
