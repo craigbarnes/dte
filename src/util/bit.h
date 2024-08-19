@@ -25,8 +25,7 @@
 #define U64(x) (UINT64_C(x))
 #define U32(x) (UINT32_C(x))
 
-// https://gcc.gnu.org/onlinedocs/gcc-3.4.6/gcc/Other-Builtins.html#Other-Builtins
-#if GNUC_AT_LEAST(3, 4) || HAS_BUILTIN(__builtin_types_compatible_p)
+#ifdef HAS_BUILTIN_TYPES_COMPATIBLE_P
     #define HAS_COMPATIBLE_BUILTIN(arg, type, fn) \
         (GNUC_AT_LEAST(3, 4) || HAS_BUILTIN(__builtin_ ## fn)) \
         && __builtin_types_compatible_p(__typeof__(arg), type)

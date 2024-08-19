@@ -330,6 +330,7 @@
     #define static_assert(x)
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc-3.1.1/gcc/Other-Builtins.html#:~:text=__builtin_types_compatible_p
 #if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_types_compatible_p)
     #define HAS_BUILTIN_TYPES_COMPATIBLE_P 1
 #endif
