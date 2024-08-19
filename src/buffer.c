@@ -415,21 +415,22 @@ void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
 String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
 {
     uintmax_t counts[2];
+    char hrsize[HRSIZE_MAX];
     buffer_count_blocks_and_bytes(buffer, counts);
     BUG_ON(counts[0] < 1);
     BUG_ON(!buffer->setup);
-    String buf = string_new(1024);
+    String buf = string_new(1024 + (DEBUG ? 24 * counts[0] : 0));
 
     string_sprintf (
         &buf,
-        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %ju\n",
+        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %s (%ju)\n",
         "     Name:", buffer_filename(buffer),
         "       ID:", buffer->id,
         " Encoding:", buffer->encoding,
         " Filetype:", buffer->options.filetype,
         "   Blocks:", counts[0],
         "    Lines:", buffer->nl,
-        "    Bytes:", counts[1]
+        "    Bytes:", human_readable_size(counts[1], hrsize), counts[1]
     );
 
     if (
@@ -460,13 +461,13 @@ String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
         string_sprintf (
             &buf,
             "\nLast stat:\n----------\n\n"
-            "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
+            "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %s (%ju)\n%s %jd\n%s %ju\n",
             "     Path:", buffer->abs_filename,
             " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
             "     Mode:", filemode_to_str(file->mode, modestr), perms,
             "     User:", (intmax_t)file->uid,
             "    Group:", (intmax_t)file->gid,
-            "     Size:", (uintmax_t)file->size,
+            "     Size:", human_readable_size(file->size, hrsize), (uintmax_t)file->size,
             "   Device:", (intmax_t)file->dev,
             "    Inode:", (uintmax_t)file->ino
         );

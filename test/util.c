@@ -1265,6 +1265,40 @@ static void test_filemode_to_str(TestContext *ctx)
 #endif
 }
 
+static void test_human_readable_size(TestContext *ctx)
+{
+    char buf[HRSIZE_MAX];
+    EXPECT_STREQ(human_readable_size(1u << 10, buf), "1 KiB");
+    EXPECT_STREQ(human_readable_size(4u << 10, buf), "4 KiB");
+    EXPECT_STREQ(human_readable_size(9u << 20, buf), "9 MiB");
+    EXPECT_STREQ(human_readable_size(1024u << 10, buf), "1 MiB");
+    EXPECT_STREQ(human_readable_size(1024u << 20, buf), "1 GiB");
+    EXPECT_STREQ(human_readable_size(1023u << 10, buf), "1023 KiB");
+    EXPECT_STREQ(human_readable_size(1023u << 20, buf), "1023 MiB");
+    EXPECT_STREQ(human_readable_size(900ull << 30, buf), "900 GiB");
+    EXPECT_STREQ(human_readable_size(1ull << 62, buf), "4 EiB");
+    EXPECT_STREQ(human_readable_size((1ull << 62) + 232ull, buf), "4 EiB");
+    EXPECT_STREQ(human_readable_size(3ull << 61, buf), "6 EiB");
+    EXPECT_STREQ(human_readable_size(11ull << 59, buf), "5.50 EiB");
+
+    // Compare to e.g.: numfmt --to=iec --format=%0.7f 7427273
+    EXPECT_STREQ(human_readable_size(4106, buf), "4.01 KiB");
+    EXPECT_STREQ(human_readable_size(4192, buf), "4.09 KiB");
+    EXPECT_STREQ(human_readable_size(4195, buf), "4.09 KiB");
+    EXPECT_STREQ(human_readable_size(4196, buf), "4.10 KiB");
+    EXPECT_STREQ(human_readable_size(4197, buf), "4.10 KiB");
+    EXPECT_STREQ(human_readable_size(7427273, buf), "7.08 MiB");
+    EXPECT_STREQ(human_readable_size(1116691500ull, buf), "1.04 GiB");
+    EXPECT_STREQ(human_readable_size(8951980327583ull, buf), "8.14 TiB");
+    EXPECT_STREQ(human_readable_size(8951998035275183ull, buf), "7.95 PiB");
+
+    // Edge case: this currently yields "8 EiB", but should be "16 EiB".
+    // This isn't a problem in practice, since the uintmax_t values passed
+    // to the function originate from off_t values (stat::st_size), which
+    // are signed and thus never have the MSB set.
+    // EXPECT_STREQ(human_readable_size(1ull << 63, buf), "16 EiB");
+}
+
 static void test_u_char_size(TestContext *ctx)
 {
     EXPECT_EQ(u_char_size('\0'), 1);
@@ -2906,6 +2940,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_uint_to_str),
     TEST(test_buf_u8_to_str),
     TEST(test_filemode_to_str),
+    TEST(test_human_readable_size),
     TEST(test_u_char_size),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),

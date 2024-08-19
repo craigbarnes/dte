@@ -2,6 +2,7 @@
 // Copyright © Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include <string.h>
 #include <sys/stat.h>
 #include "numtostr.h"
 #include "arith.h"
@@ -151,5 +152,44 @@ char *filemode_to_str(mode_t mode, char *buf)
     buf[8] = xmap[4 + ((mode & S_IXOTH) | ((mode & VTXBIT) >> 8))];
 
     buf[9] = '\0';
+    return buf;
+}
+
+char *human_readable_size(uintmax_t bytes, char *buf)
+{
+    // See note in test_human_readable_size()
+    BUG_ON(bytes >= ~((UINTMAX_MAX << 1) >> 1));
+
+    static const char suffixes[8] = "KMGTPEZY";
+    uintmax_t ipart = bytes;
+    size_t nshifts = 0;
+
+    // TODO: Use stdc_leading_zeros() instead of looping?
+    while (ipart >= 1024 && nshifts < ARRAYLEN(suffixes)) {
+        ipart >>= 10;
+        nshifts++;
+    }
+
+    uintmax_t unit = ((uintmax_t)1) << (nshifts * 10);
+    uintmax_t remainder = bytes & (unit - 1);
+    uintmax_t hundredth = unit / 100;
+    // TODO: Use shifting here, to avoid div the compiler won't optimize
+    unsigned int fpart = hundredth ? remainder / hundredth : 0;
+    size_t i = buf_umax_to_str(ipart, buf);
+
+    if (fpart > 0) {
+        buf[i++] = '.';
+        buf[i++] = '0' + ((fpart / 10) % 10);
+        buf[i++] = '0' + (fpart % 10);
+    }
+
+    buf[i++] = ' ';
+    if (nshifts > 0) {
+        buf[i++] = suffixes[nshifts - 1];
+        buf[i++] = 'i';
+    }
+
+    buf[i++] = 'B';
+    buf[i++] = '\0';
     return buf;
 }
