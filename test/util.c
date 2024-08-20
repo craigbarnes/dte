@@ -1305,7 +1305,7 @@ static void test_human_readable_size(TestContext *ctx)
     // Some of these results are arguably off by 0.01, but that's fine
     // given the approximate nature of the function and its use cases.
     // These tests are here mostly to exercise edge cases and provide
-    // useful feedback when tweaking the algorith.
+    // useful feedback when tweaking the algorithm.
     EXPECT_STREQ(human_readable_size(5242803, buf), "4.99 MiB");
     EXPECT_STREQ(human_readable_size(5242804, buf), "5 MiB");
     EXPECT_STREQ(human_readable_size(5242879, buf), "5 MiB");
