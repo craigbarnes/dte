@@ -180,6 +180,10 @@ Efficiency Improvements
 * Make use of [`fstatvfs(3)`], [`posix_fallocate(3)`], [`vmsplice(2)`]
   and [`tee(2)`][] (when available)
 
+* Use kitty's [extended clipboard protocol], when available, to allow
+  writing to the clipboard in chunks (instead of as a single `OSC 52`
+  string)
+
 Testing/Debugging
 -----------------
 
@@ -231,3 +235,4 @@ Testing/Debugging
 [`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
 [`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
 [`tee(2)`]: https://man7.org/linux/man-pages/man2/tee.2.html
+[extended clipboard protocol]: https://sw.kovidgoyal.net/kitty/clipboard/
