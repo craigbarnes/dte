@@ -428,6 +428,8 @@ static void test_complete_command(TestContext *ctx)
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "exec -o buffer");
     complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -o echo");
+    complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "exec -o eval");
     reset_completion(c);
 

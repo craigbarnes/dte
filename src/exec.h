@@ -13,6 +13,7 @@ typedef enum {
     // Note: items below here need to be kept sorted
     EXEC_BUFFER = 0,
     EXEC_COMMAND,
+    EXEC_ECHO,
     EXEC_ERRMSG,
     EXEC_EVAL,
     EXEC_LINE,

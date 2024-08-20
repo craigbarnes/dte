@@ -40,6 +40,7 @@ static const struct {
 } exec_map[] = {
     [EXEC_BUFFER] = {"buffer", IN | OUT},
     [EXEC_COMMAND] = {"command", IN},
+    [EXEC_ECHO] = {"echo", OUT},
     [EXEC_ERRMSG] = {"errmsg", ERR},
     [EXEC_EVAL] = {"eval", OUT},
     [EXEC_LINE] = {"line", IN},
@@ -334,6 +335,7 @@ ssize_t handle_exec (
     // These can't be used as input actions and should be prevented by
     // the validity checks in cmd_exec():
     case EXEC_TAG:
+    case EXEC_ECHO:
     case EXEC_EVAL:
     case EXEC_ERRMSG:
     case EXEC_INVALID:
@@ -397,6 +399,13 @@ ssize_t handle_exec (
         } else {
             size_t del_count = replace_unselected_input ? ctx.input.length : 0;
             buffer_replace_bytes(view, del_count, output->buffer, output->len);
+        }
+        break;
+    case EXEC_ECHO:
+        if (output->len) {
+            size_t pos = 0;
+            StringView line = buf_slice_next_line(output->buffer, &pos, output->len);
+            info_msg("%.*s", (int)line.length, line.data);
         }
         break;
     case EXEC_MSG:
