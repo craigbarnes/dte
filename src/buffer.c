@@ -412,10 +412,25 @@ void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
     counts[1] = bytes;
 }
 
+static const char *fmt_filesize(uintmax_t bytes, char *buf)
+{
+    human_readable_size(bytes, buf);
+    if (bytes < 1024) {
+        return buf;
+    }
+    size_t i = strlen(buf);
+    buf[i++] = ' ';
+    buf[i++] = '(';
+    i += buf_umax_to_str(bytes, buf + i);
+    buf[i++] = ')';
+    buf[i] = '\0';
+    return buf;
+}
+
 String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
 {
     uintmax_t counts[2];
-    char hrsize[HRSIZE_MAX];
+    char sizestr[HRSIZE_MAX + DECIMAL_STR_MAX(counts[1]) + 4];
     buffer_count_blocks_and_bytes(buffer, counts);
     BUG_ON(counts[0] < 1);
     BUG_ON(!buffer->setup);
@@ -423,14 +438,15 @@ String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
 
     string_sprintf (
         &buf,
-        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %s (%ju)\n",
+        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %s\n",
         "     Name:", buffer_filename(buffer),
         "       ID:", buffer->id,
         " Encoding:", buffer->encoding,
         " Filetype:", buffer->options.filetype,
         "   Blocks:", counts[0],
         "    Lines:", buffer->nl,
-        "    Bytes:", human_readable_size(counts[1], hrsize), counts[1]
+        "     Size:", fmt_filesize(counts[1], sizestr)
+
     );
 
     if (
@@ -461,13 +477,13 @@ String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
         string_sprintf (
             &buf,
             "\nLast stat:\n----------\n\n"
-            "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %s (%ju)\n%s %jd\n%s %ju\n",
+            "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %s\n%s %jd\n%s %ju\n",
             "     Path:", buffer->abs_filename,
             " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
             "     Mode:", filemode_to_str(file->mode, modestr), perms,
             "     User:", (intmax_t)file->uid,
             "    Group:", (intmax_t)file->gid,
-            "     Size:", human_readable_size(file->size, hrsize), (uintmax_t)file->size,
+            "     Size:", fmt_filesize(file->size, sizestr),
             "   Device:", (intmax_t)file->dev,
             "    Inode:", (uintmax_t)file->ino
         );
