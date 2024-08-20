@@ -171,10 +171,18 @@ char *human_readable_size(uintmax_t bytes, char *buf)
     }
 
     uintmax_t unit = ((uintmax_t)1) << (nshifts * 10);
-    uintmax_t remainder = bytes & (unit - 1);
     uintmax_t hundredth = unit / 100;
-    // TODO: Use shifting here, to avoid div the compiler won't optimize
-    unsigned int fpart = hundredth ? remainder / hundredth : 0;
+    unsigned int fpart = 0;
+    if (hundredth) {
+        uintmax_t remainder = bytes & (unit - 1);
+        // TODO: Use shifting here, to avoid emitting a divide instruction
+        fpart = remainder / hundredth;
+        if (fpart > 99) {
+            ipart++;
+            fpart = 0;
+        }
+    }
+
     size_t i = buf_umax_to_str(ipart, buf);
 
     if (fpart > 0) {

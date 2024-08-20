@@ -1268,6 +1268,9 @@ static void test_filemode_to_str(TestContext *ctx)
 static void test_human_readable_size(TestContext *ctx)
 {
     char buf[HRSIZE_MAX];
+    EXPECT_STREQ(human_readable_size(0, buf), "0 B");
+    EXPECT_STREQ(human_readable_size(1, buf), "1 B");
+    EXPECT_STREQ(human_readable_size(10, buf), "10 B");
     EXPECT_STREQ(human_readable_size(1u << 10, buf), "1 KiB");
     EXPECT_STREQ(human_readable_size(4u << 10, buf), "4 KiB");
     EXPECT_STREQ(human_readable_size(9u << 20, buf), "9 MiB");
@@ -1282,15 +1285,32 @@ static void test_human_readable_size(TestContext *ctx)
     EXPECT_STREQ(human_readable_size(11ull << 59, buf), "5.50 EiB");
 
     // Compare to e.g.: numfmt --to=iec --format=%0.7f 7427273
+    EXPECT_STREQ(human_readable_size(990, buf), "990 B");
+    EXPECT_STREQ(human_readable_size(1023, buf), "1023 B");
+    EXPECT_STREQ(human_readable_size(1025, buf), "1 KiB");
+    EXPECT_STREQ(human_readable_size(1123, buf), "1.09 KiB");
+    EXPECT_STREQ(human_readable_size(1124, buf), "1.10 KiB");
+    EXPECT_STREQ(human_readable_size(1127, buf), "1.10 KiB");
     EXPECT_STREQ(human_readable_size(4106, buf), "4.01 KiB");
     EXPECT_STREQ(human_readable_size(4192, buf), "4.09 KiB");
     EXPECT_STREQ(human_readable_size(4195, buf), "4.09 KiB");
     EXPECT_STREQ(human_readable_size(4196, buf), "4.10 KiB");
     EXPECT_STREQ(human_readable_size(4197, buf), "4.10 KiB");
+    EXPECT_STREQ(human_readable_size(6947713, buf), "6.62 MiB");
     EXPECT_STREQ(human_readable_size(7427273, buf), "7.08 MiB");
     EXPECT_STREQ(human_readable_size(1116691500ull, buf), "1.04 GiB");
     EXPECT_STREQ(human_readable_size(8951980327583ull, buf), "8.14 TiB");
     EXPECT_STREQ(human_readable_size(8951998035275183ull, buf), "7.95 PiB");
+
+    // Some of these results are arguably off by 0.01, but that's fine
+    // given the approximate nature of the function and its use cases.
+    // These tests are here mostly to exercise edge cases and provide
+    // useful feedback when tweaking the algorith.
+    EXPECT_STREQ(human_readable_size(5242803, buf), "4.99 MiB");
+    EXPECT_STREQ(human_readable_size(5242804, buf), "5 MiB");
+    EXPECT_STREQ(human_readable_size(5242879, buf), "5 MiB");
+    EXPECT_STREQ(human_readable_size(5242880, buf), "5 MiB");
+    EXPECT_STREQ(human_readable_size(5242881, buf), "5 MiB");
 
     // Edge case: this currently yields "8 EiB", but should be "16 EiB".
     // This isn't a problem in practice, since the uintmax_t values passed
