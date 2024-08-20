@@ -1268,9 +1268,9 @@ static void test_filemode_to_str(TestContext *ctx)
 static void test_human_readable_size(TestContext *ctx)
 {
     char buf[HRSIZE_MAX];
-    EXPECT_STREQ(human_readable_size(0, buf), "0 B");
-    EXPECT_STREQ(human_readable_size(1, buf), "1 B");
-    EXPECT_STREQ(human_readable_size(10, buf), "10 B");
+    EXPECT_STREQ(human_readable_size(0, buf), "0");
+    EXPECT_STREQ(human_readable_size(1, buf), "1");
+    EXPECT_STREQ(human_readable_size(10, buf), "10");
     EXPECT_STREQ(human_readable_size(1u << 10, buf), "1 KiB");
     EXPECT_STREQ(human_readable_size(4u << 10, buf), "4 KiB");
     EXPECT_STREQ(human_readable_size(9u << 20, buf), "9 MiB");
@@ -1285,8 +1285,8 @@ static void test_human_readable_size(TestContext *ctx)
     EXPECT_STREQ(human_readable_size(11ull << 59, buf), "5.50 EiB");
 
     // Compare to e.g.: numfmt --to=iec --format=%0.7f 7427273
-    EXPECT_STREQ(human_readable_size(990, buf), "990 B");
-    EXPECT_STREQ(human_readable_size(1023, buf), "1023 B");
+    EXPECT_STREQ(human_readable_size(990, buf), "990");
+    EXPECT_STREQ(human_readable_size(1023, buf), "1023");
     EXPECT_STREQ(human_readable_size(1025, buf), "1 KiB");
     EXPECT_STREQ(human_readable_size(1123, buf), "1.09 KiB");
     EXPECT_STREQ(human_readable_size(1124, buf), "1.10 KiB");

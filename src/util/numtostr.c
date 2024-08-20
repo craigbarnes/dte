@@ -191,13 +191,13 @@ char *human_readable_size(uintmax_t bytes, char *buf)
         buf[i++] = '0' + (fpart % 10);
     }
 
-    buf[i++] = ' ';
     if (nshifts > 0) {
+        buf[i++] = ' ';
         buf[i++] = suffixes[nshifts - 1];
         buf[i++] = 'i';
+        buf[i++] = 'B';
     }
 
-    buf[i++] = 'B';
     buf[i++] = '\0';
     return buf;
 }
