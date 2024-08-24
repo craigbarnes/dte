@@ -158,7 +158,7 @@ char *filemode_to_str(mode_t mode, char *buf)
 char *human_readable_size(uintmax_t bytes, char *buf)
 {
     // See note in test_human_readable_size()
-    BUG_ON(bytes >= ~((UINTMAX_MAX << 1) >> 1));
+    BUG_ON(bytes >= ~(UINTMAX_MAX >> 1));
 
     static const char suffixes[8] = "KMGTPEZY";
     uintmax_t ipart = bytes;
