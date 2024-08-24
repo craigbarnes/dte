@@ -4,9 +4,12 @@
 GCOVR ?= gcovr
 GCOVRFLAGS ?= -j$(NPROC) --config gcovr.cfg --sort uncovered-percent --sort-reverse
 
-coverage-report: gcovr-html
 gcovr-html: public/coverage/index.html
 gcovr-xml: build/coverage.xml
+
+# Convenience target, for opening HTML coverage report in $BROWSER
+coverage: public/coverage/index.html
+	$(if $(BROWSER), $(BROWSER) $<, $(error $$BROWSER not set))
 
 public/coverage/index.html: FORCE | public/coverage/
 	$(RM) public/coverage/*.html public/coverage/*.html.gz
@@ -23,7 +26,7 @@ public/coverage/: public/
 	$(Q) mkdir -p $@
 
 
-NON_PARALLEL_TARGETS += coverage-report gcovr-html gcovr-xml
+NON_PARALLEL_TARGETS += gcovr-html gcovr-xml coverage
 NON_PARALLEL_TARGETS += public/coverage/index.html build/coverage.xml
 
-.PHONY: coverage-report gcovr-html gcovr-xml
+.PHONY: gcovr-html gcovr-xml coverage
