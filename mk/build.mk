@@ -149,7 +149,7 @@ $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
 $(all_objects) $(feature_tests): build/gen/platform.mk build/gen/compiler.mk
-$(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
+$(feature_tests): mk/feature-test/defs.h build/all.cflags
 build/convert.o: build/gen/buildvar-iconv.h
 build/gen/builtin-config.h: build/gen/builtin-config.mk
 build/gen/test-data.h: build/gen/test-data.mk
@@ -168,7 +168,7 @@ build/util/xmemmem.o: build/gen/feature.h
 CFLAGS_FILTERED = $(filter-out -fexceptions, $(CFLAGS))
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS_FILTERED) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS_FILTERED) $(LDFLAGS) $(BASIC_LDFLAGS)
-featuredef = $(HASH)define HAVE_$(call toupper,$(notdir $(basename $(1))))
+CFLAGS_FTEST = $(filter-out --coverage, $(CFLAGS_ALL)) -Werror
 
 $(dte) $(test) $(bench): build/all.ldflags
 	$(E) LINK $@
@@ -223,13 +223,9 @@ build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
 	$(E) GEN $@
 	$(Q) mk/compiler.sh '$(CC)' >$@ 2>$(@:.mk=.log)
 
-$(feature_tests): build/feature/%.h: mk/feature-test/%.c
+$(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/feature/
 	$(E) DETECT $@
-	$(Q) if $(CC) $(filter-out --coverage, $(CFLAGS_ALL)) -Werror -o $(@:.h=.o) $< 2>$(@:.h=.log); then \
-	  echo '$(call featuredef,$@) 1' > $@ ; \
-	else \
-	  echo '$(call featuredef,$@) 0' > $@ ; \
-	fi
+	$(Q) mk/feature.sh '$(call toupper,$*)' $(CC) $(CFLAGS_FTEST) -o $(@:.h=.o) $< 2>$(@:.h=.log) >$@
 
 build/ $(build_subdirs):
 	$(Q) mkdir -p $@
