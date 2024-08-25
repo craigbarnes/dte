@@ -26,7 +26,8 @@ Features
 * [Copy] to system clipboard (using [OSC 52], which works over SSH)
 * [EditorConfig] support
 * Extensible via [external commands] and [stdio]
-* Minimal dependencies (just libc on most systems)
+* Minimal run-time dependencies (just libc on most systems)
+* Minimal build-time dependencies (just [GNU Make] and standard [POSIX] utilities)
 * Portable (to any [POSIX] 2008 operating system)
 * Fast startup (~10ms)
 
