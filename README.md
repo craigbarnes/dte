@@ -27,7 +27,7 @@ Features
 * [EditorConfig] support
 * Extensible via [external commands] and [stdio]
 * Minimal run-time dependencies (just libc on most systems)
-* Minimal build-time dependencies (just [GNU Make] and standard [POSIX] utilities)
+* Minimal build-time dependencies (just [GNU Make] and a C99 compiler)
 * Portable (to any [POSIX] 2008 operating system)
 * Fast startup (~10ms)
 
