@@ -1,6 +1,5 @@
 HASH := \#
 streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
-toupper = $(shell echo '$(1)' | tr '[:lower:]' '[:upper:]')
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
 echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 

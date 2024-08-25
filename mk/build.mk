@@ -225,7 +225,7 @@ build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/feature/
 	$(E) DETECT $@
-	$(Q) mk/feature.sh '$(call toupper,$*)' $(CC) $(CFLAGS_FTEST) -o $(@:.h=.o) $< 2>$(@:.h=.log) >$@
+	$(Q) mk/feature.sh '$*' $(CC) $(CFLAGS_FTEST) -o $(@:.h=.o) $< 2>$(@:.h=.log) >$@
 
 build/ $(build_subdirs):
 	$(Q) mkdir -p $@
