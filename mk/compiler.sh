@@ -22,6 +22,10 @@ else
     echo 'BASIC_CFLAGS += -std=gnu11'
 fi
 
+if cc_option -fvisibility=hidden; then
+    echo 'BASIC_CFLAGS += -fvisibility=hidden'
+fi
+
 if cc_option -MMD -MP -MF /dev/null; then
     echo 'DEPFLAGS = -MMD -MP -MF $(@:.o=.mk)'
 elif cc-option -MD -MF /dev/null; then
