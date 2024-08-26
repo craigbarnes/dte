@@ -168,7 +168,7 @@ void update_screen(EditorState *e, const ScreenState *s)
             mark_all_lines_changed(buffer);
             flags |= UPDATE_TERM_TITLE;
         }
-        update_buffer_windows(e, buffer);
+        update_buffer_windows(e);
     }
 
     if (flags & UPDATE_TERM_TITLE) {

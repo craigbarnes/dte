@@ -53,7 +53,7 @@ typedef enum {
 } WindowSeparatorType;
 
 void update_all_windows(EditorState *e);
-void update_buffer_windows(EditorState *e, const Buffer *buffer);
+void update_buffer_windows(EditorState *e);
 void update_window_separators(EditorState *e);
 
 // ui-prompt.c

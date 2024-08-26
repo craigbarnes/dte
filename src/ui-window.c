@@ -114,9 +114,10 @@ static void update_window(EditorState *e, Window *window)
     update_status_line(window);
 }
 
-// Update all visible views containing this buffer
-void update_buffer_windows(EditorState *e, const Buffer *buffer)
+// Update all visible views containing the current buffer
+void update_buffer_windows(EditorState *e)
 {
+    const Buffer *buffer = e->buffer;
     const View *current_view = e->view;
     for (size_t i = 0, n = buffer->views.count; i < n; i++) {
         View *view = buffer->views.ptrs[i];
