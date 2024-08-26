@@ -1312,11 +1312,32 @@ static void test_human_readable_size(TestContext *ctx)
     EXPECT_STREQ(human_readable_size(5242880, buf), "5 MiB");
     EXPECT_STREQ(human_readable_size(5242881, buf), "5 MiB");
 
-    // Edge case: this currently yields "8 EiB", but should be "16 EiB".
-    // This isn't a problem in practice, since the uintmax_t values passed
-    // to the function originate from off_t values (stat::st_size), which
-    // are signed and thus never have the MSB set.
-    // EXPECT_STREQ(human_readable_size(1ull << 63, buf), "16 EiB");
+    // Compare with e.g. `units '0xFF00000000000000 bytes' EiB`
+    EXPECT_STREQ(human_readable_size(0xFFFFFFFFFFFFFFFFull, buf), "16 EiB");
+    EXPECT_STREQ(human_readable_size(0x7FFFFFFFFFFFFFFFull, buf), "8 EiB");
+    EXPECT_STREQ(human_readable_size(0x3FFFFFFFFFFFFFFFull, buf), "4 EiB");
+    EXPECT_STREQ(human_readable_size(0xFF00000000000000ull, buf), "15.93 EiB");
+
+    const uintmax_t u64pow2max = 0x8000000000000000ull;
+    EXPECT_STREQ(human_readable_size(u64pow2max, buf), "8 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 1), buf), "12 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 2), buf), "10 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 3), buf), "9 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 4), buf), "8.50 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 5), buf), "8.25 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 6), buf), "8.12 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 7), buf), "8.06 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 8), buf), "8.03 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 9), buf), "8.01 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 10), buf), "8 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max | (u64pow2max >> 11), buf), "8 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 1, buf), "4 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 2, buf), "2 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 3, buf), "1 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 4, buf), "512 PiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 1 | (u64pow2max >> 2), buf), "6 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 1 | (u64pow2max >> 3), buf), "5 EiB");
+    EXPECT_STREQ(human_readable_size(u64pow2max >> 1 | (u64pow2max >> 4), buf), "4.50 EiB");
 }
 
 static void test_u_char_size(TestContext *ctx)
