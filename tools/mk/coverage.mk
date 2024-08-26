@@ -4,6 +4,13 @@
 GCOVR ?= gcovr
 GCOVRFLAGS ?= -j$(NPROC) --config gcovr.cfg --sort uncovered-percent --sort-reverse
 
+COVERAGE_MAKEFLAGS = \
+    NO_CONFIG_MK=1 \
+    DEBUG=3 \
+    TESTFLAGS=-ct \
+    CC='ccache gcc' \
+    CFLAGS='-Og -g -pipe --coverage -fno-inline'
+
 gcovr-html: public/coverage/index.html
 gcovr-xml: build/coverage.xml
 
@@ -13,13 +20,13 @@ coverage: public/coverage/index.html
 
 public/coverage/index.html: FORCE | public/coverage/
 	$(RM) public/coverage/*.html public/coverage/*.html.gz
-	$(MAKE) -j$(NPROC) check CC='ccache gcc' CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 NO_CONFIG_MK=1
+	$(MAKE) -j$(NPROC) check $(COVERAGE_MAKEFLAGS)
 	$(GCOVR) $(GCOVRFLAGS) -s --html-nested '$@'
 	find $| -name '*.css' -o -name '*.html' | $(XARGS_P) -- gzip -9kf
 
 build/coverage.xml: FORCE | build/
 	$(RM) $@ build/coverage.txt
-	$(MAKE) -j$(NPROC) check CC='ccache gcc' CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 NO_CONFIG_MK=1
+	$(MAKE) -j$(NPROC) check $(COVERAGE_MAKEFLAGS)
 	$(GCOVR) $(GCOVRFLAGS) --xml-pretty --xml '$@' --txt build/coverage.txt
 
 public/coverage/: public/
