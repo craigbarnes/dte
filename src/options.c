@@ -623,6 +623,11 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(option_desc, name, strcmp);
 }
 
+static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue value)
+{
+    return option_ops[desc->type].equals(desc, ptr, value);
+}
+
 static OptionValue desc_get(const OptionDesc *desc, void *ptr)
 {
     return option_ops[desc->type].get(desc, ptr);
@@ -630,6 +635,10 @@ static OptionValue desc_get(const OptionDesc *desc, void *ptr)
 
 static void desc_set(EditorState *e, const OptionDesc *desc, void *ptr, bool global, OptionValue value)
 {
+    if (desc_equals(desc, ptr, value)) {
+        return;
+    }
+
     option_ops[desc->type].set(desc, ptr, value);
     if (desc->on_change) {
         desc->on_change(e, global);
@@ -644,11 +653,6 @@ static bool desc_parse(const OptionDesc *desc, const char *str, OptionValue *val
 static const char *desc_string(const OptionDesc *desc, OptionValue value)
 {
     return option_ops[desc->type].string(desc, value);
-}
-
-static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue value)
-{
-    return option_ops[desc->type].equals(desc, ptr, value);
 }
 
 static int option_cmp(const void *key, const void *elem)
