@@ -28,7 +28,7 @@ typedef struct View {
     long cx_display; // Visual cursor x (char widths: wide 2, tab 1-8, control 2, invalid char 4)
     long cx_char; // Cursor x in characters (invalid UTF-8 character (byte) is 1 char)
     long vx, vy; // Top left corner
-    long preferred_x; // Preferred cursor x (preferred value for cx_display)
+    long preferred_x; // Preferred value for cx_display (e.g. after vertical movement)
     int tt_width; // Tab title width
     int tt_truncated_width;
     bool center_on_scroll; // Center view to cursor if scrolled
