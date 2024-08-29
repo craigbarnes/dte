@@ -4,6 +4,22 @@
 #include "terminal/input.h"
 #include "terminal/paste.h"
 
+/*
+ * Read input until a key is pressed that matches one of the (ASCII)
+ * characters in `choices` or one of the pre-defined keys (Enter, Esc
+ * Ctrl+c, Ctrl+g). The default choice should be given as choices[0]
+ * and pressing Enter is equivalent to pressing that key.
+ *
+ * Note that this is used to "hijack" input handling at the point it's
+ * called, as opposed to using the normal input handling in main_loop().
+ * This is so that e.g. `replace -c` can prompt at the appropriate point
+ * in the following string of commands:
+ *
+ *  open -t; repeat 3 insert "xyz\n"; replace -c y _; down; insert "xyz\n"
+ *
+ * ...and execution can then continue with the next command, without
+ * involving main_loop() at all.
+ */
 static char get_choice(Terminal *term, const char *choices, unsigned int esc_timeout)
 {
     KeyCode key = term_read_input(term, esc_timeout);
