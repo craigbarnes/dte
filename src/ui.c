@@ -169,6 +169,9 @@ void update_screen(EditorState *e, const ScreenState *s)
             flags |= UPDATE_TERM_TITLE;
         }
         update_buffer_windows(e);
+        if (unlikely(flags & UPDATE_WINDOW_SEPARATORS)) {
+            update_window_separators(e);
+        }
     }
 
     if (flags & UPDATE_TERM_TITLE) {

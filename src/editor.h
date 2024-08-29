@@ -51,14 +51,15 @@ typedef enum {
 typedef enum {
     UPDATE_TERM_TITLE = 1u << 0, // update_term_title()
     UPDATE_CURSOR_STYLE = 1u << 1, // update_cursor_style()
+    UPDATE_WINDOW_SEPARATORS = 1u << 2, // update_window_separators()
 
     // TODO: Set this when the buffer contents changes or when the cursor
     // position changes in a way that requires a redraw (e.g. a change of line
     // affected by `hi currentline`, `set ws-error trailing`, scrolling, etc.),
     // then handle it accordingly in update_screen()
-    UPDATE_CURRENT_BUFFER = 1u << 2,
+    UPDATE_CURRENT_BUFFER = 1u << 3,
 
-    UPDATE_ALL_WINDOWS = 1u << 3, // update_all_windows()
+    UPDATE_ALL_WINDOWS = 1u << 4, // update_all_windows()
     UPDATE_ALL = (UPDATE_ALL_WINDOWS << 1) - 1, // All of the above
 } ScreenUpdateFlags;
 

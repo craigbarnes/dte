@@ -160,8 +160,8 @@ static void overwrite_changed(EditorState *e, bool global)
 static void window_separator_changed(EditorState *e, bool global)
 {
     BUG_ON(!global);
-    if (e->root_frame) {
-        update_window_separators(e);
+    if (e->root_frame && !e->root_frame->window) {
+        e->screen_update |= UPDATE_WINDOW_SEPARATORS;
     }
 }
 
