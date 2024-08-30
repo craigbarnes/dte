@@ -9,10 +9,10 @@
 #include "util/ptr-array.h"
 
 typedef enum {
-    CURSOR_MODE_DEFAULT,
-    CURSOR_MODE_INSERT,
-    CURSOR_MODE_OVERWRITE,
-    CURSOR_MODE_CMDLINE,
+    CURSOR_MODE_DEFAULT, // Fallback, for modes left unspecified
+    CURSOR_MODE_INSERT, // Normal mode with `set overwrite false`
+    CURSOR_MODE_OVERWRITE, // Normal mode with `set overwrite true`
+    CURSOR_MODE_CMDLINE, // Command or search mode
     NR_CURSOR_MODES,
 } CursorInputMode;
 
