@@ -1,5 +1,6 @@
 #include <string.h>
 #include "ui.h"
+#include "error.h"
 #include "frame.h"
 #include "terminal/cursor.h"
 #include "terminal/ioctl.h"
@@ -179,6 +180,11 @@ void update_screen(EditorState *e, const ScreenState *s)
     }
 
     update_command_line(e);
+
+    if (unlikely(flags & UPDATE_DIALOG)) {
+        bool u;
+        show_dialog(term, &e->styles, get_msg(&u));
+    }
 
     if (flags & UPDATE_CURSOR_STYLE) {
         update_cursor_style(e);

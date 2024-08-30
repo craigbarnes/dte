@@ -87,6 +87,7 @@ static unsigned int replace_on_line (
         view->cursor = *bi;
 
         if (flags & REPLACE_CONFIRM) {
+            e->screen_update |= UPDATE_CURRENT_BUFFER;
             switch (status_prompt(e, "Replace? [Y/n/a/q]", "ynaq")) {
             case 'y':
                 break;

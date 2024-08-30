@@ -35,7 +35,6 @@ void restore_cursor(EditorState *e);
 
 // ui-cmdline.c
 void update_command_line(EditorState *e);
-void show_message(Terminal *term, const StyleMap *styles, const char *msg, bool is_error);
 
 // ui-tabbar.c
 void print_tabbar(Terminal *term, const StyleMap *styles, Window *window);
@@ -59,5 +58,6 @@ void update_window_separators(EditorState *e);
 // ui-prompt.c
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
+void show_dialog(Terminal *term, const StyleMap *styles, const char *question) NONNULL_ARGS;
 
 #endif

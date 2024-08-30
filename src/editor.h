@@ -61,6 +61,8 @@ typedef enum {
 
     UPDATE_ALL_WINDOWS = 1u << 4, // update_all_windows()
     UPDATE_ALL = (UPDATE_ALL_WINDOWS << 1) - 1, // All of the above
+
+    UPDATE_DIALOG = 1u << 30, // show_dialog(); modal dialog for e.g. `quit -p`
 } ScreenUpdateFlags;
 
 typedef struct EditorState {

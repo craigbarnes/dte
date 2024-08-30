@@ -48,12 +48,8 @@ static char get_choice(Terminal *term, const char *choices, unsigned int esc_tim
     return 0;
 }
 
-static void show_dialog (
-    Terminal *term,
-    const StyleMap *styles,
-    const TermStyle *text_style,
-    const char *question
-) {
+void show_dialog(Terminal *term, const StyleMap *styles, const char *question)
+{
     unsigned int question_width = u_str_width(question);
     unsigned int min_width = question_width + 2;
     if (term->height < 9 || term->width < min_width) {
@@ -66,11 +62,12 @@ static void show_dialog (
     unsigned int bot = top + height;
     unsigned int width = MAX(term->width / 2, min_width);
     unsigned int x = (term->width - width) / 2;
+    TermOutputBuffer *obuf = &term->obuf;
 
     // The "underline" and "strikethrough" attributes should only apply
     // to the text, not the whole dialog background:
-    TermStyle dialog_style = *text_style;
-    TermOutputBuffer *obuf = &term->obuf;
+    TermStyle text_style = styles->builtin[BSE_DIALOG];
+    TermStyle dialog_style = text_style;
     dialog_style.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
     set_style(term, styles, &dialog_style);
 
@@ -79,7 +76,7 @@ static void show_dialog (
         term_move_cursor(obuf, x, y);
         if (y == mid) {
             term_set_bytes(term, ' ', (width - question_width) / 2);
-            set_style(term, styles, text_style);
+            set_style(term, styles, &text_style);
             term_put_str(obuf, question);
             set_style(term, styles, &dialog_style);
         }
@@ -89,35 +86,22 @@ static void show_dialog (
 
 char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
-    const StyleMap *styles = &e->styles;
-    const TermStyle *style = &styles->builtin[BSE_DIALOG];
+    const ScreenState dummyval = {.id = 0};
+    info_msg("%s", question);
+    e->screen_update |= UPDATE_ALL | UPDATE_DIALOG;
+    update_screen(e, &dummyval);
+
     Terminal *term = &e->terminal;
-    TermOutputBuffer *obuf = &term->obuf;
-
-    start_update(term);
-    update_term_title(term, e->buffer, e->options.set_window_title);
-    update_all_windows(e);
-    show_dialog(term, styles, style, question);
-    show_message(term, styles, question, false);
-    term_end_sync_update(term);
-    term_output_flush(obuf);
-
     unsigned int esc_timeout = e->options.esc_timeout;
     char choice;
     while ((choice = get_choice(term, choices, esc_timeout)) == 0) {
-        if (!resized) {
-            continue;
+        if (resized) {
+            e->screen_update |= UPDATE_DIALOG;
+            ui_resize(e);
         }
-        resized = 0;
-        update_screen_size(&e->terminal, e->root_frame);
-        term_begin_sync_update(term);
-        update_all_windows(e);
-        show_dialog(term, styles, style, question);
-        show_message(term, styles, question, false);
-        term_end_sync_update(term);
-        term_output_flush(obuf);
     }
 
+    clear_error();
     e->screen_update |= UPDATE_ALL;
     return (choice >= 'a') ? choice : 0;
 }
@@ -125,7 +109,6 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
 char status_prompt(EditorState *e, const char *question, const char *choices)
 {
     const ScreenState dummyval = {.id = 0};
-    e->screen_update |= UPDATE_CURRENT_BUFFER | UPDATE_TERM_TITLE;
     info_msg("%s", question);
     update_screen(e, &dummyval);
 

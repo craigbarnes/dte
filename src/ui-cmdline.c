@@ -19,14 +19,6 @@ static void print_message(Terminal *term, const StyleMap *styles, const char *ms
     }
 }
 
-void show_message(Terminal *term, const StyleMap *styles, const char *msg, bool is_error)
-{
-    term_output_reset(term, 0, term->width, 0);
-    term_move_cursor(&term->obuf, 0, term->height - 1);
-    print_message(term, styles, msg, is_error);
-    term_clear_eol(term);
-}
-
 static size_t print_command(Terminal *term, const StyleMap *styles, const CommandLine *cmdline, char prefix)
 {
     const String *buf = &cmdline->buf;
