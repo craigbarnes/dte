@@ -58,7 +58,7 @@ if test "$changed_doc_regen_files"; then
         echo "   CHECK  $orig"
         if ! diff "$file" "$orig" >/dev/null; then
             # shellcheck disable=SC2295
-            abort "re-generate '${file##${TMPDIR}/}' before committing"
+            abort "re-generate '${file##${TMPDIR}/}' before committing (run 'make man')"
         fi
     done
 fi

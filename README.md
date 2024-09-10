@@ -12,24 +12,27 @@ Features
 * Unlimited [undo]/[redo]
 * Regex [search] and [replace]
 * Syntax highlighting
-* Customizable [color schemes] (including 24-bit RGB)
+* Customizable [color schemes]
 * Customizable [key bindings]
-* [Command language] with auto-completion
+* [Command language] with [command-line] auto-completion
 * [Macro] recording
 * Unicode 15 compatible text rendering
-* Support for all xterm key combos (including [`modifyOtherKeys`])
-* Support for [kitty's keyboard protocol]
-* Support for terminal [synchronized updates][] (to eliminate screen tearing)
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to [compiler error]
-* [Copy] to system clipboard (using [OSC 52], which works over SSH)
 * [EditorConfig] support
 * Extensible via [external commands] and [stdio]
-* Minimal run-time dependencies (just libc on most systems)
-* Minimal build-time dependencies (just [GNU Make] and a C99 compiler)
-* Portable (to any [POSIX] 2008 operating system)
 * Fast startup (~10ms)
+* Minimal run-time dependencies (just libc on most systems)
+* Minimal build-time dependencies ([GNU Make] and a C99 compiler)
+* Portable to any [POSIX] 2008 operating system
+* Modern terminal support:
+  * 24-bit RGB colors
+  * [OSC 52] clipboard [copy][] (works over SSH)
+  * [Kitty's keyboard protocol][] (more key combos available for binding)
+  * xterm's [`modifyOtherKeys`] keyboard protocol
+  * [synchronized screen updates][] (helps eliminate screen tearing)
+  * Dynamic feature queries (no [terminfo] database or curses library needed)
 
 Installing
 ----------
@@ -125,25 +128,31 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 Public License version 2 for more details.
 
 
-[undo]: https://craigbarnes.gitlab.io/dte/dterc.html#undo
-[redo]: https://craigbarnes.gitlab.io/dte/dterc.html#redo
-[search]: https://craigbarnes.gitlab.io/dte/dterc.html#search
-[replace]: https://craigbarnes.gitlab.io/dte/dterc.html#replace
-[color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
-[key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
+[`man dte`]: https://craigbarnes.gitlab.io/dte/dte.html
+[`man dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
+[`man dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
+[command-line]: https://craigbarnes.gitlab.io/dte/dte.html#command-mode
 [Macro]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
+[color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
+[compiler error]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
+[copy]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [external commands]: https://craigbarnes.gitlab.io/dte/dterc.html#external-commands
+[key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
+[redo]: https://craigbarnes.gitlab.io/dte/dterc.html#redo
+[replace]: https://craigbarnes.gitlab.io/dte/dterc.html#replace
+[search]: https://craigbarnes.gitlab.io/dte/dterc.html#search
+[undo]: https://craigbarnes.gitlab.io/dte/dterc.html#undo
+
 [stdio]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [screenshot]: https://craigbarnes.gitlab.io/dte/screenshot.png
 [release]: https://craigbarnes.gitlab.io/dte/releases.html
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
-[kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
-[synchronized updates]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
+[Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[synchronized screen updates]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
+[terminfo]: https://man7.org/linux/man-pages/man5/terminfo.5.html
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [ctags]: https://ctags.io/
-[compiler error]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
-[Copy]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 [EditorConfig]: https://editorconfig.org/
 [POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
@@ -163,9 +172,6 @@ Public License version 2 for more details.
 [pkgsrc]: https://cdn.netbsd.org/pub/pkgsrc/current/pkgsrc/editors/dte/index.html
 [`brew`]: https://brew.sh/
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
-[`man dte`]: https://craigbarnes.gitlab.io/dte/dte.html
-[`man dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
-[`man dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [Contributor guidelines]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md
 [Packaging information]: https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues

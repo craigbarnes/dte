@@ -140,9 +140,10 @@ are also various key combinations bound by default:
 ## Command Mode
 
 Command mode allows running various editor commands using a language
-similar to Unix shell. The [`next`] and [`prev`] commands switch
-to the next/previous file. The [`open`], [`save`] and [`quit`]
-commands should be self-explanatory. For a full list of available
+similar to Unix shell and can be accessed by pressing `M-x` (Alt+x)
+in [normal mode]. The [`next`] and [`prev`] commands switch to the
+next/previous file. The [`open`], [`save`] and [`quit`] commands
+should be somewhat self-explanatory. For a full list of available
 commands, see [`dterc`].
 
 The key bindings for command mode are:
@@ -183,9 +184,10 @@ The key bindings for command mode are:
 ## Search Mode
 
 Search mode allows entering a regular expression to search in the
-current buffer.
+current buffer and can be accessed by pressing `C-f` (Ctrl+f) in
+[normal mode].
 
-The key bindings for search mode are mostly the same as in command mode,
+The key bindings for search mode are mostly the same as in [command mode],
 plus these additional keys:
 
 `M-c`
@@ -352,6 +354,7 @@ input/output of both.
 [rc file]: #files
 [exit status]: #exit-status
 [history files]: #files
+[normal mode]: #normal-mode
 [command mode]: #command-mode
 [search mode]: #search-mode
 ["synopsis"]: #synopsis
