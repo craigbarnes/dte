@@ -110,6 +110,8 @@ void set_basic_signal_dispositions(void)
     xsigaction(SIGINT, &action);  // Terminal interrupt (see: VINTR in termios(3))
     xsigaction(SIGQUIT, &action); // Terminal quit (see: VQUIT in termios(3))
     xsigaction(SIGTSTP, &action); // Terminal stop (see: VSUSP in termios(3))
+    xsigaction(SIGTTIN, &action); // Background process attempting read (see tcsetpgrp(3))
+    xsigaction(SIGTTOU, &action); // Background process attempting write
     xsigaction(SIGXFSZ, &action); // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
     xsigaction(SIGPIPE, &action); // Broken pipe (see: EPIPE error in write(3))
     xsigaction(SIGUSR1, &action); // User signal 1 (terminates by default, for no good reason)
@@ -120,8 +122,6 @@ void set_basic_signal_dispositions(void)
     xsigaction(SIGABRT, &action); // Terminate (cleanup already done)
     xsigaction(SIGCHLD, &action); // Ignore (see: wait(3))
     xsigaction(SIGURG, &action);  // Ignore
-    xsigaction(SIGTTIN, &action); // Stop
-    xsigaction(SIGTTOU, &action); // Stop
     xsigaction(SIGCONT, &action); // Continue
 
     // Set signal mask explicitly, in case the parent process exec'd us

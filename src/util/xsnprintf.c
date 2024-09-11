@@ -31,20 +31,20 @@
  * - https://pubs.opengroup.org/onlinepubs/9699919799/functions/vsnprintf.html
  * - https://pubs.opengroup.org/onlinepubs/9699919799/functions/snprintf.html
  */
-size_t xvsnprintf(char *restrict s, size_t n, const char *restrict fmt, va_list v)
+size_t xvsnprintf(char *restrict buf, size_t n, const char *restrict fmt, va_list v)
 {
-    int r = vsnprintf(s, n, fmt, v);
+    int r = vsnprintf(buf, n, fmt, v);
     if (unlikely(r < 0 || r >= (int)n)) {
         fatal_error(__func__, (r < 0) ? errno : ENOBUFS);
     }
     return (size_t)r;
 }
 
-size_t xsnprintf(char *restrict s, size_t n, const char *restrict fmt, ...)
+size_t xsnprintf(char *restrict buf, size_t n, const char *restrict fmt, ...)
 {
     va_list v;
     va_start(v, fmt);
-    size_t ret = xvsnprintf(s, n, fmt, v);
+    size_t r = xvsnprintf(buf, n, fmt, v);
     va_end(v);
-    return ret;
+    return r;
 }
