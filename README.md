@@ -27,12 +27,12 @@ Features
 * Minimal build-time dependencies ([GNU Make] and a C99 compiler)
 * Portable to any [POSIX] 2008 operating system
 * Modern terminal support:
+  * Dynamic feature queries (no [terminfo] database or curses library needed)
   * 24-bit RGB colors
   * [OSC 52] clipboard [copy][] (works over SSH)
   * [Kitty's keyboard protocol][] (more key combos available for binding)
   * xterm's [`modifyOtherKeys`] keyboard protocol
-  * [synchronized screen updates][] (helps eliminate screen tearing)
-  * Dynamic feature queries (no [terminfo] database or curses library needed)
+  * terminal-wg ["synchronized updates"][] (helps eliminate screen tearing)
 
 Installing
 ----------
@@ -144,22 +144,19 @@ Public License version 2 for more details.
 [search]: https://craigbarnes.gitlab.io/dte/dterc.html#search
 [undo]: https://craigbarnes.gitlab.io/dte/dterc.html#undo
 
-[stdio]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [screenshot]: https://craigbarnes.gitlab.io/dte/screenshot.png
-[release]: https://craigbarnes.gitlab.io/dte/releases.html
-[`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
-[Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
-[synchronized screen updates]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
-[terminfo]: https://man7.org/linux/man-pages/man5/terminfo.5.html
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [ctags]: https://ctags.io/
-[OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+[stdio]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [EditorConfig]: https://editorconfig.org/
-[POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
-[GCC]: https://gcc.gnu.org/
-[Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
-[General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+[POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
+[terminfo]: https://man7.org/linux/man-pages/man5/terminfo.5.html
+[OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+[Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+["synchronized updates"]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
+
 [Debian]: https://packages.debian.org/source/dte
 [Ubuntu]: https://launchpad.net/ubuntu/+source/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
@@ -170,8 +167,12 @@ Public License version 2 for more details.
 [DPorts]: https://github.com/DragonFlyBSD/DPorts/tree/master/editors/dte
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
 [pkgsrc]: https://cdn.netbsd.org/pub/pkgsrc/current/pkgsrc/editors/dte/index.html
-[`brew`]: https://brew.sh/
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
+
+[GCC]: https://gcc.gnu.org/
+[Clang]: https://clang.llvm.org/
+[release]: https://craigbarnes.gitlab.io/dte/releases.html
+[`brew`]: https://brew.sh/
 [Contributor guidelines]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md
 [Packaging information]: https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
@@ -179,3 +180,4 @@ Public License version 2 for more details.
 [`#dte` channel]: https://web.libera.chat/?channels=#dte
 [Libera.Chat]: https://libera.chat/
 [Liberapay]: https://liberapay.com/craigbarnes/donate
+[General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
