@@ -613,7 +613,7 @@ system except a somewhat recent kernel.
 [glibc]: https://sourceware.org/glibc/
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
-[`REG_ENHANCED`]: https://www.unix.com/man-page/osx/7/re_format/
+[`REG_ENHANCED`]: https://keith.github.io/xcode-man-pages/re_format.7.html#ENHANCED_FEATURES
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
 [commit c4af2b1a15c96e8]: https://gitlab.com/craigbarnes/dte/-/commit/c4af2b1a15c96e820452c183e81e9bd415492778
 [commit 0fe5e5f224e832a]: https://gitlab.com/craigbarnes/dte/-/commit/0fe5e5f224e832a382ce1fb7e6b4e0d6f0da8f55
