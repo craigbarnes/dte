@@ -3,6 +3,7 @@
 #include <sys/stat.h> // S_ISVTX
 #include "buildvar-iconv.h" // ICONV_DISABLE
 #include "compat.h"
+#include "util/debug.h" // DEBUG
 #include "util/macros.h" // ASAN_ENABLED, MSAN_ENABLED
 #include "util/unicode.h" // SANE_WCTYPE
 
@@ -61,5 +62,13 @@ const char buildvar_string[] =
 #endif
 #if MSAN_ENABLED == 1
     " MSan"
+#endif
+
+#if DEBUG >= 3
+    " DEBUG=3"
+#elif DEBUG >= 2
+    " DEBUG=2"
+#elif DEBUG >= 1
+    " DEBUG=1"
 #endif
 ;
