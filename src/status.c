@@ -334,7 +334,7 @@ size_t sf_format (
         .opts = opts,
         .mode = mode,
         .buf = buf,
-        .size = size - SEPARATOR_WRITE_SIZE - UTF8_MAX_SEQ_LEN - 1,
+        .size = size - SEPARATOR_WRITE_SIZE - U_SET_CHAR_MAXLEN - 1,
     };
 
     while (f.pos < f.size && *format) {

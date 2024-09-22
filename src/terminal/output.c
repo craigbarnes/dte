@@ -398,6 +398,7 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
     }
 
     if (u_is_unprintable(u)) {
+        static_assert(U_SET_HEX_LEN == 4);
         BUG_ON(n > 3);
         char tmp[8] = {'\0'};
         u_set_hex(tmp, u);

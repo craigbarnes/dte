@@ -232,7 +232,7 @@ static void bench_u_set_char(void)
 {
     unsigned int iterations = 250000;
     size_t accum = 0;
-    char buf[UTF8_MAX_SEQ_LEN];
+    char buf[U_SET_CHAR_MAXLEN];
     struct timespec start;
     get_time(&start);
 

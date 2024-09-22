@@ -7,7 +7,14 @@
 
 enum {
     // Longest UTF-8 sequence (in bytes) permitted by RFC 3629
-    UTF8_MAX_SEQ_LEN = 4,
+    // (maximum number of bytes written by u_set_char_raw())
+    UTF8_MAX_SEQ_LEN = 4, // STRLEN(u8"\U0001F44D")
+
+    // Number of bytes written by u_set_hex()
+    U_SET_HEX_LEN = 4, // STRLEN("<ff>")
+
+    // Maximum number of bytes written by u_set_char()
+    U_SET_CHAR_MAXLEN = 4, // MAX(UTF8_MAX_SEQ_LEN, U_SET_HEX_LEN)
 };
 
 static inline size_t u_char_size(CodePoint u)
@@ -30,7 +37,7 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
 
 size_t u_set_char_raw(char *buf, CodePoint u);
 size_t u_set_char(char *buf, CodePoint u);
-size_t u_set_hex(char buf[4], CodePoint u);
+size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u);
 size_t u_make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize) NONNULL_ARG(3);
 
 /*

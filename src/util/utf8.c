@@ -217,7 +217,7 @@ size_t u_set_char(char *buf, CodePoint u)
     return u_set_char_raw(buf, u);
 }
 
-size_t u_set_hex(char buf[4], CodePoint u)
+size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u)
 {
     buf[0] = '<';
     if (!u_is_unicode(u)) {
@@ -229,16 +229,19 @@ size_t u_set_hex(char buf[4], CodePoint u)
         buf[2] = '?';
     }
     buf[3] = '>';
-    return 4;
+    return U_SET_HEX_LEN;
 }
 
 size_t u_make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize)
 {
     BUG_ON(destsize < 16);
+    const size_t safe_write_len = destsize - (U_SET_CHAR_MAXLEN + STRLEN("\0"));
+
     size_t len = 0;
-    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
+    for (size_t i = 0; i < src_len && len < safe_write_len; ) {
         len += u_set_char(dest + len, u_get_char(src, src_len, &i));
     }
+
     dest[len] = '\0';
     return len;
 }

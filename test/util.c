@@ -1622,7 +1622,8 @@ static void test_u_str_width(TestContext *ctx)
 
 static void test_u_set_char_raw(TestContext *ctx)
 {
-    unsigned char buf[16] = "";
+    unsigned char buf[UTF8_MAX_SEQ_LEN] = "";
+    EXPECT_EQ(sizeof(buf), 4);
     EXPECT_EQ(u_set_char_raw(buf, 'a'), 1);
     EXPECT_EQ(buf[0], 'a');
 
@@ -1662,7 +1663,8 @@ static void test_u_set_char_raw(TestContext *ctx)
 
 static void test_u_set_char(TestContext *ctx)
 {
-    unsigned char buf[16] = "";
+    unsigned char buf[U_SET_CHAR_MAXLEN] = "";
+    EXPECT_EQ(sizeof(buf), 4);
     EXPECT_EQ(u_set_char(buf, 'a'), 1);
     EXPECT_EQ(buf[0], 'a');
 
@@ -1675,12 +1677,14 @@ static void test_u_set_char(TestContext *ctx)
     EXPECT_EQ(buf[1], 0xB8);
     EXPECT_EQ(buf[2], 0x81);
 
+    EXPECT_EQ(UTF8_MAX_SEQ_LEN, 4);
     EXPECT_EQ(u_set_char(buf, 0x1F914), 4);
     EXPECT_EQ(buf[0], 0xF0);
     EXPECT_EQ(buf[1], 0x9F);
     EXPECT_EQ(buf[2], 0xA4);
     EXPECT_EQ(buf[3], 0x94);
 
+    EXPECT_EQ(U_SET_HEX_LEN, 4);
     EXPECT_EQ(u_set_char(buf, 0x10FFFF), 4);
     EXPECT_EQ(buf[0], '<');
     EXPECT_EQ(buf[1], '?');

@@ -195,12 +195,15 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
 static size_t make_printable_ctlseq(const char *src, size_t src_len, char *dest, size_t destsize)
 {
     BUG_ON(destsize < 16);
+    const size_t safe_write_len = destsize - (U_SET_CHAR_MAXLEN + STRLEN("\0"));
+
     size_t len = 0;
-    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
+    for (size_t i = 0; i < src_len && len < safe_write_len; ) {
         CodePoint u = u_get_char(src, src_len, &i);
         u = (u < 0x20) ? u + 0x2400 : (u == 0x7F ? 0x2421 : u);
         len += u_set_char(dest + len, u);
     }
+
     dest[len] = '\0';
     return len;
 }
@@ -234,7 +237,7 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
         }
     }
 
-    char ebuf[8 + (4 * sizeof(cbuf)) + (4 * sizeof(vbuf))];
+    char ebuf[8 + (U_SET_CHAR_MAXLEN * (sizeof(cbuf) + sizeof(vbuf)))];
     size_t i = 0;
     if (cap.length) {
         ebuf[i++] = ' ';
