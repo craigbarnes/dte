@@ -207,7 +207,6 @@ Testing/Debugging
 * Improve test coverage for:
   * `u_get_nonascii()`
   * `u_skip_chars()`
-  * `u_make_printable_mem()`
   * `path_slice_relative()`
   * `handle_exec()`
   * `spawn_compiler()`

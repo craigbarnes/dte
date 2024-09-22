@@ -1729,6 +1729,37 @@ static void test_u_set_char(TestContext *ctx)
     EXPECT_UINT_EQ(c, 0x5b);
 }
 
+static void test_u_make_printable_mem(TestContext *ctx)
+{
+    char buf[5];
+    EXPECT_EQ(sizeof(buf), U_SET_CHAR_MAXLEN + 1);
+    memset(buf, '_', sizeof(buf));
+    EXPECT_EQ(u_make_printable_mem(STRN("\xffxyz"), buf, sizeof(buf)), 4);
+    EXPECT_STREQ(buf, "<ff>");
+
+    // Enough space for `U_SET_CHAR_MAXLEN + 1` is needed, regardless of
+    // the CodePoint encountered, so 5 is the minimum remaining space
+    // required in order to write more than just a null-terminator
+    memset(buf, '_', sizeof(buf));
+    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 1), 0);
+    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 2), 0);
+    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 3), 0);
+    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 4), 0);
+    EXPECT_EQ(buf[0], '\0');
+    EXPECT_EQ(buf[1], '_');
+    EXPECT_EQ(buf[2], '_');
+    EXPECT_EQ(buf[3], '_');
+    EXPECT_EQ(buf[4], '_');
+
+    memset(buf, '_', sizeof(buf));
+    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 5), 1);
+    EXPECT_EQ(buf[0], '1');
+    EXPECT_EQ(buf[1], '\0');
+    EXPECT_EQ(buf[2], '_');
+    EXPECT_EQ(buf[3], '_');
+    EXPECT_EQ(buf[4], '_');
+}
+
 static void test_u_prev_char(TestContext *ctx)
 {
     const unsigned char *buf = "\xE6\xB7\xB1\xE5\x9C\xB3\xE5\xB8\x82"; // 深圳市
@@ -3000,6 +3031,7 @@ static const TestEntry tests[] = {
     TEST(test_u_str_width),
     TEST(test_u_set_char_raw),
     TEST(test_u_set_char),
+    TEST(test_u_make_printable_mem),
     TEST(test_u_prev_char),
     TEST(test_ptr_array),
     TEST(test_ptr_array_move),

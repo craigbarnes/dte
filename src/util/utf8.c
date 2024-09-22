@@ -234,11 +234,10 @@ size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u)
 
 size_t u_make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize)
 {
-    BUG_ON(destsize < 16);
-    const size_t safe_write_len = destsize - (U_SET_CHAR_MAXLEN + STRLEN("\0"));
-
+    BUG_ON(destsize == 0);
     size_t len = 0;
-    for (size_t i = 0; i < src_len && len < safe_write_len; ) {
+
+    for (size_t i = 0; i < src_len && len + U_SET_CHAR_MAXLEN < destsize; ) {
         len += u_set_char(dest + len, u_get_char(src, src_len, &i));
     }
 
