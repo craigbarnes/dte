@@ -1,5 +1,6 @@
 #include "feature.h"
 #include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -78,18 +79,21 @@ static const char *signum_to_str(int signum)
     return "unknown signal";
 }
 
-static void xsigaction(int sig, const struct sigaction *action)
+static bool xsigaction(int sig, const struct sigaction *action)
 {
     struct sigaction old_action;
-    if (unlikely(sigaction(sig, action, &old_action) != 0)) {
-        const char *err = strerror(errno);
-        LOG_ERROR("failed to set disposition for signal %d: %s", sig, err);
-        return;
+    if (likely(sigaction(sig, action, &old_action) == 0)) {
+        if (unlikely(old_action.sa_handler == SIG_IGN)) {
+            const char *name = signum_to_str(sig);
+            LOG_WARNING("ignored signal was inherited: %d (%s)", sig, name);
+        }
+        return true;
     }
-    if (unlikely(old_action.sa_handler == SIG_IGN)) {
-        const char *str = signum_to_str(sig);
-        LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
-    }
+
+    const char *err = strerror(errno);
+    const char *name = signum_to_str(sig);
+    LOG_ERROR("failed to set disposition for signal %d (%s): %s", sig, name, err);
+    return false;
 }
 
 void set_sigwinch_handler(void)
