@@ -15,14 +15,6 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-struct FileEncoder {
-    struct cconv *cconv;
-    unsigned char *nbuf;
-    size_t nsize;
-    bool crlf;
-    int fd;
-};
-
 typedef struct {
     const unsigned char *ibuf;
     ssize_t ipos;
@@ -134,10 +126,15 @@ static size_t unix_to_dos (
     const unsigned char *buf,
     size_t size
 ) {
+    // TODO: Pass in Buffer::nl and make this size adjustment more conservative
+    // (it's resized to handle the worst possible case, despite the fact that we
+    // already have the number of newlines pre-computed)
     if (enc->nsize < size * 2) {
         enc->nsize = size * 2;
         enc->nbuf = xrealloc(enc->nbuf, enc->nsize);
     }
+
+    // TODO: Optimize this loop, by making use of memccpy(3)
     size_t d = 0;
     for (size_t s = 0; s < size; s++) {
         unsigned char ch = buf[s];
@@ -146,6 +143,7 @@ static size_t unix_to_dos (
         }
         enc->nbuf[d++] = ch;
     }
+
     return d;
 }
 
@@ -159,28 +157,26 @@ bool conversion_supported_by_iconv (
     return false;
 }
 
-FileEncoder *new_file_encoder(const char *encoding, bool crlf, int fd)
+FileEncoder file_encoder(const char *encoding, bool crlf, int fd)
 {
     if (unlikely(!encoding_is_utf8(encoding))) {
-        errno = EINVAL;
-        return NULL;
+        BUG("unsupported conversion; should have been handled earlier");
     }
 
-    FileEncoder *enc = xnew0(FileEncoder, 1);
-    enc->crlf = crlf;
-    enc->fd = fd;
-    return enc;
+    return (FileEncoder) {
+        .crlf = crlf,
+        .fd = fd,
+    };
 }
 
-void free_file_encoder(FileEncoder *enc)
+void file_encoder_free(FileEncoder *enc)
 {
     free(enc->nbuf);
-    free(enc);
 }
 
 ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t n)
 {
-    if (enc->crlf) {
+    if (unlikely(enc->crlf)) {
         n = unix_to_dos(enc, buf, n);
         buf = enc->nbuf;
     }
@@ -201,7 +197,8 @@ bool file_decoder_read(Buffer *buffer, const unsigned char *buf, size_t size)
 
 #include <iconv.h>
 
-static const unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
+// UTF-8 encoding of U+00BF (inverted question mark; "¿")
+#define REPLACEMENT "\xc2\xbf"
 
 struct cconv {
     iconv_t cd;
@@ -215,7 +212,7 @@ struct cconv {
     char tbuf[16];
     size_t tcount;
 
-    // Replacement character 0xBF (inverted question mark)
+    // REPLACEMENT character, in target encoding
     char rbuf[4];
     size_t rcount;
 
@@ -230,17 +227,6 @@ static struct cconv *create(iconv_t cd)
     c->osize = 8192;
     c->obuf = xmalloc(c->osize);
     return c;
-}
-
-static size_t encoding_char_size(const char *encoding)
-{
-    if (str_has_prefix(encoding, "UTF-16")) {
-        return 2;
-    }
-    if (str_has_prefix(encoding, "UTF-32")) {
-        return 4;
-    }
-    return 1;
 }
 
 static size_t iconv_wrapper (
@@ -261,25 +247,9 @@ static size_t iconv_wrapper (
     return iconv(cd, in, inbytesleft, outbuf, outbytesleft);
 }
 
-static void encode_replacement(struct cconv *c)
-{
-    const char *ib = replacement;
-    char *ob = c->rbuf;
-    size_t ic = sizeof(replacement);
-    size_t oc = sizeof(c->rbuf);
-    size_t rc = iconv_wrapper(c->cd, &ib, &ic, &ob, &oc);
-
-    if (rc == (size_t)-1) {
-        c->rbuf[0] = '\xbf';
-        c->rcount = 1;
-    } else {
-        c->rcount = ob - c->rbuf;
-    }
-}
-
 static void resize_obuf(struct cconv *c)
 {
-    c->osize *= 2;
+    c->osize = xmul(2, c->osize);
     c->obuf = xrealloc(c->obuf, c->osize);
 }
 
@@ -420,11 +390,36 @@ static struct cconv *cconv_to_utf8(const char *encoding)
     if (cd == (iconv_t)-1) {
         return NULL;
     }
+
     struct cconv *c = create(cd);
-    memcpy(c->rbuf, replacement, sizeof(replacement));
-    c->rcount = sizeof(replacement);
-    c->char_size = encoding_char_size(encoding);
+    c->rcount = copyliteral(c->rbuf, REPLACEMENT);
+
+    if (str_has_prefix(encoding, "UTF-16")) {
+        c->char_size = 2;
+    } else if (str_has_prefix(encoding, "UTF-32")) {
+        c->char_size = 4;
+    } else {
+        c->char_size = 1;
+    }
+
     return c;
+}
+
+static void encode_replacement(struct cconv *c)
+{
+    static const unsigned char rep[] = REPLACEMENT;
+    const char *ib = rep;
+    char *ob = c->rbuf;
+    size_t ic = STRLEN(REPLACEMENT);
+    size_t oc = sizeof(c->rbuf);
+    size_t rc = iconv_wrapper(c->cd, &ib, &ic, &ob, &oc);
+
+    if (rc == (size_t)-1) {
+        c->rbuf[0] = '\xbf';
+        c->rcount = 1;
+    } else {
+        c->rcount = ob - c->rbuf;
+    }
 }
 
 static struct cconv *cconv_from_utf8(const char *encoding)
@@ -495,30 +490,29 @@ bool conversion_supported_by_iconv(const char *from, const char *to)
     return true;
 }
 
-FileEncoder *new_file_encoder(const char *encoding, bool crlf, int fd)
+FileEncoder file_encoder(const char *encoding, bool crlf, int fd)
 {
     struct cconv *cconv = NULL;
     if (unlikely(!encoding_is_utf8(encoding))) {
         cconv = cconv_from_utf8(encoding);
         if (!cconv) {
-            return NULL;
+            BUG("unsupported conversion; should have been handled earlier");
         }
     }
 
-    FileEncoder *enc = xnew0(FileEncoder, 1);
-    enc->cconv = cconv;
-    enc->crlf = crlf;
-    enc->fd = fd;
-    return enc;
+    return (FileEncoder) {
+        .cconv = cconv,
+        .crlf = crlf,
+        .fd = fd,
+    };
 }
 
-void free_file_encoder(FileEncoder *enc)
+void file_encoder_free(FileEncoder *enc)
 {
     if (enc->cconv) {
         cconv_free(enc->cconv);
     }
     free(enc->nbuf);
-    free(enc);
 }
 
 // NOTE: buf must contain whole characters!
@@ -527,11 +521,11 @@ ssize_t file_encoder_write (
     const unsigned char *buf,
     size_t size
 ) {
-    if (enc->crlf) {
+    if (unlikely(enc->crlf)) {
         size = unix_to_dos(enc, buf, size);
         buf = enc->nbuf;
     }
-    if (enc->cconv) {
+    if (unlikely(enc->cconv)) {
         cconv_process(enc->cconv, buf, size);
         cconv_flush(enc->cconv);
         buf = cconv_consume_all(enc->cconv, &size);

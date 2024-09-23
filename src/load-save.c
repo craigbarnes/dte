@@ -447,19 +447,13 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
         }
     }
 
-    FileEncoder *enc = new_file_encoder(ctx->encoding, ctx->crlf, fd);
-    if (unlikely(!enc)) {
-        // This should never happen because encoding is validated early
-        error_msg_errno("new_file_encoder");
-        goto error;
-    }
-
     const ByteOrderMark *bom = NULL;
     if (unlikely(ctx->write_bom)) {
         bom = get_bom_for_encoding(lookup_encoding(ctx->encoding));
     }
 
-    if (!write_buffer(buffer, enc, bom, fd)) {
+    FileEncoder enc = file_encoder(ctx->encoding, ctx->crlf, fd);
+    if (!write_buffer(buffer, &enc, bom, fd)) {
         goto error;
     }
 
@@ -480,17 +474,14 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
         goto error;
     }
 
-    free_file_encoder(enc);
+    file_encoder_free(&enc);
     buffer_stat(&buffer->file, filename);
     return true;
 
 error:
-    if (fd >= 0) {
-        xclose(fd);
-    }
-    if (enc) {
-        free_file_encoder(enc);
-    }
+    xclose(fd);
+    file_encoder_free(&enc);
+
     if (tmp[0]) {
         unlink(tmp);
     } else {
@@ -499,5 +490,6 @@ error:
         // error later when saving the file again.
         buffer_stat(&buffer->file, filename);
     }
+
     return false;
 }
