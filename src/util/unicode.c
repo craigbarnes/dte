@@ -92,21 +92,24 @@ static bool u_is_double_width(CodePoint u)
     return BISEARCH(u, double_width);
 }
 
+// Get the display width of `u`, where "display width" means the number
+// of terminal columns occupied (either by the terminal's rendered font
+// glyph or our own multi-column rendering)
 unsigned int u_char_width(CodePoint u)
 {
     if (likely(u < 0x80)) {
         if (unlikely(ascii_iscntrl(u))) {
-            return 2; // Rendered in caret notation (e.g. ^@)
+            return 2; // Rendered by u_set_char() in caret notation (e.g. ^@)
         }
         return 1;
     } else if (u_is_zero_width(u)) {
         return 0;
     } else if (u_is_unprintable(u)) {
-        return 4; // Rendered as <xx>
+        return 4; // Rendered by u_set_char() as <xx>
     } else if (u < 0x1100) {
         return 1;
     } else if (u_is_double_width(u)) {
-        return 2;
+        return 2; // Rendered by (modern) terminals as a 2 column glyph (e.g. 🎧)
     }
 
     return 1;
