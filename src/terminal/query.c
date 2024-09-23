@@ -189,22 +189,10 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
     return string_view(outbuf, n / 2);
 }
 
-// This is similar to u_make_printable_mem(), but replacing C0 control
-// characters with Unicode "control picture" symbols, instead of using
-// the (potentially ambiguous) caret notation
-static size_t make_printable_ctlseq(const char *src, size_t src_len, char *dest, size_t destsize)
+static size_t make_printable_ctlseq(const StringView *seq, char *buf, size_t buflen)
 {
-    BUG_ON(destsize == 0);
-    size_t len = 0;
-
-    for (size_t i = 0; i < src_len && len + U_SET_CHAR_MAXLEN < destsize; ) {
-        CodePoint u = u_get_char(src, src_len, &i);
-        u = (u < 0x20) ? u + 0x2400 : (u == 0x7F ? 0x2421 : u);
-        len += u_set_char(dest + len, u);
-    }
-
-    dest[len] = '\0';
-    return len;
+    MakePrintableFlags flags = MPF_C0_SYMBOLS;
+    return u_make_printable_mem(seq->data, seq->length, buf, buflen, flags);
 }
 
 static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
@@ -239,12 +227,11 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     char ebuf[8 + (U_SET_CHAR_MAXLEN * (sizeof(cbuf) + sizeof(vbuf)))];
     size_t i = 0;
     if (cap.length) {
-        ebuf[i++] = ' ';
-        ebuf[i++] = '(';
-        i += make_printable_ctlseq(cap.data, cap.length, ebuf + i, sizeof(ebuf) - i);
+        i += copyliteral(ebuf + i, " (");
+        i += make_printable_ctlseq(&cap, ebuf + i, sizeof(ebuf) - i);
         if (val.length) {
             ebuf[i++] = '=';
-            i += make_printable_ctlseq(val.data, val.length, ebuf + i, sizeof(ebuf) - i);
+            i += make_printable_ctlseq(&val, ebuf + i, sizeof(ebuf) - i);
         }
         ebuf[i++] = ')';
     }

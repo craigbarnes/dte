@@ -54,8 +54,8 @@ void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, 
         return;
     }
     char buf1[256], buf2[256];
-    u_make_printable_mem(m1, len, buf1, sizeof buf1);
-    u_make_printable_mem(m2, len, buf2, sizeof buf2);
+    u_make_printable_mem(m1, len, buf1, sizeof buf1, 0);
+    u_make_printable_mem(m2, len, buf2, sizeof buf2, 0);
     test_fail(ctx, file, line, "Bytes not equal:  %s  %s", buf1, buf2);
 }
 

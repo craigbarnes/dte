@@ -2,6 +2,7 @@
 #define UTIL_UTF8_H
 
 #include <stddef.h>
+#include "debug.h"
 #include "macros.h"
 #include "unicode.h"
 
@@ -17,6 +18,23 @@ enum {
     U_SET_CHAR_MAXLEN = 4, // MAX(UTF8_MAX_SEQ_LEN, U_SET_HEX_LEN)
 };
 
+typedef enum {
+    // Replace C0 control characters with Unicode "control picture"
+    // symbols, instead of using caret notation (which can become
+    // quite ambuguous when formatting terminal escape sequences)
+    MPF_C0_SYMBOLS = 1 << 0,
+} MakePrintableFlags;
+
+size_t u_str_width(const unsigned char *str);
+size_t u_skip_chars(const char *str, int *width);
+CodePoint u_prev_char(const unsigned char *str, size_t *idx);
+CodePoint u_str_get_char(const unsigned char *str, size_t *idx);
+CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx);
+CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
+size_t u_set_char_raw(char *buf, CodePoint u);
+size_t u_set_char(char *buf, CodePoint u);
+size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u);
+
 static inline size_t u_char_size(CodePoint u)
 {
     // If `u` is invalid, set `adj` to 3 and use to adjust the calculation
@@ -28,27 +46,26 @@ static inline size_t u_char_size(CodePoint u)
     return 1 + (u > 0x7F) + (u > 0x7FF) + (u > 0xFFFF) - adj;
 }
 
-size_t u_str_width(const unsigned char *str);
+static inline size_t u_make_printable_mem (
+    const char *src,
+    size_t src_len,
+    char *dest,
+    size_t dest_len,
+    MakePrintableFlags flags
+) {
+    BUG_ON(dest_len == 0);
+    size_t len = 0;
 
-CodePoint u_prev_char(const unsigned char *str, size_t *idx);
-CodePoint u_str_get_char(const unsigned char *str, size_t *idx);
-CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx);
-CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
+    for (size_t i = 0; i < src_len && len + U_SET_CHAR_MAXLEN < dest_len; ) {
+        CodePoint u = u_get_char(src, src_len, &i);
+        if (flags & MPF_C0_SYMBOLS) {
+            u = (u < 0x20) ? u + 0x2400 : (u == 0x7F ? 0x2421 : u);
+        }
+        len += u_set_char(dest + len, u);
+    }
 
-size_t u_set_char_raw(char *buf, CodePoint u);
-size_t u_set_char(char *buf, CodePoint u);
-size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u);
-size_t u_make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize) NONNULL_ARG(3);
-
-/*
- * Total width of skipped characters is stored back to @width.
- *
- * Stored @width can be 1 more than given width if the last skipped
- * character was double width or even 3 more if the last skipped
- * character was invalid (<xx>).
- *
- * Returns number of bytes skipped.
- */
-size_t u_skip_chars(const char *str, int *width);
+    dest[len] = '\0';
+    return len;
+}
 
 #endif
