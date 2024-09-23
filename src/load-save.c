@@ -21,36 +21,6 @@
 #include "util/time-util.h"
 #include "util/xreadwrite.h"
 
-static void add_block(Buffer *buffer, Block *blk)
-{
-    buffer->nl += blk->nl;
-    list_add_before(&blk->node, &buffer->blocks);
-}
-
-static Block *add_utf8_line (
-    Buffer *buffer,
-    Block *blk,
-    const unsigned char *line,
-    size_t len
-) {
-    size_t size = len + 1;
-    if (blk) {
-        size_t avail = blk->alloc - blk->size;
-        if (size <= avail) {
-            goto copy;
-        }
-        add_block(buffer, blk);
-    }
-    size = MAX(size, 8192);
-    blk = block_new(size);
-copy:
-    memcpy(blk->data + blk->size, line, len);
-    blk->size += len;
-    blk->data[blk->size++] = '\n';
-    blk->nl++;
-    return blk;
-}
-
 static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size_t size, bool utf8_bom)
 {
     EncodingType bom_type = detect_encoding_from_bom(buf, size);
@@ -80,32 +50,7 @@ static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size
         buffer->bom = utf8_bom;
     }
 
-    FileDecoder *dec = new_file_decoder(buffer->encoding, buf, size);
-    if (!dec) {
-        return false;
-    }
-
-    const char *line;
-    size_t len;
-    if (file_decoder_read_line(dec, &line, &len)) {
-        if (len && line[len - 1] == '\r') {
-            buffer->crlf_newlines = true;
-            len--;
-        }
-        Block *blk = add_utf8_line(buffer, NULL, line, len);
-        while (file_decoder_read_line(dec, &line, &len)) {
-            if (buffer->crlf_newlines && len && line[len - 1] == '\r') {
-                len--;
-            }
-            blk = add_utf8_line(buffer, blk, line, len);
-        }
-        if (blk) {
-            add_block(buffer, blk);
-        }
-    }
-
-    free_file_decoder(dec);
-    return true;
+    return file_decoder_read(buffer, buf, size);
 }
 
 static void fixup_blocks(Buffer *buffer)

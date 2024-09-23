@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "convert.h"
+#include "block.h"
 #include "buildvar-iconv.h"
 #include "encoding.h"
 #include "util/debug.h"
 #include "util/intern.h"
+#include "util/list.h"
 #include "util/log.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
@@ -21,17 +23,42 @@ struct FileEncoder {
     int fd;
 };
 
-struct FileDecoder {
-    const char *encoding;
+typedef struct {
     const unsigned char *ibuf;
-    ssize_t ipos, isize;
+    ssize_t ipos;
+    ssize_t isize;
     struct cconv *cconv;
-    bool (*read_line)(struct FileDecoder *dec, const char **linep, size_t *lenp);
-};
+} FileDecoder;
 
-const char *file_decoder_get_encoding(const FileDecoder *dec)
+static void add_block(Buffer *buffer, Block *blk)
 {
-    return dec->encoding;
+    buffer->nl += blk->nl;
+    list_add_before(&blk->node, &buffer->blocks);
+}
+
+static Block *add_utf8_line (
+    Buffer *buffer,
+    Block *blk,
+    const unsigned char *line,
+    size_t len
+) {
+    size_t size = len + 1;
+    if (blk) {
+        size_t avail = blk->alloc - blk->size;
+        if (size <= avail) {
+            goto copy;
+        }
+        add_block(buffer, blk);
+    }
+    size = MAX(size, 8192);
+    blk = block_new(size);
+
+copy:
+    memcpy(blk->data + blk->size, line, len);
+    blk->size += len;
+    blk->data[blk->size++] = '\n';
+    blk->nl++;
+    return blk;
 }
 
 static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
@@ -53,6 +80,52 @@ static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
 
     *linep = line;
     *lenp = len;
+    return true;
+}
+
+static bool file_decoder_read_utf8(Buffer *buffer, const unsigned char *buf, size_t size)
+{
+    if (unlikely(!encoding_is_utf8(buffer->encoding))) {
+        errno = EINVAL;
+        return false;
+    }
+
+    FileDecoder dec = {
+        .ibuf = buf,
+        .isize = size,
+    };
+
+    const char *line;
+    size_t len;
+
+    if (!read_utf8_line(&dec, &line, &len)) {
+        return true;
+    }
+
+    if (len && line[len - 1] == '\r') {
+        buffer->crlf_newlines = true;
+        len--;
+    }
+
+    Block *blk = add_utf8_line(buffer, NULL, line, len);
+
+    if (unlikely(buffer->crlf_newlines)) {
+        while (read_utf8_line(&dec, &line, &len)) {
+            if (len && line[len - 1] == '\r') {
+                len--;
+            }
+            blk = add_utf8_line(buffer, blk, line, len);
+        }
+    } else {
+        while (read_utf8_line(&dec, &line, &len)) {
+            blk = add_utf8_line(buffer, blk, line, len);
+        }
+    }
+
+    if (blk) {
+        add_block(buffer, blk);
+    }
+
     return true;
 }
 
@@ -119,27 +192,9 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
     return 0;
 }
 
-FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, size_t n)
+bool file_decoder_read(Buffer *buffer, const unsigned char *buf, size_t size)
 {
-    if (unlikely(!encoding_is_utf8(encoding))) {
-        errno = EINVAL;
-        return NULL;
-    }
-
-    FileDecoder *dec = xnew0(FileDecoder, 1);
-    dec->ibuf = buf;
-    dec->isize = n;
-    return dec;
-}
-
-void free_file_decoder(FileDecoder *dec)
-{
-    free(dec);
-}
-
-bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
-{
-    return read_utf8_line(dec, linep, lenp);
+    return file_decoder_read_utf8(buffer, buf, size);
 }
 
 #else // ICONV_DISABLE != 1; use full iconv implementation:
@@ -418,6 +473,7 @@ static char *cconv_consume_all(struct cconv *c, size_t *len)
 
 static void cconv_free(struct cconv *c)
 {
+    BUG_ON(!c);
     iconv_close(c->cd);
     free(c->obuf);
     free(c);
@@ -533,49 +589,45 @@ static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *l
     return true;
 }
 
-static bool set_encoding(FileDecoder *dec, const char *encoding)
+bool file_decoder_read(Buffer *buffer, const unsigned char *buf, size_t size)
 {
-    if (strcmp(encoding, "UTF-8") == 0) {
-        dec->read_line = read_utf8_line;
-    } else {
-        dec->cconv = cconv_to_utf8(encoding);
-        if (!dec->cconv) {
-            return false;
+    if (encoding_is_utf8(buffer->encoding)) {
+        return file_decoder_read_utf8(buffer, buf, size);
+    }
+
+    struct cconv *cconv = cconv_to_utf8(buffer->encoding);
+    if (!cconv) {
+        return false;
+    }
+
+    FileDecoder dec = {
+        .ibuf = buf,
+        .isize = size,
+        .cconv = cconv,
+    };
+
+    const char *line;
+    size_t len;
+
+    if (decode_and_read_line(&dec, &line, &len)) {
+        if (len && line[len - 1] == '\r') {
+            buffer->crlf_newlines = true;
+            len--;
         }
-        dec->read_line = decode_and_read_line;
+        Block *blk = add_utf8_line(buffer, NULL, line, len);
+        while (decode_and_read_line(&dec, &line, &len)) {
+            if (buffer->crlf_newlines && len && line[len - 1] == '\r') {
+                len--;
+            }
+            blk = add_utf8_line(buffer, blk, line, len);
+        }
+        if (blk) {
+            add_block(buffer, blk);
+        }
     }
-    dec->encoding = str_intern(encoding);
+
+    cconv_free(cconv);
     return true;
-}
-
-FileDecoder *new_file_decoder (
-    const char *encoding,
-    const unsigned char *buf,
-    size_t size
-) {
-    FileDecoder *dec = xnew0(FileDecoder, 1);
-    dec->ibuf = buf;
-    dec->isize = size;
-
-    if (!set_encoding(dec, encoding)) {
-        free_file_decoder(dec);
-        return NULL;
-    }
-
-    return dec;
-}
-
-void free_file_decoder(FileDecoder *dec)
-{
-    if (dec->cconv) {
-        cconv_free(dec->cconv);
-    }
-    free(dec);
-}
-
-bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
-{
-    return dec->read_line(dec, linep, lenp);
 }
 
 #endif
