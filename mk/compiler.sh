@@ -5,9 +5,24 @@
 set -eu
 CC="$1"
 
-# These options are divided into "sets" and are tested all at once,
-# to keep the process spawning overhead to a minimum (i.e. as compared
-# to iterating through and checking them individually)
+# The following compiler options are divided into "sets", which are
+# tested all at once, in order to keep process spawning overhead to
+# a minimum (i.e. as compared to iterating through and checking them
+# individually)
+
+# https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Warning-Options.html
+# https://releases.llvm.org/7.0.0/tools/clang/docs/DiagnosticsReference.html
+GCC_4_8_WARNINGS='
+    -Wall -Wextra -Wformat -Wformat-security -Wformat-nonliteral
+    -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings
+    -Wundef -Wshadow -Wcast-align -Wredundant-decls -Wswitch-enum
+    -Wvla -Wold-style-definition -Wframe-larger-than=32768
+    -Wpointer-arith -Wnested-externs -Winit-self -Wbad-function-cast
+    -Werror=div-by-zero -Werror=implicit-function-declaration
+    -Wno-sign-compare -Wno-pointer-sign
+'
+
+# https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Warning-Options.html
 GCC_14_WARNINGS='
     -Walloca -Walloc-zero -Wnull-dereference -Wformat-signedness
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2
@@ -15,6 +30,7 @@ GCC_14_WARNINGS='
     -Wlogical-op -Wmissing-noreturn -Wdate-time -Wtrampolines
 '
 
+# https://releases.llvm.org/18.1.8/tools/clang/docs/DiagnosticsReference.html
 CLANG_18_WARNINGS='
     -Walloca -Wnull-dereference -Wcomma -Wmissing-noreturn -Wdate-time
 '
@@ -42,6 +58,10 @@ fi
 
 if cc_option -fvisibility=hidden; then
     echo 'BASIC_CFLAGS += -fvisibility=hidden'
+fi
+
+if cc_option $GCC_4_8_WARNINGS; then
+    fmt_cflags "$GCC_4_8_WARNINGS"
 fi
 
 if cc_option $GCC_14_WARNINGS; then

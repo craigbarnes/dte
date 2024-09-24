@@ -1,22 +1,11 @@
+# GNU Make rules for building dte, build/test/test and build/test/bench
+# See mk/compiler.sh for conditionally used compiler flags
+
 CC ?= gcc
 CFLAGS ?= -g -O2
 LDFLAGS ?=
 AWK = awk
 VERSION = $(shell mk/version.sh 1.11.1)
-
-# These options are used unconditionally, since they've been supported
-# by GCC since at least the minimum required version (GCC 4.8) and are
-# also supported by Clang.
-# - https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Warning-Options.html
-# - https://clang.llvm.org/docs/DiagnosticsReference.html
-WARNINGS = \
-    -Wall -Wextra -Wformat -Wformat-security -Wformat-nonliteral \
-    -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings \
-    -Wundef -Wshadow -Wcast-align -Wredundant-decls -Wswitch-enum \
-    -Wvla -Wold-style-definition -Wframe-larger-than=32768 \
-    -Wpointer-arith -Wnested-externs -Winit-self -Wbad-function-cast \
-    -Werror=div-by-zero -Werror=implicit-function-declaration \
-    -Wno-sign-compare -Wno-pointer-sign
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config css ctags d diff docker dte gcode gitblame \
@@ -93,10 +82,6 @@ dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
 bench = build/test/bench$(EXEC_SUFFIX)
 
-ifeq "$(WERROR)" "1"
-  WARNINGS += -Werror
-endif
-
 ifneq "$(ICONV_DISABLE)" "1"
   LDLIBS += $(LDLIBS_ICONV)
 endif
@@ -125,7 +110,10 @@ else
   BASIC_CPPFLAGS += -DDEBUG=$(DEBUG)
 endif
 
-BASIC_CFLAGS += $(WARNINGS)
+ifeq "$(WERROR)" "1"
+  BASIC_CFLAGS += -Werror
+endif
+
 BASIC_CPPFLAGS += -D_FILE_OFFSET_BITS=64
 $(all_objects): BASIC_CPPFLAGS += -Isrc -Ibuild/gen
 
