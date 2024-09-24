@@ -137,7 +137,7 @@ $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
 $(all_objects) $(feature_tests): build/gen/platform.mk build/gen/compiler.mk
-$(feature_tests): mk/feature-test/defs.h build/all.cflags
+$(feature_tests): mk/feature-test/defs.h build/gen/all.cflags
 build/convert.o: build/gen/buildvar-iconv.h
 build/gen/builtin-config.h: build/gen/builtin-config.mk
 build/gen/test-data.h: build/gen/test-data.mk
@@ -158,22 +158,22 @@ CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS_FILTERED) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS_FILTERED) $(LDFLAGS) $(BASIC_LDFLAGS)
 CFLAGS_FTEST = $(filter-out --coverage, $(CFLAGS_ALL)) -Werror
 
-$(dte) $(test) $(bench): build/all.ldflags
+$(dte) $(test) $(bench): build/gen/all.ldflags
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS_ALL) -o $@ $(filter %.o, $^) $(LDLIBS)
 
-$(editor_objects): build/%.o: src/%.c build/all.cflags | build/
+$(editor_objects): build/%.o: src/%.c build/gen/all.cflags | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
 
-$(test_objects) $(bench_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
+$(test_objects) $(bench_objects): build/test/%.o: test/%.c build/gen/all.cflags | build/test/
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
 
-build/all.ldflags: FORCE | build/
+build/gen/all.ldflags: FORCE | build/gen/
 	@$(OPTCHECK) '$(CC) $(LDFLAGS_ALL) $(LDLIBS)' $@
 
-build/%.cflags: FORCE | build/
+build/gen/%.cflags: FORCE | build/gen/
 	@$(OPTCHECK) '$(CC) $(CFLAGS_ALL)' $@
 
 build/gen/cc-version.txt: FORCE | build/gen/
