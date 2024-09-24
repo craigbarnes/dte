@@ -5,6 +5,7 @@
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 static size_t parse_ex_pattern(const char *buf, size_t size, char **escaped)
 {
@@ -60,7 +61,7 @@ static size_t parse_ex_cmd(Tag *tag, const char *buf, size_t size)
         return 0;
     }
 
-    if (n + 1 < size && buf[n] == ';' && buf[n + 1] == '"') {
+    if (n + 1 < size && mem_equal(buf + n, ";\"", 2)) {
         n += 2;
     }
 
