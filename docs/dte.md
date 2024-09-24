@@ -230,7 +230,9 @@ by dte:
 
 `PATH`
 :   Colon-delimited list of directory prefixes, as used by [`execvp`]
-    to find executables.
+    to find executables. This affects the [`exec`] and [`compile`]
+    commands, but only when given a _command_ argument containing
+    no slash characters (`/`).
 
 `TZ`
 :   Timezone specification, as used by [`tzset`] to initialize time
@@ -268,13 +270,13 @@ The following environment variables are set by dte:
 
 `$DTE_HOME/rc`
 :   User configuration file. See [`dterc`] for a full list of available
-    [commands][config-commands] and [options] or run "dte -b rc" to see
+    [commands][config-commands] and [options] or run `dte -b rc` to see
     the built-in, [default config].
 
 `$DTE_HOME/syntax/*`
 :   User syntax files. These override the [built-in syntax files] that
     come with the program. See [`dte-syntax`] for more information or
-    run "dte -b syntax/dte" for a basic example.
+    run `dte -b syntax/dte` for a basic example.
 
 `$DTE_HOME/file-history`
 :   History of edited files and cursor positions. Used only if the
@@ -362,6 +364,8 @@ input/output of both.
 [`bind`]: dterc.html#bind
 [`case`]: dterc.html#case
 [`cd`]: dterc.html#cd
+[`compile`]: dterc.html#compile
+[`exec`]: dterc.html#exec
 [`show bind`]: dterc.html#show
 [`show buffer`]: dterc.html#show
 [`next`]: dterc.html#next

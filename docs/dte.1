@@ -274,7 +274,9 @@ by dte:
 .TP
 \fBPATH\fR
 Colon\-delimited list of directory prefixes, as used by \fBexecvp\fR(3)
-to find executables.
+to find executables. This affects the \fBexec\fR and \fBcompile\fR
+commands, but only when given a \fIcommand\fR argument containing
+no slash characters (\fB/\fR).
 .PP
 .TP
 \fBTZ\fR
@@ -319,14 +321,14 @@ directory \fBcd \-\fR switches to.
 .TP
 \fB$DTE_HOME/rc\fR
 User configuration file. See \fBdterc\fR(5) for a full list of available
-commands and options or run "dte \-b rc" to see
+commands and options or run \fBdte \-b rc\fR to see
 the built\-in, default config.
 .PP
 .TP
 \fB$DTE_HOME/syntax/*\fR
 User syntax files. These override the built\-in syntax files that
 come with the program. See \fBdte\-syntax\fR(5) for more information or
-run "dte \-b syntax/dte" for a basic example.
+run \fBdte \-b syntax/dte\fR for a basic example.
 .PP
 .TP
 \fB$DTE_HOME/file\-history\fR
