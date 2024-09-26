@@ -2953,7 +2953,7 @@ static void test_timespec_cmp(TestContext *ctx)
 
 static void test_timespec_to_str(TestContext *ctx)
 {
-    char buf[64] = "";
+    char buf[TIME_STR_BUFSIZE] = "";
     size_t size = sizeof(buf) - 1;
     struct timespec ts = {.tv_sec = 0};
     EXPECT_TRUE(timespecs_equal(&ts, &ts));

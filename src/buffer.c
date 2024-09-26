@@ -473,7 +473,8 @@ String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
         const FileInfo *file = &buffer->file;
         const struct timespec *mtime = &file->mtime;
         unsigned int perms = file->mode & 07777;
-        char tstr[64], modestr[12];
+        char tstr[TIME_STR_BUFSIZE];
+        char modestr[12];
         string_sprintf (
             &buf,
             "\nLast stat:\n----------\n\n"
