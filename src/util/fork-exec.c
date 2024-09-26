@@ -10,6 +10,33 @@
 #include "terminal/ioctl.h"
 #include "xreadwrite.h"
 
+// Reset ignored signal dispositions (i.e. as originally set up by
+// set_basic_signal_dispositions()) to SIG_DFL
+static bool reset_ignored_signals(void)
+{
+    // Note that handled signals don't need to be restored here, since
+    // they're necessarily and automatically reset after exec(3p)
+    static const int ignored_signals[] = {
+        SIGINT, SIGQUIT, SIGTSTP,
+        SIGTTIN, SIGTTOU, SIGXFSZ,
+        SIGPIPE, SIGUSR1, SIGUSR2,
+    };
+
+    struct sigaction action = {.sa_handler = SIG_DFL};
+    if (unlikely(sigemptyset(&action.sa_mask) != 0)) {
+        return false;
+    }
+
+    for (size_t i = 0; i < ARRAYLEN(ignored_signals); i++) {
+        int r = sigaction(ignored_signals[i], &action, NULL);
+        if (unlikely(r != 0)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 static noreturn void handle_child(const char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
 {
     int error;
@@ -74,23 +101,8 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
         }
     }
 
-    static const int ignored_signals[] = {
-        SIGINT, SIGQUIT, SIGTSTP,
-        SIGTTIN, SIGTTOU, SIGXFSZ,
-        SIGPIPE, SIGUSR1, SIGUSR2,
-    };
-
-    struct sigaction action = {.sa_handler = SIG_DFL};
-    if (unlikely(sigemptyset(&action.sa_mask) != 0)) {
+    if (!reset_ignored_signals()) {
         goto error;
-    }
-
-    // Reset ignored signals to SIG_DFL (see exec(3p))
-    for (size_t i = 0; i < ARRAYLEN(ignored_signals); i++) {
-        int r = sigaction(ignored_signals[i], &action, NULL);
-        if (unlikely(r != 0)) {
-            goto error;
-        }
     }
 
     execvp(argv[0], (char**)argv);
