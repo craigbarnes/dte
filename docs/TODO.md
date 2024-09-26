@@ -56,6 +56,12 @@ Features
 
 * Implement auto-completion for e.g. `set filetype j<Tab>`
 
+* Suggest programs found in `$PATH` (or a cached list thereof) when
+  auto-completing e.g. `exec <Tab>`
+
+* Allow defining custom auto-completions, including the ability to run
+  `exec`-style commands that return a list of candidates
+
 * Make `tags -r` retain the head of the stack instead of popping it and add
   another flag (e.g. `tag -R`) to "return" in the other direction. This will
   make the "stack" more of a circular buffer, so `EditorState::bookmarks`
@@ -67,9 +73,6 @@ Features
 
 * Bind `tab` to auto-complete search history in `search` mode (similar to
   the existing `up`/`down` bindings)
-
-* Suggest programs found in `$PATH` (or a cached list thereof) when
-  auto-completing e.g. `exec <Tab>`
 
 * Allow highlighting auto-completion prefix with a different color. For
   example, if `:wra<Tab>` expands to `:wrap-paragraph`, the first 3 letters
@@ -94,6 +97,19 @@ Features
   "ambiguous" width characters (see also: [foot#1665] and the related
   todo item below)
 
+* Add an option to allow configuring whether pastes from the terminal
+  move the cursor after the inserted text (like `paste` vs `paste -m`)
+
+* Add a command flag to allow `macro play` to keep running after errors
+
+* Add a command flag to make `compile` interpret parsed filenames relative
+  to a specified directory (e.g. `../`), perhaps by making use of `openat(3)`.
+  This seems to be necessary for output produced by e.g. `ninja -C build-dir/`.
+
+* Add a fallback implementation for `copy -b`, for cases where the
+  terminal doesn't support OSC 52 and SSH isn't in use (try `wl-copy`,
+  `xsel`, `xclip`, `pb-copy`, `termux-clipboard-set`, `/dev/clipboard`)
+
 Documentation
 -------------
 
@@ -115,6 +131,13 @@ Documentation
   be found simply by browsing the website, so going immediately into
   technical detail could be confusing for people who are just casually
   evaluating the project.
+
+* Add a `DESCRIPTION` section to the `dte(1)` man page, introducing the
+  program for those unfamiliar (see also: `nano(1)`, `micro(1)`,
+  `ed(1)`, etc.)
+
+* Add `ASYNCHRONOUS EVENTS`, `STDOUT`, `STDERR` and `OPERANDS` sections
+  to the `dte(1)` man page, similar to the ones in [`ed(1)`]
 
 * Cross-reference `clear` and `delete-line` commands (mention how they're
   similar and how they're different)
@@ -141,8 +164,8 @@ Documentation
   responsibilities (e.g. ambiguous display width codepoints, the
   U+2103 [example][foot#1665] mentioned above, ZWJ sequences, etc.)
 
-Efficiency Improvements
------------------------
+Code Quality/Efficiency Improvements
+------------------------------------
 
 * Add a `ptr_array_reserve()` method and use to pre-allocate space,
   so that pointers can be mass-appended directly instead of via
@@ -184,6 +207,17 @@ Efficiency Improvements
   writing to the clipboard in chunks (instead of as a single `OSC 52`
   string)
 
+* Unify `History` and `FileHistory` somehow (perhaps with function
+  pointers for handling extra `FileHistoryEntry` fields)
+
+* Make more colors "built-in" (i.e. backed by the `StyleMap::builtin`
+  array), so that e.g. `&styles->builtin[BSE_COMMENT]` can be used
+  (instead of `find_style(styles, "comment")`) in `hl_words()`
+
+* Call `yield_terminal()` and `resume_terminal()` in `handle_exec()`
+  instead of `spawn()`, so that `EditorConfig` doesn't have to be
+  passed into the latter
+
 Testing/Debugging
 -----------------
 
@@ -203,6 +237,11 @@ Testing/Debugging
   `Buffer::id`, and then mention the `id` in other log messages relating
   to that buffer (thus allowing logged actions to be correlated to specific
   files without spamming long filenames repeatedly)
+
+* Enable clang-tidy's `hicpp-signed-bitwise` check, once we start making use
+  of [C23 Enhanced Enumerations] to make bitflag enums explicitly `unsigned`
+
+* Improve error/log messages in `set_and_check_locale()`
 
 * Improve test coverage for:
   * `u_get_nonascii()`
@@ -229,9 +268,11 @@ Testing/Debugging
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
 [foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
+[`ed(1)`]: https://man7.org/linux/man-pages/man1/ed.1p.html#ASYNCHRONOUS_EVENTS
 [`ltrace(1)`]: https://man7.org/linux/man-pages/man1/ltrace.1.html
 [`fstatvfs(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/fstatvfs.html
 [`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
 [`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
 [`tee(2)`]: https://man7.org/linux/man-pages/man2/tee.2.html
 [extended clipboard protocol]: https://sw.kovidgoyal.net/kitty/clipboard/
+[C23 Enhanced Enumerations]: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3030.htm

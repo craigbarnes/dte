@@ -30,9 +30,9 @@ Features
   * Dynamic feature queries (no [terminfo] database or curses library needed)
   * 24-bit RGB colors
   * [OSC 52] clipboard [copy][] (works over SSH)
-  * [Kitty's keyboard protocol][] (more key combos available for binding)
+  * [Kitty keyboard protocol][] (more key combos available for binding)
   * xterm's [`modifyOtherKeys`] keyboard protocol
-  * terminal-wg ["synchronized updates"][] (helps eliminate screen tearing)
+  * ["synchronized updates"][] (helps eliminate screen tearing)
 
 Installing
 ----------
@@ -153,7 +153,7 @@ Public License version 2 for more details.
 [POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
 [terminfo]: https://man7.org/linux/man-pages/man5/terminfo.5.html
 [OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
-[Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 ["synchronized updates"]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
 
