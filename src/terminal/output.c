@@ -223,7 +223,7 @@ void term_put_extra_queries(Terminal *term)
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
 
     // Debug query responses are used purely for logging/informational purposes
-    if (DEBUG >= 2 && log_level_enabled(LOG_LEVEL_DEBUG)) {
+    if (log_level_debug_enabled()) {
         term_put_bytes(obuf, debug_queries, sizeof(debug_queries) - 1);
     }
 

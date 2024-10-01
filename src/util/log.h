@@ -29,16 +29,22 @@ typedef enum {
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
 #define WARN_ON(a) do {if (unlikely(a)) {LOG_WARNING("%s", #a);}} while (0)
 
+bool log_level_enabled(LogLevel level);
+
 #if DEBUG >= 2
     #define LOG_DEBUG(...) LOG(LOG_LEVEL_DEBUG, __VA_ARGS__)
+    static inline bool log_level_debug_enabled(void) {return log_level_enabled(LOG_LEVEL_DEBUG);}
 #else
     static inline PRINTF(1) void LOG_DEBUG(const char* UNUSED_ARG(fmt), ...) {}
+    static inline bool log_level_debug_enabled(void) {return false;}
 #endif
 
 #if DEBUG >= 3
     #define LOG_TRACE(...) LOG(LOG_LEVEL_TRACE, __VA_ARGS__)
+    static inline bool log_level_trace_enabled(void) {return log_level_enabled(LOG_LEVEL_TRACE);}
 #else
     static inline PRINTF(1) void LOG_TRACE(const char* UNUSED_ARG(fmt), ...) {}
+    static inline bool log_level_trace_enabled(void) {return false;}
 #endif
 
 LogLevel log_open(const char *filename, LogLevel level, bool use_color);
@@ -49,6 +55,5 @@ void log_write(LogLevel level, const char *str, size_t len);
 LogLevel log_level_default(void);
 LogLevel log_level_from_str(const char *str);
 const char *log_level_to_str(LogLevel level);
-bool log_level_enabled(LogLevel level);
 
 #endif
