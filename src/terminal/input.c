@@ -12,6 +12,7 @@
 #include "util/log.h"
 #include "util/time-util.h"
 #include "util/unicode.h"
+#include "util/utf8.h"
 #include "util/xmalloc.h"
 
 void term_input_init(TermInputBuffer *ibuf)
@@ -29,6 +30,13 @@ void term_input_free(TermInputBuffer *ibuf)
 
 static void consume_input(TermInputBuffer *input, size_t len)
 {
+    if (log_level_trace_enabled()) {
+        // Note that this occurs *after* e.g. query responses have been logged
+        char buf[64];
+        u_make_printable_mem(input->buf, len, buf, sizeof(buf), MPF_C0_SYMBOLS);
+        LOG_TRACE("consumed input: %s", buf);
+    }
+
     BUG_ON(len > input->len);
     input->len -= len;
     if (input->len) {
