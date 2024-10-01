@@ -75,11 +75,12 @@ static size_t insert_to_current(BlockIter *cursor, const char *buf, size_t len)
 
 /*
  * Combine current block and new data into smaller blocks:
- *   - Block _must_ contain whole lines
- *   - Block _must_ contain at least one line
- *   - Preferred maximum size of block is BLOCK_EDIT_SIZE
- *   - Size of any block can be larger than BLOCK_EDIT_SIZE
- *     only if there's a very long line
+ *
+ * • Block _must_ contain whole lines
+ * • Block _must_ contain at least one line
+ * • Preferred maximum size of block is BLOCK_EDIT_SIZE
+ * • Size of any block can be larger than BLOCK_EDIT_SIZE only if there's
+ *   a very long line
  */
 static size_t split_and_insert(BlockIter *cursor, const char *buf, size_t len)
 {

@@ -125,10 +125,10 @@ void free_buffer(Buffer *buffer)
          * remaining allocations.
          *
          * See also:
-         * - init_std_buffer()
-         * - buffer_write_blocks_and_free()
-         * - main()
-         * - cmd_save()
+         * • init_std_buffer()
+         * • buffer_write_blocks_and_free()
+         * • main()
+         * • cmd_save()
          */
         return;
     }

@@ -12,9 +12,9 @@
  *
  * The mandated errors of interest are:
  *
- * - EILSEQ: A wide-character code does not correspond to a valid character
- * - EOVERFLOW: The value of n is greater than INT_MAX
- * - EOVERFLOW: The value to be returned is greater than INT_MAX
+ * • EILSEQ: A wide-character code does not correspond to a valid character
+ * • EOVERFLOW: The value of n is greater than INT_MAX
+ * • EOVERFLOW: The value to be returned is greater than INT_MAX
  *
  * ISO C11 states:
  *
@@ -27,9 +27,9 @@
  *
  * See also:
  *
- * - ISO C11 §7.21.6.12p3
- * - https://pubs.opengroup.org/onlinepubs/9699919799/functions/vsnprintf.html
- * - https://pubs.opengroup.org/onlinepubs/9699919799/functions/snprintf.html
+ * • ISO C11 §7.21.6.12p3
+ * • https://pubs.opengroup.org/onlinepubs/9699919799/functions/vsnprintf.html
+ * • https://pubs.opengroup.org/onlinepubs/9699919799/functions/snprintf.html
  */
 size_t xvsnprintf(char *restrict buf, size_t n, const char *restrict fmt, va_list v)
 {
