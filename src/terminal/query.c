@@ -192,7 +192,7 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
 static size_t make_printable_ctlseq(const StringView *seq, char *buf, size_t buflen)
 {
     MakePrintableFlags flags = MPF_C0_SYMBOLS;
-    return u_make_printable_mem(seq->data, seq->length, buf, buflen, flags);
+    return u_make_printable(seq->data, seq->length, buf, buflen, flags);
 }
 
 static KeyCode parse_xtgettcap_reply(const char *data, size_t len)

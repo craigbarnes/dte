@@ -1729,13 +1729,13 @@ static void test_u_set_char(TestContext *ctx)
     EXPECT_UINT_EQ(c, 0x5b);
 }
 
-static void test_u_make_printable_mem(TestContext *ctx)
+static void test_u_make_printable(TestContext *ctx)
 {
     char buf[5];
     MakePrintableFlags flags = 0;
     EXPECT_EQ(sizeof(buf), U_SET_CHAR_MAXLEN + 1);
     memset(buf, '_', sizeof(buf));
-    EXPECT_EQ(u_make_printable_mem(STRN("\xffxyz"), buf, sizeof(buf), flags), 4);
+    EXPECT_EQ(u_make_printable(STRN("\xffxyz"), buf, sizeof(buf), flags), 4);
     EXPECT_STREQ(buf, "<ff>");
 
     // Enough space for `U_SET_CHAR_MAXLEN + 1` is needed, regardless of
@@ -1743,17 +1743,17 @@ static void test_u_make_printable_mem(TestContext *ctx)
     // required in order to write more than just a null-terminator
     memset(buf, '_', sizeof(buf));
     EXPECT_TRUE(sizeof(buf) >= 5);
-    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 1, flags), 0);
-    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 2, flags), 0);
-    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 3, flags), 0);
-    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 4, flags), 0);
+    EXPECT_EQ(u_make_printable(STRN("12345"), buf, 1, flags), 0);
+    EXPECT_EQ(u_make_printable(STRN("12345"), buf, 2, flags), 0);
+    EXPECT_EQ(u_make_printable(STRN("12345"), buf, 3, flags), 0);
+    EXPECT_EQ(u_make_printable(STRN("12345"), buf, 4, flags), 0);
     EXPECT_EQ(buf[0], '\0');
     EXPECT_EQ(buf[1], '_');
     EXPECT_EQ(buf[2], '_');
     EXPECT_EQ(buf[3], '_');
     EXPECT_EQ(buf[4], '_');
     memset(buf, '_', sizeof(buf));
-    EXPECT_EQ(u_make_printable_mem(STRN("12345"), buf, 5, flags), 1);
+    EXPECT_EQ(u_make_printable(STRN("12345"), buf, 5, flags), 1);
     EXPECT_EQ(buf[0], '1');
     EXPECT_EQ(buf[1], '\0');
     EXPECT_EQ(buf[2], '_');
@@ -1761,18 +1761,18 @@ static void test_u_make_printable_mem(TestContext *ctx)
     EXPECT_EQ(buf[4], '_');
 
     memset(buf, '_', sizeof(buf));
-    EXPECT_EQ(u_make_printable_mem(STRN("\x7F\n123"), buf, 5, flags), 2);
+    EXPECT_EQ(u_make_printable(STRN("\x7F\n123"), buf, 5, flags), 2);
     EXPECT_STREQ(buf, "^?");
     EXPECT_EQ(buf[3], '_');
 
     flags |= MPF_C0_SYMBOLS;
     memset(buf, '_', sizeof(buf));
-    EXPECT_EQ(u_make_printable_mem(STRN("\x7F\n123"), buf, 5, flags), 3);
+    EXPECT_EQ(u_make_printable(STRN("\x7F\n123"), buf, 5, flags), 3);
     EXPECT_STREQ(buf, "\xE2\x90\xA1"); // UTF-8 encoding of U+2421
     EXPECT_EQ(buf[4], '_');
 
     memset(buf, '_', sizeof(buf));
-    EXPECT_EQ(u_make_printable_mem(STRN("\0xyz"), buf, 5, flags), 3);
+    EXPECT_EQ(u_make_printable(STRN("\0xyz"), buf, 5, flags), 3);
     EXPECT_STREQ(buf, "\xE2\x90\x80"); // UTF-8 encoding of U+2400
     EXPECT_EQ(buf[4], '_');
 }
@@ -3048,7 +3048,7 @@ static const TestEntry tests[] = {
     TEST(test_u_str_width),
     TEST(test_u_set_char_raw),
     TEST(test_u_set_char),
-    TEST(test_u_make_printable_mem),
+    TEST(test_u_make_printable),
     TEST(test_u_prev_char),
     TEST(test_ptr_array),
     TEST(test_ptr_array_move),

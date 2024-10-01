@@ -36,7 +36,7 @@ static void expect_keycode_eq (
     char seq_str[64];
     keycode_to_string(a, a_str);
     keycode_to_string(b, b_str);
-    u_make_printable_mem(seq, seq_len, seq_str, sizeof seq_str, 0);
+    u_make_printable(seq, seq_len, seq_str, sizeof seq_str, 0);
 
     test_fail(
         ctx, file, line,

@@ -46,7 +46,7 @@ static inline size_t u_char_size(CodePoint u)
     return 1 + (u > 0x7F) + (u > 0x7FF) + (u > 0xFFFF) - adj;
 }
 
-static inline size_t u_make_printable_mem (
+static inline size_t u_make_printable (
     const char *src,
     size_t src_len,
     char *dest,
