@@ -390,8 +390,8 @@ These are the only commands allowed in user config files.
 Create an alias \fIname\fR for \fIcommand\fR. If no \fIcommand\fR is given then any
 existing alias for \fIname\fR is removed.
 .P
-Aliases can be used in command mode or bound to keys, just as
-normal commands can. When aliases are used in place of commands, they
+Aliases can be used in command mode or bound to keys, just
+as normal commands can. When aliases are used in place of commands, they
 are first recursively expanded (to allow aliases of aliases) and any
 additional arguments are then added to the end of the expanded command.
 .P
@@ -469,25 +469,25 @@ Super:
 Hyper:
 \fBH\-left\fR
 .PP
-The \fIkey\fR is bound in normal mode by default, unless one or more of the
+The \fIkey\fR is bound in [normal mode] by default, unless one or more of the
 following flags are used:
 .P
 .TP
 \fB\-c\fR
-Add binding for \fBcommand\fR mode
+Add binding for command mode
 .PP
 .TP
 \fB\-n\fR
-Add binding for normal mode
+Add binding for [normal mode]
 .PP
 .TP
 \fB\-s\fR
-Add binding for \fBsearch\fR mode
+Add binding for search mode
 .PP
 The commands available in normal mode are the ones listed in the main
 sections of this manual.
 .P
-The commands available in \fBcommand\fR/\fBsearch\fR modes are as follows:
+The commands available in command/search mode are as follows:
 .P
 \(bu \fBleft\fR
 .br
@@ -1226,7 +1226,7 @@ The character under the cursor should be one of \fB{}[]()<>\fR.
 .RE
 \fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .RS
-If no flags or just \fB\-r\fR and no \fIpattern\fR given then dte changes to
+If no flags (or just \fB\-r\fR and no \fIpattern\fR) are given then dte changes to
 search mode, where you can type a regular expression to search.
 .P
 .TP

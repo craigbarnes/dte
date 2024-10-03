@@ -10,7 +10,7 @@ seealso: ["`dte`", "`dte-syntax`"]
 # dterc
 
 dterc is the language used in `dte` configuration files (`~/.dte/rc`)
-and also in the command mode of the editor (Alt+x). The syntax of the
+and also in the [command mode] of the editor (Alt+x). The syntax of the
 language is quite similar to shell, but much simpler.
 
 Commands are separated either by a newline or `;` character. To make a
@@ -115,8 +115,8 @@ These are the only commands allowed in [user config files].
 Create an alias _name_ for _command_. If no _command_ is given then any
 existing alias for _name_ is removed.
 
-Aliases can be used in command mode or [bound][`bind`] to keys, just as
-normal commands can. When aliases are used in place of commands, they
+Aliases can be used in [command mode] or [bound][`bind`] to keys, just
+as normal commands can. When aliases are used in place of commands, they
 are first recursively expanded (to allow aliases of aliases) and any
 additional arguments are then added to the end of the expanded command.
 
@@ -168,22 +168,22 @@ Super:
 Hyper:
 :   `H-left`
 
-The _key_ is bound in normal mode by default, unless one or more of the
+The _key_ is bound in [normal mode] by default, unless one or more of the
 following flags are used:
 
 `-c`
-:   Add binding for [`command`] mode
+:   Add binding for [command mode]
 
 `-n`
-:   Add binding for normal mode
+:   Add binding for [normal mode]
 
 `-s`
-:   Add binding for [`search`] mode
+:   Add binding for [search mode]
 
 The commands available in normal mode are the ones listed in the main
 sections of this manual.
 
-The commands available in [`command`]/[`search`] modes are as follows:
+The commands available in command/search mode are as follows:
 
 * `left`
 * `right`
@@ -461,7 +461,7 @@ Change the working directory and update `$PWD` and `$OLDPWD`. Running
 
 ### **command** [_text_]
 
-Enter command mode. If _text_ is given then it is written to the command
+Enter [command mode]. If _text_ is given then it is written to the command
 line (see the default `^L` key binding for why this is useful).
 
 ### **refresh**
@@ -744,8 +744,8 @@ The character under the cursor should be one of `{}[]()<>`.
 
 ### **search** [**-Hr**] [**-n**|**-p**|**-w**|_pattern_]
 
-If no flags or just `-r` and no _pattern_ given then dte changes to
-search mode, where you can type a regular expression to search.
+If no flags (or just `-r` and no _pattern_) are given then dte changes to
+[search mode], where you can type a regular expression to search.
 
 `-H`
 :   Don't add _pattern_ to search history
@@ -1282,7 +1282,7 @@ same name and some _type_ arguments don't take any _key_ argument.
 
 Options can be changed using the [`set`] command. Enumerated options can
 also be [`toggle`]d. To see which options are enumerated, type "toggle "
-in command mode and press the tab key. You can also use the [`option`]
+in [command mode] and press the tab key. You can also use the [`option`]
 command to set default options for specific file types.
 
 ## Global options
@@ -1563,6 +1563,8 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
+[command mode]: dte.html#command-mode
+[search mode]: dte.html#search-mode
 [user config files]: dte.html#files
 [key bindings]: dte.html#key-bindings
 [options]: #options

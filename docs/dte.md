@@ -87,7 +87,7 @@ Normal mode is the mode the editor starts in. Pressing basic keys
 are also various key combinations bound by default:
 
 `S-up`, `S-down`, `S-left`, `S-right`
-:   Move cursor and select characters
+:   [Move] cursor and select characters
 
 `C-S-left`, `C-S-right`
 :   Move cursor and select whole words
@@ -96,19 +96,19 @@ are also various key combinations bound by default:
 :   Move cursor and select whole lines
 
 `C-c`
-:   Copy current line or selection
+:   [Copy] current line or selection
 
 `C-x`
-:   Cut current line or selection
+:   [Cut] current line or selection
 
 `C-v`
-:   Paste
+:   [Paste]
 
 `C-z`
-:   Undo
+:   [Undo]
 
 `C-y`
-:   Redo
+:   [Redo]
 
 `M-x`
 :   Enter [command mode]
@@ -117,25 +117,25 @@ are also various key combinations bound by default:
 :   Enter [search mode]
 
 `F3`
-:   Search next
+:   [Search] next
 
 `F4`
-:   Search previous
+:   [Search] previous
 
-`C-t`
-:   Open new buffer
+`C-t`, `C-n`
+:   [Open] new buffer
 
 `M-1`, `M-2` ... `M-9`
-:   Switch to buffer 1 (or 2, 3, 4, etc.)
+:   [View] buffer 1 (or 2, 3, 4, etc.)
 
 `C-w`
-:   Close current buffer
+:   [Close] current buffer
 
 `C-s`
-:   Save
+:   [Save]
 
 `C-q`
-:   Quit
+:   [Quit]
 
 ## Command Mode
 
@@ -183,7 +183,7 @@ The key bindings for command mode are:
 
 ## Search Mode
 
-Search mode allows entering a regular expression to search in the
+Search mode allows entering a regular expression to [`search`] in the
 current buffer and can be accessed by pressing `C-f` (Ctrl+f) in
 [normal mode].
 
@@ -361,6 +361,18 @@ input/output of both.
 [search mode]: #search-mode
 ["synopsis"]: #synopsis
 
+[Close]: dterc.html#close
+[Copy]: dterc.html#copy
+[Cut]: dterc.html#cut
+[Move]: dterc.html#movement-commands
+[Open]: dterc.html#open
+[Paste]: dterc.html#paste
+[Quit]: dterc.html#quit
+[Redo]: dterc.html#redo
+[Save]: dterc.html#save
+[Search]: dterc.html#search
+[Undo]: dterc.html#undo
+[View]: dterc.html#view
 [`bind`]: dterc.html#bind
 [`case`]: dterc.html#case
 [`cd`]: dterc.html#cd
@@ -372,6 +384,7 @@ input/output of both.
 [`prev`]: dterc.html#prev
 [`open`]: dterc.html#open
 [`save`]: dterc.html#save
+[`search`]: dterc.html#search
 [`quit`]: dterc.html#quit
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
