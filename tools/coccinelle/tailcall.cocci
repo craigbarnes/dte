@@ -21,7 +21,7 @@ func(...)
 
 @@
 identifier func;
-identifier tail != {string_reserve_space, obuf_need_space};
+identifier tail != {string_reserve_space, obuf_reserve_space};
 expression lhs != current_config;
 expression rhs, a1, a2;
 @@

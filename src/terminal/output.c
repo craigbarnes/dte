@@ -61,7 +61,7 @@ void term_output_free(TermOutputBuffer *obuf)
     };
 }
 
-static char *obuf_need_space(TermOutputBuffer *obuf, size_t count)
+static char *obuf_reserve_space(TermOutputBuffer *obuf, size_t count)
 {
     BUG_ON(count > TERM_OUTBUF_SIZE);
     if (unlikely(obuf_avail(obuf) < count)) {
@@ -103,7 +103,7 @@ void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
         return;
     }
 
-    char *buf = obuf_need_space(obuf, count);
+    char *buf = obuf_reserve_space(obuf, count);
     obuf->count += count;
     memcpy(buf, str, count);
 }
@@ -111,7 +111,7 @@ void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
 static void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 {
     while (count) {
-        char *buf = obuf_need_space(obuf, 1);
+        char *buf = obuf_reserve_space(obuf, 1);
         size_t avail = obuf_avail(obuf);
         size_t n = MIN(count, avail);
         memset(buf, ch, n);
@@ -129,7 +129,7 @@ static void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 
     // ECMA-48 REP (CSI Pn b)
     const size_t maxlen = STRLEN("_E[30000b");
-    char *buf = obuf_need_space(obuf, maxlen);
+    char *buf = obuf_reserve_space(obuf, maxlen);
     size_t i = 0;
     buf[i++] = ch;
     buf[i++] = '\033';
@@ -165,7 +165,7 @@ void term_set_bytes(Terminal *term, char ch, size_t count)
 // bytes within escape sequences without advancing the cursor position.
 void term_put_byte(TermOutputBuffer *obuf, char ch)
 {
-    char *buf = obuf_need_space(obuf, 1);
+    char *buf = obuf_reserve_space(obuf, 1);
     buf[0] = ch;
     obuf->count++;
 }
@@ -289,7 +289,7 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 {
     // ECMA-48 CUP (CSI Pl ; Pc H)
     const size_t maxlen = STRLEN("E[;H") + (2 * DECIMAL_STR_MAX(x));
-    char *buf = obuf_need_space(obuf, maxlen);
+    char *buf = obuf_reserve_space(obuf, maxlen);
     size_t i = copyliteral(buf, "\033[");
     i += buf_uint_to_str(y + 1, buf + i);
 
@@ -378,7 +378,7 @@ static const char *get_tab_str(TermTabOutputMode tab_mode)
 
 static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
 {
-    char *buf = obuf_need_space(obuf, 7);
+    char *buf = obuf_reserve_space(obuf, 7);
     size_t n = obuf->x - obuf->scroll_x;
     BUG_ON(n == 0);
 
@@ -438,7 +438,7 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         return false;
     }
 
-    obuf_need_space(obuf, 8);
+    obuf_reserve_space(obuf, 8);
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
             obuf->buf[obuf->count++] = u;
@@ -577,7 +577,7 @@ void term_set_style(Terminal *term, TermStyle style)
 
     const size_t maxcolor = STRLEN(";38;2;255;255;255");
     const size_t maxlen = STRLEN("E[0m") + (2 * maxcolor) + (2 * ARRAYLEN(attr_map));
-    char *buf = obuf_need_space(&term->obuf, maxlen);
+    char *buf = obuf_reserve_space(&term->obuf, maxlen);
     size_t pos = copyliteral(buf, "\033[0");
 
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
@@ -610,7 +610,7 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
     obuf->cursor_style = s;
 
     const size_t maxlen = STRLEN("E[7 qE]12;rgb:aa/bb/ccST");
-    char *buf = obuf_need_space(obuf, maxlen);
+    char *buf = obuf_reserve_space(obuf, maxlen);
 
     // Set shape with DECSCUSR
     BUG_ON(s.type < 0 || s.type > 9);
