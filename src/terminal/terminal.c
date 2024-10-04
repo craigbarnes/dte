@@ -264,6 +264,10 @@ void term_enable_private_modes(Terminal *term)
 {
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
+
+    // Note that changes to some of the sequences below may require
+    // corresponding updates to handle_query_reply()
+
     if (features & TFLAG_META_ESC) {
         term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
     }
