@@ -47,16 +47,19 @@ static inline bool color_is_valid(int32_t color)
     return palette || rgb;
 }
 
+// Extract red channel from RGB color
 static inline uint8_t color_r(int32_t rgb)
 {
     return (rgb >> 16) & 0xFF;
 }
 
+// Extract green channel from RGB color
 static inline uint8_t color_g(int32_t rgb)
 {
     return (rgb >> 8) & 0xFF;
 }
 
+// Extract blue channel from RGB color
 static inline uint8_t color_b(int32_t rgb)
 {
     return rgb & 0xFF;
