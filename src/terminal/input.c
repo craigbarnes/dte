@@ -244,7 +244,13 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         flush = true;
     }
     if (is_newly_detected_feature(term, flags, TFLAG_KITTY_KEYBOARD)) {
-        term_put_literal(obuf, "\033[>5u");
+        // First disable modifyOtherKeys mode (as previously enabled by
+        // main() → ui_start() → term_enable_private_modes()) and then
+        // enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5).
+        // See also:
+        // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=CSI%20%3E%20Pp%20m
+        // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+        term_put_literal(obuf, "\033[>4m\033[>5u");
         flush = true;
     }
     if (is_newly_detected_feature(term, flags, TFLAG_META_ESC)) {
