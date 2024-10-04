@@ -18,17 +18,12 @@ static inline size_t copystrn(char *dest, const char *src, size_t len)
     return len;
 }
 
-static inline bool str_is_null_or_empty(const char *str)
-{
-    return !str || str[0] == '\0';
-}
-
 // Like getenv(3) but with `const char*` return type and also returning
 // NULL for empty strings
 static inline const char *xgetenv(const char *name)
 {
     const char *val = getenv(name);
-    return str_is_null_or_empty(val) ? NULL : val;
+    return (!val || val[0] == '\0') ? NULL : val;
 }
 
 PURE NONNULL_ARGS
