@@ -156,7 +156,8 @@ static KeyCode decode_modifiers(uint32_t n)
     return mods << KEYCODE_MODIFIER_OFFSET;
 }
 
-static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
+// Normalize KeyCode values originating from `CSI u` sequences
+static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
 {
     if (u_is_ascii_upper(key)) {
         if (mods & MOD_CTRL) {
@@ -164,6 +165,22 @@ static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
         }
     } else if (key >= 57344 && key <= 63743) {
         key = decode_kitty_special_key(key);
+        if (unlikely(key == KEY_IGNORE)) {
+            return KEY_IGNORE;
+        }
+    }
+
+    return mods | keycode_normalize(key);
+}
+
+// Normalize KeyCode values originating from xterm-style "modifyOtherKeys"
+// sequences (CSI 27 ; <modifiers> ; <key> ~)
+static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
+{
+    if (u_is_ascii_upper(key)) {
+        if (mods & MOD_CTRL) {
+            key = ascii_tolower(key);
+        }
     }
 
     return mods | keycode_normalize(key);
@@ -374,6 +391,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
      *
      * • https://www.leonerd.org.uk/hacks/fixterms/
      * • https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+     * • https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:formatOtherKeys
      *
      * kitty params: key:unshifted-key:base-layout-key ; mods:event-type ; text
      */
@@ -398,7 +416,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             }
             // Fallthrough
         case 1:
-            *k = normalize_extended_keycode(mods, key);
+            *k = normalize_csi_u_keycode(mods, key);
             return i;
         }
         goto ignore;
@@ -419,8 +437,9 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             if (unlikely(mods == KEY_IGNORE)) {
                 goto ignore;
             }
+            // xterm-style modifyOtherKeys encoding
             key = csi.params[2][0];
-            *k = normalize_extended_keycode(mods, key);
+            *k = normalize_csi_27_tilde_keycode(mods, key);
             return i;
         case 2:
             mods = decode_modifiers(csi.params[1][0]);
