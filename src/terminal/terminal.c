@@ -316,9 +316,10 @@ void term_restore_private_modes(Terminal *term)
 
 void term_restore_cursor_style(Terminal *term)
 {
-    // TODO: query the cursor style at startup and restore that
-    // value instead of using CURSOR_DEFAULT (which basically
-    // amounts to using the so-called "DECSCUSR 0 hack"
+    // TODO: Query the cursor style at startup (using DECRQSS DECSCUSR)
+    // and restore the value provided in the reply (if any), instead
+    // of using CURSOR_DEFAULT (which basically amounts to using the
+    // so-called "DECSCUSR 0 hack")
     static const TermCursorStyle reset = {
         .type = CURSOR_DEFAULT,
         .color = COLOR_DEFAULT,
