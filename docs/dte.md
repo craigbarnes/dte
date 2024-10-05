@@ -1,4 +1,5 @@
 ---
+NOTE: See https://craigbarnes.gitlab.io/dte/dte.html for a fully rendered version of this document
 title: dte
 section: 1
 date: October 2022

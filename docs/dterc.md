@@ -1,4 +1,5 @@
 ---
+NOTE: See https://craigbarnes.gitlab.io/dte/dterc.html for a fully rendered version of this document
 title: dterc
 section: 5
 date: March 2024

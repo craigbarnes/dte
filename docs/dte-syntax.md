@@ -1,4 +1,5 @@
 ---
+NOTE: See https://craigbarnes.gitlab.io/dte/dte-syntax.html for a fully rendered version of this document
 title: dte-syntax
 section: 5
 date: March 2024
