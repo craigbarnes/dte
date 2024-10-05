@@ -186,7 +186,7 @@ The key bindings for command mode are:
 
 Search mode allows entering a regular expression to search in the
 current buffer and can be accessed by pressing `C-f` (Ctrl+f) in
-[normal mode].
+[normal mode] or by running the [`search`] command in [command mode].
 
 The key bindings for search mode are mostly the same as in [command mode],
 plus these additional keys:
@@ -385,6 +385,7 @@ input/output of both.
 [`prev`]: dterc.html#prev
 [`open`]: dterc.html#open
 [`save`]: dterc.html#save
+[`search`]: dterc.html#search
 [`quit`]: dterc.html#quit
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
