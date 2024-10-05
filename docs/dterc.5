@@ -546,11 +546,25 @@ without adding a history entry and \fBaccept \-e\fR (search mode only)
 which escapes all \fBregex\fR(7) special characters before performing a
 (plain\-text) search.
 .P
+Note that, due to the use of several input protocols, some key
+combinations may correspond to slightly different \fIkey\fR strings,
+depending on which terminal is in use. To see the appropriate \fIkey\fR
+string for a specific key combination, start the editor in \fBdte \-K\fR
+mode. In some cases this may mean that the same key binding has to be
+added in 2 different forms (e.g. \fBC\-S\-1\fR and \fBC\-S\-!\fR) and in other cases
+it may mean certain keys cannot be bound at all. Terminals that support
+Kitty's keyboard protocol should be preferred (if possible), for
+maximum functionality.
+.P
 See also:
 .P
 \(bu The key bindings section in the \fBdte\fR(1) man page
 .br
+\(bu The \fB\-K\fR option in the \fBdte\fR(1) man page
+.br
 \(bu The \fBshow bind\fR command (below)
+.br
+\(bu Kitty's keyboard protocol documentation (if seeking technical details)
 .br
 .P
 .RE

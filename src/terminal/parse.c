@@ -177,14 +177,10 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
 // sequences (CSI 27 ; <modifiers> ; <key> ~)
 static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
 {
-    if (u_is_ascii_upper(key)) {
-        if (unlikely(mods == MOD_SHIFT)) {
-            // This only happens in tmux 3.5, due to the buggy input rework.
-            // We never request modifyOtherKeys mode 2, but tmux 3.5 still
-            // emits some of the corresponding sequences.
-            // See also: https://github.com/tmux/tmux/issues/4146
+    if (u_is_ascii_upper(key) && (mods & MOD_SHIFT)) {
+        if (mods == MOD_SHIFT) {
             mods = 0;
-        } else if (mods & MOD_CTRL) {
+        } else if (mods & (MOD_CTRL | MOD_META)) {
             key = ascii_tolower(key);
         }
     }

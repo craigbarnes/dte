@@ -220,10 +220,22 @@ without adding a history entry and `accept -e` (search mode only)
 which escapes all [`regex`] special characters before performing a
 (plain-text) search.
 
+Note that, due to the use of several input protocols, some key
+combinations may correspond to slightly different _key_ strings,
+depending on which terminal is in use. To see the appropriate _key_
+string for a specific key combination, start the editor in [`dte -K`]
+mode. In some cases this may mean that the same key binding has to be
+added in 2 different forms (e.g. `C-S-1` and `C-S-!`) and in other cases
+it may mean certain keys cannot be bound at all. Terminals that support
+[Kitty's keyboard protocol] should be preferred (if possible), for
+maximum functionality.
+
 See also:
 
 * The [key bindings] section in the [`dte`] man page
+* The [`-K`][`dte -K`] option in the [`dte`] man page
 * The [`show bind`] command (below)
+* [Kitty's keyboard protocol] documentation (if seeking technical details)
 
 ### **set** [**-gl**] _option_ [_value_] ...
 
@@ -1564,6 +1576,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
+[`dte -K`]: dte.html#options
 [normal mode]: dte.html#normal-mode
 [command mode]: dte.html#command-mode
 [search mode]: dte.html#search-mode
@@ -1579,6 +1592,7 @@ errors should be highlighted. Set to `""` to disable.
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`ctags`]: https://ctags.io/
+[Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 
 [`alias`]: #alias
 [`bind`]: #bind

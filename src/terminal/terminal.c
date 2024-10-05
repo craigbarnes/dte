@@ -282,8 +282,8 @@ void term_enable_private_modes(Terminal *term)
         // https://gitlab.com/craigbarnes/dte/-/issues/130#note_864453071
         term_put_literal(obuf, "\033[>1u");
     } else {
-        // Try to use "modifyOtherKeys" mode
-        term_put_literal(obuf, "\033[>4;1m");
+        // Try to use "modifyOtherKeys" mode (level 2 or 1)
+        term_put_literal(obuf, "\033[>4;1m\033[>4;2m");
     }
 
     // Try to enable bracketed paste mode. This is done unconditionally,
