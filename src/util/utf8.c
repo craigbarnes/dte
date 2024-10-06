@@ -10,6 +10,7 @@ enum {
     C = 0,  // Continuation byte
 };
 
+// https://en.wikipedia.org/wiki/UTF-8#Byte_map
 static const int8_t seq_len_table[256] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 00..0F
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 10..1F
@@ -158,6 +159,9 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
     } while (--c);
 
     if (!u_seq_len_ok(u, len)) {
+        // Prevent overlong encodings:
+        // • https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings
+        // • https://en.wikipedia.org/wiki/UTF-8#Error_handling
         goto invalid;
     }
 

@@ -1777,6 +1777,40 @@ static void test_u_make_printable(TestContext *ctx)
     EXPECT_EQ(buf[4], '_');
 }
 
+static void test_u_get_char(TestContext *ctx)
+{
+    static const char a[] = "//";
+    size_t idx = 0;
+    EXPECT_EQ(u_get_char(a, sizeof(a), &idx), '/');
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(a, sizeof(a), &idx), '/');
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(a, sizeof(a), &idx), 0);
+    ASSERT_EQ(idx, 3);
+
+    // Overlong encodings should be consumed as individual bytes and
+    // each byte returned negated (to indicate that it's invalid).
+    // See also: u_get_nonascii(), u_seq_len_ok(), u_char_size()
+
+    // Overlong (2 byte) encoding of U+002F ('/')
+    static const char ol1[] = "\xC0\xAF";
+    idx = 0;
+    EXPECT_EQ(u_get_char(ol1, 2, &idx), (CodePoint)-0xC0);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(ol1, 2, &idx), (CodePoint)-0xAF);
+    ASSERT_EQ(idx, 2);
+
+    // Overlong (3 byte) encoding of U+002F ('/')
+    static const char ol2[] = "\xE0\x80\xAF";
+    idx = 0;
+    EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0xE0);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0xAF);
+    ASSERT_EQ(idx, 3);
+}
+
 static void test_u_prev_char(TestContext *ctx)
 {
     const unsigned char *buf = "\xE6\xB7\xB1\xE5\x9C\xB3\xE5\xB8\x82"; // 深圳市
@@ -3049,6 +3083,7 @@ static const TestEntry tests[] = {
     TEST(test_u_set_char_raw),
     TEST(test_u_set_char),
     TEST(test_u_make_printable),
+    TEST(test_u_get_char),
     TEST(test_u_prev_char),
     TEST(test_ptr_array),
     TEST(test_ptr_array_move),

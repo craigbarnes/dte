@@ -35,11 +35,15 @@ size_t u_set_char_raw(char *buf, CodePoint u);
 size_t u_set_char(char *buf, CodePoint u);
 size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u);
 
+// Return the number of bytes needed to encode Unicode codepoint `u`
+// in UTF-8, or 1 for codepoints exceeding UNICODE_MAX_VALID_CODEPOINT.
+// Those in the latter category may have originated as values returned
+// by u_get_nonascii() or u_prev_char() (i.e. invalid bytes in a
+// sequence that have been negated).
 static inline size_t u_char_size(CodePoint u)
 {
     // If `u` is invalid, set `adj` to 3 and use to adjust the calculation
-    // so that 1 is returned. This indicates an invalid byte in the UTF-8
-    // byte sequence.
+    // so that 1 is returned
     size_t inv = (u > UNICODE_MAX_VALID_CODEPOINT);
     size_t adj = inv | (inv << 1);
 
