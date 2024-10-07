@@ -11,6 +11,7 @@
 // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/ (CSI ? u)
 
+#include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -120,11 +121,11 @@ static void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
     }
 }
 
-static void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
+static bool ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 {
-    if (!ascii_isprint(ch) || count < 6 || count > 30000) {
+    if (!ascii_isprint(ch) || count < ECMA48_REP_MIN || count > ECMA48_REP_MAX) {
         term_repeat_byte(obuf, ch, count);
-        return;
+        return false;
     }
 
     // ECMA-48 REP (CSI Pn b)
@@ -138,26 +139,31 @@ static void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
     buf[i++] = 'b';
     BUG_ON(i > maxlen);
     obuf->count += i;
+    return true;
 }
 
-void term_set_bytes(Terminal *term, char ch, size_t count)
+TermSetBytesMethod term_set_bytes(Terminal *term, char ch, size_t count)
 {
     TermOutputBuffer *obuf = &term->obuf;
     if (obuf->x + count > obuf->scroll_x + obuf->width) {
         count = obuf->scroll_x + obuf->width - obuf->x;
     }
+
     ssize_t skip = obuf->scroll_x - obuf->x;
     if (skip > 0) {
         skip = MIN(skip, count);
         obuf->x += skip;
         count -= skip;
     }
+
     obuf->x += count;
     if (term->features & TFLAG_ECMA48_REPEAT) {
-        ecma48_repeat_byte(obuf, ch, count);
-    } else {
-        term_repeat_byte(obuf, ch, count);
+        bool used_rep = ecma48_repeat_byte(obuf, ch, count);
+        return used_rep ? TERM_SET_BYTES_REP : TERM_SET_BYTES_MEMSET;
     }
+
+    term_repeat_byte(obuf, ch, count);
+    return TERM_SET_BYTES_MEMSET;
 }
 
 // Append a single byte to the buffer.
@@ -329,21 +335,37 @@ bool term_can_clear_eol_with_el_sequence(const Terminal *term)
     return obuf->can_clear && (bce || !bg) && !rev;
 }
 
-void term_clear_eol(Terminal *term)
+int term_clear_eol(Terminal *term)
 {
     TermOutputBuffer *obuf = &term->obuf;
     const size_t end = obuf->scroll_x + obuf->width;
     if (obuf->x >= end) {
-        return;
+        // Cursor already at EOL; nothing to clear
+        return 0;
     }
 
     if (term_can_clear_eol_with_el_sequence(term)) {
         obuf->x = end;
         term_put_literal(obuf, "\033[K"); // Erase to end of line (EL 0)
-        return;
+        static_assert(ECMA48_REP_MIN > -TERM_CLEAR_EOL_USED_EL);
+        return TERM_CLEAR_EOL_USED_EL;
     }
 
-    term_set_bytes(term, ' ', end - obuf->x);
+    size_t count = end - obuf->x;
+    TermSetBytesMethod method = term_set_bytes(term, ' ', count);
+
+    if (unlikely(count > INT_MAX)) {
+        // This is basically impossible, given that POSIX requires INT_MAX
+        // to be at least 2³¹-1 and lines of that length simply aren't
+        // something that happens. In any case, the return value here is
+        // only ever used for logging purposes in update_status_line().
+        LOG_ERROR("repeat count in %s() too large for int return value", __func__);
+        return (method == TERM_SET_BYTES_REP) ? INT_MIN : INT_MAX;
+    }
+
+    // Return a negative count if an ECMA-48 REP sequence was used, or a
+    // positive count if space was emitted `count` times
+    return (method == TERM_SET_BYTES_REP) ? -count : count;
 }
 
 void term_clear_screen(TermOutputBuffer *obuf)

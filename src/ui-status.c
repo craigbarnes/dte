@@ -23,33 +23,50 @@ void update_status_line(const Window *window)
     set_builtin_style(term, &e->styles, BSE_STATUSLINE);
 
     if (lw <= w) {
-        LOG_TRACE("drawing statusline-left; width=%zu", lw);
         term_put_str(obuf, lbuf);
     }
+
+    const char *draw_sides;
+    const char *gap_method;
+    int gap_width;
 
     if (lw <= w && rw <= w && lw + rw > w) {
         // Left and right sides both fit individually, but not together.
         // They'll be drawn overlapping, so there's no inner gap to clear.
-        LOG_TRACE("no statusline gap to clear");
+        draw_sides = "LR";
+        gap_method = "overlap";
+        gap_width = w - (lw + rw);
+        WARN_ON(gap_width >= 0);
     } else {
+        draw_sides = (rw <= w) ? (lw <= w ? "LR" : "R") : "L";
         if (rw <= w && !term_can_clear_eol_with_el_sequence(term)) {
             // If rbuf will be printed below and EL can't be used, fill the
             // gap between the left and right sides with the minimal number
             // of space characters, instead of letting the fallback path in
             // `term_clear_eol()` print spaces all the way to the end.
-            size_t nspaces = w - rw - obuf->x;
-            LOG_TRACE("filling statusline gap with %zu spaces", nspaces);
-            term_set_bytes(term, ' ', nspaces);
+            gap_width = w - rw - obuf->x;
+            TermSetBytesMethod m = term_set_bytes(term, ' ', gap_width);
+            gap_method = (m == TERM_SET_BYTES_REP) ? "REP" : "spaces";
         } else {
-            LOG_TRACE("filling statusline gap with term_clear_eol()");
-            term_clear_eol(term);
+            int n = term_clear_eol(term);
+            gap_method = (n >= 0) ? "spaces" : (n == -1 ? "EL" : "REP");
+            if (lw > w && rw > w) {
+                draw_sides = "none";
+                gap_width = w;
+            } else {
+                gap_width = w - (rw <= w ? rw : lw);
+            }
         }
     }
 
     if (rw <= w) {
-        LOG_TRACE("drawing statusline-right; width=%zu", rw);
         obuf->x = w - rw;
         term_move_cursor(obuf, x + w - rw, y);
         term_put_str(obuf, rbuf);
     }
+
+    LOG_TRACE (
+        "drawing statusline: left=%zu right=%zu gap=%d(%s) show=%s",
+        lw, rw, gap_width, gap_method, draw_sides
+    );
 }

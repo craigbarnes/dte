@@ -1226,20 +1226,30 @@ static void test_term_clear_eol(TestContext *ctx)
     term_output_init(obuf);
 
     // BCE with non-default bg
-    term.features |= TFLAG_BACK_COLOR_ERASE;
+    term.features = TFLAG_BACK_COLOR_ERASE;
     obuf->style = (TermStyle){.bg = COLOR_RED};
     term_output_reset(&term, 0, 80, 0);
-    term_clear_eol(&term);
+    EXPECT_EQ(term_clear_eol(&term), TERM_CLEAR_EOL_USED_EL);
     EXPECT_EQ(obuf->count, 3);
     EXPECT_EQ(obuf->x, 80);
     EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
     ASSERT_TRUE(clear_obuf(obuf));
 
+    // No BCE, but with REP
+    term.features = TFLAG_ECMA48_REPEAT;
+    obuf->style = (TermStyle){.bg = COLOR_RED};
+    term_output_reset(&term, 0, 40, 0);
+    EXPECT_EQ(term_clear_eol(&term), -40);
+    EXPECT_EQ(obuf->count, 6);
+    EXPECT_EQ(obuf->x, 40);
+    EXPECT_MEMEQ(obuf->buf, " \033[39b", 6);
+    ASSERT_TRUE(clear_obuf(obuf));
+
     // No BCE with non-default bg
-    term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    term.features = 0;
     obuf->style = (TermStyle){.bg = COLOR_RED};
     term_output_reset(&term, 0, 80, 0);
-    term_clear_eol(&term);
+    EXPECT_EQ(term_clear_eol(&term), 80);
     EXPECT_EQ(obuf->count, 80);
     EXPECT_EQ(obuf->x, 80);
     EXPECT_EQ(obuf->buf[0], ' ');
@@ -1247,20 +1257,20 @@ static void test_term_clear_eol(TestContext *ctx)
     ASSERT_TRUE(clear_obuf(obuf));
 
     // No BCE with default bg/attrs
-    term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    term.features = 0;
     obuf->style = (TermStyle){.bg = COLOR_DEFAULT};
     term_output_reset(&term, 0, 80, 0);
-    term_clear_eol(&term);
+    EXPECT_EQ(term_clear_eol(&term), TERM_CLEAR_EOL_USED_EL);
     EXPECT_EQ(obuf->count, 3);
     EXPECT_EQ(obuf->x, 80);
     EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
     ASSERT_TRUE(clear_obuf(obuf));
 
     // No BCE with ATTR_REVERSE
-    term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    term.features = 0;
     obuf->style = (TermStyle){.bg = COLOR_DEFAULT, .attr = ATTR_REVERSE};
     term_output_reset(&term, 0, 80, 0);
-    term_clear_eol(&term);
+    EXPECT_EQ(term_clear_eol(&term), 80);
     EXPECT_EQ(obuf->count, 80);
     EXPECT_EQ(obuf->x, 80);
     ASSERT_TRUE(clear_obuf(obuf));
@@ -1270,7 +1280,7 @@ static void test_term_clear_eol(TestContext *ctx)
     EXPECT_EQ(obuf->width, 20);
     EXPECT_EQ(obuf->scroll_x, 10);
     obuf->x = 30;
-    term_clear_eol(&term);
+    EXPECT_EQ(term_clear_eol(&term), 0);
     EXPECT_EQ(obuf->count, 0);
     EXPECT_EQ(obuf->x, 30);
     ASSERT_TRUE(clear_obuf(obuf));
@@ -1310,19 +1320,21 @@ static void test_term_set_bytes(TestContext *ctx)
     ASSERT_TRUE(clear_obuf(obuf));
     term_output_reset(&term, 0, 80, 0);
 
-    term_set_bytes(&term, 'x', 40);
+    EXPECT_EQ(term_set_bytes(&term, 'x', 40), TERM_SET_BYTES_REP);
     EXPECT_EQ(obuf->count, 6);
     EXPECT_EQ(obuf->x, 40);
     EXPECT_MEMEQ(obuf->buf, "x\033[39b", 6);
     ASSERT_TRUE(clear_obuf(obuf));
 
-    term_set_bytes(&term, '-', 5);
-    EXPECT_EQ(obuf->count, 5);
-    EXPECT_EQ(obuf->x, 5);
-    EXPECT_MEMEQ(obuf->buf, "-----", 5);
+    const size_t repmin = ECMA48_REP_MIN - 1;
+    EXPECT_EQ(repmin, 5);
+    EXPECT_EQ(term_set_bytes(&term, '-', repmin), TERM_SET_BYTES_MEMSET);
+    EXPECT_EQ(obuf->count, repmin);
+    EXPECT_EQ(obuf->x, repmin);
+    EXPECT_MEMEQ(obuf->buf, "-----", repmin);
     ASSERT_TRUE(clear_obuf(obuf));
 
-    term_set_bytes(&term, '\n', 8);
+    EXPECT_EQ(term_set_bytes(&term, '\n', 8), TERM_SET_BYTES_MEMSET);
     EXPECT_EQ(obuf->count, 8);
     EXPECT_EQ(obuf->x, 8);
     EXPECT_MEMEQ(obuf->buf, "\n\n\n\n\n\n\n\n", 8);
