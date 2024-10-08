@@ -106,6 +106,12 @@ Features
   to a specified directory (e.g. `../`), perhaps by making use of `openat(3)`.
   This seems to be necessary for output produced by e.g. `ninja -C build-dir/`.
 
+* Add a command flag to make `compile` retain a copy of the whole
+  `std{out,err}` output in memory and then provide a way to insert it
+  into a buffer (e.g. `show compile`). The latter part of this would
+  make it possible to run e.g. `wsplit -t` or `open -t` first and thus
+  allow some flexibility of use.
+
 * Add a fallback implementation for `copy -b`, for cases where the
   terminal doesn't support OSC 52 and SSH isn't in use (try `wl-copy`,
   `xsel`, `xclip`, `pb-copy`, `termux-clipboard-set`, `/dev/clipboard`)
