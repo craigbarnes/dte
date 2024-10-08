@@ -33,10 +33,10 @@ void update_status_line(const Window *window)
     if (lw <= w && rw <= w && lw + rw > w) {
         // Left and right sides both fit individually, but not together.
         // They'll be drawn overlapping, so there's no inner gap to clear.
+        // gap_width is negative and set only for logging purposes.
         draw_sides = "LR";
         gap_method = "overlap";
         gap_width = w - (lw + rw);
-        WARN_ON(gap_width >= 0);
     } else {
         draw_sides = (rw <= w) ? (lw <= w ? "LR" : "R") : "L";
         if (rw <= w && !term_can_clear_eol_with_el_sequence(term)) {
