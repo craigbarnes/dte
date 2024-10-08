@@ -129,6 +129,7 @@ static bool ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
     }
 
     // ECMA-48 REP (CSI Pn b)
+    static_assert(ECMA48_REP_MAX == 30000);
     const size_t maxlen = STRLEN("_E[30000b");
     char *buf = obuf_reserve_space(obuf, maxlen);
     size_t i = 0;
