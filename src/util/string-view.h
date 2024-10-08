@@ -79,10 +79,18 @@ static inline bool strview_equal_cstring_icase(const StringView *sv, const char 
     return strview_equal_strn_icase(sv, str, strlen(str));
 }
 
-NONNULL_ARGS
+NONNULL_ARG(1)
 static inline bool strview_has_strn_prefix(const StringView *sv, const char *p, size_t n)
 {
     return sv->length >= n && mem_equal(sv->data, p, n);
+}
+
+NONNULL_ARG(1)
+static inline bool strview_has_strn_suffix(const StringView *sv, const char *suf, size_t suflen)
+{
+    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
+    size_t len = sv->length;
+    return suflen == 0 || (len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen));
 }
 
 NONNULL_ARGS
@@ -99,15 +107,9 @@ static inline bool strview_has_prefix_icase(const StringView *sv, const char *p)
 }
 
 NONNULL_ARGS
-static inline bool strview_has_suffix(const StringView *sv, const char *suf)
+static inline bool strview_has_suffix(const StringView *sv, const char *suffix)
 {
-    size_t len = sv->length;
-    size_t suflen = strlen(suf);
-    if (suflen == 0) {
-        // See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
-        return true;
-    }
-    return len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen);
+    return strview_has_strn_suffix(sv, suffix, strlen(suffix));
 }
 
 NONNULL_ARGS
@@ -157,6 +159,26 @@ static inline void strview_remove_prefix(StringView *sv, size_t len)
         sv->data += len;
         sv->length -= len;
     }
+}
+
+static inline bool strview_remove_matching_prefix(StringView *sv, const char *prefix)
+{
+    size_t prefix_len = strlen(prefix);
+    if (!strview_has_strn_prefix(sv, prefix, prefix_len)) {
+        return false;
+    }
+    strview_remove_prefix(sv, prefix_len);
+    return true;
+}
+
+static inline bool strview_remove_matching_suffix(StringView *sv, const char *suffix)
+{
+    size_t suffix_len = strlen(suffix);
+    if (!strview_has_strn_suffix(sv, suffix, suffix_len)) {
+        return false;
+    }
+    sv->length -= suffix_len;
+    return true;
 }
 
 NONNULL_ARGS

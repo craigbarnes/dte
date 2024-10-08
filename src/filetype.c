@@ -129,11 +129,10 @@ static StringView get_filename_extension(StringView filename)
 static StringView get_interpreter(StringView line)
 {
     StringView sv = STRING_VIEW_INIT;
-    if (!strview_has_prefix(&line, "#!")) {
+    if (!strview_remove_matching_prefix(&line, "#!")) {
         return sv;
     }
 
-    strview_remove_prefix(&line, 2);
     strview_trim_left(&line);
     if (line.length < 2 || line.data[0] != '/') {
         return sv;

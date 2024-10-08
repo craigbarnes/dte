@@ -724,10 +724,47 @@ static void test_strview_has_suffix(TestContext *ctx)
     sv.length--;
     EXPECT_FALSE(strview_has_suffix(&sv, "bar"));
     EXPECT_TRUE(strview_has_suffix(&sv, "ba"));
+    EXPECT_TRUE(strview_has_strn_suffix(&sv, NULL, 0));
 
     sv.length = 0;
     EXPECT_TRUE(strview_has_suffix(&sv, ""));
     EXPECT_FALSE(strview_has_suffix(&sv, "f"));
+    EXPECT_TRUE(strview_has_strn_suffix(&sv, NULL, 0));
+
+    sv.data = NULL;
+    EXPECT_TRUE(strview_has_suffix(&sv, ""));
+    EXPECT_FALSE(strview_has_suffix(&sv, "f"));
+    EXPECT_TRUE(strview_has_strn_suffix(&sv, NULL, 0));
+}
+
+static void test_strview_remove_matching(TestContext *ctx)
+{
+    StringView sv = STRING_VIEW("ABCDEFGHIJKLMN");
+    EXPECT_TRUE(strview_remove_matching_prefix(&sv, "ABC"));
+    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJKLMN"));
+
+    EXPECT_TRUE(strview_remove_matching_suffix(&sv, "KLMN"));
+    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+
+    EXPECT_FALSE(strview_remove_matching_prefix(&sv, "A"));
+    EXPECT_FALSE(strview_remove_matching_suffix(&sv, "K"));
+    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+
+    EXPECT_TRUE(strview_remove_matching_prefix(&sv, ""));
+    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+
+    EXPECT_TRUE(strview_remove_matching_suffix(&sv, ""));
+    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+
+    sv.length = 0;
+    sv.data = NULL;
+    EXPECT_TRUE(strview_remove_matching_prefix(&sv, ""));
+    EXPECT_TRUE(strview_remove_matching_suffix(&sv, ""));
+    EXPECT_FALSE(strview_remove_matching_prefix(&sv, "pre"));
+    EXPECT_FALSE(strview_remove_matching_suffix(&sv, "suf"));
+    EXPECT_EQ(sv.length, 0);
+    EXPECT_NULL(sv.data);
+    EXPECT_TRUE(strview_equal_cstring(&sv, ""));
 }
 
 static void test_get_delim(TestContext *ctx)
@@ -3046,6 +3083,7 @@ static const TestEntry tests[] = {
     TEST(test_string),
     TEST(test_string_view),
     TEST(test_strview_has_suffix),
+    TEST(test_strview_remove_matching),
     TEST(test_get_delim),
     TEST(test_get_delim_str),
     TEST(test_str_replace_byte),

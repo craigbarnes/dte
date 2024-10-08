@@ -288,8 +288,8 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     }
 
     StringView seq = string_view(data, len);
-    if (strview_has_prefix(&seq, ">|")) {
-        LOG_INFO("XTVERSION reply: %.*s", (int)len - 2, data + 2);
+    if (strview_remove_matching_prefix(&seq, ">|")) {
+        LOG_INFO("XTVERSION reply: %.*s", (int)seq.length, seq.data);
         return KEY_IGNORE;
     }
 
@@ -304,8 +304,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
         return parse_xtgettcap_reply(data, len);
     }
 
-    if (strview_has_prefix(&seq, "1$r")) {
-        strview_remove_prefix(&seq, 3);
+    if (strview_remove_matching_prefix(&seq, "1$r")) {
         if (strview_has_suffix(&seq, " q")) {
             size_t n = seq.length - 2;
             unsigned int x;
@@ -316,8 +315,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
             }
         }
 
-        if (strview_has_suffix(&seq, "m")) {
-            seq.length--;
+        if (strview_remove_matching_suffix(&seq, "m")) {
             return handle_decrqss_sgr_reply(seq.data, seq.length);
         }
 
