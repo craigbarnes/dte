@@ -103,13 +103,12 @@ static const TermEntry terms[] = {
     t("teken", DIM | REV, C8 | BCE),
     t("terminator", 0, C256 | BCE | TITLE),
     t("termite", 0, C8 | TITLE),
-    // TODO: Add REP to tmux features, when it becomes safe to assume that
-    // TERM=tmux* implies tmux >= 2.6 (see tmux commit 5fc0be50450e75)
-    t("tmux", 0, C8 | TITLE | OSC52),
+    t("tmux", 0, C8 | TITLE | OSC52), // See also: parse_dcs_query_reply()
     t("wezterm", 0, TC | BCE | REP | TITLE | OSC52 | SYNC),
     t("xfce", 0, C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too
     // many other terminals to safely add it here.
+    // See also: parse_xtgettcap_reply()
     t("xterm", 0, C8 | BCE | TITLE | OSC52),
     t("xterm.js", 0, C8 | BCE),
 };
