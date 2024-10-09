@@ -103,11 +103,11 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         unsigned int code = csi->params[0][0];
         if (code >= 61 && code <= 65) {
             LOG_INFO("DA1 reply with P=%u (device level %u)", code, code - 60);
-            return tflag(TFLAG_QUERY | da1_params_to_features(csi));
+            return tflag(TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | da1_params_to_features(csi));
         }
         if (code >= 1 && code <= 12) {
             LOG_INFO("DA1 reply with P=%u (VT100 series)", code);
-            return xgetenv("DTE_XQUERY") ? tflag(TFLAG_QUERY) : KEY_IGNORE;
+            return tflag(TFLAG_QUERY_L2);
         }
         LOG_INFO("DA1 reply with P=%u (unknown)", code);
         return KEY_IGNORE;
@@ -121,7 +121,13 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
         unsigned int pc = csi->params[2][0];
         const char *name = da2_param_to_name(type);
         LOG_INFO("DA2 reply: %u (%s); %u; %u", type, name, firmware, pc);
-        return KEY_IGNORE;
+        if (type == 0 && firmware == 136 && pc == 0) {
+            // This is the DA2 response sent by PuTTY, which doesn't parse
+            // DCS sequences in accordance with ECMA-48 and so shouldn't
+            // be sent the queries in term_put_level_3_queries()
+            return KEY_IGNORE;
+        }
+        return tflag(TFLAG_QUERY_L3);
     }
 
     if (prefix == '?' && final == 'y' && intermediate == '$' && nparams == 2) {
@@ -251,7 +257,7 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
 
     TermFeatureFlags flags = 0;
     for (size_t pos = 0; pos < len; ) {
-        // These SGR params correspond to the ones in term_put_extra_queries()
+        // These SGR params correspond to the ones in term_put_level_3_queries()
         StringView s = get_delim(data, &pos, len, ';');
         if (strview_equal_cstring(&s, "48:5:255")) {
             flags |= TFLAG_256_COLOR;
@@ -290,14 +296,14 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     StringView seq = string_view(data, len);
     if (strview_remove_matching_prefix(&seq, ">|")) {
         LOG_INFO("XTVERSION reply: %.*s", (int)seq.length, seq.data);
-        return KEY_IGNORE;
+        return tflag(TFLAG_QUERY_L3);
     }
 
     // https://vt100.net/docs/vt510-rm/DA3.html
     // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=(-,Tertiary%20DA,-)
-    if (strview_has_prefix(&seq, "!|")) {
-        LOG_INFO("DA3 reply: %.*s", (int)len - 2, data + 2);
-        return KEY_IGNORE;
+    if (strview_remove_matching_prefix(&seq, "!|")) {
+        LOG_INFO("DA3 reply: %.*s", (int)seq.length, seq.data);
+        return tflag(TFLAG_QUERY_L3);
     }
 
     if (strview_has_prefix(&seq, "1+r") || strview_has_prefix(&seq, "0+r")) {

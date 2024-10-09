@@ -187,34 +187,41 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
     }
 }
 
-void term_put_queries(Terminal *term)
+/*
+ * See also:
+ * • handle_query_reply()
+ * • parse_csi_query_reply()
+ * • https://vt100.net/docs/vt510-rm/DA1.html
+ * • ECMA-48 §8.3.24
+ */
+void term_put_level_1_queries(Terminal *term)
 {
+    LOG_INFO("sending level 1 queries to terminal");
     // ECMA-48 DA (Device Attributes; referred to as "DA1" in other contexts)
     term_put_literal(&term->obuf, "\033[c");
-    LOG_INFO("sending DA1 query to terminal");
 }
 
-void term_put_extra_queries(Terminal *term)
+/*
+ * See also:
+ * • handle_query_reply()
+ * • TFLAG_QUERY_L2
+ * • parse_csi_query_reply()
+ * • parse_dcs_query_reply()
+ * • parse_xtwinops_query_reply()
+ */
+void term_put_level_2_queries(Terminal *term)
 {
-    // Note: the correct (according to ISO 8613-6) format for the SGR
-    // sequence here would be "\033[0;38:2::60:70:80;48:5:255m", but we
-    // use the standards-incorrect (but de facto more widely supported)
-    // format because that's what is actually used in term_set_style()
     static const char queries[] =
+        "\033[>c" // DA2 (Secondary Device Attributes)
+        "\033[=c" // DA3 (Tertiary Device Attributes)
         "\033[>0q" // XTVERSION (terminal name and version)
         "\033[?u" // Kitty keyboard protocol flags
-        "\033[0;38;2;60;70;80;48;5;255m" // SGR with direct/indexed fg/bg
-        "\033P$qm\033\\" // DECRQSS SGR (check support for SGR params above)
-        "\033[0m" // SGR 0
         "\033[?1036$p" // DECRQM 1036 (metaSendsEscape; must be after kitty query)
         "\033[?1039$p" // DECRQM 1039 (altSendsEscape; must be after kitty query)
     ;
 
     static const char debug_queries[] =
-        "\033[>c" // DA2 (Secondary Device Attributes)
-        "\033[=c" // DA3 (Tertiary Device Attributes)
         "\033[?4m" // XTQMODKEYS 4 (xterm modifyOtherKeys mode)
-        "\033P$q q\033\\" // DECRQSS DECSCUSR (cursor style)
         "\033[?7$p" // DECRQM 7 (DECAWM; auto-wrap mode)
         "\033[?25$p" // DECRQM 25 (DECTCEM; cursor visibility)
         "\033[?45$p" // DECRQM 45 (XTREVWRAP; reverse-wraparound mode)
@@ -224,20 +231,52 @@ void term_put_extra_queries(Terminal *term)
         "\033[18t" // XTWINOPS 18 (text area size in "characters"/cells)
     ;
 
-    LOG_INFO("sending additional queries to terminal");
-
     TermOutputBuffer *obuf = &term->obuf;
+    LOG_INFO("sending level 2 queries to terminal");
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
+
+    if (!(term->features & TFLAG_SYNC)) {
+        term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
+    }
 
     // Debug query responses are used purely for logging/informational purposes
     if (log_level_debug_enabled()) {
         term_put_bytes(obuf, debug_queries, sizeof(debug_queries) - 1);
     }
+}
 
+/*
+ * Some terminals fail to parse DCS sequences in accordance with ECMA-48,
+ * so DCS queries are sent separately and only after probing for some
+ * known problem cases (e.g. PuTTY).
+ *
+ * See also:
+ * • handle_query_reply()
+ * • TFLAG_QUERY_L3
+ * • parse_dcs_query_reply()
+ * • parse_xtgettcap_reply()
+ * • handle_decrqss_sgr_reply()
+ */
+void term_put_level_3_queries(Terminal *term)
+{
+    // Note: the correct (according to ISO 8613-6) format for the SGR
+    // sequence here would be "\033[0;38:2::60:70:80;48:5:255m", but we
+    // use the standards-incorrect (but de facto more widely supported)
+    // format because that's what is actually used in term_set_style()
+    static const char sgr_query[] =
+        "\033[0;38;2;60;70;80;48;5;255m" // SGR with direct fg and indexed bg
+        "\033P$qm\033\\" // DECRQSS SGR (check support for SGR params above)
+        "\033[0m" // SGR 0
+    ;
+
+    TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
-    if (!(features & TFLAG_SYNC)) {
-        term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
+    LOG_INFO("sending level 3 queries to terminal");
+
+    if (!(features & TFLAG_TRUE_COLOR)) {
+        term_put_bytes(obuf, sgr_query, sizeof(sgr_query) - 1);
     }
+
     if (!(features & TFLAG_BACK_COLOR_ERASE)) {
         term_put_literal(obuf, "\033P+q626365\033\\"); // XTGETTCAP "bce"
     }
@@ -249,6 +288,10 @@ void term_put_extra_queries(Terminal *term)
     }
     if (!(features & TFLAG_OSC52_COPY)) {
         term_put_literal(obuf, "\033P+q4D73\033\\"); // XTGETTCAP "Ms"
+    }
+
+    if (log_level_debug_enabled()) {
+        term_put_literal(obuf, "\033P$q q\033\\"); // DECRQSS DECSCUSR (cursor style)
     }
 }
 

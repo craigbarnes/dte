@@ -189,35 +189,43 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     WARN_ON(!IS_POWER_OF_2(flag));
 
     switch ((unsigned int)flag) {
-    case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
-    case TFLAG_SYNC: return "SYNC";
     case TFLAG_BACK_COLOR_ERASE: return "BCE";
     case TFLAG_ECMA48_REPEAT: return "REP";
     case TFLAG_SET_WINDOW_TITLE: return "TITLE";
     case TFLAG_OSC52_COPY: return "OSC52";
-    case TFLAG_QUERY: return "QUERY";
+    case TFLAG_META_ESC: return "METAESC";
+    case TFLAG_ALT_ESC: return "ALTESC";
+    case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
+    case TFLAG_SYNC: return "SYNC";
+    case TFLAG_QUERY_L2: return "QUERY2";
+    case TFLAG_QUERY_L3: return "QUERY3";
     case TFLAG_8_COLOR: return "C8";
     case TFLAG_16_COLOR: return "C16";
     case TFLAG_256_COLOR: return "C256";
     case TFLAG_TRUE_COLOR: return "TC";
-    case TFLAG_META_ESC: return "METAESC";
-    case TFLAG_ALT_ESC: return "ALTESC";
     }
 
     return "??";
 }
 
-static void COLD log_detected_features(const Terminal *term, TermFeatureFlags flags)
-{
-    while (flags > 0) {
-        unsigned int lsb = u32_ffs(flags);
-        BUG_ON(lsb == 0 || lsb > BITSIZE(flags));
+static COLD void log_detected_features (
+    TermFeatureFlags existing,
+    TermFeatureFlags detected
+) {
+    // Don't log QUERY flags more than once
+    const TermFeatureFlags query_flags = TFLAG_QUERY_L2 | TFLAG_QUERY_L3;
+    const TermFeatureFlags repeat_query_flags = query_flags & detected & existing;
+    detected &= ~repeat_query_flags;
+
+    while (detected > 0) {
+        unsigned int lsb = u32_ffs(detected);
+        BUG_ON(lsb == 0 || lsb > BITSIZE(detected));
         TermFeatureFlags flag = 1u << (lsb - 1);
-        BUG_ON(!(flags & flag));
+        BUG_ON(!(detected & flag));
         const char *name = tflag_to_str(flag);
-        const char *extra = (term->features & flag) ? " (was already set)" : "";
+        const char *extra = (existing & flag) ? " (was already set)" : "";
         LOG_INFO("terminal feature %s detected via query%s", name, extra);
-        flags &= ~flag;
+        detected &= ~flag;
     }
 }
 
@@ -234,7 +242,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
     TermFeatureFlags flags = key & ~KEYCODE_QUERY_REPLY_BIT;
     if (unlikely(log_level_enabled(LOG_LEVEL_INFO))) {
-        log_detected_features(term, flags);
+        log_detected_features(term->features, flags);
     }
 
     TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
@@ -247,8 +255,12 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 
     TermOutputBuffer *obuf = &term->obuf;
     bool flush = false;
-    if (is_newly_detected_feature(term, flags, TFLAG_QUERY)) {
-        term_put_extra_queries(term);
+    if (is_newly_detected_feature(term, flags, TFLAG_QUERY_L2)) {
+        term_put_level_2_queries(term);
+        flush = true;
+    }
+    if (is_newly_detected_feature(term, flags, TFLAG_QUERY_L3)) {
+        term_put_level_3_queries(term);
         flush = true;
     }
     if (is_newly_detected_feature(term, flags, TFLAG_KITTY_KEYBOARD)) {
