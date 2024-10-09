@@ -8,7 +8,7 @@
 
 enum {
     // Maximum length of string produced by keycode_to_string()
-    KEYCODE_STR_MAX = 32
+    KEYCODE_STR_MAX = 32 // sizeof("QUERY REPLY; 0x12345678")
 };
 
 enum {

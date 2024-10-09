@@ -161,6 +161,12 @@ size_t keycode_to_string(KeyCode k, char *buf)
         {'H', MOD_HYPER},
     };
 
+    size_t prefix_len;
+    if (k & KEYCODE_QUERY_REPLY_BIT) {
+        prefix_len = copyliteral(buf, "QUERY REPLY; 0x");
+        goto hex;
+    }
+
     size_t pos = 0;
     for (size_t i = 0; i < ARRAYLEN(mods); i++) {
         if (k & mods[i].code) {
@@ -188,8 +194,10 @@ size_t keycode_to_string(KeyCode k, char *buf)
         goto copy;
     }
 
-    size_t plen = copyliteral(buf, "INVALID; 0x");
-    return plen + buf_umax_to_hex_str(k, buf + plen, 8);
+    prefix_len = copyliteral(buf, "INVALID; 0x");
+
+hex:
+    return prefix_len + buf_umax_to_hex_str(k, buf + prefix_len, 8);
 
 copy:
     BUG_ON(name[0] == '\0');
