@@ -217,11 +217,8 @@ static COLD void log_detected_features (
     const TermFeatureFlags repeat_query_flags = query_flags & detected & existing;
     detected &= ~repeat_query_flags;
 
-    while (detected > 0) {
-        unsigned int lsb = u32_ffs(detected);
-        BUG_ON(lsb == 0 || lsb > BITSIZE(detected));
-        TermFeatureFlags flag = 1u << (lsb - 1);
-        BUG_ON(!(detected & flag));
+    while (detected) {
+        TermFeatureFlags flag = u32_lsbit(detected);
         const char *name = tflag_to_str(flag);
         const char *extra = (existing & flag) ? " (was already set)" : "";
         LOG_INFO("terminal feature %s detected via query%s", name, extra);

@@ -2426,6 +2426,30 @@ static void test_ffs(TestContext *ctx)
     EXPECT_EQ(u32_ffs(U32(1) << 18), 19);
 }
 
+static void test_lsbit(TestContext *ctx)
+{
+    EXPECT_EQ(u32_lsbit(0), 0);
+    EXPECT_EQ(u32_lsbit(1), 1);
+    EXPECT_EQ(u32_lsbit(2), 2);
+    EXPECT_EQ(u32_lsbit(3), 1);
+    EXPECT_EQ(u32_lsbit(4), 4);
+    EXPECT_EQ(u32_lsbit(255), 1);
+    EXPECT_EQ(u32_lsbit(256), 256);
+    EXPECT_EQ(u32_lsbit(257), 1);
+    EXPECT_EQ(u32_lsbit(258), 2);
+    EXPECT_EQ(u32_lsbit(1u << 31), 1u << 31);
+    EXPECT_EQ(u32_lsbit(1u << 30), 1u << 30);
+    EXPECT_EQ(u32_lsbit(7u << 30), 1u << 30);
+    EXPECT_EQ(u32_lsbit(UINT32_MAX), 1);
+    EXPECT_EQ(u32_lsbit(UINT32_MAX << 25), 1u << 25);
+
+    for (uint32_t x = 1; x < 70; x++) {
+        uint32_t lsb = u32_lsbit(x);
+        EXPECT_TRUE(IS_POWER_OF_2(lsb));
+        EXPECT_TRUE(lsb & x);
+    }
+}
+
 static void test_path_dirname_and_path_basename(TestContext *ctx)
 {
     static const struct {
@@ -3134,6 +3158,7 @@ static const TestEntry tests[] = {
     TEST(test_popcount),
     TEST(test_ctz),
     TEST(test_ffs),
+    TEST(test_lsbit),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_path_relative),
     TEST(test_short_filename_cwd),

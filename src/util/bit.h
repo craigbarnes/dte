@@ -81,4 +81,10 @@ static inline unsigned int u32_ffs(uint32_t n)
     return n ? u32_ctz(n) + 1 : 0;
 }
 
+// Extract (isolate) least significant bit
+static inline uint32_t u32_lsbit(uint32_t x)
+{
+    return x ? 1u << (u32_ffs(x) - 1) : 0;
+}
+
 #endif
