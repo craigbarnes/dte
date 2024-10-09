@@ -5,7 +5,8 @@ PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html 
 
 man = docs/dte.1 docs/dterc.5 docs/dte-syntax.5
 html-man = public/dte.html public/dterc.html public/dte-syntax.html
-html = public/index.html public/releases.html $(html-man)
+html-aux = public/contributing.html public/TODO.html public/releasing.html
+html = public/index.html public/releases.html $(html-man) $(html-aux)
 css = public/style.css
 img = public/logo.svg public/screenshot.png public/favicon.ico
 
@@ -15,7 +16,7 @@ html: $(html) $(css) $(img)
 htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
-$(html-man): public/%.html: docs/%.md
+$(html-man) $(html-aux): public/%.html: docs/%.md
 public/index.html: docs/index.yml README.md docs/gitlab.md
 public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
@@ -25,6 +26,7 @@ public/favicon.ico: docs/favicon.ico
 public/releases.html: private PDHTML += -L docs/releases.lua
 public/dterc.html public/dte-syntax.html: private PDHTML += -L docs/fix-anchors.lua
 public/dte.html: private PDHTML += --indented-code-classes=sh
+$(html-aux): private PDHTML += --metadata title='dte - $(basename $(notdir $@))'
 
 docs/%.1: docs/%.md docs/pdman.lua build/docs/pdman.flags
 	$(E) PANDOC $@
