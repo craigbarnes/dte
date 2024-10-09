@@ -43,7 +43,7 @@ See Also
 * [`docs/releasing.md`](releasing.md)
 * `make help`
 * [GitLab CI pipelines](https://gitlab.com/craigbarnes/dte/-/pipelines)
-* [Test coverage](https://craigbarnes.gitlab.io/dte/coverage/
+* [Test coverage](https://craigbarnes.gitlab.io/dte/coverage/)
 
 
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues

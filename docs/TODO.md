@@ -2,7 +2,7 @@ Todo
 ====
 
 This is a list of ideas for improvements to the dte codebase that don't
-particularly need a GitLab issue, either because they're too minor or
+particularly need a [GitLab issue], either because they're too minor or
 obscure to warrant public discussion or because they're just preliminary
 ideas that may not go anywhere. The title "todo" is thus used very loosely.
 
@@ -12,7 +12,7 @@ Features
 * Add a function for recursively expanding aliases and use in `run_commands()`
   * Add a `show alias` flag to allow viewing fully expanded aliases, instead
     of just doing a single level of expansion
-  * Add an `alias` flag to eagerly expand aliases at creation time (instead
+  * Add an [`alias`] flag to eagerly expand aliases at creation time (instead
     of at usage time)
 
 * Add a command that swaps the positions of the selection anchor point and
@@ -20,9 +20,9 @@ Features
   over)
 
 * Remove `ARGERR_OPTION_ARGUMENT_NOT_SEPARATE` and make `do_parse_args()`
-  handle e.g. `exec -oeval ...` like `getopt(3)` would
+  handle e.g. `exec -oeval ...` like `getopt(3)` [would][Utility Syntax Guideline 6]
 
-* Persist the most recently recorded `macro`, by saving `EditorState::macro`
+* Persist the most recently recorded [`macro`], by saving `EditorState::macro`
   on exit and restoring it at startup (see also: `read_history_files()` →
   `search_set_regexp()`)
 
@@ -34,21 +34,21 @@ Features
   can create multiple messages, we may as well use the same mechanism
   to support multiple tags)
 
-* Add option to `wrap-paragraph` that allows finding a common prefix on every
+* Add option to [`wrap-paragraph`] that allows finding a common prefix on every
   affected/selected line, removing it before wrapping and then re-inserting it
   afterwards (also factoring it into the line width calculation)
 
-* Allow text selection in `command` and `search` modes, so that
-  `CommandLine::buf` can be quickly manipulated by using `copy` and
-  `paste` with selected substrings
+* Allow text selection in [`command`] and [`search`] modes, so that
+  `CommandLine::buf` can be quickly manipulated by using [`copy`] and
+  [`paste`] with selected substrings
 
-* Make the `default` command in `dte-syntax(5)` files act recursively
+* Make the [`default`] command in [`dte-syntax(5)`] files act recursively
   (for example `default X Y; default Y Z` should work as expected)
 
 * Implement a `KITTYKBD`-specialized version of `term_read_input()` that
   omits all of the Esc-prefix=Alt and Esc timing stupidity
 
-* Allow `dte -s` option to take multiple file arguments (e.g.
+* Allow [`dte -s`] option to take multiple file arguments (e.g.
   `dte -s config/syntax/*`)
 
 * Implement auto-completion for e.g. `hi c.<Tab>`, by collecting all
@@ -60,7 +60,7 @@ Features
   auto-completing e.g. `exec <Tab>`
 
 * Allow defining custom auto-completions, including the ability to run
-  `exec`-style commands that return a list of candidates
+  [`exec`]-style commands that return a list of candidates
 
 * Make `tags -r` retain the head of the stack instead of popping it and add
   another flag (e.g. `tag -R`) to "return" in the other direction. This will
@@ -68,7 +68,7 @@ Features
   should probably just be made a fixed-size array.
 
 * Add an `exec` command to command/search mode; for use cases like e.g.
-  binding `C-r` to an `fzf` history menu (and inserting output into the
+  binding `C-r` to an [`fzf(1)`] history menu (and inserting output into the
   command line)
 
 * Bind `tab` to auto-complete search history in `search` mode (similar to
@@ -117,37 +117,37 @@ Features
 Documentation
 -------------
 
-* Improve documentation for `search` command
+* Improve documentation for [`search`] command
 
-* For the `hi` command, mention that `gray`, `darkgray` and `white` are
+* For the [`hi`] command, mention that `gray`, `darkgray` and `white` are
   different from the names used by some other applications and perhaps
   give a brief explanation why (no real standard for aixterm "bright"
   colors, `brightblack` being nonsensical, etc.)
 
 * Document the fact that `exec -o tag` tries to parse the first line of
-  output as a `tags` file entry, before falling back to a simple tag name
+  output as a [`tags(5)`] file entry, before falling back to a simple tag name
 
-* Document the fact that `exec` sets `$LINES` and `$COLUMNS` and use e.g.
+* Document the fact that [`exec`] sets `$LINES` and `$COLUMNS` and use e.g.
   `wsplit -t; pipe-from man ls` as an example of why
 
-* Write a better introduction to the `dte-syntax(5)` man page, which
+* Write a better introduction to the [`dte-syntax(5)`] man page, which
   adequately answers the question "what is this?". This man page can
   be found simply by browsing the website, so going immediately into
   technical detail could be confusing for people who are just casually
   evaluating the project.
 
-* Add a `DESCRIPTION` section to the `dte(1)` man page, introducing the
-  program for those unfamiliar (see also: `nano(1)`, `micro(1)`,
-  `ed(1)`, etc.)
+* Add a `DESCRIPTION` section to the [`dte(1)`] man page, introducing the
+  program for those unfamiliar (see also: [`nano(1)`], [`micro(1)`],
+  [`ed(1)`], etc.)
 
 * Add `ASYNCHRONOUS EVENTS`, `STDOUT`, `STDERR` and `OPERANDS` sections
-  to the `dte(1)` man page, similar to the ones in [`ed(1)`]
+  to the [`dte(1)`] man page, similar to the ones in [`ed(1)`]
 
-* Cross-reference `clear` and `delete-line` commands (mention how they're
-  similar and how they're different)
+* Cross-reference [`clear`] and [`delete-line`] commands (mention how
+  they're similar and how they're different)
 
-* Mention POSIX exit code rationale in docs for `quit` and/or "EXIT STATUS":
-  https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_21_18
+* Mention [POSIX exit code rationale] in docs for [`quit`] and/or
+  ["EXIT STATUS"]
 
 * Provide dark color scheme for website
   * Define existing light scheme with `:root {color-scheme: light; ...}`
@@ -160,8 +160,7 @@ Documentation
 
 * Document `$DTE_LOG` and `$DTE_LOG_LEVEL`
 
-* Mention GNU Coding Standards §4.4 in `errorfmt` documentation
-  (see: https://www.gnu.org/prep/standards/html_node/Errors.html)
+* Mention [GNU Coding Standards §4.4] in [`errorfmt`] documentation
 
 * Document the Unicode features that don't map well to the terminal's
   "grid of cells" display model and/or multi-process division of
@@ -219,7 +218,7 @@ Code Quality/Efficiency Improvements
   (instead of `find_style(styles, "comment")`) in `hl_words()`
 
 * Call `yield_terminal()` and `resume_terminal()` in `handle_exec()`
-  instead of `spawn()`, so that `EditorConfig` doesn't have to be
+  instead of `spawn()`, so that `EditorState` doesn't have to be
   passed into the latter
 
 Testing/Debugging
@@ -242,7 +241,7 @@ Testing/Debugging
   to that buffer (thus allowing logged actions to be correlated to specific
   files without spamming long filenames repeatedly)
 
-* Enable clang-tidy's `hicpp-signed-bitwise` check, once we start making use
+* Enable clang-tidy's [`hicpp-signed-bitwise`] check, once we start making use
   of [C23 Enhanced Enumerations] to make bitflag enums explicitly `unsigned`
 
 * Improve error/log messages in `set_and_check_locale()`
@@ -262,6 +261,29 @@ Testing/Debugging
   * `src/view.c`
 
 
+[`dte(1)`]: https://craigbarnes.gitlab.io/dte/dte.html
+[`dte -s`]: https://craigbarnes.gitlab.io/dte/dte.html#options
+["EXIT STATUS"]: https://craigbarnes.gitlab.io/dte/dte.html#exit-status
+
+[`dte-syntax(5)`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
+[`default`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#default
+
+[`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
+[`clear`]: https://craigbarnes.gitlab.io/dte/dterc.html#clear
+[`command`]: https://craigbarnes.gitlab.io/dte/dterc.html#command
+[`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
+[`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
+[`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
+[`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
+[`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
+[`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
+[`paste`]: https://craigbarnes.gitlab.io/dte/dterc.html#paste
+[`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
+[`search`]: https://craigbarnes.gitlab.io/dte/dterc.html#search
+[`wrap-paragraph`]: https://craigbarnes.gitlab.io/dte/dterc.html#wrap-paragraph
+
+[GitLab issue]: https://gitlab.com/craigbarnes/dte/-/issues
+[Utility Syntax Guideline 6]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02:~:text=Guideline%C2%A06
 [AtomicUndo]: https://ne.di.unimi.it/docs/AtomicUndo.html
 [Typst]: https://typst.app/docs/reference/syntax/
 [Rust]: https://doc.rust-lang.org/reference/
@@ -271,12 +293,19 @@ Testing/Debugging
 [Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
+[GNU Coding Standards §4.4]: https://www.gnu.org/prep/standards/html_node/Errors.html
 [foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
+[`tags(5)`]: https://man.archlinux.org/man/tags.5.en
+[`nano(1)`]: https://man.archlinux.org/man/nano.1.en
+[`micro(1)`]: https://man.archlinux.org/man/micro.1.en
+[`fzf(1)`]: https://man.archlinux.org/man/fzf.1.en
 [`ed(1)`]: https://man7.org/linux/man-pages/man1/ed.1p.html#ASYNCHRONOUS_EVENTS
+[POSIX exit code rationale]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_21_18
 [`ltrace(1)`]: https://man7.org/linux/man-pages/man1/ltrace.1.html
 [`fstatvfs(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/fstatvfs.html
 [`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
 [`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
 [`tee(2)`]: https://man7.org/linux/man-pages/man2/tee.2.html
 [extended clipboard protocol]: https://sw.kovidgoyal.net/kitty/clipboard/
+[`hicpp-signed-bitwise`]: https://clang.llvm.org/extra/clang-tidy/checks/hicpp/signed-bitwise.html
 [C23 Enhanced Enumerations]: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3030.htm
