@@ -74,6 +74,7 @@ static KeyCode tflag(TermFeatureFlags flags)
     return KEYCODE_QUERY_REPLY_BIT | flags;
 }
 
+// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=features%20the%20terminal%20supports
 static TermFeatureFlags da1_params_to_features(const TermControlParams *csi)
 {
     TermFeatureFlags flags = 0;
@@ -306,6 +307,10 @@ static bool xtversion_is_tmux_2_6_or_later(StringView sv)
             return false;
         }
     } else {
+        if (unlikely(ver.length != sv.length)) {
+            // Trailing '-' (e.g. "2.6-")
+            return false;
+        }
         if (ver.length && ascii_islower(ver.data[ver.length - 1])) {
             // Patch release (e.g. "3.5a"); trim the trailing letter
             ver.length--;

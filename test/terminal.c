@@ -488,6 +488,8 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_TRUE(csi.unhandled_bytes);
 }
 
+#define TFLAG(flags) (KEYCODE_QUERY_REPLY_BIT | (flags))
+
 static void test_term_parse_sequence(TestContext *ctx)
 {
     static const struct {
@@ -604,6 +606,7 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
         {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
         {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
+
         // xterm + `modifyOtherKeys` option
         {"\033[27;5;9~", 9, MOD_CTRL | KEY_TAB},
         {"\033[27;5;13~", 10, MOD_CTRL | KEY_ENTER},
@@ -621,6 +624,7 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[27;3;1114112~", 15, KEY_IGNORE},
         {"\033[27;999999999999999999999;123~", 31, KEY_IGNORE},
         {"\033[27;123;99999999999999999~", 27, KEY_IGNORE},
+
         // www.leonerd.org.uk/hacks/fixterms/
         {"\033[13;3u", 7, MOD_META | KEY_ENTER},
         {"\033[9;5u", 6, MOD_CTRL | KEY_TAB},
@@ -640,6 +644,7 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[ 2;3u", 7, KEY_IGNORE},
         {"\033[<?>2;3u", 9, KEY_IGNORE},
         {"\033[ !//.$2;3u", 12, KEY_IGNORE},
+
         // https://sw.kovidgoyal.net/kitty/keyboard-protocol
         {"\033[27u", 5, MOD_CTRL | '['},
         {"\033[57359u", 8, KEY_SCROLL_LOCK},
@@ -698,30 +703,99 @@ static void test_term_parse_sequence(TestContext *ctx)
         {"\033[116;133u", 10, MOD_CTRL | 't'}, // Ignored Numlock in modifiers
         {"\033[116;256u", 10, MOD_MASK | 't'}, // Ignored Capslock and Numlock
         {"\033[116;257u", 10, KEY_IGNORE}, // Unknown bit in modifiers
+
         // Excess params
         {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
+
+        // DA1 replies
+        {"\033[?64;15;22c", 12, TFLAG(TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | TFLAG_8_COLOR)},
+        {"\033[?1;2c", 7, TFLAG(TFLAG_QUERY_L2)},
+        {"\033[?90c", 6, KEY_IGNORE},
+
+        // DA2 replies
+        {"\033[>0;136;0c", 11, KEY_IGNORE},
+        {"\033[>84;0;0c", 10, TFLAG(TFLAG_QUERY_L3)}, // tmux
+        {"\033[>1;11801;0c", 13, TFLAG(TFLAG_QUERY_L3)}, // foot
+
+        // DA3 replies
+        {"\033P!|464f4f54\033\\", 12, TFLAG(TFLAG_QUERY_L3)}, // foot
+        {"\033P!|464f4f54\033", 12, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P!|464f4f54", -1, KEY_IGNORE},
+
+        // XTVERSION replies
+        {"\033P>|tmux 2.6\033\\", 12, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
+        {"\033P>|tmux 2.6a\033\\", 13, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
+        {"\033P>|tmux 2.6-rc2\033\\", 16, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
+        {"\033P>|tmux next-2.6\033\\", 17, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux next-2.7\033\\", 17, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
+        {"\033P>|tmux 2.6.\033\\", 13, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux z2.6\033\\", 13, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|xyz\033\\", 7, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2.6-\033\\", 13, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2.6-z\033\\", 14, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux next\033\\", 13, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux next-\033\\", 14, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2.\033\\", 11, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2\033\\", 10, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2.d\033\\", 12, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2_4\033\\", 12, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux 2_4a\033\\", 13, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux -3.1\033\\", 13, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux -3.1-rc1\033\\", 17, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux next-2.7-rc\033\\", 20, TFLAG(TFLAG_QUERY_L3)},
+        {"\033P>|tmux next-2.7a\033\\", 18, TFLAG(TFLAG_QUERY_L3)},
+
+        // XTMODKEYS replies
+        {"\033[>4;2m", 7, KEY_IGNORE},
+        {"\033[>4m", 5, KEY_IGNORE},
+        {"\033[>4;2;0m", 9, KEY_IGNORE},
+
         // XTWINOPS replies
         {"\033]ltitle\033\\", 8, KEY_IGNORE},
         {"\033]Licon\033\\", 7, KEY_IGNORE},
         {"\033]ltitle\a", 9, KEY_IGNORE},
         {"\033]Licon\a", 8, KEY_IGNORE},
+
         // DECRPM replies (to DECRQM queries)
         {"\033[?2026;0$y", 11, KEY_IGNORE},
-        {"\033[?2026;1$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC},
-        {"\033[?2026;2$y", 11, KEYCODE_QUERY_REPLY_BIT | TFLAG_SYNC},
+        {"\033[?2026;1$y", 11, TFLAG(TFLAG_SYNC)},
+        {"\033[?2026;2$y", 11, TFLAG(TFLAG_SYNC)},
         {"\033[?2026;3$y", 11, KEY_IGNORE},
         {"\033[?2026;4$y", 11, KEY_IGNORE},
         {"\033[?2026;5$y", 11, KEY_IGNORE},
         {"\033[?0;1$y", 8, KEY_IGNORE},
+        {"\033[?1036;2$y", 11, TFLAG(TFLAG_META_ESC)},
+        {"\033[?1039;2$y", 11, TFLAG(TFLAG_ALT_ESC)},
+        {"\033[?7;2$y", 8, KEY_IGNORE},
+        {"\033[?25;2$y", 9, KEY_IGNORE},
+        {"\033[?45;2$y", 9, KEY_IGNORE},
+        {"\033[?67;2$y", 9, KEY_IGNORE},
+        {"\033[?1049;2$y", 11, KEY_IGNORE},
+        {"\033[?2004;2$y", 11, KEY_IGNORE},
+
         // Invalid, DECRPM-like sequences
         {"\033[?9$y", 6, KEY_IGNORE}, // Too few params
         {"\033[?1;2;3$y", 10, KEY_IGNORE}, // Too many params
         {"\033[?1;2y", 7, KEY_IGNORE}, // No '$' intermediate byte
         {"\033[1;2$y", 7, KEY_IGNORE}, // No '?' param prefix
+
+        // XTGETTCAP replies
+        {"\033P1+r626365\033\\", 11, TFLAG(TFLAG_BACK_COLOR_ERASE)},
+        {"\033P1+r74736C=1B5D323B\033\\", 20, TFLAG(TFLAG_SET_WINDOW_TITLE)},
+        {"\033P0+r\033\\", 5, KEY_IGNORE},
+        {"\033P0+rbbccdd\033\\", 11, KEY_IGNORE},
+
+        // DECRQSS replies
+        {"\033P1$r0;38:2::60:70:80;48:5:255m\033\\", 31, TFLAG(TFLAG_TRUE_COLOR | TFLAG_256_COLOR)}, // SGR (xterm, foot)
+        {"\033P1$r0;38:2:60:70:80;48:5:255m\033\\", 30, TFLAG(TFLAG_TRUE_COLOR | TFLAG_256_COLOR)}, // SGR (kitty)
+        {"\033P1$r0;zm\033\\", 9, KEY_IGNORE}, // Invalid SGR-like
+        {"\033P1$r2 q\033\\", 8, KEY_IGNORE}, // DECSCUSR 2 (cursor style)
+
         // Kitty keyboard protocol query replies
-        {"\033[?5u", 5, KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD},
-        {"\033[?1u", 5, KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD},
-        {"\033[?0u", 5, KEYCODE_QUERY_REPLY_BIT | TFLAG_KITTY_KEYBOARD},
+        {"\033[?5u", 5, TFLAG(TFLAG_KITTY_KEYBOARD)},
+        {"\033[?1u", 5, TFLAG(TFLAG_KITTY_KEYBOARD)},
+        {"\033[?0u", 5, TFLAG(TFLAG_KITTY_KEYBOARD)},
+
         // Invalid, kitty-reply-like sequences
         {"\033[?u", 4, KEY_IGNORE}, // Too few params (could be valid, in theory)
         {"\033[?1;2u", 7, KEY_IGNORE}, // Too many params
