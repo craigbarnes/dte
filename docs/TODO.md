@@ -111,8 +111,9 @@ Features
   into a buffer (e.g. `show compile`)
 
 * Add a fallback implementation for `copy -b`, for cases where the
-  terminal doesn't support OSC 52 and SSH isn't in use (try `wl-copy`,
-  `xsel`, `xclip`, `pb-copy`, `termux-clipboard-set`, `/dev/clipboard`)
+  terminal doesn't support OSC 52 and SSH isn't in use (try [`wl-copy(1)`],
+  [`xsel(1)`], [`xclip(1)`], [`pbcopy(1)`], [`termux-clipboard-set`],
+  [`/dev/clipboard`])
 
 Documentation
 -------------
@@ -295,6 +296,12 @@ Testing/Debugging
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
 [GNU Coding Standards §4.4]: https://www.gnu.org/prep/standards/html_node/Errors.html
 [foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
+[`wl-copy(1)`]: https://man.archlinux.org/man/wl-copy.1
+[`xsel(1)`]: https://man.archlinux.org/man/xsel.1x
+[`xclip(1)`]: https://man.archlinux.org/man/xclip.1
+[`pbcopy(1)`]: https://keith.github.io/xcode-man-pages/pbcopy.1.html
+[`termux-clipboard-set`]: https://wiki.termux.com/wiki/Termux-clipboard-set
+[`/dev/clipboard`]: https://cygwin.com/cygwin-ug-net/using-specialnames.html#pathnames-posixdevices:~:text=/dev/clipboard
 [`tags(5)`]: https://man.archlinux.org/man/tags.5.en
 [`nano(1)`]: https://man.archlinux.org/man/nano.1.en
 [`micro(1)`]: https://man.archlinux.org/man/micro.1.en
