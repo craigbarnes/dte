@@ -30,20 +30,27 @@ void term_input_free(TermInputBuffer *ibuf)
 
 static void consume_input(TermInputBuffer *input, size_t len)
 {
+    BUG_ON(len == 0);
+    BUG_ON(len > input->len);
+
     if (log_level_trace_enabled()) {
         // Note that this occurs *after* e.g. query responses have been logged
-        char buf[64];
+        char buf[256];
         u_make_printable(input->buf, len, buf, sizeof(buf), MPF_C0_SYMBOLS);
-        LOG_TRACE("consumed input: %s", buf);
+        if (len == input->len) {
+            LOG_TRACE("consumed %zu bytes from input buffer: %s", len, buf);
+        } else {
+            LOG_TRACE (
+                "consumed %zu (of %zu) bytes from input buffer: %s",
+                len, input->len, buf
+            );
+        }
     }
 
-    BUG_ON(len > input->len);
     input->len -= len;
     if (input->len) {
         memmove(input->buf, input->buf + len, input->len);
-
-        // Keys are sent faster than we can read
-        input->can_be_truncated = true;
+        input->can_be_truncated = true; // Keys sent faster than we can read
     }
 }
 
@@ -63,6 +70,7 @@ static bool fill_buffer(TermInputBuffer *input)
         return false;
     }
 
+    LOG_TRACE("read %zu bytes into input buffer", (size_t)rc);
     input->len += (size_t)rc;
     return true;
 }
@@ -338,7 +346,7 @@ KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
         }
 
         // Unknown escape sequence; avoid inserting it
-        input->len = 0;
+        consume_input(input, input->len);
         return KEY_NONE;
     }
 
