@@ -94,11 +94,8 @@ bool history_search_backward (
 
 void history_load(History *history, char *filename, size_t size_limit)
 {
-    BUG_ON(!history);
-    BUG_ON(!filename);
     BUG_ON(history->filename);
     BUG_ON(history->max_entries < 2);
-
     hashmap_init(&history->entries, history->max_entries);
     history->filename = filename;
 

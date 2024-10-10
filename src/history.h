@@ -26,12 +26,12 @@ typedef struct {
     size_t max_entries;
 } History;
 
-void history_append(History *history, const char *text);
-bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
-bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
-void history_load(History *history, char *filename, size_t size_limit);
-void history_save(const History *history);
-void history_free(History *history);
-String history_dump(const History *history);
+void history_append(History *history, const char *text) NONNULL_ARGS;
+bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text) NONNULL_ARG(1, 3) WARN_UNUSED_RESULT;
+bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) NONNULL_ARG(1, 3) WARN_UNUSED_RESULT;
+void history_load(History *history, char *filename, size_t size_limit) NONNULL_ARGS;
+void history_save(const History *history) NONNULL_ARGS;
+void history_free(History *history) NONNULL_ARGS;
+String history_dump(const History *history) NONNULL_ARGS;
 
 #endif
