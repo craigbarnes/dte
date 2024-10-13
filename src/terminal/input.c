@@ -218,6 +218,8 @@ static COLD void log_detected_features (
     detected &= ~repeat_query_flags;
 
     while (detected) {
+        // Iterate through detected features, by finding the least
+        // significant set bit and then logging and unsetting it
         TermFeatureFlags flag = u32_lsbit(detected);
         const char *name = tflag_to_str(flag);
         const char *extra = (existing & flag) ? " (was already set)" : "";
@@ -227,40 +229,54 @@ static COLD void log_detected_features (
 }
 
 static bool is_newly_detected_feature (
-    const Terminal *term,
-    TermFeatureFlags detected_features,
+    TermFeatureFlags existing,
+    TermFeatureFlags detected,
     TermFeatureFlags feature
 ) {
     BUG_ON(!IS_POWER_OF_2(feature));
-    return ((detected_features & feature) && !(term->features & feature));
+    // (detected & feature) && !(existing & feature)
+    return ~existing & detected & feature;
+}
+
+UNITTEST {
+    BUG_ON(is_newly_detected_feature(1, 1, 1));
+    BUG_ON(is_newly_detected_feature(1, 2, 1));
+    BUG_ON(is_newly_detected_feature(3, 1, 1));
+    BUG_ON(is_newly_detected_feature(1, 3, 1));
+    BUG_ON(is_newly_detected_feature(0, 6, 1));
+    BUG_ON(!is_newly_detected_feature(0, 1, 1));
+    BUG_ON(!is_newly_detected_feature(2, 1, 1));
+    BUG_ON(!is_newly_detected_feature(3, 4, 4));
 }
 
 static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
-    TermFeatureFlags flags = key & ~KEYCODE_QUERY_REPLY_BIT;
+    const TermFeatureFlags existing = term->features;
+    TermFeatureFlags detected = key & ~KEYCODE_QUERY_REPLY_BIT;
     if (unlikely(log_level_enabled(LOG_LEVEL_INFO))) {
-        log_detected_features(term->features, flags);
+        log_detected_features(existing, detected);
     }
 
     TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
-    if ((flags & escflags) && (term->features & TFLAG_KITTY_KEYBOARD)) {
-        const char *name = tflag_to_str(flags);
+    if ((detected & escflags) && (existing & TFLAG_KITTY_KEYBOARD)) {
+        const char *name = tflag_to_str(detected);
         const char *ovr = tflag_to_str(TFLAG_KITTY_KEYBOARD);
         LOG_INFO("terminal feature %s overridden by %s", name, ovr);
-        flags &= ~escflags;
+        detected &= ~escflags;
     }
 
     TermOutputBuffer *obuf = &term->obuf;
     bool flush = false;
-    if (is_newly_detected_feature(term, flags, TFLAG_QUERY_L2)) {
+    if (is_newly_detected_feature(existing, detected, TFLAG_QUERY_L2)) {
         term_put_level_2_queries(term);
         flush = true;
     }
-    if (is_newly_detected_feature(term, flags, TFLAG_QUERY_L3)) {
+    if (is_newly_detected_feature(existing, detected, TFLAG_QUERY_L3)) {
         term_put_level_3_queries(term);
         flush = true;
     }
-    if (is_newly_detected_feature(term, flags, TFLAG_KITTY_KEYBOARD)) {
+
+    if (is_newly_detected_feature(existing, detected, TFLAG_KITTY_KEYBOARD)) {
         // First disable modifyOtherKeys mode (as previously enabled by
         // main() → ui_start() → term_enable_private_modes()) and then
         // enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5).
@@ -270,19 +286,21 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         term_put_literal(obuf, "\033[>4m\033[>5u");
         flush = true;
     }
-    if (is_newly_detected_feature(term, flags, TFLAG_META_ESC)) {
+
+    if (is_newly_detected_feature(existing, detected, TFLAG_META_ESC)) {
         term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
         flush = true;
     }
-    if (is_newly_detected_feature(term, flags, TFLAG_ALT_ESC)) {
+    if (is_newly_detected_feature(existing, detected, TFLAG_ALT_ESC)) {
         term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
         flush = true;
     }
+
     if (flush) {
         term_output_flush(obuf);
     }
 
-    term->features |= flags;
+    term->features |= detected;
     return KEY_NONE;
 }
 
