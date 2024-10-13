@@ -269,7 +269,7 @@ Local and global options:
    \fBws\-error\fR [special]
 .br
 .SH DESCRIPTION
-dterc is the language used in \fBdte\fR(1) configuration files (\fB~/.dte/rc\fR)
+dterc is the language used in \fBdte\fR(1) configuration files (\fB\[ti]/.dte/rc\fR)
 and also in the command mode of the editor (Alt+x). The syntax of the
 language is quite similar to shell, but much simpler.
 .P
@@ -400,7 +400,7 @@ For example, if the following alias is created:
 .IP
 .nf
 \f[C]
-alias\ read\ 'pipe\-from\ cat'
+alias\ read\ \[aq]pipe\-from\ cat\[aq]
 \f[]
 .fi
 .PP
@@ -451,7 +451,7 @@ Modifiers:
 .P
 .TP
 Ctrl:
-\fBC\-x\fR (or \fB^X\fR)
+\fBC\-x\fR (or \fB\[ha]X\fR)
 .PP
 .TP
 Alt:
@@ -786,8 +786,8 @@ Examples:
 \f[C]
 ft\ c\ c\ h
 ft\ \-b\ make\ Makefile\ GNUmakefile
-ft\ \-c\ xml\ '<\\?xml'
-ft\ \-f\ mail\ '/tmpmsg\-.*\\.txt$'
+ft\ \-c\ xml\ \[aq]<\\?xml\[aq]
+ft\ \-f\ mail\ \[aq]/tmpmsg\-.*\\.txt$\[aq]
 ft\ \-i\ lua\ lua\ luajit
 \f[]
 .fi
@@ -890,7 +890,7 @@ Change the working directory and update \fB$PWD\fR and \fB$OLDPWD\fR. Running
 \fBcommand\fR [\fItext\fR]
 .RS
 Enter command mode. If \fItext\fR is given then it is written to the command
-line (see the default \fB^L\fR key binding for why this is useful).
+line (see the default \fB\[ha]L\fR key binding for why this is useful).
 .P
 .RE
 \fBrefresh\fR
@@ -1570,10 +1570,10 @@ Examples:
 .IP
 .nf
 \f[C]
-replace\ ^\ #
-replace\ 'Hello\ World'\ '&\ (Hallo\ Welt)'
-replace\ "[\ \\t]+$"\ ''
-replace\ \-cg\ '([^\ ]+)\ +([^\ ]+)'\ '\\2\ \\1'
+replace\ \[ha]\ #
+replace\ \[aq]Hello\ World\[aq]\ \[aq]&\ (Hallo\ Welt)\[aq]
+replace\ "[\ \\t]+$"\ \[aq]\[aq]
+replace\ \-cg\ \[aq]([\[ha]\ ]+)\ +([\[ha]\ ]+)\[aq]\ \[aq]\\2\ \\1\[aq]
 \f[]
 .fi
 .PP
@@ -1743,14 +1743,14 @@ uses of \fBexec\fR:
 .IP
 .nf
 \f[C]
-alias\ filter\ 'exec\ \-s\ \-i\ buffer\ \-o\ buffer\ \-e\ errmsg'
-alias\ pipe\-from\ 'exec\ \-s\ \-o\ buffer\ \-e\ errmsg'
-alias\ pipe\-to\ 'exec\ \-s\ \-i\ buffer\ \-e\ errmsg'
-alias\ run\ 'exec'
-alias\ eval\ 'exec\ \-o\ eval'
-alias\ exec\-open\ 'exec\ \-o\ open'
-alias\ exec\-tag\ 'exec\ \-o\ tag'
-alias\ exec\-msg\ 'exec\ \-o\ msg\ \-i\ msg'
+alias\ filter\ \[aq]exec\ \-s\ \-i\ buffer\ \-o\ buffer\ \-e\ errmsg\[aq]
+alias\ pipe\-from\ \[aq]exec\ \-s\ \-o\ buffer\ \-e\ errmsg\[aq]
+alias\ pipe\-to\ \[aq]exec\ \-s\ \-i\ buffer\ \-e\ errmsg\[aq]
+alias\ run\ \[aq]exec\[aq]
+alias\ eval\ \[aq]exec\ \-o\ eval\[aq]
+alias\ exec\-open\ \[aq]exec\ \-o\ open\[aq]
+alias\ exec\-tag\ \[aq]exec\ \-o\ tag\[aq]
+alias\ exec\-msg\ \[aq]exec\ \-o\ msg\ \-i\ msg\[aq]
 \f[]
 .fi
 .PP
@@ -1760,13 +1760,13 @@ Examples:
 .nf
 \f[C]
 filter\ sort\ \-r
-filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
+filter\ sh\ \-c\ \[aq]tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/\[aq]
 pipe\-to\ xsel\ \-b
 exec\-open\ \-s\ find\ .\ \-type\ f\ \-name\ *.h
 exec\-open\ \-s\ git\ ls\-files\ \-\-modified
 exec\-open\ fzf\ \-m\ \-\-reverse
 exec\-tag\ \-s\ echo\ main
-exec\-tag\ sh\ \-c\ 'readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-reverse'
+exec\-tag\ sh\ \-c\ \[aq]readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-reverse\[aq]
 \f[]
 .fi
 .PP

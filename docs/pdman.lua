@@ -2,6 +2,36 @@ local concat = table.concat
 local Buffer = {}
 Buffer.__index = Buffer
 
+-- See: https://man7.org/linux/man-pages/man7/man-pages.7.html#:~:text=Generating%20optimal%20glyphs
+local escmap = {
+    ["\\"] = "\\\\",
+    ["-"] = "\\-",
+    ["~"] = "\\[ti]",
+    ["^"] = "\\[ha]",
+    ["'"] = "\\[aq]",
+    [" "] = "\\ ",
+}
+
+local crossrefs = {
+    dte = "(1)",
+    dterc = "(5)",
+    ["dte-syntax"] = "(5)",
+    execvp = "(3)",
+    tzset = "(3)",
+    glob = "(7)",
+    regex = "(7)",
+    stdout = "(3)",
+    stderr = "(3)",
+    sysexits = "(3)",
+    ctags = "(1)",
+    fmt = "(1)",
+    terminfo = "(5)",
+    locale = "(7)",
+    regcomp = "(3)",
+    towlower = "(3)",
+    towupper = "(3)",
+}
+
 function Buffer:write(...)
     local n = self.n
     for i = 1, select("#", ...) do
@@ -20,10 +50,6 @@ local function new_buffer()
 end
 
 setmetatable(Buffer, {__call = new_buffer})
-
-local function escape(s, in_attribute)
-    return (s:gsub("[\\-]", "\\%1"))
-end
 
 local toc = Buffer()
 
@@ -129,32 +155,13 @@ function OrderedList(items)
 end
 
 function CodeBlock(s, attr)
-    local code = s:gsub("[ \\-]", "\\%1")
+    local code = s:gsub("[ '~^\\-]", escmap)
     return ".IP\n.nf\n\\f[C]\n" .. code .. "\n\\f[]\n.fi\n.PP\n"
 end
 
-local crossrefs = {
-    dte = "(1)",
-    dterc = "(5)",
-    ["dte-syntax"] = "(5)",
-    execvp = "(3)",
-    tzset = "(3)",
-    glob = "(7)",
-    regex = "(7)",
-    stdout = "(3)",
-    stderr = "(3)",
-    sysexits = "(3)",
-    ctags = "(1)",
-    fmt = "(1)",
-    terminfo = "(5)",
-    locale = "(7)",
-    regcomp = "(3)",
-    towlower = "(3)",
-    towupper = "(3)",
-}
-
 function Code(s, attr)
-    return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")
+    local code = s:gsub("['~^\\-]", escmap)
+    return "\\fB" .. code .. "\\fR" .. (crossrefs[s] or "")
 end
 
 function Strong(s)
@@ -170,7 +177,7 @@ function Link(text, href, title, attr)
 end
 
 function Str(s)
-    return escape(s)
+    return (s:gsub("[\\-]", escmap))
 end
 
 function Para(s)
