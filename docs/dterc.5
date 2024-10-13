@@ -274,7 +274,7 @@ and also in the command mode of the editor (Alt+x). The syntax of the
 language is quite similar to shell, but much simpler.
 .P
 Commands are separated either by a newline or \fB;\fR character. To make a
-command span multiple lines in an rc file, escape the newline (put \fB\\\fR
+command span multiple lines in an rc file, escape the newline (put \fB\e\fR
 at the end of the line).
 .P
 Rc files can contain comments at the start of a line. Comments begin
@@ -351,32 +351,32 @@ Single quoted strings can't contain single quotes or escaped characters.
 Double quoted strings may contain the following escapes:
 .P
 .TP
-\fB\\a\fR, \fB\\b\fR, \fB\\t\fR, \fB\\n\fR, \fB\\v\fR, \fB\\f\fR, \fB\\r\fR
+\fB\ea\fR, \fB\eb\fR, \fB\et\fR, \fB\en\fR, \fB\ev\fR, \fB\ef\fR, \fB\er\fR
 Control characters (same as in C)
 .PP
 .TP
-\fB\\e\fR
+\fB\ee\fR
 Escape character
 .PP
 .TP
-\fB\\\\\fR
+\fB\e\e\fR
 Backslash
 .PP
 .TP
-\fB\\"\fR
+\fB\e"\fR
 Double quote
 .PP
 .TP
-\fB\\x0a\fR
-Hexadecimal byte value 0x0A (note that \fB\\x00\fR is not supported,
+\fB\ex0a\fR
+Hexadecimal byte value 0x0A (note that \fB\ex00\fR is not supported,
 because strings are null\-terminated)
 .PP
 .TP
-\fB\\u20ac\fR
+\fB\eu20ac\fR
 Four hex digit Unicode code point U+20AC
 .PP
 .TP
-\fB\\U000020ac\fR
+\fB\eU000020ac\fR
 Eight hex digit Unicode code point U+20AC
 .PP
 .SH COMMANDS
@@ -786,8 +786,8 @@ Examples:
 \f[C]
 ft\ c\ c\ h
 ft\ \-b\ make\ Makefile\ GNUmakefile
-ft\ \-c\ xml\ \[aq]<\\?xml\[aq]
-ft\ \-f\ mail\ \[aq]/tmpmsg\-.*\\.txt$\[aq]
+ft\ \-c\ xml\ \[aq]<\e?xml\[aq]
+ft\ \-f\ mail\ \[aq]/tmpmsg\-.*\e.txt$\[aq]
 ft\ \-i\ lua\ lua\ luajit
 \f[]
 .fi
@@ -1533,14 +1533,14 @@ The \fIpattern\fR argument is a POSIX extended \fBregex\fR(7).
 The \fIreplacement\fR argument is treated like a template and may contain
 several, special substitutions:
 .P
-\(bu Backslash sequences \fB\\1\fR through \fB\\9\fR are replaced by sub\-strings
+\(bu Backslash sequences \fB\e1\fR through \fB\e9\fR are replaced by sub\-strings
 that were "captured" (via parentheses) in the \fIpattern\fR.
 .br
 \(bu The special character \fB&\fR is replaced by the full string that was
 matched by \fIpattern\fR.
 .br
-\(bu Literal \fB\\\fR and \fB&\fR characters can be inserted in \fIreplacement\fR
-by escaping them (as \fB\\\\\fR and \fB\\&\fR).
+\(bu Literal \fB\e\fR and \fB&\fR characters can be inserted in \fIreplacement\fR
+by escaping them (as \fB\e\e\fR and \fB\e&\fR).
 .br
 \(bu All other characters in \fIreplacement\fR represent themselves.
 .br
@@ -1572,8 +1572,8 @@ Examples:
 \f[C]
 replace\ \[ha]\ #
 replace\ \[aq]Hello\ World\[aq]\ \[aq]&\ (Hallo\ Welt)\[aq]
-replace\ "[\ \\t]+$"\ \[aq]\[aq]
-replace\ \-cg\ \[aq]([\[ha]\ ]+)\ +([\[ha]\ ]+)\[aq]\ \[aq]\\2\ \\1\[aq]
+replace\ "[\ \et]+$"\ \[aq]\[aq]
+replace\ \-cg\ \[aq]([\[ha]\ ]+)\ +([\[ha]\ ]+)\[aq]\ \[aq]\e2\ \e1\[aq]
 \f[]
 .fi
 .PP

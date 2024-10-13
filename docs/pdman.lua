@@ -4,11 +4,13 @@ Buffer.__index = Buffer
 
 -- See: https://man7.org/linux/man-pages/man7/man-pages.7.html#:~:text=Generating%20optimal%20glyphs
 local escmap = {
-    ["\\"] = "\\\\",
+    ["\\"] = "\\e",
     ["-"] = "\\-",
     ["~"] = "\\[ti]",
     ["^"] = "\\[ha]",
+    ["`"] = "\\(ga",
     ["'"] = "\\[aq]",
+    ["\""] = "\"",
     [" "] = "\\ ",
 }
 
@@ -155,12 +157,12 @@ function OrderedList(items)
 end
 
 function CodeBlock(s, attr)
-    local code = s:gsub("[ '~^\\-]", escmap)
+    local code = s:gsub("[ '~^`\"\\-]", escmap)
     return ".IP\n.nf\n\\f[C]\n" .. code .. "\n\\f[]\n.fi\n.PP\n"
 end
 
 function Code(s, attr)
-    local code = s:gsub("['~^\\-]", escmap)
+    local code = s:gsub("['~^`\"\\-]", escmap)
     return "\\fB" .. code .. "\\fR" .. (crossrefs[s] or "")
 end
 
@@ -177,7 +179,7 @@ function Link(text, href, title, attr)
 end
 
 function Str(s)
-    return (s:gsub("[\\-]", escmap))
+    return (s:gsub("[~^`\\-]", escmap))
 end
 
 function Para(s)
