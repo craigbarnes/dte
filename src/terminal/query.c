@@ -287,64 +287,6 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
     return flags ? tflag(flags) : KEY_IGNORE;
 }
 
-// https://github.com/tmux/tmux/wiki/FAQ#how-often-is-tmux-released-what-is-the-version-number-scheme
-static bool xtversion_is_tmux_2_6_or_later(StringView sv)
-{
-    if (!strview_remove_matching_prefix(&sv, "tmux ")) {
-        return false;
-    }
-
-    bool next = false;
-    size_t pos = 0;
-    StringView ver = get_delim(sv.data, &pos, sv.length, '-');
-
-    if (pos < sv.length) {
-        StringView p2 = string_view(sv.data + pos, sv.length - pos);
-        if (strview_equal_cstring(&ver, "next")) {
-            next = true;
-            ver = p2;
-        } else if (!strview_has_prefix(&p2, "rc")) {
-            return false;
-        }
-    } else {
-        if (unlikely(ver.length != sv.length)) {
-            // Trailing '-' (e.g. "2.6-")
-            return false;
-        }
-        if (ver.length && ascii_islower(ver.data[ver.length - 1])) {
-            // Patch release (e.g. "3.5a"); trim the trailing letter
-            ver.length--;
-        }
-    }
-
-    if (
-        ver.length < 3
-        || !ascii_isdigit(ver.data[ver.length - 1])
-        || ver.data[ver.length - 2] != '.'
-    ) {
-        return false;
-    }
-
-    unsigned int minor = ver.data[ver.length - 1] - '0';
-    ver.length -= 2;
-    unsigned int major;
-    size_t n = buf_parse_uint(ver.data, ver.length, &major);
-    if (n != ver.length) {
-        return false;
-    }
-
-    if (unlikely(major == 2 && minor == 6 && next)) {
-        // For the sake of features, *-rc* versions can be considered
-        // equivalent to real releases, whereas no such equivalence can
-        // be assumed for next-* versions
-        LOG_TRACE("tmux next-2.6 development version; >= 2.6 condition not met");
-        return false;
-    }
-
-    LOG_TRACE("parsed tmux version: major=%u minor=%u", major, minor);
-    return major >= 3 || (major == 2 && minor >= 6);
-}
-
 KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 {
     const char *note = "";
@@ -356,8 +298,14 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     StringView seq = string_view(data, len);
     if (strview_remove_matching_prefix(&seq, ">|")) {
         LOG_INFO("XTVERSION reply: %.*s", (int)seq.length, seq.data);
-        if (xtversion_is_tmux_2_6_or_later(seq)) {
-            // See tmux commit 5fc0be50450e75
+        if (strview_has_prefix(&seq, "tmux ")) {
+            // tmux gained support for ECMA-48 REP in version 2.6, but
+            // didn't get XTVERSION support until 3.2, so any response
+            // starting with "tmux " implies REP support.
+            // See also:
+            // • https://github.com/tmux/tmux/wiki/FAQ#how-often-is-tmux-released-what-is-the-version-number-scheme
+            // • tmux commit 5fc0be50450e75
+            // • tmux commit 9dd58470e41bfb
             return tflag(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT);
         }
         return tflag(TFLAG_QUERY_L3);
