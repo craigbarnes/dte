@@ -2,7 +2,9 @@ local concat = table.concat
 local Buffer = {}
 Buffer.__index = Buffer
 
--- See: https://man7.org/linux/man-pages/man7/man-pages.7.html#:~:text=Generating%20optimal%20glyphs
+-- https://man7.org/linux/man-pages/man7/man-pages.7.html#:~:text=Generating%20optimal%20glyphs
+-- https://man7.org/linux/man-pages/man7/groff_char.7.html#:~:text=exceptional%20code%20points
+-- https://lists.gnu.org/archive/html/info-gnu/2023-07/msg00001.html
 local escmap = {
     ["\\"] = "\\e",
     ["-"] = "\\-",
