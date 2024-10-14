@@ -16,6 +16,8 @@
 [attr]xml 2space
 
 /.* export-ignore
+/gcovr.cfg export-ignore
+/test/vi.dterc export-ignore
 /docs/README.md export-ignore
 /docs/TODO.md export-ignore
 /docs/contributing.md export-ignore
