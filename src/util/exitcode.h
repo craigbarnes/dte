@@ -1,6 +1,8 @@
 #ifndef UTIL_EXITCODE_H
 #define UTIL_EXITCODE_H
 
+#include <stdio.h>
+
 // Semantic exit codes, as defined by BSD sysexits(3)
 enum {
     EC_OK = 0, // Exited normally (EX_OK)
@@ -14,5 +16,11 @@ enum {
 // This exists purely for "self-documentation" purposes. Functions
 // returning this type should only return one of the above values.
 typedef int ExitCode;
+
+static inline ExitCode ec_error(const char *prefix, ExitCode ec)
+{
+    perror(prefix);
+    return ec;
+}
 
 #endif

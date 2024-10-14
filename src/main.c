@@ -60,8 +60,7 @@ static void cleanup_handler(void *userdata)
 static ExitCode write_stdout(const char *str, size_t len)
 {
     if (xwrite_all(STDOUT_FILENO, str, len) < 0) {
-        perror("write");
-        return EC_IO_ERROR;
+        return ec_error("write", EC_IO_ERROR);
     }
     return EC_OK;
 }
@@ -105,12 +104,10 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 static ExitCode showkey_loop(void)
 {
     if (!term_mode_init()) {
-        perror("tcgetattr");
-        return EC_IO_ERROR;
+        return ec_error("tcgetattr", EC_IO_ERROR);
     }
     if (unlikely(!term_raw())) {
-        perror("tcsetattr");
-        return EC_IO_ERROR;
+        return ec_error("tcsetattr", EC_IO_ERROR);
     }
 
     Terminal term;
@@ -165,8 +162,7 @@ static ExitCode init_std_fds(int std_fds[2])
             // allow reading/writing after freopen(3) closes the original
             int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
             if (fd == -1 && errno != EBADF) {
-                perror("fcntl");
-                return EC_OS_ERROR;
+                return ec_error("fcntl", EC_OS_ERROR);
             }
             std_fds[i] = fd;
         }
@@ -190,8 +186,7 @@ static ExitCode init_std_fds(int std_fds[2])
         }
 
         if (unlikely(!is_controlling_tty(new_fd))) {
-            perror("tcgetpgrp");
-            return EC_OS_ERROR;
+            return ec_error("tcgetpgrp", EC_OS_ERROR);
         }
     }
 
@@ -477,8 +472,7 @@ int main(int argc, char *argv[])
     LOG_INFO("build vars:%s", buildvar_string);
 
     if (!term_mode_init()) {
-        perror("tcgetattr");
-        return EC_IO_ERROR;
+        return ec_error("tcgetattr", EC_IO_ERROR);
     }
 
     set_basic_signal_dispositions();
@@ -588,8 +582,7 @@ int main(int argc, char *argv[])
     set_sigwinch_handler();
 
     if (unlikely(!term_raw())) {
-        perror("tcsetattr");
-        return EC_IO_ERROR;
+        return ec_error("tcsetattr", EC_IO_ERROR);
     }
 
     if (unlikely(nr_stderr_errors > 0)) {
