@@ -10,8 +10,14 @@ include tools/mk/show-sizes.mk
 
 CTAGS ?= ctags
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
+html-aux = public/contributing.html public/TODO.html public/releasing.html
+html += $(html-aux)
 
 git-hooks: $(GIT_HOOKS)
+html-aux: $(html-aux)
+
+$(html-aux): public/%.html: docs/%.md
+$(html-aux): private PDHTML += --metadata title='dte - $(basename $(notdir $@))'
 
 $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
@@ -22,4 +28,4 @@ tags:
 
 
 DEVMK := loaded
-.PHONY: git-hooks tags
+.PHONY: git-hooks html-aux tags
