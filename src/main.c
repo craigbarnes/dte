@@ -120,7 +120,7 @@ static ExitCode showkey_loop(void)
     term_input_init(ibuf);
     term_output_init(obuf);
     term_enable_private_modes(&term);
-    term_put_level_1_queries(&term);
+    term_put_level_1_queries(&term, !!xgetenv("DTE_FULL_QUERY"));
     term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -598,7 +598,7 @@ int main(int argc, char *argv[])
     }
 
     ui_start(e);
-    term_put_level_1_queries(term);
+    term_put_level_1_queries(term, !!xgetenv("DTE_FULL_QUERY"));
     term_output_flush(&term->obuf);
     exit_code = main_loop(e);
     term_restore_title(term);

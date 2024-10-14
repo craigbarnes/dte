@@ -268,11 +268,11 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
     TermOutputBuffer *obuf = &term->obuf;
     bool flush = false;
     if (is_newly_detected_feature(existing, detected, TFLAG_QUERY_L2)) {
-        term_put_level_2_queries(term);
+        term_put_level_2_queries(term, false);
         flush = true;
     }
     if (is_newly_detected_feature(existing, detected, TFLAG_QUERY_L3)) {
-        term_put_level_3_queries(term);
+        term_put_level_3_queries(term, false);
         flush = true;
     }
 

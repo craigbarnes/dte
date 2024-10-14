@@ -194,11 +194,21 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
  * • https://vt100.net/docs/vt510-rm/DA1.html
  * • ECMA-48 §8.3.24
  */
-void term_put_level_1_queries(Terminal *term)
+void term_put_level_1_queries(Terminal *term, bool emit_all)
 {
     LOG_INFO("sending level 1 queries to terminal");
+
     // ECMA-48 DA (Device Attributes; referred to as "DA1" in other contexts)
     term_put_literal(&term->obuf, "\033[c");
+
+    if (emit_all) {
+        LOG_INFO("emit_all set; unconditionally sending all queries");
+        term_put_level_2_queries(term, true);
+        term_put_level_3_queries(term, true);
+        // Set QUERY flags in Terminal::features, so that handle_query_reply()
+        // doesn't send level 2/3 queries again
+        term->features |= TFLAG_QUERY_L2 | TFLAG_QUERY_L3;
+    }
 }
 
 /*
@@ -209,7 +219,7 @@ void term_put_level_1_queries(Terminal *term)
  * • parse_dcs_query_reply()
  * • parse_xtwinops_query_reply()
  */
-void term_put_level_2_queries(Terminal *term)
+void term_put_level_2_queries(Terminal *term, bool emit_all)
 {
     static const char queries[] =
         "\033[>c" // DA2 (Secondary Device Attributes)
@@ -235,7 +245,8 @@ void term_put_level_2_queries(Terminal *term)
     LOG_INFO("sending level 2 queries to terminal");
     term_put_bytes(obuf, queries, sizeof(queries) - 1);
 
-    if (!(term->features & TFLAG_SYNC)) {
+    TermFeatureFlags features = emit_all ? 0 : term->features;
+    if (!(features & TFLAG_SYNC)) {
         term_put_literal(obuf, "\033[?2026$p"); // DECRQM 2026
     }
 
@@ -257,7 +268,7 @@ void term_put_level_2_queries(Terminal *term)
  * • parse_xtgettcap_reply()
  * • handle_decrqss_sgr_reply()
  */
-void term_put_level_3_queries(Terminal *term)
+void term_put_level_3_queries(Terminal *term, bool emit_all)
 {
     // Note: the correct (according to ISO 8613-6) format for the SGR
     // sequence here would be "\033[0;38:2::60:70:80;48:5:255m", but we
@@ -270,7 +281,7 @@ void term_put_level_3_queries(Terminal *term)
     ;
 
     TermOutputBuffer *obuf = &term->obuf;
-    TermFeatureFlags features = term->features;
+    TermFeatureFlags features = emit_all ? 0 : term->features;
     LOG_INFO("sending level 3 queries to terminal");
 
     if (!(features & TFLAG_TRUE_COLOR)) {
