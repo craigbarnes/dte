@@ -2,7 +2,7 @@
 <component type="console-application">
   <name>dte</name>
   <id>dte</id>
-  <summary>A small and easy to use console text editor</summary>
+  <summary>A small and easy to use terminal text editor</summary>
   <project_license>GPL-2.0-only</project_license>
   <metadata_license>CC0-1.0</metadata_license>
   <developer_name>Craig Barnes, Timo Hirvonen</developer_name>

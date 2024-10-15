@@ -1,6 +1,7 @@
 # This makefile contains various targets that are only useful for
 # development purposes and is NOT included in release tarballs
 
+include tools/mk/docs.mk
 include tools/mk/clang-tidy.mk
 include tools/mk/coverage.mk
 include tools/mk/dist.mk

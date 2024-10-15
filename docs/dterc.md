@@ -2,7 +2,7 @@
 NOTE: See https://craigbarnes.gitlab.io/dte/dterc.html for a fully rendered version of this document
 title: dterc
 section: 5
-date: March 2024
+date: October 2024
 description: Command and configuration language used by dte
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dte-syntax`"]
