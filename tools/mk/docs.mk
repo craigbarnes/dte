@@ -11,4 +11,5 @@ $(manpage-date-targets): manpage-date-%: docs/%.md
 	$(Q) sed -i'' "/^---/,/^---/s|^date: .*|date: `$(last-commit-date) -- $<`|" $<
 
 
+NON_PARALLEL_TARGETS += bump-manpage-dates $(manpage-date-targets)
 .PHONY: bump-manpage-dates $(manpage-date-targets)
