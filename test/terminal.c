@@ -14,9 +14,11 @@
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 
-#define EXPECT_KEYCODE_EQ(idx, a, b, seq, seq_len) EXPECT(keycode_eq, idx, a, b, seq, seq_len)
+#define TFLAG(flags) (KEYCODE_QUERY_REPLY_BIT | (flags))
+#define IEXPECT_KEYCODE_EQ(a, b, seq, seq_len) IEXPECT(keycode_eq, a, b, seq, seq_len)
+#define EXPECT_PARSE_SEQ(seq, explen, expkey) EXPECT(parse_seq, seq, explen, expkey)
 
-static void expect_keycode_eq (
+static void iexpect_keycode_eq (
     TestContext *ctx,
     const char *file,
     int line,
@@ -43,6 +45,59 @@ static void expect_keycode_eq (
         "Test #%zu: key codes not equal: 0x%02x, 0x%02x (%s, %s); input: %s",
         ++idx, a, b, a_str, b_str, seq_str
     );
+}
+
+static void expect_parse_seq (
+    TestContext *ctx,
+    const char *file,
+    int line,
+    const char *seq,
+    ssize_t expected_length,
+    KeyCode expected_key
+) {
+    KeyCode key = 0x18;
+    ssize_t parsed_length = term_parse_sequence(seq, strlen(seq), &key);
+    if (unlikely(parsed_length != expected_length)) {
+        test_fail (
+            ctx, file, line,
+            "term_parse_sequence() returned %zd; expected %zd",
+            parsed_length, expected_length
+        );
+        return;
+    }
+
+    static_assert(TPARSE_PARTIAL_MATCH == -1);
+    if (expected_length <= 0) {
+        test_pass(ctx);
+        return;
+    }
+
+    if (unlikely(key != expected_key)) {
+        char str[2][KEYCODE_STR_MAX];
+        keycode_to_string(key, str[0]);
+        keycode_to_string(expected_key, str[1]);
+        test_fail (
+            ctx, file, line,
+            "Key codes not equal: 0x%02x, 0x%02x (%s, %s)",
+            key, expected_key, str[0], str[1]
+        );
+        return;
+    }
+
+    for (size_t n = expected_length - 1; n != 0; n--) {
+        parsed_length = term_parse_sequence(seq, n, &key);
+        if (parsed_length == TPARSE_PARTIAL_MATCH) {
+            continue;
+        }
+        test_fail (
+            ctx, file, line,
+            "Parsing truncated sequence of %zu bytes returned %zd; expected -1",
+            n, parsed_length
+        );
+        return;
+    }
+
+    test_pass(ctx);
 }
 
 static void test_parse_rgb(TestContext *ctx)
@@ -488,331 +543,301 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_TRUE(csi.unhandled_bytes);
 }
 
-#define TFLAG(flags) (KEYCODE_QUERY_REPLY_BIT | (flags))
-
 static void test_term_parse_sequence(TestContext *ctx)
 {
-    static const struct {
-        const char *escape_sequence;
-        ssize_t expected_length;
-        KeyCode expected_key;
-    } tests[] = {
-        {"\033[Z", 3, MOD_SHIFT | KEY_TAB},
-        {"\033[1;2A", 6, MOD_SHIFT | KEY_UP},
-        {"\033[1;2B", 6, MOD_SHIFT | KEY_DOWN},
-        {"\033[1;2C", 6, MOD_SHIFT | KEY_RIGHT},
-        {"\033[1;2D", 6, MOD_SHIFT | KEY_LEFT},
-        {"\033[1;2E", 6, MOD_SHIFT | KEY_BEGIN},
-        {"\033[1;2F", 6, MOD_SHIFT | KEY_END},
-        {"\033[1;2H", 6, MOD_SHIFT | KEY_HOME},
-        {"\033[1;8H", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
-        {"\033[1;8H~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
-        {"\033[1;8H~_", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
-        {"\033", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[", TPARSE_PARTIAL_MATCH, 0},
-        {"\033]", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[1", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[9", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[1;", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[1[", 4, KEY_IGNORE},
-        {"\033[1;2", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[1;8", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[1;9", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[1;_", 5, KEY_IGNORE},
-        {"\033[1;8Z", 6, KEY_IGNORE},
-        {"\033O", TPARSE_PARTIAL_MATCH, 0},
-        {"\033[\033", 2, KEY_IGNORE},
-        {"\033[\030", 3, KEY_IGNORE},
-        {"\033[A", 3, KEY_UP},
-        {"\033[B", 3, KEY_DOWN},
-        {"\033[C", 3, KEY_RIGHT},
-        {"\033[D", 3, KEY_LEFT},
-        {"\033[E", 3, KEY_BEGIN},
-        {"\033[F", 3, KEY_END},
-        {"\033[H", 3, KEY_HOME},
-        {"\033[L", 3, KEY_INSERT},
-        {"\033[P", 3, KEY_F1},
-        {"\033[Q", 3, KEY_F2},
-        {"\033[R", 3, KEY_F3},
-        {"\033[S", 3, KEY_F4},
-        {"\033O ", 3, KEY_SPACE},
-        {"\033OA", 3, KEY_UP},
-        {"\033OB", 3, KEY_DOWN},
-        {"\033OC", 3, KEY_RIGHT},
-        {"\033OD", 3, KEY_LEFT},
-        {"\033OE", 3, KEY_BEGIN},
-        {"\033OF", 3, KEY_END},
-        {"\033OH", 3, KEY_HOME},
-        {"\033OI", 3, KEY_TAB},
-        {"\033OJ", 3, KEY_IGNORE},
-        {"\033OM", 3, KEY_ENTER},
-        {"\033OP", 3, KEY_F1},
-        {"\033OQ", 3, KEY_F2},
-        {"\033OR", 3, KEY_F3},
-        {"\033OS", 3, KEY_F4},
-        {"\033OT", 3, KEY_IGNORE},
-        {"\033OX", 3, '='},
-        {"\033Oi", 3, KEY_IGNORE},
-        {"\033Oj", 3, '*'},
-        {"\033Ok", 3, '+'},
-        {"\033Ol", 3, ','},
-        {"\033Om", 3, '-'},
-        {"\033On", 3, '.'},
-        {"\033Oo", 3, '/'},
-        {"\033Op", 3, '0'},
-        {"\033Oq", 3, '1'},
-        {"\033Or", 3, '2'},
-        {"\033Os", 3, '3'},
-        {"\033Ot", 3, '4'},
-        {"\033Ou", 3, '5'},
-        {"\033Ov", 3, '6'},
-        {"\033Ow", 3, '7'},
-        {"\033Ox", 3, '8'},
-        {"\033Oy", 3, '9'},
-        {"\033Oz", 3, KEY_IGNORE},
-        {"\033O~", 3, KEY_IGNORE},
-        {"\033[1~", 4, KEY_HOME},
-        {"\033[2~", 4, KEY_INSERT},
-        {"\033[3~", 4, KEY_DELETE},
-        {"\033[4~", 4, KEY_END},
-        {"\033[5~", 4, KEY_PAGE_UP},
-        {"\033[6~", 4, KEY_PAGE_DOWN},
-        {"\033[7~", 4, KEY_HOME},
-        {"\033[8~", 4, KEY_END},
-        {"\033[10~", 5, KEY_IGNORE},
-        {"\033[11~", 5, KEY_F1},
-        {"\033[12~", 5, KEY_F2},
-        {"\033[13~", 5, KEY_F3},
-        {"\033[14~", 5, KEY_F4},
-        {"\033[15~", 5, KEY_F5},
-        {"\033[16~", 5, KEY_IGNORE},
-        {"\033[17~", 5, KEY_F6},
-        {"\033[18~", 5, KEY_F7},
-        {"\033[19~", 5, KEY_F8},
-        {"\033[20~", 5, KEY_F9},
-        {"\033[21~", 5, KEY_F10},
-        {"\033[22~", 5, KEY_IGNORE},
-        {"\033[23~", 5, KEY_F11},
-        {"\033[24~", 5, KEY_F12},
-        {"\033[25~", 5, KEY_F13},
-        {"\033[26~", 5, KEY_F14},
-        {"\033[27~", 5, KEY_IGNORE},
-        {"\033[28~", 5, KEY_F15},
-        {"\033[29~", 5, KEY_F16},
-        {"\033[30~", 5, KEY_IGNORE},
-        {"\033[31~", 5, KEY_F17},
-        {"\033[34~", 5, KEY_F20},
-        {"\033[35~", 5, KEY_IGNORE},
-        {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
-        {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
-        {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
+    EXPECT_PARSE_SEQ("", 0, 0);
+    EXPECT_PARSE_SEQ("x", 0, 0);
+    EXPECT_PARSE_SEQ("\033q", 0, 0);
+    EXPECT_PARSE_SEQ("\033\\", 2, KEY_IGNORE);
 
-        // xterm + `modifyOtherKeys` option
-        {"\033[27;5;9~", 9, MOD_CTRL | KEY_TAB},
-        {"\033[27;5;13~", 10, MOD_CTRL | KEY_ENTER},
-        {"\033[27;6;13~", 10, MOD_CTRL | MOD_SHIFT | KEY_ENTER},
-        // {"\033[27;2;127~", 11, MOD_CTRL | '?'},
-        // {"\033[27;6;127~", 11, MOD_CTRL | '?'},
-        // {"\033[27;8;127~", 11, MOD_CTRL | MOD_META | '?'},
-        {"\033[27;6;82~", 10, MOD_CTRL | MOD_SHIFT | 'r'},
-        {"\033[27;5;114~", 11, MOD_CTRL | 'r'},
-        {"\033[27;3;82~", 10, MOD_META | 'R'},
-        {"\033[27;3;114~", 11, MOD_META | 'r'},
-        // {"\033[27;4;62~", 10, MOD_META | '>'},
-        {"\033[27;5;46~", 10, MOD_CTRL | '.'},
-        {"\033[27;3;1114111~", 15, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
-        {"\033[27;3;1114112~", 15, KEY_IGNORE},
-        {"\033[27;999999999999999999999;123~", 31, KEY_IGNORE},
-        {"\033[27;123;99999999999999999~", 27, KEY_IGNORE},
+    EXPECT_PARSE_SEQ("\033[Z", 3, MOD_SHIFT | KEY_TAB);
+    EXPECT_PARSE_SEQ("\033[1;2A", 6, MOD_SHIFT | KEY_UP);
+    EXPECT_PARSE_SEQ("\033[1;2B", 6, MOD_SHIFT | KEY_DOWN);
+    EXPECT_PARSE_SEQ("\033[1;2C", 6, MOD_SHIFT | KEY_RIGHT);
+    EXPECT_PARSE_SEQ("\033[1;2D", 6, MOD_SHIFT | KEY_LEFT);
+    EXPECT_PARSE_SEQ("\033[1;2E", 6, MOD_SHIFT | KEY_BEGIN);
+    EXPECT_PARSE_SEQ("\033[1;2F", 6, MOD_SHIFT | KEY_END);
+    EXPECT_PARSE_SEQ("\033[1;2H", 6, MOD_SHIFT | KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[1;8H", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[1;8H~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[1;8H~_", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME);
+    EXPECT_PARSE_SEQ("\033", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033]", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[1", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[9", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[1;", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[1[", 4, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[1;2", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[1;8", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[1;9", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[1;_", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[1;8Z", 6, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033O", TPARSE_PARTIAL_MATCH, 0);
+    EXPECT_PARSE_SEQ("\033[\033", 2, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[\030", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[A", 3, KEY_UP);
+    EXPECT_PARSE_SEQ("\033[B", 3, KEY_DOWN);
+    EXPECT_PARSE_SEQ("\033[C", 3, KEY_RIGHT);
+    EXPECT_PARSE_SEQ("\033[D", 3, KEY_LEFT);
+    EXPECT_PARSE_SEQ("\033[E", 3, KEY_BEGIN);
+    EXPECT_PARSE_SEQ("\033[F", 3, KEY_END);
+    EXPECT_PARSE_SEQ("\033[H", 3, KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[L", 3, KEY_INSERT);
+    EXPECT_PARSE_SEQ("\033[P", 3, KEY_F1);
+    EXPECT_PARSE_SEQ("\033[Q", 3, KEY_F2);
+    EXPECT_PARSE_SEQ("\033[R", 3, KEY_F3);
+    EXPECT_PARSE_SEQ("\033[S", 3, KEY_F4);
+    EXPECT_PARSE_SEQ("\033O ", 3, KEY_SPACE);
+    EXPECT_PARSE_SEQ("\033OA", 3, KEY_UP);
+    EXPECT_PARSE_SEQ("\033OB", 3, KEY_DOWN);
+    EXPECT_PARSE_SEQ("\033OC", 3, KEY_RIGHT);
+    EXPECT_PARSE_SEQ("\033OD", 3, KEY_LEFT);
+    EXPECT_PARSE_SEQ("\033OE", 3, KEY_BEGIN);
+    EXPECT_PARSE_SEQ("\033OF", 3, KEY_END);
+    EXPECT_PARSE_SEQ("\033OH", 3, KEY_HOME);
+    EXPECT_PARSE_SEQ("\033OI", 3, KEY_TAB);
+    EXPECT_PARSE_SEQ("\033OJ", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033OM", 3, KEY_ENTER);
+    EXPECT_PARSE_SEQ("\033OP", 3, KEY_F1);
+    EXPECT_PARSE_SEQ("\033OQ", 3, KEY_F2);
+    EXPECT_PARSE_SEQ("\033OR", 3, KEY_F3);
+    EXPECT_PARSE_SEQ("\033OS", 3, KEY_F4);
+    EXPECT_PARSE_SEQ("\033OT", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033OX", 3, '=');
+    EXPECT_PARSE_SEQ("\033Oi", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033Oj", 3, '*');
+    EXPECT_PARSE_SEQ("\033Ok", 3, '+');
+    EXPECT_PARSE_SEQ("\033Ol", 3, ',');
+    EXPECT_PARSE_SEQ("\033Om", 3, '-');
+    EXPECT_PARSE_SEQ("\033On", 3, '.');
+    EXPECT_PARSE_SEQ("\033Oo", 3, '/');
+    EXPECT_PARSE_SEQ("\033Op", 3, '0');
+    EXPECT_PARSE_SEQ("\033Oq", 3, '1');
+    EXPECT_PARSE_SEQ("\033Or", 3, '2');
+    EXPECT_PARSE_SEQ("\033Os", 3, '3');
+    EXPECT_PARSE_SEQ("\033Ot", 3, '4');
+    EXPECT_PARSE_SEQ("\033Ou", 3, '5');
+    EXPECT_PARSE_SEQ("\033Ov", 3, '6');
+    EXPECT_PARSE_SEQ("\033Ow", 3, '7');
+    EXPECT_PARSE_SEQ("\033Ox", 3, '8');
+    EXPECT_PARSE_SEQ("\033Oy", 3, '9');
+    EXPECT_PARSE_SEQ("\033Oz", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033O~", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[1~", 4, KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[2~", 4, KEY_INSERT);
+    EXPECT_PARSE_SEQ("\033[3~", 4, KEY_DELETE);
+    EXPECT_PARSE_SEQ("\033[4~", 4, KEY_END);
+    EXPECT_PARSE_SEQ("\033[5~", 4, KEY_PAGE_UP);
+    EXPECT_PARSE_SEQ("\033[6~", 4, KEY_PAGE_DOWN);
+    EXPECT_PARSE_SEQ("\033[7~", 4, KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[8~", 4, KEY_END);
+    EXPECT_PARSE_SEQ("\033[10~", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[11~", 5, KEY_F1);
+    EXPECT_PARSE_SEQ("\033[12~", 5, KEY_F2);
+    EXPECT_PARSE_SEQ("\033[13~", 5, KEY_F3);
+    EXPECT_PARSE_SEQ("\033[14~", 5, KEY_F4);
+    EXPECT_PARSE_SEQ("\033[15~", 5, KEY_F5);
+    EXPECT_PARSE_SEQ("\033[16~", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[17~", 5, KEY_F6);
+    EXPECT_PARSE_SEQ("\033[18~", 5, KEY_F7);
+    EXPECT_PARSE_SEQ("\033[19~", 5, KEY_F8);
+    EXPECT_PARSE_SEQ("\033[20~", 5, KEY_F9);
+    EXPECT_PARSE_SEQ("\033[21~", 5, KEY_F10);
+    EXPECT_PARSE_SEQ("\033[22~", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[23~", 5, KEY_F11);
+    EXPECT_PARSE_SEQ("\033[24~", 5, KEY_F12);
+    EXPECT_PARSE_SEQ("\033[25~", 5, KEY_F13);
+    EXPECT_PARSE_SEQ("\033[26~", 5, KEY_F14);
+    EXPECT_PARSE_SEQ("\033[27~", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[28~", 5, KEY_F15);
+    EXPECT_PARSE_SEQ("\033[29~", 5, KEY_F16);
+    EXPECT_PARSE_SEQ("\033[30~", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[31~", 5, KEY_F17);
+    EXPECT_PARSE_SEQ("\033[34~", 5, KEY_F20);
+    EXPECT_PARSE_SEQ("\033[35~", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN);
+    EXPECT_PARSE_SEQ("\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN);
+    EXPECT_PARSE_SEQ("\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN);
 
-        // www.leonerd.org.uk/hacks/fixterms/
-        {"\033[13;3u", 7, MOD_META | KEY_ENTER},
-        {"\033[9;5u", 6, MOD_CTRL | KEY_TAB},
-        {"\033[65;3u", 7, MOD_META | 'A'},
-        {"\033[108;5u", 8, MOD_CTRL | 'l'},
-        {"\033[127765;3u", 11, MOD_META | 127765ul},
-        {"\033[1114111;3u", 12, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
-        {"\033[1114112;3u", 12, KEY_IGNORE},
-        {"\033[11141110;3u", 13, KEY_IGNORE},
-        {"\033[11141111;3u", 13, KEY_IGNORE},
-        {"\033[2147483647;3u", 15, KEY_IGNORE}, // INT32_MAX
-        {"\033[2147483648;3u", 15, KEY_IGNORE}, // INT32_MAX + 1
-        {"\033[4294967295;3u", 15, KEY_IGNORE}, // UINT32_MAX
-        {"\033[4294967296;3u", 15, KEY_IGNORE}, // UINT32_MAX + 1
-        {"\033[-1;3u", 7, KEY_IGNORE},
-        {"\033[-2;3u", 7, KEY_IGNORE},
-        {"\033[ 2;3u", 7, KEY_IGNORE},
-        {"\033[<?>2;3u", 9, KEY_IGNORE},
-        {"\033[ !//.$2;3u", 12, KEY_IGNORE},
+    // xterm + `modifyOtherKeys` option
+    EXPECT_PARSE_SEQ("\033[27;5;9~", 9, MOD_CTRL | KEY_TAB);
+    EXPECT_PARSE_SEQ("\033[27;5;13~", 10, MOD_CTRL | KEY_ENTER);
+    EXPECT_PARSE_SEQ("\033[27;6;13~", 10, MOD_CTRL | MOD_SHIFT | KEY_ENTER);
+    // EXPECT_PARSE_SEQ("\033[27;2;127~", 11, MOD_CTRL | '?');
+    // EXPECT_PARSE_SEQ("\033[27;6;127~", 11, MOD_CTRL | '?');
+    // EXPECT_PARSE_SEQ("\033[27;8;127~", 11, MOD_CTRL | MOD_META | '?');
+    EXPECT_PARSE_SEQ("\033[27;6;82~", 10, MOD_CTRL | MOD_SHIFT | 'r');
+    EXPECT_PARSE_SEQ("\033[27;5;114~", 11, MOD_CTRL | 'r');
+    EXPECT_PARSE_SEQ("\033[27;3;82~", 10, MOD_META | 'R');
+    EXPECT_PARSE_SEQ("\033[27;3;114~", 11, MOD_META | 'r');
+    // EXPECT_PARSE_SEQ("\033[27;4;62~", 10, MOD_META | '>');
+    EXPECT_PARSE_SEQ("\033[27;5;46~", 10, MOD_CTRL | '.');
+    EXPECT_PARSE_SEQ("\033[27;3;1114111~", 15, MOD_META | UNICODE_MAX_VALID_CODEPOINT);
+    EXPECT_PARSE_SEQ("\033[27;3;1114112~", 15, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[27;999999999999999999999;123~", 31, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[27;123;99999999999999999~", 27, KEY_IGNORE);
 
-        // https://sw.kovidgoyal.net/kitty/keyboard-protocol
-        {"\033[27u", 5, MOD_CTRL | '['},
-        {"\033[57359u", 8, KEY_SCROLL_LOCK},
-        {"\033[57360u", 8, KEY_IGNORE},
-        {"\033[57361u", 8, KEY_PRINT_SCREEN},
-        {"\033[57362u", 8, KEY_PAUSE},
-        {"\033[57363u", 8, KEY_MENU},
-        {"\033[57376u", 8, KEY_F13},
-        {"\033[57377u", 8, KEY_F14},
-        {"\033[57378u", 8, KEY_F15},
-        {"\033[57379u", 8, KEY_F16},
-        {"\033[57380u", 8, KEY_F17},
-        {"\033[57381u", 8, KEY_F18},
-        {"\033[57382u", 8, KEY_F19},
-        {"\033[57383u", 8, KEY_F20},
-        {"\033[57399u", 8, '0'},
-        {"\033[57400u", 8, '1'},
-        {"\033[57401u", 8, '2'},
-        {"\033[57402u", 8, '3'},
-        {"\033[57403u", 8, '4'},
-        {"\033[57404u", 8, '5'},
-        {"\033[57405u", 8, '6'},
-        {"\033[57406u", 8, '7'},
-        {"\033[57407u", 8, '8'},
-        {"\033[57408u", 8, '9'},
-        {"\033[57409u", 8, '.'},
-        {"\033[57410u", 8, '/'},
-        {"\033[57411u", 8, '*'},
-        {"\033[57412u", 8, '-'},
-        {"\033[57413u", 8, '+'},
-        // TODO: {"\033[57414u", 8, KEY_ENTER},
-        {"\033[57415u", 8, '='},
-        {"\033[57417u", 8, KEY_LEFT},
-        {"\033[57418u", 8, KEY_RIGHT},
-        {"\033[57419u", 8, KEY_UP},
-        {"\033[57420u", 8, KEY_DOWN},
-        {"\033[57421u", 8, KEY_PAGE_UP},
-        {"\033[57422u", 8, KEY_PAGE_DOWN},
-        {"\033[57423u", 8, KEY_HOME},
-        {"\033[57424u", 8, KEY_END},
-        {"\033[57425u", 8, KEY_INSERT},
-        {"\033[57426u", 8, KEY_DELETE},
-        {"\033[57427u", 8, KEY_BEGIN},
-        {"\033[57361;2u", 10, MOD_SHIFT | KEY_PRINT_SCREEN},
-        {"\033[3615:3620:97;6u", 17, MOD_CTRL | MOD_SHIFT | 'a'},
-        {"\033[97;5u", 7, MOD_CTRL | 'a'},
-        {"\033[97;5:1u", 9, MOD_CTRL | 'a'},
-        {"\033[97;5:2u", 9, MOD_CTRL | 'a'},
-        {"\033[97;5:3u", 9, KEY_IGNORE},
-        // TODO: {"\033[97;5:u", 8, MOD_CTRL | 'a'},
-        {"\033[104;5u", 8, MOD_CTRL | 'h'},
-        {"\033[104;9u", 8, MOD_SUPER | 'h'},
-        {"\033[104;17u", 9, MOD_HYPER | 'h'},
-        {"\033[104;10u", 9, MOD_SUPER | MOD_SHIFT | 'h'},
-        {"\033[116;69u", 9, MOD_CTRL | 't'}, // Ignored Capslock in modifiers
-        {"\033[116;133u", 10, MOD_CTRL | 't'}, // Ignored Numlock in modifiers
-        {"\033[116;256u", 10, MOD_MASK | 't'}, // Ignored Capslock and Numlock
-        {"\033[116;257u", 10, KEY_IGNORE}, // Unknown bit in modifiers
+    // www.leonerd.org.uk/hacks/fixterms/
+    EXPECT_PARSE_SEQ("\033[13;3u", 7, MOD_META | KEY_ENTER);
+    EXPECT_PARSE_SEQ("\033[9;5u", 6, MOD_CTRL | KEY_TAB);
+    EXPECT_PARSE_SEQ("\033[65;3u", 7, MOD_META | 'A');
+    EXPECT_PARSE_SEQ("\033[108;5u", 8, MOD_CTRL | 'l');
+    EXPECT_PARSE_SEQ("\033[127765;3u", 11, MOD_META | 127765ul);
+    EXPECT_PARSE_SEQ("\033[1114111;3u", 12, MOD_META | UNICODE_MAX_VALID_CODEPOINT);
+    EXPECT_PARSE_SEQ("\033[1114112;3u", 12, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[11141110;3u", 13, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[11141111;3u", 13, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[2147483647;3u", 15, KEY_IGNORE); // INT32_MAX
+    EXPECT_PARSE_SEQ("\033[2147483648;3u", 15, KEY_IGNORE); // INT32_MAX + 1
+    EXPECT_PARSE_SEQ("\033[4294967295;3u", 15, KEY_IGNORE); // UINT32_MAX
+    EXPECT_PARSE_SEQ("\033[4294967296;3u", 15, KEY_IGNORE); // UINT32_MAX + 1
+    EXPECT_PARSE_SEQ("\033[-1;3u", 7, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[-2;3u", 7, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[ 2;3u", 7, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[<?>2;3u", 9, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[ !//.$2;3u", 12, KEY_IGNORE);
 
-        // Excess params
-        {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
+    // https://sw.kovidgoyal.net/kitty/keyboard-protocol
+    EXPECT_PARSE_SEQ("\033[27u", 5, MOD_CTRL | '[');
+    EXPECT_PARSE_SEQ("\033[57359u", 8, KEY_SCROLL_LOCK);
+    EXPECT_PARSE_SEQ("\033[57360u", 8, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[57361u", 8, KEY_PRINT_SCREEN);
+    EXPECT_PARSE_SEQ("\033[57362u", 8, KEY_PAUSE);
+    EXPECT_PARSE_SEQ("\033[57363u", 8, KEY_MENU);
+    EXPECT_PARSE_SEQ("\033[57376u", 8, KEY_F13);
+    EXPECT_PARSE_SEQ("\033[57377u", 8, KEY_F14);
+    EXPECT_PARSE_SEQ("\033[57378u", 8, KEY_F15);
+    EXPECT_PARSE_SEQ("\033[57379u", 8, KEY_F16);
+    EXPECT_PARSE_SEQ("\033[57380u", 8, KEY_F17);
+    EXPECT_PARSE_SEQ("\033[57381u", 8, KEY_F18);
+    EXPECT_PARSE_SEQ("\033[57382u", 8, KEY_F19);
+    EXPECT_PARSE_SEQ("\033[57383u", 8, KEY_F20);
+    EXPECT_PARSE_SEQ("\033[57399u", 8, '0');
+    EXPECT_PARSE_SEQ("\033[57400u", 8, '1');
+    EXPECT_PARSE_SEQ("\033[57401u", 8, '2');
+    EXPECT_PARSE_SEQ("\033[57402u", 8, '3');
+    EXPECT_PARSE_SEQ("\033[57403u", 8, '4');
+    EXPECT_PARSE_SEQ("\033[57404u", 8, '5');
+    EXPECT_PARSE_SEQ("\033[57405u", 8, '6');
+    EXPECT_PARSE_SEQ("\033[57406u", 8, '7');
+    EXPECT_PARSE_SEQ("\033[57407u", 8, '8');
+    EXPECT_PARSE_SEQ("\033[57408u", 8, '9');
+    EXPECT_PARSE_SEQ("\033[57409u", 8, '.');
+    EXPECT_PARSE_SEQ("\033[57410u", 8, '/');
+    EXPECT_PARSE_SEQ("\033[57411u", 8, '*');
+    EXPECT_PARSE_SEQ("\033[57412u", 8, '-');
+    EXPECT_PARSE_SEQ("\033[57413u", 8, '+');
+    // TODO: EXPECT_PARSE_SEQ("\033[57414u", 8, KEY_ENTER);
+    EXPECT_PARSE_SEQ("\033[57415u", 8, '=');
+    EXPECT_PARSE_SEQ("\033[57417u", 8, KEY_LEFT);
+    EXPECT_PARSE_SEQ("\033[57418u", 8, KEY_RIGHT);
+    EXPECT_PARSE_SEQ("\033[57419u", 8, KEY_UP);
+    EXPECT_PARSE_SEQ("\033[57420u", 8, KEY_DOWN);
+    EXPECT_PARSE_SEQ("\033[57421u", 8, KEY_PAGE_UP);
+    EXPECT_PARSE_SEQ("\033[57422u", 8, KEY_PAGE_DOWN);
+    EXPECT_PARSE_SEQ("\033[57423u", 8, KEY_HOME);
+    EXPECT_PARSE_SEQ("\033[57424u", 8, KEY_END);
+    EXPECT_PARSE_SEQ("\033[57425u", 8, KEY_INSERT);
+    EXPECT_PARSE_SEQ("\033[57426u", 8, KEY_DELETE);
+    EXPECT_PARSE_SEQ("\033[57427u", 8, KEY_BEGIN);
+    EXPECT_PARSE_SEQ("\033[57361;2u", 10, MOD_SHIFT | KEY_PRINT_SCREEN);
+    EXPECT_PARSE_SEQ("\033[3615:3620:97;6u", 17, MOD_CTRL | MOD_SHIFT | 'a');
+    EXPECT_PARSE_SEQ("\033[97;5u", 7, MOD_CTRL | 'a');
+    EXPECT_PARSE_SEQ("\033[97;5:1u", 9, MOD_CTRL | 'a');
+    EXPECT_PARSE_SEQ("\033[97;5:2u", 9, MOD_CTRL | 'a');
+    EXPECT_PARSE_SEQ("\033[97;5:3u", 9, KEY_IGNORE);
+    // TODO: EXPECT_PARSE_SEQ("\033[97;5:u", 8, MOD_CTRL | 'a');
+    EXPECT_PARSE_SEQ("\033[104;5u", 8, MOD_CTRL | 'h');
+    EXPECT_PARSE_SEQ("\033[104;9u", 8, MOD_SUPER | 'h');
+    EXPECT_PARSE_SEQ("\033[104;17u", 9, MOD_HYPER | 'h');
+    EXPECT_PARSE_SEQ("\033[104;10u", 9, MOD_SUPER | MOD_SHIFT | 'h');
+    EXPECT_PARSE_SEQ("\033[116;69u", 9, MOD_CTRL | 't'); // Ignored Capslock in modifiers
+    EXPECT_PARSE_SEQ("\033[116;133u", 10, MOD_CTRL | 't'); // Ignored Numlock in modifiers
+    EXPECT_PARSE_SEQ("\033[116;256u", 10, MOD_MASK | 't'); // Ignored Capslock and Numlock
+    EXPECT_PARSE_SEQ("\033[116;257u", 10, KEY_IGNORE); // Unknown bit in modifiers
 
-        // DA1 replies
-        {"\033[?64;15;22c", 12, TFLAG(TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | TFLAG_8_COLOR)},
-        {"\033[?1;2c", 7, TFLAG(TFLAG_QUERY_L2)},
-        {"\033[?90c", 6, KEY_IGNORE},
+    // Excess params
+    EXPECT_PARSE_SEQ("\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE);
 
-        // DA2 replies
-        {"\033[>0;136;0c", 11, KEY_IGNORE},
-        {"\033[>84;0;0c", 10, TFLAG(TFLAG_QUERY_L3)}, // tmux
-        {"\033[>1;11801;0c", 13, TFLAG(TFLAG_QUERY_L3)}, // foot
+    // DA1 replies
+    EXPECT_PARSE_SEQ("\033[?64;15;22c", 12, TFLAG(TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | TFLAG_8_COLOR));
+    EXPECT_PARSE_SEQ("\033[?1;2c", 7, TFLAG(TFLAG_QUERY_L2));
+    EXPECT_PARSE_SEQ("\033[?90c", 6, KEY_IGNORE);
 
-        // DA3 replies
-        {"\033P!|464f4f54\033\\", 12, TFLAG(TFLAG_QUERY_L3)}, // foot
-        {"\033P!|464f4f54\033", 12, TFLAG(TFLAG_QUERY_L3)},
-        {"\033P!|464f4f54", -1, KEY_IGNORE},
+    // DA2 replies
+    EXPECT_PARSE_SEQ("\033[>0;136;0c", 11, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[>84;0;0c", 10, TFLAG(TFLAG_QUERY_L3)); // tmux
+    EXPECT_PARSE_SEQ("\033[>1;11801;0c", 13, TFLAG(TFLAG_QUERY_L3)); // foot
 
-        // XTVERSION replies
-        {"\033P>|tmux 3.2\033\\", 12, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
-        {"\033P>|tmux 3.2a\033\\", 13, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
-        {"\033P>|tmux 3.2-rc2\033\\", 16, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
-        {"\033P>|tmux next-3.3\033\\", 17, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT)},
-        {"\033P>|xyz\033\\", 7, TFLAG(TFLAG_QUERY_L3)},
+    // DA3 replies
+    EXPECT_PARSE_SEQ("\033P!|464f4f54\033\\", 12, TFLAG(TFLAG_QUERY_L3)); // foot
+    EXPECT_PARSE_SEQ("\033P!|464f4f54\033", 12, TFLAG(TFLAG_QUERY_L3));
+    EXPECT_PARSE_SEQ("\033P!|464f4f54", TPARSE_PARTIAL_MATCH, 0);
 
-        // XTMODKEYS replies
-        {"\033[>4;2m", 7, KEY_IGNORE},
-        {"\033[>4m", 5, KEY_IGNORE},
-        {"\033[>4;2;0m", 9, KEY_IGNORE},
+    // XTVERSION replies
+    EXPECT_PARSE_SEQ("\033P>|tmux 3.2\033\\", 12, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT));
+    EXPECT_PARSE_SEQ("\033P>|tmux 3.2a\033\\", 13, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT));
+    EXPECT_PARSE_SEQ("\033P>|tmux 3.2-rc2\033\\", 16, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT));
+    EXPECT_PARSE_SEQ("\033P>|tmux next-3.3\033\\", 17, TFLAG(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT));
+    EXPECT_PARSE_SEQ("\033P>|xyz\033\\", 7, TFLAG(TFLAG_QUERY_L3));
 
-        // XTWINOPS replies
-        {"\033]ltitle\033\\", 8, KEY_IGNORE},
-        {"\033]Licon\033\\", 7, KEY_IGNORE},
-        {"\033]ltitle\a", 9, KEY_IGNORE},
-        {"\033]Licon\a", 8, KEY_IGNORE},
+    // XTMODKEYS replies
+    EXPECT_PARSE_SEQ("\033[>4;2m", 7, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[>4m", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[>4;2;0m", 9, KEY_IGNORE);
 
-        // DECRPM replies (to DECRQM queries)
-        {"\033[?2026;0$y", 11, KEY_IGNORE},
-        {"\033[?2026;1$y", 11, TFLAG(TFLAG_SYNC)},
-        {"\033[?2026;2$y", 11, TFLAG(TFLAG_SYNC)},
-        {"\033[?2026;3$y", 11, KEY_IGNORE},
-        {"\033[?2026;4$y", 11, KEY_IGNORE},
-        {"\033[?2026;5$y", 11, KEY_IGNORE},
-        {"\033[?0;1$y", 8, KEY_IGNORE},
-        {"\033[?1036;2$y", 11, TFLAG(TFLAG_META_ESC)},
-        {"\033[?1039;2$y", 11, TFLAG(TFLAG_ALT_ESC)},
-        {"\033[?7;2$y", 8, KEY_IGNORE},
-        {"\033[?25;2$y", 9, KEY_IGNORE},
-        {"\033[?45;2$y", 9, KEY_IGNORE},
-        {"\033[?67;2$y", 9, KEY_IGNORE},
-        {"\033[?1049;2$y", 11, KEY_IGNORE},
-        {"\033[?2004;2$y", 11, KEY_IGNORE},
+    // XTWINOPS replies
+    EXPECT_PARSE_SEQ("\033]ltitle\033\\", 8, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033]Licon\033\\", 7, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033]ltitle\a", 9, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033]Licon\a", 8, KEY_IGNORE);
 
-        // Invalid, DECRPM-like sequences
-        {"\033[?9$y", 6, KEY_IGNORE}, // Too few params
-        {"\033[?1;2;3$y", 10, KEY_IGNORE}, // Too many params
-        {"\033[?1;2y", 7, KEY_IGNORE}, // No '$' intermediate byte
-        {"\033[1;2$y", 7, KEY_IGNORE}, // No '?' param prefix
+    // DECRPM replies (to DECRQM queries)
+    EXPECT_PARSE_SEQ("\033[?2026;0$y", 11, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?2026;1$y", 11, TFLAG(TFLAG_SYNC));
+    EXPECT_PARSE_SEQ("\033[?2026;2$y", 11, TFLAG(TFLAG_SYNC));
+    EXPECT_PARSE_SEQ("\033[?2026;3$y", 11, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?2026;4$y", 11, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?2026;5$y", 11, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?0;1$y", 8, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?1036;2$y", 11, TFLAG(TFLAG_META_ESC));
+    EXPECT_PARSE_SEQ("\033[?1039;2$y", 11, TFLAG(TFLAG_ALT_ESC));
+    EXPECT_PARSE_SEQ("\033[?7;2$y", 8, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?25;2$y", 9, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?45;2$y", 9, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?67;2$y", 9, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?1049;2$y", 11, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033[?2004;2$y", 11, KEY_IGNORE);
 
-        // XTGETTCAP replies
-        {"\033P1+r626365\033\\", 11, TFLAG(TFLAG_BACK_COLOR_ERASE)},
-        {"\033P1+r74736C=1B5D323B\033\\", 20, TFLAG(TFLAG_SET_WINDOW_TITLE)},
-        {"\033P0+r\033\\", 5, KEY_IGNORE},
-        {"\033P0+rbbccdd\033\\", 11, KEY_IGNORE},
+    // Invalid, DECRPM-like sequences
+    EXPECT_PARSE_SEQ("\033[?9$y", 6, KEY_IGNORE); // Too few params
+    EXPECT_PARSE_SEQ("\033[?1;2;3$y", 10, KEY_IGNORE); // Too many params
+    EXPECT_PARSE_SEQ("\033[?1;2y", 7, KEY_IGNORE); // No '$' intermediate byte
+    EXPECT_PARSE_SEQ("\033[1;2$y", 7, KEY_IGNORE); // No '?' param prefix
 
-        // DECRQSS replies
-        {"\033P1$r0;38:2::60:70:80;48:5:255m\033\\", 31, TFLAG(TFLAG_TRUE_COLOR | TFLAG_256_COLOR)}, // SGR (xterm, foot)
-        {"\033P1$r0;38:2:60:70:80;48:5:255m\033\\", 30, TFLAG(TFLAG_TRUE_COLOR | TFLAG_256_COLOR)}, // SGR (kitty)
-        {"\033P1$r0;zm\033\\", 9, KEY_IGNORE}, // Invalid SGR-like
-        {"\033P1$r2 q\033\\", 8, KEY_IGNORE}, // DECSCUSR 2 (cursor style)
+    // XTGETTCAP replies
+    EXPECT_PARSE_SEQ("\033P1+r626365\033\\", 11, TFLAG(TFLAG_BACK_COLOR_ERASE));
+    EXPECT_PARSE_SEQ("\033P1+r74736C=1B5D323B\033\\", 20, TFLAG(TFLAG_SET_WINDOW_TITLE));
+    EXPECT_PARSE_SEQ("\033P0+r\033\\", 5, KEY_IGNORE);
+    EXPECT_PARSE_SEQ("\033P0+rbbccdd\033\\", 11, KEY_IGNORE);
 
-        // Kitty keyboard protocol query replies
-        {"\033[?5u", 5, TFLAG(TFLAG_KITTY_KEYBOARD)},
-        {"\033[?1u", 5, TFLAG(TFLAG_KITTY_KEYBOARD)},
-        {"\033[?0u", 5, TFLAG(TFLAG_KITTY_KEYBOARD)},
+    // DECRQSS replies
+    EXPECT_PARSE_SEQ("\033P1$r0;38:2::60:70:80;48:5:255m\033\\", 31, TFLAG(TFLAG_TRUE_COLOR | TFLAG_256_COLOR)); // SGR (xterm, foot)
+    EXPECT_PARSE_SEQ("\033P1$r0;38:2:60:70:80;48:5:255m\033\\", 30, TFLAG(TFLAG_TRUE_COLOR | TFLAG_256_COLOR)); // SGR (kitty)
+    EXPECT_PARSE_SEQ("\033P1$r0;zm\033\\", 9, KEY_IGNORE); // Invalid SGR-like
+    EXPECT_PARSE_SEQ("\033P1$r2 q\033\\", 8, KEY_IGNORE); // DECSCUSR 2 (cursor style)
 
-        // Invalid, kitty-reply-like sequences
-        {"\033[?u", 4, KEY_IGNORE}, // Too few params (could be valid, in theory)
-        {"\033[?1;2u", 7, KEY_IGNORE}, // Too many params
-        {"\033[?1:2u", 7, KEY_IGNORE}, // Sub-params
-        {"\033[?1!u", 6, KEY_IGNORE}, // Intermediate '!' byte
-    };
+    // Kitty keyboard protocol query replies
+    EXPECT_PARSE_SEQ("\033[?5u", 5, TFLAG(TFLAG_KITTY_KEYBOARD));
+    EXPECT_PARSE_SEQ("\033[?1u", 5, TFLAG(TFLAG_KITTY_KEYBOARD));
+    EXPECT_PARSE_SEQ("\033[?0u", 5, TFLAG(TFLAG_KITTY_KEYBOARD));
 
-    FOR_EACH_I(i, tests) {
-        const char *seq = tests[i].escape_sequence;
-        const size_t seq_length = strlen(seq);
-        ASSERT_TRUE(seq_length > 0);
-
-        KeyCode key = 0x18;
-        ssize_t parsed_length = term_parse_sequence(seq, seq_length, &key);
-        ssize_t expected_length = tests[i].expected_length;
-        IEXPECT_EQ(parsed_length, expected_length);
-        if (parsed_length <= 0) {
-            // If nothing was parsed, key should be unmodified
-            IEXPECT_EQ(key, 0x18);
-            continue;
-        }
-
-        EXPECT_KEYCODE_EQ(i, key, tests[i].expected_key, seq, seq_length);
-
-        // Ensure that parsing any truncated sequence returns
-        // TPARSE_PARTIAL_MATCH:
-        key = 0x18;
-        for (size_t n = expected_length - 1; n != 0; n--) {
-            parsed_length = term_parse_sequence(seq, n, &key);
-            IEXPECT_EQ(parsed_length, TPARSE_PARTIAL_MATCH);
-            IEXPECT_EQ(key, 0x18);
-        }
-    }
+    // Invalid, kitty-reply-like sequences
+    EXPECT_PARSE_SEQ("\033[?u", 4, KEY_IGNORE); // Too few params (could be valid, in theory)
+    EXPECT_PARSE_SEQ("\033[?1;2u", 7, KEY_IGNORE); // Too many params
+    EXPECT_PARSE_SEQ("\033[?1:2u", 7, KEY_IGNORE); // Sub-params
+    EXPECT_PARSE_SEQ("\033[?1!u", 6, KEY_IGNORE); // Intermediate '!' byte
 }
 
 static void test_term_parse_sequence2(TestContext *ctx)
@@ -907,7 +932,7 @@ static void test_term_parse_sequence2(TestContext *ctx)
             KeyCode mods = modifiers[j].mask;
             KeyCode expected_key = mods | (mods == KEY_IGNORE ? 0 : templates[i].key);
             IEXPECT_EQ(parsed_length, seq_length);
-            EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
+            IEXPECT_KEYCODE_EQ(key, expected_key, seq, seq_length);
             // Truncated
             key = 25;
             for (size_t n = seq_length - 1; n != 0; n--) {
@@ -920,7 +945,7 @@ static void test_term_parse_sequence2(TestContext *ctx)
             seq[seq_length++] = '~';
             parsed_length = term_parse_sequence(seq, seq_length, &key);
             IEXPECT_EQ(parsed_length, seq_length - 1);
-            EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
+            IEXPECT_KEYCODE_EQ(key, expected_key, seq, seq_length);
         }
     }
 }
@@ -1019,7 +1044,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
         ssize_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
         KeyCode expected_key = (parsed_length > 0) ? tests[i].expected_key : 0x18;
         IEXPECT_EQ(parsed_length, tests[i].expected_length);
-        EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
+        IEXPECT_KEYCODE_EQ(key, expected_key, seq, seq_length);
     }
 }
 
@@ -1050,7 +1075,7 @@ static void test_linux_parse_key(TestContext *ctx)
         ssize_t parsed_length = linux_parse_key(seq, seq_length, &key);
         KeyCode expected_key = (parsed_length > 0) ? tests[i].expected_key : 0x18;
         IEXPECT_EQ(parsed_length, tests[i].expected_length);
-        EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
+        IEXPECT_KEYCODE_EQ(key, expected_key, seq, seq_length);
     }
 }
 
