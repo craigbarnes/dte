@@ -25,9 +25,8 @@ char *path_absolute(const char *path)
         return NULL;
     }
 
-    // If the full path doesn't exist but the directory part does,
-    // return the concatenation of the real directory and the
-    // non-existent filename
+    // If the full path doesn't exist but the directory part does, return
+    // the concatenation of the real directory and the non-existent filename
     abs = path_join(dir, base);
     free(dir);
     return abs;
@@ -38,6 +37,8 @@ static bool path_component(const char *path, size_t pos)
     return path[pos] == '\0' || pos == 0 || path[pos - 1] == '/';
 }
 
+// Like path_relative(), but always returning either a "borrowed" pointer
+// into `abs` or the static string ".", thus avoiding the need to allocate
 const char *path_slice_relative(const char *abs, const char *cwd)
 {
     BUG_ON(!path_is_absolute(cwd));

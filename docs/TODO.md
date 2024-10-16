@@ -250,7 +250,6 @@ Testing/Debugging
 * Improve test coverage for:
   * `u_get_nonascii()`
   * `u_skip_chars()`
-  * `path_slice_relative()`
   * `handle_exec()`
   * `spawn_compiler()`
   * `dump_buffer()`

@@ -2501,6 +2501,19 @@ static void test_path_relative(TestContext *ctx)
     }
 }
 
+static void test_path_slice_relative(TestContext *ctx)
+{
+    const char *abs = "/a/b/c/d";
+    EXPECT_PTREQ(path_slice_relative(abs, "/a/b/c/d/e"), abs);
+    EXPECT_PTREQ(path_slice_relative(abs, "/a/b/file"), abs);
+    EXPECT_STREQ(path_slice_relative(abs, "/a/b/c/d"), ".");
+    EXPECT_STREQ(path_slice_relative(abs, "/a/b/c"), "d");
+    EXPECT_STREQ(path_slice_relative(abs, "/"), "a/b/c/d");
+    EXPECT_PTREQ(path_slice_relative(abs, "/a/b/c"), abs + STRLEN("/a/b/c/"));
+    EXPECT_STREQ(path_slice_relative("/", "/"), "/");
+    EXPECT_STREQ(path_slice_relative("/aa/bb/ccX", "/aa/bb/cc"), "/aa/bb/ccX");
+}
+
 static void test_short_filename_cwd(TestContext *ctx)
 {
     const StringView home = STRING_VIEW("/home/user");
@@ -3161,6 +3174,7 @@ static const TestEntry tests[] = {
     TEST(test_lsbit),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_path_relative),
+    TEST(test_path_slice_relative),
     TEST(test_short_filename_cwd),
     TEST(test_short_filename),
     TEST(test_path_absolute),
