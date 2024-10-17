@@ -27,6 +27,7 @@
 #include "filetype.h"
 #include "frame.h"
 #include "history.h"
+#include "insert.h"
 #include "load-save.h"
 #include "lock.h"
 #include "misc.h"
@@ -65,6 +66,7 @@
 #include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
+#include "wrap.h"
 
 NOINLINE
 static void do_selection_noinline(View *view, SelectionType sel)
@@ -2356,7 +2358,7 @@ static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
             return error_msg("width must be between 1 and %u", max);
         }
     }
-    format_paragraph(e->view, width);
+    wrap_paragraph(e->view, width);
     return true;
 }
 

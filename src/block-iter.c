@@ -1,5 +1,6 @@
 #include <string.h>
 #include "block-iter.h"
+#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -200,6 +201,60 @@ size_t block_iter_eol(BlockIter *bi)
     BUG_ON(!end);
     bi->offset = (size_t)(end - blk->data);
     return bi->offset - offset;
+}
+
+// Count spaces and tabs at or after iterator (and move beyond them)
+size_t block_iter_skip_blanks_fwd(BlockIter *bi)
+{
+    block_iter_normalize(bi);
+    const char *data = bi->blk->data;
+    size_t count = 0;
+    size_t i = bi->offset;
+
+    // We're only operating on one line and checking for ASCII characters,
+    // so Block traversal and Unicode-aware decoding are both unnecessary
+    for (size_t n = bi->blk->size; i < n; count++) {
+        unsigned char c = data[i++];
+        if (!ascii_isblank(c)) {
+            break;
+        }
+    }
+
+    bi->offset = i;
+    return count;
+}
+
+// Count spaces and tabs before iterator (and move to beginning of them)
+size_t block_iter_skip_blanks_bwd(BlockIter *bi)
+
+{
+    block_iter_normalize(bi);
+    size_t count = 0;
+    size_t i = bi->offset;
+
+    for (const char *data = bi->blk->data; i > 0; count++) {
+        unsigned char c = data[--i];
+        if (!ascii_isblank(c)) {
+            i++;
+            break;
+        }
+    }
+
+    bi->offset = i;
+    return count;
+}
+
+// Non-empty line can be used to determine size of indentation for the next line
+bool block_iter_find_non_empty_line_bwd(BlockIter *bi)
+{
+    block_iter_bol(bi);
+    do {
+        StringView line = block_iter_get_line(bi);
+        if (!strview_isblank(&line)) {
+            return true;
+        }
+    } while (block_iter_prev_line(bi));
+    return false;
 }
 
 void block_iter_back_bytes(BlockIter *bi, size_t count)
