@@ -7,7 +7,9 @@ man = docs/dte.1 docs/dterc.5 docs/dte-syntax.5
 html-man = public/dte.html public/dterc.html public/dte-syntax.html
 html = public/index.html public/releases.html $(html-man)
 css = public/style.css
-img = public/logo.svg public/screenshot.png public/favicon.ico
+img_tpl = public/logo.svg public/favicon.ico # Images used in template.html
+img_ss = public/screenshot.png
+img = $(img_tpl) $(img_ss)
 
 docs: man html htmlgz
 man: $(man)
@@ -16,7 +18,7 @@ htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
 $(html-man): public/%.html: docs/%.md
-public/index.html: docs/index.yml README.md docs/gitlab.md
+public/index.html: docs/index.yml README.md docs/gitlab.md | $(img_ss)
 public/releases.html: docs/releases.yml CHANGELOG.md docs/releases.lua
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
 public/logo.svg: share/dte.svg
@@ -34,7 +36,7 @@ docs/%.5: docs/%.md docs/pdman.lua build/docs/pdman.flags
 	$(E) PANDOC $@
 	$(Q) $(PDMAN) -o $@ $<
 
-$(html): docs/template.html build/docs/pdhtml.flags | $(css) $(img)
+$(html): docs/template.html build/docs/pdhtml.flags | $(css) $(img_tpl)
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -o $@ $(filter %.md %.yml, $^)
 

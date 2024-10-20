@@ -121,7 +121,7 @@ coverage:
         expire_in: 60 days
         name: dte-$CI_JOB_NAME-$CI_COMMIT_SHORT_SHA
     script:
-        - make docs
+        - make docs htmlgz-aux
         - make gcovr-html
         - make vars check CC=musl-gcc LDFLAGS=-static DEBUG=0 SANE_WCTYPE=1
         - strip dte
