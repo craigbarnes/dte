@@ -383,7 +383,7 @@ Eight hex digit Unicode code point U+20AC
 .SS Configuration Commands
 Configuration commands are used to customize certain aspects of the
 editor, for example adding key bindings, setting options, etc.
-These are the only commands allowed in user config files.
+These are the only commands allowed in user configuration files.
 .P
 \fBalias\fR \fIname\fR [\fIcommand\fR]
 .RS
@@ -404,9 +404,9 @@ alias\ read\ \[aq]pipe\-from\ cat\[aq]
 \f[]
 .fi
 .PP
-this can then be invoked as \fBread file.txt\fR, which will expand to
-the command \fBpipe\-from cat file.txt\fR and thus cause \fBfile.txt\fR to be
-inserted into the current buffer.
+this can then be invoked as e.g. \fBread file.txt\fR, which will expand to
+\fBpipe\-from cat file.txt\fR and thus cause \fBfile.txt\fR to be inserted into
+the current buffer.
 .P
 .RE
 \fBbind\fR [\fB\-cns\fR] \fIkey\fR [\fIcommand\fR]
@@ -2053,8 +2053,8 @@ Cursor display column
 .PP
 .TP
 \fB%X\fR
-Cursor column as characters. If it differs from cursor display
-column then both are shown (e.g. \fB2\-9\fR)
+Cursor column as characters (if this differs from cursor display
+column then both are shown, as e.g. \fB2\-9\fR)
 .PP
 .TP
 \fB%p\fR

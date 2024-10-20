@@ -10,7 +10,7 @@ seealso: ["`dte`", "`dte-syntax`"]
 
 # dterc
 
-dterc is the language used in `dte` configuration files (`~/.dte/rc`)
+dterc is the language used in `dte` [configuration files][] (`~/.dte/rc`)
 and also in the [command mode] of the editor (Alt+x). The syntax of the
 language is quite similar to shell, but much simpler.
 
@@ -82,7 +82,7 @@ Single quoted strings can't contain single quotes or escaped characters.
 Double quoted strings may contain the following escapes:
 
 `\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`
-:   Control characters (same as in C)
+:   Control characters (same [as in C][`ascii(7)`])
 
 `\e`
 :   Escape character
@@ -109,7 +109,7 @@ Double quoted strings may contain the following escapes:
 
 Configuration commands are used to customize certain aspects of the
 editor, for example adding [key bindings], setting [options], etc.
-These are the only commands allowed in [user config files].
+These are the only commands allowed in user [configuration files].
 
 ### **alias** _name_ [_command_]
 
@@ -125,9 +125,9 @@ For example, if the following alias is created:
 
     alias read 'pipe-from cat'
 
-this can then be invoked as `read file.txt`, which will expand to
-the command `pipe-from cat file.txt` and thus cause `file.txt` to be
-inserted into the current buffer.
+this can then be invoked as e.g. `read file.txt`, which will expand to
+[`pipe-from cat file.txt`] and thus cause `file.txt` to be inserted into
+the current buffer.
 
 ### **bind** [**-cns**] _key_ [_command_]
 
@@ -263,7 +263,7 @@ By default `set` changes both global and local values.
 `-l`
 :   Change only local option value of current file
 
-In configuration files only global options can be set (no need
+In [configuration files] only global options can be set (no need
 to specify the `-g` flag).
 
 See also: [`toggle`] and [`option`] commands.
@@ -1401,8 +1401,8 @@ Format string for the left aligned part of status line.
 :   Cursor display column
 
 `%X`
-:   Cursor column as characters. If it differs from cursor display
-    column then both are shown (e.g. `2-9`)
+:   Cursor column as characters (if this differs from cursor display
+    column then both are shown, as e.g. `2-9`)
 
 `%p`
 :   Position in percentage
@@ -1580,12 +1580,14 @@ errors should be highlighted. Set to `""` to disable.
 [normal mode]: dte.html#normal-mode
 [command mode]: dte.html#command-mode
 [search mode]: dte.html#search-mode
-[user config files]: dte.html#files
+[configuration files]: dte.html#files:~:text=%24DTE_HOME/rc
 [key bindings]: dte.html#key-bindings
 [options]: #options
+[`pipe-from cat file.txt`]: #exec:~:text=alias%20pipe%2Dfrom
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings
 [`color/reset`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/reset
+[`ascii(7)`]: https://www.man7.org/linux/man-pages/man7/ascii.7.html#DESCRIPTION
 [standard streams]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [external scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/contrib
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
