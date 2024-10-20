@@ -27,7 +27,7 @@
         <li>Customizable color schemes (including 24-bit RGB)</li>
         <li>Customizable key bindings</li>
         <li>Command language with auto-completion</li>
-        <li>Unicode 15 compatible text rendering</li>
+        <li>Unicode 16 compatible text rendering</li>
         <li>Support for all xterm key combos</li>
         <li>Support for kitty's keyboard protocol</li>
         <li>Support for multiple encodings (using iconv)</li>
