@@ -1825,11 +1825,37 @@ static void test_u_get_char(TestContext *ctx)
     EXPECT_EQ(u_get_char(a, sizeof(a), &idx), 0);
     ASSERT_EQ(idx, 3);
 
-    // Overlong encodings should be consumed as individual bytes and
+    // "In UTF-8, the code point sequence <004D, 0430, 4E8C, 10302> is
+    // represented as <4D D0 B0 E4 BA 8C F0 90 8C 82>, where <4D>
+    // corresponds to U+004D, <D0 B0> corresponds to U+0430, <E4 BA 8C>
+    // corresponds to U+4E8C, and <F0 90 8C 82> corresponds to U+10302."
+    // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31703
+    static const char b[] = "\x4D\xD0\xB0\xE4\xBA\x8C\xF0\x90\x8C\x82";
+    idx = 0;
+    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x004D);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x0430);
+    ASSERT_EQ(idx, 3);
+    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x4E8C);
+    ASSERT_EQ(idx, 6);
+    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x10302);
+    ASSERT_EQ(idx, 10);
+
+    // "The byte sequence <F4 80 83 92> is well-formed, because every
+    // byte in that sequence matches a byte range in a row of the table
+    // (the last row)."
+    // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27288
+    idx = 0;
+    EXPECT_EQ(u_get_char(STRN("\xF4\x80\x83\x92"), &idx), 0x1000D2);
+    EXPECT_EQ(idx, 4);
+
+    // Overlong encodings are consumed as individual bytes and
     // each byte returned negated (to indicate that it's invalid).
     // See also: u_get_nonascii(), u_seq_len_ok(), u_char_size()
 
-    // Overlong (2 byte) encoding of U+002F ('/')
+    // Overlong (2 byte) encoding of U+002F ('/').
+    // "The byte sequence <C0 AF> is ill-formed, because C0 is not
+    // well-formed in the “First Byte” column."
     static const char ol1[] = "\xC0\xAF";
     idx = 0;
     EXPECT_EQ(u_get_char(ol1, 2, &idx), (CodePoint)-0xC0);
@@ -1846,6 +1872,38 @@ static void test_u_get_char(TestContext *ctx)
     ASSERT_EQ(idx, 2);
     EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0xAF);
     ASSERT_EQ(idx, 3);
+
+    // "The byte sequence <E0 9F 80> is ill-formed, because in the row
+    // where E0 is well-formed as a first byte, 9F is not well-formed
+    // as a second byte."
+    static const char ol3[] = "\xE0\x9F\x80";
+    idx = 0;
+    EXPECT_EQ(u_get_char(ol3, 3, &idx), (CodePoint)-0xE0);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(ol3, 3, &idx), (CodePoint)-0x9F);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(ol3, 3, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 3);
+
+    // "For example, in processing the UTF-8 code unit sequence
+    // <F0 80 80 41>, the only formal requirement mandated by Unicode
+    // conformance for a converter is that the <41> be processed and
+    // correctly interpreted as <U+0041>. The converter could return
+    // <U+FFFD, U+0041>, handling <F0 80 80> as a single error, or
+    // <U+FFFD, U+FFFD, U+FFFD, U+0041>, handling each byte of
+    // <F0 80 80> as a separate error, or could take other approaches
+    // to signalling <F0 80 80> as an ill-formed code unit subsequence."
+    // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G48534
+    static const char e1[] = "\xF0\x80\x80\x41";
+    idx = 0;
+    EXPECT_EQ(u_get_char(e1, 4, &idx), (CodePoint)-0xF0);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(e1, 4, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(e1, 4, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 3);
+    EXPECT_EQ(u_get_char(e1, 4, &idx), 0x41);
+    ASSERT_EQ(idx, 4);
 }
 
 static void test_u_prev_char(TestContext *ctx)

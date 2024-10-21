@@ -11,6 +11,7 @@ enum {
 };
 
 // https://en.wikipedia.org/wiki/UTF-8#Byte_map
+// https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27506
 static const int8_t seq_len_table[256] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 00..0F
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 10..1F
@@ -37,11 +38,16 @@ static int u_seq_len(unsigned char first_byte)
     return len;
 }
 
+// https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27288
 static bool u_is_continuation_byte(unsigned char u)
 {
-    return (u & 0xc0) == 0x80;
+    // (u & 0b11000000) == 0b10000000
+    return (u & 0xC0) == 0x80;
 }
 
+// https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27506
+// https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings
+// https://en.wikipedia.org/wiki/UTF-8#Error_handling
 static bool u_seq_len_ok(CodePoint u, int len)
 {
     return u_char_size(u) == len;
@@ -159,9 +165,7 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
     } while (--c);
 
     if (!u_seq_len_ok(u, len)) {
-        // Prevent overlong encodings:
-        // • https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings
-        // • https://en.wikipedia.org/wiki/UTF-8#Error_handling
+        // Overlong encoding
         goto invalid;
     }
 
