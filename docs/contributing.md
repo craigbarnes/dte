@@ -36,6 +36,7 @@ See Also
 * [`config/README.md`](../config/README.md)
 * [`mk/README.md`](../mk/README.md)
 * [`mk/feature-test/README.md`](../mk/feature-test/README.md)
+* [`test/README.md`](../test/README.md)
 * [`tools/README.md`](../tools/README.md)
 * [`docs/README.md`](README.md)
 * [`docs/TODO.md`](TODO.md)
