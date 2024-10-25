@@ -28,6 +28,7 @@ local crossrefs = {
     stderr = "(3)",
     sysexits = "(3)",
     ctags = "(1)",
+    tags = "(5)",
     fmt = "(1)",
     terminfo = "(5)",
     locale = "(7)",

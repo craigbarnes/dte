@@ -25,7 +25,7 @@ seealso: ["`dterc`", "`dte-syntax`"]
     arguments. See [`dterc`] for available commands.
 
 `-t` _ctag_
-:   Jump to source location of _ctag_. Requires `tags` file generated
+:   Jump to source location of _ctag_. Requires [`tags`] file generated
     by [`ctags`].
 
 `-r` _rcfile_
@@ -391,6 +391,7 @@ input/output of both.
 [`file-history`]: dterc.html#file-history
 
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
+[`tags`]: https://docs.ctags.io/en/stable/man/tags.5.html
 [`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html
