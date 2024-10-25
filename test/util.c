@@ -3087,13 +3087,12 @@ static void test_timespec_subtract(TestContext *ctx)
 {
     struct timespec a = {.tv_sec = 3, .tv_nsec = 5497};
     struct timespec b = {.tv_sec = 1, .tv_nsec = NS_PER_SECOND - 1};
-    struct timespec r;
-    timespec_subtract(&a, &b, &r);
+    struct timespec r = timespec_subtract(&a, &b);
     EXPECT_EQ(r.tv_sec, 1);
     EXPECT_EQ(r.tv_nsec, 5498);
 
     b.tv_nsec = 501;
-    timespec_subtract(&a, &b, &r);
+    r = timespec_subtract(&a, &b);
     EXPECT_EQ(r.tv_sec, 2);
     EXPECT_EQ(r.tv_nsec, 4996);
 }

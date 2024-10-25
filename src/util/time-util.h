@@ -24,19 +24,18 @@ static inline const struct timespec *get_stat_mtime(const struct stat *st)
 #endif
 }
 
-static inline void timespec_subtract (
+static inline struct timespec timespec_subtract (
     const struct timespec *lhs,
-    const struct timespec *rhs,
-    struct timespec *res
+    const struct timespec *rhs
 ) {
     BUG_ON(lhs->tv_nsec >= NS_PER_SECOND);
     BUG_ON(rhs->tv_nsec >= NS_PER_SECOND);
-    res->tv_sec = lhs->tv_sec - rhs->tv_sec;
-    res->tv_nsec = lhs->tv_nsec - rhs->tv_nsec;
-    if (res->tv_nsec < 0) {
-        res->tv_sec--;
-        res->tv_nsec += NS_PER_SECOND;
-    }
+    time_t sec = lhs->tv_sec - rhs->tv_sec;
+    long nsec = lhs->tv_nsec - rhs->tv_nsec;
+    return (struct timespec) {
+        .tv_sec = sec - (nsec < 0),
+        .tv_nsec = nsec + (nsec < 0 ? NS_PER_SECOND : 0),
+    };
 }
 
 static inline int timespec_cmp(const struct timespec *a, const struct timespec *b)

@@ -39,11 +39,9 @@ extern const TestGroup util_tests;
 
 static void print_timing(const TestContext *ctx, const struct timespec ts[2])
 {
-    struct timespec diff;
-    timespec_subtract(&ts[1], &ts[0], &diff);
-
-    double ms = (double)diff.tv_sec * (double)MS_PER_SECOND;
-    ms += (double)diff.tv_nsec / (double)NS_PER_MS;
+    struct timespec duration = timespec_subtract(&ts[1], &ts[0]);
+    double ms = (double)duration.tv_sec * (double)MS_PER_SECOND;
+    ms += (double)duration.tv_nsec / (double)NS_PER_MS;
 
     int precision = 3 - (ms >= 1000.0) - (ms >= 100.0) - (ms >= 10.0);
     fprintf(stderr, " %s(%0.*f ms)%s", ctx->dim, precision, ms, ctx->sgr0);

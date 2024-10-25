@@ -20,14 +20,20 @@
 #include "util/xsnprintf.h"
 
 COLD PRINTF(1)
-static noreturn void fail(const char *format, ...)
+static noreturn void error_exit(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
     vfprintf(stderr, format, ap);
     va_end(ap);
     putc('\n', stderr);
-    fflush(stderr);
+    exit(1);
+}
+
+COLD
+static noreturn void perror_exit(const char *str)
+{
+    perror(str);
     exit(1);
 }
 
@@ -36,21 +42,23 @@ static noreturn void fail(const char *format, ...)
 static void check(const char *file, int line, uintmax_t a, uintmax_t b)
 {
     if (unlikely(a != b)) {
-        fail("%s:%d: Result check failed: %ju != %ju", file, line, a, b);
+        error_exit("%s:%d: Result check failed: %ju != %ju", file, line, a, b);
     }
 }
 
-static void get_time(struct timespec *ts)
+static struct timespec get_time(void)
 {
-    if (clock_gettime(CLOCK_MONOTONIC, ts) != 0) {
-        fail("clock_gettime() failed: %s", strerror(errno));
+    struct timespec ts;
+    if (unlikely(clock_gettime(CLOCK_MONOTONIC, &ts) != 0)) {
+        perror_exit("clock_gettime");
     }
+    return ts;
 }
 
 static uintmax_t timespec_to_ns(const struct timespec *ts)
 {
     if (ts->tv_sec < 0 || ts->tv_nsec < 0) {
-        fail("%s(): Negative timespec value", __func__);
+        error_exit("%s(): Negative timespec value", __func__);
     }
 
     uintmax_t sec = ts->tv_sec;
@@ -59,7 +67,7 @@ static uintmax_t timespec_to_ns(const struct timespec *ts)
         umax_multiply_overflows(sec, NS_PER_SECOND, &sec)
         || umax_add_overflows(ns, sec, &ns)
     ) {
-        fail("%s(): %s", __func__, strerror(EOVERFLOW));
+        error_exit("%s(): %s", __func__, strerror(EOVERFLOW));
     }
 
     return ns;
@@ -68,10 +76,9 @@ static uintmax_t timespec_to_ns(const struct timespec *ts)
 PRINTF(3)
 static void report(const struct timespec *start, unsigned int iters, const char *fmt, ...)
 {
-    struct timespec end, diff;
-    get_time(&end);
-    timespec_subtract(&end, start, &diff);
-    uintmax_t ns = timespec_to_ns(&diff);
+    struct timespec end = get_time();
+    struct timespec duration = timespec_subtract(&end, start);
+    uintmax_t ns = timespec_to_ns(&duration);
     char name[64];
     va_list ap;
     va_start(ap, fmt);
@@ -88,12 +95,11 @@ static void do_bench_find_ft(const char *expected_ft, const char *filename)
     PointerArray filetypes = PTR_ARRAY_INIT;
     StringView line = STRING_VIEW_INIT;
     if (!xstreq(find_ft(&filetypes, filename, line), expected_ft)) {
-        fail("Unexpected return value for find_ft() in %s()", __func__);
+        error_exit("Unexpected return value for find_ft() in %s()", __func__);
     }
 
     unsigned int iterations = 300000;
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         find_ft(&filetypes, filename, line);
@@ -114,8 +120,7 @@ static void do_bench_get_indent_width(const StringView *line, unsigned int tab_w
 {
     unsigned int iterations = 30000;
     unsigned int accum = 0;
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         accum += get_indent_width(line, tab_width);
@@ -130,8 +135,7 @@ static void do_bench_get_indent_info(const LocalOptions *opts, const StringView 
     unsigned int iterations = 30000;
     unsigned int accum = 0;
     IndentInfo info = {.width = 0};
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         info = get_indent_info(opts, line);
@@ -185,8 +189,7 @@ static void bench_parse_rgb(void)
     static_assert(IS_POWER_OF_2(ARRAYLEN(colors)));
     unsigned int iterations = 30000;
     unsigned int accum = 0;
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         const char *s = colors[i % ARRAYLEN(colors)];
@@ -214,8 +217,7 @@ static void bench_string_append_escaped_arg(void)
     unsigned int iterations = 30000;
     size_t accum = 0;
     String buf = STRING_INIT;
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         string_append_escaped_arg(&buf, args[i % ARRAYLEN(args)], true);
@@ -233,8 +235,7 @@ static void bench_u_set_char(void)
     unsigned int iterations = 250000;
     size_t accum = 0;
     char buf[U_SET_CHAR_MAXLEN];
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         accum |= u_set_char(buf, i & 0xFFFFF);
@@ -249,8 +250,7 @@ static void bench_u_set_char_raw(void)
     unsigned int iterations = 250000;
     size_t accum = 0;
     char buf[UTF8_MAX_SEQ_LEN];
-    struct timespec start;
-    get_time(&start);
+    struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
         accum |= u_set_char_raw(buf, i & 0xFFFFF);
@@ -264,7 +264,7 @@ int main(void)
 {
     struct timespec res;
     if (clock_getres(CLOCK_MONOTONIC, &res) != 0) {
-        fail("clock_getres: %s", strerror(errno));
+        perror_exit("clock_getres");
     }
 
     uintmax_t res_ns = timespec_to_ns(&res);
