@@ -19,7 +19,7 @@ case ${state} in
         IFS=$'\n'
         # TODO: Explicitly handle case where no tags file exists
         # TODO: Use `readtags --prefix-match`?
-        _values 'tags' $(readtags -l 2>/dev/null | cut -f1 | head -n50000)
+        _values 'tags' $(readtags -F '(list $name #t)' -l 2>/dev/null)
         unset IFS
         ;;
 

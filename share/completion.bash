@@ -22,11 +22,8 @@ _dte() {
         COMPREPLY=($(compgen -W "$($dte -B)" -- "$cur"))
         return;;
     -t)
-        COMPREPLY=($(
-            readtags -Q "(prefix? \$name \"$cur\")" -l 2>/dev/null |
-            cut -f1 |
-            head -n50000
-        ))
+        local format="(if (prefix? \$name \"$cur\") (list \$name #t) #f)"
+        COMPREPLY=($(readtags -F "$format" -l 2>/dev/null))
         return;;
     -[cBhKV])
         return;;
