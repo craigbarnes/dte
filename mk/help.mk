@@ -31,6 +31,7 @@ help:
 	$P install-bin 'Install $(dte) binary'
 	$P install-man 'Install man pages'
 	$P install-bash-completion 'Install bash auto-completion script'
+	$P install-fish-completion 'Install fish auto-completion script'
 	$P install-zsh-completion 'Install zsh auto-completion script'
 	$P install-desktop-file 'Install desktop entry file'
 	$P install-icons 'Install SVG/PNG icon files'

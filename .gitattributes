@@ -4,6 +4,7 @@
 [attr]c 4space linguist-language=C
 [attr]make text
 [attr]shell 4space
+[attr]fish 4space
 [attr]zsh 4space
 [attr]markdown 4space
 [attr]dterc 4space
@@ -32,6 +33,7 @@
 *.sed sed
 *.sh shell
 *.bash shell
+*.fish fish
 *.zsh zsh
 *.yml yaml
 *.css css

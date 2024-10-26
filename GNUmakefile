@@ -20,6 +20,7 @@ icondir ?= $(datarootdir)/icons
 hicolordir ?= $(icondir)/hicolor
 metainfodir ?= $(datarootdir)/metainfo
 bashcompletiondir ?= $(datarootdir)/bash-completion/completions
+fishcompletiondir ?= $(datarootdir)/fish/vendor_completions.d
 zshcompletiondir ?= $(datarootdir)/zsh/site-functions
 appid = dte
 
@@ -51,7 +52,7 @@ CONTRIB_SCRIPTS = \
     fzf.sh git-changes.sh help.sh lf-wrapper.sh longest-line.awk \
     open-c-header.sh ranger-wrapper.sh xtag.sh
 
-INSTALL_TARGETS_BASIC := bin man bash-completion zsh-completion
+INSTALL_TARGETS_BASIC := bin man bash-completion fish-completion zsh-completion
 INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) icons desktop-file appstream
 
 ifeq "$(KERNEL)" "Darwin"
@@ -99,6 +100,14 @@ install-bash-completion:
 
 uninstall-bash-completion:
 	$(RM) '$(DESTDIR)$(bashcompletiondir)/$(dte)'
+
+install-fish-completion:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(fishcompletiondir)'
+	$(E) INSTALL '$(DESTDIR)$(fishcompletiondir)/$(dte).fish'
+	$(Q) $(INSTALL_DATA) share/completion.fish '$(DESTDIR)$(fishcompletiondir)/$(dte).fish'
+
+uninstall-fish-completion:
+	$(RM) '$(DESTDIR)$(fishcompletiondir)/$(dte).fish'
 
 install-zsh-completion:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(zshcompletiondir)'

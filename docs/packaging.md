@@ -9,8 +9,9 @@ targets:
 
 * `install-bin`: Install `dte` binary
 * `install-man`: Install man pages
-* `install-bash-completion`: Install bash auto-completion script
-* `install-zsh-completion`: Install zsh auto-completion script
+* `install-bash-completion`: Install [bash] auto-completion script
+* `install-fish-completion`: Install [fish] auto-completion script
+* `install-zsh-completion`: Install [zsh] auto-completion script
 * `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
 * `install-icons`: Install SVG/PNG icon files (excluded on macOS)
 * `install-appstream`: Install [AppStream] metadata (excluded on macOS)
@@ -29,8 +30,9 @@ The following Make variables may be useful when packaging `dte`:
 * `prefix`: Top-level installation prefix (defaults to `/usr/local`)
 * `bindir`: Installation prefix for `dte` binary
 * `mandir`: Installation prefix for manual pages
-* `bashcompletiondir`: Installation prefix for bash auto-completion script
-* `zshcompletiondir`: Installation prefix for zsh auto-completion script
+* `bashcompletiondir`: Installation prefix for [bash] auto-completion script
+* `fishcompletiondir`: Installation prefix for [fish] auto-completion script
+* `zshcompletiondir`: Installation prefix for [zsh] auto-completion script
 * `appdir`: Installation prefix for [desktop entry] file
 * `metainfodir`: Installation prefix for [AppStream] metadata file
 * `DESTDIR`: Standard variable used for [staged installs]
@@ -93,6 +95,9 @@ page, unless you're prepared to deal with future checksum failures.
 [syntax highlighters]: ../config/syntax
 [desktop entry]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
+[bash]: https://www.gnu.org/software/bash/
+[fish]: https://fishshell.com
+[zsh]: https://www.zsh.org
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [section 7.2.5]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [GNU Coding Standards]: https://www.gnu.org/prep/standards/html_node/index.html
