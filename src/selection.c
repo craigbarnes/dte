@@ -52,10 +52,8 @@ SelectionInfo init_selection(const View *view)
     if (view->selection == SELECT_LINES) {
         info.so -= block_iter_bol(&info.si);
         info.eo += block_iter_eat_line(&ei);
-    } else {
-        if (include_cursor_char_in_selection(view)) {
-            info.eo += block_iter_next_column(&ei);
-        }
+    } else if (include_cursor_char_in_selection(view)) {
+        info.eo += block_iter_next_column(&ei);
     }
 
     return info;
@@ -66,20 +64,6 @@ size_t prepare_selection(View *view)
     SelectionInfo info = init_selection(view);
     view->cursor = info.si;
     return info.eo - info.so;
-}
-
-char *view_get_selection(View *view, size_t *size)
-{
-    if (view->selection == SELECT_NONE) {
-        *size = 0;
-        return NULL;
-    }
-
-    BlockIter save = view->cursor;
-    *size = prepare_selection(view);
-    char *buf = block_iter_get_bytes(&view->cursor, *size);
-    view->cursor = save;
-    return buf;
 }
 
 size_t get_nr_selected_lines(const SelectionInfo *info)

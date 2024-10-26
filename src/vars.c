@@ -92,19 +92,24 @@ static char *expand_msgpos(const EditorState *e)
 
 static char *expand_word(const EditorState *e)
 {
-    if (!e->view) {
+    const View *view = e->view;
+    if (unlikely(!view)) {
         return NULL;
     }
 
-    size_t size;
-    char *selection = view_get_selection(e->view, &size);
-    if (selection) {
-        selection = xrealloc(selection, size + 1);
-        selection[size] = '\0';
+    if (view->selection) {
+        SelectionInfo info = init_selection(view);
+        size_t len = info.eo - info.so;
+        if (unlikely(len == 0)) {
+            return NULL;
+        }
+        char *selection = block_iter_get_bytes(&info.si, len);
+        BUG_ON(!selection);
+        selection[len] = '\0'; // See comment in block_iter_get_bytes()
         return selection;
     }
 
-    StringView word = view_get_word_under_cursor(e->view);
+    StringView word = view_get_word_under_cursor(view);
     return word.length ? xstrcut(word.data, word.length) : NULL;
 }
 

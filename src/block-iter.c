@@ -333,7 +333,7 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
     const Block *blk = bi->blk;
     size_t offset = bi->offset;
     size_t pos = 0;
-    char *buf = xmalloc(len);
+    char *buf = xmalloc(len + 1); // +1 byte; so expand_word() can append '\0'
 
     while (pos < len) {
         const size_t avail = blk->size - offset;
