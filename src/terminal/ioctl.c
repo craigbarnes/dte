@@ -1,6 +1,7 @@
 #include "feature.h"
 #include <errno.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
 #include "ioctl.h"
 #include "util/log.h"
@@ -20,41 +21,25 @@ bool term_drop_controlling_tty(int fd)
 #endif
 }
 
-#if HAVE_TIOCGWINSZ
-
 bool term_get_size(unsigned int *w, unsigned int *h)
 {
+#if HAVE_TIOCGWINSZ || HAVE_TCGETWINSIZE
     struct winsize ws;
-    if (unlikely(ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)) {
-        LOG_ERRNO("TIOCGWINSZ ioctl");
+    #if HAVE_TIOCGWINSZ
+        int r = ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+    #else
+        int r = tcgetwinsize(STDIN_FILENO, &ws);
+    #endif
+    if (unlikely(r == -1)) {
+        LOG_ERRNO("term_get_size");
         return false;
     }
     *w = ws.ws_col;
     *h = ws.ws_row;
     return true;
-}
-
-#elif HAVE_TCGETWINSIZE
-
-#include <termios.h>
-
-bool term_get_size(unsigned int *w, unsigned int *h)
-{
-    struct winsize ws;
-    if (unlikely(tcgetwinsize(STDIN_FILENO, &ws) != 0)) {
-        LOG_ERRNO("tcgetwinsize");
-        return false;
-    }
-    *w = ws.ws_col;
-    *h = ws.ws_row;
-    return true;
-}
-
 #else
-
-bool term_get_size(unsigned int* UNUSED_ARG(w), unsigned int* UNUSED_ARG(h))
-{
+    (void)w;
+    (void)h;
     return false;
-}
-
 #endif
+}
