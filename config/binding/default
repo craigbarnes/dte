@@ -116,12 +116,21 @@ bind M-? 'search -r'
 bind M-! 'move-tab left'
 bind M-@ 'move-tab right'
 
+# Kitty Keyboard Protocol encodings:
 bind M-S-, wprev
 bind M-S-. wnext
 bind M-S-\; command
 bind M-S-/ 'search -r'
 bind M-S-1 'move-tab left'
 bind M-S-2 'move-tab right'
+
+# Xterm "modifyOtherKeys" encodings of the above (see commit 923e4e3a3540):
+bind M-S-< wprev
+bind M-S-> wnext
+bind M-S-: command
+bind M-S-? 'search -r'
+bind M-S-! 'move-tab left'
+bind M-S-@ 'move-tab right'
 
 bind F1 'run man dterc'
 bind F3 'search -n'
