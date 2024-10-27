@@ -9,6 +9,7 @@ bind pgdown pgdown
 bind delete delete
 bind backspace erase
 bind escape unselect
+bind M-escape unselect
 
 bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
@@ -172,6 +173,7 @@ bind -cs M-d delete-word
 bind -cs M-f word-fwd
 bind -cs enter accept
 bind -cs escape cancel
+bind -cs M-escape cancel
 bind -cs backspace erase
 bind -c tab complete-next
 bind -c S-tab complete-prev
