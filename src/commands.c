@@ -179,13 +179,17 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
     const char *cmd = a->args[a->nr_flag_args + 1];
     KeyCode key = parse_key_string(keystr);
     if (unlikely(key == KEY_NONE)) {
+        if (has_flag(a, 'q')) {
+            LOG_INFO("bind -q: dropped invalid key string: %s", keystr);
+            return false;
+        }
         return error_msg("invalid key string: %s", keystr);
     }
 
     ModeHandler *modes[10];
     size_t nmodes = 0;
     static_assert(ARRAYLEN(modes) <= ARRAYLEN(a->flags));
-    if (has_flag(a, 'n') || a->nr_flags == 0) {
+    if (has_flag(a, 'n')) {
         modes[nmodes++] = e->normal_mode;
     }
     if (has_flag(a, 'c')) {
@@ -212,6 +216,11 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
             return error_msg("can't bind key in unknown mode '%s'", name);
         }
         modes[nmodes++] = mode;
+    }
+
+    if (nmodes == 0) {
+        // No [-cnsT] flags used; default to normal mode
+        modes[nmodes++] = e->normal_mode;
     }
 
     if (!cmd) {
@@ -2493,7 +2502,7 @@ enum {
 
 static const Command cmds[] = {
     CMD("alias", "", RC | NFAA, 1, 2, cmd_alias),
-    CMD("bind", "cnsT=", RC | NFAA, 1, 2, cmd_bind),
+    CMD("bind", "cnqsT=", RC | NFAA, 1, 2, cmd_bind),
     CMD("blkdown", "cl", NA, 0, 0, cmd_blkdown),
     CMD("blkup", "cl", NA, 0, 0, cmd_blkup),
     CMD("bof", "cl", NA, 0, 0, cmd_bof),
