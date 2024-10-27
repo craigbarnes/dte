@@ -161,6 +161,13 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
 {
     if (u_is_ascii_upper(key)) {
         if (mods & MOD_CTRL) {
+            // This is done only for the sake of (older versions of) iTerm2
+            // See also:
+            // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_870592688
+            // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_864512674
+            // • https://gitlab.com/gnachman/iterm2/-/issues/10017
+            // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7
+            // • https://gitlab.com/gnachman/iterm2/-/issues/7440#note_129599012
             key = ascii_tolower(key);
         }
     } else if (key >= 57344 && key <= 63743) {
