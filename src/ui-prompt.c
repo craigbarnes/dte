@@ -34,6 +34,7 @@ static char get_choice(Terminal *term, const char *choices, unsigned int esc_tim
     case MOD_CTRL | 'c':
     case MOD_CTRL | 'g':
     case MOD_CTRL | '[':
+    case KEY_ESCAPE:
         return 0x18; // Cancel
     case KEY_ENTER:
         return choices[0]; // Default

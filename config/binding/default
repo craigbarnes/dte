@@ -7,6 +7,8 @@ bind end eol
 bind pgup pgup
 bind pgdown pgdown
 bind delete delete
+bind backspace erase
+bind escape unselect
 
 bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
@@ -16,6 +18,8 @@ bind M-left bol
 bind M-right eol
 bind M-up pgup
 bind M-down pgdown
+bind C-backspace 'erase-word -s'
+bind M-backspace 'erase-word -s'
 bind M-delete 'delete-word -s'
 bind M-C-delete 'delete-line'
 
@@ -50,18 +54,10 @@ bind C-M-S-pgup 'pgup -l'
 bind C-M-S-pgdown 'pgdown -l'
 bind C-M-S-delete 'delete-eol'
 
-# Either Ctrl+H or Ctrl+? may be equivalent to Backspace, depending
-# on the terminal, so they're both bound to "erase" by default for
-# portability. On some terminals one may be equivalent to Backspace
-# and the other Ctrl+Backspace.
-bind C-h erase
-bind C-? erase
-bind M-C-h 'erase-word -s'
-bind M-C-? 'erase-word -s'
-
 bind C-c 'copy -k'
 bind C-f search
 bind C-g 'search -n'
+bind C-h erase
 # C-i == Tab
 bind C-l 'command line\ '
 # C-m == Enter
@@ -77,7 +73,6 @@ bind C-x cut
 bind C-y redo
 bind C-z undo
 bind C-] tag
-bind C-[ unselect
 
 bind M-b bof
 bind M-c 'toggle -v case-sensitive-search'
@@ -157,8 +152,8 @@ bind -cs M-left bol
 bind -cs M-right eol
 bind -cs C-delete delete-word
 bind -cs M-delete delete-word
-bind -cs C-M-h erase-word
-bind -cs C-M-? erase-word
+bind -cs C-backspace erase-word
+bind -cs M-backspace erase-word
 bind -cs C-a bol
 bind -cs C-b left
 bind -cs C-c cancel
@@ -172,12 +167,12 @@ bind -cs C-n 'history-next -S'
 bind -cs C-p 'history-prev -S'
 bind -cs C-u erase-bol
 bind -cs C-w erase-word
-bind -cs C-? erase
-bind -cs C-[ cancel
 bind -cs M-b word-bwd
 bind -cs M-d delete-word
 bind -cs M-f word-fwd
 bind -cs enter accept
+bind -cs escape cancel
+bind -cs backspace erase
 bind -c tab complete-next
 bind -c S-tab complete-prev
 bind -s M-enter 'accept -e'

@@ -22,7 +22,7 @@ mode vi-normal
 # Create another fallthrough mode, with a single key binding (makes Esc
 # switch back to vi-normal mode)
 def-mode -u vi-esc
-bind -T vi-esc ^[ 'mode vi-normal'
+bind -T vi-esc escape 'mode vi-normal'
 
 # Create "vi-insert" mode, which "falls through" to dte's built-in "normal"
 # mode for unbound keys (note: the ability to remove/rename built-in modes
@@ -35,7 +35,7 @@ alias map 'bind -T vi-move'
 alias nmap 'bind -T vi-normal'
 alias xmap 'bind -T vi-visual'
 
-map ^[ 'unselect; mode vi-normal'
+map escape 'unselect; mode vi-normal'
 map left left
 map right right
 map up up
@@ -72,7 +72,7 @@ map - 'up; bol; bol -t'
 map + 'down; bol; bol -t'
 map enter 'down; bol; bol -t'
 map space right
-map C-? left
+map backspace left
 map C-d 'scroll-pgdown -h'
 map C-e scroll-down
 map C-f pgdown

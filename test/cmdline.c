@@ -555,7 +555,7 @@ static void test_complete_command_extra(TestContext *ctx)
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "show bind ");
     complete_command_next(e);
-    EXPECT_STRING_EQ(c->buf, "show bind C-?");
+    EXPECT_STRING_EQ(c->buf, "show bind C-M-S-delete");
     complete_command_prev(e);
     EXPECT_STRING_EQ(c->buf, "show bind up");
     reset_completion(c);

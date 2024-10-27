@@ -179,7 +179,7 @@ The key bindings for command mode are:
 `C-u`
 :   Delete to beginning of command line
 
-`C-w`, `M-C-?` (Alt+Backspace)
+`C-w`, `C-backspace`, `M-backspace`
 :   Erase word
 
 ## Search Mode

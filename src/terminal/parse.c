@@ -24,6 +24,7 @@ typedef enum {
     BYTE_OTHER,         // 0x80..0xFF
 } ByteType;
 
+// https://sw.kovidgoyal.net/kitty/keyboard-protocol/#legacy-functional-keys
 static KeyCode decode_key_from_final_byte(uint8_t byte)
 {
     switch (byte) {
@@ -44,6 +45,9 @@ static KeyCode decode_key_from_final_byte(uint8_t byte)
     return KEY_IGNORE;
 }
 
+// https://sw.kovidgoyal.net/kitty/keyboard-protocol/#legacy-functional-keys
+// https://gitlab.com/craigbarnes/dte/-/commit/f540904cfdbb04b4cafdff0d7b15e3fd188395d4
+// https://gitlab.com/craigbarnes/dte/-/issues/121
 static KeyCode decode_key_from_param(uint32_t param)
 {
     switch (param) {
@@ -79,6 +83,7 @@ static KeyCode decode_key_from_param(uint32_t param)
     return KEY_IGNORE;
 }
 
+// https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
 static KeyCode decode_kitty_special_key(uint32_t n)
 {
     switch (n) {
@@ -175,16 +180,35 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
         if (unlikely(key == KEY_IGNORE)) {
             return KEY_IGNORE;
         }
+    } else {
+        // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
+        switch (key) {
+        case 9: key = KEY_TAB; break;
+        case 13: key = KEY_ENTER; break;
+        case 27: key = KEY_ESCAPE; break;
+        case 127: key = KEY_BACKSPACE; break;
+        }
     }
 
-    return mods | keycode_normalize(key);
+    return mods | key;
 }
 
 // Normalize KeyCode values originating from xterm-style "modifyOtherKeys"
 // sequences (CSI 27 ; <modifiers> ; <key> ~)
 static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
 {
-    if (u_is_ascii_upper(key) && (mods & MOD_SHIFT)) {
+    if (key == '\b' || key == 127) {
+        // https://codeberg.org/dnkl/foot/pulls/791#issuecomment-279784
+        key = KEY_BACKSPACE;
+    } else if (key == '\n' || key == '\r') {
+        key = KEY_ENTER;
+    } else if (key == '\t') {
+        key = KEY_TAB;
+    } else if (key == 27) {
+        key = KEY_ESCAPE;
+    } else if (key < 32) {
+        return KEY_IGNORE;
+    } else if (u_is_ascii_upper(key) && (mods & MOD_SHIFT)) {
         if (mods == MOD_SHIFT) {
             mods = 0;
         } else if (mods & (MOD_CTRL | MOD_META)) {
@@ -192,7 +216,7 @@ static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
         }
     }
 
-    return mods | keycode_normalize(key);
+    return mods | key;
 }
 
 static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)

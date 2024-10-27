@@ -29,7 +29,9 @@ enum {
     KEY_SPECIAL_MIN = KEY_UNICODE_MAX + 1,
 
     // Note: these must be kept in sync with the array of names in key.c
-    KEY_INSERT = KEY_SPECIAL_MIN,
+    KEY_ESCAPE = KEY_SPECIAL_MIN,
+    KEY_BACKSPACE,
+    KEY_INSERT,
     KEY_DELETE,
     KEY_UP,
     KEY_DOWN,
@@ -99,19 +101,6 @@ static inline KeyCode keycode_get_key(KeyCode k)
 static inline KeyCode keycode_get_modifiers(KeyCode k)
 {
     return k & MOD_MASK;
-}
-
-static inline KeyCode keycode_normalize(KeyCode k)
-{
-    switch (k) {
-    case '\t': return KEY_TAB;
-    case '\r': return KEY_ENTER;
-    case 0x7F: return MOD_CTRL | '?';
-    }
-    if (k < 0x20) {
-        return MOD_CTRL | ascii_tolower(k | 0x40);
-    }
-    return k;
 }
 
 KeyCode parse_key_string(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;

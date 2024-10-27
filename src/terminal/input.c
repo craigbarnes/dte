@@ -137,9 +137,17 @@ static KeyCode read_simple(TermInputBuffer *input)
     // > 0 bytes in buf
     input_get_byte(input, &ch);
 
-    // Normal key
     if (ch < 0x80) {
-        return keycode_normalize(ch);
+        // TODO: Interpret \b or 0x7F as MOD_CTRL|KEY_BACKSPACE, when appropriate
+        // (e.g. based on XTGETTCAP "kbs" or DECRQM DECBKM response)
+        switch (ch) {
+        case '\b': return KEY_BACKSPACE;
+        case '\t': return KEY_TAB;
+        case '\r': return KEY_ENTER;
+        case 0x1B: return KEY_ESCAPE;
+        case 0x7F: return KEY_BACKSPACE;
+        }
+        return (ch >= 0x20) ? ch : MOD_CTRL | ascii_tolower(ch | 0x40);
     }
 
     /*

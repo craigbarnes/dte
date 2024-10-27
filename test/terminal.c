@@ -662,11 +662,17 @@ static void test_term_parse_sequence(TestContext *ctx)
 
     // xterm + `modifyOtherKeys` option
     EXPECT_PARSE_SEQ("\033[27;5;9~", 9, MOD_CTRL | KEY_TAB);
+    EXPECT_PARSE_SEQ("\033[27;5;27~", 10, MOD_CTRL | KEY_ESCAPE);
+    EXPECT_PARSE_SEQ("\033[27;8;27~", 10, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_ESCAPE);
+    EXPECT_PARSE_SEQ("\033[27;1;27~", 10, KEY_ESCAPE); // Tested in principle only; xterm never sends this
     EXPECT_PARSE_SEQ("\033[27;5;13~", 10, MOD_CTRL | KEY_ENTER);
     EXPECT_PARSE_SEQ("\033[27;6;13~", 10, MOD_CTRL | MOD_SHIFT | KEY_ENTER);
-    // EXPECT_PARSE_SEQ("\033[27;2;127~", 11, MOD_CTRL | '?');
-    // EXPECT_PARSE_SEQ("\033[27;6;127~", 11, MOD_CTRL | '?');
-    // EXPECT_PARSE_SEQ("\033[27;8;127~", 11, MOD_CTRL | MOD_META | '?');
+    EXPECT_PARSE_SEQ("\033[27;2;127~", 11, MOD_SHIFT | KEY_BACKSPACE);
+    EXPECT_PARSE_SEQ("\033[27;6;127~", 11, MOD_CTRL | MOD_SHIFT | KEY_BACKSPACE);
+    EXPECT_PARSE_SEQ("\033[27;8;127~", 11, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_BACKSPACE);
+    EXPECT_PARSE_SEQ("\033[27;2;8~", 9, MOD_SHIFT | KEY_BACKSPACE);
+    EXPECT_PARSE_SEQ("\033[27;6;8~", 9, MOD_CTRL | MOD_SHIFT | KEY_BACKSPACE);
+    EXPECT_PARSE_SEQ("\033[27;8;8~", 9, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_BACKSPACE);
     EXPECT_PARSE_SEQ("\033[27;6;82~", 10, MOD_CTRL | MOD_SHIFT | 'r');
     EXPECT_PARSE_SEQ("\033[27;5;114~", 11, MOD_CTRL | 'r');
     EXPECT_PARSE_SEQ("\033[27;3;82~", 10, MOD_META | 'R');
@@ -699,7 +705,9 @@ static void test_term_parse_sequence(TestContext *ctx)
     EXPECT_PARSE_SEQ("\033[ !//.$2;3u", 12, KEY_IGNORE);
 
     // https://sw.kovidgoyal.net/kitty/keyboard-protocol
-    EXPECT_PARSE_SEQ("\033[27u", 5, MOD_CTRL | '[');
+    EXPECT_PARSE_SEQ("\033[27u", 5, KEY_ESCAPE);
+    EXPECT_PARSE_SEQ("\033[27;5u", 7, MOD_CTRL | KEY_ESCAPE);
+    EXPECT_PARSE_SEQ("\033[27;8u", 7, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_ESCAPE);
     EXPECT_PARSE_SEQ("\033[57359u", 8, KEY_SCROLL_LOCK);
     EXPECT_PARSE_SEQ("\033[57360u", 8, KEY_IGNORE);
     EXPECT_PARSE_SEQ("\033[57361u", 8, KEY_PRINT_SCREEN);
@@ -1092,6 +1100,8 @@ static void test_keycode_to_string(TestContext *ctx)
         {"space", KEY_SPACE},
         {"enter", KEY_ENTER},
         {"tab", KEY_TAB},
+        {"escape", KEY_ESCAPE},
+        {"backspace", KEY_BACKSPACE},
         {"insert", KEY_INSERT},
         {"delete", KEY_DELETE},
         {"home", KEY_HOME},
@@ -1151,11 +1161,11 @@ static void test_keycode_to_string(TestContext *ctx)
     }
 
     EXPECT_EQ(keycode_to_string(KEYCODE_DETECTED_PASTE, buf), 19);
-    EXPECT_STREQ(buf, "INVALID; 0x00110023");
-    EXPECT_EQ(keycode_to_string(KEYCODE_BRACKETED_PASTE, buf), 19);
-    EXPECT_STREQ(buf, "INVALID; 0x00110024");
-    EXPECT_EQ(keycode_to_string(KEY_IGNORE, buf), 19);
     EXPECT_STREQ(buf, "INVALID; 0x00110025");
+    EXPECT_EQ(keycode_to_string(KEYCODE_BRACKETED_PASTE, buf), 19);
+    EXPECT_STREQ(buf, "INVALID; 0x00110026");
+    EXPECT_EQ(keycode_to_string(KEY_IGNORE, buf), 19);
+    EXPECT_STREQ(buf, "INVALID; 0x00110027");
     EXPECT_EQ(keycode_to_string(UINT32_MAX, buf), 23);
     EXPECT_STREQ(buf, "QUERY REPLY; 0xFFFFFFFF");
 
@@ -1189,6 +1199,8 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(parse_key_string("tab"), KEY_TAB);
     EXPECT_EQ(parse_key_string("enter"), KEY_ENTER);
     EXPECT_EQ(parse_key_string("space"), KEY_SPACE);
+    EXPECT_EQ(parse_key_string("escape"), KEY_ESCAPE);
+    EXPECT_EQ(parse_key_string("backspace"), KEY_BACKSPACE);
     EXPECT_EQ(parse_key_string("insert"), KEY_INSERT);
     EXPECT_EQ(parse_key_string("delete"), KEY_DELETE);
     EXPECT_EQ(parse_key_string("up"), KEY_UP);
