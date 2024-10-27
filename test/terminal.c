@@ -1138,6 +1138,8 @@ static void test_keycode_to_string(TestContext *ctx)
     };
 
     char buf[KEYCODE_STR_MAX];
+    ASSERT_TRUE(sizeof(buf) >= sizeof("QUERY REPLY; 0xFFFFFFFF"));
+
     FOR_EACH_I(i, tests) {
         const char *str = tests[i].str;
         size_t len = strlen(str);
@@ -1148,31 +1150,25 @@ static void test_keycode_to_string(TestContext *ctx)
         IEXPECT_EQ(parse_key_string(str), tests[i].key);
     }
 
+    EXPECT_EQ(keycode_to_string(KEYCODE_DETECTED_PASTE, buf), 19);
+    EXPECT_STREQ(buf, "INVALID; 0x00110023");
+    EXPECT_EQ(keycode_to_string(KEYCODE_BRACKETED_PASTE, buf), 19);
+    EXPECT_STREQ(buf, "INVALID; 0x00110024");
+    EXPECT_EQ(keycode_to_string(KEY_IGNORE, buf), 19);
+    EXPECT_STREQ(buf, "INVALID; 0x00110025");
+    EXPECT_EQ(keycode_to_string(UINT32_MAX, buf), 23);
+    EXPECT_STREQ(buf, "QUERY REPLY; 0xFFFFFFFF");
+
     // These combos aren't round-trippable by the code above and can't end
     // up in real bindings, since the letters are normalized to lower case
     // by parse_key_string(). We still test them nevertheless; for the sake
     // of completeness and catching unexpected changes.
-    static const struct {
-        const char *str;
-        KeyCode key;
-    } xtests[] = {
-        {"C-A", MOD_CTRL | 'A'},
-        {"C-S-A", MOD_CTRL | MOD_SHIFT | 'A'},
-        {"M-S-A", MOD_META | MOD_SHIFT | 'A'},
-        {"INVALID; 0x00110023", KEYCODE_DETECTED_PASTE},
-        {"INVALID; 0x00110024", KEYCODE_BRACKETED_PASTE},
-        {"INVALID; 0x00110025", KEY_IGNORE},
-        {"QUERY REPLY; 0xFFFFFFFF", UINT32_MAX},
-    };
-
-    FOR_EACH_I(i, xtests) {
-        const char *str = xtests[i].str;
-        size_t len = strlen(str);
-        ASSERT_TRUE(len < sizeof(buf));
-        size_t buflen = keycode_to_string(xtests[i].key, buf);
-        IEXPECT_STREQ(buf, str);
-        IEXPECT_EQ(buflen, len);
-    }
+    EXPECT_EQ(keycode_to_string(MOD_CTRL | 'A', buf), 3);
+    EXPECT_STREQ(buf, "C-A");
+    EXPECT_EQ(keycode_to_string(MOD_CTRL | MOD_SHIFT | 'A', buf), 5);
+    EXPECT_STREQ(buf, "C-S-A");
+    EXPECT_EQ(keycode_to_string(MOD_META | MOD_SHIFT | 'A', buf), 5);
+    EXPECT_STREQ(buf, "M-S-A");
 }
 
 static void test_parse_key_string(TestContext *ctx)
