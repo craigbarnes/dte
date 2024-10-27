@@ -183,10 +183,18 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
     } else {
         // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
         switch (key) {
-        case 9: key = KEY_TAB; break;
-        case 13: key = KEY_ENTER; break;
-        case 27: key = KEY_ESCAPE; break;
-        case 127: key = KEY_BACKSPACE; break;
+        case '\b': key = KEY_BACKSPACE; break; // BS; Kitty never emits this, but (buggy) WezTerm does
+        case '\t': key = KEY_TAB; break; // HT
+        case '\n': key = KEY_ENTER; break; // LF; Kitty never emits this
+        case '\r': key = KEY_ENTER; break; // CR
+        case 27: key = KEY_ESCAPE; break; // ESC
+        case 127: key = KEY_BACKSPACE; break; // DEL
+        default:
+            if (unlikely(key < 32)) {
+                // All other values corresponding to C0 controls are ignored
+                return KEY_IGNORE;
+            }
+            break;
         }
     }
 
