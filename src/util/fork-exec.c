@@ -37,8 +37,13 @@ static bool reset_ignored_signals(void)
     return true;
 }
 
-static noreturn void handle_child(const char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
-{
+static noreturn void child_process_exec (
+    const char **argv,
+    const char **env,
+    int fd[3],
+    int error_fd,
+    bool drop_ctty
+) {
     int error;
     int nr_fds = 3;
     bool move = error_fd < nr_fds;
@@ -140,8 +145,8 @@ pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
 
     if (pid == 0) {
         // Child
-        handle_child(argv, env, fd, ep[1], drop_ctty);
-        BUG("handle_child() should never return");
+        child_process_exec(argv, env, fd, ep[1], drop_ctty);
+        BUG("child_process_exec() should never return");
         return -1;
     }
 
