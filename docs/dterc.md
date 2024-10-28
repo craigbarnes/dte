@@ -450,7 +450,7 @@ For a basic example of usage, see the output of `dte -b compiler/go`.
 
 ## Editor Commands
 
-### **quit** [**-f**|**-p**] [_exitcode_]
+### **quit** [**-f**|**-p**] [**-CSFH**] [_exitcode_]
 
 Quit the editor.
 
@@ -462,6 +462,23 @@ in the range `0`..`125`, or defaults to `0` if unspecified.
 
 `-p`
 :   Prompt for confirmation if there are unsaved files
+
+`-C`
+:   Don't write [`command`][] [history file]
+
+`-S`
+:   Don't write [`search`][] [history file]
+
+`-F`
+:   Don't write file [history file]
+
+`-H`
+:   Don't write any history files (equivalent to `-CSF`)
+
+See also:
+
+* The `dte` [`-H`][`dte -H`] flag
+* The [`file-history`] option
 
 ### **suspend**
 
@@ -1576,10 +1593,12 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
+[`dte -H`]: dte.html#options
 [`dte -K`]: dte.html#options
 [normal mode]: dte.html#normal-mode
 [command mode]: dte.html#command-mode
 [search mode]: dte.html#search-mode
+[history file]: dte.html#files
 [configuration files]: dte.html#files:~:text=%24DTE_HOME/rc
 [key bindings]: dte.html#key-bindings
 [options]: #options
@@ -1640,6 +1659,7 @@ errors should be highlighted. Set to `""` to disable.
 [`auto-indent`]: #auto-indent
 [`emulate-tab`]: #emulate-tab
 [`expand-tab`]: #expand-tab
+[`file-history`]: #file-history
 [`indent-regex`]: #indent-regex
 [`indent-width`]: #indent-width
 [`newline`]: #newline

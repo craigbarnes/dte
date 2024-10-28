@@ -32,7 +32,7 @@ Configuration Commands:
 .P
 Editor Commands:
 .br
-   \fBquit\fR [\fB\-f\fR|\fB\-p\fR] [\fIexitcode\fR]
+   \fBquit\fR [\fB\-f\fR|\fB\-p\fR] [\fB\-CSFH\fR] [\fIexitcode\fR]
 .br
    \fBsuspend\fR
 .br
@@ -860,7 +860,7 @@ Ignore this error
 .PP
 .RE
 .SS Editor Commands
-\fBquit\fR [\fB\-f\fR|\fB\-p\fR] [\fIexitcode\fR]
+\fBquit\fR [\fB\-f\fR|\fB\-p\fR] [\fB\-CSFH\fR] [\fIexitcode\fR]
 .RS
 Quit the editor.
 .P
@@ -875,6 +875,29 @@ Force quit, even if there are unsaved files
 \fB\-p\fR
 Prompt for confirmation if there are unsaved files
 .PP
+.TP
+\fB\-C\fR
+Don't write \fBcommand\fR history file
+.PP
+.TP
+\fB\-S\fR
+Don't write \fBsearch\fR history file
+.PP
+.TP
+\fB\-F\fR
+Don't write file history file
+.PP
+.TP
+\fB\-H\fR
+Don't write any history files (equivalent to \fB\-CSF\fR)
+.PP
+See also:
+.P
+\(bu The \fBdte\fR(1) \fB\-H\fR flag
+.br
+\(bu The \fBfile\-history\fR option
+.br
+.P
 .RE
 \fBsuspend\fR
 .RS
