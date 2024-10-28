@@ -530,9 +530,9 @@ The commands available in command/search mode are as follows:
 .br
 \(bu \fBcancel\fR \- Return to normal mode
 .br
-\(bu \fBhistory\-next\fR \- Find next history item matching current prefix
+\(bu \fBhistory\-next\fR [\fB\-S\fR] \- Find next history item matching current prefix
 .br
-\(bu \fBhistory\-prev\fR \- Find previous history item matching current prefix
+\(bu \fBhistory\-prev\fR [\fB\-S\fR] \- Find previous history item matching current prefix
 .br
 \(bu \fBcomplete\-next\fR \- Select next auto\-completion in command mode
 .br
@@ -543,13 +543,18 @@ The commands available in command/search mode are as follows:
 .P
 Most of these commands behave in a similar fashion to the normal mode
 commands of the same name. The exceptions to this have been given a
-short description above.
+short description above. Most of the command flags also behave similarly
+to the normal mode equivalents, except for the following:
 .P
-Most of the command flags also behave similarly to the normal mode
-equivalents, except for \fBaccept \-H\fR, which accepts the current text
-without adding a history entry and \fBaccept \-e\fR (search mode only)
-which escapes all \fBregex\fR(7) special characters before performing a
-(plain\-text) search.
+\(bu \fBaccept \-H\fR \- Accept the current text without adding a history entry
+.br
+\(bu \fBaccept \-e\fR (search mode only) \- Escape all \fBregex\fR(7) special
+characters, before performing a (plain\-text) search
+.br
+\(bu \fBhistory\-next \-S\fR \- Get next history item (without prefix matching)
+.br
+\(bu \fBhistory\-prev \-S\fR \- Get previous history item (without prefix matching)
+.br
 .P
 Note that, due to the use of several input protocols, some key
 combinations may correspond to slightly different \fIkey\fR strings,
