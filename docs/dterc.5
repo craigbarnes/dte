@@ -123,7 +123,7 @@ Movement Commands:
 .br
    \fBmatch\-bracket\fR
 .br
-   \fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
+   \fBsearch\fR [\fB\-Her\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .br
    \fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .br
@@ -170,7 +170,7 @@ Editing Commands:
 .br
    \fBinsert\fR [\fB\-k\fR|\fB\-m\fR] \fItext\fR
 .br
-   \fBreplace\fR [\fB\-bcgi\fR] \fIpattern\fR \fIreplacement\fR
+   \fBreplace\fR [\fB\-bcegi\fR] \fIpattern\fR \fIreplacement\fR
 .br
    \fBshift\fR \fIcount\fR
 .br
@@ -1261,7 +1261,7 @@ Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of \fB{}[]()<>\fR.
 .P
 .RE
-\fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
+\fBsearch\fR [\fB\-Her\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .RS
 If no flags (or just \fB\-r\fR and no \fIpattern\fR) are given then dte changes to
 search mode, where you can type a regular expression to search.
@@ -1271,16 +1271,21 @@ search mode, where you can type a regular expression to search.
 Don't add \fIpattern\fR to search history
 .PP
 .TP
+\fB\-e\fR
+Escape \fBregex\fR(7) special characters in \fIpattern\fR, so that the search
+becomes effectively "plain text"
+.PP
+.TP
+\fB\-r\fR
+Start searching backwards
+.PP
+.TP
 \fB\-n\fR
 Search next
 .PP
 .TP
 \fB\-p\fR
 Search previous
-.PP
-.TP
-\fB\-r\fR
-Start searching backwards
 .PP
 .TP
 \fB\-w\fR
@@ -1546,7 +1551,7 @@ whitespace trimming, line\-by\-line undo, etc.)
 Move after inserted text
 .PP
 .RE
-\fBreplace\fR [\fB\-bcgi\fR] \fIpattern\fR \fIreplacement\fR
+\fBreplace\fR [\fB\-bcegi\fR] \fIpattern\fR \fIreplacement\fR
 .RS
 Replace all instances of text matching \fIpattern\fR with the \fIreplacement\fR
 text. Matching is confined to the current selection, if there is one.
@@ -1579,6 +1584,11 @@ Use basic (instead of extended) regex syntax
 .TP
 \fB\-c\fR
 Ask for confirmation before each replacement
+.PP
+.TP
+\fB\-e\fR
+Escape \fBregex\fR(7) special characters in \fIpattern\fR, so that it's
+matched literally (i.e. as "plain text")
 .PP
 .TP
 \fB\-g\fR

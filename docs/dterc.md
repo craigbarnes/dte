@@ -772,22 +772,26 @@ Center view to cursor.
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of `{}[]()<>`.
 
-### **search** [**-Hr**] [**-n**|**-p**|**-w**|_pattern_]
+### **search** [**-Her**] [**-n**|**-p**|**-w**|_pattern_]
 
 If no flags (or just `-r` and no _pattern_) are given then dte changes to
-[search mode], where you can type a regular expression to search.
+[search mode], where you can type a [regular expression][`regex`] to search.
 
 `-H`
 :   Don't add _pattern_ to search history
+
+`-e`
+:   Escape [`regex`] special characters in _pattern_, so that the search
+    becomes effectively "plain text"
+
+`-r`
+:   Start searching backwards
 
 `-n`
 :   Search next
 
 `-p`
 :   Search previous
-
-`-r`
-:   Start searching backwards
 
 `-w`
 :   Search word under cursor
@@ -995,7 +999,7 @@ Insert _text_ into the buffer.
 `-m`
 :   Move after inserted text
 
-### **replace** [**-bcgi**] _pattern_ _replacement_
+### **replace** [**-bcegi**] _pattern_ _replacement_
 
 Replace all instances of text matching _pattern_ with the _replacement_
 text. Matching is confined to the current selection, if there is one.
@@ -1022,6 +1026,10 @@ _pattern_ argument, since double quoted arguments have their own
 
 `-c`
 :   Ask for confirmation before each replacement
+
+`-e`
+:   Escape [`regex`] special characters in _pattern_, so that it's
+    matched literally (i.e. as "plain text")
 
 `-g`
 :   Replace all matches for each line (instead of just the first)
