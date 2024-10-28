@@ -52,6 +52,10 @@ The relative filename of the current buffer (or an empty string if unsaved).
 
 The directory part of `$FILE`.
 
+### **$RFILEDIR**
+
+The directory part of `$RFILE`, or `.`.
+
 ### **$FILETYPE**
 
 The value of the [`filetype`] option for the current buffer.
