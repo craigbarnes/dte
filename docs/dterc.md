@@ -999,7 +999,7 @@ Insert _text_ into the buffer.
 `-m`
 :   Move after inserted text
 
-### **replace** [**-bcegi**] _pattern_ _replacement_
+### **replace** [**-bcegi**] _pattern_ [_replacement_]
 
 Replace all instances of text matching _pattern_ with the _replacement_
 text. Matching is confined to the current selection, if there is one.
