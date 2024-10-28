@@ -626,10 +626,12 @@ static bool cmd_delete_line(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     View *view = e->view;
     long x = view_get_preferred_x(view);
+    bool whole_lines = true;
     size_t del_count;
 
     if (view->selection) {
-        view->selection = has_flag(a, 'S') ? view->selection : SELECT_LINES;
+        whole_lines = !has_flag(a, 'S');
+        view->selection = whole_lines ? SELECT_LINES : view->selection;
         del_count = prepare_selection(view);
         unselect(view);
     } else {
@@ -639,7 +641,10 @@ static bool cmd_delete_line(EditorState *e, const CommandArgs *a)
     }
 
     buffer_delete_bytes(view, del_count);
-    move_to_preferred_x(view, x);
+    if (whole_lines) {
+        move_to_preferred_x(view, x);
+    }
+
     return true;
 }
 
