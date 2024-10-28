@@ -38,7 +38,9 @@ static bool path_component(const char *path, size_t pos)
 }
 
 // Like path_relative(), but always returning either a "borrowed" pointer
-// into `abs` or the static string ".", thus avoiding the need to allocate
+// into `abs` or the static string ".", thus avoiding the need to allocate.
+// This most notably means that "../" path components are never used, even
+// if doing so would produce a path shorter than `abs`.
 const char *path_slice_relative(const char *abs, const char *cwd)
 {
     BUG_ON(!path_is_absolute(cwd));
