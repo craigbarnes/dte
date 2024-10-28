@@ -79,9 +79,9 @@ Window Management Commands:
 .P
 Movement Commands:
 .br
-   \fBleft\fR [\fB\-c\fR]
+   \fBleft\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBright\fR [\fB\-c\fR]
+   \fBright\fR [\fB\-c\fR|\fB\-l\fR]
 .br
    \fBup\fR [\fB\-c\fR|\fB\-l\fR]
 .br
@@ -95,13 +95,13 @@ Movement Commands:
 .br
    \fBblkdown\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBword\-fwd\fR [\fB\-cs\fR]
+   \fBword\-fwd\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR]
 .br
-   \fBword\-bwd\fR [\fB\-cs\fR]
+   \fBword\-bwd\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR]
 .br
-   \fBbol\fR [\fB\-c\fR] [\fB\-s\fR|\fB\-t\fR]
+   \fBbol\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR|\fB\-t\fR]
 .br
-   \fBeol\fR [\fB\-c\fR]
+   \fBeol\fR [\fB\-c\fR|\fB\-l\fR]
 .br
    \fBbof\fR [\fB\-c\fR|\fB\-l\fR]
 .br
@@ -1103,12 +1103,12 @@ Select characters
 \fB\-l\fR
 Select whole lines
 .PP
-\fBleft\fR [\fB\-c\fR]
+\fBleft\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move one column left.
 .P
 .RE
-\fBright\fR [\fB\-c\fR]
+\fBright\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move one column right.
 .P
@@ -1146,7 +1146,7 @@ Blocks are delimited by one or more blank lines
 Move one block down.
 .P
 .RE
-\fBword\-fwd\fR [\fB\-cs\fR]
+\fBword\-fwd\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR]
 .RS
 Move forward one word.
 .P
@@ -1155,7 +1155,7 @@ Move forward one word.
 Skip special characters
 .PP
 .RE
-\fBword\-bwd\fR [\fB\-cs\fR]
+\fBword\-bwd\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR]
 .RS
 Move backward one word.
 .P
@@ -1164,7 +1164,7 @@ Move backward one word.
 Skip special characters
 .PP
 .RE
-\fBbol\fR [\fB\-c\fR] [\fB\-s\fR|\fB\-t\fR]
+\fBbol\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR|\fB\-t\fR]
 .RS
 Move to beginning of current line.
 .P
@@ -1179,7 +1179,7 @@ Like \fB\-s\fR, but with the additional behavior of moving back and forth
 between the two positions
 .PP
 .RE
-\fBeol\fR [\fB\-c\fR]
+\fBeol\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move to end of current line.
 .P

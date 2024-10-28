@@ -646,11 +646,11 @@ command summaries below, but are only described once, as follows:
 `-l`
 :   Select whole lines
 
-### **left** [**-c**]
+### **left** [**-c**|**-l**]
 
 Move one column left.
 
-### **right** [**-c**]
+### **right** [**-c**|**-l**]
 
 Move one column right.
 
@@ -681,21 +681,21 @@ Blocks are delimited by one or more blank lines
 
 Move one block down.
 
-### **word-fwd** [**-cs**]
+### **word-fwd** [**-c**|**-l**] [**-s**]
 
 Move forward one word.
 
 `-s`
 :   Skip special characters
 
-### **word-bwd** [**-cs**]
+### **word-bwd** [**-c**|**-l**] [**-s**]
 
 Move backward one word.
 
 `-s`
 :   Skip special characters
 
-### **bol** [**-c**] [**-s**|**-t**]
+### **bol** [**-c**|**-l**] [**-s**|**-t**]
 
 Move to beginning of current line.
 
@@ -707,7 +707,7 @@ Move to beginning of current line.
 :   Like `-s`, but with the additional behavior of moving back and forth
     between the two positions
 
-### **eol** [**-c**]
+### **eol** [**-c**|**-l**]
 
 Move to end of current line.
 
