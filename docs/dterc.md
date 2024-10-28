@@ -975,9 +975,13 @@ Erase word before cursor.
 `-s`
 :   Be more "aggressive"
 
-### **delete-line**
+### **delete-line** [**-S**]
 
-Delete current line.
+Delete whole lines touched by the selection, or the current line.
+
+`-S`
+:   If there's a character-wise selection, only delete the selected
+    characters (instead of treating it like a line selection)
 
 ### **case** [**-l**|**-u**]
 

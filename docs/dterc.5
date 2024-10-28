@@ -164,7 +164,7 @@ Editing Commands:
 .br
    \fBerase\-word\fR [\fB\-s\fR]
 .br
-   \fBdelete\-line\fR
+   \fBdelete\-line\fR [\fB\-S\fR]
 .br
    \fBcase\fR [\fB\-l\fR|\fB\-u\fR]
 .br
@@ -1521,10 +1521,15 @@ Erase word before cursor.
 Be more "aggressive"
 .PP
 .RE
-\fBdelete\-line\fR
+\fBdelete\-line\fR [\fB\-S\fR]
 .RS
-Delete current line.
+Delete whole lines touched by the selection, or the current line.
 .P
+.TP
+\fB\-S\fR
+If there's a character\-wise selection, only delete the selected
+characters (instead of treating it like a line selection)
+.PP
 .RE
 \fBcase\fR [\fB\-l\fR|\fB\-u\fR]
 .RS
