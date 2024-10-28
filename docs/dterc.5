@@ -121,11 +121,11 @@ Movement Commands:
 .br
    \fBcenter\-view\fR
 .br
-   \fBmatch\-bracket\fR
+   \fBmatch\-bracket\fR [\fB\-c\fR|\fB\-l\fR]
 .br
    \fBsearch\fR [\fB\-Her\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .br
-   \fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
+   \fBline\fR [\fB\-c\fR|\fB\-l\fR] \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .br
    \fBbookmark\fR [\fB\-r\fR]
 .br
@@ -1260,7 +1260,7 @@ maintained. See also \fBpgdown\fR.
 Center view to cursor.
 .P
 .RE
-\fBmatch\-bracket\fR
+\fBmatch\-bracket\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of \fB{}[]()<>\fR.
@@ -1297,7 +1297,7 @@ Search previous
 Search word under cursor
 .PP
 .RE
-\fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
+\fBline\fR [\fB\-c\fR|\fB\-l\fR] \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .RS
 Move the cursor to the line number specified by \fIlineno\fR and
 (optionally) the column number specified by \fIcolno\fR. The delimiter

@@ -900,7 +900,7 @@ static bool cmd_line(EditorState *e, const CommandArgs *a)
 
     View *view = e->view;
     long x = view_get_preferred_x(view);
-    unselect(view);
+    handle_selection_flags(view, a);
 
     if (column >= 1) {
         // Column was specified; move to exact position
@@ -1010,8 +1010,7 @@ search_fwd:
         if (u == target) {
             if (level == 0) {
                 block_iter_prev_char(&bi, &u);
-                view->cursor = bi;
-                return true; // Found
+                goto found;
             }
             level--;
         } else if (u == cursor_char) {
@@ -1024,8 +1023,7 @@ search_bwd:
     while (block_iter_prev_char(&bi, &u)) {
         if (u == target) {
             if (level == 0) {
-                view->cursor = bi;
-                return true; // Found
+                goto found;
             }
             level--;
         } else if (u == cursor_char) {
@@ -1035,6 +1033,11 @@ search_bwd:
 
 not_found:
     return error_msg("No matching bracket found");
+
+found:
+    handle_selection_flags(view, a);
+    view->cursor = bi;
+    return true;
 }
 
 static bool cmd_mode(EditorState *e, const CommandArgs *a)
@@ -2539,9 +2542,9 @@ static const Command cmds[] = {
     CMD("insert", "km", NA, 1, 1, cmd_insert),
     CMD("join", "", NA, 0, 1, cmd_join),
     CMD("left", "cl", NA, 0, 0, cmd_left),
-    CMD("line", "", NA, 1, 1, cmd_line),
+    CMD("line", "cl", NA, 1, 1, cmd_line),
     CMD("macro", "", NA, 1, 1, cmd_macro),
-    CMD("match-bracket", "", NA, 0, 0, cmd_match_bracket),
+    CMD("match-bracket", "cl", NA, 0, 0, cmd_match_bracket),
     CMD("mode", "", RC, 1, 1, cmd_mode),
     CMD("move-tab", "", NA, 1, 1, cmd_move_tab),
     CMD("msg", "np", NA, 0, 1, cmd_msg),

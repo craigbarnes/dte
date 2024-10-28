@@ -771,7 +771,7 @@ maintained. See also [`pgdown`].
 
 Center view to cursor.
 
-### **match-bracket**
+### **match-bracket** [**-c**|**-l**]
 
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of `{}[]()<>`.
@@ -800,7 +800,7 @@ If no flags (or just `-r` and no _pattern_) are given then dte changes to
 `-w`
 :   Search word under cursor
 
-### **line** _lineno_[`,`_colno_]
+### **line** [**-c**|**-l**] _lineno_[`,`_colno_]
 
 Move the cursor to the line number specified by _lineno_ and
 (optionally) the column number specified by _colno_. The delimiter
