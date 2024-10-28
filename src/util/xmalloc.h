@@ -61,7 +61,7 @@ static inline char *xstrslice(const char *str, size_t pos, size_t end)
     return xstrcut(str + pos, end - pos);
 }
 
-XSTRDUP
+NONNULL_ARGS_AND_RETURN
 static inline void *xmemjoin(const void *p1, size_t n1, const void *p2, size_t n2)
 {
     char *joined = xmalloc(xadd(n1, n2));
