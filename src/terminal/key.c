@@ -7,45 +7,46 @@
 #include "util/str-util.h"
 #include "util/utf8.h"
 
-// Note: these strings must be kept in sync with the enum in key.h
+#define KEY(keyname) [KEY_ ## keyname - KEY_SPECIAL_MIN]
+
 static const char special_names[][10] = {
-    "escape",
-    "backspace",
-    "insert",
-    "delete",
-    "up",
-    "down",
-    "right",
-    "left",
-    "begin",
-    "end",
-    "pgdown",
-    "home",
-    "pgup",
-    "scrlock",
-    "print",
-    "pause",
-    "menu",
-    "F1",
-    "F2",
-    "F3",
-    "F4",
-    "F5",
-    "F6",
-    "F7",
-    "F8",
-    "F9",
-    "F10",
-    "F11",
-    "F12",
-    "F13",
-    "F14",
-    "F15",
-    "F16",
-    "F17",
-    "F18",
-    "F19",
-    "F20",
+    KEY(ESCAPE) = "escape",
+    KEY(BACKSPACE) = "backspace",
+    KEY(INSERT) = "insert",
+    KEY(DELETE) = "delete",
+    KEY(HOME) = "home",
+    KEY(END) = "end",
+    KEY(PAGE_UP) = "pgup",
+    KEY(PAGE_DOWN) = "pgdown",
+    KEY(UP) = "up",
+    KEY(DOWN) = "down",
+    KEY(RIGHT) = "right",
+    KEY(LEFT) = "left",
+    KEY(BEGIN) = "begin",
+    KEY(SCROLL_LOCK) = "scrlock",
+    KEY(PRINT_SCREEN) = "print",
+    KEY(PAUSE) = "pause",
+    KEY(MENU) = "menu",
+    KEY(F1) = "F1",
+    KEY(F2) = "F2",
+    KEY(F3) = "F3",
+    KEY(F4) = "F4",
+    KEY(F5) = "F5",
+    KEY(F6) = "F6",
+    KEY(F7) = "F7",
+    KEY(F8) = "F8",
+    KEY(F9) = "F9",
+    KEY(F10) = "F10",
+    KEY(F11) = "F11",
+    KEY(F12) = "F12",
+    KEY(F13) = "F13",
+    KEY(F14) = "F14",
+    KEY(F15) = "F15",
+    KEY(F16) = "F16",
+    KEY(F17) = "F17",
+    KEY(F18) = "F18",
+    KEY(F19) = "F19",
+    KEY(F20) = "F20",
 };
 
 static const struct {
@@ -58,6 +59,7 @@ static const struct {
 };
 
 UNITTEST {
+    static_assert(ARRAYLEN(special_names) == NR_SPECIAL_KEYS);
     CHECK_STRING_ARRAY(special_names);
     CHECK_STRUCT_ARRAY(other_keys, name);
 }
@@ -137,8 +139,7 @@ KeyCode parse_key_string(const char *str)
         }
     }
 
-    static_assert(ARRAYLEN(special_names) == NR_SPECIAL_KEYS);
-    for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
+    for (size_t i = 0; i < ARRAYLEN(special_names); i++) {
         if (ascii_streq_icase(str, special_names[i])) {
             return modifiers | (KEY_SPECIAL_MIN + i);
         }

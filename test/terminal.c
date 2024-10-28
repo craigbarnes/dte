@@ -737,7 +737,7 @@ static void test_term_parse_sequence(TestContext *ctx)
     EXPECT_PARSE_SEQ("\033[57411u", '*');
     EXPECT_PARSE_SEQ("\033[57412u", '-');
     EXPECT_PARSE_SEQ("\033[57413u", '+');
-    // TODO: EXPECT_PARSE_SEQ("\033[57414u", KEY_ENTER);
+    EXPECT_PARSE_SEQ("\033[57414u", KEY_ENTER);
     EXPECT_PARSE_SEQ("\033[57415u", '=');
     EXPECT_PARSE_SEQ("\033[57417u", KEY_LEFT);
     EXPECT_PARSE_SEQ("\033[57418u", KEY_RIGHT);
