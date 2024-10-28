@@ -216,10 +216,19 @@ static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
         key = KEY_ESCAPE;
     } else if (key < 32) {
         return KEY_IGNORE;
-    } else if (u_is_ascii_upper(key) && (mods & MOD_SHIFT)) {
-        if (mods == MOD_SHIFT) {
+    } else if (u_is_ascii_upper(key)) {
+        if ((mods & ~MOD_SHIFT) == 0) {
+            // [A-Z] and Shift+[A-Z] should be encoded as just [A-Z].
+            // The former is handled here just to exclude it from the
+            // "else" clause below.
             mods = 0;
-        } else if (mods & (MOD_CTRL | MOD_META)) {
+        } else {
+            // [A-Z] with any other combination of modifiers should be
+            // converted to `mods | MOD_SHIFT | key | 0x20`. This is
+            // done in a "blanket" fashion and covers sequences that
+            // xterm never emits, because some terminals (e.g. tmux)
+            // emulate the protocol imperfectly.
+            mods |= MOD_SHIFT;
             key = ascii_tolower(key);
         }
     }

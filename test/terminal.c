@@ -676,7 +676,7 @@ static void test_term_parse_sequence(TestContext *ctx)
     EXPECT_PARSE_SEQ("\033[27;8;8~", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_BACKSPACE);
     EXPECT_PARSE_SEQ("\033[27;6;82~", MOD_CTRL | MOD_SHIFT | 'r');
     EXPECT_PARSE_SEQ("\033[27;5;114~", MOD_CTRL | 'r');
-    EXPECT_PARSE_SEQ("\033[27;3;82~", MOD_META | 'R');
+    EXPECT_PARSE_SEQ("\033[27;3;82~", MOD_META | MOD_SHIFT | 'r'); // Sent by tmux 3.5-76-gbbc3cc55 (xterm sends "\033[27;4;82~")
     EXPECT_PARSE_SEQ("\033[27;3;114~", MOD_META | 'r');
     // EXPECT_PARSE_SEQ("\033[27;4;62~", MOD_META | '>');
     EXPECT_PARSE_SEQ("\033[27;5;46~", MOD_CTRL | '.');
