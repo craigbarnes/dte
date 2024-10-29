@@ -845,8 +845,15 @@ and [`tag`] commands. If the activated message has an associated
 file location, the file will be opened and the cursor moved to
 the appropriate position.
 
-If no `-n` or `-p` flag or _number_ argument is given, the current
-message will be displayed.
+Messages are displayed in the bottom row of the screen (i.e. the
+[`command`] line) and thus truncated to the width of the terminal.
+The [`show msg`] command can be used to display a numbered list of
+messages, without any truncation and with the cursor placed on the
+current message.
+
+If this command is used without flags or arguments (e.g. as `msg`)
+the current message will be re-displayed, which can be useful after
+other input clears the message line.
 
 `-n`
 :   Next message
@@ -1666,6 +1673,7 @@ errors should be highlighted. Set to `""` to disable.
 [`show bind`]: #show
 [`show include`]: #show
 [`show macro`]: #show
+[`show msg`]: #show
 [`tag`]: #tag
 [`toggle`]: #toggle
 [`undo`]: #undo
