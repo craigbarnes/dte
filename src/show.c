@@ -71,20 +71,17 @@ static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag
     const char *cmd_str = find_alias(&e->aliases, alias_name);
     if (!cmd_str) {
         if (find_normal_command(alias_name)) {
-            info_msg("%s is a built-in command, not an alias", alias_name);
-        } else {
-            info_msg("%s is not a known alias", alias_name);
+            return info_msg("%s is a built-in command, not an alias", alias_name);
         }
-        return true;
+        return info_msg("%s is not a known alias", alias_name);
     }
 
-    if (cflag) {
-        push_input_mode(e, e->command_mode);
-        cmdline_set_text(&e->cmdline, cmd_str);
-    } else {
-        info_msg("%s is aliased to: %s", alias_name, cmd_str);
+    if (!cflag) {
+        return info_msg("%s is aliased to: %s", alias_name, cmd_str);
     }
 
+    push_input_mode(e, e->command_mode);
+    cmdline_set_text(&e->cmdline, cmd_str);
     return true;
 }
 
@@ -107,17 +104,15 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 
     const CachedCommand *b = lookup_binding(&e->normal_mode->key_bindings, key);
     if (!b) {
-        info_msg("%s is not bound to a command", keystr);
-        return true;
+        return info_msg("%s is not bound to a command", keystr);
     }
 
-    if (cflag) {
-        push_input_mode(e, e->command_mode);
-        cmdline_set_text(&e->cmdline, b->cmd_str);
-    } else {
-        info_msg("%s is bound to: %s", keystr, b->cmd_str);
+    if (!cflag) {
+        return info_msg("%s is bound to: %s", keystr, b->cmd_str);
     }
 
+    push_input_mode(e, e->command_mode);
+    cmdline_set_text(&e->cmdline, b->cmd_str);
     return true;
 }
 
@@ -125,22 +120,20 @@ static bool show_color(EditorState *e, const char *name, bool cflag)
 {
     const TermStyle *hl = find_style(&e->styles, name);
     if (!hl) {
-        info_msg("no color entry with name '%s'", name);
-        return true;
+        return info_msg("no color entry with name '%s'", name);
     }
 
-    if (cflag) {
-        CommandLine *c = &e->cmdline;
-        push_input_mode(e, e->command_mode);
-        cmdline_clear(c);
-        string_append_hl_style(&c->buf, name, hl);
-        c->pos = c->buf.len;
-    } else {
+    if (!cflag) {
         char buf[TERM_STYLE_BUFSIZE];
         const char *style_str = term_style_to_string(buf, hl);
-        info_msg("color '%s' is set to: %s", name, style_str);
+        return info_msg("color '%s' is set to: %s", name, style_str);
     }
 
+    CommandLine *c = &e->cmdline;
+    push_input_mode(e, e->command_mode);
+    cmdline_clear(c);
+    string_append_hl_style(&c->buf, name, hl);
+    c->pos = c->buf.len;
     return true;
 }
 
@@ -156,15 +149,14 @@ static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
     const char *type = cursor_type_to_str(style.type);
     const char *color = cursor_color_to_str(colorbuf, style.color);
 
-    if (cflag) {
-        char buf[64];
-        xsnprintf(buf, sizeof buf, "cursor %s %s %s", mode_str, type, color);
-        push_input_mode(e, e->command_mode);
-        cmdline_set_text(&e->cmdline, buf);
-    } else {
-        info_msg("cursor '%s' is set to: %s %s", mode_str, type, color);
+    if (!cflag) {
+        return info_msg("cursor '%s' is set to: %s %s", mode_str, type, color);
     }
 
+    char buf[64];
+    xsnprintf(buf, sizeof buf, "cursor %s %s %s", mode_str, type, color);
+    push_input_mode(e, e->command_mode);
+    cmdline_set_text(&e->cmdline, buf);
     return true;
 }
 
@@ -172,17 +164,15 @@ static bool show_env(EditorState *e, const char *name, bool cflag)
 {
     const char *value = getenv(name);
     if (!value) {
-        info_msg("no environment variable with name '%s'", name);
-        return true;
+        return info_msg("no environment variable with name '%s'", name);
     }
 
-    if (cflag) {
-        push_input_mode(e, e->command_mode);
-        cmdline_set_text(&e->cmdline, value);
-    } else {
-        info_msg("$%s is set to: %s", name, value);
+    if (!cflag) {
+        return info_msg("$%s is set to: %s", name, value);
     }
 
+    push_input_mode(e, e->command_mode);
+    cmdline_set_text(&e->cmdline, value);
     return true;
 }
 
@@ -239,8 +229,7 @@ static bool show_compiler(EditorState *e, const char *name, bool cflag)
 {
     const Compiler *compiler = find_compiler(&e->compilers, name);
     if (!compiler) {
-        info_msg("no errorfmt entry found for '%s'", name);
-        return true;
+        return info_msg("no errorfmt entry found for '%s'", name);
     }
 
     String str = string_new(512);
@@ -262,13 +251,12 @@ static bool show_option(EditorState *e, const char *name, bool cflag)
         return error_msg("invalid option name: %s", name);
     }
 
-    if (cflag) {
-        push_input_mode(e, e->command_mode);
-        cmdline_set_text(&e->cmdline, value);
-    } else {
-        info_msg("%s is set to: %s", name, value);
+    if (!cflag) {
+        return info_msg("%s is set to: %s", name, value);
     }
 
+    push_input_mode(e, e->command_mode);
+    cmdline_set_text(&e->cmdline, value);
     return true;
 }
 
@@ -302,13 +290,12 @@ static bool show_wsplit(EditorState *e, const char *name, bool cflag)
     char buf[(4 * DECIMAL_STR_MAX(w->x)) + 4];
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 
-    if (cflag) {
-        push_input_mode(e, e->command_mode);
-        cmdline_set_text(&e->cmdline, buf);
-    } else {
-        info_msg("current window dimensions: %s", buf);
+    if (!cflag) {
+        return info_msg("current window dimensions: %s", buf);
     }
 
+    push_input_mode(e, e->command_mode);
+    cmdline_set_text(&e->cmdline, buf);
     return true;
 }
 

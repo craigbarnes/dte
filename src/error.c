@@ -76,13 +76,14 @@ bool error_msg_errno(const char *prefix)
     return error_msg("%s: %s", prefix, strerror(errno));
 }
 
-void info_msg(const char *format, ...)
+bool info_msg(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
     vsnprintf(err.buf, sizeof(err.buf), format, ap);
     va_end(ap);
     err.is_error = false;
+    return true; // To allow tail-calling from command handlers
 }
 
 const char *get_msg(bool *is_error)

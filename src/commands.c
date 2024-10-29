@@ -934,43 +934,30 @@ static bool cmd_macro(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    const char *msg;
     if (streq(action, "toggle")) {
-        if (m->recording) {
-            goto stop;
-        }
-        goto record;
+        action = m->recording ? "stop" : "record";
     }
 
     if (streq(action, "record")) {
-        record:
-        msg = macro_record(m) ? "Recording macro" : "Already recording";
-        goto message;
+        bool r = macro_record(m);
+        return info_msg("%s", r ? "Recording macro" : "Already recording");
     }
 
     if (streq(action, "stop")) {
-        stop:
         if (!macro_stop(m)) {
-            msg = "Not recording";
-            goto message;
+            return info_msg("Not recording");
         }
         size_t count = m->macro.count;
         const char *plural = (count != 1) ? "s" : "";
-        info_msg("Macro recording stopped; %zu command%s saved", count, plural);
-        return true;
+        return info_msg("Macro recording stopped; %zu command%s saved", count, plural);
     }
 
     if (streq(action, "cancel")) {
-        msg = macro_cancel(m) ? "Macro recording cancelled" : "Not recording";
-        goto message;
+        bool r = macro_cancel(m);
+        return info_msg("%s", r ? "Macro recording cancelled" : "Not recording");
     }
 
     return error_msg("Unknown action '%s'", action);
-
-message:
-    info_msg("%s", msg);
-    // TODO: make this conditional?
-    return true;
 }
 
 static bool cmd_match_bracket(EditorState *e, const CommandArgs *a)
@@ -1677,8 +1664,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     Buffer *buffer = e->buffer;
     if (unlikely(buffer->stdout_buffer)) {
         const char *f = buffer_filename(buffer);
-        info_msg("%s can't be saved; it will be piped to stdout on exit", f);
-        return true;
+        return info_msg("%s can't be saved; it will be piped to stdout on exit", f);
     }
 
     bool dos_nl = has_flag(a, 'd');

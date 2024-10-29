@@ -50,12 +50,10 @@ bool activate_current_message(const MessageArray *msgs, Window *window)
     }
 
     if (count == 1) {
-        info_msg("%s", m->msg);
-    } else {
-        info_msg("[%zu/%zu] %s", pos + 1, count, m->msg);
+        return info_msg("%s", m->msg);
     }
 
-    return true;
+    return info_msg("[%zu/%zu] %s", pos + 1, count, m->msg);
 }
 
 void activate_current_message_save (

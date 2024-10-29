@@ -193,8 +193,7 @@ bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, b
         }
         block_iter_bof(&bi);
         if (do_search_fwd(view, regex, &bi, false)) {
-            info_msg("Continuing at top");
-            return true;
+            return info_msg("Continuing at top");
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
@@ -203,8 +202,7 @@ bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, b
         }
         block_iter_eof(&bi);
         if (do_search_bwd(view, regex, &bi, -1, false)) {
-            info_msg("Continuing at bottom");
-            return true;
+            return info_msg("Continuing at bottom");
         }
     }
 

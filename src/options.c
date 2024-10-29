@@ -779,13 +779,13 @@ bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
     }
 
     desc_set(e, desc, ptr, global, value);
-    if (verbose) {
-        const char *prefix = (global && desc->local) ? "[global] " : "";
-        const char *str = desc_string(desc, value);
-        info_msg("%s%s = %s", prefix, desc->name, str);
+    if (!verbose) {
+        return true;
     }
 
-    return true;
+    const char *prefix = (global && desc->local) ? "[global] " : "";
+    const char *str = desc_string(desc, value);
+    return info_msg("%s%s = %s", prefix, desc->name, str);
 }
 
 bool toggle_option_values (
