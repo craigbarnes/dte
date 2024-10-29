@@ -1685,6 +1685,72 @@ static void test_term_begin_sync_update(TestContext *ctx)
     term_output_free(obuf);
 }
 
+static void test_term_put_level_1_queries(TestContext *ctx)
+{
+    enum {
+        // Short aliases for TermFeatureFlags:
+        BCE = TFLAG_BACK_COLOR_ERASE,
+        TITLE = TFLAG_SET_WINDOW_TITLE,
+        OSC52 = TFLAG_OSC52_COPY,
+        C8 = TFLAG_8_COLOR,
+        C16 = TFLAG_16_COLOR | C8,
+        C256 = TFLAG_256_COLOR | C16,
+    };
+
+    Terminal term;
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
+    term_init(&term, "xterm-256color", NULL);
+    EXPECT_UINT_EQ(term.features, (C256 | BCE | TITLE | OSC52));
+    EXPECT_EQ(obuf->count, 0);
+
+    // Basic level 1 queries (with emit_all=false)
+    static const char level1[] = "\033[c";
+    term_put_level_1_queries(&term, false);
+    EXPECT_MEMEQ_FULL(obuf->buf, obuf->count, level1, sizeof(level1) - 1);
+
+    // All queries (forced by emit_all=true)
+    static const char full[] =
+        // term_put_level_1_queries()
+        "\033[c"
+        // term_put_level_2_queries()
+        "\033[>c"
+        "\033[=c"
+        "\033[>0q"
+        "\033[?u"
+        "\033[?1036$p"
+        "\033[?1039$p"
+        "\033[?2026$p"
+        // term_put_level_2_queries() debug
+        "\033[?4m"
+        "\033[?7$p"
+        "\033[?25$p"
+        "\033[?45$p"
+        "\033[?67$p"
+        "\033[?1049$p"
+        "\033[?2004$p"
+        "\033[18t"
+        // term_put_level_3_queries()
+        "\033[0;38;2;60;70;80;48;5;255m"
+        "\033P$qm\033\\"
+        "\033[0m"
+        "\033P+q626365\033\\"
+        "\033P+q726570\033\\"
+        "\033P+q74736C\033\\"
+        "\033P+q4D73\033\\"
+        // term_put_level_3_queries() debug
+        "\033P$q q\033\\"
+    ;
+
+    obuf->count = 0;
+    term_put_level_1_queries(&term, true);
+    EXPECT_MEMEQ_FULL(obuf->buf, obuf->count, full, sizeof(full) - 1);
+
+    EXPECT_EQ(obuf->scroll_x, 0);
+    EXPECT_EQ(obuf->x, 0);
+    term_output_free(obuf);
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_rgb),
     TEST(test_parse_term_style),
@@ -1713,6 +1779,7 @@ static const TestEntry tests[] = {
     TEST(test_term_set_cursor_style),
     TEST(test_term_restore_cursor_style),
     TEST(test_term_begin_sync_update),
+    TEST(test_term_put_level_1_queries),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);

@@ -59,6 +59,37 @@ void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, 
     test_fail(ctx, file, line, "Bytes not equal:  %s  %s", buf1, buf2);
 }
 
+// Like expect_memeq() but with a length parameter for each memory area,
+// thus freeing the caller of the responsibility to perform bounds checks
+// and providing much more useful error messages
+void expect_memeq_full (
+    TestContext *ctx,
+    const char *file,
+    int line,
+    const void *p1,
+    size_t n1,
+    const void *p2,
+    size_t n2
+) {
+    if (likely(n1 == n2 && mem_equal(p1, p2, n1))) {
+        test_pass(ctx);
+        return;
+    }
+
+    char buf[2048];
+    int buflen1 = u_make_printable(p1, n1, buf, sizeof(buf), 0);
+    size_t avail = sizeof(buf) - buflen1;
+    int buflen2 = u_make_printable(p2, n2, buf + buflen1, avail, 0);
+
+    test_fail (
+        ctx, file, line,
+        "Memory areas not equal: lengths: %zu, %zu; contents:  %.*s  %.*s",
+        n1, n2,
+        buflen1, buf,
+        buflen2, buf + buflen1
+    );
+}
+
 void expect_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b)
 {
     expect(a == b, ctx, file, line, "Values not equal: %jd, %jd", a, b);
