@@ -853,7 +853,7 @@ current message.
 
 If this command is used without flags or arguments (e.g. as `msg`)
 the current message will be re-displayed, which can be useful after
-other input clears the message line.
+other input clears it.
 
 `-n`
 :   Next message
