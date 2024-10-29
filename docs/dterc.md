@@ -150,10 +150,12 @@ Special keys:
 * `end`
 * `pgup`
 * `pgdown`
-* `begin` (keypad "5" with Num Lock off)
+* `escape`
+* `backspace`
 * `enter`
 * `tab`
 * `space`
+* `begin` (keypad "5" with Num Lock off)
 * `F1`..`F20`
 
 Modifiers:
