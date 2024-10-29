@@ -251,7 +251,7 @@ void term_put_level_2_queries(Terminal *term, bool emit_all)
     }
 
     // Debug query responses are used purely for logging/informational purposes
-    if (log_level_debug_enabled()) {
+    if (emit_all || log_level_debug_enabled()) {
         term_put_bytes(obuf, debug_queries, sizeof(debug_queries) - 1);
     }
 }
@@ -301,7 +301,7 @@ void term_put_level_3_queries(Terminal *term, bool emit_all)
         term_put_literal(obuf, "\033P+q4D73\033\\"); // XTGETTCAP "Ms"
     }
 
-    if (log_level_debug_enabled()) {
+    if (emit_all || log_level_debug_enabled()) {
         term_put_literal(obuf, "\033P$q q\033\\"); // DECRQSS DECSCUSR (cursor style)
     }
 }
