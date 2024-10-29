@@ -52,8 +52,7 @@ static void test_builtin_configs(TestContext *ctx)
             xsnprintf(path, sizeof path, "config/%s", cfg.name);
             char *src;
             ssize_t size = read_file(path, &src, 8u << 20);
-            ASSERT_EQ(size, cfg.text.length);
-            EXPECT_MEMEQ(src, cfg.text.data, size);
+            EXPECT_MEMEQ(src, size, cfg.text.data, cfg.text.length);
             free(src);
         }
     }

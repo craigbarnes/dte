@@ -75,16 +75,13 @@ static void test_encoding_from_type(TestContext *ctx)
 static void test_get_bom_for_encoding(TestContext *ctx)
 {
     const ByteOrderMark *bom = get_bom_for_encoding(UTF8);
-    ASSERT_EQ(bom->len, 3);
-    EXPECT_MEMEQ(bom->bytes, "\xef\xbb\xbf", 3);
+    EXPECT_MEMEQ(bom->bytes, bom->len, "\xef\xbb\xbf", 3);
 
     bom = get_bom_for_encoding(UTF32LE);
-    ASSERT_EQ(bom->len, 4);
-    EXPECT_MEMEQ(bom->bytes, "\xff\xfe\0\0", 4);
+    EXPECT_MEMEQ(bom->bytes, bom->len, "\xff\xfe\0\0", 4);
 
     bom = get_bom_for_encoding(UTF16BE);
-    ASSERT_EQ(bom->len, 2);
-    EXPECT_MEMEQ(bom->bytes, "\xfe\xff", 2);
+    EXPECT_MEMEQ(bom->bytes, bom->len, "\xfe\xff", 2);
 
     EXPECT_NULL(get_bom_for_encoding(UNKNOWN_ENCODING));
     EXPECT_FALSE(encoding_type_has_bom(UNKNOWN_ENCODING));

@@ -47,22 +47,7 @@ void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, 
     expect(p1 == p2, ctx, file, line, "Pointers not equal: %p, %p", p1, p2);
 }
 
-void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, const void *m2, size_t len)
-{
-    if (likely(mem_equal(m1, m2, len))) {
-        test_pass(ctx);
-        return;
-    }
-    char buf1[256], buf2[256];
-    u_make_printable(m1, len, buf1, sizeof buf1, 0);
-    u_make_printable(m2, len, buf2, sizeof buf2, 0);
-    test_fail(ctx, file, line, "Bytes not equal:  %s  %s", buf1, buf2);
-}
-
-// Like expect_memeq() but with a length parameter for each memory area,
-// thus freeing the caller of the responsibility to perform bounds checks
-// and providing much more useful error messages
-void expect_memeq_full (
+void expect_memeq (
     TestContext *ctx,
     const char *file,
     int line,

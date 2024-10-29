@@ -330,9 +330,7 @@ static void test_color_to_str(TestContext *ctx)
         int32_t color = tests[i].color;
         ASSERT_TRUE(color_is_valid(color));
         size_t len = color_to_str(buf, color);
-        ASSERT_TRUE(len < sizeof(tests[0].expected_string));
-        IEXPECT_EQ(len, tests[i].expected_len);
-        EXPECT_MEMEQ(buf, tests[i].expected_string, len);
+        EXPECT_MEMEQ(buf, len, tests[i].expected_string, tests[i].expected_len);
     }
 }
 
@@ -1359,9 +1357,8 @@ static void test_term_clear_eol(TestContext *ctx)
     obuf->style = (TermStyle){.bg = COLOR_RED};
     term_output_reset(&term, 0, 80, 0);
     EXPECT_EQ(term_clear_eol(&term), TERM_CLEAR_EOL_USED_EL);
-    EXPECT_EQ(obuf->count, 3);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[K", 3);
     EXPECT_EQ(obuf->x, 80);
-    EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
     ASSERT_TRUE(clear_obuf(obuf));
 
     // No BCE, but with REP
@@ -1369,9 +1366,8 @@ static void test_term_clear_eol(TestContext *ctx)
     obuf->style = (TermStyle){.bg = COLOR_RED};
     term_output_reset(&term, 0, 40, 0);
     EXPECT_EQ(term_clear_eol(&term), -40);
-    EXPECT_EQ(obuf->count, 6);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, " \033[39b", 6);
     EXPECT_EQ(obuf->x, 40);
-    EXPECT_MEMEQ(obuf->buf, " \033[39b", 6);
     ASSERT_TRUE(clear_obuf(obuf));
 
     // No BCE with non-default bg
@@ -1390,9 +1386,8 @@ static void test_term_clear_eol(TestContext *ctx)
     obuf->style = (TermStyle){.bg = COLOR_DEFAULT};
     term_output_reset(&term, 0, 80, 0);
     EXPECT_EQ(term_clear_eol(&term), TERM_CLEAR_EOL_USED_EL);
-    EXPECT_EQ(obuf->count, 3);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[K", 3);
     EXPECT_EQ(obuf->x, 80);
-    EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
     ASSERT_TRUE(clear_obuf(obuf));
 
     // No BCE with ATTR_REVERSE
@@ -1422,15 +1417,13 @@ static void test_term_move_cursor(TestContext *ctx)
     TermOutputBuffer obuf;
     term_output_init(&obuf);
     term_move_cursor(&obuf, 12, 5);
-    EXPECT_EQ(obuf.count, 7);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, "\033[6;13H", 7);
     EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033[6;13H", 7);
     ASSERT_TRUE(clear_obuf(&obuf));
 
     term_move_cursor(&obuf, 0, 22);
-    EXPECT_EQ(obuf.count, 5);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, "\033[23H", 5);
     EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033[23H", 5);
     ASSERT_TRUE(clear_obuf(&obuf));
 
     term_output_free(&obuf);
@@ -1450,23 +1443,20 @@ static void test_term_set_bytes(TestContext *ctx)
     term_output_reset(&term, 0, 80, 0);
 
     EXPECT_EQ(term_set_bytes(&term, 'x', 40), TERM_SET_BYTES_REP);
-    EXPECT_EQ(obuf->count, 6);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "x\033[39b", 6);
     EXPECT_EQ(obuf->x, 40);
-    EXPECT_MEMEQ(obuf->buf, "x\033[39b", 6);
     ASSERT_TRUE(clear_obuf(obuf));
 
     const size_t repmin = ECMA48_REP_MIN - 1;
     EXPECT_EQ(repmin, 5);
     EXPECT_EQ(term_set_bytes(&term, '-', repmin), TERM_SET_BYTES_MEMSET);
-    EXPECT_EQ(obuf->count, repmin);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "-----", repmin);
     EXPECT_EQ(obuf->x, repmin);
-    EXPECT_MEMEQ(obuf->buf, "-----", repmin);
     ASSERT_TRUE(clear_obuf(obuf));
 
     EXPECT_EQ(term_set_bytes(&term, '\n', 8), TERM_SET_BYTES_MEMSET);
-    EXPECT_EQ(obuf->count, 8);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\n\n\n\n\n\n\n\n", 8);
     EXPECT_EQ(obuf->x, 8);
-    EXPECT_MEMEQ(obuf->buf, "\n\n\n\n\n\n\n\n", 8);
     ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);
@@ -1491,42 +1481,37 @@ static void test_term_set_style(TestContext *ctx)
     };
 
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 14);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;1;7;31;43m", 14);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;1;7;31;43m", 14);
     ASSERT_TRUE(clear_obuf(obuf));
 
     style.attr = 0;
     style.fg = COLOR_RGB(0x12ef46);
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 22);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;38;2;18;239;70;43m", 22);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;38;2;18;239;70;43m", 22);
     ASSERT_TRUE(clear_obuf(obuf));
 
     style.fg = 144;
     style.bg = COLOR_DEFAULT;
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 13);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;38;5;144m", 13);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
     ASSERT_TRUE(clear_obuf(obuf));
 
     style.fg = COLOR_GRAY;
     style.bg = COLOR_RGB(0x00b91f);
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 21);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;37;48;2;0;185;31m", 21);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;37;48;2;0;185;31m", 21);
     ASSERT_TRUE(clear_obuf(obuf));
 
     style.fg = COLOR_WHITE;
     style.bg = COLOR_DARKGRAY;
     style.attr = ATTR_ITALIC;
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 13);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;3;97;100m", 13);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;3;97;100m", 13);
     ASSERT_TRUE(clear_obuf(obuf));
 
     // Ensure longest sequence doesn't trigger assertion
@@ -1542,9 +1527,8 @@ static void test_term_set_style(TestContext *ctx)
     style.bg = COLOR_RGB(0xC8CAFF);
     style.attr = ~0u;
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, n);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, longest, n);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, longest, n);
     ASSERT_TRUE(clear_obuf(obuf));
 
     style.fg = COLOR_DEFAULT;
@@ -1552,18 +1536,16 @@ static void test_term_set_style(TestContext *ctx)
     style.attr = ATTR_REVERSE | ATTR_DIM | ATTR_UNDERLINE | ATTR_KEEP;
     term.ncv_attributes = ATTR_DIM | ATTR_STRIKETHROUGH;
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 10);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;2;4;7m", 10);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;2;4;7m", 10);
     style.attr &= ~ATTR_KEEP;
     EXPECT_TRUE(same_style(&obuf->style, &style));
     ASSERT_TRUE(clear_obuf(obuf));
 
     style.fg = COLOR_BLUE;
     term_set_style(&term, style);
-    EXPECT_EQ(obuf->count, 11);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, "\033[0;4;7;34m", 11);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, "\033[0;4;7;34m", 11);
     style.attr &= ~ATTR_DIM;
     EXPECT_TRUE(same_style(&obuf->style, &style));
     ASSERT_TRUE(clear_obuf(obuf));
@@ -1577,21 +1559,18 @@ static void test_term_osc52_copy(TestContext *ctx)
     term_output_init(&obuf);
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN("foobar"), true, true));
-    EXPECT_EQ(obuf.count, 18);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;pc;Zm9vYmFy\033\\", 18);
     EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
     ASSERT_TRUE(clear_obuf(&obuf));
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
-    EXPECT_EQ(obuf.count, 17);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;p;8J+low==\033\\", 17);
     EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033]52;p;8J+low==\033\\", 17);
     ASSERT_TRUE(clear_obuf(&obuf));
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN(""), true, false));
-    EXPECT_EQ(obuf.count, 9);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;c;\033\\", 9);
     EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033]52;c;\033\\", 9);
     ASSERT_TRUE(clear_obuf(&obuf));
 
     term_output_free(&obuf);
@@ -1618,9 +1597,8 @@ static void test_term_set_cursor_style(TestContext *ctx)
     memset(obuf->buf, '@', expected_len + 16);
 
     term_set_cursor_style(&term, style);
-    EXPECT_EQ(obuf->count, expected_len);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, expected, expected_len);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, expected, expected_len);
     EXPECT_EQ(obuf->cursor_style.type, style.type);
     EXPECT_EQ(obuf->cursor_style.color, style.color);
     ASSERT_TRUE(clear_obuf(obuf));
@@ -1644,9 +1622,8 @@ static void test_term_restore_cursor_style(TestContext *ctx)
     memset(obuf->buf, '@', expected_len + 16);
 
     term_restore_cursor_style(&term);
-    EXPECT_EQ(obuf->count, expected_len);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, expected, expected_len);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, expected, expected_len);
     ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);
@@ -1678,9 +1655,8 @@ static void test_term_begin_sync_update(TestContext *ctx)
     term_use_normal_screen_buffer(&term);
     term_end_sync_update(&term);
 
-    EXPECT_EQ(obuf->count, sizeof(expected) - 1);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, expected, sizeof(expected) - 1);
     EXPECT_EQ(obuf->x, 0);
-    EXPECT_MEMEQ(obuf->buf, expected, sizeof(expected) - 1);
 
     term_output_free(obuf);
 }
@@ -1707,7 +1683,7 @@ static void test_term_put_level_1_queries(TestContext *ctx)
     // Basic level 1 queries (with emit_all=false)
     static const char level1[] = "\033[c";
     term_put_level_1_queries(&term, false);
-    EXPECT_MEMEQ_FULL(obuf->buf, obuf->count, level1, sizeof(level1) - 1);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, level1, sizeof(level1) - 1);
 
     // All queries (forced by emit_all=true)
     static const char full[] =
@@ -1744,7 +1720,7 @@ static void test_term_put_level_1_queries(TestContext *ctx)
 
     obuf->count = 0;
     term_put_level_1_queries(&term, true);
-    EXPECT_MEMEQ_FULL(obuf->buf, obuf->count, full, sizeof(full) - 1);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, full, sizeof(full) - 1);
 
     EXPECT_EQ(obuf->scroll_x, 0);
     EXPECT_EQ(obuf->x, 0);

@@ -63,19 +63,16 @@ static void test_handle_binding(TestContext *ctx)
     ASSERT_TRUE(handle_binding(e, mode, key));
     const Block *block = BLOCK(e->buffer->blocks.next);
     ASSERT_NONNULL(block);
-    ASSERT_EQ(block->size, 4);
+    EXPECT_MEMEQ(block->data, block->size, "zzz\n", 4);
     EXPECT_EQ(block->nl, 1);
-    EXPECT_MEMEQ(block->data, "zzz\n", 4);
 
     ASSERT_TRUE(handle_binding(e, mode, KEY_BACKSPACE));
-    ASSERT_EQ(block->size, 3);
+    EXPECT_MEMEQ(block->data, block->size, "zz\n", 3);
     EXPECT_EQ(block->nl, 1);
-    EXPECT_MEMEQ(block->data, "zz\n", 3);
 
     ASSERT_TRUE(handle_binding(e, mode, MOD_CTRL | KEY_BACKSPACE));
-    ASSERT_EQ(block->size, 1);
+    EXPECT_MEMEQ(block->data, block->size, "\n", 1);
     EXPECT_EQ(block->nl, 1);
-    EXPECT_MEMEQ(block->data, "\n", 1);
 
     View *view = e->view;
     ASSERT_NONNULL(view);

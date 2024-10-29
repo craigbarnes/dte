@@ -50,8 +50,7 @@ typedef struct {
 
 #define EXPECT_STREQ(s1, s2) EXPECT(streq, s1, s2)
 #define EXPECT_PTREQ(p1, p2) EXPECT(ptreq, p1, p2)
-#define EXPECT_MEMEQ(m1, m2, len) EXPECT(memeq, m1, m2, len)
-#define EXPECT_MEMEQ_FULL(p1, n1, p2, n2) EXPECT(memeq_full, p1, n1, p2, n2)
+#define EXPECT_MEMEQ(p1, n1, p2, n2) EXPECT(memeq, p1, n1, p2, n2)
 #define EXPECT_EQ(a, b) EXPECT(eq, a, b)
 #define EXPECT_UINT_EQ(a, b) EXPECT(uint_eq, a, b)
 #define EXPECT_NULL(p) EXPECT(null, p)
@@ -74,8 +73,7 @@ static inline void test_pass(TestContext *ctx)
 void test_fail(TestContext *ctx, const char *file, int line, const char *format, ...) COLD PRINTF(4);
 void expect_streq(TestContext *ctx, const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, const void *p2);
-void expect_memeq(TestContext *ctx, const char *file, int line, const void *m1, const void *m2, size_t len);
-void expect_memeq_full(TestContext *ctx, const char *file, int line, const void *p1, size_t n1, const void *p2, size_t n2);
+void expect_memeq(TestContext *ctx, const char *file, int line, const void *p1, size_t n1, const void *p2, size_t n2);
 void expect_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
 void expect_uint_eq(TestContext *ctx, const char *file, int line, uintmax_t a, uintmax_t b);
 void expect_true(TestContext *ctx, const char *file, int line, bool x);

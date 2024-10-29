@@ -138,7 +138,7 @@ static void test_xmalloc(TestContext *ctx)
 
     str = xcalloc(4, 1);
     ASSERT_NONNULL(str);
-    EXPECT_MEMEQ(str, "\0\0\0\0", 4);
+    EXPECT_MEMEQ(str, 4, "\0\0\0\0", 4);
     free(str);
 
     str = xstrslice("one two three", 4, 7);
@@ -504,32 +504,29 @@ static void test_base64_encode_block(TestContext *ctx)
 {
     char buf[16];
     size_t n = base64_encode_block(STRN("xyz"), buf, sizeof(buf));
-    EXPECT_EQ(n, 4);
-    EXPECT_MEMEQ(buf, "eHl6", n);
+    EXPECT_MEMEQ(buf, n, "eHl6", 4);
 
     n = base64_encode_block(STRN("123456"), buf, sizeof(buf));
-    EXPECT_EQ(n, 8);
-    EXPECT_MEMEQ(buf, "MTIzNDU2", n);
+    EXPECT_MEMEQ(buf, n, "MTIzNDU2", 8);
 
     n = base64_encode_block(STRN("a == *x++"), buf, sizeof(buf));
-    EXPECT_EQ(n, 12);
-    EXPECT_MEMEQ(buf, "YSA9PSAqeCsr", n);
+    EXPECT_MEMEQ(buf, n, "YSA9PSAqeCsr", 12);
 }
 
 static void test_base64_encode_final(TestContext *ctx)
 {
     char buf[4];
     base64_encode_final(STRN("+"), buf);
-    EXPECT_MEMEQ(buf, "Kw==", 4);
+    EXPECT_MEMEQ(buf, 4, "Kw==", 4);
 
     base64_encode_final(STRN(".."), buf);
-    EXPECT_MEMEQ(buf, "Li4=", 4);
+    EXPECT_MEMEQ(buf, 4, "Li4=", 4);
 
     base64_encode_final(STRN("~."), buf);
-    EXPECT_MEMEQ(buf, "fi4=", 4);
+    EXPECT_MEMEQ(buf, 4, "fi4=", 4);
 
     base64_encode_final(STRN("\xC2\xA9"), buf);
-    EXPECT_MEMEQ(buf, "wqk=", 4);
+    EXPECT_MEMEQ(buf, 4, "wqk=", 4);
 }
 
 static void test_string(TestContext *ctx)
@@ -825,9 +822,10 @@ static void test_str_replace_byte(TestContext *ctx)
 
 static void test_strn_replace_byte(TestContext *ctx)
 {
-    char str[] = "..a.b.c..\n\0\0.d.e.f...\0g.h..\0\0";
+    static const char expected[] = "||a|b|c||\n\0\0|d|e|f|||\0g|h||\0\0";
+    char str[] = /* ........... */ "..a.b.c..\n\0\0.d.e.f...\0g.h..\0\0";
     strn_replace_byte(str, sizeof(str), '.', '|');
-    EXPECT_MEMEQ(str, "||a|b|c||\n\0\0|d|e|f|||\0g|h||\0\0", sizeof(str));
+    EXPECT_MEMEQ(str, sizeof(str), expected, sizeof(expected));
 }
 
 static void test_size_str_width(TestContext *ctx)
