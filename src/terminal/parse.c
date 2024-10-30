@@ -83,54 +83,6 @@ static KeyCode decode_key_from_param(uint32_t param)
     return KEY_IGNORE;
 }
 
-// https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
-static KeyCode decode_kitty_special_key(uint32_t n)
-{
-    switch (n) {
-    case 57359: return KEY_SCROLL_LOCK;
-    case 57361: return KEY_PRINT_SCREEN;
-    case 57362: return KEY_PAUSE;
-    case 57363: return KEY_MENU;
-    case 57376: return KEY_F13;
-    case 57377: return KEY_F14;
-    case 57378: return KEY_F15;
-    case 57379: return KEY_F16;
-    case 57380: return KEY_F17;
-    case 57381: return KEY_F18;
-    case 57382: return KEY_F19;
-    case 57383: return KEY_F20;
-    case 57399: return '0';
-    case 57400: return '1';
-    case 57401: return '2';
-    case 57402: return '3';
-    case 57403: return '4';
-    case 57404: return '5';
-    case 57405: return '6';
-    case 57406: return '7';
-    case 57407: return '8';
-    case 57408: return '9';
-    case 57409: return '.';
-    case 57410: return '/';
-    case 57411: return '*';
-    case 57412: return '-';
-    case 57413: return '+';
-    case 57414: return KEY_ENTER;
-    case 57415: return '=';
-    case 57417: return KEY_LEFT;
-    case 57418: return KEY_RIGHT;
-    case 57419: return KEY_UP;
-    case 57420: return KEY_DOWN;
-    case 57421: return KEY_PAGE_UP;
-    case 57422: return KEY_PAGE_DOWN;
-    case 57423: return KEY_HOME;
-    case 57424: return KEY_END;
-    case 57425: return KEY_INSERT;
-    case 57426: return KEY_DELETE;
-    case 57427: return KEY_BEGIN;
-    }
-    return KEY_IGNORE;
-}
-
 // See: https://sw.kovidgoyal.net/kitty/keyboard-protocol/#modifiers
 // ----------------------------
 // Shift     0b1         (1)
@@ -161,76 +113,111 @@ static KeyCode decode_modifiers(uint32_t n)
     return mods << KEYCODE_MODIFIER_OFFSET;
 }
 
-// Normalize KeyCode values originating from `CSI u` sequences
+// Normalize KeyCode values originating from `CSI u` sequences.
+// Note that, unlike normalize_csi_27_tilde_keycode(), the `mods`
+// parameter is only passed in for context and not expected to be
+// included in the returned value.
 static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
 {
-    if (u_is_ascii_upper(key)) {
-        if (mods & MOD_CTRL) {
-            // This is done only for the sake of (older versions of) iTerm2
-            // See also:
-            // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_870592688
-            // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_864512674
-            // • https://gitlab.com/gnachman/iterm2/-/issues/10017
-            // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7
-            // • https://gitlab.com/gnachman/iterm2/-/issues/7440#note_129599012
-            key = ascii_tolower(key);
-        }
-    } else if (key >= 57344 && key <= 63743) {
-        key = decode_kitty_special_key(key);
-        if (unlikely(key == KEY_IGNORE)) {
-            return KEY_IGNORE;
-        }
-    } else {
-        // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
-        switch (key) {
-        case '\b': key = KEY_BACKSPACE; break; // BS; Kitty never emits this, but (buggy) WezTerm does
-        case '\t': key = KEY_TAB; break; // HT
-        case '\n': key = KEY_ENTER; break; // LF; Kitty never emits this
-        case '\r': key = KEY_ENTER; break; // CR
-        case 27: key = KEY_ESCAPE; break; // ESC
-        case 127: key = KEY_BACKSPACE; break; // DEL
-        default:
-            if (unlikely(key < 32)) {
-                // All other values corresponding to C0 controls are ignored
-                return KEY_IGNORE;
-            }
-            break;
-        }
+    // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
+    switch (key) {
+        case '\b': return KEY_BACKSPACE; // BS; Kitty never emits this, but (buggy) WezTerm does
+        case '\t': return KEY_TAB;
+        case '\n': return KEY_ENTER; // Kitty never emits this
+        case '\r': return KEY_ENTER;
+        case 27: return KEY_ESCAPE; // ESC
+        case 127: return KEY_BACKSPACE; // DEL
+        case 57359: return KEY_SCROLL_LOCK;
+        case 57361: return KEY_PRINT_SCREEN;
+        case 57362: return KEY_PAUSE;
+        case 57363: return KEY_MENU;
+        case 57376: return KEY_F13;
+        case 57377: return KEY_F14;
+        case 57378: return KEY_F15;
+        case 57379: return KEY_F16;
+        case 57380: return KEY_F17;
+        case 57381: return KEY_F18;
+        case 57382: return KEY_F19;
+        case 57383: return KEY_F20;
+        case 57399: return '0';
+        case 57400: return '1';
+        case 57401: return '2';
+        case 57402: return '3';
+        case 57403: return '4';
+        case 57404: return '5';
+        case 57405: return '6';
+        case 57406: return '7';
+        case 57407: return '8';
+        case 57408: return '9';
+        case 57409: return '.';
+        case 57410: return '/';
+        case 57411: return '*';
+        case 57412: return '-';
+        case 57413: return '+';
+        case 57414: return KEY_ENTER;
+        case 57415: return '=';
+        case 57417: return KEY_LEFT;
+        case 57418: return KEY_RIGHT;
+        case 57419: return KEY_UP;
+        case 57420: return KEY_DOWN;
+        case 57421: return KEY_PAGE_UP;
+        case 57422: return KEY_PAGE_DOWN;
+        case 57423: return KEY_HOME;
+        case 57424: return KEY_END;
+        case 57425: return KEY_INSERT;
+        case 57426: return KEY_DELETE;
+        case 57427: return KEY_BEGIN;
     }
 
-    return mods | key;
+    if (unlikely(key < 32 || (key >= 57344 && key <= 63743))) {
+        // Ignore values (not already handled above) that correspond
+        // to C0 controls or the Kitty private use range
+        return KEY_IGNORE;
+    }
+
+    if (u_is_ascii_upper(key) && (mods & MOD_CTRL)) {
+        // This is done only for the sake of (older versions of) iTerm2
+        // See also:
+        // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_870592688
+        // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_864512674
+        // • https://gitlab.com/gnachman/iterm2/-/issues/10017
+        // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7
+        // • https://gitlab.com/gnachman/iterm2/-/issues/7440#note_129599012
+        return ascii_tolower(key);
+    }
+
+    return key;
 }
 
 // Normalize KeyCode values originating from xterm-style "modifyOtherKeys"
 // sequences (CSI 27 ; <modifiers> ; <key> ~)
 static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
 {
-    if (key == '\b' || key == 127) {
+    switch (key) {
         // https://codeberg.org/dnkl/foot/pulls/791#issuecomment-279784
-        key = KEY_BACKSPACE;
-    } else if (key == '\n' || key == '\r') {
-        key = KEY_ENTER;
-    } else if (key == '\t') {
-        key = KEY_TAB;
-    } else if (key == 27) {
-        key = KEY_ESCAPE;
-    } else if (key < 32) {
+        case '\b': return mods | KEY_BACKSPACE;
+        case '\t': return mods | KEY_TAB;
+        case '\n': return mods | KEY_ENTER;
+        case '\r': return mods | KEY_ENTER;
+        case 27: return mods | KEY_ESCAPE; // ESC
+        case 127: return mods | KEY_BACKSPACE; // DEL
+    }
+
+    if (unlikely(key < 32)) {
         return KEY_IGNORE;
-    } else if (u_is_ascii_upper(key)) {
+    }
+
+    if (u_is_ascii_upper(key)) {
         if ((mods & ~MOD_SHIFT) == 0) {
-            // [A-Z] and Shift+[A-Z] should be encoded as just [A-Z].
-            // The former is handled here just to exclude it from the
-            // "else" clause below.
-            mods = 0;
-        } else {
-            // [A-Z] with any other combination of modifiers should be
-            // converted to `mods | MOD_SHIFT | key | 0x20`. This is
-            // done in a "blanket" fashion and covers sequences that
-            // xterm never emits, because some terminals (e.g. tmux)
-            // emulate the protocol imperfectly.
-            mods |= MOD_SHIFT;
-            key = ascii_tolower(key);
+            // [A-Z] and Shift+[A-Z] should be encoded as just [A-Z]
+            return key;
         }
+        // [A-Z] with any other combination of modifiers should be
+        // converted to lowercase and have the MOD_SHIFT bit set.
+        // This is done in a "blanket" fashion and covers sequences
+        // that xterm never emits, because some terminals (e.g. tmux)
+        // emulate the protocol imperfectly.
+        return mods | MOD_SHIFT | key | 0x20;
     }
 
     return mods | key;
@@ -466,7 +453,11 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             }
             // Fallthrough
         case 1:
-            *k = normalize_csi_u_keycode(mods, key);
+            key = normalize_csi_u_keycode(mods, key);
+            if (unlikely(key == KEY_IGNORE)) {
+                goto ignore;
+            }
+            *k = mods | key;
             return i;
         }
         goto ignore;

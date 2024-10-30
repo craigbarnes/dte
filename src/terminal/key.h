@@ -76,6 +76,7 @@ enum {
     KEY_IGNORE,
 
     // Modifier bit flags (as described above)
+    // See also: decode_modifiers()
     KEYCODE_MODIFIER_OFFSET = 21,
     MOD_SHIFT =  1 << KEYCODE_MODIFIER_OFFSET,
     MOD_META  =  2 << KEYCODE_MODIFIER_OFFSET,
