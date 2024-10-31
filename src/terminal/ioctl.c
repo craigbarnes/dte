@@ -21,6 +21,7 @@ bool term_drop_controlling_tty(int fd)
 #endif
 }
 
+// NOLINTNEXTLINE(*-non-const-parameter)
 bool term_get_size(unsigned int *w, unsigned int *h)
 {
 #if HAVE_TIOCGWINSZ || HAVE_TCGETWINSIZE

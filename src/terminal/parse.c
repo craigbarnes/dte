@@ -122,9 +122,9 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
     // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
     switch (key) {
         case '\b': return KEY_BACKSPACE; // BS; Kitty never emits this, but (buggy) WezTerm does
+        case '\r': return KEY_ENTER;
         case '\t': return KEY_TAB;
         case '\n': return KEY_ENTER; // Kitty never emits this
-        case '\r': return KEY_ENTER;
         case 27: return KEY_ESCAPE; // ESC
         case 127: return KEY_BACKSPACE; // DEL
         case 57359: return KEY_SCROLL_LOCK;
@@ -196,9 +196,9 @@ static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
     switch (key) {
         // https://codeberg.org/dnkl/foot/pulls/791#issuecomment-279784
         case '\b': return mods | KEY_BACKSPACE;
+        case '\r': return mods | KEY_ENTER;
         case '\t': return mods | KEY_TAB;
         case '\n': return mods | KEY_ENTER;
-        case '\r': return mods | KEY_ENTER;
         case 27: return mods | KEY_ESCAPE; // ESC
         case 127: return mods | KEY_BACKSPACE; // DEL
     }
