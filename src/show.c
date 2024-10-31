@@ -299,21 +299,6 @@ static bool show_wsplit(EditorState *e, const char *name, bool cflag)
     return true;
 }
 
-static String dump_command_history(EditorState *e)
-{
-    return history_dump(&e->command_history);
-}
-
-static String dump_search_history(EditorState *e)
-{
-    return history_dump(&e->search_history);
-}
-
-static String dump_file_history(EditorState *e)
-{
-    return file_history_dump(&e->file_history);
-}
-
 typedef struct {
     const char *name;
     const char *value;
@@ -492,50 +477,25 @@ static String dump_cursors(EditorState *e)
     return buf;
 }
 
-// Dump option values only
-static String do_dump_options(EditorState *e)
-{
-    return dump_options(&e->options, &e->buffer->options);
-}
-
 // Dump option values and FileOption entries
 static String dump_options_and_fileopts(EditorState *e)
 {
-    String str = do_dump_options(e);
+    String str = dump_options(&e->options, &e->buffer->options);
     string_append_literal(&str, "\n\n");
     dump_file_options(&e->file_options, &str);
     return str;
 }
 
-static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))
-{
-    return dump_builtin_configs();
-}
-
-static String do_dump_hl_styles(EditorState *e)
-{
-    return dump_hl_styles(&e->styles);
-}
-
-static String do_dump_filetypes(EditorState *e)
-{
-    return dump_filetypes(&e->filetypes);
-}
-
-static String do_dump_messages(EditorState *e)
-{
-    return dump_messages(&e->messages);
-}
-
-static String do_dump_macro(EditorState *e)
-{
-    return dump_macro(&e->macro);
-}
-
-static String do_dump_buffer(EditorState *e)
-{
-    return dump_buffer(e->buffer, &e->view->cursor);
-}
+static String do_dump_options(EditorState *e) {return dump_options(&e->options, &e->buffer->options);}
+static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e)) {return dump_builtin_configs();}
+static String do_dump_hl_styles(EditorState *e) {return dump_hl_styles(&e->styles);}
+static String do_dump_filetypes(EditorState *e) {return dump_filetypes(&e->filetypes);}
+static String do_dump_messages(EditorState *e) {return dump_messages(&e->messages);}
+static String do_dump_macro(EditorState *e) {return dump_macro(&e->macro);}
+static String do_dump_buffer(EditorState *e) {return dump_buffer(e->buffer, &e->view->cursor);}
+static String dump_command_history(EditorState *e) {return history_dump(&e->command_history);}
+static String dump_search_history(EditorState *e) {return history_dump(&e->search_history);}
+static String dump_file_history(EditorState *e) {return file_history_dump(&e->file_history);}
 
 // Shorter aliases for ShowHandlerFlags
 enum {
