@@ -2919,20 +2919,14 @@ static void test_xfopen(TestContext *ctx)
     static const char modes[][4] = {"a", "a+", "r", "r+", "w", "w+"};
     FOR_EACH_I(i, modes) {
         FILE *f = xfopen("/dev/null", modes[i], O_CLOEXEC, 0666);
-        EXPECT_NONNULL(f);
-        if (likely(f)) {
-            EXPECT_EQ(fclose(f), 0);
-        }
+        IEXPECT_TRUE(f && fclose(f) == 0);
     }
 }
 
 static void test_xstdio(TestContext *ctx)
 {
     FILE *f = xfopen("/dev/null", "r+", O_CLOEXEC, 0666);
-    EXPECT_NONNULL(f);
-    if (unlikely(!f)) {
-        return;
-    }
+    ASSERT_NONNULL(f);
 
     char buf[16];
     EXPECT_NULL(xfgets(buf, sizeof(buf), f));
