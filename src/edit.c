@@ -239,34 +239,32 @@ static bool only_block(const Buffer *buffer, const Block *blk)
 
 char *do_delete(View *view, size_t len, bool sanity_check_newlines)
 {
-    ListHead *saved_prev_node = NULL;
-    Block *blk = view->cursor.blk;
-    size_t offset = view->cursor.offset;
-    size_t pos = 0;
-    size_t deleted_nl = 0;
-
-    if (!len) {
+    if (len == 0) {
         return NULL;
     }
 
+    ListHead *saved_prev_node = NULL;
+    Block *blk = view->cursor.blk;
+    size_t offset = view->cursor.offset;
     if (!offset) {
-        // The block where cursor is can become empty and thereby may be deleted
+        // The block where the cursor is can become empty and thus
+        // may be deleted
         saved_prev_node = blk->node.prev;
     }
 
     Buffer *buffer = view->buffer;
     char *deleted = xmalloc(len);
+    size_t pos = 0;
+    size_t deleted_nl = 0;
+
     while (pos < len) {
         ListHead *next = blk->node.next;
         size_t avail = blk->size - offset;
         size_t count = MIN(len - pos, avail);
-        size_t nl = copy_count_nl(deleted + pos, blk->data + offset, count);
+        char *ptr = blk->data + offset;
+        size_t nl = copy_count_nl(deleted + pos, ptr, count);
         if (count < avail) {
-            memmove (
-                blk->data + offset,
-                blk->data + offset + count,
-                avail - count
-            );
+            memmove(ptr, ptr + count, avail - count);
         }
 
         deleted_nl += nl;
@@ -280,7 +278,6 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
         offset = 0;
         pos += count;
         blk = BLOCK(next);
-
         BUG_ON(pos < len && next == &buffer->blocks);
     }
 
@@ -295,6 +292,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
     }
 
     blk = view->cursor.blk;
+
     if (
         blk->size
         && blk->data[blk->size - 1] != '\n'
@@ -313,18 +311,22 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
+
     if (buffer->syntax) {
         hl_delete(&buffer->line_start_states, view->cy, deleted_nl);
     }
+
     return deleted;
 }
 
 char *do_replace(View *view, size_t del, const char *buf, size_t ins)
 {
+    BUG_ON(del == 0);
+    BUG_ON(ins == 0);
     block_iter_normalize(&view->cursor);
+
     Block *blk = view->cursor.blk;
     size_t offset = view->cursor.offset;
-
     size_t avail = blk->size - offset;
     if (del >= avail) {
         goto slow;
@@ -377,6 +379,7 @@ slow:
     // because it may be removing a terminating newline that do_insert()
     // is going to insert again at a different position:
     deleted = do_delete(view, del, false);
+    BUG_ON(!deleted); // do_delete() only returns NULL if len is 0
     do_insert(view, buf, ins);
     return deleted;
 }

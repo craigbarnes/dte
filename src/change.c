@@ -172,36 +172,43 @@ static void fix_cursors(const View *view, size_t offset, size_t del, size_t ins)
 
 static void reverse_change(View *view, Change *change)
 {
+    const size_t ins_count = change->ins_count;
+    const size_t del_count = change->del_count;
+    BUG_ON(!del_count && !ins_count);
+
     if (view->buffer->views.count > 1) {
-        fix_cursors(view, change->offset, change->ins_count, change->del_count);
+        fix_cursors(view, change->offset, ins_count, del_count);
     }
 
     block_iter_goto_offset(&view->cursor, change->offset);
-    if (!change->ins_count) {
+
+    if (ins_count == 0) {
         // Convert delete to insert
-        do_insert(view, change->buf, change->del_count);
+        do_insert(view, change->buf, del_count);
         if (change->move_after) {
-            block_iter_skip_bytes(&view->cursor, change->del_count);
+            block_iter_skip_bytes(&view->cursor, del_count);
         }
-        change->ins_count = change->del_count;
+        change->ins_count = del_count;
         change->del_count = 0;
         free(change->buf);
         change->buf = NULL;
-    } else if (change->del_count) {
-        // Reverse replace
-        size_t del_count = change->ins_count;
-        size_t ins_count = change->del_count;
-        char *buf = do_replace(view, del_count, change->buf, ins_count);
-        free(change->buf);
-        change->buf = buf;
-        change->ins_count = ins_count;
-        change->del_count = del_count;
-    } else {
-        // Convert insert to delete
-        change->buf = do_delete(view, change->ins_count, true);
-        change->del_count = change->ins_count;
-        change->ins_count = 0;
+        return;
     }
+
+    if (del_count == 0) {
+        // Convert insert to delete
+        change->buf = do_delete(view, ins_count, true);
+        change->del_count = ins_count;
+        change->ins_count = 0;
+        return;
+    }
+
+    // Reverse replace
+    char *buf = do_replace(view, ins_count, change->buf, del_count);
+    free(change->buf);
+    change->buf = buf;
+    change->ins_count = del_count;
+    change->del_count = ins_count;
 }
 
 bool undo(View *view)
@@ -369,6 +376,7 @@ static void buffer_delete_bytes_internal(View *view, size_t len, bool move_after
             }
         }
     }
+
     record_delete(view, do_delete(view, len, true), len, move_after);
 
     if (view->buffer->views.count > 1) {
@@ -388,7 +396,6 @@ void buffer_erase_bytes(View *view, size_t len)
 
 void buffer_replace_bytes(View *view, size_t del_count, const char *ins, size_t ins_count)
 {
-    view_reset_preferred_x(view);
     if (del_count == 0) {
         buffer_insert_bytes(view, ins, ins_count);
         return;
@@ -397,6 +404,8 @@ void buffer_replace_bytes(View *view, size_t del_count, const char *ins, size_t 
         buffer_delete_bytes(view, del_count);
         return;
     }
+
+    view_reset_preferred_x(view);
 
     // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(view, del_count)) {
