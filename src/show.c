@@ -28,6 +28,7 @@
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/intern.h"
+#include "util/log.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -48,21 +49,34 @@ static void open_temporary_buffer (
 ) {
     View *view = window_open_new_file(e->window);
     Buffer *buffer = view->buffer;
-    buffer->temporary = true;
-    do_insert(view, text, text_len);
     buffer_set_display_filename(buffer, xasprintf("(%s %s)", cmd, cmd_arg));
+    buffer->temporary = true;
+
+    if (flags & SHOW_DTERC) {
+        buffer->options.filetype = str_intern("dte");
+        set_file_options(e, buffer);
+        buffer_update_syntax(e, buffer);
+    }
+
+    if (text_len == 0) {
+        return;
+    }
+
+    BUG_ON(!text);
+
+    // We don't use buffer_insert_bytes() here, because the call to
+    // record_insert() would make the initial text contents undoable
+    if (unlikely(text[text_len - 1] != '\n')) {
+        LOG_ERROR("no final newline in text");
+        do_insert(view, "\n", 1);
+    }
+    do_insert(view, text, text_len);
 
     if (flags & SHOW_LASTLINE) {
         block_iter_eof(&view->cursor);
         block_iter_prev_line(&view->cursor);
     } else if ((flags & SHOW_MSGLINE) && e->messages.array.count > 0) {
         block_iter_goto_line(&view->cursor, e->messages.pos);
-    }
-
-    if (flags & SHOW_DTERC) {
-        buffer->options.filetype = str_intern("dte");
-        set_file_options(e, buffer);
-        buffer_update_syntax(e, buffer);
     }
 }
 
