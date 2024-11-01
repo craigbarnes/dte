@@ -5,8 +5,16 @@
 #include <sys/types.h>
 #include "util/macros.h"
 
-void init_file_locks_context(const char *fallback_dir, pid_t pid);
-bool lock_file(const char *filename) WARN_UNUSED_RESULT;
-void unlock_file(const char *filename);
+typedef struct {
+    char *locks;
+    char *locks_lock;
+    mode_t locks_mode;
+    pid_t editor_pid;
+} FileLocksContext;
+
+void init_file_locks_context(FileLocksContext *ctx, const char *fallback_dir, pid_t pid) NONNULL_ARGS;
+void free_file_locks_context(FileLocksContext *ctx) NONNULL_ARGS;
+bool lock_file(const FileLocksContext *ctx, const char *filename) NONNULL_ARGS WARN_UNUSED_RESULT;
+void unlock_file(const FileLocksContext *ctx, const char *filename) NONNULL_ARGS;
 
 #endif

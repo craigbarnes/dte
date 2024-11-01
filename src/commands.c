@@ -1785,7 +1785,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     if (e->options.lock_files) {
         if (absolute == buffer->abs_filename) {
             if (!buffer->locked) {
-                if (!lock_file(absolute)) {
+                if (!lock_file(&e->locks_ctx, absolute)) {
                     if (!force) {
                         error_msg("Can't lock file %s", absolute);
                         goto error;
@@ -1795,7 +1795,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
                 }
             }
         } else {
-            if (!lock_file(absolute)) {
+            if (!lock_file(&e->locks_ctx, absolute)) {
                 if (!force) {
                     error_msg("Can't lock file %s", absolute);
                     goto error;
@@ -1856,7 +1856,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     if (absolute != buffer->abs_filename) {
         if (buffer->locked) {
             // Filename changes, release old file lock
-            unlock_file(buffer->abs_filename);
+            unlock_file(&e->locks_ctx, buffer->abs_filename);
         }
         buffer->locked = new_locked;
 
@@ -1881,7 +1881,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
 
 error:
     if (new_locked) {
-        unlock_file(absolute);
+        unlock_file(&e->locks_ctx, absolute);
     }
     if (absolute != buffer->abs_filename) {
         free(absolute);

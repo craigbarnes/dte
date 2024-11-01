@@ -146,7 +146,7 @@ EditorState *init_editor_state(void)
     LOG_INFO("umask: %04o", 0777u & (unsigned int)mask);
 
     set_and_check_locale();
-    init_file_locks_context(e->user_config_dir, pid);
+    init_file_locks_context(&e->locks_ctx, e->user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
     if (unlikely(setenv("DTE_VERSION", VERSION, 1) != 0)) {
@@ -201,9 +201,10 @@ void free_editor_state(EditorState *e)
     clear_messages(&e->messages);
     free_macro(&e->macro);
     tag_file_free(&e->tagfile);
+    free_buffers(&e->buffers, &e->locks_ctx);
+    free_file_locks_context(&e->locks_ctx);
 
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
-    ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
     hashmap_free(&e->compilers, FREE_FUNC(free_compiler));
     hashmap_free(&e->modes, FREE_FUNC(free_mode_handler));
     hashmap_free(&e->styles.other, free);

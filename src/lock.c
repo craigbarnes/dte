@@ -21,22 +21,11 @@
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 
-typedef struct {
-    const char *locks;
-    const char *locks_lock;
-    mode_t locks_mode;
-    pid_t editor_pid;
-} FileLocksContext;
-
-// This is initialized during early startup and then never changed,
-// so it's deemed an acceptable use of non-const globals:
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-static FileLocksContext ctx = {.locks_mode = 0666};
-
-void init_file_locks_context(const char *fallback_dir, pid_t pid)
+void init_file_locks_context(FileLocksContext *ctx, const char *fallback_dir, pid_t pid)
 {
-    BUG_ON(ctx.locks);
     const char *dir = xgetenv("XDG_RUNTIME_DIR");
+    mode_t mode = 0666;
+
     if (!dir) {
         LOG_INFO("$XDG_RUNTIME_DIR not set");
         dir = fallback_dir;
@@ -47,14 +36,25 @@ void init_file_locks_context(const char *fallback_dir, pid_t pid)
         // Set sticky bit
         // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html#:~:text=sticky
         #ifdef S_ISVTX
-            ctx.locks_mode |= S_ISVTX;
+            mode |= S_ISVTX;
         #endif
     }
 
-    ctx.locks = path_join(dir, "dte-locks");
-    ctx.locks_lock = path_join(dir, "dte-locks.lock");
-    ctx.editor_pid = pid;
-    LOG_INFO("locks file: %s", ctx.locks);
+    *ctx = (FileLocksContext) {
+        .locks = path_join(dir, "dte-locks"),
+        .locks_lock = path_join(dir, "dte-locks.lock"),
+        .editor_pid = pid,
+        .locks_mode = mode,
+    };
+
+    LOG_INFO("locks file: %s", ctx->locks);
+}
+
+void free_file_locks_context(FileLocksContext *ctx)
+{
+    free(ctx->locks);
+    free(ctx->locks_lock);
+    *ctx = (FileLocksContext){.locks = NULL};
 }
 
 static bool process_exists(pid_t pid)
@@ -62,7 +62,7 @@ static bool process_exists(pid_t pid)
     return !kill(pid, 0);
 }
 
-static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
+static pid_t rewrite_lock_file(const FileLocksContext *ctx, char *buf, size_t *sizep, const char *filename)
 {
     const size_t filename_len = strlen(filename);
     size_t size = *sizep;
@@ -84,7 +84,7 @@ static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 
         bool same = strview_equal_strn(&line, filename, filename_len);
         pid_t pid = (pid_t)num;
-        if (pid == ctx.editor_pid) {
+        if (pid == ctx->editor_pid) {
             if (same) {
                 goto remove_line;
             }
@@ -106,16 +106,16 @@ static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
     return other_pid;
 }
 
-static bool lock_or_unlock(const char *filename, bool lock)
+static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bool lock)
 {
-    const char *const file_locks = ctx.locks;
-    const char *const file_locks_lock = ctx.locks_lock;
+    const char *const file_locks = ctx->locks;
+    const char *const file_locks_lock = ctx->locks_lock;
     BUG_ON(!file_locks);
     if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
         return true;
     }
 
-    mode_t mode = ctx.locks_mode;
+    mode_t mode = ctx->locks_mode;
     int tries = 0;
     int wfd;
     while (1) {
@@ -153,10 +153,10 @@ static bool lock_or_unlock(const char *filename, bool lock)
     }
 
     size_t size = (size_t)ssize;
-    pid_t pid = rewrite_lock_file(buf, &size, filename);
+    pid_t pid = rewrite_lock_file(ctx, buf, &size, filename);
     if (lock) {
         if (pid == 0) {
-            intmax_t p = (intmax_t)ctx.editor_pid;
+            intmax_t p = (intmax_t)ctx->editor_pid;
             size_t n = strlen(filename) + DECIMAL_STR_MAX(pid) + 4;
             buf = xrealloc(buf, size + n);
             size += xsnprintf(buf + size, n, "%jd %s\n", p, filename);
@@ -196,12 +196,12 @@ error:
     return false;
 }
 
-bool lock_file(const char *filename)
+bool lock_file(const FileLocksContext *ctx, const char *filename)
 {
-    return lock_or_unlock(filename, true);
+    return lock_or_unlock(ctx, filename, true);
 }
 
-void unlock_file(const char *filename)
+void unlock_file(const FileLocksContext *ctx, const char *filename)
 {
-    lock_or_unlock(filename, false);
+    lock_or_unlock(ctx, filename, false);
 }

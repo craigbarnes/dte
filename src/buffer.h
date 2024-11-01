@@ -8,6 +8,7 @@
 #include <time.h>
 #include "block-iter.h"
 #include "change.h"
+#include "lock.h"
 #include "options.h"
 #include "syntax/syntax.h"
 #include "util/debug.h"
@@ -106,7 +107,7 @@ bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes) NONNU
 void buffer_update_syntax(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_setup(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2]) NONNULL_ARGS;
-void free_buffer(Buffer *buffer) NONNULL_ARGS;
+void buffer_remove_unlock_and_free(PointerArray *buffers, Buffer *buffer, const FileLocksContext *locks) NONNULL_ARGS;
 void free_blocks(Buffer *buffer) NONNULL_ARGS;
 String dump_buffer(const Buffer *buffer, const BlockIter *cursor) NONNULL_ARGS;
 
@@ -114,6 +115,6 @@ Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNU
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
 Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const char *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
 Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts) NONNULL_ARGS_AND_RETURN;
-void remove_and_free_buffer(PointerArray *buffers, Buffer *buffer) NONNULL_ARGS;
+void free_buffers(PointerArray *buffers, const FileLocksContext *locks) NONNULL_ARGS;
 
 #endif

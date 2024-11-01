@@ -12,6 +12,7 @@
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
+#include "lock.h"
 #include "mode.h"
 #include "msg.h"
 #include "options.h"
@@ -96,6 +97,7 @@ typedef struct EditorState {
     SyntaxLoadState syn;
     CommandMacroState macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];
+    FileLocksContext locks_ctx;
     Frame *root_frame;
     struct Window *window;
     View *view;

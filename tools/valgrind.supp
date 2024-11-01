@@ -17,12 +17,3 @@
    fun:regexp_compile_or_fatal_error
    ...
 }
-
-{
-   static file lock filenames initialized by init_file_locks_context()
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   ...
-   fun:init_file_locks_context
-   ...
-}

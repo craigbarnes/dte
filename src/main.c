@@ -205,7 +205,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
             buffer->temporary = true;
         } else {
             error_msg("Unable to read redirected stdin");
-            remove_and_free_buffer(&e->buffers, buffer);
+            buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
             buffer = NULL;
         }
     }
@@ -242,7 +242,7 @@ static bool buffer_write_blocks_and_free(Buffer *buffer, int fd)
     }
 
     // Note: the other allocations for buffer should have already been
-    // freed by free_buffer()
+    // freed by buffer_unlock_and_free()
     free_blocks(buffer);
     free(buffer);
     return r;

@@ -105,10 +105,10 @@ void free_blocks(Buffer *buffer)
     }
 }
 
-void free_buffer(Buffer *buffer)
+static void buffer_unlock_and_free(Buffer *buffer, const FileLocksContext *locks)
 {
     if (buffer->locked) {
-        unlock_file(buffer->abs_filename);
+        unlock_file(locks, buffer->abs_filename);
     }
 
     free_changes(&buffer->change_head);
@@ -137,10 +137,20 @@ void free_buffer(Buffer *buffer)
     free(buffer);
 }
 
-void remove_and_free_buffer(PointerArray *buffers, Buffer *buffer)
+void free_buffers(PointerArray *buffers, const FileLocksContext *locks)
+{
+    for (size_t i = 0, n = buffers->count; i < n; i++) {
+        Buffer *buffer = buffers->ptrs[i];
+        buffer_unlock_and_free(buffer, locks);
+        buffers->ptrs[i] = NULL;
+    }
+    ptr_array_free_array(buffers);
+}
+
+void buffer_remove_unlock_and_free(PointerArray *buffers, Buffer *buffer, const FileLocksContext *locks)
 {
     ptr_array_remove(buffers, buffer);
-    free_buffer(buffer);
+    buffer_unlock_and_free(buffer, locks);
 }
 
 static bool same_file(const Buffer *buffer, const struct stat *st)

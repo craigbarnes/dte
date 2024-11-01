@@ -99,14 +99,14 @@ View *window_open_buffer (
 
     Buffer *buffer = buffer_new(&e->buffers, &e->options, encoding);
     if (!load_buffer(buffer, filename, &e->options, must_exist)) {
-        remove_and_free_buffer(&e->buffers, buffer);
+        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
         free(absolute);
         return NULL;
     }
     if (unlikely(buffer->file.mode == 0 && dir_missing)) {
         // New file in non-existing directory; this is usually a mistake
         error_msg("Error opening %s: Directory does not exist", filename);
-        remove_and_free_buffer(&e->buffers, buffer);
+        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
         free(absolute);
         return NULL;
     }
@@ -120,7 +120,7 @@ View *window_open_buffer (
     buffer_update_short_filename(buffer, &e->home_dir);
 
     if (e->options.lock_files) {
-        if (!lock_file(buffer->abs_filename)) {
+        if (!lock_file(&e->locks_ctx, buffer->abs_filename)) {
             buffer->readonly = true;
         } else {
             buffer->locked = true;
@@ -216,7 +216,7 @@ size_t remove_view(View *view)
             FileHistory *hist = &e->file_history;
             file_history_append(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
         }
-        remove_and_free_buffer(&e->buffers, buffer);
+        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
     }
 
     free(view);
