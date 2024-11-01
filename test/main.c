@@ -129,9 +129,10 @@ error:
     exit(1);
 }
 
-static void usage(FILE *stream, int argc, char *argv[])
+static ExitCode usage(const char *prog, bool err)
 {
-    fprintf(stream, "Usage: %s [-cCth]\n", progname(argc, argv, NULL));
+    fprintf(err ? stderr : stdout, "Usage: %s [-cCtTh]\n", prog);
+    return err ? EC_USAGE_ERROR : EC_OK;
 }
 
 int main(int argc, char *argv[])
@@ -145,21 +146,19 @@ int main(int argc, char *argv[])
 
     bool color = isatty(STDERR_FILENO) && !xgetenv("NO_COLOR");
 
-    for (int ch; (ch = getopt(argc, argv, "cCth")) != -1; ) {
+    for (int ch; (ch = getopt(argc, argv, "cCtTh")) != -1; ) {
         switch (ch) {
         case 'c':
         case 'C':
             color = (ch == 'c');
             break;
         case 't':
-            ctx.timing = true;
+        case 'T':
+            ctx.timing = (ch == 't');
             break;
         case 'h':
-            usage(stdout, argc, argv);
-            return EC_OK;
         default:
-            usage(stderr, argc, argv);
-            return EC_USAGE_ERROR;
+            return usage(progname(argc, argv, NULL), ch != 'h');
         }
     }
 
