@@ -22,6 +22,9 @@ const char buildvar_string[] =
 #if HAVE_MEMMEM
     " memmem"
 #endif
+#if HAVE_MEMRCHR
+    " memrchr"
+#endif
 #if HAVE_QSORT_R
     " qsort_r"
 #endif

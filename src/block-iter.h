@@ -37,6 +37,7 @@ static inline bool block_iter_is_eof(const BlockIter *bi)
 
 static inline bool block_iter_is_bol(const BlockIter *bi)
 {
+    // See also: Block invariants mentioned in sanity_check_blocks()
     return bi->offset == 0 || bi->blk->data[bi->offset - 1] == '\n';
 }
 

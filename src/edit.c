@@ -39,12 +39,15 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
             cursor_seen = true;
         }
         if (check_newlines) {
+            // Non-empty blocks must ALWAYS end with a newline, since
+            // lines MAY NOT straddle multiple blocks
             BUG_ON(blk->data[size - 1] != '\n');
         }
         if (DEBUG > 2) {
             BUG_ON(count_nl(blk->data, size) != blk->nl);
         }
     }
+
     BUG_ON(!cursor_seen);
 }
 

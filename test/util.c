@@ -35,6 +35,7 @@
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xmemmem.h"
+#include "util/xmemrchr.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 #include "util/xstdio.h"
@@ -3042,6 +3043,17 @@ static void test_xmemmem(TestContext *ctx)
     EXPECT_NULL(needle);
 }
 
+static void test_xmemrchr(TestContext *ctx)
+{
+    static const char str[] = "123456789 abcdefedcba 987654321";
+    EXPECT_PTREQ(xmemrchr(str, '9', sizeof(str) - 1), str + 22);
+    EXPECT_PTREQ(xmemrchr(str, '1', sizeof(str) - 1), str + sizeof(str) - 2);
+    EXPECT_PTREQ(xmemrchr(str, '1', sizeof(str) - 2), str);
+    EXPECT_PTREQ(xmemrchr(str, '\0', sizeof(str)), str + sizeof(str) - 1);
+    EXPECT_PTREQ(xmemrchr(str, '\0', sizeof(str) - 1), NULL);
+    EXPECT_PTREQ(xmemrchr(str, 'z', sizeof(str) - 1), NULL);
+}
+
 static void test_log_level_from_str(TestContext *ctx)
 {
     EXPECT_EQ(log_level_from_str("none"), LOG_LEVEL_NONE);
@@ -3244,6 +3256,7 @@ static const TestEntry tests[] = {
     TEST(test_fd_set_nonblock),
     TEST(test_fork_exec),
     TEST(test_xmemmem),
+    TEST(test_xmemrchr),
     TEST(test_log_level_from_str),
     TEST(test_log_level_to_str),
     TEST(test_timespec_subtract),

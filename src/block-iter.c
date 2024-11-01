@@ -4,6 +4,7 @@
 #include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
+#include "util/xmemrchr.h"
 
 /*
  * Move after next newline (beginning of next line or end of file).
@@ -167,21 +168,27 @@ size_t block_iter_bol(BlockIter *bi)
 {
     block_iter_normalize(bi);
     size_t offset = bi->offset;
-    if (offset == 0 || offset == bi->blk->size) {
+    if (block_iter_is_bol(bi)) {
         return 0;
     }
 
-    if (bi->blk->nl == 1) {
-        offset = 0;
-    } else {
-        while (offset && bi->blk->data[offset - 1] != '\n') {
-            offset--;
-        }
+    // These cases are handled by the condition above
+    const Block *blk = bi->blk;
+    BUG_ON(offset == 0);
+    BUG_ON(offset >= blk->size);
+
+    const unsigned char *nl;
+    if (blk->nl == 1 || !(nl = xmemrchr(blk->data, '\n', offset - 1))) {
+        // If there's only a single line in `blk` or no newline before
+        // the offset, then bol is at offset 0
+        bi->offset = 0;
+        return offset;
     }
 
-    const size_t ret = bi->offset - offset;
+    offset = (size_t)(nl - blk->data) + 1;
+    size_t count = bi->offset - offset;
     bi->offset = offset;
-    return ret;
+    return count;
 }
 
 size_t block_iter_eol(BlockIter *bi)
@@ -189,14 +196,17 @@ size_t block_iter_eol(BlockIter *bi)
     block_iter_normalize(bi);
     const Block *blk = bi->blk;
     const size_t offset = bi->offset;
+
     if (unlikely(offset == blk->size)) {
         // Cursor at end of last block
         return 0;
     }
+
     if (blk->nl == 1) {
         bi->offset = blk->size - 1;
         return bi->offset - offset;
     }
+
     const unsigned char *end = memchr(blk->data + offset, '\n', blk->size - offset);
     BUG_ON(!end);
     bi->offset = (size_t)(end - blk->data);
