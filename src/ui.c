@@ -67,7 +67,7 @@ void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_tit
     term_put_literal(obuf, " dte\033\\");
 }
 
-void restore_cursor(EditorState *e)
+static void restore_cursor(EditorState *e)
 {
     unsigned int x, y;
     if (e->mode->cmds == &normal_commands) {
@@ -85,7 +85,7 @@ static void clear_update_tabbar(Window *window, void* UNUSED_ARG(data))
     window->update_tabbar = false;
 }
 
-void end_update(EditorState *e)
+static void end_update(EditorState *e)
 {
     Terminal *term = &e->terminal;
     restore_cursor(e);
@@ -105,7 +105,7 @@ void end_update(EditorState *e)
     }
 }
 
-void start_update(Terminal *term)
+static void start_update(Terminal *term)
 {
     term_begin_sync_update(term);
     term_hide_cursor(term);
