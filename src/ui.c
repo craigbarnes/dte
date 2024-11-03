@@ -88,8 +88,6 @@ static void clear_update_tabbar(Window *window, void* UNUSED_ARG(data))
 static void end_update(EditorState *e)
 {
     Terminal *term = &e->terminal;
-    restore_cursor(e);
-    term_show_cursor(term);
     term_end_sync_update(term);
     term_output_flush(&term->obuf);
 
@@ -181,13 +179,16 @@ void update_screen(EditorState *e, const ScreenState *s)
 
     update_command_line(e);
 
+    if (flags & UPDATE_CURSOR_STYLE) {
+        update_cursor_style(e);
+    }
+
     if (unlikely(flags & UPDATE_DIALOG)) {
         bool u;
         show_dialog(term, &e->styles, get_msg(&u));
-    }
-
-    if (flags & UPDATE_CURSOR_STYLE) {
-        update_cursor_style(e);
+    } else {
+        restore_cursor(e);
+        term_show_cursor(term);
     }
 
     e->screen_update = 0;
