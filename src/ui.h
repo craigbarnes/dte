@@ -22,6 +22,17 @@ typedef struct {
     long vy;
 } ScreenState;
 
+static inline ScreenState get_screen_state(const View *view)
+{
+    return (ScreenState) {
+        .is_modified = buffer_modified(view->buffer),
+        .id = view->buffer->id,
+        .cy = view->cy,
+        .vx = view->vx,
+        .vy = view->vy
+    };
+}
+
 // ui.c
 void update_screen(EditorState *e, const ScreenState *s);
 void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);

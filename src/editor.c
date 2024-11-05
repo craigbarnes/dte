@@ -315,14 +315,7 @@ int main_loop(EditorState *e)
             continue;
         }
 
-        const ScreenState s = {
-            .is_modified = buffer_modified(e->buffer),
-            .id = e->buffer->id,
-            .cy = e->view->cy,
-            .vx = e->view->vx,
-            .vy = e->view->vy
-        };
-
+        const ScreenState s = get_screen_state(e->view);
         clear_error();
         handle_input(e, key);
         sanity_check(e->view);
