@@ -478,13 +478,12 @@ void dump_frame(const Frame *frame, size_t level, String *str)
     string_append_memset(str, ' ', level * 4);
     string_sprintf(str, "%dx%d", frame->w, frame->h);
 
-    const Window *win = frame->window;
-    if (win) {
+    const Window *w = frame->window;
+    if (w) {
+        const char *name = buffer_filename(w->view->buffer);
         string_append_byte(str, '\n');
         string_append_memset(str, ' ', (level + 1) * 4);
-        string_sprintf(str, "%d,%d %dx%d ", win->x, win->y, win->w, win->h);
-        string_append_cstring(str, buffer_filename(win->view->buffer));
-        string_append_byte(str, '\n');
+        string_sprintf(str, "%d,%d %dx%d %s\n", w->x, w->y, w->w, w->h, name);
         return;
     }
 
