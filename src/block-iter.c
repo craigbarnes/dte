@@ -177,11 +177,14 @@ size_t block_iter_bol(BlockIter *bi)
     BUG_ON(offset == 0);
     BUG_ON(offset >= blk->size);
 
-    const unsigned char *nl;
-    if (blk->nl == 1 || !(nl = xmemrchr(blk->data, '\n', offset - 1))) {
-        // If there's only a single line in `blk` or no newline before
-        // the offset, then bol is at offset 0
-        bi->offset = 0;
+    if (blk->nl == 1) {
+        bi->offset = 0; // Only 1 line in `blk`; bol is at offset 0
+        return offset;
+    }
+
+    const unsigned char *nl = xmemrchr(blk->data, '\n', offset - 1);
+    if (!nl) {
+        bi->offset = 0; // No newline before offset; bol is at offset 0
         return offset;
     }
 
