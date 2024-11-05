@@ -14,6 +14,9 @@
 #include "view.h"
 #include "window.h"
 
+// A snapshot of various editor state values, as recorded by main_loop()
+// and later checked by update_screen(), to determine which areas of the
+// screen need to be redrawn
 typedef struct {
     bool is_modified;
     unsigned long id;
