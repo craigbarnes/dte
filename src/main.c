@@ -32,6 +32,7 @@
 #include "terminal/output.h"
 #include "terminal/paste.h"
 #include "terminal/terminal.h"
+#include "ui.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/fd.h"
@@ -509,12 +510,18 @@ int main(int argc, char *argv[])
         read_history_files(e);
     }
 
-    // We don't want errors relating to opening files printed to stderr,
-    // since wildcard arguments (e.g. `dte *`) may expand to directory
-    // names and produce lots of "not a regular file" errors
-    unsigned int nr_stderr_errors = get_nr_errors();
     errors_to_stderr(false);
-    clear_error();
+
+    // Initialize terminal but don't update screen yet. Also display
+    // "Press any key to continue" prompt if there were any errors
+    // during reading configuration files.
+    if (unlikely(!term_raw())) {
+        return ec_error("tcsetattr", EC_IO_ERROR);
+    }
+    if (get_nr_errors()) {
+        any_key(term, e->options.esc_timeout);
+        clear_error();
+    }
 
     e->status = EDITOR_RUNNING;
 
@@ -543,18 +550,12 @@ int main(int argc, char *argv[])
     }
 
     set_view(window_get_first_view(window));
+    ui_start(e);
+    term_put_level_1_queries(term, !!xgetenv("DTE_FULL_QUERY"));
+    term_output_flush(&term->obuf);
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);
-    }
-
-    int exit_code = e->status;
-    bool skipped_mainloop = false;
-    if (exit_code >= 0) {
-        // If a -c command caused the editor to exit (quit, close -q, etc.),
-        // terminal init/deinit and entering the main-loop can be skipped
-        skipped_mainloop = true;
-        goto exit;
     }
 
     size_t opened_tags = 0;
@@ -581,19 +582,12 @@ int main(int argc, char *argv[])
     set_fatal_signal_handlers();
     set_sigwinch_handler();
 
-    if (unlikely(!term_raw())) {
-        return ec_error("tcsetattr", EC_IO_ERROR);
+    if (nr_commands + nr_tags > 0) {
+        const ScreenState s = get_screen_state(e->view);
+        update_screen(e, &s);
     }
 
-    if (unlikely(nr_stderr_errors > 0)) {
-        // Display "press any key to continue" prompt for stderr errors
-        any_key(term, e->options.esc_timeout);
-    }
-
-    ui_start(e);
-    term_put_level_1_queries(term, !!xgetenv("DTE_FULL_QUERY"));
-    term_output_flush(&term->obuf);
-    exit_code = main_loop(e);
+    int exit_code = main_loop(e);
     term_restore_title(term);
 
     /*
@@ -609,7 +603,6 @@ int main(int argc, char *argv[])
      */
     ui_end(e);
 
-exit:
     errors_to_stderr(true);
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
@@ -617,9 +610,7 @@ exit:
     // This must be done before calling buffer_write_blocks_and_free(), since
     // output modes need to be restored to get proper line ending translation
     // and std_fds[STDOUT_FILENO] may be a pipe to the terminal
-    if (!skipped_mainloop) {
-        term_cooked();
-    }
+    term_cooked();
 
     if (have_stdout_buffer) {
         bool ok = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
