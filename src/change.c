@@ -177,6 +177,7 @@ static void reverse_change(View *view, Change *change)
     BUG_ON(!del_count && !ins_count);
 
     if (view->buffer->views.count > 1) {
+        // NOLINTNEXTLINE(readability-suspicious-call-argument)
         fix_cursors(view, change->offset, ins_count, del_count);
     }
 
@@ -204,6 +205,7 @@ static void reverse_change(View *view, Change *change)
     }
 
     // Reverse replace
+    // NOLINTNEXTLINE(readability-suspicious-call-argument)
     char *buf = do_replace(view, ins_count, change->buf, del_count);
     free(change->buf);
     change->buf = buf;
