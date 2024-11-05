@@ -550,9 +550,7 @@ int main(int argc, char *argv[])
     }
 
     set_view(window_get_first_view(window));
-    ui_start(e);
-    term_put_level_1_queries(term, !!xgetenv("DTE_FULL_QUERY"));
-    term_output_flush(&term->obuf);
+    ui_first_start(e, !!xgetenv("DTE_FULL_QUERY"));
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);

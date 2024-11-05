@@ -286,8 +286,8 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 
     if (is_newly_detected_feature(existing, detected, TFLAG_KITTY_KEYBOARD)) {
         // First disable modifyOtherKeys mode (as previously enabled by
-        // main() → ui_start() → term_enable_private_modes()) and then
-        // enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5).
+        // main() → ui_first_start() → term_enable_private_modes()) and
+        // then enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5).
         // See also:
         // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=CSI%20%3E%20Pp%20m
         // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
