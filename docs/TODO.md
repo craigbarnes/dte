@@ -88,6 +88,10 @@ Features
   * [YAML]
   * [jq]
 
+* Extend the [`dte-syntax(5)`] command set, so as to provide a proper
+  solution for handling e.g. [ambiguous regexp literals in Ruby][]
+  (most likely some form of backtracking)
+
 * Handle codepoints from [Unicode categories] `Ps`, `Pe`, `Pi` and `Pf`
   in `cmd_match_bracket()` (see also: [EU's list of quotation marks] and
   Unicode's [`BidiBrackets.txt`])
@@ -289,6 +293,7 @@ Testing/Debugging
 [TOML]: https://toml.io/en/v1.0.0
 [YAML]: https://yaml.org/spec/1.2.2/
 [jq]: https://jqlang.github.io/jq/manual/#modules
+[ambiguous regexp literals in Ruby]: https://stackoverflow.com/questions/38333687/what-is-ambiguous-regexp-literal-in-rubocop
 [Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
