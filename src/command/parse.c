@@ -106,6 +106,11 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
     return n;
 }
 
+// Parse a single dterc(5) argument from `cmd`, stopping when an unquoted
+// whitespace or semicolon character is found or when all `len` bytes have
+// been processed without encountering such a character. Escape sequences
+// and $variables are expanded during processing and the fully expanded
+// result is returned as a malloc'd string.
 char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len)
 {
     String buf;
