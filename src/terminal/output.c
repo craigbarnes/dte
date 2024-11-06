@@ -3,13 +3,14 @@
 // Copyright © Timo Hirvonen.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also:
-// • ECMA-48 5th edition, §8.3 (CUP, ED, EL, REP, SGR)
-// • DEC Manual EK-VT510-RM, Chapter 5 (CUP, ED, EL, SGR, DECRQM, DECSCUSR, DECTCEM)
-// • XTerm's ctlseqs.html (XTWINOPS, XTQMODKEYS, XTGETTCAP, OSC 12, OSC 112)
-// • https://ecma-international.org/publications-and-standards/standards/ecma-48/
-// • https://vt100.net/docs/vt510-rm/contents.html
-// • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-// • https://sw.kovidgoyal.net/kitty/keyboard-protocol/ (CSI ? u)
+// • ECMA-48 5th edition, §8.3 (CUP, ED, EL, REP, SGR):
+//   https://ecma-international.org/publications-and-standards/standards/ecma-48/
+// • DEC Manual EK-VT510-RM, Chapter 5 (DECRQM, DECRQSS, DECSCUSR, DECTCEM):
+//   https://vt100.net/docs/vt510-rm/contents.html
+// • XTerm's ctlseqs.html (XTWINOPS, XTQMODKEYS, XTGETTCAP, OSC 12, OSC 112):
+//   https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+// • Kitty's keyboard protocol documentation (CSI ? u):
+//   https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 
 #include <limits.h>
 #include <stdint.h>
