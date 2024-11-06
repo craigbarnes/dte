@@ -20,7 +20,7 @@ shift $((OPTIND - 1))
 value="$1"
 file="$2"
 
-if test "$noregen" -a -f "$file"; then
+if test "$noregen" && test -f "$file"; then
     # Don't update file; it already exists and -R was used
     exit 0
 fi

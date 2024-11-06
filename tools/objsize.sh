@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-if test "$#" -gt 1 -o -z "$(size -V 2>/dev/null | head -n1 | grep '^GNU ')"; then
+if test "$#" -gt 1 || test -z "$(size -V 2>/dev/null | head -n1 | grep '^GNU ')"; then
     size "${@:-dte}"
     exit $?
 fi
