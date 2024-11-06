@@ -60,6 +60,11 @@ static SerializeType get_serialize_type(const unsigned char *arg, size_t n)
     return type;
 }
 
+// Append `arg` to `s`, escaping dterc(5) special characters and/or
+// quoting as appropriate, so that the appended string round-trips
+// back to `arg` when passed to parse_command_arg(). If escape_tilde
+// is true, any leading "~/" substring will be escaped, so as to not
+// expand to $HOME/ when round-tripped.
 void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde)
 {
     char *buf = string_reserve_space(s, arg.length + STRLEN("~/''"));
