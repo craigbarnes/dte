@@ -8,7 +8,6 @@
 #include "output.h"
 #include "util/ascii.h"
 #include "util/bit.h"
-#include "util/debug.h"
 #include "util/log.h"
 #include "util/time-util.h"
 #include "util/unicode.h"
@@ -234,27 +233,6 @@ static COLD void log_detected_features (
         LOG_INFO("terminal feature %s detected via query%s", name, extra);
         detected &= ~flag;
     }
-}
-
-static bool is_newly_detected_feature (
-    TermFeatureFlags existing,
-    TermFeatureFlags detected,
-    TermFeatureFlags feature
-) {
-    BUG_ON(!IS_POWER_OF_2(feature));
-    // (detected & feature) && !(existing & feature)
-    return ~existing & detected & feature;
-}
-
-UNITTEST {
-    BUG_ON(is_newly_detected_feature(1, 1, 1));
-    BUG_ON(is_newly_detected_feature(1, 2, 1));
-    BUG_ON(is_newly_detected_feature(3, 1, 1));
-    BUG_ON(is_newly_detected_feature(1, 3, 1));
-    BUG_ON(is_newly_detected_feature(0, 6, 1));
-    BUG_ON(!is_newly_detected_feature(0, 1, 1));
-    BUG_ON(!is_newly_detected_feature(2, 1, 1));
-    BUG_ON(!is_newly_detected_feature(3, 4, 4));
 }
 
 static KeyCode handle_query_reply(Terminal *term, KeyCode key)

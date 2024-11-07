@@ -51,9 +51,9 @@ static inline size_t u_char_size(CodePoint u)
 }
 
 static inline size_t u_make_printable (
-    const char *src,
+    const char *restrict src,
     size_t src_len,
-    char *dest,
+    char *restrict dest,
     size_t dest_len,
     MakePrintableFlags flags
 ) {

@@ -1,6 +1,7 @@
 #include "test.h"
 #include "terminal/color.h"
 #include "terminal/cursor.h"
+#include "terminal/input.h"
 #include "terminal/key.h"
 #include "terminal/linux.h"
 #include "terminal/osc52.h"
@@ -1727,6 +1728,18 @@ static void test_term_put_level_1_queries(TestContext *ctx)
     term_output_free(obuf);
 }
 
+static void test_is_newly_detected_feature(TestContext *ctx)
+{
+    EXPECT_FALSE(is_newly_detected_feature(1, 1, 1));
+    EXPECT_FALSE(is_newly_detected_feature(1, 2, 1));
+    EXPECT_FALSE(is_newly_detected_feature(3, 1, 1));
+    EXPECT_FALSE(is_newly_detected_feature(1, 3, 1));
+    EXPECT_FALSE(is_newly_detected_feature(0, 6, 1));
+    EXPECT_TRUE(is_newly_detected_feature(0, 1, 1));
+    EXPECT_TRUE(is_newly_detected_feature(2, 1, 1));
+    EXPECT_TRUE(is_newly_detected_feature(3, 4, 4));
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_rgb),
     TEST(test_parse_term_style),
@@ -1756,6 +1769,7 @@ static const TestEntry tests[] = {
     TEST(test_term_restore_cursor_style),
     TEST(test_term_begin_sync_update),
     TEST(test_term_put_level_1_queries),
+    TEST(test_is_newly_detected_feature),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);

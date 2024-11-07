@@ -3,7 +3,18 @@
 
 #include "key.h"
 #include "terminal.h"
+#include "util/debug.h"
 #include "util/macros.h"
+
+static inline bool is_newly_detected_feature (
+    TermFeatureFlags existing, // Existing Terminal::features bits
+    TermFeatureFlags detected, // term_parse_sequence() return value
+    TermFeatureFlags feature   // Feature flag to test
+) {
+    BUG_ON(!IS_POWER_OF_2(feature));
+    // (detected & feature) && !(existing & feature)
+    return ~existing & detected & feature;
+}
 
 void term_input_init(TermInputBuffer *ibuf) NONNULL_ARGS;
 void term_input_free(TermInputBuffer *ibuf) NONNULL_ARGS;
