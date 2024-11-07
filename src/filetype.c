@@ -118,9 +118,7 @@ static StringView get_filename_extension(StringView filename)
         filename.length -= ext.length + 1;
         ext = path_extension(filename);
     }
-    if (strview_has_suffix(&ext, "~")) {
-        ext.length--;
-    }
+    strview_remove_matching_suffix(&ext, "~");
     return ext;
 }
 

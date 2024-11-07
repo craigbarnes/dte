@@ -86,8 +86,7 @@ static inline bool path_parent(StringView *path)
     }
 
     // Remove up to 1 trailing slash
-    if (unlikely(strview_has_suffix(path, "/"))) {
-        path->length--;
+    if (unlikely(strview_remove_matching_suffix(path, "/"))) {
         BUG_ON(strview_has_suffix(path, "/"));
     }
 
