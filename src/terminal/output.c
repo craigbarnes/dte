@@ -708,8 +708,7 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
         i += hex_encode_byte(buf + i, color_b(s.color));
     }
 
-    buf[i++] = '\033';
-    buf[i++] = '\\';
+    i += copyliteral(buf + i, "\033\\"); // String Terminator (ST)
     BUG_ON(i > maxlen);
     obuf->count += i;
 }

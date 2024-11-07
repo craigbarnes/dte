@@ -34,7 +34,7 @@ static void string_append_dquoted_arg(String *s, StringView arg)
             buf[pos++] = '\\';
             ch = escmap[ch];
         } else if (unlikely(ascii_iscntrl(ch))) {
-            pos += copyliteral(buf, "\\x");
+            pos += copyliteral(buf + pos, "\\x");
             buf[pos++] = hextab_upper[(ch >> 4) & 0xF];
             ch = hextab_upper[ch & 0xF];
         }
@@ -64,7 +64,7 @@ static SerializeType get_serialize_type(const unsigned char *arg, size_t n)
 // quoting as appropriate, so that the appended string round-trips
 // back to `arg` when passed to parse_command_arg(). If escape_tilde
 // is true, any leading "~/" substring will be escaped, so as to not
-// expand to $HOME/ when round-tripped.
+// expand to $HOME/.
 void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde)
 {
     char *buf = string_reserve_space(s, arg.length + STRLEN("~/''"));

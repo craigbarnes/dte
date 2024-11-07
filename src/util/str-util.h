@@ -18,8 +18,7 @@ static inline size_t copystrn(char *dest, const char *src, size_t len)
     return len;
 }
 
-// Like getenv(3) but with `const char*` return type and also returning
-// NULL for empty strings
+// Like getenv(3), but also returning NULL for empty strings
 static inline const char *xgetenv(const char *name)
 {
     const char *val = getenv(name);
