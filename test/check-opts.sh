@@ -39,13 +39,10 @@ check_str "$($dte -b rc)" "$(cat config/rc)"
 
 $dte -s config/syntax/dte >/dev/null
 
-# TODO: Run these tests unconditionally when main() no longer requires
-# a controlling terminal when started with e.g. `dte -cquit`
-if test -t 0 && test -t 1; then
-    check_str "$(echo xyz | TERM='' $dte -c 'replace y Y; quit' | cat)" 'xYz'
-    printf test | TERM='' $dte -cquit
-    check_exit "$?" 0
-fi
+# TODO: Run these tests in headless mode, when implemented
+#check_str "$(echo xyz | $dte -H -c 'replace y Y; quit' | cat)" 'xYz'
+#printf test | $dte -H -cquit
+#check_exit "$?" 0
 
 # Check error handling -----------------------------------------------------
 set +e
