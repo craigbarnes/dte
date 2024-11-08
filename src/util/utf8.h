@@ -50,6 +50,16 @@ static inline size_t u_char_size(CodePoint u)
     return 1 + (u > 0x7F) + (u > 0x7FF) + (u > 0xFFFF) - adj;
 }
 
+/*
+ * Copy into `dest` the printable representation of `src`, escaping
+ * control characters and other unprintable sequences as necessary.
+ * Bytes >= 0x80 are assumed to be the start of a UTF-8 multi-byte
+ * sequence, if subsequent bytes result in a valid encoding, or are
+ * otherwise byte-wise escaped. This is similar in purpose to the
+ * BSD strnvisx(3) function, but produces a truncated string if the
+ * destination buffer has insufficient space. If `dest_len` is at
+ * least `(4 * src_len) + 1`, truncation can never happen.
+ */
 static inline size_t u_make_printable (
     const char *restrict src,
     size_t src_len,
