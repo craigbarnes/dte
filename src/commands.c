@@ -2341,7 +2341,7 @@ static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 static bool cmd_wprev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    e->window = window_next(e->window);
+    e->window = window_prev(e->window);
     set_view(e->window->view);
     e->screen_update |= UPDATE_ALL;
     frame_debug(e->root_frame);
