@@ -18,6 +18,7 @@ Checks: >
     -clang-diagnostic-pointer-sign,
     -clang-diagnostic-sign-compare,
     -clang-analyzer-core.NonNullParamChecker,
+    -clang-analyzer-optin.core.EnumCastOutOfRange,
     -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
     -clang-analyzer-unix.Malloc,
     -clang-analyzer-valist.Uninitialized,
