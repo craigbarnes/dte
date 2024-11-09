@@ -59,10 +59,11 @@ static void set_and_check_locale(void)
     exit(EC_CONFIG_ERROR);
 }
 
+// Get permissions mask for new files
 static mode_t get_umask(void)
 {
-    mode_t old = umask(0);
-    umask(old);
+    mode_t old = umask(0); // Get by setting a dummy value
+    umask(old); // Restore previous value
     return old;
 }
 
