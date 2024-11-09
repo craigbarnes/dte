@@ -132,7 +132,7 @@ size_t buf_uint_to_str(unsigned int x, char *buf)
  * • https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
  * • https://gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html#index-long-ls-format
  */
-char *filemode_to_str(mode_t mode, char *buf)
+char *file_permissions_to_str(mode_t mode, char *buf)
 {
     static const char xmap[8] = "-xSs-xTt";
 

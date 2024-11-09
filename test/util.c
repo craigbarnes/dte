@@ -1266,38 +1266,38 @@ static void test_buf_u8_to_str(TestContext *ctx)
     EXPECT_STREQ(buf, "255");
 }
 
-static void test_filemode_to_str(TestContext *ctx)
+static void test_file_permissions_to_str(TestContext *ctx)
 {
     char buf[12];
-    EXPECT_STREQ("---------", filemode_to_str(0, buf));
-    EXPECT_STREQ("--------x", filemode_to_str(01, buf));
-    EXPECT_STREQ("--x--x--x", filemode_to_str(0111, buf));
-    EXPECT_STREQ("rwx------", filemode_to_str(0700, buf));
-    EXPECT_STREQ("r--r--r--", filemode_to_str(0444, buf));
-    EXPECT_STREQ("rw-rw-rw-", filemode_to_str(0666, buf));
-    EXPECT_STREQ("rwxrwxrwx", filemode_to_str(0777, buf));
+    EXPECT_STREQ("---------", file_permissions_to_str(0, buf));
+    EXPECT_STREQ("--------x", file_permissions_to_str(01, buf));
+    EXPECT_STREQ("--x--x--x", file_permissions_to_str(0111, buf));
+    EXPECT_STREQ("rwx------", file_permissions_to_str(0700, buf));
+    EXPECT_STREQ("r--r--r--", file_permissions_to_str(0444, buf));
+    EXPECT_STREQ("rw-rw-rw-", file_permissions_to_str(0666, buf));
+    EXPECT_STREQ("rwxrwxrwx", file_permissions_to_str(0777, buf));
 
-    EXPECT_STREQ("-----S---", filemode_to_str(02000, buf));
-    EXPECT_STREQ("-----s---", filemode_to_str(02010, buf));
-    EXPECT_STREQ("--S------", filemode_to_str(04000, buf));
-    EXPECT_STREQ("--s------", filemode_to_str(04100, buf));
-    EXPECT_STREQ("--S--S---", filemode_to_str(06000, buf));
-    EXPECT_STREQ("--s--s---", filemode_to_str(06110, buf));
-    EXPECT_STREQ("--s--S---", filemode_to_str(06100, buf));
-    EXPECT_STREQ("--S--s---", filemode_to_str(06010, buf));
+    EXPECT_STREQ("-----S---", file_permissions_to_str(02000, buf));
+    EXPECT_STREQ("-----s---", file_permissions_to_str(02010, buf));
+    EXPECT_STREQ("--S------", file_permissions_to_str(04000, buf));
+    EXPECT_STREQ("--s------", file_permissions_to_str(04100, buf));
+    EXPECT_STREQ("--S--S---", file_permissions_to_str(06000, buf));
+    EXPECT_STREQ("--s--s---", file_permissions_to_str(06110, buf));
+    EXPECT_STREQ("--s--S---", file_permissions_to_str(06100, buf));
+    EXPECT_STREQ("--S--s---", file_permissions_to_str(06010, buf));
 
 #ifdef S_ISVTX
-    EXPECT_STREQ("--S--S--T", filemode_to_str(07000, buf));
-    EXPECT_STREQ("--s--s--t", filemode_to_str(07111, buf));
-    EXPECT_STREQ("rwsrwsrwt", filemode_to_str(07777, buf));
-    EXPECT_STREQ("rwSrwSrwT", filemode_to_str(07666, buf));
-    EXPECT_STREQ("------rwt", filemode_to_str(01007, buf));
+    EXPECT_STREQ("--S--S--T", file_permissions_to_str(07000, buf));
+    EXPECT_STREQ("--s--s--t", file_permissions_to_str(07111, buf));
+    EXPECT_STREQ("rwsrwsrwt", file_permissions_to_str(07777, buf));
+    EXPECT_STREQ("rwSrwSrwT", file_permissions_to_str(07666, buf));
+    EXPECT_STREQ("------rwt", file_permissions_to_str(01007, buf));
 #else
-    EXPECT_STREQ("--S--S---", filemode_to_str(07000, buf));
-    EXPECT_STREQ("--s--s--x", filemode_to_str(07111, buf));
-    EXPECT_STREQ("rwsrwsrwx", filemode_to_str(07777, buf));
-    EXPECT_STREQ("rwSrwSrw-", filemode_to_str(07666, buf));
-    EXPECT_STREQ("------rwx", filemode_to_str(01007, buf));
+    EXPECT_STREQ("--S--S---", file_permissions_to_str(07000, buf));
+    EXPECT_STREQ("--s--s--x", file_permissions_to_str(07111, buf));
+    EXPECT_STREQ("rwsrwsrwx", file_permissions_to_str(07777, buf));
+    EXPECT_STREQ("rwSrwSrw-", file_permissions_to_str(07666, buf));
+    EXPECT_STREQ("------rwx", file_permissions_to_str(01007, buf));
 #endif
 }
 
@@ -3202,7 +3202,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_umax_to_str),
     TEST(test_buf_uint_to_str),
     TEST(test_buf_u8_to_str),
-    TEST(test_filemode_to_str),
+    TEST(test_file_permissions_to_str),
     TEST(test_human_readable_size),
     TEST(test_u_char_size),
     TEST(test_u_char_width),

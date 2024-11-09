@@ -28,7 +28,7 @@ size_t buf_u8_to_str(uint8_t x, char *buf) NONNULL_ARGS;
 const char *umax_to_str(uintmax_t x) RETURNS_NONNULL;
 const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
 const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;
-char *filemode_to_str(mode_t mode, char *buf) NONNULL_ARGS_AND_RETURN;
+char *file_permissions_to_str(mode_t mode, char *buf) NONNULL_ARGS_AND_RETURN;
 char *human_readable_size(uintmax_t bytes, char *buf) NONNULL_ARGS_AND_RETURN;
 
 #endif

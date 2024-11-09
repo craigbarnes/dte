@@ -491,7 +491,7 @@ String dump_buffer(const Buffer *buffer, const BlockIter *cursor)
             "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %s\n%s %jd\n%s %ju\n",
             "     Path:", buffer->abs_filename,
             " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
-            "     Mode:", filemode_to_str(file->mode, modestr), perms,
+            "     Mode:", file_permissions_to_str(file->mode, modestr), perms,
             "     User:", (intmax_t)file->uid,
             "    Group:", (intmax_t)file->gid,
             "     Size:", fmt_filesize(file->size, sizestr),
