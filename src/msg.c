@@ -61,7 +61,8 @@ void activate_current_message_save (
     PointerArray *bookmarks,
     const View *view
 ) {
-    if (msgs->array.count == 0) {
+    size_t nmsgs = msgs->array.count;
+    if (nmsgs == 0) {
         return;
     }
 
@@ -71,11 +72,15 @@ void activate_current_message_save (
     activate_current_message(msgs, view->window);
 
     const BlockIter *cursor = &view->window->editor->view->cursor;
-    if (cursor->blk == save.blk && cursor->offset == save.offset) {
+    if (nmsgs == 1 && cursor->blk == save.blk && cursor->offset == save.offset) {
+        // TODO: Make this condition configurable (some people may prefer
+        // to *always* push a bookmark)
         return;
     }
 
-    // Active view or cursor position changed; bookmark previous location
+    // Active view or cursor position changed, or MAY change due to
+    // there being multiple Messages to navigate with `msg -n|-p`;
+    // bookmark the previous location
     const Buffer *b = view->buffer;
     char *filename = b->abs_filename ? xstrdup(b->abs_filename) : NULL;
     bookmark_push(bookmarks, new_file_location(filename, b->id, line, col));
