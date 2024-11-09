@@ -205,11 +205,12 @@ int main(int argc, char *argv[])
 
     timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[1]);
 
+    const char *red = ctx.failed ? ctx.boldred : "";
+    const char *sgr0 = ctx.failed ? ctx.sgr0 : "";
     fprintf (
         stderr,
         "\n   TOTAL  %u passed, %s%u failed%s",
-        ctx.passed,
-        ctx.failed ? ctx.boldred : "", ctx.failed, ctx.sgr0
+        ctx.passed, red, ctx.failed, sgr0
     );
 
     if (timing) {
