@@ -2653,8 +2653,8 @@ static void test_path_absolute(TestContext *ctx)
     EXPECT_STREQ(path, NULL);
     free(path);
 
-    const char linkpath[] = "./build/../build/test/test-symlink";
-    if (symlink("../../README.md", linkpath) != 0) {
+    static const char linkpath[] = "./build/test/../test/test-symlink";
+    if (symlink("../gen/platform.mk", linkpath) != 0) {
         TEST_FAIL("symlink() failed: %s", strerror(errno));
         return;
     }
@@ -2663,7 +2663,7 @@ static void test_path_absolute(TestContext *ctx)
     path = path_absolute(linkpath);
     EXPECT_EQ(unlink(linkpath), 0);
     ASSERT_NONNULL(path);
-    EXPECT_STREQ(path_basename(path), "README.md");
+    EXPECT_STREQ(path_basename(path), "platform.mk");
     free(path);
 }
 

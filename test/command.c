@@ -188,7 +188,7 @@ static void test_parse_command_arg(TestContext *ctx)
     // Tilde expansion
     runner.expand_tilde_slash = true;
     arg = parse_command_arg(&runner, STRN("~/filename"));
-    EXPECT_TRUE(str_has_suffix(arg, "/build/test/HOME/filename"));
+    EXPECT_TRUE(str_has_suffix(arg, "/test/HOME/filename"));
     free(arg);
 
     runner.expand_tilde_slash = false;
