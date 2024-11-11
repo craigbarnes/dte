@@ -14,11 +14,6 @@
 #include "util/path.h"
 #include "util/xreadwrite.h"
 
-static bool fd_is_valid(int fd)
-{
-    return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
-}
-
 static void test_process_sanity(TestContext *ctx)
 {
     // Note that if this fails, there'll only be (at best) an "aborted"

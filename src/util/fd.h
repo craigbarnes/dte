@@ -1,6 +1,7 @@
 #ifndef UTIL_FD_H
 #define UTIL_FD_H
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
 #include <sys/types.h>
@@ -38,6 +39,12 @@ WARN_UNUSED_RESULT
 static inline bool fd_set_nonblock(int fd, bool nonblock)
 {
     return fd_set_flag(fd, O_NONBLOCK, F_GETFL, F_SETFL, nonblock);
+}
+
+WARN_UNUSED_RESULT
+static inline bool fd_is_valid(int fd)
+{
+    return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
 }
 
 WARN_UNUSED_RESULT

@@ -1,5 +1,4 @@
 #include "feature.h"
-#include <errno.h>
 #include <sys/stat.h>
 #include "fd.h"
 #include "debug.h"
