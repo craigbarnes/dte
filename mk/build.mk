@@ -225,6 +225,7 @@ $(build_subdirs):
 # "overriding recipe" warnings. This may be useful for symlinking to a
 # tmpfs filesystem (instead of just creating a normal directory) in order
 # to reduce wear to physical storage during development.
+# See also: tools/Config-example.mk
 ifneq "$(CUSTOM_DTE_BUILD_DIR)" "1"
 CLEANDIRS += build/
 build/:
