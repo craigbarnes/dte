@@ -217,10 +217,20 @@ $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/f
 	$(E) DETECT $@
 	$(Q) mk/feature.sh '$*' $(CC) $(CFLAGS_FTEST) -o $(@:.h=.o) $< 2>$(@:.h=.log) >$@
 
-build/ $(build_subdirs):
+$(build_subdirs):
 	$(Q) mkdir -p $@
+
+# The CUSTOM_DTE_BUILD_DIR variable can be set to 1, so as to allow the
+# build/ target to be defined elsewhere (e.g. Config.mk), without getting
+# "overriding recipe" warnings. This may be useful for symlinking to a
+# tmpfs filesystem (instead of just creating a normal directory) in order
+# to reduce wear to physical storage during development.
+ifneq "$(CUSTOM_DTE_BUILD_DIR)" "1"
+CLEANDIRS += build/
+build/:
+	$(Q) mkdir -p $@
+endif
 
 
 CLEANFILES += $(dte)
-CLEANDIRS += build/
 .SECONDARY: build/
