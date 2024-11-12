@@ -1681,14 +1681,14 @@ static void test_term_put_level_1_queries(TestContext *ctx)
     EXPECT_UINT_EQ(term.features, (C256 | BCE | TITLE | OSC52));
     EXPECT_EQ(obuf->count, 0);
 
-    // Basic level 1 queries (with emit_all=false)
+    // Basic level 1 queries
     static const char level1[] = "\033[c";
-    term_put_level_1_queries(&term, false);
+    term_put_initial_queries(&term, 1);
     EXPECT_MEMEQ(obuf->buf, obuf->count, level1, sizeof(level1) - 1);
 
     // All queries (forced by emit_all=true)
     static const char full[] =
-        // term_put_level_1_queries()
+        // term_put_initial_queries()
         "\033[c"
         // term_put_level_2_queries()
         "\033[>c"
@@ -1720,7 +1720,7 @@ static void test_term_put_level_1_queries(TestContext *ctx)
     ;
 
     obuf->count = 0;
-    term_put_level_1_queries(&term, true);
+    term_put_initial_queries(&term, 6);
     EXPECT_MEMEQ(obuf->buf, obuf->count, full, sizeof(full) - 1);
 
     EXPECT_EQ(obuf->scroll_x, 0);

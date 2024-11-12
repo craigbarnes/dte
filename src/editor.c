@@ -289,8 +289,8 @@ void ui_start(EditorState *e)
 // Like ui_start(), but to be called only the first time the UI is started.
 // Terminal queries are buffered before ui_resize() is called, so that only
 // a single term_output_flush() is needed (i.e. as opposed to calling
-// ui_start() + term_put_level_1_queries() + term_output_flush()).
-void ui_first_start(EditorState *e, bool emit_all_queries)
+// ui_start() + term_put_initial_queries() + term_output_flush()).
+void ui_first_start(EditorState *e, unsigned int terminal_query_level)
 {
     BUG_ON(e->status != EDITOR_RUNNING);
     Terminal *term = &e->terminal;
@@ -299,7 +299,7 @@ void ui_first_start(EditorState *e, bool emit_all_queries)
     term_use_alt_screen_buffer(term);
     term_enable_private_modes(term);
 
-    term_put_level_1_queries(term, emit_all_queries);
+    term_put_initial_queries(term, terminal_query_level);
     ui_resize(e);
 }
 

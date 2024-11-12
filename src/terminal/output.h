@@ -53,7 +53,7 @@ void term_put_byte(TermOutputBuffer *obuf, char ch);
 void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
 TermSetBytesMethod term_set_bytes(Terminal *term, char ch, size_t count);
 void term_put_str(TermOutputBuffer *obuf, const char *str);
-void term_put_level_1_queries(Terminal *term, bool emit_all);
+void term_put_initial_queries(Terminal *term, unsigned int level);
 void term_put_level_2_queries(Terminal *term, bool emit_all);
 void term_put_level_3_queries(Terminal *term, bool emit_all);
 void term_use_alt_screen_buffer(Terminal *term);

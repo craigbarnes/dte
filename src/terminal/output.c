@@ -195,21 +195,36 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
  * • https://vt100.net/docs/vt510-rm/DA1.html
  * • ECMA-48 §8.3.24
  */
-void term_put_level_1_queries(Terminal *term, bool emit_all)
+void term_put_initial_queries(Terminal *term, unsigned int level)
 {
-    LOG_INFO("sending level 1 queries to terminal");
-
-    // ECMA-48 DA (Device Attributes; referred to as "DA1" in other contexts)
-    term_put_literal(&term->obuf, "\033[c");
-
-    if (emit_all) {
-        LOG_INFO("emit_all set; unconditionally sending all queries");
-        term_put_level_2_queries(term, true);
-        term_put_level_3_queries(term, true);
-        // Set QUERY flags in Terminal::features, so that handle_query_reply()
-        // doesn't send level 2/3 queries again
-        term->features |= TFLAG_QUERY_L2 | TFLAG_QUERY_L3;
+    if (level < 1) {
+        return;
     }
+
+    LOG_INFO("sending level 1 queries to terminal");
+    term_put_literal(&term->obuf, "\033[c"); // ECMA-48 DA (AKA "DA1")
+
+    if (level < 2) {
+        return;
+    }
+
+    // Level 6 or greater means emit all query levels and also emit even
+    // conditional queries, i.e. those that are usually omitted when the
+    // corresponding feature flag was already set by term_init()
+    bool emit_all = (level >= 6);
+    if (emit_all) {
+        LOG_INFO("query level set to %u; unconditionally sending all queries", level);
+    }
+
+    term_put_level_2_queries(term, emit_all);
+    term->features |= TFLAG_QUERY_L2;
+
+    if (level < 3) {
+        return;
+    }
+
+    term_put_level_3_queries(term, emit_all);
+    term->features |= TFLAG_QUERY_L3;
 }
 
 /*

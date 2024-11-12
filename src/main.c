@@ -102,7 +102,7 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
     return get_nr_errors() ? EC_DATA_ERROR : EC_OK;
 }
 
-static ExitCode showkey_loop(void)
+static ExitCode showkey_loop(unsigned int terminal_query_level)
 {
     if (!term_mode_init()) {
         return ec_error("tcgetattr", EC_IO_ERROR);
@@ -118,7 +118,7 @@ static ExitCode showkey_loop(void)
     term_input_init(ibuf);
     term_output_init(obuf);
     term_enable_private_modes(&term);
-    term_put_level_1_queries(&term, !!xgetenv("DTE_FULL_QUERY"));
+    term_put_initial_queries(&term, terminal_query_level);
     term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -401,7 +401,7 @@ static const char usage[] =
 // NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKRVS:b:c:t:r:s:";
+    static const char optstring[] = "hBHKRVQ:S:b:c:t:r:s:";
     const char *rc = NULL;
     const char *commands[8];
     const char *tags[8];
@@ -409,6 +409,7 @@ int main(int argc, char *argv[])
     size_t nr_tags = 0;
     bool read_rc = true;
     bool load_and_save_history = true;
+    unsigned int terminal_query_level = 1;
     errors_to_stderr(true);
 
     for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
@@ -443,8 +444,14 @@ int main(int argc, char *argv[])
         case 'H':
             load_and_save_history = false;
             break;
+        case 'Q':
+            if (!str_to_uint(optarg, &terminal_query_level)) {
+                fprintf(stderr, "Error: invalid argument for -Q: '%s'\n", optarg);
+                return EC_USAGE_ERROR;
+            }
+            break;
         case 'K':
-            return showkey_loop();
+            return showkey_loop(terminal_query_level);
         case 'V':
             return write_stdout(copyright, sizeof(copyright));
         case 'h':
@@ -550,7 +557,7 @@ int main(int argc, char *argv[])
     }
 
     set_view(window_get_first_view(window));
-    ui_first_start(e, !!xgetenv("DTE_FULL_QUERY"));
+    ui_first_start(e, terminal_query_level);
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);
