@@ -27,6 +27,7 @@
 #include "syntax/syntax.h"
 #include "tag.h"
 #include "terminal/input.h"
+#include "terminal/ioctl.h"
 #include "terminal/key.h"
 #include "terminal/mode.h"
 #include "terminal/output.h"
@@ -194,6 +195,34 @@ static ExitCode init_std_fds(int std_fds[2])
     return EC_OK;
 }
 
+static ExitCode init_std_fds_headless(int std_fds[2])
+{
+    FILE *streams[] = {stdin, stdout};
+    for (int i = 0; i < ARRAYLEN(streams); i++) {
+        if (!isatty(i)) {
+            int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
+            if (fd == -1 && errno != EBADF) {
+                return ec_error("fcntl", EC_OS_ERROR);
+            }
+            std_fds[i] = fd;
+        }
+        if (!freopen("/dev/null", i ? "w" : "r", streams[i])) {
+            return ec_error("freopen", EC_IO_ERROR);
+        }
+    }
+
+    if (!fd_is_valid(STDERR_FILENO)) {
+        // If FD 3 isn't valid (e.g. because it was closed), point it
+        // to /dev/null to ensure open(3) doesn't allocate it to other
+        // opened files
+        if (!freopen("/dev/null", "w", stderr)) {
+            return ec_error("freopen", EC_IO_ERROR);
+        }
+    }
+
+    return EC_OK;
+}
+
 static Buffer *init_std_buffer(EditorState *e, int fds[2])
 {
     const char *name = NULL;
@@ -354,7 +383,13 @@ static void read_history_files(EditorState *e)
     file_history_load(&e->file_history, path_join(dir, "file-history"), size_limit);
     history_load(&e->command_history, path_join(dir, "command-history"), size_limit);
     history_load(&e->search_history, path_join(dir, "search-history"), size_limit);
-    e->flags |= EFLAG_SAVE_ALL_HIST;
+
+    // There's not much sense in saving history for headless sessions, but we
+    // do still load it (above), to make it available to e.g. `exec -i command`
+    if (!(e->flags & EFLAG_HEADLESS)) {
+        e->flags |= EFLAG_SAVE_ALL_HIST;
+    }
+
     if (e->search_history.last) {
         search_set_regexp(&e->search, e->search_history.last->text);
     }
@@ -362,13 +397,14 @@ static void read_history_files(EditorState *e)
 
 static void write_history_files(const EditorState *e)
 {
-    if (e->flags & EFLAG_SAVE_CMD_HIST) {
+    EditorFlags flags = e->flags;
+    if (flags & EFLAG_SAVE_CMD_HIST) {
         history_save(&e->command_history);
     }
-    if (e->flags & EFLAG_SAVE_SEARCH_HIST) {
+    if (flags & EFLAG_SAVE_SEARCH_HIST) {
         history_save(&e->search_history);
     }
-    if (e->flags & EFLAG_SAVE_FILE_HIST) {
+    if (flags & EFLAG_SAVE_FILE_HIST) {
         file_history_save(&e->file_history);
     }
 }
@@ -401,12 +437,13 @@ static const char usage[] =
 // NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKRVQ:S:b:c:t:r:s:";
+    static const char optstring[] = "hBHKRVC:Q:S:b:c:t:r:s:";
     const char *rc = NULL;
     const char *commands[8];
     const char *tags[8];
     size_t nr_commands = 0;
     size_t nr_tags = 0;
+    bool headless = false;
     bool read_rc = true;
     bool load_and_save_history = true;
     unsigned int terminal_query_level = 1;
@@ -414,9 +451,12 @@ int main(int argc, char *argv[])
 
     for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
+        case 'C':
+            headless = true;
+            // Fallthrough
         case 'c':
             if (unlikely(nr_commands >= ARRAYLEN(commands))) {
-                fputs("Error: too many -c options used\n", stderr);
+                fputs("Error: too many -c or -C options used\n", stderr);
                 return EC_USAGE_ERROR;
             }
             commands[nr_commands++] = optarg;
@@ -466,7 +506,7 @@ int main(int argc, char *argv[])
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
     // cause the logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
-    ExitCode r = init_std_fds(std_fds);
+    ExitCode r = headless ? init_std_fds_headless(std_fds) : init_std_fds(std_fds);
     if (unlikely(r != EC_OK)) {
         return r;
     }
@@ -479,14 +519,22 @@ int main(int argc, char *argv[])
     LOG_INFO("dte version: " VERSION);
     LOG_INFO("build vars:%s", buildvar_string);
 
-    if (!term_mode_init()) {
-        return ec_error("tcgetattr", EC_IO_ERROR);
+    if (headless) {
+        set_signal_dispositions_headless();
+    } else {
+        if (!term_mode_init()) {
+            return ec_error("tcgetattr", EC_IO_ERROR);
+        }
+        set_basic_signal_dispositions();
     }
 
-    set_basic_signal_dispositions();
-    EditorState *e = init_editor_state(0);
+    EditorState *e = init_editor_state(headless ? EFLAG_HEADLESS : 0);
     Terminal *term = &e->terminal;
-    term_init(term, getenv("TERM"), getenv("COLORTERM"));
+
+    if (!headless) {
+        term_init(term, getenv("TERM"), getenv("COLORTERM"));
+    }
+
     Buffer *std_buffer = init_std_buffer(e, std_fds);
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
@@ -517,17 +565,18 @@ int main(int argc, char *argv[])
         read_history_files(e);
     }
 
-    errors_to_stderr(false);
-
-    // Initialize terminal but don't update screen yet. Also display
-    // "Press any key to continue" prompt if there were any errors
-    // during reading configuration files.
-    if (unlikely(!term_raw())) {
-        return ec_error("tcsetattr", EC_IO_ERROR);
-    }
-    if (get_nr_errors()) {
-        any_key(term, e->options.esc_timeout);
-        clear_error();
+    if (!headless) {
+        errors_to_stderr(false);
+        // Initialize terminal but don't update screen yet
+        if (unlikely(!term_raw())) {
+            return ec_error("tcsetattr", EC_IO_ERROR);
+        }
+        if (get_nr_errors()) {
+            // Display "Press any key to continue" prompt, if there were
+            // errors while reading config files
+            any_key(term, e->options.esc_timeout);
+            clear_error();
+        }
     }
 
     e->status = EDITOR_RUNNING;
@@ -563,6 +612,10 @@ int main(int argc, char *argv[])
         handle_normal_command(e, commands[i], false);
     }
 
+    if (headless) {
+        goto exit;
+    }
+
     size_t opened_tags = 0;
     for (size_t i = 0; i < nr_tags; i++) {
         StringView tag_sv = strview_from_cstring(tags[i]);
@@ -592,7 +645,7 @@ int main(int argc, char *argv[])
         update_screen(e, &s);
     }
 
-    int exit_code = main_loop(e);
+    main_loop(e);
     term_restore_title(term);
 
     /*
@@ -608,14 +661,21 @@ int main(int argc, char *argv[])
      */
     ui_end(e);
 
+exit:
     errors_to_stderr(true);
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
-    // This must be done before calling buffer_write_blocks_and_free(), since
-    // output modes need to be restored to get proper line ending translation
-    // and std_fds[STDOUT_FILENO] may be a pipe to the terminal
-    term_cooked();
+    int exit_code = e->status;
+    if (headless) {
+        exit_code = MAX(exit_code, EDITOR_EXIT_OK);
+    } else {
+        // This must be done before calling buffer_write_blocks_and_free(),
+        // since output modes need to be restored to get proper line ending
+        // translation and std_fds[STDOUT_FILENO] may be a pipe to the
+        // terminal
+        term_cooked();
+    }
 
     if (have_stdout_buffer) {
         bool ok = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);

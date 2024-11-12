@@ -222,3 +222,32 @@ void set_fatal_signal_handlers(void)
     }
 #endif
 }
+
+// Set signals for headless (EFLAG_HEADLESS) mode
+void set_signal_dispositions_headless(void)
+{
+    struct sigaction action = {.sa_handler = SIG_DFL};
+    sigemptyset(&action.sa_mask);
+
+    // SIGHUP is left unchanged, so that nohup(1) can be used. All
+    // other signals not ignored further below are restored to the
+    // default disposition, in case the parent process ignored and
+    // then failed to restore them (common mistake).
+    for (size_t i = 0; i < ARRAYLEN(signames); i++) {
+        int s = signames[i].signum;
+        switch (s) {
+        case SIGUSR1: case SIGUSR2: case SIGTSTP:
+        case SIGTTIN: case SIGTTOU: case SIGHUP:
+            continue;
+        }
+        xsigaction(s, &action);
+    }
+
+    // Ignored signals
+    action.sa_handler = SIG_IGN;
+    xsigaction(SIGUSR1, &action);
+    xsigaction(SIGUSR2, &action);
+    xsigaction(SIGTSTP, &action);
+    xsigaction(SIGTTIN, &action);
+    xsigaction(SIGTTOU, &action);
+}

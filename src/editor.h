@@ -162,7 +162,7 @@ static inline CommandRunner normal_mode_cmdrunner(EditorState *e)
 EditorState *init_editor_state(EditorFlags flags) RETURNS_NONNULL;
 void free_editor_state(EditorState *e) NONNULL_ARGS;
 void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
-int main_loop(EditorState *e) NONNULL_ARGS WARN_UNUSED_RESULT;
+int main_loop(EditorState *e) NONNULL_ARGS;
 void ui_first_start(EditorState *e, unsigned int terminal_query_level) NONNULL_ARGS;
 void ui_start(EditorState *e) NONNULL_ARGS;
 void ui_end(EditorState *e) NONNULL_ARGS;

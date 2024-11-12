@@ -166,9 +166,9 @@ check-tests: $(test) all
 	$(E) EXEC '$(test)'
 	$(Q) ./$(test) $(TESTFLAGS)
 
-check-opts: $(dte)
+check-opts: $(dte) | build/test/
 	$(E) EXEC 'test/check-opts.sh'
-	$(Q) test/check-opts.sh './$<' '$(VERSION)'
+	$(Q) test/check-opts.sh './$(dte)' '$(VERSION)' build/test/check-opts.log
 
 installcheck: install
 	$(E) EXEC '$(DESTDIR)$(bindir)/$(dte) -V'

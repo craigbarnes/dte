@@ -23,12 +23,13 @@ alias abort='error "$LINENO"'
 alias check_str='assert_streq "$LINENO"'
 alias check_exit='assert_exitcode "$LINENO"'
 
-if test "$#" != 2; then
-    abort 'exactly 2 arguments required'
+if test "$#" != 3; then
+    abort 'exactly 3 arguments required; see GNUmakefile'
 fi
 
 dte="$1"
 ver="$2"
+logfile="$3"
 
 test -x "$dte" || abort "argument #1 ('$dte') not executable"
 
@@ -39,13 +40,31 @@ check_str "$($dte -b rc)" "$(cat config/rc)"
 
 $dte -s config/syntax/dte >/dev/null
 
-# TODO: Run these tests in headless mode, when implemented
-#check_str "$(echo xyz | $dte -H -c 'replace y Y; quit' | cat)" 'xYz'
-#printf test | $dte -H -cquit
-#check_exit "$?" 0
+
+# Check headless mode ------------------------------------------------------
+
+set +e
+
+check_str "$(echo xyz | $dte -C 'replace y Y' | cat)" 'xYz'
+check_exit "$?" 0
+
+$dte -C 'quit 91'
+check_exit "$?" 91
+
+# `replace -c` should be ignored
+check_str "$(echo xyz | $dte -C 'replace -c y Y' 2>"$logfile" | cat)" 'xyz'
+check_exit "$?" 0
+
+# `quit -p` should be ignored
+check_str "$($dte -C 'insert A; open; insert _; quit -p 98' 2>"$logfile" | cat)" 'A'
+check_exit "$?" 0
+
+# `suspend` should be ignored
+check_str "$($dte -C 'suspend; insert q; case' 2>"$logfile" | cat)" 'Q'
+check_exit "$?" 0
+
 
 # Check error handling -----------------------------------------------------
-set +e
 
 # Unknown option
 $dte -7 2>/dev/null
