@@ -87,6 +87,8 @@ void show_dialog(Terminal *term, const StyleMap *styles, const char *question)
 
 char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
+    BUG_ON(e->flags & EFLAG_HEADLESS);
+
     const ScreenState dummyval = {.id = 0};
     info_msg("%s", question);
     e->screen_update |= UPDATE_ALL | UPDATE_DIALOG;
@@ -109,6 +111,8 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
 
 char status_prompt(EditorState *e, const char *question, const char *choices)
 {
+    BUG_ON(e->flags & EFLAG_HEADLESS);
+
     const ScreenState dummyval = {.id = 0};
     info_msg("%s", question);
     update_screen(e, &dummyval);

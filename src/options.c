@@ -132,6 +132,10 @@ static void filetype_changed(EditorState *e, bool global)
 static void set_window_title_changed(EditorState *e, bool global)
 {
     BUG_ON(!global);
+    if (e->flags & EFLAG_HEADLESS) {
+        return;
+    }
+
     Terminal *term = &e->terminal;
     if (e->options.set_window_title) {
         if (e->status == EDITOR_RUNNING) {

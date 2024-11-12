@@ -45,6 +45,7 @@ typedef enum {
     EFLAG_SAVE_SEARCH_HIST = 1u << 1, // Update search history on quit
     EFLAG_SAVE_FILE_HIST = 1u << 2, // Update file history on quit
     EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1, // All of the above
+    EFLAG_HEADLESS = 1u << 3, // Running in "headless" mode (no tty interaction)
 } EditorFlags;
 
 // Used to track which parts of the screen have changed since the last
@@ -158,7 +159,7 @@ static inline CommandRunner normal_mode_cmdrunner(EditorState *e)
     return cmdrunner(e, &normal_commands);
 }
 
-EditorState *init_editor_state(void) RETURNS_NONNULL;
+EditorState *init_editor_state(EditorFlags flags) RETURNS_NONNULL;
 void free_editor_state(EditorState *e) NONNULL_ARGS;
 void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
 int main_loop(EditorState *e) NONNULL_ARGS WARN_UNUSED_RESULT;

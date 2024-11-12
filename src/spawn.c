@@ -211,6 +211,10 @@ static int handle_child_error(pid_t pid)
 
 static void yield_terminal(EditorState *e, bool quiet)
 {
+    if (e->flags & EFLAG_HEADLESS) {
+        return;
+    }
+
     if (quiet) {
         term_raw_isig();
     } else {
@@ -222,6 +226,10 @@ static void yield_terminal(EditorState *e, bool quiet)
 
 static void resume_terminal(EditorState *e, bool quiet, bool prompt)
 {
+    if (e->flags & EFLAG_HEADLESS) {
+        return;
+    }
+
     term_raw();
     if (!quiet && e->child_controls_terminal) {
         if (prompt) {

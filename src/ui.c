@@ -139,6 +139,7 @@ void update_screen_size(Terminal *term, Frame *root_frame)
 
 void update_screen(EditorState *e, const ScreenState *s)
 {
+    BUG_ON(e->flags & EFLAG_HEADLESS);
     Buffer *buffer = e->buffer;
     Terminal *term = &e->terminal;
     ScreenUpdateFlags flags = e->screen_update;

@@ -87,7 +87,7 @@ static ExitCode dump_builtin_config(const char *name)
 
 static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 {
-    EditorState *e = init_editor_state();
+    EditorState *e = init_editor_state(EFLAG_HEADLESS);
     int err;
     BUG_ON(e->status != EDITOR_INITIALIZING);
     const Syntax *s = load_syntax_file(e, filename, flags | SYN_MUST_EXIST, &err);
@@ -484,7 +484,7 @@ int main(int argc, char *argv[])
     }
 
     set_basic_signal_dispositions();
-    EditorState *e = init_editor_state();
+    EditorState *e = init_editor_state(0);
     Terminal *term = &e->terminal;
     term_init(term, getenv("TERM"), getenv("COLORTERM"));
     Buffer *std_buffer = init_std_buffer(e, std_fds);

@@ -373,6 +373,11 @@ static bool cmd_close(EditorState *e, const CommandArgs *a)
                 "save or run 'close -f' to close without saving"
             );
         }
+
+        if (unlikely(e->flags & EFLAG_HEADLESS)) {
+            return error_msg("-p flag unavailable in headless mode");
+        }
+
         static const char str[] = "Close without saving changes? [y/N]";
         if (dialog_prompt(e, str, "ny") != 'y') {
             return false;
@@ -419,10 +424,16 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
         return error_msg("No such error parser %s", a->args[0]);
     }
 
+    SpawnFlags spawn_flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
+    if ((e->flags & EFLAG_HEADLESS) && !(spawn_flags & SPAWN_QUIET)) {
+        LOG_INFO("automatically added -s flag to compile command (headless mode)");
+        spawn_flags |= SPAWN_QUIET;
+    }
+
     SpawnContext ctx = {
         .editor = e,
         .argv = (const char **)a->args + 1,
-        .flags = cmdargs_convert_flags(a, map, ARRAYLEN(map)),
+        .flags = spawn_flags,
     };
 
     MessageArray *messages = &e->messages;
@@ -765,6 +776,11 @@ static bool cmd_exec(EditorState *e, const CommandArgs *a)
     if (lflag && actions[STDIN_FILENO] == EXEC_BUFFER) {
         // For compat. with old "filter" and "pipe-to" commands
         actions[STDIN_FILENO] = EXEC_LINE;
+    }
+
+    if ((e->flags & EFLAG_HEADLESS) && !(spawn_flags & SPAWN_QUIET)) {
+        LOG_INFO("automatically added -s flag to exec command (headless mode)");
+        spawn_flags |= SPAWN_QUIET;
     }
 
     const char **argv = (const char **)a->args + a->nr_flag_args;
@@ -1451,6 +1467,10 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
         return error_msg("Save modified files or run 'quit -f' to quit without saving");
     }
 
+    if (unlikely(e->flags & EFLAG_HEADLESS)) {
+        return error_msg("-p flag unavailable in headless mode");
+    }
+
     char question[128];
     xsnprintf (
         question, sizeof question,
@@ -1602,6 +1622,11 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
 
     const char *pattern = a->args[0];
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
+
+    if (unlikely((flags & REPLACE_CONFIRM) && (e->flags & EFLAG_HEADLESS))) {
+        return error_msg("-c flag unavailable in headless mode");
+    }
+
     char *alloc = NULL;
     if (has_flag(a, 'e')) {
         size_t len = strlen(pattern);
@@ -2142,6 +2167,10 @@ static bool cmd_show(EditorState *e, const CommandArgs *a)
 static bool cmd_suspend(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
+    if (e->flags & EFLAG_HEADLESS) {
+        return error_msg("unavailable in headless mode");
+    }
+
     if (e->status == EDITOR_INITIALIZING) {
         LOG_WARNING("suspend request ignored");
         return false;
@@ -2287,6 +2316,10 @@ static bool cmd_wclose(EditorState *e, const CommandArgs *a)
             "Save modified files or run 'wclose -f' to close "
             "window without saving"
         );
+    }
+
+    if (unlikely(e->flags & EFLAG_HEADLESS)) {
+        return error_msg("-p flag unavailable in headless mode");
     }
 
     if (dialog_prompt(e, "Close window without saving? [y/N]", "ny") != 'y') {

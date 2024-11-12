@@ -67,11 +67,12 @@ static mode_t get_umask(void)
     return old;
 }
 
-EditorState *init_editor_state(void)
+EditorState *init_editor_state(EditorFlags flags)
 {
     EditorState *e = xnew(EditorState, 1);
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
+        .flags = flags,
         .version = VERSION,
         .command_history = {
             .max_entries = 512,
@@ -259,10 +260,7 @@ void any_key(Terminal *term, unsigned int esc_timeout)
 NOINLINE
 void ui_resize(EditorState *e)
 {
-    if (e->status == EDITOR_INITIALIZING) {
-        return;
-    }
-
+    BUG_ON(e->flags & EFLAG_HEADLESS);
     resized = 0;
     update_screen_size(&e->terminal, e->root_frame);
 
@@ -273,9 +271,7 @@ void ui_resize(EditorState *e)
 
 void ui_start(EditorState *e)
 {
-    if (e->status == EDITOR_INITIALIZING) {
-        return;
-    }
+    BUG_ON(e->flags & EFLAG_HEADLESS);
 
     // Note: the order of these calls is important - Kitty saves/restores
     // some terminal state when switching buffers, so switching to the
@@ -292,7 +288,10 @@ void ui_start(EditorState *e)
 // ui_start() + term_put_initial_queries() + term_output_flush()).
 void ui_first_start(EditorState *e, unsigned int terminal_query_level)
 {
-    BUG_ON(e->status != EDITOR_RUNNING);
+    if (e->flags & EFLAG_HEADLESS) {
+        return;
+    }
+
     Terminal *term = &e->terminal;
 
     // The order of these calls is important; see ui_start()
@@ -305,9 +304,7 @@ void ui_first_start(EditorState *e, unsigned int terminal_query_level)
 
 void ui_end(EditorState *e)
 {
-    if (e->status == EDITOR_INITIALIZING) {
-        return;
-    }
+    BUG_ON(e->flags & EFLAG_HEADLESS);
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     term_clear_screen(obuf);
@@ -322,6 +319,8 @@ void ui_end(EditorState *e)
 
 int main_loop(EditorState *e)
 {
+    BUG_ON(e->flags & EFLAG_HEADLESS);
+
     while (e->status == EDITOR_RUNNING) {
         if (unlikely(resized)) {
             LOG_INFO("SIGWINCH received");

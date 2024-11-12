@@ -111,7 +111,7 @@ static void test_init(TestContext *ctx)
     log_write(LOG_LEVEL_WARNING, STRN("testing log_write()"));
     log_write(LOG_LEVEL_INFO, STRN("testing log_write()"));
 
-    EditorState *e = init_editor_state();
+    EditorState *e = init_editor_state(EFLAG_HEADLESS);
     ctx->userdata = e;
     ASSERT_NONNULL(e);
     ASSERT_NONNULL(e->user_config_dir);
@@ -155,7 +155,7 @@ static void test_deinit(TestContext *ctx)
     EXPECT_NULL(e->buffer->abs_filename);
     EXPECT_PTREQ(e->buffer, e->buffers.ptrs[0]);
     EXPECT_FALSE(e->child_controls_terminal);
-    EXPECT_EQ(e->flags, 0);
+    EXPECT_EQ(e->flags, EFLAG_HEADLESS);
 
     frame_remove(e, e->root_frame);
     EXPECT_NULL(e->view);
