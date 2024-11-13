@@ -3,7 +3,8 @@ CTIDYFLAGS ?= -quiet
 CTIDYFILTER = 2>&1 | sed -E '/^[0-9]+ warnings? generated\.$$/d' >&2
 
 CTIDYCFLAGS = \
-    -std=gnu11 -O2 -Wall -Wextra -DDEBUG=3 -D_FILE_OFFSET_BITS=64 \
+    -std=gnu11 -O2 -Wall -Wextra -Wundef -Wcomma \
+    -DDEBUG=3 -D_FILE_OFFSET_BITS=64 \
     -Isrc -Itools/mock-headers -Ibuild/gen
 
 all_headers = $(shell git ls-files -- 'src/**.h' 'test/**.h')
