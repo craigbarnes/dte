@@ -35,8 +35,7 @@ ifeq "$(shell uname)" "Linux"
  # See the comment at the bottom of mk/build.mk for more details.
  CUSTOM_DTE_BUILD_DIR = 1
  BUILD_DIR_SYMLINK_TARGET = /tmp/dte-build
- CLEANDIRS += $(BUILD_DIR_SYMLINK_TARGET)
- CLEANFILES += build
+ CLEANDIRS += build $(BUILD_DIR_SYMLINK_TARGET)
 
  $(BUILD_DIR_SYMLINK_TARGET):
 	$(Q) mkdir -m755 -p '$@'
