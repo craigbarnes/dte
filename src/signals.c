@@ -40,13 +40,17 @@ static const struct {
     {"SIGFPE", SIGFPE},
     {"SIGILL", SIGILL},
     {"SIGSEGV", SIGSEGV},
-    {"SIGSYS", SIGSYS},
     {"SIGTRAP", SIGTRAP},
     {"SIGXCPU", SIGXCPU},
     {"SIGALRM", SIGALRM},
     {"SIGHUP", SIGHUP},
     {"SIGTERM", SIGTERM},
+#ifdef SIGSYS
+    {"SIGSYS", SIGSYS},
+#endif
+#ifdef SIGVTALRM
     {"SIGVTALRM", SIGVTALRM},
+#endif
 #ifdef SIGPROF
     {"SIGPROF", SIGPROF},
 #endif
@@ -202,8 +206,15 @@ void set_fatal_signal_handlers(void)
     xsigaction(SIGTRAP, &action);
     xsigaction(SIGFPE, &action);
     xsigaction(SIGILL, &action);
-    xsigaction(SIGSYS, &action);
     xsigaction(SIGXCPU, &action);
+
+#ifdef SIGSYS
+    xsigaction(SIGSYS, &action);
+#endif
+
+#ifdef SIGVTALRM
+    xsigaction(SIGVTALRM, &action);
+#endif
 
 #ifdef SIGPROF
     xsigaction(SIGPROF, &action);
