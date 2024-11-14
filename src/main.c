@@ -316,12 +316,6 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
         LOG_INFO("log colors disabled ($NO_COLOR)");
     }
 
-    struct utsname u;
-    if (likely(uname(&u) >= 0)) {
-        LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
-    } else {
-        LOG_ERRNO("uname");
-    }
     return EC_OK;
 }
 
@@ -514,6 +508,22 @@ int main(int argc, char *argv[])
     r = init_logging(getenv("DTE_LOG"), getenv("DTE_LOG_LEVEL"));
     if (unlikely(r != EC_OK)) {
         return r;
+    }
+
+    struct utsname u;
+    if (likely(uname(&u) >= 0)) {
+        LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
+        if (str_has_suffix(u.release, "-WSL2")) {
+            // There appears to be an issue on WSL2 where the DA1 query
+            // response is interpreted as pasted text and then inserted
+            // into the buffer at startup. For now, we simply disable
+            // querying entirely on that platform, until the problem
+            // can be investigated.
+            LOG_NOTICE("WSL2 detected; disabling all terminal queries");
+            terminal_query_level = 0;
+        }
+    } else {
+        LOG_ERRNO("uname");
     }
 
     LOG_INFO("dte version: " VERSION);
