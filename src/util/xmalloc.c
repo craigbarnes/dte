@@ -33,6 +33,8 @@ size_t xadd(size_t a, size_t b)
     return result;
 }
 
+// Like malloc(3), but calling fatal_error() on OOM and forbidding
+// zero-sized allocations (thus never returning NULL)
 void *xmalloc(size_t size)
 {
     BUG_ON(size == 0);

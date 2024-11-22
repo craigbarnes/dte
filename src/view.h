@@ -24,11 +24,12 @@ typedef struct View {
     struct Buffer *buffer;
     struct Window *window;
     BlockIter cursor;
-    long cx, cy; // Cursor position
-    long cx_display; // Visual cursor x (char widths: wide 2, tab 1-8, control 2, invalid char 4)
-    long cx_char; // Cursor x in characters (invalid UTF-8 character (byte) is 1 char)
-    long vx, vy; // Top left corner
-    long preferred_x; // Preferred value for cx_display (e.g. after vertical movement)
+    long cx; // Cursor x, in bytes
+    long cy; // Cursor y
+    long cx_display; // Cursor x, in terminal columns (see u_char_width())
+    long cx_char; // Cursor x, in Unicode codepoints (invalid UTF-8 byte is counted as 1)
+    long vx, vy; // Top left corner (what cx/cy would be, if cursor was at top left of screen)
+    long preferred_x; // Preferred value for cx_display (after vertical cursor movement)
     int tt_width; // Tab title width
     int tt_truncated_width;
     bool center_on_scroll; // Center view to cursor if scrolled

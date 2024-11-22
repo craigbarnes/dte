@@ -21,13 +21,13 @@ enum {
 // corresponds to a View and the editable text area corresponds to the
 // Buffer of the *current* View (Window::view::buffer).
 typedef struct Window {
-    struct EditorState *editor;
+    struct EditorState *editor; // Editor session containing this Window
     PointerArray views; // All Views contained by this Window
-    Frame *frame;
+    Frame *frame; // Parent Frame containing this Window
     View *view; // Current View
     View *prev_view; // Previous view, if set
     int x, y; // Coordinates for top left of window
-    int w, h; // Width and height of window (including tabbar and status)
+    int w, h; // Width and height of window (including tabbar and statusline)
     int edit_x, edit_y; // Top left of editable area
     int edit_w, edit_h; // Width and height of editable area
     size_t first_tab_idx;

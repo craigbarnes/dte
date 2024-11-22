@@ -47,6 +47,7 @@ static inline void *xmemdup(const void *ptr, size_t size)
     return memcpy(xmalloc(size), ptr, size);
 }
 
+// Return a null-terminated copy of the first `size` bytes of `str`
 XSTRDUP
 static inline char *xstrcut(const char *str, size_t size)
 {
@@ -55,6 +56,7 @@ static inline char *xstrcut(const char *str, size_t size)
     return memcpy(s, str, size);
 }
 
+// Return a null-terminated copy of the substring between `pos` and `end`
 XSTRDUP
 static inline char *xstrslice(const char *str, size_t pos, size_t end)
 {
