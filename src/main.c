@@ -440,6 +440,7 @@ int main(int argc, char *argv[])
     bool headless = false;
     bool read_rc = true;
     bool load_and_save_history = true;
+    bool explicit_term_query_level = false;
     unsigned int terminal_query_level = 1;
     errors_to_stderr(true);
 
@@ -483,6 +484,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Error: invalid argument for -Q: '%s'\n", optarg);
                 return EC_USAGE_ERROR;
             }
+            explicit_term_query_level = true;
             break;
         case 'K':
             return showkey_loop(terminal_query_level);
@@ -513,7 +515,7 @@ int main(int argc, char *argv[])
     struct utsname u;
     if (likely(uname(&u) >= 0)) {
         LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
-        if (str_has_suffix(u.release, "-WSL2")) {
+        if (!explicit_term_query_level && str_has_suffix(u.release, "-WSL2")) {
             // There appears to be an issue on WSL2 where the DA1 query
             // response is interpreted as pasted text and then inserted
             // into the buffer at startup. For now, we simply disable
