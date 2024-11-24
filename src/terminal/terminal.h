@@ -28,7 +28,7 @@ typedef enum {
     TFLAG_ITERM2 = 0x200, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
     TFLAG_SYNC = 0x400, // Supports synchronized updates via DECSET private mode 2026
     TFLAG_QUERY_L2 = 0x800, // Supports or tolerates queries sent by term_put_level_2_queries()
-    TFLAG_QUERY_L3 = 0x1000, // Supports or tolerates queries sent by term_put_level_2_queries()
+    TFLAG_QUERY_L3 = 0x1000, // Supports or tolerates queries sent by term_put_level_3_queries()
     TFLAG_8_COLOR = 0x2000, // Supports ECMA-48 palette colors (e.g. SGR 30)
     TFLAG_16_COLOR = 0x4000, // Supports aixterm-style "bright" palette colors (e.g. SGR 90)
     TFLAG_256_COLOR = 0x8000, // Supports xterm-style (ISO 8613-6) indexed colors (e.g. SGR 38;5;255)
@@ -67,7 +67,7 @@ typedef struct {
     // if smaller than scroll_x printed characters are not visible
     size_t x;
 
-    unsigned int width; // Width of terminal area being written to
+    unsigned int width; // Width of terminal area being written to (see term_output_reset())
     uint8_t tab_mode; // See TermTabOutputMode
     uint8_t tab_width; // See LocalOptions::tab_width
     bool can_clear; // Whether lines can be cleared with EL (Erase in Line) sequence
