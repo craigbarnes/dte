@@ -6,6 +6,7 @@
 #include "block.h"
 #include "buildvar-iconv.h"
 #include "encoding.h"
+#include "error.h"
 #include "util/debug.h"
 #include "util/intern.h"
 #include "util/list.h"
@@ -14,6 +15,12 @@
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
+
+enum {
+    // If any line exceeds this length when reading a file, syntax
+    // highlighting will be automatically disabled
+    SYN_HIGHLIGHT_MAX_LINE_LEN = 512u << 10, // 512KiB
+};
 
 typedef struct {
     const unsigned char *ibuf;
@@ -46,6 +53,14 @@ static Block *add_utf8_line (
     blk = block_new(size);
 
 copy:
+    if (unlikely(len > SYN_HIGHLIGHT_MAX_LINE_LEN && buffer->options.syntax)) {
+        error_msg (
+            "line length (%zu) exceeded limit (%ju); disabling syntax highlighting",
+            len, (uintmax_t)SYN_HIGHLIGHT_MAX_LINE_LEN
+        );
+        buffer->options.syntax = false;
+    }
+
     memcpy(blk->data + blk->size, line, len);
     blk->size += len;
     blk->data[blk->size++] = '\n';
