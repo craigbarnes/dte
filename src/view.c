@@ -1,9 +1,13 @@
+#include <string.h>
 #include "view.h"
+#include "block.h"
 #include "buffer.h"
 #include "indent.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
+#include "util/time-util.h"
 #include "util/utf8.h"
 #include "window.h"
 
@@ -175,4 +179,100 @@ StringView view_get_word_under_cursor(const View *view)
     StringView line;
     size_t cursor_offset_in_line = fetch_this_line(&view->cursor, &line);
     return get_word_under_cursor(line, cursor_offset_in_line);
+}
+
+static const char *fmt_filesize(uintmax_t bytes, char *buf)
+{
+    human_readable_size(bytes, buf);
+    if (bytes < 1024) {
+        return buf;
+    }
+    size_t i = strlen(buf);
+    buf[i++] = ' ';
+    buf[i++] = '(';
+    i += buf_umax_to_str(bytes, buf + i);
+    buf[i++] = ')';
+    buf[i] = '\0';
+    return buf;
+}
+
+String dump_buffer(const View *view)
+{
+    const Buffer *buffer = view->buffer;
+    uintmax_t counts[2];
+    char sizestr[HRSIZE_MAX + DECIMAL_STR_MAX(counts[1]) + 4];
+    buffer_count_blocks_and_bytes(buffer, counts);
+    BUG_ON(counts[0] < 1);
+    BUG_ON(!buffer->setup);
+    String buf = string_new(1024 + (DEBUG ? 24 * counts[0] : 0));
+
+    string_sprintf (
+        &buf,
+        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %s\n",
+        "     Name:", buffer_filename(buffer),
+        "       ID:", buffer->id,
+        " Encoding:", buffer->encoding,
+        " Filetype:", buffer->options.filetype,
+        "   Blocks:", counts[0],
+        "    Lines:", buffer->nl,
+        "     Size:", fmt_filesize(counts[1], sizestr)
+
+    );
+
+    if (
+        buffer->stdout_buffer || buffer->temporary || buffer->readonly
+        || buffer->locked || buffer->crlf_newlines || buffer->bom
+    ) {
+        string_sprintf (
+            &buf,
+            "    Flags:%s%s%s%s%s%s\n",
+            buffer->stdout_buffer ? " STDOUT" : "",
+            buffer->temporary ? " TMP" : "",
+            buffer->readonly ? " RO" : "",
+            buffer->locked ? " LOCKED" : "",
+            buffer->crlf_newlines ? " CRLF" : "",
+            buffer->bom ? " BOM" : ""
+        );
+    }
+
+    if (buffer->views.count > 1) {
+        string_sprintf(&buf, "    Views: %zu\n", buffer->views.count);
+    }
+
+    if (buffer->abs_filename) {
+        const FileInfo *file = &buffer->file;
+        const struct timespec *mtime = &file->mtime;
+        unsigned int perms = file->mode & 07777;
+        char tstr[TIME_STR_BUFSIZE];
+        char modestr[12];
+        string_sprintf (
+            &buf,
+            "\nLast stat:\n----------\n\n"
+            "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %s\n%s %jd\n%s %ju\n",
+            "     Path:", buffer->abs_filename,
+            " Modified:", timespec_to_str(mtime, tstr, sizeof(tstr)) ? tstr : "-",
+            "     Mode:", file_permissions_to_str(file->mode, modestr), perms,
+            "     User:", (intmax_t)file->uid,
+            "    Group:", (intmax_t)file->gid,
+            "     Size:", fmt_filesize(file->size, sizestr),
+            "   Device:", (intmax_t)file->dev,
+            "    Inode:", (uintmax_t)file->ino
+        );
+    }
+
+    if (DEBUG >= 1) {
+        const BlockIter *cursor = &view->cursor;
+        string_append_cstring(&buf, "\nBlocks:\n-------\n\n");
+        size_t i = 1;
+        const Block *b;
+        block_for_each(b, &buffer->blocks) {
+            string_sprintf(&buf, "%4zu: %zu/%zu nl=%zu", i++, b->size, b->alloc, b->nl);
+            if (b == cursor->blk) {
+                string_sprintf(&buf, " (cursor; offset=%zu)", cursor->offset);
+            }
+            string_append_byte(&buf, '\n');
+        }
+    }
+
+    return buf;
 }

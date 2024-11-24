@@ -506,7 +506,7 @@ static String do_dump_hl_styles(EditorState *e) {return dump_hl_styles(&e->style
 static String do_dump_filetypes(EditorState *e) {return dump_filetypes(&e->filetypes);}
 static String do_dump_messages(EditorState *e) {return dump_messages(&e->messages);}
 static String do_dump_macro(EditorState *e) {return dump_macro(&e->macro);}
-static String do_dump_buffer(EditorState *e) {return dump_buffer(e->buffer, &e->view->cursor);}
+static String do_dump_buffer(EditorState *e) {return dump_buffer(e->view);}
 static String dump_command_history(EditorState *e) {return history_dump(&e->command_history);}
 static String dump_search_history(EditorState *e) {return history_dump(&e->search_history);}
 static String dump_file_history(EditorState *e) {return file_history_dump(&e->file_history);}

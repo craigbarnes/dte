@@ -7,6 +7,7 @@
 #include "block-iter.h"
 #include "util/macros.h"
 #include "util/string-view.h"
+#include "util/string.h"
 
 typedef enum {
     SELECT_NONE,
@@ -63,5 +64,6 @@ long view_get_preferred_x(View *view) NONNULL_ARGS;
 bool view_can_close(const View *view) NONNULL_ARGS;
 StringView view_get_word_under_cursor(const View *view) NONNULL_ARGS;
 StringView get_word_under_cursor(StringView line, size_t cursor_offset);
+String dump_buffer(const View *view) NONNULL_ARGS;
 
 #endif

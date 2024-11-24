@@ -16,7 +16,6 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
-#include "util/string.h"
 
 /*
  * Subset of stat(3) struct, to minimize size bloat.
@@ -109,7 +108,6 @@ void buffer_setup(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2]) NONNULL_ARGS;
 void buffer_remove_unlock_and_free(PointerArray *buffers, Buffer *buffer, const FileLocksContext *locks) NONNULL_ARGS;
 void free_blocks(Buffer *buffer) NONNULL_ARGS;
-String dump_buffer(const Buffer *buffer, const BlockIter *cursor) NONNULL_ARGS;
 
 Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
