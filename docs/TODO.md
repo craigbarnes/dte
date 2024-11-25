@@ -226,6 +226,10 @@ Code Quality/Efficiency Improvements
   instead of `spawn()`, so that `EditorState` doesn't have to be
   passed into the latter
 
+* Optimize `update_range()` to make handling long lines more efficient,
+  both by avoiding unnecessary work and by speeding up the necessary
+  parts (see: https://gitlab.com/craigbarnes/dte/-/issues/220)
+
 Testing/Debugging
 -----------------
 
