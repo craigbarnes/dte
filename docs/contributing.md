@@ -7,12 +7,14 @@ or [merge requests] for dte.
 Issues
 ------
 
-* Check for existing [issues] before opening a new one.
+* Search for existing [issues] before opening new ones.
 * Include any relevant error messages as Markdown [code blocks].
-* Avoid linking to external paste services.
 * Include relevant system information (as printed by `make vars`).
-* If suggesting new features, mention *at least* one real-world
-  use case in the opening description.
+* If suggesting new features:
+  * Mention at least one real-world use case in the opening description.
+  * Search [`TODO.md`] first. Feel free to open issues for features
+    already mentioned there, but only if there's something substantive
+    to discuss.
 
 Merge Requests
 --------------

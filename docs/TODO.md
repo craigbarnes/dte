@@ -2,9 +2,10 @@ Todo
 ====
 
 This is a list of ideas for improvements to the dte codebase that don't
-particularly need a [GitLab issue], either because they're too minor or
-obscure to warrant public discussion or because they're just preliminary
-ideas that may not go anywhere. The title "todo" is thus used very loosely.
+particularly need a [GitLab issue], either because they're nice-to-have
+features that simply need some time spent on them or because they're
+preliminary ideas that may not go anywhere. The title "todo" is thus
+used very loosely.
 
 Features
 --------
@@ -118,6 +119,10 @@ Features
   terminal doesn't support OSC 52 and SSH isn't in use (try [`wl-copy(1)`],
   [`xsel(1)`], [`xclip(1)`], [`pbcopy(1)`], [`termux-clipboard-set`],
   [`/dev/clipboard`])
+
+* Add an option for rendering a "scroll indicator" on the left and/or
+  right edge of the screen, when content is horizontally scrolled out of
+  view (see: https://gitlab.com/craigbarnes/dte/-/issues/88)
 
 Documentation
 -------------
