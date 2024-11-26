@@ -52,5 +52,6 @@ See Also
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-spans-and-blocks
+[`TODO.md`]: TODO.md
 [`pre-commit`]: ../tools/git-hooks/pre-commit
 [`commit-msg`]: ../tools/git-hooks/commit-msg
