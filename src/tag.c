@@ -204,22 +204,6 @@ static void free_tags(PointerArray *tags)
     ptr_array_free_cb(tags, FREE_FUNC(free_tags_cb));
 }
 
-// Both parameters must be absolute and clean
-static const char *slice_relative(const char *filename, const StringView dir)
-{
-    if (strncmp(filename, dir.data, dir.length) != 0) {
-        // Filename doesn't start with dir
-        return NULL;
-    }
-    switch (filename[dir.length]) {
-    case '\0': // Equal strings
-        return ".";
-    case '/':
-        return filename + dir.length + 1;
-    }
-    return NULL;
-}
-
 #if !HAVE_QSORT_R
 static const char *current_filename_global; // NOLINT(*-non-const-global-variables)
 static int tag_cmp(const void *ap, const void *bp)
@@ -247,8 +231,16 @@ static void tag_file_find_tags (
     }
 
     if (filename) {
+        BUG_ON(!path_is_absolute(filename));
+        BUG_ON(!path_is_absolute(tf->filename));
         StringView dir = path_slice_dirname(tf->filename);
-        filename = slice_relative(filename, dir);
+        size_t n = dir.length;
+        if (strncmp(filename, dir.data, n) == 0 && filename[n] == '/') {
+            filename = filename + n + 1;
+        } else {
+            // Filename doesn't start with dir
+            filename = NULL;
+        }
     }
 
     void **ptrs = tags->ptrs;
