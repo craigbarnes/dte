@@ -185,6 +185,7 @@ static bool load_tag_file(TagFile *tf)
 
     *tf = (TagFile) {
         .filename = xstrdup(path),
+        .dirname_len = (xstrrchr(path, '/') - path) + 1, // Includes last slash
         .buf = buf,
         .size = size,
         .mtime = st.st_mtime,
@@ -232,13 +233,12 @@ static void tag_file_find_tags (
 
     if (filename) {
         BUG_ON(!path_is_absolute(filename));
-        BUG_ON(!path_is_absolute(tf->filename));
-        StringView dir = path_slice_dirname(tf->filename);
-        size_t n = dir.length;
-        if (strncmp(filename, dir.data, n) == 0 && filename[n] == '/') {
-            filename = filename + n + 1;
+        size_t n = tf->dirname_len;
+        BUG_ON(n == 0);
+        if (strncmp(filename, tf->filename, n) == 0) {
+            filename += n;
         } else {
-            // Filename doesn't start with dir
+            // Filename doesn't start with directory prefix of tag file
             filename = NULL;
         }
     }
@@ -301,10 +301,14 @@ size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, Mes
         return 0;
     }
 
-    StringView tf_dir = path_slice_dirname(tf->filename);
+    // Note that `dirname_len` always includes a trailing slash, but the
+    // call to path_join_sv() in add_message_for_tag() handles that fine
+    BUG_ON(tf->dirname_len == 0);
+    StringView tagfile_dir = string_view(tf->filename, tf->dirname_len);
+
     for (size_t i = 0; i < ntags; i++) {
         Tag *tag = tags.ptrs[i];
-        add_message_for_tag(messages, tag, &tf_dir);
+        add_message_for_tag(messages, tag, &tagfile_dir);
     }
 
     free_tags(&tags);

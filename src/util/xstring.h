@@ -20,6 +20,16 @@ static inline bool xstreq(const char *a, const char *b)
     return (a == b) || (a && b && streq(a, b));
 }
 
+// Like strrchr(3), but for use when `ch` is known to be present in
+// `str` (e.g. when searching for '/' in absolute filenames)
+NONNULL_ARGS_AND_RETURN
+static inline const char *xstrrchr(const char *str, int ch)
+{
+    const char *ptr = strrchr(str, ch);
+    BUG_ON(!ptr);
+    return ptr;
+}
+
 // See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
 static inline bool mem_equal(const void *s1, const void *s2, size_t n)
 {

@@ -8,11 +8,13 @@
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 
+// Metadata and contents of a tags(5) file, as loaded by load_tag_file()
 typedef struct {
-    char *filename;
-    char *buf;
-    size_t size;
-    time_t mtime;
+    char *filename; // The absolute path of the tags file
+    size_t dirname_len; // The length of the directory part of `filename` (including the last slash)
+    char *buf; // The contents of the tags file
+    size_t size; // The length of `buf`
+    time_t mtime; // The modification time of the tags file (when last loaded)
 } TagFile;
 
 void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir) NONNULL_ARGS;

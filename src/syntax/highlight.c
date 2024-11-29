@@ -96,11 +96,8 @@ static const TermStyle **highlight_line (
     const StringView *line_sv,
     State **ret
 ) {
-    // NOLINTBEGIN(*-avoid-non-const-global-variables)
-    static const TermStyle **styles;
-    static size_t alloc;
-    // NOLINTEND(*-avoid-non-const-global-variables)
-
+    static const TermStyle **styles; // NOLINT(*-avoid-non-const-global-variables)
+    static size_t alloc; // NOLINT(*-avoid-non-const-global-variables)
     const unsigned char *const line = line_sv->data;
     const size_t len = line_sv->length;
     size_t i = 0;

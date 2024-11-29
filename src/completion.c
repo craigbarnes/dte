@@ -137,8 +137,7 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
         CommandRunner runner = normal_mode_cmdrunner(e);
         runner.expand_tilde_slash = false;
         char *str = parse_command_arg(&runner, esc.data, esc.length);
-        const char *slash = strrchr(str, '/');
-        BUG_ON(!slash);
+        const char *slash = xstrrchr(str, '/');
         cs->tilde_expanded = true;
         char *dir = path_dirname(cs->parsed);
         char *dirprefix = path_dirname(str);

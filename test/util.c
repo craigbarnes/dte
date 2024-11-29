@@ -173,6 +173,15 @@ static void test_xstreq(TestContext *ctx)
     EXPECT_FALSE(xstreq("", NULL));
 }
 
+static void test_xstrrchr(TestContext *ctx)
+{
+    static const char str[] = "12345432";
+    EXPECT_PTREQ(xstrrchr(str, '1'), str);
+    EXPECT_PTREQ(xstrrchr(str, '2'), str + 7);
+    EXPECT_PTREQ(xstrrchr(str, '5'), str + 4);
+    EXPECT_PTREQ(xstrrchr(str, '\0'), str + sizeof(str) - 1);
+}
+
 static void test_str_has_prefix(TestContext *ctx)
 {
     EXPECT_TRUE(str_has_prefix("foo", "foo"));
@@ -3169,6 +3178,7 @@ static const TestEntry tests[] = {
     TEST(test_is_power_of_2),
     TEST(test_xmalloc),
     TEST(test_xstreq),
+    TEST(test_xstrrchr),
     TEST(test_str_has_prefix),
     TEST(test_str_has_suffix),
     TEST(test_hex_decode),
