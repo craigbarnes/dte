@@ -52,6 +52,10 @@ size_t buf_umax_to_str(uintmax_t x, char *buf)
     return ndigits;
 }
 
+// Like buf_umax_to_str(), but writing a hexadecimal string and
+// needing `HEX_STR_MAX(x)` bytes of buffer space for arbitrary
+// values. A minimum number of digits can also be specified, e.g.
+// for use cases like "U+000A".
 size_t buf_umax_to_hex_str(uintmax_t x, char *buf, size_t min_digits)
 {
     const size_t ndigits = MAX(min_digits, umax_count_base16_digits(x));
@@ -132,7 +136,7 @@ size_t buf_uint_to_str(unsigned int x, char *buf)
  * • https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10:~:text=three%20character%20positions
  * • https://gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html#index-long-ls-format
  */
-char *file_permissions_to_str(mode_t mode, char *buf)
+char *file_permissions_to_str(mode_t mode, char buf[10])
 {
     static const char xmap[8] = "-xSs-xTt";
 
@@ -155,7 +159,7 @@ char *file_permissions_to_str(mode_t mode, char *buf)
     return buf;
 }
 
-char *human_readable_size(uintmax_t bytes, char *buf)
+char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 {
     static const char suffixes[8] = "KMGTPEZY";
     uintmax_t ipart = bytes;
@@ -199,7 +203,7 @@ char *human_readable_size(uintmax_t bytes, char *buf)
     return buf;
 }
 
-char *filesize_to_str(uintmax_t bytes, char *buf)
+char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX])
 {
     human_readable_size(bytes, buf);
     if (bytes < 1024) {

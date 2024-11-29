@@ -343,7 +343,7 @@ String dump_tags(TagFile *tf)
     }
 
     const struct timespec ts = {.tv_sec = tf->mtime};
-    char sizestr[FMT_FILESIZE_MAX];
+    char sizestr[FILESIZE_STR_MAX];
     char tstr[TIME_STR_BUFSIZE];
     String buf = string_new(tf->size);
 

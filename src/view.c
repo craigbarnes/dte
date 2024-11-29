@@ -185,7 +185,7 @@ String dump_buffer(const View *view)
 {
     const Buffer *buffer = view->buffer;
     uintmax_t counts[2];
-    char sizestr[FMT_FILESIZE_MAX];
+    char sizestr[FILESIZE_STR_MAX];
     buffer_count_blocks_and_bytes(buffer, counts);
     BUG_ON(counts[0] < 1);
     BUG_ON(!buffer->setup);

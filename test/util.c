@@ -1385,6 +1385,18 @@ static void test_human_readable_size(TestContext *ctx)
     EXPECT_STREQ(human_readable_size(u64pow2max >> 1 | (u64pow2max >> 4), buf), "4.50 EiB");
 }
 
+static void test_filesize_to_str(TestContext *ctx)
+{
+    char buf[FILESIZE_STR_MAX];
+    EXPECT_STREQ(filesize_to_str(0, buf), "0");
+    EXPECT_STREQ(filesize_to_str(1023, buf), "1023");
+    EXPECT_STREQ(filesize_to_str(1024, buf), "1 KiB (1024)");
+
+    static_assert(18446744073709551615ull == 0xFFFFFFFFFFFFFFFFull);
+    EXPECT_STREQ(filesize_to_str(18446744073709551615ull, buf), "16 EiB (18446744073709551615)");
+    EXPECT_STREQ(filesize_to_str(17446744073709551615ull, buf), "15.13 EiB (17446744073709551615)");
+}
+
 static void test_u_char_size(TestContext *ctx)
 {
     EXPECT_EQ(u_char_size('\0'), 1);
@@ -3214,6 +3226,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_u8_to_str),
     TEST(test_file_permissions_to_str),
     TEST(test_human_readable_size),
+    TEST(test_filesize_to_str),
     TEST(test_u_char_size),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),
