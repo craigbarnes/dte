@@ -181,26 +181,11 @@ StringView view_get_word_under_cursor(const View *view)
     return get_word_under_cursor(line, cursor_offset_in_line);
 }
 
-static const char *fmt_filesize(uintmax_t bytes, char *buf)
-{
-    human_readable_size(bytes, buf);
-    if (bytes < 1024) {
-        return buf;
-    }
-    size_t i = strlen(buf);
-    buf[i++] = ' ';
-    buf[i++] = '(';
-    i += buf_umax_to_str(bytes, buf + i);
-    buf[i++] = ')';
-    buf[i] = '\0';
-    return buf;
-}
-
 String dump_buffer(const View *view)
 {
     const Buffer *buffer = view->buffer;
     uintmax_t counts[2];
-    char sizestr[HRSIZE_MAX + DECIMAL_STR_MAX(counts[1]) + 4];
+    char sizestr[FMT_FILESIZE_MAX];
     buffer_count_blocks_and_bytes(buffer, counts);
     BUG_ON(counts[0] < 1);
     BUG_ON(!buffer->setup);
@@ -215,7 +200,7 @@ String dump_buffer(const View *view)
         " Filetype:", buffer->options.filetype,
         "   Blocks:", counts[0],
         "    Lines:", buffer->nl,
-        "     Size:", fmt_filesize(counts[1], sizestr)
+        "     Size:", filesize_to_str(counts[1], sizestr)
 
     );
 
@@ -254,7 +239,7 @@ String dump_buffer(const View *view)
             "     Mode:", file_permissions_to_str(file->mode, modestr), perms,
             "     User:", (intmax_t)file->uid,
             "    Group:", (intmax_t)file->gid,
-            "     Size:", fmt_filesize(file->size, sizestr),
+            "     Size:", filesize_to_str(file->size, sizestr),
             "   Device:", (intmax_t)file->dev,
             "    Inode:", (uintmax_t)file->ino
         );

@@ -198,3 +198,18 @@ char *human_readable_size(uintmax_t bytes, char *buf)
     buf[i++] = '\0';
     return buf;
 }
+
+char *filesize_to_str(uintmax_t bytes, char *buf)
+{
+    human_readable_size(bytes, buf);
+    if (bytes < 1024) {
+        return buf;
+    }
+    size_t i = strlen(buf);
+    buf[i++] = ' ';
+    buf[i++] = '(';
+    i += buf_umax_to_str(bytes, buf + i);
+    buf[i++] = ')';
+    buf[i] = '\0';
+    return buf;
+}

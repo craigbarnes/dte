@@ -7,7 +7,8 @@
 #include "macros.h"
 
 enum {
-    HRSIZE_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN(".99 GiB")
+    HRSIZE_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN(".99 GiB"),
+    FMT_FILESIZE_MAX = HRSIZE_MAX + DECIMAL_STR_MAX(uintmax_t) + STRLEN(" ()"),
 };
 
 extern const char hextab_lower[16];
@@ -30,5 +31,6 @@ const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
 const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;
 char *file_permissions_to_str(mode_t mode, char *buf) NONNULL_ARGS_AND_RETURN;
 char *human_readable_size(uintmax_t bytes, char *buf) NONNULL_ARGS_AND_RETURN;
+char *filesize_to_str(uintmax_t bytes, char *buf) NONNULL_ARGS_AND_RETURN;
 
 #endif

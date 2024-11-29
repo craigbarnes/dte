@@ -8,7 +8,9 @@
 #include "tag.h"
 #include "error.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/path.h"
+#include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 #include "util/xstring.h"
@@ -332,4 +334,51 @@ void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
         }
         free_tag(&t);
     }
+}
+
+String dump_tags(TagFile *tf)
+{
+    if (!load_tag_file(tf)) {
+        return string_new(0);
+    }
+
+    const struct timespec ts = {.tv_sec = tf->mtime};
+    char sizestr[FMT_FILESIZE_MAX];
+    char tstr[TIME_STR_BUFSIZE];
+    String buf = string_new(tf->size);
+
+    string_sprintf (
+        &buf,
+        "Tags file\n---------\n\n"
+        "%s %s\n%s %s\n%s %s\n\n"
+        "Tag entries\n-----------\n\n",
+        "     Path:", tf->filename,
+        " Modified:", timespec_to_str(&ts, tstr, sizeof(tstr)) ? tstr : "-",
+        "     Size:", filesize_to_str(tf->size, sizestr)
+    );
+
+    const StringView prefix = STRING_VIEW_INIT;
+    size_t pos = 0;
+    Tag tag;
+
+    while (next_tag(tf->buf, tf->size, &pos, &prefix, false, &tag)) {
+        string_append_buf(&buf, tag.name.data, tag.name.length);
+        string_append_cstring(&buf, "   ");
+        string_append_buf(&buf, tag.filename.data, tag.filename.length);
+        if (tag.kind) {
+            string_sprintf(&buf, "   kind:%c", tag.kind);
+        }
+        if (tag.local) {
+            string_append_cstring(&buf, "   LOCAL");
+        }
+        if (tag.pattern) {
+            string_sprintf(&buf, "   /%s/", tag.pattern);
+        } else {
+            string_sprintf(&buf, "   lineno:%lu", tag.lineno);
+        }
+        string_append_byte(&buf, '\n');
+        free_tag(&tag);
+    }
+
+    return buf;
 }
