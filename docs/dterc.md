@@ -246,34 +246,44 @@ See also:
 
 ### **set** [**-gl**] _option_ [_value_] ...
 
-Set _value_ for _option_. Value can be omitted for boolean option to set
-it true. Multiple options can be set at once but then _value_ must be
-given for every option.
+Set _option_ to the specified _value_.
 
-There are three kinds of options.
+For boolean options, an omitted _value_ is equivalent to `true`. Multiple
+options can be set at once, but then a _value_ must be given for every
+_option_.
 
-1. Global options.
+There are three kinds of [options]:
 
-2. Local options. These are file specific options. Each open file has
-   its own copies of the option values.
+1. [Global options][global options].
 
-3. Options that have both global and local values. The Global value is
-   just a default local value for opened files and is never used for
-   anything else. Changing the global value does not affect any already
-   opened files.
+2. [Local options][local options]. These are file specific options.
+   Each open file has its own copies of the option values.
 
-By default `set` changes both global and local values.
+3. [Options that have both global and local values][common options].
+   The Global value is just a default local value for opened files
+   and is never used for anything else. Changing the global value
+   does not affect any already opened files.
 
-`-g`
-:   Change only global option value
-
-`-l`
-:   Change only local option value of current file
-
-In [configuration files] only global options can be set (no need
+Both global and local values are set by default (as applicable), except
+in [configuration files], where only global values can be set (no need
 to specify the `-g` flag).
 
-See also: [`toggle`] and [`option`] commands.
+`-g`
+:   Change only global option values
+
+`-l`
+:   Change only local option values (of the current file)
+
+Examples:
+
+    set indent-width 4
+    set expand-tab true
+    set emulate-tab true
+    set ws-error auto-indent,trailing,special
+    set set-window-title
+    set editorconfig
+
+See also: [`toggle`], [`option`] and [`show set`] commands.
 
 ### **setenv** _name_ [_value_]
 
@@ -1257,17 +1267,26 @@ Run _command_ _count_ times.
 
 ### **toggle** [**-gv**] _option_ [_values_]...
 
-Toggle _option_. If list of _values_ is not given then the option
-must be either boolean or enum.
+Toggle _option_ between several _values_.
+
+If no _values_ are specified and the [option][options] is of enum or
+boolean type, toggle between all enumerated values. If _option_ has
+both [local and global][common options] values then the local value
+is toggled, by default.
 
 `-g`
-:   toggle global option instead of local
+:   Toggle global values, instead of local
 
 `-v`
-:   display new value
+:   Display new value
 
-If _option_ has both local and global values then local is toggled
-unless `-g` is used.
+Examples:
+
+    toggle -v show-line-numbers
+    toggle -v display-special
+    toggle -v text-width 60 70 80
+
+See also: [`set`] command.
 
 ### **show** [**-c**] _type_ [_key_]
 
@@ -1628,6 +1647,9 @@ errors should be highlighted. Set to `""` to disable.
 [configuration files]: dte.html#files:~:text=%24DTE_HOME/rc
 [key bindings]: dte.html#key-bindings
 [options]: #options
+[global options]: #global-options
+[local options]: #local-options
+[common options]: #local-and-global-options
 [`pipe-from cat file.txt`]: #exec:~:text=alias%20pipe%2Dfrom
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings
@@ -1676,6 +1698,7 @@ errors should be highlighted. Set to `""` to disable.
 [`show include`]: #show
 [`show macro`]: #show
 [`show msg`]: #show
+[`show set`]: #show
 [`tag`]: #tag
 [`toggle`]: #toggle
 [`undo`]: #undo

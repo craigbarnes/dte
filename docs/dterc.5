@@ -584,43 +584,58 @@ See also:
 .RE
 \fBset\fR [\fB\-gl\fR] \fIoption\fR [\fIvalue\fR] ...
 .RS
-Set \fIvalue\fR for \fIoption\fR. Value can be omitted for boolean option to set
-it true. Multiple options can be set at once but then \fIvalue\fR must be
-given for every option.
+Set \fIoption\fR to the specified \fIvalue\fR.
 .P
-There are three kinds of options.
+For boolean options, an omitted \fIvalue\fR is equivalent to \fBtrue\fR. Multiple
+options can be set at once, but then a \fIvalue\fR must be given for every
+\fIoption\fR.
+.P
+There are three kinds of options:
 .P
 1. Global options.
 .P
 .
 .br
-2. Local options. These are file specific options. Each open file has
-its own copies of the option values.
+2. Local options. These are file specific options.
+Each open file has its own copies of the option values.
 .P
 .
 .br
-3. Options that have both global and local values. The Global value is
-just a default local value for opened files and is never used for
-anything else. Changing the global value does not affect any already
-opened files.
+3. Options that have both global and local values.
+The Global value is just a default local value for opened files
+and is never used for anything else. Changing the global value
+does not affect any already opened files.
 .P
 .
 .br
 .P
-By default \fBset\fR changes both global and local values.
+Both global and local values are set by default (as applicable), except
+in configuration files, where only global values can be set (no need
+to specify the \fB\-g\fR flag).
 .P
 .TP
 \fB\-g\fR
-Change only global option value
+Change only global option values
 .PP
 .TP
 \fB\-l\fR
-Change only local option value of current file
+Change only local option values (of the current file)
 .PP
-In configuration files only global options can be set (no need
-to specify the \fB\-g\fR flag).
+Examples:
 .P
-See also: \fBtoggle\fR and \fBoption\fR commands.
+.IP
+.nf
+\f[C]
+set\ indent\-width\ 4
+set\ expand\-tab\ true
+set\ emulate\-tab\ true
+set\ ws\-error\ auto\-indent,trailing,special
+set\ set\-window\-title
+set\ editorconfig
+\f[]
+.fi
+.PP
+See also: \fBtoggle\fR, \fBoption\fR and \fBshow set\fR commands.
 .P
 .RE
 \fBsetenv\fR \fIname\fR [\fIvalue\fR]
@@ -1885,19 +1900,33 @@ Run \fIcommand\fR \fIcount\fR times.
 .RE
 \fBtoggle\fR [\fB\-gv\fR] \fIoption\fR [\fIvalues\fR]...
 .RS
-Toggle \fIoption\fR. If list of \fIvalues\fR is not given then the option
-must be either boolean or enum.
+Toggle \fIoption\fR between several \fIvalues\fR.
+.P
+If no \fIvalues\fR are specified and the option is of enum or
+boolean type, toggle between all enumerated values. If \fIoption\fR has
+both local and global values then the local value
+is toggled, by default.
 .P
 .TP
 \fB\-g\fR
-toggle global option instead of local
+Toggle global values, instead of local
 .PP
 .TP
 \fB\-v\fR
-display new value
+Display new value
 .PP
-If \fIoption\fR has both local and global values then local is toggled
-unless \fB\-g\fR is used.
+Examples:
+.P
+.IP
+.nf
+\f[C]
+toggle\ \-v\ show\-line\-numbers
+toggle\ \-v\ display\-special
+toggle\ \-v\ text\-width\ 60\ 70\ 80
+\f[]
+.fi
+.PP
+See also: \fBset\fR command.
 .P
 .RE
 \fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
