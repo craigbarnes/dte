@@ -19,6 +19,7 @@ function escape_syntax(s) {
 }
 
 BEGIN {
+    nfiles = 0
     print "#ifdef __linux__"
     print "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)"
     print "#else"
