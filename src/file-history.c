@@ -15,7 +15,7 @@
 #include "util/xstdio.h"
 
 enum {
-    MAX_ENTRIES = 512
+    FILEHIST_MAX_ENTRIES = 512
 };
 
 void file_history_append(FileHistory *history, unsigned long row, unsigned long col, const char *filename)
@@ -38,7 +38,7 @@ void file_history_append(FileHistory *history, unsigned long row, unsigned long 
             e->prev->next = e->next;
         }
     } else {
-        if (map->count == MAX_ENTRIES) {
+        if (map->count == FILEHIST_MAX_ENTRIES) {
             // History is full; recycle the oldest entry
             FileHistoryEntry *old_first = history->first;
             FileHistoryEntry *new_first = old_first->next;
@@ -80,7 +80,7 @@ static bool parse_ulong_field(StringView *sv, unsigned long *valp)
 void file_history_load(FileHistory *history, char *filename, size_t size_limit)
 {
     BUG_ON(history->filename);
-    hashmap_init(&history->entries, MAX_ENTRIES);
+    hashmap_init(&history->entries, FILEHIST_MAX_ENTRIES);
     history->filename = filename;
 
     char *buf;
