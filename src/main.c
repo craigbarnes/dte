@@ -212,7 +212,7 @@ static ExitCode init_std_fds_headless(int std_fds[2])
     }
 
     if (!fd_is_valid(STDERR_FILENO)) {
-        // If FD 3 isn't valid (e.g. because it was closed), point it
+        // If FD 2 isn't valid (e.g. because it was closed), point it
         // to /dev/null to ensure open(3) doesn't allocate it to other
         // opened files
         if (!freopen("/dev/null", "w", stderr)) {
