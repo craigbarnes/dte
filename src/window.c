@@ -56,67 +56,38 @@ View *window_open_buffer (
         return NULL;
     }
 
-    EditorState *e = window->editor;
-    bool dir_missing = false;
     char *absolute = path_absolute(filename);
-    if (absolute) {
-        // Already open?
-        Buffer *buffer = find_buffer(&e->buffers, absolute);
-        if (buffer) {
-            if (!streq(absolute, buffer->abs_filename)) {
-                const char *bufname = buffer_filename(buffer);
-                char *s = short_filename(absolute, &e->home_dir);
-                info_msg("%s and %s are the same file", s, bufname);
-                free(s);
-            }
-            free(absolute);
-            return window_get_view(window, buffer);
-        }
-    } else {
-        // Let load_buffer() create error message
-        dir_missing = (errno == ENOENT);
+    if (!absolute) {
+        bool nodir = (errno == ENOENT); // New file in non-existing dir (usually a mistake)
+        const char *err = nodir ? "Directory does not exist" : strerror(errno);
+        error_msg("Error opening %s: %s", filename, err);
+        return NULL;
     }
 
-    /*
-    /proc/$PID/fd/ contains symbolic links to files that have been opened
-    by process $PID. Some of the files may have been deleted but can still
-    be opened using the symbolic link but not by using the absolute path.
+    EditorState *e = window->editor;
+    Buffer *buffer = find_buffer(&e->buffers, absolute);
+    if (buffer) {
+        // File already open in editor
+        if (!streq(absolute, buffer->abs_filename)) {
+            const char *bufname = buffer_filename(buffer);
+            char *s = short_filename(absolute, &e->home_dir);
+            info_msg("%s and %s are the same file", s, bufname); // Hard links
+            free(s);
+        }
+        free(absolute);
+        return window_get_view(window, buffer);
+    }
 
-    # create file
-    mkdir /tmp/x
-    echo foo > /tmp/x/file
-
-    # in another shell: keep the file open
-    tail -f /tmp/x/file
-
-    # make the absolute path unavailable
-    rm /tmp/x/file
-    rmdir /tmp/x
-
-    # this should still succeed
-    dte /proc/$(pidof tail)/fd/3
-    */
-
-    Buffer *buffer = buffer_new(&e->buffers, &e->options, encoding);
+    buffer = buffer_new(&e->buffers, &e->options, encoding);
     if (!load_buffer(buffer, filename, &e->options, must_exist)) {
         buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
         free(absolute);
         return NULL;
     }
-    if (unlikely(buffer->file.mode == 0 && dir_missing)) {
-        // New file in non-existing directory; this is usually a mistake
-        error_msg("Error opening %s: Directory does not exist", filename);
-        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
-        free(absolute);
-        return NULL;
-    }
 
-    if (absolute) {
-        buffer->abs_filename = absolute;
-    } else {
-        // FIXME: obviously wrong
-        buffer->abs_filename = xstrdup(filename);
-    }
+    BUG_ON(!absolute);
+    BUG_ON(!path_is_absolute(absolute));
+    buffer->abs_filename = absolute;
     buffer_update_short_filename(buffer, &e->home_dir);
 
     if (e->options.lock_files) {
