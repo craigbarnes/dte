@@ -138,6 +138,7 @@ bind F5 refresh
 bind C-tab next
 bind C-S-tab prev
 bind C-S-g 'search -p'
+bind C-S-t reopen
 
 # Command/search mode bindings:
 bind -cs left left

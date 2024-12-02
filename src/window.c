@@ -197,20 +197,21 @@ void window_free(Window *window)
 size_t remove_view(View *view)
 {
     Window *window = view->window;
-    EditorState *e = window->editor;
+    window->update_tabbar = true;
     if (view == window->prev_view) {
         window->prev_view = NULL;
     }
+
+    EditorState *e = window->editor;
     if (view == e->view) {
         e->view = NULL;
         e->buffer = NULL;
     }
 
     size_t idx = ptr_array_remove(&window->views, view);
-    window->update_tabbar = true;
-
     Buffer *buffer = view->buffer;
     ptr_array_remove(&buffer->views, view);
+
     if (buffer->views.count == 0) {
         if (buffer->options.file_history && buffer->abs_filename) {
             FileHistory *hist = &e->file_history;

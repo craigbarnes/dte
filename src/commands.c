@@ -1575,6 +1575,26 @@ insert:
     return true;
 }
 
+static bool cmd_reopen(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    for (const FileHistoryEntry *h = e->file_history.last; h; h = h->prev) {
+        const char *path = h->filename;
+        // The combination of walking the history and doing a linear search
+        // (with find_buffer()) here makes this O(m*n) in the worst case,
+        // although n will typically be small and m is bounded by
+        // FILEHIST_MAX_ENTRIES
+        if (
+            !find_buffer(&e->buffers, path) // Not already open in the editor
+            && access(path, R_OK) == 0 // File exists and is readable
+            && window_open_file(e->window, path, NULL) // Reopened successfully
+        ) {
+            return true;
+        }
+    }
+
+    return error_msg("no reopenable files in history");
+}
+
 static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 {
     unsigned int count;
@@ -2580,6 +2600,7 @@ static const Command cmds[] = {
     {"quit", "CFHSfp", NA, 0, 1, cmd_quit},
     {"redo", "", NA, 0, 1, cmd_redo},
     {"refresh", "", NA, 0, 0, cmd_refresh},
+    {"reopen", "", NA, 0, 0, cmd_reopen},
     {"repeat", "", NFAA, 2, -1, cmd_repeat},
     {"replace", "bcegi", NA, 1, 2, cmd_replace},
     {"right", "cl", NA, 0, 0, cmd_right},
