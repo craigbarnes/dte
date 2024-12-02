@@ -75,7 +75,7 @@ View *window_open_buffer (
             free(s);
         }
         free(absolute);
-        return window_get_view(window, buffer);
+        return window_find_or_create_view(window, buffer);
     }
 
     buffer = buffer_new(&e->buffers, &e->options, encoding);
@@ -106,11 +106,11 @@ View *window_open_buffer (
     return window_add_buffer(window, buffer);
 }
 
-View *window_get_view(Window *window, Buffer *buffer)
+View *window_find_or_create_view(Window *window, Buffer *buffer)
 {
     View *view = window_find_view(window, buffer);
     if (!view) {
-        // Open the buffer in other window to this window
+        // Buffer isn't open in this window; create a new view of it
         view = window_add_buffer(window, buffer);
         view->cursor = buffer_get_first_view(buffer)->cursor;
     }

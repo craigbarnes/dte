@@ -46,7 +46,7 @@ static bool file_location_return(Window *window, const FileLocation *loc)
     Buffer *buffer = find_buffer_by_id(&window->editor->buffers, loc->buffer_id);
     View *view;
     if (buffer) {
-        view = window_get_view(window, buffer);
+        view = window_find_or_create_view(window, buffer);
     } else {
         if (!loc->filename) {
             // Can't restore closed buffer that had no filename; try again
