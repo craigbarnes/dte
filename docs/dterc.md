@@ -1257,8 +1257,6 @@ exits successfully, parsed messages can be navigated using the
     just silently collect messages (use this to avoid screen
     flicker, e.g. for commands that typically complete quickly)
 
-See also: [`errorfmt`] and [`msg`] commands.
-
 ## Other Commands
 
 ### **repeat** _count_ _command_ [_argument_]...
