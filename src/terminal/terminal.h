@@ -33,6 +33,7 @@ typedef enum {
     TFLAG_16_COLOR = 0x4000, // Supports aixterm-style "bright" palette colors (e.g. SGR 90)
     TFLAG_256_COLOR = 0x8000, // Supports xterm-style (ISO 8613-6) indexed colors (e.g. SGR 38;5;255)
     TFLAG_TRUE_COLOR = 0x10000, // Supports 24-bit RGB ("direct") colors (e.g. SGR 38;2;50;60;70)
+    TFLAG_MODIFY_OTHER_KEYS = 0x20000, // Supports xterm "modifyOtherKeys" mode (keyboard protocol)
 } TermFeatureFlags;
 
 typedef enum {

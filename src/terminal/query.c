@@ -165,7 +165,7 @@ KeyCode parse_csi_query_reply(const TermControlParams *csi, uint8_t prefix)
             // XTMODKEYS 4 reply to XTQMODKEYS 4 query (CSI > 4 ; Pv m)
             unsigned int val = (nparams == 1) ? 0 : csi->params[1][0];
             LOG_DEBUG("XTMODKEYS 4 reply: modifyOtherKeys=%u", val);
-            return KEY_IGNORE;
+            return (val <= 2) ? tflag(TFLAG_MODIFY_OTHER_KEYS) : KEY_IGNORE;
         }
         LOG_DEBUG("XTMODKEYS %u reply with %u params", code, nparams);
         return KEY_IGNORE;
@@ -298,15 +298,22 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     StringView seq = string_view(data, len);
     if (strview_remove_matching_prefix(&seq, ">|")) {
         LOG_INFO("XTVERSION reply: %.*s", (int)seq.length, seq.data);
-        if (strview_has_prefix(&seq, "tmux ")) {
-            // tmux gained support for ECMA-48 REP in version 2.6, but
-            // didn't get XTVERSION support until 3.2, so any response
-            // starting with "tmux " implies REP support.
+        if (strview_has_prefix(&seq, "XTerm(")) {
+            return tflag (
+                TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
+            );
+        } else if (strview_has_prefix(&seq, "tmux ")) {
+            // tmux gained support for XTVERSION in release 3.2, so any response
+            // starting with "tmux " implies support for all tmux 3.2 features.
             // See also:
             // • https://github.com/tmux/tmux/wiki/FAQ#how-often-is-tmux-released-what-is-the-version-number-scheme
-            // • tmux commit 5fc0be50450e75
-            // • tmux commit 9dd58470e41bfb
-            return tflag(TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT);
+            // • https://github.com/tmux/tmux/commit/9dd58470e41bfb (XTVERSION; v3.2)
+            // • https://github.com/tmux/tmux/commit/5fc0be50450e75 (REP; v2.6)
+            // TODO: Set TFLAG_MODIFY_OTHER_KEYS conditionally, for tmux 3.5a+ (or 3.6+?)
+            // TODO: Set TFLAG_SYNC for tmux 3.4+ (tmux doesn't support DECRQM)
+            return tflag (
+                TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
+            );
         }
         return tflag(TFLAG_QUERY_L3);
     }

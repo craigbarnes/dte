@@ -210,6 +210,7 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_16_COLOR: return "C16";
     case TFLAG_256_COLOR: return "C256";
     case TFLAG_TRUE_COLOR: return "TC";
+    case TFLAG_MODIFY_OTHER_KEYS: return "MOKEYS";
     }
 
     return "??";
@@ -263,13 +264,24 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
     }
 
     if (is_newly_detected_feature(existing, detected, TFLAG_KITTY_KEYBOARD)) {
-        // First disable modifyOtherKeys mode (as previously enabled by
-        // main() → ui_first_start() → term_enable_private_modes()) and
-        // then enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5).
-        // See also:
+        if (existing & TFLAG_MODIFY_OTHER_KEYS) {
+            // Disable modifyOtherKeys mode, if previously enabled by
+            // main() → ui_first_start() → term_enable_private_modes()
+            // (i.e. due to feature flags set by term_init())
+            term_put_literal(obuf, "\033[>4m");
+        }
+        // Enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5). See also:
         // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=CSI%20%3E%20Pp%20m
         // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
-        term_put_literal(obuf, "\033[>4m\033[>5u");
+        term_put_literal(obuf, "\033[>5u");
+        flush = true;
+    }
+
+    if (
+        is_newly_detected_feature(existing, detected, TFLAG_MODIFY_OTHER_KEYS)
+        && !((existing | detected) & TFLAG_KITTY_KEYBOARD)
+    ) {
+        term_put_literal(obuf, "\033[>4;1m\033[>4;2m"); // modifyOtherKeys=1/2
         flush = true;
     }
 

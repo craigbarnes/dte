@@ -8,7 +8,7 @@
 
 static inline bool is_newly_detected_feature (
     TermFeatureFlags existing, // Existing Terminal::features bits
-    TermFeatureFlags detected, // term_parse_sequence() return value
+    TermFeatureFlags detected, // Return value from query.h function
     TermFeatureFlags feature   // Feature flag to test
 ) {
     BUG_ON(!IS_POWER_OF_2(feature));

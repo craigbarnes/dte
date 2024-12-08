@@ -32,6 +32,7 @@ enum {
     LINUX = TFLAG_LINUX,
     OSC52 = TFLAG_OSC52_COPY,
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
+    MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
     ITERM2 = TFLAG_ITERM2,
     SYNC = TFLAG_SYNC,
     C8 = TFLAG_8_COLOR,
@@ -280,7 +281,7 @@ void term_enable_private_modes(Terminal *term)
     } else if (features & ITERM2) {
         // https://gitlab.com/craigbarnes/dte/-/issues/130#note_864453071
         term_put_literal(obuf, "\033[>1u");
-    } else {
+    } else if (features & MOKEYS) {
         // Try to use "modifyOtherKeys" mode (level 2 or 1)
         term_put_literal(obuf, "\033[>4;1m\033[>4;2m");
     }
@@ -307,7 +308,7 @@ void term_restore_private_modes(Terminal *term)
     }
     if (features & (KITTYKBD | ITERM2)) {
         term_put_literal(obuf, "\033[<u");
-    } else {
+    } else if (features & MOKEYS) {
         term_put_literal(obuf, "\033[>4m");
     }
     //term_put_literal(obuf, "\033[?2004l\033[?2004r");
