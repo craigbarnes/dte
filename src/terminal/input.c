@@ -254,9 +254,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
     }
 
     if ((detected & TFLAG_QUERY_L3) && (existing & TFLAG_NO_QUERY_L3)) {
-        const char *name = tflag_to_str(TFLAG_QUERY_L3);
-        const char *ovr = tflag_to_str(TFLAG_NO_QUERY_L3);
-        LOG_INFO("terminal feature %s overridden by %s", name, ovr);
+        LOG_INFO("terminal feature QUERY3 overridden by NOQUERY3");
         detected &= ~TFLAG_QUERY_L3;
     }
 
