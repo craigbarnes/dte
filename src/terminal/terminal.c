@@ -35,6 +35,7 @@ enum {
     MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
     ITERM2 = TFLAG_ITERM2,
     SYNC = TFLAG_SYNC,
+    NOQUERY3 = TFLAG_NO_QUERY_L3,
     C8 = TFLAG_8_COLOR,
     C16 = TFLAG_16_COLOR | C8,
     C256 = TFLAG_256_COLOR | C16,
@@ -104,7 +105,7 @@ static const TermEntry terms[] = {
     t("teken", DIM | REV, C8 | BCE),
     t("terminator", 0, C256 | BCE | TITLE),
     t("termite", 0, C8 | TITLE),
-    t("tmux", 0, C8 | TITLE | OSC52), // See also: parse_dcs_query_reply()
+    t("tmux", 0, C8 | TITLE | OSC52 | NOQUERY3), // See also: parse_dcs_query_reply()
     t("wezterm", 0, TC | BCE | REP | TITLE | OSC52 | SYNC),
     t("xfce", 0, C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too

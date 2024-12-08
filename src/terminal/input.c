@@ -206,6 +206,7 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_SYNC: return "SYNC";
     case TFLAG_QUERY_L2: return "QUERY2";
     case TFLAG_QUERY_L3: return "QUERY3";
+    case TFLAG_NO_QUERY_L3: return "NOQUERY3";
     case TFLAG_8_COLOR: return "C8";
     case TFLAG_16_COLOR: return "C16";
     case TFLAG_256_COLOR: return "C256";
@@ -250,6 +251,13 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         const char *ovr = tflag_to_str(TFLAG_KITTY_KEYBOARD);
         LOG_INFO("terminal feature %s overridden by %s", name, ovr);
         detected &= ~escflags;
+    }
+
+    if ((detected & TFLAG_QUERY_L3) && (existing & TFLAG_NO_QUERY_L3)) {
+        const char *name = tflag_to_str(TFLAG_QUERY_L3);
+        const char *ovr = tflag_to_str(TFLAG_NO_QUERY_L3);
+        LOG_INFO("terminal feature %s overridden by %s", name, ovr);
+        detected &= ~TFLAG_QUERY_L3;
     }
 
     TermOutputBuffer *obuf = &term->obuf;

@@ -785,7 +785,7 @@ static void test_term_parse_sequence(TestContext *ctx)
 
     // XTVERSION replies
     const TermFeatureFlags tmuxflags = TFLAG (
-        TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
+        TFLAG_NO_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
     );
     EXPECT_PARSE_SEQN("\033P>|tmux 3.2\033\\", 12, tmuxflags);
     EXPECT_PARSE_SEQN("\033P>|tmux 3.2a\033\\", 13, tmuxflags);
@@ -1698,9 +1698,9 @@ static void test_term_put_level_1_queries(TestContext *ctx)
         // term_put_initial_queries()
         "\033[c"
         // term_put_level_2_queries()
+        "\033[>0q"
         "\033[>c"
         "\033[=c"
-        "\033[>0q"
         "\033[?u"
         "\033[?1036$p"
         "\033[?1039$p"

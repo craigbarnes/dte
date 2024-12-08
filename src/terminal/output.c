@@ -238,9 +238,9 @@ void term_put_initial_queries(Terminal *term, unsigned int level)
 void term_put_level_2_queries(Terminal *term, bool emit_all)
 {
     static const char queries[] =
+        "\033[>0q" // XTVERSION (terminal name and version)
         "\033[>c" // DA2 (Secondary Device Attributes)
         "\033[=c" // DA3 (Tertiary Device Attributes)
-        "\033[>0q" // XTVERSION (terminal name and version)
         "\033[?u" // Kitty keyboard protocol flags
         "\033[?1036$p" // DECRQM 1036 (metaSendsEscape; must be after kitty query)
         "\033[?1039$p" // DECRQM 1039 (altSendsEscape; must be after kitty query)
