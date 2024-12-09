@@ -15,6 +15,7 @@
 #include "msg.h"
 #include "selection.h"
 #include "tag.h"
+#include "terminal/mode.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -198,6 +199,10 @@ static const char **lines_and_columns_env(const Window *window)
 static void show_spawn_error_msg(const String *errstr, int err)
 {
     if (err <= 0) {
+        // spawn() returned an error code instead of an exit code, which
+        // indicates that something failed before (or during) the child
+        // process exec(3p), or that an error occurred in wait_child().
+        // In this case, error_msg() has already been called.
         return;
     }
 
@@ -249,7 +254,6 @@ ssize_t handle_exec (
     bool replace_unselected_input = false;
 
     SpawnContext ctx = {
-        .editor = e,
         .argv = argv,
         .outputs = {STRING_INIT, STRING_INIT},
         .flags = spawn_flags,
@@ -361,8 +365,11 @@ ssize_t handle_exec (
         ctx.input.data = alloc;
     }
 
+    yield_terminal(e, spawn_flags);
     int err = spawn(&ctx);
+    resume_terminal(e, spawn_flags, err >= 0);
     free(alloc);
+
     if (err != 0) {
         show_spawn_error_msg(&ctx.outputs[1], err);
         string_free(&ctx.outputs[0]);
@@ -439,4 +446,35 @@ ssize_t handle_exec (
     size_t output_len = output->len;
     string_free(output);
     return output_len;
+}
+
+void yield_terminal(EditorState *e, SpawnFlags spawn_flags)
+{
+    if (e->flags & EFLAG_HEADLESS) {
+        return;
+    }
+
+    if (spawn_flags & SPAWN_QUIET) {
+        term_raw_isig();
+    } else {
+        e->child_controls_terminal = true;
+        ui_end(e);
+        term_cooked();
+    }
+}
+
+void resume_terminal(EditorState *e, SpawnFlags spawn_flags, bool spawn_succeeded)
+{
+    if (e->flags & EFLAG_HEADLESS) {
+        return;
+    }
+
+    term_raw();
+    if (!(spawn_flags & SPAWN_QUIET) && e->child_controls_terminal) {
+        if ((spawn_flags & SPAWN_PROMPT) && spawn_succeeded) {
+            any_key(&e->terminal, e->options.esc_timeout);
+        }
+        ui_start(e);
+        e->child_controls_terminal = false;
+    }
 }

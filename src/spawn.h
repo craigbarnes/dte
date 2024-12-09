@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include "compiler.h"
-#include "editor.h"
 #include "msg.h"
 #include "util/macros.h"
 #include "util/string.h"
@@ -22,7 +21,6 @@ typedef enum {
 } SpawnAction;
 
 typedef struct {
-    EditorState *editor;
     const char **argv;
     const char **env;
     StringView input;

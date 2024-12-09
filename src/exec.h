@@ -36,6 +36,8 @@ ssize_t handle_exec (
 ) NONNULL_ARGS;
 
 ExecAction lookup_exec_action(const char *name, int fd) NONNULL_ARGS;
+void yield_terminal(EditorState *e, SpawnFlags spawn_flags) NONNULL_ARGS;
+void resume_terminal(EditorState *e, SpawnFlags spawn_flags, bool spawn_succeeded) NONNULL_ARGS;
 void collect_exec_actions(PointerArray *a, const char *prefix, int fd) NONNULL_ARGS;
 
 #endif

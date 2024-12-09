@@ -9,12 +9,7 @@ static void test_spawn(TestContext *ctx)
         NULL
     };
 
-    EditorState e = {
-        .child_controls_terminal = false
-    };
-
     SpawnContext sc = {
-        .editor = &e,
         .argv = args,
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},

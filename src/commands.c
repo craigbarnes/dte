@@ -431,14 +431,15 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
     }
 
     SpawnContext ctx = {
-        .editor = e,
         .argv = (const char **)a->args + 1,
         .flags = spawn_flags,
     };
 
     MessageArray *messages = &e->messages;
     clear_messages(messages);
+    yield_terminal(e, spawn_flags);
     bool spawned = spawn_compiler(&ctx, compiler, messages);
+    resume_terminal(e, spawn_flags, spawned);
     activate_current_message_save(messages, &e->bookmarks, e->view);
     return spawned;
 }

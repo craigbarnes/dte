@@ -227,10 +227,6 @@ Code Quality/Efficiency Improvements
   array), so that e.g. `&styles->builtin[BSE_COMMENT]` can be used
   (instead of `find_style(styles, "comment")`) in `hl_words()`
 
-* Call `yield_terminal()` and `resume_terminal()` in `handle_exec()`
-  instead of `spawn()`, so that `EditorState` doesn't have to be
-  passed into the latter
-
 * Optimize `update_range()` to make handling long lines more efficient,
   both by avoiding unnecessary work and by speeding up the necessary
   parts (see: https://gitlab.com/craigbarnes/dte/-/issues/220)
