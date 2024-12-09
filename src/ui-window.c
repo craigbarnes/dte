@@ -18,15 +18,15 @@ static void print_separator(Window *window, void* UNUSED_ARG(ud))
     }
 }
 
-void update_window_separators(EditorState *e)
+void update_window_separators(Terminal *term, Frame *root_frame, const StyleMap *styles)
 {
-    if (e->root_frame->window) {
+    if (root_frame->window) {
         // Only 1 window in use; no separators needed
         return;
     }
 
-    set_builtin_style(&e->terminal, &e->styles, BSE_STATUSLINE);
-    frame_for_each_window(e->root_frame, print_separator, NULL);
+    set_builtin_style(term, styles, BSE_STATUSLINE);
+    frame_for_each_window(root_frame, print_separator, NULL);
 }
 
 static void update_line_numbers(Terminal *term, const StyleMap *styles, Window *window, bool force)
@@ -76,49 +76,64 @@ static void update_window_full(Window *window, void* UNUSED_ARG(data))
 {
     EditorState *e = window->editor;
     View *view = window->view;
-    view_update(view, e->options.scroll_margin);
-    if (e->options.tab_bar) {
-        print_tabbar(&e->terminal, &e->styles, window);
+    const GlobalOptions *options = &e->options;
+    view_update(view, options->scroll_margin);
+
+    const StyleMap *styles = &e->styles;
+    Terminal *term = &e->terminal;
+    if (options->tab_bar) {
+        print_tabbar(term, styles, window);
     }
-    if (e->options.show_line_numbers) {
-        update_line_numbers(&e->terminal, &e->styles, window, true);
+
+    if (options->show_line_numbers) {
+        update_line_numbers(term, styles, window, true);
     }
-    update_range(e, view, view->vy, view->vy + window->edit_h);
+
+    bool display_special = options->display_special;
+    long y2 = view->vy + window->edit_h;
+    update_range(term, view, styles, view->vy, y2, display_special);
     update_status_line(window);
 }
 
-void update_all_windows(EditorState *e)
+void update_all_windows(Terminal *term, Frame *root_frame, const StyleMap *styles)
 {
-    update_window_sizes(&e->terminal, e->root_frame);
-    frame_for_each_window(e->root_frame, update_window_full, NULL);
-    update_window_separators(e);
+    update_window_sizes(term, root_frame);
+    frame_for_each_window(root_frame, update_window_full, NULL);
+    update_window_separators(term, root_frame, styles);
 }
 
-static void update_window(EditorState *e, Window *window)
-{
-    if (e->options.tab_bar && window->update_tabbar) {
-        print_tabbar(&e->terminal, &e->styles, window);
+static void update_window (
+    Terminal *term,
+    Window *window,
+    const StyleMap *styles,
+    const GlobalOptions *options
+) {
+    if (options->tab_bar && window->update_tabbar) {
+        print_tabbar(term, styles, window);
     }
 
     const View *view = window->view;
     const Buffer *buffer = view->buffer;
-    if (e->options.show_line_numbers) {
+    if (options->show_line_numbers) {
         // Force updating line numbers if all lines changed
         bool force = (buffer->changed_line_max == LONG_MAX);
-        update_line_numbers(&e->terminal, &e->styles, window, force);
+        update_line_numbers(term, styles, window, force);
     }
 
     long y1 = MAX(buffer->changed_line_min, view->vy);
     long y2 = MIN(buffer->changed_line_max, view->vy + window->edit_h - 1);
-    update_range(e, view, y1, y2 + 1);
+    update_range(term, view, styles, y1, y2 + 1, options->display_special);
     update_status_line(window);
 }
 
 // Update all visible views containing the current buffer
-void update_buffer_windows(EditorState *e)
-{
-    const Buffer *buffer = e->buffer;
-    const View *current_view = e->view;
+void update_buffer_windows (
+    Terminal *term,
+    const View *current_view,
+    const StyleMap *styles,
+    const GlobalOptions *options
+) {
+    const Buffer *buffer = current_view->buffer;
     for (size_t i = 0, n = buffer->views.count; i < n; i++) {
         View *view = buffer->views.ptrs[i];
         if (view != view->window->view) {
@@ -131,8 +146,8 @@ void update_buffer_windows(EditorState *e)
             block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
 
             // This has already been done for the current view
-            view_update(view, e->options.scroll_margin);
+            view_update(view, options->scroll_margin);
         }
-        update_window(e, view->window);
+        update_window(term, view->window, styles, options);
     }
 }

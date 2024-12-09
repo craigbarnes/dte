@@ -27,18 +27,22 @@ void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum 
     set_style(term, styles, &styles->builtin[s]);
 }
 
-static void update_cursor_style(EditorState *e)
-{
+static void update_cursor_style (
+    Terminal *term,
+    const Buffer *buffer,
+    const TermCursorStyle *cursor_styles,
+    bool is_normal_mode
+) {
     CursorInputMode mode;
-    if (e->mode->cmds == &normal_commands) {
-        bool overwrite = e->buffer->options.overwrite;
+    if (is_normal_mode) {
+        bool overwrite = buffer->options.overwrite;
         mode = overwrite ? CURSOR_MODE_OVERWRITE : CURSOR_MODE_INSERT;
     } else {
         mode = CURSOR_MODE_CMDLINE;
     }
 
-    TermCursorStyle style = e->cursor_styles[mode];
-    TermCursorStyle def = e->cursor_styles[CURSOR_MODE_DEFAULT];
+    TermCursorStyle style = cursor_styles[mode];
+    TermCursorStyle def = cursor_styles[CURSOR_MODE_DEFAULT];
     if (style.type == CURSOR_KEEP) {
         style.type = def.type;
     }
@@ -46,8 +50,8 @@ static void update_cursor_style(EditorState *e)
         style.color = def.color;
     }
 
-    if (!same_cursor(&style, &e->terminal.obuf.cursor_style)) {
-        term_set_cursor_style(&e->terminal, style);
+    if (!same_cursor(&style, &term->obuf.cursor_style)) {
+        term_set_cursor_style(term, style);
     }
 }
 
@@ -67,17 +71,22 @@ void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_tit
     term_put_literal(obuf, " dte\033\\");
 }
 
-static void restore_cursor(EditorState *e)
-{
+static void restore_cursor (
+    Terminal *term,
+    const View *view,
+    bool is_normal_mode,
+    size_t cmdline_x
+) {
     unsigned int x, y;
-    if (e->mode->cmds == &normal_commands) {
-        x = e->window->edit_x + e->view->cx_display - e->view->vx;
-        y = e->window->edit_y + e->view->cy - e->view->vy;
+    if (is_normal_mode) {
+        const Window *window = view->window;
+        x = window->edit_x + view->cx_display - view->vx;
+        y = window->edit_y + view->cy - view->vy;
     } else {
-        x = e->cmdline_x;
-        y = e->terminal.height - 1;
+        x = cmdline_x;
+        y = term->height - 1;
     }
-    term_move_cursor(&e->terminal.obuf, x, y);
+    term_move_cursor(&term->obuf, x, y);
 }
 
 static void clear_update_tabbar(Window *window, void* UNUSED_ARG(data))
@@ -85,21 +94,19 @@ static void clear_update_tabbar(Window *window, void* UNUSED_ARG(data))
     window->update_tabbar = false;
 }
 
-static void end_update(EditorState *e)
+static void end_update(Terminal *term, Buffer *buffer, const Frame *root_frame)
 {
-    Terminal *term = &e->terminal;
     term_end_sync_update(term);
     term_output_flush(&term->obuf);
 
-    e->buffer->changed_line_min = LONG_MAX;
-    e->buffer->changed_line_max = -1;
+    buffer->changed_line_min = LONG_MAX;
+    buffer->changed_line_max = -1;
 
-    const Frame *root = e->root_frame;
-    if (root->window) {
+    if (root_frame->window) {
         // Only 1 window to update
-        clear_update_tabbar(root->window, NULL);
+        clear_update_tabbar(root_frame->window, NULL);
     } else {
-        frame_for_each_window(root, clear_update_tabbar, NULL);
+        frame_for_each_window(root_frame, clear_update_tabbar, NULL);
     }
 }
 
@@ -140,16 +147,19 @@ void update_screen_size(Terminal *term, Frame *root_frame)
 void update_screen(EditorState *e, const ScreenState *s)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
+    const GlobalOptions *options = &e->options;
+    const StyleMap *styles = &e->styles;
+    Frame *root_frame = e->root_frame;
+    View *view = e->view;
     Buffer *buffer = e->buffer;
     Terminal *term = &e->terminal;
     ScreenUpdateFlags flags = e->screen_update;
     start_update(term);
 
     if (flags & UPDATE_ALL_WINDOWS) {
-        update_all_windows(e);
+        update_all_windows(term, root_frame, styles);
     } else {
-        View *view = e->view;
-        view_update(view, e->options.scroll_margin);
+        view_update(view, options->scroll_margin);
         if (s->id == buffer->id) {
             if (s->vx != view->vx || s->vy != view->vy) {
                 mark_all_lines_changed(buffer);
@@ -168,30 +178,31 @@ void update_screen(EditorState *e, const ScreenState *s)
             mark_all_lines_changed(buffer);
             flags |= UPDATE_TERM_TITLE;
         }
-        update_buffer_windows(e);
+        update_buffer_windows(term, view, styles, options);
         if (unlikely(flags & UPDATE_WINDOW_SEPARATORS)) {
-            update_window_separators(e);
+            update_window_separators(term, root_frame, styles);
         }
     }
 
     if (flags & UPDATE_TERM_TITLE) {
-        update_term_title(term, buffer, e->options.set_window_title);
+        update_term_title(term, buffer, options->set_window_title);
     }
 
     update_command_line(e);
 
+    bool is_normal_mode = (e->mode->cmds == &normal_commands);
     if (flags & UPDATE_CURSOR_STYLE) {
-        update_cursor_style(e);
+        update_cursor_style(term, buffer, e->cursor_styles, is_normal_mode);
     }
 
     if (unlikely(flags & UPDATE_DIALOG)) {
         bool u;
-        show_dialog(term, &e->styles, get_msg(&u));
+        show_dialog(term, styles, get_msg(&u));
     } else {
-        restore_cursor(e);
+        restore_cursor(term, view, is_normal_mode, e->cmdline_x);
         term_show_cursor(term);
     }
 
     e->screen_update = 0;
-    end_update(e);
+    end_update(term, buffer, root_frame);
 }

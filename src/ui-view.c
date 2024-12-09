@@ -129,8 +129,12 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     return (flags & mask) != 0;
 }
 
-static CodePoint screen_next_char(EditorState *e, LineInfo *info)
-{
+static CodePoint screen_next_char (
+    Terminal *term,
+    LineInfo *info,
+    const StyleMap *styles,
+    bool display_special
+) {
     size_t count, pos = info->pos;
     CodePoint u = info->line[pos];
     TermStyle style;
@@ -157,16 +161,16 @@ static CodePoint screen_next_char(EditorState *e, LineInfo *info)
     if (info->styles && info->styles[pos]) {
         style = *info->styles[pos];
     } else {
-        style = e->styles.builtin[BSE_DEFAULT];
+        style = styles->builtin[BSE_DEFAULT];
     }
-    if (is_non_text(u, e->options.display_special)) {
-        mask_style(&style, &e->styles.builtin[BSE_NONTEXT]);
+    if (is_non_text(u, display_special)) {
+        mask_style(&style, &styles->builtin[BSE_NONTEXT]);
     }
     if (ws_error) {
-        mask_style(&style, &e->styles.builtin[BSE_WSERROR]);
+        mask_style(&style, &styles->builtin[BSE_WSERROR]);
     }
-    mask_selection_and_current_line(&e->styles, info, &style);
-    set_style(&e->terminal, &e->styles, &style);
+    mask_selection_and_current_line(styles, info, &style);
+    set_style(term, styles, &style);
 
     info->offset += count;
     return u;
@@ -322,26 +326,28 @@ static void line_info_set_line (
     }
 }
 
-static void print_line(EditorState *e, LineInfo *info)
-{
+static void print_line (
+    Terminal *term,
+    LineInfo *info,
+    const StyleMap *styles,
+    bool display_special
+) {
     // Screen might be scrolled horizontally. Skip most invisible
     // characters using screen_skip_char(), which is much faster than
     // buf_skip(screen_next_char(info)).
     //
     // There can be a wide character (tab, control code etc.) that is
     // partially visible and can't be skipped using screen_skip_char().
-    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     while (obuf->x + 8 < obuf->scroll_x && info->pos < info->size) {
         screen_skip_char(obuf, info);
     }
 
-    const StyleMap *styles = &e->styles;
     hl_words(term, styles, info);
 
     while (info->pos < info->size) {
         BUG_ON(obuf->x > obuf->scroll_x + obuf->width);
-        CodePoint u = screen_next_char(e, info);
+        CodePoint u = screen_next_char(term, info, styles, display_special);
         if (!term_put_char(obuf, u)) {
             // +1 for newline
             info->offset += info->size - info->pos + 1;
@@ -350,7 +356,7 @@ static void print_line(EditorState *e, LineInfo *info)
     }
 
     TermStyle style;
-    if (e->options.display_special && obuf->x >= obuf->scroll_x) {
+    if (display_special && obuf->x >= obuf->scroll_x) {
         // Syntax highlighter highlights \n but use default style anyway
         style = styles->builtin[BSE_DEFAULT];
         mask_style(&style, &styles->builtin[BSE_NONTEXT]);
@@ -366,18 +372,24 @@ static void print_line(EditorState *e, LineInfo *info)
     term_clear_eol(term);
 }
 
-void update_range(EditorState *e, const View *view, long y1, long y2)
-{
+void update_range (
+    Terminal *term,
+    const View *view,
+    const StyleMap *styles,
+    long y1,
+    long y2,
+    bool display_special
+) {
+
     const int edit_x = view->window->edit_x;
     const int edit_y = view->window->edit_y;
     const int edit_w = view->window->edit_w;
     const int edit_h = view->window->edit_h;
 
-    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     term_output_reset(term, edit_x, edit_w, view->vx);
     obuf->tab_width = view->buffer->options.tab_width;
-    obuf->tab_mode = e->options.display_special ? TAB_SPECIAL : TAB_NORMAL;
+    obuf->tab_mode = display_special ? TAB_SPECIAL : TAB_NORMAL;
 
     BlockIter bi = view->cursor;
     for (long i = 0, n = view->cy - y1; i < n; i++) {
@@ -397,7 +409,7 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
     Syntax *syn = view->buffer->syntax;
     PointerArray *lss = &view->buffer->line_start_states;
     BlockIter tmp = block_iter(view->buffer);
-    hl_fill_start_states(syn, lss, &e->styles, &tmp, info.line_nr);
+    hl_fill_start_states(syn, lss, styles, &tmp, info.line_nr);
     long i;
 
     for (i = y1; got_line && i < y2; i++) {
@@ -406,9 +418,9 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
 
         StringView line = block_iter_get_line_with_nl(&bi);
         bool next_changed;
-        const TermStyle **styles = hl_line(syn, lss, &e->styles, &line, info.line_nr, &next_changed);
-        line_info_set_line(&info, &line, styles);
-        print_line(e, &info);
+        const TermStyle **hlstyles = hl_line(syn, lss, styles, &line, info.line_nr, &next_changed);
+        line_info_set_line(&info, &line, hlstyles);
+        print_line(term, &info, styles, display_special);
 
         got_line = !!block_iter_next_line(&bi);
         info.line_nr++;
@@ -422,18 +434,18 @@ void update_range(EditorState *e, const View *view, long y1, long y2)
 
     if (i < y2 && info.line_nr == view->cy) {
         // Dummy empty line is shown only if cursor is on it
-        TermStyle style = e->styles.builtin[BSE_DEFAULT];
+        TermStyle style = styles->builtin[BSE_DEFAULT];
 
         obuf->x = 0;
-        mask_style2(&e->styles, &style, &e->styles.builtin[BSE_CURRENTLINE]);
-        set_style(term, &e->styles, &style);
+        mask_style2(styles, &style, &styles->builtin[BSE_CURRENTLINE]);
+        set_style(term, styles, &style);
 
         term_move_cursor(obuf, edit_x, edit_y + i++);
         term_clear_eol(term);
     }
 
     if (i < y2) {
-        set_builtin_style(term, &e->styles, BSE_NOLINE);
+        set_builtin_style(term, styles, BSE_NOLINE);
     }
     for (; i < y2; i++) {
         obuf->x = 0;

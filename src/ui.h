@@ -54,7 +54,14 @@ void print_tabbar(Terminal *term, const StyleMap *styles, Window *window);
 void update_status_line(const Window *window);
 
 // ui-view.c
-void update_range(EditorState *e, const View *view, long y1, long y2);
+void update_range (
+    Terminal *term,
+    const View *view,
+    const StyleMap *styles,
+    long y1,
+    long y2,
+    bool display_special
+);
 
 // ui-window.c
 typedef enum {
@@ -62,9 +69,9 @@ typedef enum {
     WINSEP_BAR,   // ASCII vertical bar; '|'
 } WindowSeparatorType;
 
-void update_all_windows(EditorState *e);
-void update_buffer_windows(EditorState *e);
-void update_window_separators(EditorState *e);
+void update_all_windows(Terminal *term, Frame *root_frame, const StyleMap *styles);
+void update_buffer_windows(Terminal *term, const View *view, const StyleMap *styles, const GlobalOptions *options);
+void update_window_separators(Terminal *term, Frame *root_frame, const StyleMap *styles);
 
 // ui-prompt.c
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
