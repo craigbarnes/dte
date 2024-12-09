@@ -241,8 +241,7 @@ ssize_t handle_exec (
     EditorState *e,
     const char **argv,
     ExecAction actions[3],
-    SpawnFlags spawn_flags,
-    bool strip_trailing_newline
+    ExecFlags exec_flags
 ) {
     View *view = e->view;
     const BlockIter saved_cursor = view->cursor;
@@ -252,11 +251,12 @@ ssize_t handle_exec (
     bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
     bool input_from_buffer = false;
     bool replace_unselected_input = false;
+    bool quiet = (exec_flags & EXECFLAG_QUIET);
 
     SpawnContext ctx = {
         .argv = argv,
         .outputs = {STRING_INIT, STRING_INIT},
-        .flags = spawn_flags,
+        .quiet = quiet,
         .env = output_to_buffer ? lines_and_columns_env(e->window) : NULL,
         .actions = {
             spawn_action_from_exec_action(actions[0]),
@@ -365,9 +365,10 @@ ssize_t handle_exec (
         ctx.input.data = alloc;
     }
 
-    yield_terminal(e, spawn_flags);
+    yield_terminal(e, quiet);
     int err = spawn(&ctx);
-    resume_terminal(e, spawn_flags, err >= 0);
+    bool prompt = (err >= 0) && (exec_flags & EXECFLAG_PROMPT);
+    resume_terminal(e, quiet, prompt);
     free(alloc);
 
     if (err != 0) {
@@ -380,6 +381,7 @@ ssize_t handle_exec (
 
     string_free(&ctx.outputs[1]);
     String *output = &ctx.outputs[0];
+    bool strip_trailing_newline = (exec_flags & EXECFLAG_STRIP_NL);
     if (
         strip_trailing_newline
         && output_to_buffer
@@ -448,13 +450,13 @@ ssize_t handle_exec (
     return output_len;
 }
 
-void yield_terminal(EditorState *e, SpawnFlags spawn_flags)
+void yield_terminal(EditorState *e, bool quiet)
 {
     if (e->flags & EFLAG_HEADLESS) {
         return;
     }
 
-    if (spawn_flags & SPAWN_QUIET) {
+    if (quiet) {
         term_raw_isig();
     } else {
         e->child_controls_terminal = true;
@@ -463,15 +465,15 @@ void yield_terminal(EditorState *e, SpawnFlags spawn_flags)
     }
 }
 
-void resume_terminal(EditorState *e, SpawnFlags spawn_flags, bool spawn_succeeded)
+void resume_terminal(EditorState *e, bool quiet, bool prompt)
 {
     if (e->flags & EFLAG_HEADLESS) {
         return;
     }
 
     term_raw();
-    if (!(spawn_flags & SPAWN_QUIET) && e->child_controls_terminal) {
-        if ((spawn_flags & SPAWN_PROMPT) && spawn_succeeded) {
+    if (!quiet && e->child_controls_terminal) {
+        if (prompt) {
             any_key(&e->terminal, e->options.esc_timeout);
         }
         ui_start(e);

@@ -9,12 +9,6 @@
 #include "util/string-view.h"
 
 typedef enum {
-    SPAWN_QUIET = 1 << 0, // Interpret SPAWN_TTY as SPAWN_NULL and don't yield terminal to child
-    SPAWN_PROMPT = 1 << 1, // Show "press any key to continue" prompt
-    SPAWN_READ_STDOUT = 1 << 2, // Read errors from stdout instead of stderr
-} SpawnFlags;
-
-typedef enum {
     SPAWN_NULL,
     SPAWN_TTY,
     SPAWN_PIPE,
@@ -25,11 +19,11 @@ typedef struct {
     const char **env;
     StringView input;
     String outputs[2]; // For stdout/stderr
-    SpawnFlags flags;
     SpawnAction actions[3];
+    bool quiet;
 } SpawnContext;
 
 int spawn(SpawnContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bool read_stdout) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

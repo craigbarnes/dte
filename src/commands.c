@@ -413,33 +413,31 @@ static bool cmd_command(EditorState *e, const CommandArgs *a)
 
 static bool cmd_compile(EditorState *e, const CommandArgs *a)
 {
-    static const FlagMapping map[] = {
-        {'1', SPAWN_READ_STDOUT},
-        {'p', SPAWN_PROMPT},
-        {'s', SPAWN_QUIET},
-    };
-
     Compiler *compiler = find_compiler(&e->compilers, a->args[0]);
     if (unlikely(!compiler)) {
         return error_msg("No such error parser %s", a->args[0]);
     }
 
-    SpawnFlags spawn_flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    if ((e->flags & EFLAG_HEADLESS) && !(spawn_flags & SPAWN_QUIET)) {
+    bool quiet = has_flag(a, 's');
+    if ((e->flags & EFLAG_HEADLESS) && !quiet) {
         LOG_INFO("automatically added -s flag to compile command (headless mode)");
-        spawn_flags |= SPAWN_QUIET;
+        quiet = true;
     }
 
     SpawnContext ctx = {
         .argv = (const char **)a->args + 1,
-        .flags = spawn_flags,
+        .quiet = quiet,
     };
 
     MessageArray *messages = &e->messages;
     clear_messages(messages);
-    yield_terminal(e, spawn_flags);
-    bool spawned = spawn_compiler(&ctx, compiler, messages);
-    resume_terminal(e, spawn_flags, spawned);
+
+    yield_terminal(e, quiet);
+    bool prompt = has_flag(a, 'p');
+    bool read_stdout = has_flag(a, '1');
+    bool spawned = spawn_compiler(&ctx, compiler, messages, read_stdout);
+    resume_terminal(e, quiet, spawned && prompt);
+
     activate_current_message_save(messages, &e->bookmarks, e->view);
     return spawned;
 }
@@ -748,22 +746,21 @@ static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
 static bool cmd_exec(EditorState *e, const CommandArgs *a)
 {
     ExecAction actions[3] = {EXEC_TTY, EXEC_TTY, EXEC_TTY};
-    SpawnFlags spawn_flags = 0;
+    ExecFlags exec_flags = 0;
     bool lflag = false;
     bool move_after_insert = false;
-    bool strip_nl = false;
 
     for (size_t i = 0, n = a->nr_flags, argidx = 0, fd; i < n; i++) {
         switch (a->flags[i]) {
             case 'e': fd = STDERR_FILENO; break;
             case 'i': fd = STDIN_FILENO; break;
             case 'o': fd = STDOUT_FILENO; break;
-            case 'p': spawn_flags |= SPAWN_PROMPT; continue;
-            case 's': spawn_flags |= SPAWN_QUIET; continue;
-            case 't': spawn_flags &= ~SPAWN_QUIET; continue;
+            case 'p': exec_flags |= EXECFLAG_PROMPT; continue;
+            case 's': exec_flags |= EXECFLAG_QUIET; continue;
+            case 't': exec_flags &= ~EXECFLAG_QUIET; continue;
             case 'l': lflag = true; continue;
             case 'm': move_after_insert = true; continue;
-            case 'n': strip_nl = true; continue;
+            case 'n': exec_flags |= EXECFLAG_STRIP_NL; continue;
             default: BUG("unexpected flag"); return false;
         }
         const char *action_name = a->args[argidx++];
@@ -779,13 +776,13 @@ static bool cmd_exec(EditorState *e, const CommandArgs *a)
         actions[STDIN_FILENO] = EXEC_LINE;
     }
 
-    if ((e->flags & EFLAG_HEADLESS) && !(spawn_flags & SPAWN_QUIET)) {
+    if ((e->flags & EFLAG_HEADLESS) && !(exec_flags & EXECFLAG_QUIET)) {
         LOG_INFO("automatically added -s flag to exec command (headless mode)");
-        spawn_flags |= SPAWN_QUIET;
+        exec_flags |= EXECFLAG_QUIET;
     }
 
     const char **argv = (const char **)a->args + a->nr_flag_args;
-    ssize_t outlen = handle_exec(e, argv, actions, spawn_flags, strip_nl);
+    ssize_t outlen = handle_exec(e, argv, actions, exec_flags);
     if (outlen <= 0) {
         return outlen == 0;
     }

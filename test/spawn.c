@@ -13,7 +13,7 @@ static void test_spawn(TestContext *ctx)
         .argv = args,
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
-        .flags = SPAWN_QUIET,
+        .quiet = true,
         .actions = {
             [STDIN_FILENO] = SPAWN_PIPE,
             [STDOUT_FILENO] = SPAWN_PIPE,

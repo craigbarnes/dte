@@ -214,7 +214,7 @@ static void exec_error(const char *argv0)
     error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
 }
 
-bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
+bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bool read_stdout)
 {
     BUG_ON(!ctx->argv[0]);
 
@@ -238,9 +238,7 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
         return false;
     }
 
-    SpawnFlags flags = ctx->flags;
-    bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
-    bool quiet = !!(flags & SPAWN_QUIET);
+    bool quiet = ctx->quiet;
     if (read_stdout) {
         fd[1] = p[1];
         fd[2] = quiet ? dev_null : 2;
@@ -297,7 +295,7 @@ int spawn(SpawnContext *ctx)
 
     int child_fds[3] = {-1, -1, -1};
     int parent_fds[3] = {-1, -1, -1};
-    bool quiet = !!(ctx->flags & SPAWN_QUIET);
+    bool quiet = ctx->quiet;
     size_t nr_pipes = 0;
 
     for (size_t i = 0; i < ARRAYLEN(child_fds); i++) {
