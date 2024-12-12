@@ -23,10 +23,10 @@ typedef struct {
 } CompletionState;
 
 typedef struct {
-    String buf;
-    size_t pos;
-    const HistoryEntry *search_pos;
-    char *search_text;
+    String buf; // Command-line text
+    size_t pos; // Cursor position (offset; in bytes)
+    const HistoryEntry *search_pos; // Pointer to history item, used for history search
+    char *search_text; // Prefix string for history search
     CompletionState completion;
 } CommandLine;
 

@@ -8,6 +8,8 @@
     #define DEBUG 0
 #endif
 
+// This is similar to the Linux kernel macro of the same name, or to the
+// ISO C assert() macro with the condition inverted
 #define BUG_ON(a) do { \
     IGNORE_WARNING("-Wtautological-compare") \
     if (unlikely(a)) { \
@@ -17,18 +19,25 @@
 } while (0)
 
 #if GNUC_AT_LEAST(4, 5) || HAS_BUILTIN(__builtin_unreachable)
+    // https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-_005f_005fbuiltin_005funreachable
+    // https://clang.llvm.org/docs/LanguageExtensions.html#builtin-unreachable
     #define UNREACHABLE() __builtin_unreachable()
 #elif __STDC_VERSION__ >= 202311L
+    // ISO C23 §7.21.1
     #define UNREACHABLE() unreachable()
 #else
     #define UNREACHABLE()
 #endif
 
 #if DEBUG >= 1
+    // In DEBUG builds, BUG() cleans up the terminal, prints an error
+    // message and then calls abort(3)
     #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER)(void)
     #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
     noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...) COLD PRINTF(4);
 #else
+    // In non-DEBUG builds, BUG() expands to UNREACHABLE(), which may
+    // allow the compiler to optimize more aggressively
     #define UNITTEST UNUSED static void XPASTE(unittest_, COUNTER)(void)
     #define BUG(...) UNREACHABLE()
 #endif

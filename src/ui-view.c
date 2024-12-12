@@ -334,7 +334,7 @@ static void print_line (
 ) {
     // Screen might be scrolled horizontally. Skip most invisible
     // characters using screen_skip_char(), which is much faster than
-    // buf_skip(screen_next_char(info)).
+    // buf_skip(obuf, screen_next_char(...)).
     //
     // There can be a wide character (tab, control code etc.) that is
     // partially visible and can't be skipped using screen_skip_char().
@@ -380,7 +380,6 @@ void update_range (
     long y2,
     bool display_special
 ) {
-
     const int edit_x = view->window->edit_x;
     const int edit_y = view->window->edit_y;
     const int edit_w = view->window->edit_w;

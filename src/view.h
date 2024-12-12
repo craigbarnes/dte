@@ -36,8 +36,8 @@ typedef struct View {
     bool center_on_scroll; // Center view to cursor if scrolled
     bool force_center; // Force centering view to cursor
 
-    SelectionType selection;
-    SelectionType select_mode;
+    SelectionType selection; // Type of selection currently active in this View
+    SelectionType select_mode; // State of "selection mode" in this View (see dterc(5))
     ssize_t sel_so; // Cursor offset when selection was started
     ssize_t sel_eo; // See `SEL_EO_RECALC` below
 
