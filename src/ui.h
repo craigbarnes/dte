@@ -45,7 +45,13 @@ void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);
 void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s);
 
 // ui-cmdline.c
-void update_command_line(EditorState *e);
+size_t update_command_line (
+    Terminal *term,
+    const StyleMap *styles,
+    const CommandLine *cmdline,
+    const SearchState *search,
+    const ModeHandler *mode
+);
 
 // ui-tabbar.c
 void print_tabbar(Terminal *term, const StyleMap *styles, Window *window);

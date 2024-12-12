@@ -85,7 +85,6 @@ typedef struct EditorState {
     ScreenUpdateFlags screen_update;
     bool child_controls_terminal;
     bool session_leader;
-    size_t cmdline_x;
     Clipboard clipboard;
     TagFile tagfile;
     HashMap aliases;

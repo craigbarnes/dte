@@ -188,9 +188,9 @@ void update_screen(EditorState *e, const ScreenState *s)
         update_term_title(term, buffer, options->set_window_title);
     }
 
-    update_command_line(e);
-
     bool is_normal_mode = (e->mode->cmds == &normal_commands);
+    size_t cmdline_x = update_command_line(term, styles, &e->cmdline, &e->search, e->mode);
+
     if (flags & UPDATE_CURSOR_STYLE) {
         update_cursor_style(term, buffer, e->cursor_styles, is_normal_mode);
     }
@@ -199,7 +199,7 @@ void update_screen(EditorState *e, const ScreenState *s)
         bool u;
         show_dialog(term, styles, get_msg(&u));
     } else {
-        restore_cursor(term, view, is_normal_mode, e->cmdline_x);
+        restore_cursor(term, view, is_normal_mode, cmdline_x);
         term_show_cursor(term);
     }
 
