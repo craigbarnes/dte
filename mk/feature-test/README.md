@@ -13,7 +13,7 @@ mean the feature is supported by the target platform.
 The following points should be observed when adding new feature tests:
 
 * When detecting the presence of library functions, the function name
-  should be enclosed in parenthesis, e.g. `(fsync)(1)`. This suppresses
+  should be enclosed in parentheses, e.g. `(fsync)(1)`. This suppresses
   the expansion of function-like macros and forces the compiler to error
   out if there's no function declaration. (see https://ewontfix.com/13/).
 * If the feature being detected depends on [`feature_test_macros(7)`], the

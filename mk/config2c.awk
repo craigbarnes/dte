@@ -26,12 +26,15 @@ BEGIN {
         print "ERROR: AWK interpreter doesn't conform to POSIX\n" ref > "/dev/stderr"
         exit(1)
     }
-    print "#ifdef __linux__"
-    print "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)"
-    print "#else"
-    print "#define CONFIG_SECTION"
-    print "#endif\n"
-    print "IGNORE_WARNING(\"-Woverlength-strings\")\n"
+
+    print \
+        "#ifdef __linux__\n" \
+        "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)\n" \
+        "#else\n" \
+        "#define CONFIG_SECTION\n" \
+        "#endif\n\n" \
+        "IGNORE_WARNING(\"-Woverlength-strings\")\n"
+
     nfiles = 0
 }
 
@@ -59,17 +62,17 @@ name ~ /syntax\// {
 }
 
 END {
-    print ";\n\nUNIGNORE_WARNINGS\n"
-
     print \
+        ";\n\nUNIGNORE_WARNINGS\n\n" \
         "#define cfg(n, t) { \\\n" \
         "    .name = n, \\\n" \
         "    .text = {.data = t, .length = sizeof(t) - 1} \\\n" \
-        "}\n"
+        "}\n\n" \
+        "static CONFIG_SECTION const BuiltinConfig builtin_configs[] = {"
 
-    print "static CONFIG_SECTION const BuiltinConfig builtin_configs[] = {"
     for (i = 1; i <= nfiles; i++) {
         print "    cfg(\"" names[i] "\", " idents[i] "),"
     }
+
     print "};"
 }

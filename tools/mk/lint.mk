@@ -4,6 +4,7 @@ SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
 TYPOS ?= typos
 SPATCH ?= spatch
+GAWK ?= gawk
 SPATCHFLAGS ?= --very-quiet
 SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
@@ -13,13 +14,17 @@ DOCFILES = $(call GITATTRS, xml markdown)
 SPATCHNAMES = arraylen minmax tailcall wrap perf pitfalls staticbuf
 SPATCHFILES = $(foreach f, $(SPATCHNAMES), tools/coccinelle/$f.cocci)
 
-check-source: check-whitespace check-headers check-codespell check-shell-scripts
+check-source: check-whitespace check-headers check-codespell check-shell check-awk
 check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
 
-check-shell-scripts:
+check-shell:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
 	$(Q) $(SHELLCHECK) -fgcc $(call GITATTRS, shell) >&2
+
+check-awk: $(BUILTIN_CONFIGS) $(TEST_CONFIGS)
+	$(E) AWKLINT mk/config2c.awk
+	$(Q) $(GAWK) --lint=fatal -f mk/config2c.awk $^ >/dev/null
 
 check-whitespace:
 	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2
@@ -56,6 +61,6 @@ check-coccinelle:
 
 
 .PHONY: \
-    check-all check-source check-docs check-shell-scripts check-headers \
-    check-whitespace check-codespell check-typos check-coccinelle \
-    check-aux check-desktop-file check-appstream
+    check-all check-source check-aux check-typos check-coccinelle check-docs \
+    check-whitespace check-headers check-codespell check-shell check-awk \
+    check-desktop-file check-appstream
