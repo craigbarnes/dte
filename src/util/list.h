@@ -15,7 +15,7 @@ static inline void list_init(ListHead *head)
     head->prev = head;
 }
 
-static inline void list_add(ListHead *new, ListHead *prev, ListHead *next)
+static inline void list_insert(ListHead *new, ListHead *prev, ListHead *next)
 {
     next->prev = new;
     new->next = next;
@@ -23,17 +23,17 @@ static inline void list_add(ListHead *new, ListHead *prev, ListHead *next)
     prev->next = new;
 }
 
-static inline void list_add_before(ListHead *new, ListHead *item)
+static inline void list_insert_before(ListHead *new, ListHead *item)
 {
-    list_add(new, item->prev, item);
+    list_insert(new, item->prev, item);
 }
 
-static inline void list_add_after(ListHead *new, ListHead *item)
+static inline void list_insert_after(ListHead *new, ListHead *item)
 {
-    list_add(new, item, item->next);
+    list_insert(new, item, item->next);
 }
 
-static inline void list_del(ListHead *entry)
+static inline void list_remove(ListHead *entry)
 {
     entry->next->prev = entry->prev;
     entry->prev->next = entry->next;

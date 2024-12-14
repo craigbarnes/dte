@@ -86,7 +86,7 @@ Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts)
 
     // At least one block required
     Block *blk = block_new(1);
-    list_add_before(&blk->node, &buffer->blocks);
+    list_insert_before(&blk->node, &buffer->blocks);
 
     return buffer;
 }

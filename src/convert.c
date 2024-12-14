@@ -32,7 +32,7 @@ typedef struct {
 static void add_block(Buffer *buffer, Block *blk)
 {
     buffer->nl += blk->nl;
-    list_add_before(&blk->node, &buffer->blocks);
+    list_insert_before(&blk->node, &buffer->blocks);
 }
 
 static Block *add_utf8_line (

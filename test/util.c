@@ -2102,7 +2102,7 @@ static void test_list(TestContext *ctx)
     list_init(&b);
     EXPECT_TRUE(list_empty(&b));
 
-    list_add_before(&a, &b);
+    list_insert_before(&a, &b);
     EXPECT_FALSE(list_empty(&a));
     EXPECT_FALSE(list_empty(&b));
     EXPECT_PTREQ(a.next, &b);
@@ -2110,7 +2110,7 @@ static void test_list(TestContext *ctx)
     EXPECT_PTREQ(b.next, &a);
     EXPECT_PTREQ(b.prev, &a);
 
-    list_add_after(&c, &b);
+    list_insert_after(&c, &b);
     EXPECT_FALSE(list_empty(&a));
     EXPECT_FALSE(list_empty(&b));
     EXPECT_FALSE(list_empty(&c));
@@ -2121,7 +2121,7 @@ static void test_list(TestContext *ctx)
     EXPECT_PTREQ(c.next, &a);
     EXPECT_PTREQ(c.prev, &b);
 
-    list_del(&b);
+    list_remove(&b);
     EXPECT_FALSE(list_empty(&a));
     EXPECT_FALSE(list_empty(&c));
     EXPECT_PTREQ(a.next, &c);

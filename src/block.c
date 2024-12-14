@@ -25,7 +25,7 @@ void block_grow(Block *blk, size_t alloc)
 
 void block_free(Block *blk)
 {
-    list_del(&blk->node);
+    list_remove(&blk->node);
     free(blk->data);
     free(blk);
 }

@@ -184,7 +184,7 @@ static size_t split_and_insert(BlockIter *cursor, const char *buf, size_t len)
 
         new->size = size;
         BUG_ON(copied != size);
-        list_add_before(&new->node, &blk->node);
+        list_insert_before(&new->node, &blk->node);
 
         nl_added += new->nl;
         size = 0;

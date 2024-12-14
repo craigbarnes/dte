@@ -15,7 +15,7 @@ static void test_sf_format(TestContext *ctx)
 
     Block *block = block_new(1);
     list_init(&buffer.blocks);
-    list_add_before(&block->node, &buffer.blocks);
+    list_insert_before(&block->node, &buffer.blocks);
 
     View view = {
         .buffer = &buffer,
