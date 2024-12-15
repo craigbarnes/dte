@@ -8,12 +8,15 @@ static void merge_insert_buffer(CommandMacroState *m)
     if (len == 0) {
         return;
     }
+
     String s = string_new(32 + len);
     StringView ibuf = strview_from_string(&m->insert_buffer);
     string_append_literal(&s, "insert -k ");
+
     if (unlikely(strview_has_prefix(&ibuf, "-"))) {
         string_append_literal(&s, "-- ");
     }
+
     string_append_escaped_arg_sv(&s, ibuf, true);
     string_clear(&m->insert_buffer);
     ptr_array_append(&m->macro, string_steal_cstring(&s));
@@ -58,22 +61,56 @@ void macro_command_hook(CommandMacroState *m, const char *cmd_name, char **args)
     if (!m->recording) {
         return;
     }
+
     String buf = string_new(512);
     string_append_cstring(&buf, cmd_name);
+
     for (size_t i = 0; args[i]; i++) {
         string_append_byte(&buf, ' ');
         string_append_escaped_arg(&buf, args[i], true);
     }
+
     merge_insert_buffer(m);
     ptr_array_append(&m->macro, string_steal_cstring(&buf));
 }
 
-void macro_insert_char_hook(CommandMacroState *m, CodePoint c)
-{
+void macro_search_hook (
+    CommandMacroState *m,
+    const char *pattern,
+    bool reverse,
+    bool add_to_history
+) {
     if (!m->recording) {
         return;
     }
-    string_append_codepoint(&m->insert_buffer, c);
+
+    const char *args[5];
+    size_t i = 0;
+
+    if (pattern) {
+        if (reverse) {
+            args[i++] = "-r";
+        }
+        if (!add_to_history) {
+            args[i++] = "-H";
+        }
+        if (unlikely(pattern[0] == '-')) {
+            args[i++] = "--";
+        }
+        args[i++] = pattern;
+    } else {
+        args[i++] = reverse ? "-p" : "-n";
+    }
+
+    args[i] = NULL;
+    macro_command_hook(m, "search", (char**)args);
+}
+
+void macro_insert_char_hook(CommandMacroState *m, CodePoint c)
+{
+    if (m->recording) {
+        string_append_codepoint(&m->insert_buffer, c);
+    }
 }
 
 void macro_insert_text_hook(CommandMacroState *m, const char *text, size_t size)
@@ -81,12 +118,15 @@ void macro_insert_text_hook(CommandMacroState *m, const char *text, size_t size)
     if (!m->recording) {
         return;
     }
+
     String buf = string_new(512);
     StringView sv = string_view(text, size);
     string_append_literal(&buf, "insert -m ");
+
     if (unlikely(strview_has_prefix(&sv, "-"))) {
         string_append_literal(&buf, "-- ");
     }
+
     string_append_escaped_arg_sv(&buf, sv, true);
     merge_insert_buffer(m);
     ptr_array_append(&m->macro, string_steal_cstring(&buf));

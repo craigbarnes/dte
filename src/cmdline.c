@@ -438,25 +438,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     }
 
     if (e->macro.recording) {
-        const char *args[5];
-        size_t i = 0;
-        bool reverse = e->search.reverse;
-        if (pat) {
-            if (reverse) {
-                args[i++] = "-r";
-            }
-            if (!add_to_history) {
-                args[i++] = "-H";
-            }
-            if (unlikely(pat[0] == '-')) {
-                args[i++] = "--";
-            }
-            args[i++] = pat;
-        } else {
-            args[i++] = reverse ? "-p" : "-n";
-        }
-        args[i] = NULL;
-        macro_command_hook(&e->macro, "search", (char**)args);
+        macro_search_hook(&e->macro, pat, e->search.reverse, add_to_history);
     }
 
     current_command = NULL;
