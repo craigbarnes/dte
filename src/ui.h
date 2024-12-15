@@ -38,7 +38,7 @@ static inline ScreenState get_screen_state(const View *view)
 
 // ui.c
 void update_screen(EditorState *e, const ScreenState *s);
-void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);
+void update_term_title(Terminal *term, const char *filename, bool is_modified);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
 void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);

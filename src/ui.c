@@ -5,6 +5,7 @@
 #include "terminal/cursor.h"
 #include "terminal/ioctl.h"
 #include "util/log.h"
+#include "util/str-util.h"
 
 void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style)
 {
@@ -55,20 +56,30 @@ static void update_cursor_style (
     }
 }
 
-void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title)
+void update_term_title(Terminal *term, const char *filename, bool is_modified)
 {
-    if (!set_window_title || !(term->features & TFLAG_SET_WINDOW_TITLE)) {
+    if (!(term->features & TFLAG_SET_WINDOW_TITLE)) {
         return;
     }
 
-    // FIXME: title must not contain control characters
-    TermOutputBuffer *obuf = &term->obuf;
-    const char *filename = buffer_filename(buffer);
-    term_put_literal(obuf, "\033]2;");
-    term_put_bytes(obuf, filename, strlen(filename));
-    term_put_byte(obuf, ' ');
-    term_put_byte(obuf, buffer_modified(buffer) ? '+' : '-');
-    term_put_literal(obuf, " dte\033\\");
+    // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Miscellaneous:~:text=OSC%202%20ST
+    static const char prefix[] = "\033]2;"; // OSC 2
+    char suffix[] = " + dte\033\\"; // ST
+    suffix[1] = is_modified ? '+' : '-';
+
+    size_t filename_len = strlen(filename);
+    size_t print_max = U_MAKE_PRINTABLE_MAXLEN(filename_len);
+    size_t extra_len = sizeof(prefix) + sizeof(suffix) - 2;
+    size_t reserved = MIN(print_max + extra_len, TERM_OUTBUF_SIZE);
+    char *buf = term_output_reserve_space(&term->obuf, reserved);
+
+    // Using u_make_printable() here ensures that there are no control
+    // characters or invalid UTF-8 sequences in the emitted OSC string
+    size_t i = copystrn(buf, prefix, sizeof(prefix) - 1);
+    i += u_make_printable(filename, filename_len, buf + i, print_max, 0);
+    i += copystrn(buf + i, suffix, sizeof(suffix) - 1);
+    BUG_ON(i >= reserved);
+    term->obuf.count += i;
 }
 
 static void restore_cursor (
@@ -184,8 +195,8 @@ void update_screen(EditorState *e, const ScreenState *s)
         }
     }
 
-    if (flags & UPDATE_TERM_TITLE) {
-        update_term_title(term, buffer, options->set_window_title);
+    if ((flags & UPDATE_TERM_TITLE) && options->set_window_title) {
+        update_term_title(term, buffer_filename(buffer), buffer_modified(buffer));
     }
 
     bool is_normal_mode = (e->mode->cmds == &normal_commands);

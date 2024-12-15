@@ -6,6 +6,10 @@
 #include "macros.h"
 #include "unicode.h"
 
+// Minimum `dest_len` value needed by u_make_printable() to guarantee
+// truncation cannot occur
+#define U_MAKE_PRINTABLE_MAXLEN(src_len) ((4 * src_len) + 1)
+
 enum {
     // Longest UTF-8 sequence (in bytes) permitted by RFC 3629
     // (maximum number of bytes written by u_set_char_raw())
@@ -58,7 +62,8 @@ static inline size_t u_char_size(CodePoint u)
  * otherwise byte-wise escaped. This is similar in purpose to the
  * BSD strnvisx(3) function, but produces a truncated string if the
  * destination buffer has insufficient space. If `dest_len` is at
- * least `(4 * src_len) + 1`, truncation can never happen.
+ * least `U_MAKE_PRINTABLE_MAXLEN(src_len)`, truncation can never
+ * happen.
  */
 static inline size_t u_make_printable (
     const char *restrict src,

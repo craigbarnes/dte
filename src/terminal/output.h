@@ -48,6 +48,7 @@ static inline size_t obuf_avail(TermOutputBuffer *obuf)
 
 void term_output_init(TermOutputBuffer *obuf);
 void term_output_free(TermOutputBuffer *obuf);
+char *term_output_reserve_space(TermOutputBuffer *obuf, size_t count) NONNULL_ARGS_AND_RETURN;
 void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x);
 void term_put_byte(TermOutputBuffer *obuf, char ch);
 void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
