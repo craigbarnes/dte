@@ -2016,6 +2016,17 @@ static void test_ptr_array(TestContext *ctx)
     EXPECT_EQ(a.alloc, 8);
     EXPECT_NONNULL(a.ptrs);
     ptr_array_free(&a);
+
+    // ptr_array_trim_nulls() should remove everything (i.e. not leave 1
+    // trailing NULL) when all elements are NULL
+    ptr_array_init(&a, 0);
+    ptr_array_append(&a, NULL);
+    ptr_array_append(&a, NULL);
+    ptr_array_append(&a, NULL);
+    EXPECT_EQ(a.count, 3);
+    ptr_array_trim_nulls(&a);
+    EXPECT_EQ(a.count, 0);
+    ptr_array_free(&a);
 }
 
 static void test_ptr_array_move(TestContext *ctx)

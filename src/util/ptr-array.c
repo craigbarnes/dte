@@ -126,15 +126,19 @@ void ptr_array_trim_nulls(PointerArray *array)
         n++;
     }
 
+    if (n == 0 || ptrs[0] != NULL) {
+        // No leading NULLs; simply adjust count and return early
+        array->count = n;
+        return;
+    }
+
     size_t i = 0;
     while (i < n && ptrs[i] == NULL) {
         i++;
     }
 
-    if (i > 0) {
-        n -= i;
-        memmove(ptrs, ptrs + i, n * sizeof(void*));
-    }
-
+    BUG_ON(i == 0);
+    n -= i;
     array->count = n;
+    memmove(ptrs, ptrs + i, n * sizeof(void*));
 }
