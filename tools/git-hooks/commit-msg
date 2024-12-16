@@ -5,6 +5,10 @@ function error(msg) {
     exit 1
 }
 
+BEGIN {
+    LINE = 0
+}
+
 # Ignore everything below "scissors" line (as used by "git commit -v")
 /^# *--+ >8 --+$/ {
     exit 0
@@ -15,11 +19,16 @@ function error(msg) {
     next
 }
 
+# Keep count of non-commented lines
+{
+    LINE++
+}
+
 # Exclude long URLs from maximum line length check, so long as they
 # appear at the start of a line (excluding an optional bullet point
 # or numbered back-reference)
 /^([*-]|\[[0-9]]:)? *https?:/ {
-    if (++LINES <= 2) {
+    if (LINE <= 2) {
         error("this line shouldn't begin with a URL")
     }
     next
@@ -28,7 +37,7 @@ function error(msg) {
 # Exclude Markdown-style indented code blocks (with 4 space indents)
 # from maximum line length check
 /^ {4,}[^ ]/ {
-    if (++LINES <= 2) {
+    if (LINE <= 2) {
         error("this line shouldn't be indented")
     }
     next
@@ -38,17 +47,14 @@ function error(msg) {
     error("line exceeds 72 columns")
 }
 
-/^$/ {
-    LINES++
-    next
+LINE == 1 && /^[ \t]*$/ {
+    error("first line shouldn't be blank")
 }
 
-{
-    LINES++
-    if (LINES == 1 && $0 ~ /\. *$/) {
-        error("first line shouldn't end with '.'")
-    }
-    if (LINES == 2) {
-        error("second line should always be blank")
-    }
+LINE == 1 && /\.[ \t]*$/ {
+    error("first line shouldn't end with '.'")
+}
+
+LINE == 2 && $0 != "" {
+    error("second line should always be blank")
 }
