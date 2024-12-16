@@ -5,9 +5,8 @@
 #include <stddef.h>
 #include "macros.h"
 
-// This is a container type for holding a set of related strings.
-// It uses hashing for primary lookups and separate chaining for
-// collision resolution.
+// A container type for holding a set of strings, using hashing for
+// primary lookups and separate chaining for collision resolution.
 typedef struct {
     struct HashSetEntry **table;
     size_t table_size;

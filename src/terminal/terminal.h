@@ -84,7 +84,7 @@ typedef struct {
     bool can_be_truncated;
 } TermInputBuffer;
 
-typedef struct Terminal {
+typedef struct {
     TermFeatureFlags features;
     unsigned int width; // Terminal width (in columns)
     unsigned int height; // Terminal height (in rows)
