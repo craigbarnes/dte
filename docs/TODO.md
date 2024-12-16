@@ -209,10 +209,6 @@ Code Quality/Efficiency Improvements
   (without executing more commands) if `run_command()` returns `false`.
   This may be useful for `macro play`, `load_syntax_file()`, etc.
 
-* Add a helper function (e.g. `pick_flag()`) that abstracts away the
-  code for handling mutually exclusive subsets of `Command` flags
-  (e.g. `save [-b|-B]`, `paste [-a|-c]`, etc.)
-
 * Make use of [`fstatvfs(3)`], [`posix_fallocate(3)`], [`vmsplice(2)`]
   and [`tee(2)`][] (when available)
 

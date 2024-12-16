@@ -54,6 +54,31 @@ static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
     return (a->flag_set & bitmask) != 0;
 }
 
+static inline char cmdargs_pick_winning_flag_from_set(const CommandArgs *a, uint_least64_t flagset)
+{
+    if (!(a->flag_set & flagset)) {
+        return 0;
+    }
+
+    BUG_ON(a->nr_flags > ARRAYLEN(a->flags));
+    for (size_t n = a->nr_flags, i = n - 1; i < n; i--) {
+        char flag = a->flags[i];
+        if (flagset & cmdargs_flagset_value(flag)) {
+            return flag;
+        }
+    }
+
+    return 0;
+}
+
+static inline char cmdargs_pick_winning_flag(const CommandArgs *a, char f1, char f2)
+{
+    uint_least64_t set = cmdargs_flagset_value(f1) | cmdargs_flagset_value(f2);
+    char flag = cmdargs_pick_winning_flag_from_set(a, set);
+    BUG_ON(flag && flag != f1 && flag != f2);
+    return flag;
+}
+
 // Convert CommandArgs::flag_set to bit flags of a different format,
 // by using a set of mappings
 static inline unsigned int cmdargs_convert_flags (

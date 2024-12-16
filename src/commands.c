@@ -1322,19 +1322,15 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 
 static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
-    bool move_after = has_flag(a, 'm');
-    bool above_cursor = has_flag(a, 'a');
-    bool at_cursor = has_flag(a, 'c');
+    char ac_flag = cmdargs_pick_winning_flag(a, 'a', 'c');
     PasteLinesType type = PASTE_LINES_BELOW_CURSOR;
-
-    if (above_cursor && at_cursor) {
-        return error_msg("flags -a and -c are mutually exclusive");
-    } else if (above_cursor) {
+    if (ac_flag == 'a') {
         type = PASTE_LINES_ABOVE_CURSOR;
-    } else if (at_cursor) {
+    } else if (ac_flag == 'c') {
         type = PASTE_LINES_INLINE;
     }
 
+    bool move_after = has_flag(a, 'm');
     paste(&e->clipboard, e->view, type, move_after);
     return true;
 }
@@ -1710,16 +1706,8 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         return info_msg("%s can't be saved; it will be piped to stdout on exit", f);
     }
 
-    bool dos_nl = has_flag(a, 'd');
-    bool unix_nl = has_flag(a, 'u');
-    bool crlf = buffer->crlf_newlines;
-    if (unlikely(dos_nl && unix_nl)) {
-        return error_msg("flags -d and -u can't be used together");
-    } else if (dos_nl) {
-        crlf = true;
-    } else if (unix_nl) {
-        crlf = false;
-    }
+    char du_flag = cmdargs_pick_winning_flag(a, 'd', 'u');
+    bool crlf = du_flag ? (du_flag == 'd') : buffer->crlf_newlines;
 
     const char *requested_encoding = NULL;
     char **args = a->args;
@@ -1757,15 +1745,8 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
     }
 
-    bool b = has_flag(a, 'b');
-    bool B = has_flag(a, 'B');
-    if (unlikely(b && B)) {
-        return error_msg("flags -b and -B can't be used together");
-    } else if (b) {
-        bom = true;
-    } else if (B) {
-        bom = false;
-    }
+    char b_flag = cmdargs_pick_winning_flag(a, 'b', 'B');
+    bom = b_flag ? (b_flag == 'b') : bom;
 
     char *absolute = buffer->abs_filename;
     bool force = has_flag(a, 'f');
