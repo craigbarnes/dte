@@ -35,9 +35,9 @@ Features
   can create multiple messages, we may as well use the same mechanism
   to support multiple tags)
 
-* Add option to [`wrap-paragraph`] that allows finding a common prefix on every
-  affected/selected line, removing it before wrapping and then re-inserting it
-  afterwards (also factoring it into the line width calculation)
+* Add option to [`wrap-paragraph`] to allow finding and removing a common
+  prefix string from every line and then re-inserting it afterwards
+  (see also: https://gitlab.com/craigbarnes/dte/-/issues/118)
 
 * Allow text selection in [`command`] and [`search`] modes, so that
   `CommandLine::buf` can be quickly manipulated by using [`copy`] and
