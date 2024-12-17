@@ -15,6 +15,8 @@ Features
     of just doing a single level of expansion
   * Add an [`alias`] flag to eagerly expand aliases at creation time (instead
     of at usage time)
+  * Perform recursive `alias` expansion when auto-completing commands
+    (see also: https://gitlab.com/craigbarnes/dte/-/issues/152)
 
 * Add a command that swaps the positions of the selection anchor point and
   cursor (so that selections can be extended on both ends, without starting
@@ -138,6 +140,9 @@ Features
 
 * Add support for interactive spell checking
 
+* Show raw escape sequences in `dte -K` output
+  (see also: https://gitlab.com/craigbarnes/dte/-/issues/151)
+
 Documentation
 -------------
 
@@ -248,6 +253,10 @@ Code Quality/Efficiency Improvements
 * Optimize `update_range()` to make handling long lines more efficient,
   both by avoiding unnecessary work and by speeding up the necessary
   parts (see: https://gitlab.com/craigbarnes/dte/-/issues/220)
+
+* Compress large undo history (`Change`) entries, e.g. those created
+  when an [`exec`] command rewrites the entire buffer
+  (see also: https://gitlab.com/craigbarnes/dte/-/issues/142)
 
 Testing/Debugging
 -----------------
