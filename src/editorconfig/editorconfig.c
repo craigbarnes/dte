@@ -24,15 +24,15 @@ typedef struct {
 } UserData;
 
 typedef enum {
-    EC_CHARSET,
-    EC_END_OF_LINE,
-    EC_INDENT_SIZE,
-    EC_INDENT_STYLE,
-    EC_INSERT_FINAL_NL,
-    EC_MAX_LINE_LENGTH,
-    EC_TAB_WIDTH,
-    EC_TRIM_TRAILING_WS,
-    EC_UNKNOWN_PROPERTY,
+    ECONF_CHARSET,
+    ECONF_END_OF_LINE,
+    ECONF_INDENT_SIZE,
+    ECONF_INDENT_STYLE,
+    ECONF_INSERT_FINAL_NL,
+    ECONF_MAX_LINE_LENGTH,
+    ECONF_TAB_WIDTH,
+    ECONF_TRIM_TRAILING_WS,
+    ECONF_UNKNOWN_PROPERTY,
 } PropertyType;
 
 #define CMP(s, val) if (mem_equal(name->data, s, STRLEN(s))) return val;
@@ -40,18 +40,18 @@ typedef enum {
 static PropertyType lookup_property(const StringView *name)
 {
     switch (name->length) {
-    case  7: CMP("charset", EC_CHARSET); break;
-    case  9: CMP("tab_width", EC_TAB_WIDTH); break;
+    case  7: CMP("charset", ECONF_CHARSET); break;
+    case  9: CMP("tab_width", ECONF_TAB_WIDTH); break;
     case 11:
-        CMP("indent_size", EC_INDENT_SIZE);
-        CMP("end_of_line", EC_END_OF_LINE);
+        CMP("indent_size", ECONF_INDENT_SIZE);
+        CMP("end_of_line", ECONF_END_OF_LINE);
         break;
-    case 12: CMP("indent_style", EC_INDENT_STYLE); break;
-    case 15: CMP("max_line_length", EC_MAX_LINE_LENGTH); break;
-    case 20: CMP("insert_final_newline", EC_INSERT_FINAL_NL); break;
-    case 24: CMP("trim_trailing_whitespace", EC_TRIM_TRAILING_WS); break;
+    case 12: CMP("indent_style", ECONF_INDENT_STYLE); break;
+    case 15: CMP("max_line_length", ECONF_MAX_LINE_LENGTH); break;
+    case 20: CMP("insert_final_newline", ECONF_INSERT_FINAL_NL); break;
+    case 24: CMP("trim_trailing_whitespace", ECONF_TRIM_TRAILING_WS); break;
     }
-    return EC_UNKNOWN_PROPERTY;
+    return ECONF_UNKNOWN_PROPERTY;
 }
 
 static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
@@ -92,23 +92,23 @@ static void editorconfig_option_set (
     const StringView *val
 ) {
     switch (lookup_property(name)) {
-    case EC_INDENT_STYLE:
+    case ECONF_INDENT_STYLE:
         options->indent_style = lookup_indent_style(val);
         break;
-    case EC_INDENT_SIZE:
+    case ECONF_INDENT_SIZE:
         parse_indent_size(options, val);
         break;
-    case EC_TAB_WIDTH:
+    case ECONF_TAB_WIDTH:
         options->tab_width = parse_indent_digit(val);
         break;
-    case EC_MAX_LINE_LENGTH:
+    case ECONF_MAX_LINE_LENGTH:
         options->max_line_length = parse_max_line_length(val);
         break;
-    case EC_CHARSET:
-    case EC_END_OF_LINE:
-    case EC_INSERT_FINAL_NL:
-    case EC_TRIM_TRAILING_WS:
-    case EC_UNKNOWN_PROPERTY:
+    case ECONF_CHARSET:
+    case ECONF_END_OF_LINE:
+    case ECONF_INSERT_FINAL_NL:
+    case ECONF_TRIM_TRAILING_WS:
+    case ECONF_UNKNOWN_PROPERTY:
         break;
     default:
         BUG("unhandled property type");
