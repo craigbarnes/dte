@@ -122,7 +122,21 @@ Features
 
 * Add an option for rendering a "scroll indicator" on the left and/or
   right edge of the screen, when content is horizontally scrolled out of
-  view (see: https://gitlab.com/craigbarnes/dte/-/issues/88)
+  view (see also: https://gitlab.com/craigbarnes/dte/-/issues/88)
+
+* Allow the `cut` command to set the system clipboard, like e.g. `copy -b`
+  can (see also: https://gitlab.com/craigbarnes/dte/-/issues/183)
+
+* Allow the `filesize-limit` option to be specified as a percentage of
+  total RAM (see also: https://gitlab.com/craigbarnes/dte/-/issues/203)
+
+* Allow limiting the size of loaded `tags` files
+  (see also: https://gitlab.com/craigbarnes/dte/-/issues/202)
+
+* Add support for trimming trailing whitespace on `save` (i.e. the
+  EditorConfig `trim_trailing_whitespace` property)
+
+* Add support for interactive spell checking
 
 Documentation
 -------------
