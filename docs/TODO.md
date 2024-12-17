@@ -139,10 +139,15 @@ Features
 
 * Add support for interactive spell checking
 
+* Add support for extended underline styles/colors to [`hi`] command
+  (see also: [#161])
+
 * Show raw escape sequences in `dte -K` output (see also: [#151])
 
 * Update the terminal window title after running child processes, in
   case it was changed and not restored (see also: [#14])
+
+* Allow custom colors/attributes in the statusline (see also: [#70])
 
 Documentation
 -------------
@@ -256,6 +261,9 @@ Code Quality/Efficiency Improvements
 * Compress large undo history (`Change`) entries, e.g. those created
   when an [`exec`] command rewrites the entire buffer (see also: [#142])
 
+* Cache EditorConfig properties in memory, so that each `.editorconfig`
+  file is read only once per session (see also: [#105])
+
 Testing/Debugging
 -----------------
 
@@ -318,11 +326,14 @@ Testing/Debugging
 
 [GitLab issue]: https://gitlab.com/craigbarnes/dte/-/issues
 [#14]: https://gitlab.com/craigbarnes/dte/-/issues/14
+[#70]: https://gitlab.com/craigbarnes/dte/-/issues/70
 [#88]: https://gitlab.com/craigbarnes/dte/-/issues/88
+[#105]: https://gitlab.com/craigbarnes/dte/-/issues/105
 [#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
 [#142]: https://gitlab.com/craigbarnes/dte/-/issues/142
 [#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
 [#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
+[#161]: https://gitlab.com/craigbarnes/dte/-/issues/161
 [#179]: https://gitlab.com/craigbarnes/dte/-/issues/179
 [#180]: https://gitlab.com/craigbarnes/dte/-/issues/180
 [#183]: https://gitlab.com/craigbarnes/dte/-/issues/183
