@@ -66,10 +66,9 @@ static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
 
 static unsigned int parse_indent_digit(const StringView *val)
 {
-    // Valid indent widths are 1-8
-    static_assert_compatible_types(val->data[0], unsigned char);
-    unsigned int n = (val->length != 1) ? 0 : val->data[0] - '0';
-    return (n <= 8) ? n : 0;
+    const unsigned char *data = val->data;
+    unsigned int indent = (val->length == 1) ? data[0] - '0' : 0;
+    return (indent <= 8) ? indent : 0; // Valid indent widths are 1-8
 }
 
 static void parse_indent_size(EditorConfigOptions *options, const StringView *val)
@@ -81,9 +80,9 @@ static void parse_indent_size(EditorConfigOptions *options, const StringView *va
 
 static unsigned int parse_max_line_length(const StringView *val)
 {
-    unsigned int n = 0;
-    buf_parse_uint(val->data, val->length, &n);
-    return n;
+    unsigned int maxlen = 0;
+    size_t ndigits = buf_parse_uint(val->data, val->length, &maxlen);
+    return (ndigits == val->length) ? maxlen : 0;
 }
 
 static void editorconfig_option_set (
