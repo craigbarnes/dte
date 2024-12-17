@@ -16,7 +16,7 @@ Features
   * Add an [`alias`] flag to eagerly expand aliases at creation time (instead
     of at usage time)
   * Perform recursive `alias` expansion when auto-completing commands
-    (see also: https://gitlab.com/craigbarnes/dte/-/issues/152)
+    (see also: [#152])
 
 * Add a command that swaps the positions of the selection anchor point and
   cursor (so that selections can be extended on both ends, without starting
@@ -39,7 +39,7 @@ Features
 
 * Add option to [`wrap-paragraph`] to allow finding and removing a common
   prefix string from every line and then re-inserting it afterwards
-  (see also: https://gitlab.com/craigbarnes/dte/-/issues/118)
+  (see also: [#118])
 
 * Allow text selection in [`command`] and [`search`] modes, so that
   `CommandLine::buf` can be quickly manipulated by using [`copy`] and
@@ -124,24 +124,25 @@ Features
 
 * Add an option for rendering a "scroll indicator" on the left and/or
   right edge of the screen, when content is horizontally scrolled out of
-  view (see also: https://gitlab.com/craigbarnes/dte/-/issues/88)
+  view (see also: [#88])
 
 * Allow the `cut` command to set the system clipboard, like e.g. `copy -b`
-  can (see also: https://gitlab.com/craigbarnes/dte/-/issues/183)
+  can (see also: [#183])
 
 * Allow the `filesize-limit` option to be specified as a percentage of
-  total RAM (see also: https://gitlab.com/craigbarnes/dte/-/issues/203)
+  total RAM (see also: [#203])
 
-* Allow limiting the size of loaded `tags` files
-  (see also: https://gitlab.com/craigbarnes/dte/-/issues/202)
+* Allow limiting the size of loaded `tags` files (see also: [#202])
 
 * Add support for trimming trailing whitespace on `save` (i.e. the
   EditorConfig `trim_trailing_whitespace` property)
 
 * Add support for interactive spell checking
 
-* Show raw escape sequences in `dte -K` output
-  (see also: https://gitlab.com/craigbarnes/dte/-/issues/151)
+* Show raw escape sequences in `dte -K` output (see also: [#151])
+
+* Update the terminal window title after running child processes, in
+  case it was changed and not restored (see also: [#14])
 
 Documentation
 -------------
@@ -153,13 +154,11 @@ Documentation
   give a brief explanation why (no real standard for aixterm "bright"
   colors, `brightblack` being nonsensical, etc.)
 
-* For the [`hi`] command, clarify what is meant by "the name argument
-  can be a token name defined by a `dte-syntax(5)` file" (see also:
-  https://gitlab.com/craigbarnes/dte/-/issues/179)
+* For the [`hi`] command, clarify what is meant by "the name argument can
+  be a token name defined by a `dte-syntax(5)` file" (see also: [#179])
 
 * Mention [built-in filetype associations] in the [`ft`] documentation
-  and also describe how precedence/ordering works (see also:
-  https://gitlab.com/craigbarnes/dte/-/issues/180
+  and also describe how precedence/ordering works (see also: [#180])
 
 * Document the fact that `exec -o tag` tries to parse the first line of
   output as a [`tags(5)`] file entry, before falling back to a simple tag name
@@ -252,11 +251,10 @@ Code Quality/Efficiency Improvements
 
 * Optimize `update_range()` to make handling long lines more efficient,
   both by avoiding unnecessary work and by speeding up the necessary
-  parts (see: https://gitlab.com/craigbarnes/dte/-/issues/220)
+  parts (see also: [#220])
 
 * Compress large undo history (`Change`) entries, e.g. those created
-  when an [`exec`] command rewrites the entire buffer
-  (see also: https://gitlab.com/craigbarnes/dte/-/issues/142)
+  when an [`exec`] command rewrites the entire buffer (see also: [#142])
 
 Testing/Debugging
 -----------------
@@ -319,6 +317,18 @@ Testing/Debugging
 [`wrap-paragraph`]: https://craigbarnes.gitlab.io/dte/dterc.html#wrap-paragraph
 
 [GitLab issue]: https://gitlab.com/craigbarnes/dte/-/issues
+[#14]: https://gitlab.com/craigbarnes/dte/-/issues/14
+[#88]: https://gitlab.com/craigbarnes/dte/-/issues/88
+[#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
+[#142]: https://gitlab.com/craigbarnes/dte/-/issues/142
+[#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
+[#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
+[#179]: https://gitlab.com/craigbarnes/dte/-/issues/179
+[#180]: https://gitlab.com/craigbarnes/dte/-/issues/180
+[#183]: https://gitlab.com/craigbarnes/dte/-/issues/183
+[#202]: https://gitlab.com/craigbarnes/dte/-/issues/202
+[#203]: https://gitlab.com/craigbarnes/dte/-/issues/203
+[#220]: https://gitlab.com/craigbarnes/dte/-/issues/220
 [Utility Syntax Guideline 6]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02:~:text=Guideline%C2%A06
 [AtomicUndo]: https://ne.di.unimi.it/docs/AtomicUndo.html
 [Typst]: https://typst.app/docs/reference/syntax/
