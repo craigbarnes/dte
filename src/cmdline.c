@@ -292,12 +292,17 @@ static bool cmd_left(EditorState *e, const CommandArgs *a)
 
 static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
-    CommandLine *c = &e->cmdline;
     const Clipboard *clip = &e->clipboard;
-    string_insert_buf(&c->buf, c->pos, clip->buf, clip->len);
-    if (cmdargs_has_flag(a, 'm')) {
-        c->pos += clip->len;
+    const size_t len = clip->len;
+    if (len == 0) {
+        return true;
     }
+
+    CommandLine *c = &e->cmdline;
+    char newline_replacement = cmdargs_has_flag(a, 'n') ? ';' : ' ';
+    string_insert_buf(&c->buf, c->pos, clip->buf, len);
+    strn_replace_byte(c->buf.buffer + c->pos, len, '\n', newline_replacement);
+    c->pos += cmdargs_has_flag(a, 'm') ? len : 0;
     return cmdline_soft_reset(c);
 }
 
@@ -471,7 +476,7 @@ static const Command common_cmds[] = {
     CMD("erase-bol", "", 0, 0, cmd_erase_bol),
     CMD("erase-word", "s", 0, 0, cmd_erase_word), // Ignored flag: s
     CMD("left", "", 0, 0, cmd_left),
-    CMD("paste", "acm", 0, 0, cmd_paste), // Ignored flags: a, c
+    CMD("paste", "acmn", 0, 0, cmd_paste), // Ignored flags: a, c
     CMD("right", "", 0, 0, cmd_right),
     CMD("toggle", "gv", 1, -1, cmd_toggle), // Ignored flag: v
     CMD("word-bwd", "s", 0, 0, cmd_word_bwd), // Ignored flag: s
