@@ -134,6 +134,14 @@ Documentation
   give a brief explanation why (no real standard for aixterm "bright"
   colors, `brightblack` being nonsensical, etc.)
 
+* For the [`hi`] command, clarify what is meant by "the name argument
+  can be a token name defined by a `dte-syntax(5)` file" (see also:
+  https://gitlab.com/craigbarnes/dte/-/issues/179)
+
+* Mention [built-in filetype associations] in the [`ft`] documentation
+  and also describe how precedence/ordering works (see also:
+  https://gitlab.com/craigbarnes/dte/-/issues/180
+
 * Document the fact that `exec -o tag` tries to parse the first line of
   output as a [`tags(5)`] file entry, before falling back to a simple tag name
 
@@ -280,6 +288,7 @@ Testing/Debugging
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
 [`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
+[`ft`]: https://craigbarnes.gitlab.io/dte/dterc.html#ft
 [`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
 [`paste`]: https://craigbarnes.gitlab.io/dte/dterc.html#paste
 [`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
@@ -300,6 +309,7 @@ Testing/Debugging
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
 [GNU Coding Standards §4.4]: https://www.gnu.org/prep/standards/html_node/Errors.html
 [foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
+[built-in filetype associations]: https://gitlab.com/craigbarnes/dte/-/tree/master/src/filetype
 [`wl-copy(1)`]: https://man.archlinux.org/man/wl-copy.1
 [`xsel(1)`]: https://man.archlinux.org/man/xsel.1x
 [`xclip(1)`]: https://man.archlinux.org/man/xclip.1
