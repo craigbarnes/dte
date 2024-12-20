@@ -389,10 +389,15 @@ void window_set_size(Window *window, int w, int h)
     window_calculate_line_numbers(window);
 }
 
-int window_get_scroll_margin(const Window *window, unsigned int scroll_margin)
+unsigned int window_get_scroll_margin(const Window *window)
 {
-    int max = (window->edit_h - 1) / 2;
-    BUG_ON(max < 0);
+    int edit_h = window->edit_h;
+    if (unlikely(edit_h <= 2)) {
+        return 0;
+    }
+
+    unsigned int max = (edit_h - 1) / 2;
+    unsigned int scroll_margin = window->editor->options.scroll_margin;
     return MIN(max, scroll_margin);
 }
 

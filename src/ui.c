@@ -170,7 +170,7 @@ void update_screen(EditorState *e, const ScreenState *s)
     if (flags & UPDATE_ALL_WINDOWS) {
         update_all_windows(term, root_frame, styles);
     } else {
-        view_update(view, options->scroll_margin);
+        view_update(view);
         if (s->id == buffer->id) {
             if (s->vx != view->vx || s->vy != view->vy) {
                 mark_all_lines_changed(buffer);

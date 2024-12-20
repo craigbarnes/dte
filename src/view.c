@@ -93,10 +93,10 @@ static void view_update_vx(View *v)
     }
 }
 
-static void view_update_vy(View *v, unsigned int scroll_margin)
+static void view_update_vy(View *v)
 {
     Window *window = v->window;
-    int margin = window_get_scroll_margin(window, scroll_margin);
+    unsigned int margin = window_get_scroll_margin(window);
     long max_y = v->vy + window->edit_h - 1 - margin;
 
     if (v->cy < v->vy + margin) {
@@ -110,7 +110,7 @@ static void view_update_vy(View *v, unsigned int scroll_margin)
     }
 }
 
-void view_update(View *v, unsigned int scroll_margin)
+void view_update(View *v)
 {
     view_update_cursor_x(v);
     view_update_cursor_y(v);
@@ -118,7 +118,7 @@ void view_update(View *v, unsigned int scroll_margin)
     if (v->force_center || (v->center_on_scroll && view_is_cursor_visible(v))) {
         view_center_to_cursor(v);
     } else {
-        view_update_vy(v, scroll_margin);
+        view_update_vy(v);
     }
     v->force_center = false;
     v->center_on_scroll = false;

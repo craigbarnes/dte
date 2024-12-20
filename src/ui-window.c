@@ -77,10 +77,10 @@ static void update_window_full(Window *window, void* UNUSED_ARG(data))
     EditorState *e = window->editor;
     View *view = window->view;
     const GlobalOptions *options = &e->options;
-    view_update(view, options->scroll_margin);
-
     const StyleMap *styles = &e->styles;
     Terminal *term = &e->terminal;
+    view_update(view);
+
     if (options->tab_bar) {
         print_tabbar(term, styles, window);
     }
@@ -146,7 +146,7 @@ void update_buffer_windows (
             block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
 
             // This has already been done for the current view
-            view_update(view, options->scroll_margin);
+            view_update(view);
         }
         update_window(term, view->window, styles, options);
     }

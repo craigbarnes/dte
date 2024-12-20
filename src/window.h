@@ -63,7 +63,7 @@ View *window_open_files(Window *window, char **filenames, const char *encoding) 
 void window_calculate_line_numbers(Window *window) NONNULL_ARGS;
 void window_set_coordinates(Window *window, int x, int y) NONNULL_ARGS;
 void window_set_size(Window *window, int w, int h) NONNULL_ARGS;
-int window_get_scroll_margin(const Window *window, unsigned int scroll_margin) NONNULL_ARGS;
+unsigned int window_get_scroll_margin(const Window *window) NONNULL_ARGS;
 Window *window_prev(Window *window) NONNULL_ARGS_AND_RETURN;
 Window *window_next(Window *window) NONNULL_ARGS_AND_RETURN;
 void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), void *data) NONNULL_ARG(1, 2);
