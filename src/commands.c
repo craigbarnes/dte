@@ -1917,9 +1917,17 @@ static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     View *view = e->view;
     view->vy++;
-    if (view->cy < view->vy) {
+
+    bool never_move_cursor = has_flag(a, 'M');
+    if (never_move_cursor) {
+        return true;
+    }
+
+    unsigned int margin = window_get_scroll_margin(e->window);
+    if (view->cy < view->vy + margin) {
         move_down(view, 1);
     }
+
     return true;
 }
 
@@ -1974,14 +1982,22 @@ static bool cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
 static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    Window *window = e->window;
     View *view = e->view;
     if (view->vy) {
         view->vy--;
     }
-    if (view->vy + window->edit_h <= view->cy) {
+
+    bool never_move_cursor = has_flag(a, 'M');
+    if (never_move_cursor) {
+        return true;
+    }
+
+    const Window *window = e->window;
+    unsigned int margin = window_get_scroll_margin(window);
+    if (view->vy + (window->edit_h - margin) <= view->cy) {
         move_up(view, 1);
     }
+
     return true;
 }
 
@@ -2583,10 +2599,10 @@ static const Command cmds[] = {
     {"replace", "bcegi", NA, 1, 2, cmd_replace},
     {"right", "cl", NA, 0, 0, cmd_right},
     {"save", "Bbde=fpu", NA, 0, 1, cmd_save},
-    {"scroll-down", "", NA, 0, 0, cmd_scroll_down},
+    {"scroll-down", "M", NA, 0, 0, cmd_scroll_down},
     {"scroll-pgdown", "h", NA, 0, 0, cmd_scroll_pgdown},
     {"scroll-pgup", "h", NA, 0, 0, cmd_scroll_pgup},
-    {"scroll-up", "", NA, 0, 0, cmd_scroll_up},
+    {"scroll-up", "M", NA, 0, 0, cmd_scroll_up},
     {"search", "Henprw", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
