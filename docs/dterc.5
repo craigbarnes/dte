@@ -2096,7 +2096,12 @@ Whether to include the character under the cursor in selections.
 .RE
 \fBscroll\-margin\fR [0]
 .RS
-Minimum number of lines to keep visible before and after cursor.
+Minimum number of lines to keep visible above/below the cursor.
+.P
+Note that this minimum can only be honored if the window has enough
+lines to accommodate both margins (upper and lower), plus 1 non\-margin
+line. If this condition isn't satisfied, it will be adjusted down to
+the greatest value the window can accommodate.
 .P
 .RE
 \fBset\-window\-title\fR [false]
