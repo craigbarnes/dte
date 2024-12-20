@@ -1999,10 +1999,11 @@ Show window dimensions
 .PP
 The \fIkey\fR argument is the name of the entry to look up (e.g. the alias
 name). If this argument is omitted, the full list of entries of the
-specified \fItype\fR will be displayed in a new buffer.
+specified \fItype\fR will be displayed in a new, temporary buffer (created
+as if by \fBopen \-t\fR).
 .P
-Note: the majority of \fItype\fR arguments correspond to a command of the
-same name and some \fItype\fR arguments don't take any \fIkey\fR argument.
+Note that the majority of \fItype\fR arguments correspond to a command of
+the same name and some \fItype\fR arguments don't take any \fIkey\fR argument.
 .P
 .TP
 \fB\-c\fR

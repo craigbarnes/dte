@@ -1116,7 +1116,7 @@ by running [`show macro`].
 
 ### **select** [**-kl**]
 
-Enter selection mode. All basic movement commands while in this mode
+Enter selection mode. All basic [movement commands] while in this mode
 extend the selected area, until either the [`unselect`] command is used
 (e.g. by pressing `Esc`) or some other operation (e.g. [`delete`],
 [`insert`], etc.) clears the selection.
@@ -1342,10 +1342,11 @@ The _type_ argument can be one of:
 
 The _key_ argument is the name of the entry to look up (e.g. the alias
 name). If this argument is omitted, the full list of entries of the
-specified _type_ will be displayed in a new buffer.
+specified _type_ will be displayed in a new, temporary buffer (created
+as if by [`open -t`]).
 
-Note: the majority of _type_ arguments correspond to a command of the
-same name and some _type_ arguments don't take any _key_ argument.
+Note that the majority of _type_ arguments correspond to a [command] of
+the same name and some _type_ arguments don't take any _key_ argument.
 
 `-c`
 :   write output to the command line (for most _type_ arguments) or to
@@ -1644,6 +1645,8 @@ errors should be highlighted. Set to `""` to disable.
 [history file]: dte.html#files
 [configuration files]: dte.html#files:~:text=%24DTE_HOME/rc
 [key bindings]: dte.html#key-bindings
+[command]: #commands
+[movement commands]: #movement-commands
 [options]: #options
 [global options]: #global-options
 [local options]: #local-options
@@ -1684,6 +1687,7 @@ errors should be highlighted. Set to `""` to disable.
 [`macro`]: #macro
 [`msg`]: #msg
 [`open`]: #open
+[`open -t`]: #open
 [`option`]: #option
 [`pgdown`]: #pgdown
 [`pgup`]: #pgup
