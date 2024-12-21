@@ -9,11 +9,11 @@ VERSION = $(shell mk/version.sh 1.11.1)
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config css ctags d diff docker dte gcode gitblame \
-    gitcommit gitignore gitrebase gitstash go gomod html haskell ini java \
-    javascript json lisp lua mail make markdown meson nftables nginx \
-    ninja php python robotstxt roff ruby scheme sed sh sql tex texmfcnf \
-    tmux vala weechatlog xml xresources zig inc/c-comment inc/c-uchar \
-    inc/diff
+    gitcommit gitignore gitlog gitrebase gitstash go gomod html haskell \
+    ini java javascript json lisp lua mail make markdown meson nftables \
+    nginx ninja php python robotstxt roff ruby scheme sed sh sql tex \
+    texmfcnf tmux vala weechatlog xml xresources zig inc/c-comment \
+    inc/c-uchar inc/diff
 
 BUILTIN_CONFIGS = $(addprefix config/, \
     rc binding/default compiler/gcc compiler/go \

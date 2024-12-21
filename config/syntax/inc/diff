@@ -8,13 +8,12 @@ state headers diff-header
     str '+++ ' header
     str '@@ ' chunk
     char # comment
-    char "\n" this
     noeat text
 
 # Note that all "END" destinations in this sub-syntax are only for the
-# benefit of the "gitstash" syntax and could otherwise just be replaced
-# with "headers". This sub-syntax also used by the "diff" and "gitcommit"
-# syntaxes.
+# benefit of the "gitlog" and "gitstash" syntaxes and could otherwise
+# just be replaced with "headers". This sub-syntax is also used by the
+# "diff" and "gitcommit" syntaxes.
 
 state header diff-header
     char "\n" END

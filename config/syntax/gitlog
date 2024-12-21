@@ -1,0 +1,16 @@
+require diff
+
+# This is very similar to the `diff` syntax, but also allows
+# highlighting lines like e.g. "commit c68d5f4a6 (HEAD -> master)".
+# Usage example: git log -p HEAD~8..HEAD | dte -c 'set filetype gitlog'
+syntax gitlog
+
+state start
+    str 'commit ' commit
+    noeat .diff:this
+
+state commit
+    char "\n" start
+    eat this
+
+default string commit
