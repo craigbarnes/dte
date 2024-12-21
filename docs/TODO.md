@@ -152,6 +152,16 @@ Features
 Documentation
 -------------
 
+* Briefly describe formatting conventions used in "COMMANDS" section of
+  `dterc(5)` man page (and also cross-reference `man(1)`, where similar
+  conventions are mentioned):
+  * **Bold**: Type exactly as shown
+  * _Italic_ (or underline, in `roff(7)`): Replace with appropriate argument
+  * `[-abc]`: Any or all arguments within `[ ]` are optional
+  * `-a|-b`: Options delimited by `|` cannot be used together
+  * `argument ...`: Argument is repeatable
+  * `[expression] ...`: Entire expression within `[ ]` is repeatable
+
 * Improve documentation for [`search`] command
 
 * For the [`hi`] command, mention that `gray`, `darkgray` and `white` are
