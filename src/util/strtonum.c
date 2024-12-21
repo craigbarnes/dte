@@ -30,16 +30,16 @@ const uint8_t hex_decode_table[256] = {
     I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I
 };
 
-size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
+size_t buf_parse_uintmax(const char *str, size_t len, uintmax_t *valp)
 {
-    if (unlikely(size == 0 || !ascii_isdigit(str[0]))) {
+    if (unlikely(len == 0 || !ascii_isdigit(str[0]))) {
         return 0;
     }
 
     uintmax_t val = str[0] - '0';
     size_t i = 1;
 
-    while (i < size && ascii_isdigit(str[i])) {
+    while (i < len && ascii_isdigit(str[i])) {
         if (unlikely(umax_multiply_overflows(val, 10, &val))) {
             return 0;
         }
@@ -52,10 +52,10 @@ size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
     return i;
 }
 
-size_t buf_parse_ulong(const char *str, size_t size, unsigned long *valp)
+size_t buf_parse_ulong(const char *str, size_t len, unsigned long *valp)
 {
     uintmax_t val;
-    size_t n = buf_parse_uintmax(str, size, &val);
+    size_t n = buf_parse_uintmax(str, len, &val);
     if (n == 0 || val > ULONG_MAX) {
         return 0;
     }
@@ -63,10 +63,10 @@ size_t buf_parse_ulong(const char *str, size_t size, unsigned long *valp)
     return n;
 }
 
-size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp)
+size_t buf_parse_uint(const char *str, size_t len, unsigned int *valp)
 {
     uintmax_t val;
-    size_t n = buf_parse_uintmax(str, size, &val);
+    size_t n = buf_parse_uintmax(str, len, &val);
     if (n == 0 || val > UINT_MAX) {
         return 0;
     }
@@ -85,9 +85,9 @@ size_t buf_parse_size(const char *str, size_t len, size_t *valp)
     return n;
 }
 
-static size_t buf_parse_long(const char *str, size_t size, long *valp)
+static size_t buf_parse_long(const char *str, size_t len, long *valp)
 {
-    if (unlikely(size == 0)) {
+    if (unlikely(len == 0)) {
         return 0;
     }
 
@@ -100,12 +100,12 @@ static size_t buf_parse_long(const char *str, size_t size, long *valp)
     case '+':
         skipped = 1;
         str++;
-        size--;
+        len--;
         break;
     }
 
     uintmax_t val;
-    size_t n = buf_parse_uintmax(str, size, &val);
+    size_t n = buf_parse_uintmax(str, len, &val);
     if (n == 0 || val > LONG_MAX) {
         return 0;
     }
