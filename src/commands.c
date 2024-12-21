@@ -1918,9 +1918,8 @@ static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
     View *view = e->view;
     view->vy++;
 
-    bool never_move_cursor = has_flag(a, 'M');
-    if (never_move_cursor) {
-        return true;
+    if (has_flag(a, 'M')) {
+        return true; // Don't move cursor, even at scroll margin
     }
 
     unsigned int margin = window_get_scroll_margin(e->window);
@@ -1983,13 +1982,10 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    if (view->vy) {
-        view->vy--;
-    }
+    view->vy -= (view->vy > 0);
 
-    bool never_move_cursor = has_flag(a, 'M');
-    if (never_move_cursor) {
-        return true;
+    if (has_flag(a, 'M')) {
+        return true; // Don't move cursor, even at scroll margin
     }
 
     const Window *window = e->window;
