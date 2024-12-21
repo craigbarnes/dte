@@ -54,8 +54,8 @@ option python indent-regex ':[ \t]*(#.*)?$'
 option sh indent-regex '(^|;)[ \t]*(do|else|then) *$'
 option html,xml indent-regex '(^[ \t]*>|<[A-Za-z]>|<[^/][^<]*[^/]>)[ \t]*$'
 
-# Don't highlight whitespace errors in diff and mail files
-option diff,mail ws-error 0
+# Don't highlight whitespace errors in diff/gitstash/mail files
+option diff,gitstash,mail ws-error 0
 
 # Aliases for renamed/removed commands (for backwards compatibility)
 alias filter 'exec -s -i buffer -o buffer -e errmsg'

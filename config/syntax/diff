@@ -4,7 +4,7 @@ require diff
 
 syntax diff
 
-state start
-    # The `.diff` sub-syntax has no `END` destination states, so the return
-    # state here just uses a dummy value (`this`)
+# Jump into the ".diff" sub-syntax and transition straight back to it,
+# whenever it returns here (see also: the comment in syntax/inc/diff)
+state subsyn-loop
     noeat .diff:this

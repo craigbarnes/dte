@@ -9,7 +9,7 @@ VERSION = $(shell mk/version.sh 1.11.1)
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config css ctags d diff docker dte gcode gitblame \
-    gitcommit gitignore gitrebase go gomod html haskell ini java \
+    gitcommit gitignore gitrebase gitstash go gomod html haskell ini java \
     javascript json lisp lua mail make markdown meson nftables nginx \
     ninja php python robotstxt roff ruby scheme sed sh sql tex texmfcnf \
     tmux vala weechatlog xml xresources zig inc/c-comment inc/c-uchar \

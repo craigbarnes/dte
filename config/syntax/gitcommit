@@ -27,8 +27,13 @@ state maybe-scissors comment
 
 state scissors comment
     char ' -' this
-    char "\n" .diff:this
+    char "\n" subsyn-loop
     noeat comment
+
+# Jump into the ".diff" sub-syntax and transition straight back to it,
+# whenever it returns here (see also: the comment in syntax/inc/diff)
+state subsyn-loop
+    noeat .diff:this
 
 state comment
     char "\n" start

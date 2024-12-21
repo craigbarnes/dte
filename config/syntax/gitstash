@@ -1,0 +1,22 @@
+require diff
+
+# This is very similar to the `diff` syntax, but also allows
+# highlighting lines like e.g. "stash@{0}: WIP on master: ...".
+# Usage example: git stash list -p | dte -c 'set filetype gitstash'
+
+syntax gitstash
+
+state start
+    char s maybe-stashline
+    noeat .diff:this
+
+state maybe-stashline stashline
+    str 'tash@{' stashline
+    recolor text 1
+    noeat .diff:start
+
+state stashline
+    char "\n" start
+    eat this
+
+default string stashline
