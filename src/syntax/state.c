@@ -619,7 +619,8 @@ static ConfigFlags syn_flags_to_cfg_flags(SyntaxLoadFlags flags)
 {
     static_assert(SYN_MUST_EXIST == (SyntaxLoadFlags)CFG_MUST_EXIST);
     static_assert(SYN_BUILTIN == (SyntaxLoadFlags)CFG_BUILTIN);
-    return (ConfigFlags)(flags & (SYN_MUST_EXIST | SYN_BUILTIN));
+    SyntaxLoadFlags mask = SYN_MUST_EXIST | SYN_BUILTIN;
+    return (ConfigFlags)(flags & mask);
 }
 
 static int read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags flags)

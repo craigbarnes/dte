@@ -1916,6 +1916,7 @@ static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
+    handle_selection_flags(view, a);
     view->vy++;
 
     if (has_flag(a, 'M')) {
@@ -1933,15 +1934,17 @@ static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
 static bool cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    Window *window = e->window;
     View *view = e->view;
-    long max = view->buffer->nl - window->edit_h + 1;
+    handle_selection_flags(view, a);
 
+    const long edit_h = e->window->edit_h;
+    const long max = view->buffer->nl - edit_h + 1;
     long count;
+
     if (view->vy < max && max > 0) {
         bool half = has_flag(a, 'h');
         unsigned int shift = half & 1;
-        count = (window->edit_h - 1) >> shift;
+        count = (edit_h - 1) >> shift;
         if (view->vy + count > max) {
             count = max - view->vy;
         }
@@ -1959,14 +1962,14 @@ static bool cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
 static bool cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    Window *window = e->window;
     View *view = e->view;
+    handle_selection_flags(view, a);
 
     long count;
     if (view->vy > 0) {
         bool half = has_flag(a, 'h');
         unsigned int shift = half & 1;
-        count = MIN((window->edit_h - 1) >> shift, view->vy);
+        count = MIN((e->window->edit_h - 1) >> shift, view->vy);
         view->vy -= count;
     } else if (view->cy > 0) {
         count = view->cy;
@@ -1982,6 +1985,7 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
+    handle_selection_flags(view, a);
     view->vy -= (view->vy > 0);
 
     if (has_flag(a, 'M')) {
@@ -2595,10 +2599,10 @@ static const Command cmds[] = {
     {"replace", "bcegi", NA, 1, 2, cmd_replace},
     {"right", "cl", NA, 0, 0, cmd_right},
     {"save", "Bbde=fpu", NA, 0, 1, cmd_save},
-    {"scroll-down", "M", NA, 0, 0, cmd_scroll_down},
-    {"scroll-pgdown", "h", NA, 0, 0, cmd_scroll_pgdown},
-    {"scroll-pgup", "h", NA, 0, 0, cmd_scroll_pgup},
-    {"scroll-up", "M", NA, 0, 0, cmd_scroll_up},
+    {"scroll-down", "Mcl", NA, 0, 0, cmd_scroll_down},
+    {"scroll-pgdown", "chl", NA, 0, 0, cmd_scroll_pgdown},
+    {"scroll-pgup", "chl", NA, 0, 0, cmd_scroll_pgup},
+    {"scroll-up", "Mcl", NA, 0, 0, cmd_scroll_up},
     {"search", "Henprw", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
