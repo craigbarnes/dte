@@ -1097,7 +1097,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     if (has_flag(a, 'n')) {
         p = MIN(p + 1, count - 1);
     } else if (has_flag(a, 'p')) {
-        p = p ? p - 1 : 0;
+        p -= (p > 0);
     } else if (str) {
         if (!str_to_size(str, &p) || p == 0) {
             return error_msg("invalid message index: %s", str);

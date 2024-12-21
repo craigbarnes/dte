@@ -863,7 +863,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
         cs->add_space_after_single_match = true;
         size_t count = array.count;
         char **args = count ? (char**)array.ptrs + 1 + semicolon : NULL;
-        size_t argc = count ? array.count - semicolon - 1 : 0;
+        size_t argc = count ? count - semicolon - 1 : 0;
         collect_completions(e, args, argc);
     }
 
