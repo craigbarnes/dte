@@ -59,35 +59,27 @@ void set_editorconfig_options(Buffer *buffer)
         return;
     }
 
-    switch (opts.indent_style) {
-    case INDENT_STYLE_SPACE:
-        options->expand_tab = true;
-        options->emulate_tab = true;
-        options->detect_indent = 0;
-        break;
-    case INDENT_STYLE_TAB:
-        options->expand_tab = false;
-        options->emulate_tab = false;
-        options->detect_indent = 0;
-        break;
-    case INDENT_STYLE_UNSPECIFIED:
-        break;
-    }
-
-    const unsigned int indent_size = opts.indent_size;
-    if (indent_size > 0 && indent_size <= INDENT_WIDTH_MAX) {
-        options->indent_width = indent_size;
+    EditorConfigIndentStyle style = opts.indent_style;
+    if (style != INDENT_STYLE_UNSPECIFIED) {
+        options->expand_tab = (style == INDENT_STYLE_SPACE);
+        options->emulate_tab = (style == INDENT_STYLE_SPACE);
         options->detect_indent = 0;
     }
 
-    const unsigned int tab_width = opts.tab_width;
-    if (tab_width > 0 && tab_width <= TAB_WIDTH_MAX) {
-        options->tab_width = tab_width;
+    unsigned int iw = opts.indent_size;
+    if (iw && iw <= INDENT_WIDTH_MAX) {
+        options->indent_width = iw;
+        options->detect_indent = 0;
     }
 
-    const unsigned int max_line_length = opts.max_line_length;
-    if (max_line_length > 0 && max_line_length <= TEXT_WIDTH_MAX) {
-        options->text_width = max_line_length;
+    unsigned int tw = opts.tab_width;
+    if (tw && tw <= TAB_WIDTH_MAX) {
+        options->tab_width = tw;
+    }
+
+    unsigned int maxlen = opts.max_line_length;
+    if (maxlen && maxlen <= TEXT_WIDTH_MAX) {
+        options->text_width = maxlen;
     }
 }
 
