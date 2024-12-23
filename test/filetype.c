@@ -209,6 +209,12 @@ static void test_find_ft_firstline(TestContext *ctx)
         {"#autoload", "sh"},
         {"#compdef dte", "sh"},
         {"#compdef", NULL},
+        {"stash@{0}: WIP on master: ...", "gitstash"},
+        {"stash@", NULL},
+        {"commit 8c6db8e8f8fbf055633ffb7a8bb449bb177adf01 (...)", "gitlog"},
+        {"commit 8c6db8e8f8fbf055633ffb7a8bb449bb177adf01", "gitlog"},
+        {"commit 8c6db8e8f8fbf055633ffb7a8bb449bb177adf01 ", NULL},
+        {"commit 8c6db8e8f8fbf055633ffb7a8bb449bb177adf0 (...)", NULL},
 
         // Emacs style file-local variables
         {"<!--*-xml-*-->", "xml"},

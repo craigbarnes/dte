@@ -113,6 +113,15 @@ static inline bool strview_has_suffix(const StringView *sv, const char *suffix)
 }
 
 NONNULL_ARGS
+static inline bool strview_has_prefix_and_suffix (
+    const StringView *sv,
+    const char *prefix,
+    const char *suffix
+) {
+    return strview_has_prefix(sv, prefix) && strview_has_suffix(sv, suffix);
+}
+
+NONNULL_ARGS
 static inline bool strview_isblank(const StringView *sv)
 {
     size_t len = sv->length;

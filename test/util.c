@@ -428,8 +428,8 @@ static void test_ascii(TestContext *ctx)
         EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
         EXPECT_EQ(ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(ascii_isprint(i), !!isprint(i));
+        EXPECT_EQ(ascii_isxdigit(i), !!isxdigit(i));
         EXPECT_EQ(u_is_ascii_upper(i), !!isupper(i));
-        EXPECT_EQ(hex_decode(i) <= 0xF, !!isxdigit(i));
         EXPECT_EQ(is_alpha_or_underscore(i), !!isalpha(i) || i == '_');
         EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum(i) || i == '_');
         if (i != '\v' && i != '\f') {
@@ -1573,6 +1573,14 @@ static void test_u_is_cntrl(TestContext *ctx)
     EXPECT_FALSE(u_is_cntrl(0x41));
     EXPECT_FALSE(u_is_cntrl(0x61));
     EXPECT_FALSE(u_is_cntrl(0xFF));
+}
+
+static void test_u_is_unicode(TestContext *ctx)
+{
+    EXPECT_TRUE(u_is_unicode(0));
+    EXPECT_TRUE(u_is_unicode(1));
+    EXPECT_TRUE(u_is_unicode(UNICODE_MAX_VALID_CODEPOINT));
+    EXPECT_FALSE(u_is_unicode(UNICODE_MAX_VALID_CODEPOINT + 1));
 }
 
 static void test_u_is_zero_width(TestContext *ctx)
@@ -3246,6 +3254,7 @@ static const TestEntry tests[] = {
     TEST(test_u_is_upper),
     TEST(test_u_is_ascii_upper),
     TEST(test_u_is_cntrl),
+    TEST(test_u_is_unicode),
     TEST(test_u_is_zero_width),
     TEST(test_u_is_special_whitespace),
     TEST(test_u_is_unprintable),

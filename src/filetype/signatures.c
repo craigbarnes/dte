@@ -65,6 +65,21 @@ static FileTypeEnum filetype_from_emacs_var(const StringView line)
     return (ft >= 0) ? (FileTypeEnum)ft : NONE;
 }
 
+static bool is_gitlog_commit_line(StringView line)
+{
+    if (!strview_remove_matching_prefix(&line, "commit ") || line.length < 40) {
+        return false;
+    }
+
+    size_t ndigits = ascii_hex_prefix_length(line.data, line.length);
+    if (ndigits < 40) {
+        return false;
+    }
+
+    strview_remove_prefix(&line, ndigits);
+    return line.length == 0 || strview_has_prefix_and_suffix(&line, " (", ")");
+}
+
 static FileTypeEnum filetype_from_signature(const StringView line)
 {
     if (line.length < 5) {
@@ -95,8 +110,12 @@ static FileTypeEnum filetype_from_signature(const StringView line)
         break;
     case 'I':
         return strview_has_prefix(&line, "ISO-10303-21;") ? STEP : NONE;
+    case 'c':
+        return is_gitlog_commit_line(line) ? GITLOG : NONE;
     case 'd':
         return strview_has_prefix(&line, "diff --git") ? DIFF : NONE;
+    case 's':
+        return strview_has_prefix(&line, "stash@{") ? GITSTASH : NONE;
     case '/':
     case '.':
     case ';':

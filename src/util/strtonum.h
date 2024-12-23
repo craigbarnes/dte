@@ -20,6 +20,20 @@ static inline unsigned int hex_decode(unsigned char c)
     return hex_decode_table[c];
 }
 
+static inline bool ascii_isxdigit(unsigned char c)
+{
+    return hex_decode(c) <= 0xF;
+}
+
+static inline size_t ascii_hex_prefix_length(const char *str, size_t len)
+{
+    size_t i = 0;
+    while (i < len && ascii_isxdigit(str[i])) {
+        i++;
+    }
+    return i;
+}
+
 WARN_UNUSED_RESULT
 static inline size_t buf_parse_hex_uint(const char *str, size_t len, unsigned int *valp)
 {
