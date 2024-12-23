@@ -222,6 +222,7 @@ bool str_to_filepos(const char *str, size_t *linep, size_t *colp)
     return r;
 }
 
+// Return the number of decimal digits in `x`
 size_t size_str_width(size_t x)
 {
     size_t width = 0;

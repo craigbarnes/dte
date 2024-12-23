@@ -8,6 +8,7 @@
 #include "ascii.h"
 #include "debug.h"
 #include "macros.h"
+#include "xmemrchr.h"
 #include "xstring.h"
 
 // A non-owning, length-bounded "view" into another string, similar to
@@ -143,15 +144,7 @@ static inline const unsigned char *strview_memchr(const StringView *sv, int c)
 NONNULL_ARGS
 static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
 {
-    const unsigned char *s = sv->data;
-    size_t n = sv->length;
-    c = (int)(unsigned char)c;
-    while (n--) {
-        if (s[n] == c) {
-            return (s + n);
-        }
-    }
-    return NULL;
+    return sv->length ? xmemrchr(sv->data, c, sv->length) : NULL;
 }
 
 NONNULL_ARGS
