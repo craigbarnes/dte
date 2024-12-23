@@ -865,6 +865,7 @@ update:
         update_all_syntax_styles(&e->syntaxes, &e->styles);
         e->screen_update |= UPDATE_ALL_WINDOWS;
     }
+
     return true;
 }
 
@@ -874,6 +875,7 @@ static bool cmd_include(EditorState *e, const CommandArgs *a)
     if (has_flag(a, 'b')) {
         flags |= CFG_BUILTIN;
     }
+
     int err = read_normal_config(e, a->args[0], flags);
     // TODO: Clean up read_normal_config() so this can be simplified to `err == 0`
     return err == 0 || (err == ENOENT && !(flags & CFG_MUST_EXIST));

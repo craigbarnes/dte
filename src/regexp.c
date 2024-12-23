@@ -22,10 +22,7 @@ bool regexp_error_msg(const regex_t *re, const char *pattern, int err)
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
 {
     int err = regcomp(re, pattern, flags);
-    if (err) {
-        return regexp_error_msg(re, pattern, err);
-    }
-    return true;
+    return !err || regexp_error_msg(re, pattern, err);
 }
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags)

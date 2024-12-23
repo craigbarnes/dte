@@ -149,6 +149,10 @@ Features
 
 * Allow custom colors/attributes in the statusline (see also: [#70])
 
+* Allow [`include`] to run *any* command when used from command mode
+  or key bindings (the restrictions noted for [configuration commands]
+  should only apply to `rc` files and built-in configs)
+
 Documentation
 -------------
 
@@ -319,6 +323,7 @@ Testing/Debugging
 [`dte-syntax(5)`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [`default`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#default
 
+[configuration commands]: https://craigbarnes.gitlab.io/dte/dterc.html#configuration-commands
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
 [`clear`]: https://craigbarnes.gitlab.io/dte/dterc.html#clear
 [`command`]: https://craigbarnes.gitlab.io/dte/dterc.html#command
@@ -326,8 +331,9 @@ Testing/Debugging
 [`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
 [`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
-[`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`ft`]: https://craigbarnes.gitlab.io/dte/dterc.html#ft
+[`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
+[`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
 [`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
 [`paste`]: https://craigbarnes.gitlab.io/dte/dterc.html#paste
 [`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
