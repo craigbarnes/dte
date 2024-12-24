@@ -28,7 +28,7 @@ ft -f dte '/(\.|dot_)?dte/(config/)?(rc|((syntax|color|binding|compiler)/.*))$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|/tmp/mutt(ng)?-'
 
 # Don't remember cursor position for git temporary files
-option gitcommit,gitrebase file-history false
+option gitcommit,gitnote,gitrebase file-history false
 option -r '/\.git/.*\.diff$' file-history false
 
 # Try to detect indent settings based on existing file contents

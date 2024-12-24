@@ -26,6 +26,7 @@ static const struct FileBasenameMap {
     {"Makefile", MAKE, false},
     {"Makefile.am", MAKE, false},
     {"Makefile.in", MAKE, false},
+    {"NOTES_EDITMSG", GITNOTE, false},
     {"PKGBUILD", SH, false},
     {"Pipfile", TOML, false},
     {"Pipfile.lock", JSON, false},

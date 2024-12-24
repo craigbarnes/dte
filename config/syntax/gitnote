@@ -1,0 +1,27 @@
+# Highlighter for NOTES_EDITMSG files (`git notes add` format)
+syntax gitnote
+
+state start text
+    char # comment-start
+    noeat text
+
+state text
+    char "\n" start
+    eat this
+
+state comment-start comment
+    char "\n" start
+    str ' commit ' commit-id commit-prefix
+    eat comment
+
+state comment
+    char "\n" start
+    eat this
+
+state commit-id
+    char 0-9A-Fa-f this
+    char "\n" start
+    noeat comment
+
+default string commit-id
+default comment commit-prefix
