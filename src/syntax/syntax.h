@@ -8,6 +8,7 @@
 #include "syntax/color.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 
@@ -126,5 +127,6 @@ void update_syntax_styles(Syntax *syn, const StyleMap *styles);
 void update_all_syntax_styles(const HashMap *syntaxes, const StyleMap *styles);
 void find_unused_subsyntaxes(const HashMap *syntaxes);
 void free_syntaxes(HashMap *syntaxes);
+void collect_syntax_emit_names(const Syntax *syntax, PointerArray *a, const char *prefix) NONNULL_ARGS;
 
 #endif

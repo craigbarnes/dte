@@ -93,11 +93,10 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
             BUG_ON(s->conds.alloc != 0);
         }
 
-        // Mark unvisited so that state that is used only as a return
-        // state gets visited
+        // Mark unvisited, so that return-only states get visited
         s->visited = false;
 
-        // Don't complain about unvisited copied states
+        // Don't complain about unvisited, copied states
         s->copied = true;
     }
 

@@ -1,6 +1,9 @@
 #include <stdlib.h>
+#include <string.h>
 #include "syntax.h"
 #include "error.h"
+#include "util/str-util.h"
+#include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
 StringList *find_string_list(const Syntax *syn, const char *name)
@@ -153,13 +156,14 @@ static const char *find_default_style(const Syntax *syn, const char *name)
     return hashmap_get(&syn->default_styles, name);
 }
 
+static const char *get_effective_emit_name(const Action *a)
+{
+    return a->emit_name ? a->emit_name : a->destination->emit_name;
+}
+
 static void update_action_style(const Syntax *syn, Action *a, const StyleMap *styles)
 {
-    const char *name = a->emit_name;
-    if (!name) {
-        name = a->destination->emit_name;
-    }
-
+    const char *name = get_effective_emit_name(a);
     char full[256];
     xsnprintf(full, sizeof full, "%s.%s", syn->name, name);
     a->emit_style = find_style(styles, full);
@@ -213,4 +217,43 @@ void find_unused_subsyntaxes(const HashMap *syntaxes)
             s->warned_unused_subsyntax = true;
         }
     }
+}
+
+void collect_syntax_emit_names (
+    const Syntax *syntax,
+    PointerArray *a,
+    const char *prefix
+) {
+    HashSet set;
+    hashset_init(&set, 16, false);
+
+    // Insert all `Action::emit_name` strings beginning with `prefix` into
+    // a HashSet (to avoid duplicates)
+    for (HashMapIter it = hashmap_iter(&syntax->states); hashmap_next(&it); ) {
+        const State *s = it.entry->value;
+        const char *emit = get_effective_emit_name(&s->default_action);
+        if (str_has_prefix(emit, prefix)) {
+            hashset_insert(&set, emit, strlen(emit));
+        }
+        for (size_t i = 0, n = s->conds.count; i < n; i++) {
+            const Condition *cond = s->conds.ptrs[i];
+            emit = get_effective_emit_name(&cond->a);
+            if (str_has_prefix(emit, prefix)) {
+                hashset_insert(&set, emit, strlen(emit));
+            }
+        }
+    }
+
+    const char *ft = syntax->name;
+    size_t ftlen = strlen(ft);
+
+    // Append the collected strings to the PointerArray
+    for (size_t i = 0, n = set.table_size; i < n; i++) {
+        for (HashSetEntry *h = set.table[i]; h; h = h->next) {
+            char *str = xmemjoin3(ft, ftlen, STRN("."), h->str, h->str_len + 1);
+            ptr_array_append(a, str);
+        }
+    }
+
+    hashset_free(&set);
 }

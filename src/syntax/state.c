@@ -293,9 +293,10 @@ static bool cmd_eat(EditorState *e, const CommandArgs *a)
     }
 
     const char *emit = a->args[1];
-    lint_emit_name(e, emit, e->syn.current_state->default_action.destination);
-    e->syn.current_state->default_action.emit_name = emit ? xstrdup(emit) : NULL;
-    e->syn.current_state->type = STATE_EAT;
+    State *curstate = e->syn.current_state;
+    lint_emit_name(e, emit, curstate->default_action.destination);
+    curstate->default_action.emit_name = emit ? xstrdup(emit) : NULL;
+    curstate->type = STATE_EAT;
     e->syn.current_state = NULL;
     return true;
 }

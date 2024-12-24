@@ -35,6 +35,11 @@ static inline size_t xmul(size_t a, size_t b)
     return xmul_(a, b);
 }
 
+static inline size_t xadd3(size_t a, size_t b, size_t c)
+{
+    return xadd(a, xadd(b, c));
+}
+
 RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2, 3)
 static inline void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 {
@@ -69,6 +74,19 @@ static inline void *xmemjoin(const void *p1, size_t n1, const void *p2, size_t n
     char *joined = xmalloc(xadd(n1, n2));
     memcpy(joined, p1, n1);
     memcpy(joined + n1, p2, n2);
+    return joined;
+}
+
+NONNULL_ARGS_AND_RETURN
+static inline void *xmemjoin3 (
+    const void *p1, size_t n1,
+    const void *p2, size_t n2,
+    const void *p3, size_t n3
+) {
+    char *joined = xmalloc(xadd3(n1, n2, n3));
+    memcpy(joined, p1, n1);
+    memcpy(joined + n1, p2, n2);
+    memcpy(joined + n1 + n2, p3, n3);
     return joined;
 }
 
