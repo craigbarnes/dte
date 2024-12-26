@@ -189,10 +189,8 @@ void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *pref
 
 void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
 {
-    char filetype[FILETYPE_NAME_MAX + 1];
-    char *end = memccpy(filetype, prefix, '.', sizeof(filetype));
-
-    if (!end || end <= filetype + 1) {
+    const char *dot = strchr(prefix, '.');
+    if (!dot || dot == prefix || (dot - prefix) > FILETYPE_NAME_MAX) {
         // No dot found in prefix, or found at offset 0, or buffer too small;
         // just collect matching highlight names added by the `hi` command
         collect_builtin_styles(a, prefix);
@@ -200,10 +198,13 @@ void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
         return;
     }
 
-    // Null terminate filetype[] by overwriting the dot
-    end[-1] = '\0';
+    // Copy and null-terminate the filetype part of `prefix` (before the dot)
+    char filetype[FILETYPE_NAME_MAX + 1];
+    size_t ftlen = dot - prefix;
+    memcpy(filetype, prefix, ftlen);
+    filetype[ftlen] = '\0';
 
-    // Find or load the Syntax matching the string before the dot
+    // Find or load the Syntax for `filetype`
     const Syntax *syn = find_syntax(&e->syntaxes, filetype);
     if (!syn) {
         syn = load_syntax_by_filetype(e, filetype);
@@ -214,7 +215,7 @@ void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
 
     // Collect all emit names from `syn` that start with the string after
     // the dot
-    collect_syntax_emit_names(syn, a, prefix + (end - filetype));
+    collect_syntax_emit_names(syn, a, dot + 1);
 }
 
 void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)
