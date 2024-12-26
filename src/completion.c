@@ -206,9 +206,6 @@ void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
     // Find or load the Syntax matching the string before the dot
     const Syntax *syn = find_syntax(&e->syntaxes, filetype);
     if (!syn) {
-        if (e->flags & EFLAG_HEADLESS) {
-            return;
-        }
         syn = load_syntax_by_filetype(e, filetype);
         if (!syn) {
             return;
