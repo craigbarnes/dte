@@ -17,6 +17,9 @@ static COLD void string_grow(String *s, size_t min_alloc)
     s->buffer = xrealloc(s->buffer, alloc);
 }
 
+// Reserve `more` bytes of additional space and return a pointer to the
+// start of it, to allow writing directly to the buffer. Updating `s->len`
+// to reflect the new length is left up to the caller.
 char *string_reserve_space(String *s, size_t more)
 {
     BUG_ON(more == 0);
