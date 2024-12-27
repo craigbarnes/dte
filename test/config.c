@@ -107,6 +107,7 @@ static void test_exec_config(TestContext *ctx)
         "replace.txt",
         "shift.txt",
         "repeat.txt",
+        "wrap.txt",
     };
 
     // Delete output files left over from previous runs

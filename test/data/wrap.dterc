@@ -1,0 +1,11 @@
+open
+
+repeat 30 insert "xyz "
+wrap-paragraph
+repeat 2 new-line
+
+repeat 30 insert "xyz "
+wrap-paragraph 20
+
+save -f build/test/wrap.txt
+close
