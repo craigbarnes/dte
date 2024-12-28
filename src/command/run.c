@@ -65,9 +65,7 @@ static bool run_command(CommandRunner *runner, char **av)
     begin_change(CHANGE_MERGE_NONE);
 
     CommandArgs a = cmdargs_new(av + 1);
-    current_command = cmd;
-    bool r = likely(parse_args(cmd, &a)) && cmd->cmd(runner->e, &a);
-    current_command = NULL;
+    bool r = likely(parse_args(cmd, &a)) && command_func_call(runner->e, cmd, &a);
 
     end_change();
     return r;

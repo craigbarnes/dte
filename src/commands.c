@@ -1606,21 +1606,17 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
     }
 
     CommandArgs a2 = cmdargs_new(a->args + 2);
-    current_command = cmd;
-    bool ok = parse_args(cmd, &a2);
-    current_command = NULL;
-    if (unlikely(!ok)) {
+    if (unlikely(!parse_args(cmd, &a2))) {
         return false;
     }
 
-    CommandFunc fn = cmd->cmd;
-    if (count > 1 && fn == cmd_insert && !has_flag(&a2, 'k')) {
+    if (count > 1 && cmd->cmd == cmd_insert && !has_flag(&a2, 'k')) {
         // Use optimized implementation for repeated "insert"
         return repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
     }
 
     while (count--) {
-        fn(e, &a2);
+        command_func_call(e, cmd, &a2);
     }
 
     // TODO: return false if fn() fails?
@@ -2635,7 +2631,7 @@ static const Command cmds[] = {
 
 static bool allow_macro_recording(const Command *cmd, char **args)
 {
-    CommandFunc fn = cmd->cmd;
+    const CommandFunc fn = cmd->cmd;
     if (fn == cmd_macro || fn == cmd_command || fn == cmd_mode) {
         return false;
     }

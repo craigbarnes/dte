@@ -64,6 +64,18 @@ static inline int command_cmp(const void *key, const void *elem)
     return strcmp(name, cmd->name);
 }
 
+static inline bool command_func_call (
+    struct EditorState *e,
+    const Command *cmd,
+    const CommandArgs *args
+) {
+    const Command *save = current_command;
+    current_command = cmd;
+    bool r = cmd->cmd(e, args);
+    current_command = save;
+    return r;
+}
+
 bool handle_command(CommandRunner *runner, const char *cmd) NONNULL_ARGS;
 
 #endif

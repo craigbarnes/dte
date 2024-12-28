@@ -107,27 +107,31 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 
 static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgParseError err)
 {
+    const char *name = cmd->name;
     switch (err) {
     case ARGERR_INVALID_OPTION:
-        return error_msg("Invalid option -%c", a->flags[0]);
+        return error_msg_for_cmd(name, "Invalid option -%c", a->flags[0]);
     case ARGERR_TOO_MANY_OPTIONS:
-        return error_msg("Too many options given");
+        return error_msg_for_cmd(name, "Too many options given");
+    case ARGERR_OPTION_ARGUMENT_MISSING:
+        return error_msg_for_cmd(name, "Option -%c requires an argument", a->flags[0]);
     case ARGERR_OPTION_ARGUMENT_NOT_SEPARATE:
-        return error_msg (
+        return error_msg_for_cmd (
+            name,
             "Option -%c must be given separately because it"
             " requires an argument",
             a->flags[0]
         );
-    case ARGERR_OPTION_ARGUMENT_MISSING:
-        return error_msg("Option -%c requires an argument", a->flags[0]);
     case ARGERR_TOO_FEW_ARGUMENTS:
-        return error_msg (
+        return error_msg_for_cmd (
+            name,
             "Too few arguments (got: %zu, minimum: %u)",
             a->nr_args,
             (unsigned int)cmd->min_args
         );
     case ARGERR_TOO_MANY_ARGUMENTS:
-        return error_msg (
+        return error_msg_for_cmd (
+            name,
             "Too many arguments (got: %zu, maximum: %u)",
             a->nr_args,
             (unsigned int)cmd->max_args

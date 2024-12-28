@@ -37,16 +37,18 @@ static bool in_state(const EditorState *e)
 
 static void close_state(EditorState *e)
 {
-    if (!e->syn.current_state) {
+    const State *curstate = e->syn.current_state;
+    if (!curstate) {
         return;
     }
-    if (unlikely(e->syn.current_state->type == STATE_INVALID)) {
-        // Command prefix in error message makes no sense
-        const Command *save = current_command;
-        current_command = NULL;
-        error_msg("No default action in state '%s'", e->syn.current_state->name);
-        current_command = save;
+
+    if (unlikely(curstate->type == STATE_INVALID)) {
+        // This error applies to the state itself rather than the last
+        // command, so it doesn't make sense to include the command name
+        // in the error message
+        error_msg_for_cmd(NULL, "No default action in state '%s'", curstate->name);
     }
+
     e->syn.current_state = NULL;
 }
 
