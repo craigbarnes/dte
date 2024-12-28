@@ -203,13 +203,14 @@ void window_close_current_view(Window *window)
         window->prev_view = NULL;
         return;
     }
-    if (window->views.count == 0) {
+
+    const PointerArray *views = &window->views;
+    if (views->count == 0) {
         window_open_empty_buffer(window);
     }
-    if (window->views.count == idx) {
-        idx--;
-    }
-    window->view = window->views.ptrs[idx];
+
+    idx -= (views->count == idx);
+    window->view = views->ptrs[idx];
 }
 
 static void restore_cursor_from_history(const FileHistory *hist, View *view)

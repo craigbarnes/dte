@@ -1622,6 +1622,7 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
     while (count--) {
         fn(e, &a2);
     }
+
     // TODO: return false if fn() fails?
     return true;
 }

@@ -371,11 +371,13 @@ StringView block_iter_get_line_with_nl(BlockIter *bi)
         // Cursor at end of last block
         return line;
     }
+
     if (bi->blk->nl == 1) {
         BUG_ON(line.data[max - 1] != '\n');
         line.length = max;
         return line;
     }
+
     const unsigned char *nl = memchr(line.data, '\n', max);
     BUG_ON(!nl);
     line.length = (size_t)(nl - line.data + 1);
@@ -386,8 +388,7 @@ StringView block_iter_get_line_with_nl(BlockIter *bi)
 StringView block_iter_get_line(BlockIter *bi)
 {
     StringView line = block_iter_get_line_with_nl(bi);
-    // Trim the newline
-    line.length -= (line.length > 0);
+    line.length -= (line.length > 0); // Trim the newline
     return line;
 }
 
