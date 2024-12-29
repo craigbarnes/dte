@@ -7,14 +7,29 @@
 
 static void test_find_buffer_by_id(TestContext *ctx)
 {
-    EditorState *e = ctx->userdata;
-    const Buffer *buffer = e->buffer;
-    ASSERT_NONNULL(buffer);
-    EXPECT_PTREQ(find_buffer_by_id(&e->buffers, buffer->id), buffer);
+    Buffer buffers[] = {
+        {.id = 4},
+        {.id = 7},
+        {.id = 9},
+    };
 
-    const unsigned long large_id = 1UL << 30;
-    static_assert_compatible_types(large_id, buffer->id);
-    EXPECT_NULL(find_buffer_by_id(&e->buffers, large_id));
+    PointerArray array = PTR_ARRAY_INIT;
+    ptr_array_append(&array, &buffers[0]);
+    ptr_array_append(&array, &buffers[1]);
+    ptr_array_append(&array, &buffers[2]);
+
+    EXPECT_PTREQ(find_buffer_by_id(&array, 4), &buffers[0]);
+    EXPECT_PTREQ(find_buffer_by_id(&array, 7), &buffers[1]);
+    EXPECT_PTREQ(find_buffer_by_id(&array, 9), &buffers[2]);
+    EXPECT_NULL(find_buffer_by_id(&array, 1));
+    EXPECT_NULL(find_buffer_by_id(&array, 2));
+    EXPECT_NULL(find_buffer_by_id(&array, 3));
+    EXPECT_NULL(find_buffer_by_id(&array, 5));
+    EXPECT_NULL(find_buffer_by_id(&array, 6));
+    EXPECT_NULL(find_buffer_by_id(&array, 8));
+    EXPECT_NULL(find_buffer_by_id(&array, 10));
+
+    ptr_array_free_array(&array);
 }
 
 static void test_buffer_mark_lines_changed(TestContext *ctx)
