@@ -23,15 +23,6 @@ void ptr_array_grow_and_append(PointerArray *array, void *ptr)
     array->ptrs[array->count++] = ptr;
 }
 
-void ptr_array_insert(PointerArray *array, void *ptr, size_t idx)
-{
-    BUG_ON(idx > array->count);
-    size_t count = array->count - idx;
-    ptr_array_append(array, NULL);
-    memmove(array->ptrs + idx + 1, array->ptrs + idx, count * sizeof(void*));
-    array->ptrs[idx] = ptr;
-}
-
 // Move a pointer from one index to another
 void ptr_array_move(PointerArray *array, size_t from, size_t to)
 {
@@ -42,21 +33,22 @@ void ptr_array_move(PointerArray *array, size_t from, size_t to)
     }
 
     void **p = array->ptrs;
-    void *dest, *src;
-    size_t difference;
-    if (from < to) {
-        dest = p + from;
-        src = p + from + 1;
-        difference = to - from;
-    } else {
-        dest = p + to + 1;
-        src = p + to;
-        difference = from - to;
-    }
+    bool up = (from < to);
+    void *dest = up ? p + from : p + to + 1;
+    void *src = up ? p + from + 1 : p + to;
+    size_t difference = up ? to - from : from - to;
 
     void *tmp = p[from];
     memmove(dest, src, difference * sizeof(void*));
     p[to] = tmp;
+}
+
+void ptr_array_insert(PointerArray *array, void *ptr, size_t idx)
+{
+    size_t last = array->count;
+    BUG_ON(idx > last);
+    ptr_array_append(array, ptr); // last is now array->count - 1
+    ptr_array_move(array, last, idx);
 }
 
 // Call a FreeFunction declared with an arbitrary pointer parameter type
@@ -86,10 +78,9 @@ size_t ptr_array_remove(PointerArray *array, void *ptr)
 void *ptr_array_remove_index(PointerArray *array, size_t idx)
 {
     BUG_ON(idx >= array->count);
-    void **ptrs = array->ptrs;
-    void *removed = ptrs[idx];
-    array->count--;
-    memmove(ptrs + idx, ptrs + idx + 1, (array->count - idx) * sizeof(void*));
+    void **ptrs = array->ptrs + idx;
+    void *removed = *ptrs;
+    memmove(ptrs, ptrs + 1, (--array->count - idx) * sizeof(void*));
     return removed;
 }
 
