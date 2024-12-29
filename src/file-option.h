@@ -13,6 +13,11 @@ typedef enum {
     FOPTS_FILETYPE,
 } FileOptionType;
 
+typedef union {
+    const char *filetype; // Interned
+    const InternedRegexp *filename;
+} FileTypeOrFileName;
+
 struct EditorState;
 
 void set_file_options(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
@@ -20,11 +25,11 @@ void set_editorconfig_options(Buffer *buffer) NONNULL_ARGS;
 void dump_file_options(const PointerArray *file_options, String *buf);
 void free_file_options(PointerArray *file_options);
 
-NONNULL_ARGS WARN_UNUSED_RESULT
-bool add_file_options (
+NONNULL_ARGS
+void add_file_options (
     PointerArray *file_options,
     FileOptionType type,
-    StringView str,
+    FileTypeOrFileName u,
     char **strs,
     size_t nstrs
 );

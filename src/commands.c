@@ -56,6 +56,7 @@
 #include "util/bit.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/intern.h"
 #include "util/log.h"
 #include "util/path.h"
 #include "util/str-array.h"
@@ -1223,29 +1224,39 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
 static bool cmd_option(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args < 3);
-    size_t nstrs = a->nr_args - 1;
-    if (unlikely(nstrs & 1)) {
-        return error_msg("Missing option value");
-    }
-
+    const char *arg0 = a->args[0];
     char **strs = a->args + 1;
+    size_t nstrs = a->nr_args - 1;
+    if (unlikely(arg0[0] == '\0')) {
+        return error_msg("first argument cannot be empty");
+    }
+    if (unlikely(nstrs & 1)) {
+        return error_msg("missing option value");
+    }
     if (unlikely(!validate_local_options(strs))) {
         return false;
     }
 
     PointerArray *opts = &e->file_options;
     if (has_flag(a, 'r')) {
-        const StringView pattern = strview_from_cstring(a->args[0]);
-        return add_file_options(opts, FOPTS_FILENAME, pattern, strs, nstrs);
+        FileTypeOrFileName u = {.filename = regexp_intern(arg0)};
+        if (unlikely(!u.filename)) {
+            return false;
+        }
+        add_file_options(opts, FOPTS_FILENAME, u, strs, nstrs);
+        return true;
     }
 
-    const char *ft_list = a->args[0];
     size_t errors = 0;
-    for (size_t pos = 0, len = strlen(ft_list); pos < len; ) {
-        const StringView filetype = get_delim(ft_list, &pos, len, ',');
-        if (!add_file_options(opts, FOPTS_FILETYPE, filetype, strs, nstrs)) {
+    for (size_t pos = 0, len = strlen(arg0); pos < len; ) {
+        const StringView ft = get_delim(arg0, &pos, len, ',');
+        if (unlikely(!is_valid_filetype_name_sv(&ft))) {
+            error_msg("invalid filetype name: '%.*s'", (int)ft.length, ft.data);
             errors++;
+            continue;
         }
+        FileTypeOrFileName u = {.filetype = mem_intern(ft.data, ft.length)};
+        add_file_options(opts, FOPTS_FILETYPE, u, strs, nstrs);
     }
 
     return !errors;

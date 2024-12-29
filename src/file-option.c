@@ -15,11 +15,6 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-typedef union {
-    const char *filetype; // Interned
-    const InternedRegexp *filename;
-} FileTypeOrFileName;
-
 typedef struct {
     FileOptionType type;
     char **strs;
@@ -109,26 +104,20 @@ void set_file_options(EditorState *e, Buffer *buffer)
     }
 }
 
-bool add_file_options(PointerArray *file_options, FileOptionType type, StringView str, char **strs, size_t nstrs)
-{
-    size_t len = str.length;
-    FileTypeOrFileName u;
-    if (type == FOPTS_FILETYPE) {
-        if (unlikely(!is_valid_filetype_name_sv(&str))) {
-            return error_msg("invalid filetype name: '%.*s'", (int)len, str.data);
-        }
-        u.filetype = mem_intern(str.data, len);
+void add_file_options (
+    PointerArray *file_options,
+    FileOptionType type,
+    FileTypeOrFileName u,
+    char **strs,
+    size_t nstrs
+) {
+    BUG_ON(nstrs < 2);
+    if (type == FOPTS_FILENAME) {
+        BUG_ON(!u.filename);
+        BUG_ON(!u.filename->str);
     } else {
-        BUG_ON(type != FOPTS_FILENAME);
-        if (unlikely(len == 0)) {
-            return error_msg("can't add option with empty pattern");
-        }
-        char *pat = xstrcut(str.data, len);
-        u.filename = regexp_intern(pat);
-        free(pat);
-        if (unlikely(!u.filename)) {
-            return false;
-        }
+        BUG_ON(type != FOPTS_FILETYPE);
+        BUG_ON(!u.filetype);
     }
 
     FileOption *opt = xnew(FileOption, 1);
@@ -136,7 +125,6 @@ bool add_file_options(PointerArray *file_options, FileOptionType type, StringVie
     opt->type = type;
     opt->strs = copy_string_array(strs, nstrs);
     ptr_array_append(file_options, opt);
-    return true;
 }
 
 void dump_file_options(const PointerArray *file_options, String *buf)
