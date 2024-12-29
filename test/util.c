@@ -2115,6 +2115,33 @@ static void test_ptr_array_move(TestContext *ctx)
     ptr_array_free(&a);
 }
 
+static void test_ptr_array_insert(TestContext *ctx)
+{
+    PointerArray a = PTR_ARRAY_INIT;
+    ptr_array_insert(&a, xstrdup("D"), 0);
+    ptr_array_insert(&a, xstrdup("C"), 0);
+    ptr_array_insert(&a, xstrdup("B"), 0);
+    ptr_array_insert(&a, xstrdup("A"), 0);
+    EXPECT_EQ(a.count, 4);
+
+    ptr_array_insert(&a, xstrdup("X"), 1);
+    ptr_array_insert(&a, xstrdup("Y"), 3);
+    EXPECT_EQ(a.count, 6);
+
+    ptr_array_insert(&a, xstrdup("Z"), a.count);
+    EXPECT_EQ(a.count, 7);
+
+    EXPECT_STREQ(a.ptrs[0], "A");
+    EXPECT_STREQ(a.ptrs[1], "X");
+    EXPECT_STREQ(a.ptrs[2], "B");
+    EXPECT_STREQ(a.ptrs[3], "Y");
+    EXPECT_STREQ(a.ptrs[4], "C");
+    EXPECT_STREQ(a.ptrs[5], "D");
+    EXPECT_STREQ(a.ptrs[6], "Z");
+
+    ptr_array_free(&a);
+}
+
 static void test_list(TestContext *ctx)
 {
     ListHead a, b, c;
@@ -3266,6 +3293,7 @@ static const TestEntry tests[] = {
     TEST(test_u_prev_char),
     TEST(test_ptr_array),
     TEST(test_ptr_array_move),
+    TEST(test_ptr_array_insert),
     TEST(test_list),
     TEST(test_hashmap),
     TEST(test_hashset),
