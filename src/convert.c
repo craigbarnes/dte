@@ -54,7 +54,7 @@ static Block *add_utf8_line (
 
 copy:
     if (unlikely(len > SYN_HIGHLIGHT_MAX_LINE_LEN && buffer->options.syntax)) {
-        error_msg (
+        error_msg_ (
             "line length (%zu) exceeded limit (%ju); disabling syntax highlighting",
             len, (uintmax_t)SYN_HIGHLIGHT_MAX_LINE_LEN
         );

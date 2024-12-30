@@ -112,13 +112,13 @@ static int open_tag_file(char *path)
             return fd;
         }
         if (errno != ENOENT) {
-            error_msg("failed to open '%s': %s", path, strerror(errno));
+            error_msg_("failed to open '%s': %s", path, strerror(errno));
             return -1;
         }
         *slash = '\0';
     }
 
-    error_msg("no tags file");
+    error_msg_("no tags file");
     return -1;
 }
 
@@ -142,7 +142,7 @@ static bool load_tag_file(TagFile *tf)
 {
     char path[8192];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
-        return error_msg_errno("getcwd");
+        return error_msg_errno_("getcwd");
     }
 
     int fd = open_tag_file(path);
@@ -154,12 +154,12 @@ static bool load_tag_file(TagFile *tf)
     if (unlikely(fstat(fd, &st) != 0)) {
         const char *str = strerror(errno);
         xclose(fd);
-        return error_msg("fstat: %s", str);
+        return error_msg_("fstat: %s", str);
     }
 
     if (unlikely(st.st_size <= 0)) {
         xclose(fd);
-        return error_msg("empty tags file");
+        return error_msg_("empty tags file");
     }
 
     if (tf->filename) {
@@ -174,7 +174,7 @@ static bool load_tag_file(TagFile *tf)
     char *buf = malloc(st.st_size);
     if (unlikely(!buf)) {
         xclose(fd);
-        return error_msg("malloc: %s", strerror(ENOMEM));
+        return error_msg_("malloc: %s", strerror(ENOMEM));
     }
 
     ssize_t size = xread_all(fd, buf, st.st_size);
@@ -182,7 +182,7 @@ static bool load_tag_file(TagFile *tf)
     xclose(fd);
     if (size < 0) {
         free(buf);
-        return error_msg("read: %s", strerror(err));
+        return error_msg_("read: %s", strerror(err));
     }
 
     *tf = (TagFile) {
@@ -299,7 +299,7 @@ size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, Mes
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg("Tag '%.*s' not found", (int)name->length, name->data);
+        error_msg_("Tag '%.*s' not found", (int)name->length, name->data);
         return 0;
     }
 

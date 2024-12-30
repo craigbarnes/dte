@@ -103,7 +103,7 @@ void history_load(History *history, char *filename, size_t size_limit)
     const ssize_t ssize = read_file(filename, &buf, size_limit);
     if (ssize < 0) {
         if (errno != ENOENT) {
-            error_msg("Error reading %s: %s", filename, strerror(errno));
+            error_msg_("Error reading %s: %s", filename, strerror(errno));
         }
         return;
     }
@@ -124,7 +124,7 @@ void history_save(const History *history)
 
     FILE *f = xfopen(filename, "w", O_CLOEXEC, 0666);
     if (!f) {
-        error_msg("Error creating %s: %s", filename, strerror(errno));
+        error_msg_("Error creating %s: %s", filename, strerror(errno));
         return;
     }
 

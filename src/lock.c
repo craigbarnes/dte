@@ -125,17 +125,17 @@ static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bo
         }
 
         if (errno != EEXIST) {
-            return error_msg("Error creating %s: %s", file_locks_lock, strerror(errno));
+            return error_msg_("Error creating %s: %s", file_locks_lock, strerror(errno));
         }
         if (++tries == 3) {
             if (unlink(file_locks_lock)) {
-                return error_msg (
+                return error_msg_ (
                     "Error removing stale lock file %s: %s",
                     file_locks_lock,
                     strerror(errno)
                 );
             }
-            error_msg("Stale lock file %s removed", file_locks_lock);
+            error_msg_("Stale lock file %s removed", file_locks_lock);
         } else {
             struct timespec ts = {.tv_nsec = 100 * NS_PER_MS}; // 100ms
             nanosleep(&ts, NULL);
@@ -146,7 +146,7 @@ static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bo
     ssize_t ssize = read_file(file_locks, &buf, 0);
     if (ssize < 0) {
         if (errno != ENOENT) {
-            error_msg("Error reading %s: %s", file_locks, strerror(errno));
+            error_msg_("Error reading %s: %s", file_locks, strerror(errno));
             goto error;
         }
         ssize = 0;
@@ -162,25 +162,25 @@ static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bo
             size += xsnprintf(buf + size, n, "%jd %s\n", p, filename);
         } else {
             intmax_t p = (intmax_t)pid;
-            error_msg("File is locked (%s) by process %jd", file_locks, p);
+            error_msg_("File is locked (%s) by process %jd", file_locks, p);
         }
     }
 
     if (xwrite_all(wfd, buf, size) < 0) {
-        error_msg("Error writing %s: %s", file_locks_lock, strerror(errno));
+        error_msg_("Error writing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
 
     int r = xclose(wfd);
     wfd = -1;
     if (r != 0) {
-        error_msg("Error closing %s: %s", file_locks_lock, strerror(errno));
+        error_msg_("Error closing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
 
     if (rename(file_locks_lock, file_locks)) {
         const char *err = strerror(errno);
-        error_msg("Renaming %s to %s: %s", file_locks_lock, file_locks, err);
+        error_msg_("Renaming %s to %s: %s", file_locks_lock, file_locks, err);
         goto error;
     }
 

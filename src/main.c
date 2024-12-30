@@ -89,18 +89,21 @@ static ExitCode dump_builtin_config(const char *name)
 static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 {
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
-    int err;
     BUG_ON(e->status != EDITOR_INITIALIZING);
+    int err;
     const Syntax *s = load_syntax_file(e, filename, flags | SYN_MUST_EXIST, &err);
+
     if (s) {
         const size_t n = s->states.count;
         const char *plural = (n == 1) ? "" : "s";
         printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, plural);
     } else if (err == EINVAL) {
-        error_msg("%s: no default syntax found", filename);
+        error_msg(e->err, "%s: no default syntax found", filename);
     }
+
+    unsigned int nr_errs = e->err->nr_errors;
     free_editor_state(e);
-    return get_nr_errors() ? EC_DATA_ERROR : EC_OK;
+    return nr_errs ? EC_DATA_ERROR : EC_OK;
 }
 
 static ExitCode showkey_loop(unsigned int terminal_query_level)
@@ -234,7 +237,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
             name = "(stdin)";
             buffer->temporary = true;
         } else {
-            error_msg("Unable to read redirected stdin");
+            error_msg(e->err, "Unable to read redirected stdin");
             buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
             buffer = NULL;
         }
@@ -259,14 +262,13 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     return buffer;
 }
 
-static bool buffer_write_blocks_and_free(Buffer *buffer, int fd)
+static int buffer_write_blocks_and_free(Buffer *buffer, int fd)
 {
-    bool r = true;
+    int err = 0;
     const Block *blk;
     block_for_each(blk, &buffer->blocks) {
         if (xwrite_all(fd, blk->data, blk->size) < 0) {
-            error_msg_errno("failed to write (stdout) buffer");
-            r = false;
+            err = errno;
             break;
         }
     }
@@ -275,7 +277,7 @@ static bool buffer_write_blocks_and_free(Buffer *buffer, int fd)
     // freed by buffer_unlock_and_free()
     free_blocks(buffer);
     free(buffer);
-    return r;
+    return err;
 }
 
 static ExitCode init_logging(const char *filename, const char *req_level_str)
@@ -442,7 +444,6 @@ int main(int argc, char *argv[])
     bool load_and_save_history = true;
     bool explicit_term_query_level = false;
     unsigned int terminal_query_level = 1;
-    errors_to_stderr(true);
 
     for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
@@ -542,6 +543,7 @@ int main(int argc, char *argv[])
 
     EditorState *e = init_editor_state(headless ? EFLAG_HEADLESS : 0);
     Terminal *term = &e->terminal;
+    e->err->print_to_stderr = true;
 
     if (!headless) {
         term_init(term, getenv("TERM"), getenv("COLORTERM"));
@@ -554,7 +556,7 @@ int main(int argc, char *argv[])
     const char *cfgdir = e->user_config_dir;
     BUG_ON(!cfgdir);
     if (mkdir(cfgdir, 0755) != 0 && errno != EEXIST) {
-        error_msg("Error creating %s: %s", cfgdir, strerror(errno));
+        error_msg(e->err, "Error creating %s: %s", cfgdir, strerror(errno));
         load_and_save_history = false;
         e->options.lock_files = false;
     }
@@ -578,16 +580,16 @@ int main(int argc, char *argv[])
     }
 
     if (!headless) {
-        errors_to_stderr(false);
+        e->err->print_to_stderr = false;
         // Initialize terminal but don't update screen yet
         if (unlikely(!term_raw())) {
             return ec_error("tcsetattr", EC_IO_ERROR);
         }
-        if (get_nr_errors()) {
+        if (e->err->nr_errors) {
             // Display "Press any key to continue" prompt, if there were
             // errors while reading config files
             any_key(term, e->options.esc_timeout);
-            clear_error();
+            clear_error(e->err);
         }
     }
 
@@ -674,7 +676,7 @@ int main(int argc, char *argv[])
     ui_end(e);
 
 exit:
-    errors_to_stderr(true);
+    e->err->print_to_stderr = true;
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
@@ -690,9 +692,12 @@ exit:
     }
 
     if (have_stdout_buffer) {
-        bool ok = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
-        if (!ok && exit_code == EDITOR_EXIT_OK) {
-            exit_code = EC_IO_ERROR;
+        int err = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
+        if (err != 0) {
+            error_msg(e->err, "failed to write (stdout) buffer: %s", strerror(err));
+            if (exit_code == EDITOR_EXIT_OK) {
+                exit_code = EC_IO_ERROR;
+            }
         }
     }
 

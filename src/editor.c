@@ -74,6 +74,7 @@ EditorState *init_editor_state(EditorFlags flags)
         .status = EDITOR_INITIALIZING,
         .flags = flags,
         .version = VERSION,
+        .err= &errbuf,
         .command_history = {
             .max_entries = 512,
         },
@@ -333,7 +334,7 @@ int main_loop(EditorState *e)
         }
 
         const ScreenState s = get_screen_state(e->view);
-        clear_error();
+        clear_error(e->err);
         handle_input(e, key);
         sanity_check(e->view);
         update_screen(e, &s);

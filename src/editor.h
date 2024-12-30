@@ -9,6 +9,7 @@
 #include "command/run.h"
 #include "commands.h"
 #include "copy.h"
+#include "error.h"
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
@@ -74,6 +75,7 @@ typedef struct EditorState {
     ModeHandler *normal_mode;
     ModeHandler *command_mode;
     ModeHandler *search_mode;
+    ErrorBuffer *err;
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;

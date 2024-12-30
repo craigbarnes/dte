@@ -220,10 +220,10 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd < 0) {
         if (errno != ENOENT) {
-            return error_msg("Error opening %s: %s", filename, strerror(errno));
+            return error_msg_("Error opening %s: %s", filename, strerror(errno));
         }
         if (must_exist) {
-            return error_msg("File %s does not exist", filename);
+            return error_msg_("File %s does not exist", filename);
         }
         if (!buffer->encoding) {
             buffer->encoding = encoding_from_type(UTF8);
@@ -236,17 +236,17 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
 
     FileInfo *info = &buffer->file;
     if (!buffer_fstat(info, fd)) {
-        error_msg("fstat failed on %s: %s", filename, strerror(errno));
+        error_msg_("fstat failed on %s: %s", filename, strerror(errno));
         goto error;
     }
     if (!S_ISREG(info->mode)) {
-        error_msg("Not a regular file %s", filename);
+        error_msg_("Not a regular file %s", filename);
         goto error;
     }
 
     off_t size = info->size;
     if (unlikely(size < 0)) {
-        error_msg("Invalid file size: %jd", (intmax_t)size);
+        error_msg_("Invalid file size: %jd", (intmax_t)size);
         goto error;
     }
 
@@ -254,7 +254,7 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
     if (limit_mib > 0) {
         uintmax_t size_mib = filesize_in_mib(size);
         if (unlikely(size_mib > limit_mib)) {
-            error_msg (
+            error_msg_ (
                 "File size (%juMiB) exceeds 'filesize-limit' option (%uMiB): %s",
                 size_mib, limit_mib, filename
             );
@@ -263,7 +263,7 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
     }
 
     if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
-        error_msg("Error reading %s: %s", filename, strerror(errno));
+        error_msg_("Error reading %s: %s", filename, strerror(errno));
         goto error;
     }
 
@@ -286,7 +286,7 @@ static bool write_buffer (
     if (bom) {
         size = bom->len;
         if (size && xwrite_all(fd, bom->bytes, size) < 0) {
-            return error_msg_errno("write");
+            return error_msg_errno_("write");
         }
     }
 
@@ -294,7 +294,7 @@ static bool write_buffer (
     block_for_each(blk, &buffer->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {
-            return error_msg_errno("write");
+            return error_msg_errno_("write");
         }
         size += rc;
     }
@@ -302,7 +302,7 @@ static bool write_buffer (
     size_t nr_errors = file_encoder_get_nr_errors(enc);
     if (nr_errors > 0) {
         // Any real error hides this message
-        error_msg (
+        error_msg_ (
             "Warning: %zu non-reversible character conversion%s; file saved",
             nr_errors,
             (nr_errors > 1) ? "s" : ""
@@ -311,7 +311,7 @@ static bool write_buffer (
 
     // Need to truncate if writing to existing file
     if (xftruncate(fd, size)) {
-        return error_msg_errno("ftruncate");
+        return error_msg_errno_("ftruncate");
     }
 
     return true;
@@ -443,7 +443,7 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
-            return error_msg_errno("open");
+            return error_msg_errno_("open");
         }
     }
 
@@ -458,19 +458,19 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
     }
 
     if (buffer->options.fsync && xfsync(fd) != 0) {
-        error_msg_errno("fsync");
+        error_msg_errno_("fsync");
         goto error;
     }
 
     int r = xclose(fd);
     fd = -1;
     if (r != 0) {
-        error_msg_errno("close");
+        error_msg_errno_("close");
         goto error;
     }
 
     if (tmp[0] && rename(tmp, filename)) {
-        error_msg_errno("rename");
+        error_msg_errno_("rename");
         goto error;
     }
 

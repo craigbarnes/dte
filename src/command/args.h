@@ -96,7 +96,9 @@ static inline unsigned int cmdargs_convert_flags (
     return val;
 }
 
-bool parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS WARN_UNUSED_RESULT;
+struct EditorState;
+
+bool parse_args(struct EditorState *e, const Command *cmd, CommandArgs *a) NONNULL_ARGS WARN_UNUSED_RESULT;
 ArgParseError do_parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

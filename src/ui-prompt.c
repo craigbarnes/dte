@@ -90,7 +90,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
     BUG_ON(e->flags & EFLAG_HEADLESS);
 
     const ScreenState dummyval = {.id = 0};
-    info_msg("%s", question);
+    info_msg(e->err, "%s", question);
     e->screen_update |= UPDATE_ALL | UPDATE_DIALOG;
     update_screen(e, &dummyval);
 
@@ -104,7 +104,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         }
     }
 
-    clear_error();
+    clear_error(e->err);
     e->screen_update |= UPDATE_ALL;
     return (choice >= 'a') ? choice : 0;
 }
@@ -114,7 +114,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     BUG_ON(e->flags & EFLAG_HEADLESS);
 
     const ScreenState dummyval = {.id = 0};
-    info_msg("%s", question);
+    info_msg(e->err, "%s", question);
     update_screen(e, &dummyval);
 
     Terminal *term = &e->terminal;
@@ -127,6 +127,6 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
         }
     }
 
-    clear_error();
+    clear_error(e->err);
     return (choice >= 'a') ? choice : 0;
 }

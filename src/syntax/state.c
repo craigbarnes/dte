@@ -24,7 +24,7 @@
 
 static bool in_syntax(const EditorState *e)
 {
-    return likely(e->syn.current_syntax) || error_msg("No syntax started");
+    return likely(e->syn.current_syntax) || error_msg(e->err, "No syntax started");
 }
 
 static bool in_state(const EditorState *e)
@@ -32,21 +32,21 @@ static bool in_state(const EditorState *e)
     if (unlikely(!in_syntax(e))) {
         return false;
     }
-    return likely(e->syn.current_state) || error_msg("No state started");
+    return likely(e->syn.current_state) || error_msg(e->err, "No state started");
 }
 
 static void close_state(EditorState *e)
 {
-    const State *curstate = e->syn.current_state;
-    if (!curstate) {
+    const State *state = e->syn.current_state;
+    if (!state) {
         return;
     }
 
-    if (unlikely(curstate->type == STATE_INVALID)) {
+    if (unlikely(state->type == STATE_INVALID)) {
         // This error applies to the state itself rather than the last
         // command, so it doesn't make sense to include the command name
         // in the error message
-        error_msg_for_cmd(NULL, "No default action in state '%s'", curstate->name);
+        error_msg_for_cmd(e, NULL, "No default action in state '%s'", state->name);
     }
 
     e->syn.current_state = NULL;
@@ -80,6 +80,7 @@ static State *reference_state(EditorState *e, const char *name)
     State *state = find_or_add_state(e, name);
     if (unlikely((e->syn.flags & SYN_LINT) && state == e->syn.current_state)) {
         error_msg (
+            e->err,
             "destination '%s' can be optimized to 'this' in '%s' syntax",
             name,
             e->syn.current_syntax->name
@@ -92,18 +93,18 @@ static State *reference_state(EditorState *e, const char *name)
 static bool in_subsyntax(const EditorState *e)
 {
     bool ss = likely(is_subsyntax(e->syn.current_syntax));
-    return ss || error_msg("Destination state 'END' only allowed in a subsyntax");
+    return ss || error_msg(e->err, "Destination state 'END' only allowed in a subsyntax");
 }
 
 static Syntax *must_find_subsyntax(EditorState *e, const char *name)
 {
     Syntax *syntax = find_any_syntax(&e->syntaxes, name);
     if (unlikely(!syntax)) {
-        error_msg("No such syntax '%s'", name);
+        error_msg(e->err, "No such syntax '%s'", name);
         return NULL;
     }
     if (unlikely(!is_subsyntax(syntax))) {
-        error_msg("Syntax '%s' is not a subsyntax", name);
+        error_msg(e->err, "Syntax '%s' is not a subsyntax", name);
         return NULL;
     }
     return syntax;
@@ -168,6 +169,7 @@ static void lint_emit_name(const EditorState *e, const char *ename, const State 
         return;
     }
     error_msg (
+        e->err,
         "emit-name '%s' not needed (destination state uses same emit-name)",
         ename
     );
@@ -212,6 +214,7 @@ static bool cmd_bufis(EditorState *e, const CommandArgs *a)
     Condition *c;
     if (unlikely(len > ARRAYLEN(c->u.str.buf))) {
         return error_msg (
+            e->err,
             "Maximum length of string is %zu bytes",
             ARRAYLEN(c->u.str.buf)
         );
@@ -232,7 +235,7 @@ static bool cmd_char(EditorState *e, const CommandArgs *a)
 {
     const char *chars = a->args[0];
     if (unlikely(chars[0] == '\0')) {
-        return error_msg("char argument can't be empty");
+        return error_msg(e->err, "char argument can't be empty");
     }
 
     bool add_to_buffer = cmdargs_has_flag(a, 'b');
@@ -276,7 +279,7 @@ static bool cmd_default(EditorState *e, const CommandArgs *a)
         const char *name = a->args[i];
         const void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
         if (unlikely(oldval)) {
-            error_msg("'%s' argument specified multiple times", name);
+            error_msg(e->err, "'%s' argument specified multiple times", name);
         }
     }
 
@@ -369,7 +372,7 @@ static bool cmd_list(EditorState *e, const CommandArgs *a)
         list = xnew0(StringList, 1);
         hashmap_insert(&e->syn.current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
-        return error_msg("List '%s' already exists", name);
+        return error_msg(e->err, "List '%s' already exists", name);
     }
     list->defined = true;
 
@@ -415,7 +418,7 @@ static bool cmd_noeat(EditorState *e, const CommandArgs *a)
     }
 
     if (unlikely(dest == e->syn.current_state)) {
-        return error_msg("using noeat to jump to same state causes infinite loop");
+        return error_msg(e->err, "using noeat to jump to same state causes infinite loop");
     }
 
     e->syn.current_state->default_action.destination = dest;
@@ -435,10 +438,10 @@ static bool cmd_recolor(EditorState *e, const CommandArgs *a)
     if (len_str) {
         type = COND_RECOLOR;
         if (unlikely(!str_to_size(len_str, &len))) {
-            return error_msg("invalid number: '%s'", len_str);
+            return error_msg(e->err, "invalid number: '%s'", len_str);
         }
         if (unlikely(len < 1 || len > 2500)) {
-            return error_msg("number of bytes must be between 1-2500 (got %zu)", len);
+            return error_msg(e->err, "number of bytes must be between 1-2500 (got %zu)", len);
         }
     }
 
@@ -498,12 +501,12 @@ static bool cmd_state(EditorState *e, const CommandArgs *a)
 
     const char *name = a->args[0];
     if (unlikely(streq(name, "END") || streq(name, "this"))) {
-        return error_msg("'%s' is reserved state name", name);
+        return error_msg(e->err, "'%s' is reserved state name", name);
     }
 
     State *state = find_or_add_state(e, name);
     if (unlikely(state->defined)) {
-        return error_msg("State '%s' already exists", name);
+        return error_msg(e->err, "State '%s' already exists", name);
     }
 
     state->defined = true;
@@ -517,13 +520,13 @@ static bool cmd_str(EditorState *e, const CommandArgs *a)
     const char *str = a->args[0];
     size_t len = strlen(str);
     if (unlikely(len < 2)) {
-        return error_msg("string should be at least 2 bytes; use 'char' for single bytes");
+        return error_msg(e->err, "string should be at least 2 bytes; use 'char' for single bytes");
     }
 
     Condition *c;
     size_t maxlen = ARRAYLEN(c->u.str.buf);
     if (unlikely(len > maxlen)) {
-        return error_msg("maximum length of string is %zu bytes", maxlen);
+        return error_msg(e->err, "maximum length of string is %zu bytes", maxlen);
     }
 
     ConditionType type;
@@ -547,7 +550,7 @@ static void finish_syntax(EditorState *e)
 {
     BUG_ON(!e->syn.current_syntax);
     close_state(e);
-    finalize_syntax(&e->syntaxes, e->syn.current_syntax, e->syn.saved_nr_errors);
+    finalize_syntax(&e->syntaxes, e->syn.current_syntax, e->err, e->syn.saved_nr_errors);
     e->syn.current_syntax = NULL;
 }
 
@@ -565,7 +568,7 @@ static bool cmd_syntax(EditorState *e, const CommandArgs *a)
 
     e->syn.current_syntax = syntax;
     e->syn.current_state = NULL;
-    e->syn.saved_nr_errors = get_nr_errors();
+    e->syn.saved_nr_errors = e->err->nr_errors;
     return true;
 }
 
@@ -651,7 +654,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags f
 
     if (e->syn.current_syntax) {
         finish_syntax(e);
-        find_unused_subsyntaxes(&e->syntaxes);
+        find_unused_subsyntaxes(&e->syntaxes, e->err);
     }
 
     current_config = saved;

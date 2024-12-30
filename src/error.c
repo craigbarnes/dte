@@ -5,25 +5,11 @@
 #include "error.h"
 #include "command/run.h"
 #include "config.h"
+#include "editor.h"
 #include "util/log.h"
 #include "util/xstdio.h"
 
-typedef struct {
-    char buf[512];
-    unsigned int nr_errors;
-    bool is_error;
-    bool print_to_stderr;
-} ErrorBuffer;
-
-// This is not accessed from signal handlers or multiple threads and
-// is considered an acceptable use of non-const globals:
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-static ErrorBuffer err;
-
-void clear_error(void)
-{
-    err.buf[0] = '\0';
-}
+ErrorBuffer errbuf;
 
 VPRINTF(5)
 static void error_msgv (
@@ -66,12 +52,12 @@ static void error_msgv (
     LOG_INFO("%s", eb->buf);
 }
 
-bool error_msg(const char *format, ...)
+bool error_msg(ErrorBuffer *eb, const char *format, ...)
 {
     const char *cmd = current_command ? current_command->name : NULL;
     va_list ap;
     va_start(ap, format);
-    error_msgv(&err, current_config.file, current_config.line, cmd, format, ap);
+    error_msgv(eb, current_config.file, current_config.line, cmd, format, ap);
     va_end(ap);
 
     // Always return false, to allow tail-calling as `return error_msg(...);`
@@ -79,42 +65,31 @@ bool error_msg(const char *format, ...)
     return false;
 }
 
-bool error_msg_for_cmd(const char *cmd, const char *format, ...)
+bool error_msg_for_cmd(EditorState *e, const char *cmd, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    error_msgv(&err, current_config.file, current_config.line, cmd, format, ap);
+    error_msgv(e->err, current_config.file, current_config.line, cmd, format, ap);
     va_end(ap);
     return false;
 }
 
-bool error_msg_errno(const char *prefix)
+bool error_msg_errno(ErrorBuffer *eb, const char *prefix)
 {
-    return error_msg("%s: %s", prefix, strerror(errno));
+    return error_msg(eb, "%s: %s", prefix, strerror(errno));
 }
 
-bool info_msg(const char *format, ...)
+bool info_msg(ErrorBuffer *eb, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    vsnprintf(err.buf, sizeof(err.buf), format, ap);
+    vsnprintf(eb->buf, sizeof(eb->buf), format, ap);
     va_end(ap);
-    err.is_error = false;
+    eb->is_error = false;
     return true; // To allow tail-calling from command handlers
 }
 
-const char *get_msg(bool *is_error)
+void clear_error(ErrorBuffer *eb)
 {
-    *is_error = err.is_error;
-    return err.buf;
-}
-
-unsigned int get_nr_errors(void)
-{
-    return err.nr_errors;
-}
-
-void errors_to_stderr(bool enable)
-{
-    err.print_to_stderr = enable;
+    eb->buf[0] = '\0';
 }

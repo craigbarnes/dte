@@ -60,7 +60,7 @@ bool add_error_fmt (
             }
         }
         if (unlikely(j == n)) {
-            return error_msg("unknown substring name %s", desc[i]);
+            return error_msg_("unknown substring name %s", desc[i]);
         }
     }
 
@@ -77,7 +77,7 @@ bool add_error_fmt (
     if (unlikely(max_idx > f->re.re_nsub)) {
         regfree(&f->re);
         free(f);
-        return error_msg("invalid substring count");
+        return error_msg_("invalid substring count");
     }
 
     Compiler *compiler = find_or_add_compiler(compilers, name);

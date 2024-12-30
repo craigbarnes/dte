@@ -2,10 +2,12 @@
 #include "search.h"
 #include "block-iter.h"
 #include "buffer.h"
+#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"
 #include "util/xmalloc.h"
+#include "window.h"
 
 // NOLINTNEXTLINE(misc-no-recursion)
 static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
@@ -121,7 +123,7 @@ bool search_tag(View *view, const char *pattern)
     if (!found) {
         // Don't center view to cursor unnecessarily
         view->force_center = false;
-        return error_msg("Tag not found");
+        return error_msg(view->window->editor->err, "Tag not found");
     }
 
     view->center_on_scroll = true;
@@ -178,8 +180,9 @@ void search_set_regexp(SearchState *search, const char *pattern)
 
 bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
+    ErrorBuffer *err = view->window->editor->err;
     if (!search->pattern) {
-        return error_msg("No previous search pattern");
+        return error_msg(err, "No previous search pattern");
     }
     if (!update_regex(search, cs)) {
         return false;
@@ -193,7 +196,7 @@ bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, b
         }
         block_iter_bof(&bi);
         if (do_search_fwd(view, regex, &bi, false)) {
-            return info_msg("Continuing at top");
+            return info_msg(err, "Continuing at top");
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
@@ -202,9 +205,9 @@ bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, b
         }
         block_iter_eof(&bi);
         if (do_search_bwd(view, regex, &bi, -1, false)) {
-            return info_msg("Continuing at bottom");
+            return info_msg(err, "Continuing at bottom");
         }
     }
 
-    return error_msg("Pattern '%s' not found", search->pattern);
+    return error_msg(err, "Pattern '%s' not found", search->pattern);
 }

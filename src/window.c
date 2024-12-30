@@ -51,8 +51,9 @@ View *window_open_buffer (
     bool must_exist,
     const char *encoding
 ) {
+    ErrorBuffer *ebuf = window->editor->err;
     if (unlikely(filename[0] == '\0')) {
-        error_msg("Empty filename not allowed");
+        error_msg(ebuf, "Empty filename not allowed");
         return NULL;
     }
 
@@ -60,7 +61,7 @@ View *window_open_buffer (
     if (!absolute) {
         bool nodir = (errno == ENOENT); // New file in non-existing dir (usually a mistake)
         const char *err = nodir ? "Directory does not exist" : strerror(errno);
-        error_msg("Error opening %s: %s", filename, err);
+        error_msg(ebuf, "Error opening %s: %s", filename, err);
         return NULL;
     }
 
@@ -71,7 +72,7 @@ View *window_open_buffer (
         if (!streq(absolute, buffer->abs_filename)) {
             const char *bufname = buffer_filename(buffer);
             char *s = short_filename(absolute, &e->home_dir);
-            info_msg("%s and %s are the same file", s, bufname); // Hard links
+            info_msg(ebuf, "%s and %s are the same file", s, bufname); // Hard links
             free(s);
         }
         free(absolute);
@@ -99,7 +100,7 @@ View *window_open_buffer (
     }
 
     if (buffer->file.mode != 0 && !buffer->readonly && access(filename, W_OK)) {
-        error_msg("No write permission to %s, marking read-only", filename);
+        error_msg(ebuf, "No write permission to %s, marking read-only", filename);
         buffer->readonly = true;
     }
 

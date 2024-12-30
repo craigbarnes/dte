@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "error.h"
 #include "syntax/bitset.h"
 #include "syntax/color.h"
 #include "util/hashmap.h"
@@ -118,14 +119,14 @@ static inline bool cond_type_has_destination(ConditionType type)
 
 StringList *find_string_list(const Syntax *syn, const char *name);
 State *find_state(const Syntax *syn, const char *name);
-void finalize_syntax(HashMap *syntaxes, Syntax *syn, unsigned int saved_nr_errors);
+void finalize_syntax(HashMap *syntaxes, Syntax *syn, ErrorBuffer *ebuf, unsigned int saved_nr_errors);
 
 Syntax *find_any_syntax(const HashMap *syntaxes, const char *name);
 Syntax *find_syntax(const HashMap *syntaxes, const char *name);
 void update_state_styles(const Syntax *syn, State *s, const StyleMap *styles);
 void update_syntax_styles(Syntax *syn, const StyleMap *styles);
 void update_all_syntax_styles(const HashMap *syntaxes, const StyleMap *styles);
-void find_unused_subsyntaxes(const HashMap *syntaxes);
+void find_unused_subsyntaxes(const HashMap *syntaxes, ErrorBuffer *ebuf);
 void free_syntaxes(HashMap *syntaxes);
 void collect_syntax_emit_names(const Syntax *syntax, PointerArray *a, const char *prefix) NONNULL_ARGS;
 

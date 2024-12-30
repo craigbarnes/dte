@@ -123,6 +123,7 @@ static void test_normal_command_errors(TestContext *ctx)
     };
 
     EditorState *e = ctx->userdata;
+    ErrorBuffer *ebuf = e->err;
     ASSERT_NONNULL(window_open_empty_buffer(e->window));
 
     FOR_EACH_I(i, tests) {
@@ -134,22 +135,20 @@ static void test_normal_command_errors(TestContext *ctx)
         ASSERT_TRUE(substr[1] != '\0');
         ASSERT_TRUE(!ascii_isupper(substr[0]));
 
-        clear_error();
+        clear_error(ebuf);
         EXPECT_FALSE(handle_normal_command(e, cmd, false));
-        bool is_error = false;
-        const char *msg = get_msg(&is_error);
-        ASSERT_NONNULL(msg);
-        EXPECT_TRUE(is_error);
+        EXPECT_FALSE(ebuf->buf[0] == '\0');
+        EXPECT_TRUE(ebuf->is_error);
 
         // Check for substring in error message (ignoring capitalization)
-        const char *found = strstr(msg, substr + 1);
-        if (likely(found && found != msg)) {
+        const char *found = strstr(ebuf->buf, substr + 1);
+        if (likely(found && found != ebuf->buf)) {
             test_pass(ctx);
             EXPECT_EQ(ascii_tolower(found[-1]), substr[0]);
         } else {
             TEST_FAIL (
                 "Test #%zu: substring \"%s\" not found in message \"%s\"",
-                i + 1, substr, msg
+                i + 1, substr, ebuf->buf
             );
         }
     }
@@ -162,29 +161,25 @@ static void test_normal_command_errors(TestContext *ctx)
 
     CommandRunner runner = normal_mode_cmdrunner(e);
     runner.lookup_alias = NULL;
-    clear_error();
+    clear_error(ebuf);
     EXPECT_FALSE(handle_command(&runner, "_xyz"));
-    bool is_error = false;
-    const char *msg = get_msg(&is_error);
-    EXPECT_STREQ(msg, "No such command: _xyz");
-    EXPECT_TRUE(is_error);
+    EXPECT_STREQ(ebuf->buf, "No such command: _xyz");
+    EXPECT_TRUE(ebuf->is_error);
 
     runner.lookup_alias = dummy_lookup_alias;
-    clear_error();
+    clear_error(e->err);
     EXPECT_FALSE(handle_command(&runner, "_abc"));
-    msg = get_msg(&is_error);
-    EXPECT_TRUE(msg && str_has_prefix(msg, "Parsing alias _abc:"));
-    EXPECT_TRUE(is_error);
+    EXPECT_TRUE(ebuf->buf && str_has_prefix(ebuf->buf, "Parsing alias _abc:"));
+    EXPECT_TRUE(ebuf->is_error);
 
     EXPECT_NULL(current_config.file);
     current_config.file = "example";
     current_config.line = 1;
     runner.lookup_alias = NULL;
-    clear_error();
+    clear_error(e->err);
     EXPECT_FALSE(handle_command(&runner, "quit"));
-    msg = get_msg(&is_error);
-    EXPECT_STREQ(msg, "example:1: Command quit not allowed in config file");
-    EXPECT_TRUE(is_error);
+    EXPECT_STREQ(ebuf->buf, "example:1: Command quit not allowed in config file");
+    EXPECT_TRUE(ebuf->is_error);
     current_config.file = NULL;
 
     // TODO: Cover alias recursion overflow check in run_commands()

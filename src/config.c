@@ -94,6 +94,7 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
 
 int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
+    ErrorBuffer *ebuf = runner->e->err;
     const bool must_exist = flags & CFG_MUST_EXIST;
     const bool builtin = flags & CFG_BUILTIN;
 
@@ -106,6 +107,7 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
             exec_config(runner, cfg->text);
         } else if (must_exist) {
             error_msg (
+                ebuf,
                 "Error reading '%s': no built-in config exists for that path",
                 filename
             );
@@ -119,7 +121,7 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
     if (size < 0) {
         int err = errno;
         if (err != ENOENT || must_exist) {
-            error_msg("Error reading %s: %s", filename, strerror(err));
+            error_msg(ebuf, "Error reading %s: %s", filename, strerror(err));
         }
         return err;
     }

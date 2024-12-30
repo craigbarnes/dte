@@ -18,15 +18,17 @@ static bool run_command(CommandRunner *runner, char **av)
 {
     const CommandSet *cmds = runner->cmds;
     const Command *cmd = cmds->lookup(av[0]);
+    struct EditorState *e = runner->e;
+
     if (!cmd) {
         const char *name = av[0];
         if (!runner->lookup_alias) {
-            return error_msg("No such command: %s", name);
+            return error_msg_for_cmd(e, NULL, "No such command: %s", name);
         }
 
-        const char *alias_value = runner->lookup_alias(runner->e, name);
+        const char *alias_value = runner->lookup_alias(e, name);
         if (unlikely(!alias_value)) {
-            return error_msg("No such command or alias: %s", name);
+            return error_msg_for_cmd(e, NULL, "No such command or alias: %s", name);
         }
 
         PointerArray array = PTR_ARRAY_INIT;
@@ -34,7 +36,7 @@ static bool run_command(CommandRunner *runner, char **av)
         if (unlikely(err != CMDERR_NONE)) {
             const char *err_msg = command_parse_error_to_string(err);
             ptr_array_free(&array);
-            return error_msg("Parsing alias %s: %s", name, err_msg);
+            return error_msg_for_cmd(e, NULL, "Parsing alias %s: %s", name, err_msg);
         }
 
         // Remove NULL
@@ -51,13 +53,13 @@ static bool run_command(CommandRunner *runner, char **av)
     }
 
     if (unlikely(current_config.file && !(cmd->cmdopts & CMDOPT_ALLOW_IN_RC))) {
-        return error_msg("Command %s not allowed in config file", cmd->name);
+        return error_msg_for_cmd(e, NULL, "Command %s not allowed in config file", cmd->name);
     }
 
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
     if (runner->allow_recording && runner->cmds->macro_record) {
-        runner->cmds->macro_record(runner->e, cmd, av + 1);
+        runner->cmds->macro_record(e, cmd, av + 1);
     }
 
     // By default change can't be merged with previous one.
@@ -65,7 +67,7 @@ static bool run_command(CommandRunner *runner, char **av)
     begin_change(CHANGE_MERGE_NONE);
 
     CommandArgs a = cmdargs_new(av + 1);
-    bool r = likely(parse_args(cmd, &a)) && command_func_call(runner->e, cmd, &a);
+    bool r = likely(parse_args(e, cmd, &a)) && command_func_call(e, cmd, &a);
 
     end_change();
     return r;
@@ -75,7 +77,7 @@ static bool run_command(CommandRunner *runner, char **av)
 static bool run_commands(CommandRunner *runner, const PointerArray *array)
 {
     if (unlikely(runner->recursion_count > 16)) {
-        return error_msg("alias recursion limit reached");
+        return error_msg_for_cmd(runner->e, NULL, "alias recursion limit reached");
     }
 
     void **ptrs = array->ptrs;
@@ -119,7 +121,7 @@ bool handle_command(CommandRunner *runner, const char *cmd)
         BUG_ON(runner->recursion_count != 0);
     } else {
         const char *str = command_parse_error_to_string(err);
-        error_msg("Command syntax error: %s", str);
+        error_msg_for_cmd(runner->e, NULL, "Command syntax error: %s", str);
         r = false;
     }
     ptr_array_free(&array);

@@ -30,7 +30,7 @@ static void test_builtin_configs(TestContext *ctx)
     HashMap *syntaxes = &e->syntaxes;
     size_t n;
     const BuiltinConfig *editor_builtin_configs = get_builtin_configs_array(&n);
-    errors_to_stderr(true);
+    e->err->print_to_stderr = true;
 
     for (size_t i = 0; i < n; i++) {
         const BuiltinConfig cfg = editor_builtin_configs[i];
@@ -42,9 +42,9 @@ static void test_builtin_configs(TestContext *ctx)
             EXPECT_NULL(find_syntax(syntaxes, path_basename(cfg.name)));
             int err;
             SyntaxLoadFlags flags = SYN_BUILTIN | SYN_MUST_EXIST;
-            unsigned int saved_nr_errs = get_nr_errors();
+            unsigned int saved_nr_errs = e->err->nr_errors;
             EXPECT_NONNULL(load_syntax_file(e, cfg.name, flags, &err));
-            EXPECT_EQ(get_nr_errors(), saved_nr_errs);
+            EXPECT_EQ(e->err->nr_errors, saved_nr_errs);
             EXPECT_NONNULL(find_syntax(syntaxes, path_basename(cfg.name)));
         } else {
             // Check that built-in configs are identical to their source files
@@ -58,7 +58,7 @@ static void test_builtin_configs(TestContext *ctx)
     }
 
     update_all_syntax_styles(&e->syntaxes, &e->styles);
-    errors_to_stderr(false);
+    e->err->print_to_stderr = false;
 }
 
 static void expect_files_equal(TestContext *ctx, const char *path1, const char *path2)

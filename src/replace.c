@@ -158,8 +158,9 @@ out:
 
 bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
+    ErrorBuffer *ebuf = view->window->editor->err;
     if (unlikely(pattern[0] == '\0')) {
-        return error_msg("Search pattern must contain at least 1 character");
+        return error_msg(ebuf, "Search pattern must contain at least 1 character");
     }
 
     int re_flags = REG_NEWLINE;
@@ -227,6 +228,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
 
     if (nr_substitutions) {
         info_msg (
+            ebuf,
             "%u substitution%s on %zu line%s",
             nr_substitutions,
             (nr_substitutions > 1) ? "s" : "",
@@ -234,7 +236,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
             (nr_lines > 1) ? "s" : ""
         );
     } else if (!(flags & REPLACE_CANCEL)) {
-        error_msg("Pattern '%s' not found", pattern);
+        error_msg(ebuf, "Pattern '%s' not found", pattern);
     }
 
     if (view->selection) {

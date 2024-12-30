@@ -107,7 +107,7 @@ static void open_files_from_string(EditorState *e, const String *str)
 static void parse_and_activate_message(EditorState *e, const String *str)
 {
     if (unlikely(str->len == 0)) {
-        error_msg("child produced no output");
+        error_msg(e->err, "child produced no output");
         return;
     }
 
@@ -125,7 +125,7 @@ static void parse_and_activate_message(EditorState *e, const String *str)
 static void parse_and_goto_tag(EditorState *e, const String *str)
 {
     if (unlikely(str->len == 0)) {
-        error_msg("child produced no output");
+        error_msg(e->err, "child produced no output");
         return;
     }
 
@@ -142,7 +142,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     if (parsed) {
         char cwd[8192];
         if (unlikely(!getcwd(cwd, sizeof cwd))) {
-            error_msg_errno("getcwd() failed");
+            error_msg_errno(e->err, "getcwd() failed");
             return;
         }
         StringView dir = strview_from_cstring(cwd);
@@ -196,7 +196,7 @@ static const char **lines_and_columns_env(const Window *window)
     return vars;
 }
 
-static void show_spawn_error_msg(const String *errstr, int err)
+static void show_spawn_error_msg(ErrorBuffer *ebuf, const String *errstr, int err)
 {
     if (err <= 0) {
         // spawn() returned an error code instead of an exit code, which
@@ -219,9 +219,9 @@ static void show_spawn_error_msg(const String *errstr, int err)
     if (err >= 256) {
         int sig = err >> 8;
         const char *str = strsignal(sig);
-        error_msg("Child received signal %d (%s)%s", sig, str ? str : "??", msg);
+        error_msg(ebuf, "Child received signal %d (%s)%s", sig, str ? str : "??", msg);
     } else if (err) {
-        error_msg("Child returned %d%s", err, msg);
+        error_msg(ebuf, "Child returned %d%s", err, msg);
     }
 }
 
@@ -372,7 +372,7 @@ ssize_t handle_exec (
     free(alloc);
 
     if (err != 0) {
-        show_spawn_error_msg(&ctx.outputs[1], err);
+        show_spawn_error_msg(e->err, &ctx.outputs[1], err);
         string_free(&ctx.outputs[0]);
         string_free(&ctx.outputs[1]);
         view->cursor = saved_cursor;
@@ -414,7 +414,7 @@ ssize_t handle_exec (
         if (output->len) {
             size_t pos = 0;
             StringView line = buf_slice_next_line(output->buffer, &pos, output->len);
-            info_msg("%.*s", (int)line.length, line.data);
+            info_msg(e->err, "%.*s", (int)line.length, line.data);
         }
         break;
     case EXEC_MSG:

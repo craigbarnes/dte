@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "buffer.h"
+#include "command/run.h"
 #include "editor.h"
 #include "syntax/color.h"
 #include "terminal/output.h"
@@ -47,10 +48,11 @@ void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum 
 // ui-cmdline.c
 size_t update_command_line (
     Terminal *term,
+    const ErrorBuffer *err,
     const StyleMap *styles,
     const CommandLine *cmdline,
     const SearchState *search,
-    const ModeHandler *mode
+    const CommandSet *cmds
 );
 
 // ui-tabbar.c

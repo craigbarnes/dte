@@ -16,7 +16,7 @@ bool regexp_error_msg(const regex_t *re, const char *pattern, int err)
 {
     char msg[1024];
     regerror(err, re, msg, sizeof(msg));
-    return error_msg("%s: %s", msg, pattern);
+    return error_msg_("%s: %s", msg, pattern);
 }
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)

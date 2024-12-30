@@ -105,33 +105,37 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     return 0;
 }
 
-static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgParseError err)
-{
+static bool arg_parse_error_msg (
+    struct EditorState *e,
+    const Command *cmd,
+    const CommandArgs *a,
+    ArgParseError err
+) {
     const char *name = cmd->name;
     switch (err) {
     case ARGERR_INVALID_OPTION:
-        return error_msg_for_cmd(name, "Invalid option -%c", a->flags[0]);
+        return error_msg_for_cmd(e, name, "Invalid option -%c", a->flags[0]);
     case ARGERR_TOO_MANY_OPTIONS:
-        return error_msg_for_cmd(name, "Too many options given");
+        return error_msg_for_cmd(e, name, "Too many options given");
     case ARGERR_OPTION_ARGUMENT_MISSING:
-        return error_msg_for_cmd(name, "Option -%c requires an argument", a->flags[0]);
+        return error_msg_for_cmd(e, name, "Option -%c requires an argument", a->flags[0]);
     case ARGERR_OPTION_ARGUMENT_NOT_SEPARATE:
         return error_msg_for_cmd (
-            name,
+            e, name,
             "Option -%c must be given separately because it"
             " requires an argument",
             a->flags[0]
         );
     case ARGERR_TOO_FEW_ARGUMENTS:
         return error_msg_for_cmd (
-            name,
+            e, name,
             "Too few arguments (got: %zu, minimum: %u)",
             a->nr_args,
             (unsigned int)cmd->min_args
         );
     case ARGERR_TOO_MANY_ARGUMENTS:
         return error_msg_for_cmd (
-            name,
+            e, name,
             "Too many arguments (got: %zu, maximum: %u)",
             a->nr_args,
             (unsigned int)cmd->max_args
@@ -144,8 +148,8 @@ static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgPar
     return false;
 }
 
-bool parse_args(const Command *cmd, CommandArgs *a)
+bool parse_args(struct EditorState *e, const Command *cmd, CommandArgs *a)
 {
     ArgParseError err = do_parse_args(cmd, a);
-    return likely(err == ARGERR_NONE) || arg_parse_error_msg(cmd, a, err);
+    return likely(err == ARGERR_NONE) || arg_parse_error_msg(e, cmd, a, err);
 }

@@ -58,21 +58,20 @@ static size_t print_command(Terminal *term, const StyleMap *styles, const Comman
 
 size_t update_command_line (
     Terminal *term,
+    const ErrorBuffer *err,
     const StyleMap *styles,
     const CommandLine *cmdline,
     const SearchState *search,
-    const ModeHandler *mode
+    const CommandSet *cmds
 ) {
     term_output_reset(term, 0, term->width, 0);
     term_move_cursor(&term->obuf, 0, term->height - 1);
 
     size_t cmdline_x = 0;
-    if (mode->cmds == &normal_commands) {
-        bool msg_is_error;
-        const char *msg = get_msg(&msg_is_error);
-        print_message(term, styles, msg, msg_is_error);
+    if (cmds == &normal_commands) {
+        print_message(term, styles, err->buf, err->is_error);
     } else {
-        bool search_mode = (mode->cmds == &search_mode_commands);
+        bool search_mode = (cmds == &search_mode_commands);
         char prefix = search_mode ? (search->reverse ? '?' : '/') : ':';
         cmdline_x = print_command(term, styles, cmdline, prefix);
     }
