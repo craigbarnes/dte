@@ -169,7 +169,7 @@ static void test_normal_command_errors(TestContext *ctx)
     runner.lookup_alias = dummy_lookup_alias;
     clear_error(e->err);
     EXPECT_FALSE(handle_command(&runner, "_abc"));
-    EXPECT_TRUE(ebuf->buf && str_has_prefix(ebuf->buf, "Parsing alias _abc:"));
+    EXPECT_TRUE(str_has_prefix(ebuf->buf, "Parsing alias _abc:"));
     EXPECT_TRUE(ebuf->is_error);
 
     EXPECT_NULL(current_config.file);
