@@ -7,14 +7,7 @@ static size_t tab_title_width(size_t tab_number, const char *filename)
     return 3 + size_str_width(tab_number) + u_str_width(filename);
 }
 
-static void update_tab_title_width(View *view, size_t tab_number)
-{
-    size_t w = tab_title_width(tab_number, buffer_filename(view->buffer));
-    view->tt_width = w;
-    view->tt_truncated_width = w;
-}
-
-static void update_first_tab_idx(Window *window)
+static size_t get_first_tab_idx(const Window *window)
 {
     size_t max_first_idx = window->views.count;
     for (size_t w = 0; max_first_idx > 0; max_first_idx--) {
@@ -36,8 +29,7 @@ static void update_first_tab_idx(Window *window)
         }
     }
 
-    size_t idx = CLAMP(window->first_tab_idx, min_first_idx, max_first_idx);
-    window->first_tab_idx = idx;
+    return CLAMP(window->first_tab_idx, min_first_idx, max_first_idx);
 }
 
 static void calculate_tabbar(Window *window)
@@ -52,8 +44,10 @@ static void calculate_tabbar(Window *window)
             // Make sure current tab is visible
             window->first_tab_idx = MIN(i, window->first_tab_idx);
         }
-        update_tab_title_width(view, i + 1);
-        total_w += view->tt_width;
+        size_t w = tab_title_width(i + 1, buffer_filename(view->buffer));
+        view->tt_width = w;
+        view->tt_truncated_width = w;
+        total_w += w;
     }
 
     if (total_w <= window->w) {
@@ -79,7 +73,7 @@ static void calculate_tabbar(Window *window)
 
     if (total_w > window->w) {
         // Not all tabs fit even after truncating wide tabs
-        update_first_tab_idx(window);
+        window->first_tab_idx = get_first_tab_idx(window);
         return;
     }
 
