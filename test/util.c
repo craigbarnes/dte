@@ -150,6 +150,10 @@ static void test_xmalloc(TestContext *ctx)
     EXPECT_STREQ(str, "foo-bar");
     free(str);
 
+    str = xmemjoin3(STRN("123"), STRN("::"), STRN("456") + 1);
+    EXPECT_STREQ(str, "123::456");
+    free(str);
+
     str = xnew0(char, 4);
     ASSERT_NONNULL(str);
     EXPECT_EQ(str[3], 0);
@@ -2901,10 +2905,14 @@ static void test_xmul(TestContext *ctx)
 
 static void test_xadd(TestContext *ctx)
 {
-    const size_t nearmax = SIZE_MAX - 1;
-    EXPECT_UINT_EQ(xadd(nearmax, 1), nearmax + 1);
+    const size_t max = SIZE_MAX;
+    EXPECT_UINT_EQ(xadd(max - 1, 1), max);
     EXPECT_UINT_EQ(xadd(8, 8), 16);
     EXPECT_UINT_EQ(xadd(0, 0), 0);
+
+    EXPECT_UINT_EQ(xadd3(max - 3, 2, 1), max);
+    EXPECT_UINT_EQ(xadd3(11, 9, 5071), 5091);
+    EXPECT_UINT_EQ(xadd3(0, 0, 0), 0);
 }
 
 static void test_size_ssub(TestContext *ctx)
