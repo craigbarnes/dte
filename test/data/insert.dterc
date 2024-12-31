@@ -4,6 +4,9 @@ set -l emulate-tab false
 set -l auto-indent true
 set -l indent-width 4
 set -l tab-width 4
+set -l overwrite false
+set -l brace-indent true
+set -l select-cursor-char true
 
 insert -k "a\nb\n\tc\n\td\ne"
 up
@@ -13,6 +16,23 @@ up
 insert -k "\t\t\t"
 bol
 insert -k "\n\t\t\t\n"
+
+eof
+insert -m "\n"
+insert -k "if (1) {\na();\nb();"
+new-line
+insert -k "c();\n}"
+new-line -a
+insert -k "d();"
+
+bof
+new-line -a
+repeat 8 insert -m .
+left
+repeat 3 left -c
+insert 'xyz'
+right -c
+insert -k "\n"
 
 save -f build/test/insert.txt
 close
