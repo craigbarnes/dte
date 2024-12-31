@@ -8,6 +8,7 @@
 #include "util/strtonum.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 static size_t parse_sq(const char *cmd, size_t len, String *buf)
 {
@@ -113,16 +114,15 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
 // result is returned as a malloc'd string.
 char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len)
 {
-    String buf;
+    const StringView *home = runner->home_dir;
+    bool expand_ts = runner->expand_tilde_slash;
+    bool tilde_slash = expand_ts && len >= 2 && mem_equal(cmd, "~/", 2);
+    String buf = string_new(len + 1 + (tilde_slash ? home->length : 0));
     size_t pos = 0;
 
-    if (runner->expand_tilde_slash && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {
-        buf = string_new(len + runner->home_dir->length);
-        string_append_strview(&buf, runner->home_dir);
-        string_append_byte(&buf, '/');
-        pos += 2;
-    } else {
-        buf = string_new(len);
+    if (tilde_slash) {
+        string_append_strview(&buf, home);
+        pos += 1; // Skip past '~' and leave '/' to be handled below
     }
 
     while (pos < len) {
