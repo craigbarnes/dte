@@ -148,6 +148,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"insert x; wclose -p; undo", "-p flag unavailable in headless mode"},
         {"insert x; quit -p; undo", "-p flag unavailable in headless mode"},
         {"insert x; match-bracket; undo", "character under cursor not matchable"},
+        {"insert {{}; match-bracket; undo", "no matching bracket found"},
         {"repeat 4100 insert x; search -w; undo", "word under cursor too long"},
     };
 

@@ -1,0 +1,44 @@
+open
+
+insert "AAA\nBBB\n\n\nCCC\nDDD\n"
+eol
+blkup
+insert -m 1
+blkdown
+insert -m 2
+blkdown
+blkdown
+insert -m 3
+blkdown
+insert -m 4
+blkup
+insert -m 5
+blkup
+insert -m 6
+blkdown
+insert -m 7
+up
+
+insert -m "\n\n\n\n"
+up
+blkup
+blkdown
+insert -m 8
+blkdown
+insert -m 9
+blkdown
+blkdown
+insert -m 10
+
+bof
+insert "({{"
+eof
+insert "}})"
+match-bracket
+insert _
+bol
+match-bracket
+insert ?
+
+save -f build/test/move.txt
+close
