@@ -7,6 +7,7 @@
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/hashset.h"
 #include "util/log.h"
 #include "util/path.h"
 #include "util/str-util.h"
@@ -275,14 +276,35 @@ bool is_ft(const PointerArray *filetypes, const char *name)
 
 void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *prefix)
 {
-    COLLECT_STRINGS(builtin_filetype_names, a, prefix);
+    // Insert all filetype names beginning with `prefix` into a HashSet
+    // (to avoid duplicates)
+    const size_t nr_builtin_ft = ARRAYLEN(builtin_filetype_names);
+    HashSet set;
+    hashset_init(&set, 20 + (prefix[0] == '\0' ? nr_builtin_ft : 0), false);
+
+    for (size_t i = 0; i < nr_builtin_ft; i++) {
+        const char *name = builtin_filetype_names[i];
+        if (str_has_prefix(name, prefix)) {
+            hashset_insert(&set, name, strlen(name));
+        }
+    }
+
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
         const char *name = ft->name;
         if (str_has_prefix(name, prefix)) {
-            ptr_array_append(a, xstrdup(name));
+            hashset_insert(&set, name, strlen(name));
         }
     }
+
+    // Append the collected strings to the PointerArray
+    for (size_t i = 0, n = set.table_size; i < n; i++) {
+        for (HashSetEntry *h = set.table[i]; h; h = h->next) {
+            ptr_array_append(a, xstrdup(h->str));
+        }
+    }
+
+    hashset_free(&set);
 }
 
 static const char *ft_get_str(const UserFileTypeEntry *ft)
