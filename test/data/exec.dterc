@@ -1,0 +1,12 @@
+open
+
+insert abcxyz
+filter sed 's/[axz]/R/g'
+pipe-from echo $WORD $WORD
+
+eof
+repeat 3 left
+pipe-from echo $WORD
+
+save -f build/test/exec.txt
+close

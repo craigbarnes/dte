@@ -5,5 +5,14 @@ replace -g [0-9]
 replace X _
 replace 'B\.(B)\.' '\1#'
 replace ' +$'
+
+eof
+insert -m "\nAAA\nBBB\nCCC\nDDD"
+repeat 3 up -l
+replace '([A-Z])$' ':\1,\1|&'
+down
+up -l
+replace '([A-Z])$' ' \1'
+
 save -f build/test/replace.txt
 close

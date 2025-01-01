@@ -1,1 +1,6 @@
 A.A. B# _.X. Y.Y.
+
+AA:A,A| A
+BB:B,B| B
+CC:C,C|C
+DD:D,D|D
