@@ -13,6 +13,7 @@
 #include "terminal/color.h"
 #include "util/arith.h"
 #include "util/macros.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/time-util.h"
@@ -260,6 +261,31 @@ static void bench_u_set_char_raw(void)
     report(&start, iterations, "u_set_char_raw()");
 }
 
+static void bench_human_readable_size(void)
+{
+    static const uintmax_t sizes[] = {
+        4106,
+        8951998035275183ull,
+        990,
+        1116691500ull,
+        0,
+        11ull << 59,
+        6947713,
+        8951980327583ull,
+    };
+
+    static_assert(IS_POWER_OF_2(ARRAYLEN(sizes)));
+    unsigned int iterations = 250000;
+    char buf[HRSIZE_MAX];
+    struct timespec start = get_time();
+
+    for (unsigned int i = 0; i < iterations; i++) {
+        human_readable_size(sizes[i % ARRAYLEN(sizes)], buf);
+    }
+
+    report(&start, iterations, "human_readable_size()");
+}
+
 int main(void)
 {
     struct timespec res;
@@ -281,5 +307,6 @@ int main(void)
     bench_string_append_escaped_arg();
     bench_u_set_char();
     bench_u_set_char_raw();
+    bench_human_readable_size();
     return 0;
 }
