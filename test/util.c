@@ -2578,6 +2578,32 @@ static void test_lsbit(TestContext *ctx)
     }
 }
 
+static void test_clz(TestContext *ctx)
+{
+    EXPECT_EQ(u64_clz(1), 63);
+    EXPECT_EQ(u64_clz(2), 62);
+    EXPECT_EQ(u64_clz(3), 62);
+    EXPECT_EQ(u64_clz(1ULL << 10), 53);
+    EXPECT_EQ(u64_clz(1ULL << 55), 8);
+    EXPECT_EQ(u64_clz(1ULL << 63), 0);
+    EXPECT_EQ(u64_clz(UINT64_MAX), 0);
+    EXPECT_EQ(u64_clz(UINT64_MAX >> 1), 1);
+    EXPECT_EQ(u64_clz(UINT64_MAX >> 3), 3);
+}
+
+static void test_umax_bitwidth(TestContext *ctx)
+{
+    EXPECT_EQ(umax_bitwidth(0), 0);
+    EXPECT_EQ(umax_bitwidth(1), 1);
+    EXPECT_EQ(umax_bitwidth(2), 2);
+    EXPECT_EQ(umax_bitwidth(3), 2);
+    EXPECT_EQ(umax_bitwidth(0x80), 8);
+    EXPECT_EQ(umax_bitwidth(0xFF), 8);
+    EXPECT_EQ(umax_bitwidth(0x10081), 17);
+    EXPECT_EQ(umax_bitwidth(1ULL << 62), 63);
+    EXPECT_EQ(umax_bitwidth(0xFFFFFFFFFFFFFFFFULL), 64);
+}
+
 static void test_path_dirname_and_path_basename(TestContext *ctx)
 {
     static const struct {
@@ -3312,6 +3338,8 @@ static const TestEntry tests[] = {
     TEST(test_ctz),
     TEST(test_ffs),
     TEST(test_lsbit),
+    TEST(test_clz),
+    TEST(test_umax_bitwidth),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_path_relative),
     TEST(test_path_slice_relative),

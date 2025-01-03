@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include "numtostr.h"
 #include "arith.h"
+#include "bit.h"
 #include "debug.h"
 
 const char hextab_lower[16] = "0123456789abcdef";
@@ -159,29 +160,25 @@ char *file_permissions_to_str(mode_t mode, char buf[10])
     return buf;
 }
 
+// Write an approximate, human-readable representation of `bytes` into
+// `buf`, using IEC 80000-13 units (e.g. KiB, MiB, etc.) and (optionally)
+// a 2 digit decimal fraction
 char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 {
     static const char suffixes[8] = "KMGTPEZY";
-    uintmax_t ipart = bytes;
-    size_t nshifts = 0;
-
-    // TODO: Use stdc_leading_zeros() instead of looping?
-    while (ipart >= 1024 && nshifts < ARRAYLEN(suffixes)) {
-        ipart >>= 10;
-        nshifts++;
-    }
-
-    uintmax_t unit = ((uintmax_t)1) << (nshifts * 10);
+    unsigned int sigbits = umax_bitwidth(bytes);
+    unsigned int nr_unit_shifts = (sigbits - !!sigbits) / 10;
+    uintmax_t ipart = bytes >> (nr_unit_shifts * 10);
+    uintmax_t unit = ((uintmax_t)1) << (nr_unit_shifts * 10);
     uintmax_t hundredth = unit / 100;
     unsigned int fpart = 0;
+
     if (hundredth) {
         uintmax_t remainder = bytes & (unit - 1);
         // TODO: Use shifting here, to avoid emitting a divide instruction
         fpart = remainder / hundredth;
-        if (fpart > 99) {
-            ipart++;
-            fpart = 0;
-        }
+        ipart += (fpart > 99);
+        fpart = (fpart > 99) ? 0 : fpart;
     }
 
     size_t i = buf_umax_to_str(ipart, buf);
@@ -192,9 +189,9 @@ char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
         buf[i++] = '0' + (fpart % 10);
     }
 
-    if (nshifts > 0) {
+    if (nr_unit_shifts > 0) {
         buf[i++] = ' ';
-        buf[i++] = suffixes[nshifts - 1];
+        buf[i++] = suffixes[nr_unit_shifts - 1];
         buf[i++] = 'i';
         buf[i++] = 'B';
     }
@@ -203,6 +200,8 @@ char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
     return buf;
 }
 
+// Like human_readable_size(), but also printing the exact number
+// of bytes in parentheses, e.g. 1024 → "1 KiB (1024)"
 char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX])
 {
     human_readable_size(bytes, buf);

@@ -87,4 +87,41 @@ static inline uint32_t u32_lsbit(uint32_t x)
     return x ? 1u << (u32_ffs(x) - 1) : 0;
 }
 
+// Count leading zeros
+static inline unsigned int u64_clz(uint64_t x)
+{
+    BUG_ON(x == 0);
+    USE_STDBIT(stdc_leading_zeros, x);
+    USE_BUILTIN(clz, x);
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    x |= x >> 32;
+    return u64_popcount(~x);
+}
+
+// Calculate number of significant bits in `x` (minimum number of
+// base 2 digits needed to represent it)
+static inline unsigned int umax_bitwidth(uintmax_t x)
+{
+    USE_STDBIT(stdc_bit_width, x);
+
+#if HAS_BUILTIN(__builtin_stdc_bit_width)
+    return __builtin_stdc_bit_width(x);
+#endif
+
+    if (BITSIZE(x) == 64) {
+        return x ? 64u - u64_clz(x) : 0;
+    }
+
+    unsigned int width = 0;
+    while (x) {
+        x >>= 1;
+        width++;
+    }
+    return width;
+}
+
 #endif
