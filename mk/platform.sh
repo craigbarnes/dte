@@ -18,6 +18,11 @@ else
 fi
 
 case "$KERNEL" in
+Linux)
+    OS="$(uname -o)"
+    if test "$OS" = Android; then
+        echo 'LDLIBS_ICONV = -liconv'
+    fi ;;
 Darwin)
     echo 'LDLIBS_ICONV = -liconv' ;;
 OpenBSD)
