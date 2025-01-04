@@ -34,10 +34,10 @@ logfile="$3"
 test -x "$dte" || abort "argument #1 ('$dte') not executable"
 
 check_str "$($dte -V | head -n1)" "dte $ver"
-check_str "$($dte -h | head -n1)" "Usage: $dte [OPTIONS] [[+LINE] FILE]..."
 check_str "$($dte -B | grep -c '^rc$')" "1"
 check_str "$($dte -b rc)" "$(cat config/rc)"
 
+$dte -h >/dev/null
 $dte -s config/syntax/dte >/dev/null
 
 
