@@ -17,14 +17,21 @@ else
     echo 'XARGS_P = xargs'
 fi
 
+NO_INSTALL_XDG_CLUTTER='
+# This causes `make install` to exclude .desktop/icon/AppStream files
+# See also: docs/packaging.md ("installation targets") and GNUmakefile
+NO_INSTALL_XDG_CLUTTER = 1'
+
 case "$KERNEL" in
 Linux)
     OS="$(uname -o)"
     if test "$OS" = Android; then
         echo 'LDLIBS_ICONV = -liconv'
+        echo "$NO_INSTALL_XDG_CLUTTER"
     fi ;;
 Darwin)
-    echo 'LDLIBS_ICONV = -liconv' ;;
+    echo 'LDLIBS_ICONV = -liconv'
+    echo "$NO_INSTALL_XDG_CLUTTER" ;;
 OpenBSD)
     echo 'LDLIBS_ICONV = -liconv'
     echo 'BASIC_CPPFLAGS += -I/usr/local/include'
