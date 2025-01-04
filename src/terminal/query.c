@@ -324,6 +324,11 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     // https://vt100.net/docs/vt510-rm/DA3.html
     // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=(-,Tertiary%20DA,-)
     if (strview_remove_matching_prefix(&seq, "!|")) {
+        // Note that DA3 is no longer sent by term_put_level_2_queries(),
+        // because several terminals (including Termux) have buggy handling
+        // of CSI sequences containing '=', which causes "c" to be rendered
+        // (but not inserted into the buffer) at startup.
+        // See also: https://github.com/fish-shell/fish-shell/commit/e49dde87cc0f1dcedd424d5ed7a520a3f011ee29
         LOG_INFO("DA3 reply: %.*s", (int)seq.length, seq.data);
         return tflag(TFLAG_QUERY_L3);
     }

@@ -1700,7 +1700,6 @@ static void test_term_put_level_1_queries(TestContext *ctx)
         // term_put_level_2_queries()
         "\033[>0q"
         "\033[>c"
-        "\033[=c"
         "\033[?u"
         "\033[?1036$p"
         "\033[?1039$p"
