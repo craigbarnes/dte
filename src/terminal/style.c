@@ -9,60 +9,67 @@
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 
-static const char attr_names[][16] = {
-    "keep",
-    "underline",
-    "reverse",
-    "blink",
-    "dim",
-    "bold",
-    "invisible",
-    "italic",
-    "strikethrough"
+typedef struct {
+    char name[15];
+    uint8_t len;
+} ShortStr;
+
+#define S(str) {str, STRLEN(str)}
+
+static const ShortStr attr_names[] = {
+    S("keep"),
+    S("underline"),
+    S("reverse"),
+    S("blink"),
+    S("dim"),
+    S("bold"),
+    S("invisible"),
+    S("italic"),
+    S("strikethrough"),
 };
 
-static const char color_names[][16] = {
-    "keep",
-    "default",
-    "black",
-    "red",
-    "green",
-    "yellow",
-    "blue",
-    "magenta",
-    "cyan",
-    "gray",
-    "darkgray",
-    "lightred",
-    "lightgreen",
-    "lightyellow",
-    "lightblue",
-    "lightmagenta",
-    "lightcyan",
-    "white"
+static const ShortStr color_names[] = {
+    S("keep"),
+    S("default"),
+    S("black"),
+    S("red"),
+    S("green"),
+    S("yellow"),
+    S("blue"),
+    S("magenta"),
+    S("cyan"),
+    S("gray"),
+    S("darkgray"),
+    S("lightred"),
+    S("lightgreen"),
+    S("lightyellow"),
+    S("lightblue"),
+    S("lightmagenta"),
+    S("lightcyan"),
+    S("white"),
 };
 
 UNITTEST {
-    CHECK_STRING_ARRAY(attr_names);
-    CHECK_STRING_ARRAY(color_names);
+    CHECK_STRUCT_ARRAY(attr_names, name);
+    CHECK_STRUCT_ARRAY(color_names, name);
 }
 
-static unsigned int lookup_attr(const char *s)
+static unsigned int lookup_attr(const char *str)
 {
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
-        if (streq(s, attr_names[i])) {
+        if (streq(str, attr_names[i].name)) {
             return 1U << i;
         }
     }
-    if (streq(s, "lowintensity")) {
+    if (streq(str, "lowintensity")) {
         return ATTR_DIM;
     }
     return 0;
 }
 
-static int32_t lookup_color(const char *name)
+static int32_t lookup_color(const char *str)
 {
-    return STR_TO_ENUM_WITH_OFFSET(name, color_names, COLOR_INVALID, -2);
+    return SSTR_TO_ENUM_WITH_OFFSET(str, color_names, name, COLOR_INVALID, -2);
 }
 
 static int32_t parse_color(const char *str)
@@ -146,13 +153,15 @@ ssize_t parse_term_style(TermStyle *style, char **strs, size_t nstrs)
 void collect_colors_and_attributes(PointerArray *a, const char *prefix)
 {
     for (size_t i = 1; i < ARRAYLEN(color_names); i++) {
-        if (str_has_prefix(color_names[i], prefix)) {
-            ptr_array_append(a, xstrdup(color_names[i]));
+        const ShortStr *s = &color_names[i];
+        if (str_has_prefix(s->name, prefix)) {
+            ptr_array_append(a, xmemdup(s->name, s->len + 1));
         }
     }
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
-        if (str_has_prefix(attr_names[i], prefix)) {
-            ptr_array_append(a, xstrdup(attr_names[i]));
+        const ShortStr *s = &attr_names[i];
+        if (str_has_prefix(s->name, prefix)) {
+            ptr_array_append(a, xmemdup(s->name, s->len + 1));
         }
     }
 }
@@ -161,9 +170,10 @@ size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
 {
     BUG_ON(!color_is_valid(color));
     if (color < 16) {
-        static_assert(sizeof(color_names[0]) <= COLOR_STR_BUFSIZE);
-        memcpy(buf, color_names[color + 2], sizeof(color_names[0]));
-        return strlen(buf);
+        const ShortStr *s = &color_names[color + 2];
+        static_assert(sizeof(s->name) <= COLOR_STR_BUFSIZE);
+        memcpy(buf, s->name, sizeof(s->name));
+        return s->len;
     }
 
     if (color < 256) {
@@ -190,10 +200,11 @@ const char *term_style_to_string(char buf[TERM_STYLE_BUFSIZE], const TermStyle *
 
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
         if (style->attr & (1U << i)) {
-            BUG_ON(pos + 2 + sizeof(attr_names[0]) >= TERM_STYLE_BUFSIZE);
+            const ShortStr *s = &attr_names[i];
+            BUG_ON(pos + 2 + sizeof(s->name) >= TERM_STYLE_BUFSIZE);
             buf[pos++] = ' ';
-            memcpy(buf + pos, attr_names[i], sizeof(attr_names[0]));
-            pos += strlen(buf + pos);
+            memcpy(buf + pos, s->name, sizeof(s->name));
+            pos += s->len;
         }
     }
 

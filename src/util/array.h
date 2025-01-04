@@ -44,6 +44,9 @@
 #define STR_TO_ENUM_WITH_OFFSET(str, a, nfval, off) \
     str_to_enum(str, a[0], ARRAYLEN(a), sizeof(a[0]), off, nfval)
 
+#define SSTR_TO_ENUM_WITH_OFFSET(str, a, field, nfval, off) \
+    str_to_enum(str, a[0].field, ARRAYLEN(a), sizeof(a[0]), off, nfval)
+
 #define STR_TO_ENUM(str, a, nfval) \
     STR_TO_ENUM_WITH_OFFSET(str, a, nfval, 0)
 

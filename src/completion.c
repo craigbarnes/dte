@@ -399,6 +399,8 @@ static void complete_hi(EditorState *e, const CommandArgs *a)
     if (a->nr_args == 0) {
         collect_hl_styles(e, &cs->completions, cs->parsed);
     } else {
+        // TODO: Take into account previous arguments and don't
+        // suggest repeat attributes or excess colors
         collect_colors_and_attributes(&cs->completions, cs->parsed);
     }
 }
