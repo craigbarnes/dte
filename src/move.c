@@ -106,34 +106,33 @@ void move_bol(View *view)
     view_reset_preferred_x(view);
 }
 
-void move_bol_smart(View *view, SmartBolFlags flags)
+void move_bol_smart(View *view, SmartBolType type)
 {
-    if (flags == 0) {
+    if (type == BOL_SIMPLE) {
         move_bol(view);
         return;
     }
 
-    BUG_ON(!(flags & BOL_SMART));
-    bool fwd = false;
     StringView line;
     size_t cursor_offset = fetch_this_line(&view->cursor, &line);
-
-    if (cursor_offset == 0) {
-        // Already at bol
-        if (!(flags & BOL_SMART_TOGGLE)) {
-            goto out;
-        }
-        fwd = true;
+    bool at_bol = (cursor_offset == 0);
+    if (at_bol && type == BOL_INDENT) {
+        // At BOL and not using toggle; nothing to do
+        goto out;
     }
 
     size_t indent = ascii_blank_prefix_length(line.data, line.length);
-    if (fwd) {
+    if (at_bol) {
+        // At BOL and using toggle; move right to first non-blank char
         block_iter_skip_bytes(&view->cursor, indent);
-    } else {
-        size_t co = cursor_offset;
-        size_t move = (co > indent) ? co - indent : co;
-        block_iter_back_bytes(&view->cursor, move);
+        goto out;
     }
+
+    // Not at BOL; move left (either to BOL or leftmost non-blank) depending on
+    // `type` and whether the cursor is before or after the leftmost non-blank
+    size_t co = cursor_offset;
+    size_t move = (co > indent && type != BOL_TOGGLE_LR) ? co - indent : co;
+    block_iter_back_bytes(&view->cursor, move);
 
 out:
     view_reset_preferred_x(view);

@@ -250,14 +250,23 @@ static bool cmd_bof(EditorState *e, const CommandArgs *a)
 
 static bool cmd_bol(EditorState *e, const CommandArgs *a)
 {
-    static const FlagMapping map[] = {
-        {'s', BOL_SMART},
-        {'t', BOL_SMART | BOL_SMART_TOGGLE},
-    };
+    const uint_least64_t flagset =
+        cmdargs_flagset_value('r')
+        | cmdargs_flagset_value('s')
+        | cmdargs_flagset_value('t')
+    ;
 
-    SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
+    SmartBolType type = BOL_SIMPLE;
+    switch (cmdargs_pick_winning_flag_from_set(a, flagset)) {
+        case 'r': type = BOL_TOGGLE_LR; break;
+        case 's': type = BOL_INDENT; break;
+        case 't': type = BOL_TOGGLE_RL; break;
+        case 0: break;
+        default: BUG("unhandled flag");
+    }
+
     handle_selection_flags(e->view, a);
-    move_bol_smart(e->view, flags);
+    move_bol_smart(e->view, type);
     return true;
 }
 
@@ -2573,7 +2582,7 @@ static const Command cmds[] = {
     {"blkdown", "cl", NA, 0, 0, cmd_blkdown},
     {"blkup", "cl", NA, 0, 0, cmd_blkup},
     {"bof", "cl", NA, 0, 0, cmd_bof},
-    {"bol", "clst", NA, 0, 0, cmd_bol},
+    {"bol", "clrst", NA, 0, 0, cmd_bol},
     {"bolsf", "cl", NA, 0, 0, cmd_bolsf},
     {"bookmark", "r", NA, 0, 0, cmd_bookmark},
     {"case", "lu", NA, 0, 0, cmd_case},
