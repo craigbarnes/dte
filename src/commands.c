@@ -947,7 +947,7 @@ static bool cmd_line(EditorState *e, const CommandArgs *a)
 
 static bool cmd_macro(EditorState *e, const CommandArgs *a)
 {
-    CommandMacroState *m = &e->macro;
+    MacroRecorder *m = &e->macro;
     const char *action = a->args[0];
 
     if (streq(action, "play") || streq(action, "run")) {

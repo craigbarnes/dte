@@ -2,7 +2,7 @@
 #include "serialize.h"
 #include "util/string-view.h"
 
-static void merge_insert_buffer(CommandMacroState *m)
+static void merge_insert_buffer(MacroRecorder *m)
 {
     size_t len = m->insert_buffer.len;
     if (len == 0) {
@@ -22,7 +22,7 @@ static void merge_insert_buffer(CommandMacroState *m)
     ptr_array_append(&m->macro, string_steal_cstring(&s));
 }
 
-bool macro_record(CommandMacroState *m)
+bool macro_record(MacroRecorder *m)
 {
     if (m->recording) {
         return false;
@@ -34,7 +34,7 @@ bool macro_record(CommandMacroState *m)
     return true;
 }
 
-bool macro_stop(CommandMacroState *m)
+bool macro_stop(MacroRecorder *m)
 {
     if (!m->recording) {
         return false;
@@ -44,7 +44,7 @@ bool macro_stop(CommandMacroState *m)
     return true;
 }
 
-bool macro_cancel(CommandMacroState *m)
+bool macro_cancel(MacroRecorder *m)
 {
     if (!m->recording) {
         return false;
@@ -56,7 +56,7 @@ bool macro_cancel(CommandMacroState *m)
     return true;
 }
 
-void macro_command_hook(CommandMacroState *m, const char *cmd_name, char **args)
+void macro_command_hook(MacroRecorder *m, const char *cmd_name, char **args)
 {
     if (!m->recording) {
         return;
@@ -75,7 +75,7 @@ void macro_command_hook(CommandMacroState *m, const char *cmd_name, char **args)
 }
 
 void macro_search_hook (
-    CommandMacroState *m,
+    MacroRecorder *m,
     const char *pattern,
     bool reverse,
     bool add_to_history
@@ -106,14 +106,14 @@ void macro_search_hook (
     macro_command_hook(m, "search", (char**)args);
 }
 
-void macro_insert_char_hook(CommandMacroState *m, CodePoint c)
+void macro_insert_char_hook(MacroRecorder *m, CodePoint c)
 {
     if (m->recording) {
         string_append_codepoint(&m->insert_buffer, c);
     }
 }
 
-void macro_insert_text_hook(CommandMacroState *m, const char *text, size_t size)
+void macro_insert_text_hook(MacroRecorder *m, const char *text, size_t size)
 {
     if (!m->recording) {
         return;
@@ -132,7 +132,7 @@ void macro_insert_text_hook(CommandMacroState *m, const char *text, size_t size)
     ptr_array_append(&m->macro, string_steal_cstring(&buf));
 }
 
-String dump_macro(const CommandMacroState *m)
+String dump_macro(const MacroRecorder *m)
 {
     String buf = string_new(4096);
     for (size_t i = 0, n = m->macro.count; i < n; i++) {
@@ -143,7 +143,7 @@ String dump_macro(const CommandMacroState *m)
     return buf;
 }
 
-void free_macro(CommandMacroState *m)
+void free_macro(MacroRecorder *m)
 {
     string_free(&m->insert_buffer);
     ptr_array_free(&m->macro);
