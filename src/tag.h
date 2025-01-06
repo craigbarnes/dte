@@ -1,6 +1,7 @@
 #ifndef TAG_H
 #define TAG_H
 
+#include <stdbool.h>
 #include <sys/types.h>
 #include "ctags.h"
 #include "msg.h"
@@ -18,6 +19,7 @@ typedef struct {
     time_t mtime; // The modification time of the tags file (when last loaded)
 } TagFile;
 
+bool load_tag_file(TagFile *tf) NONNULL_ARGS WARN_UNUSED_RESULT;
 void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir) NONNULL_ARGS;
 size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, MessageArray *messages) NONNULL_ARG(1, 2, 4);
 void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix) NONNULL_ARGS;

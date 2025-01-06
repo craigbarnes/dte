@@ -613,41 +613,40 @@ int main(int argc, char *argv[])
         window_add_buffer(window, std_buffer);
     }
 
-    View *dview = NULL;
-    if (window->views.count == 0) {
-        // Open a default buffer, if none were opened for arguments
-        dview = window_open_empty_buffer(window);
-    }
+    // Open a default buffer, if none were opened for arguments
+    View *dview = window->views.count ? NULL : window_open_empty_buffer(window);
 
     set_view(window_get_first_view(window));
     ui_first_start(e, terminal_query_level);
 
-    for (size_t i = 0; i < nr_commands; i++) {
-        handle_normal_command(e, commands[i], false);
+    if (nr_commands) {
+        for (size_t i = 0; i < nr_commands; i++) {
+            handle_normal_command(e, commands[i], false);
+        }
+        // Refresh Window pointer; in case `wsplit` opened a new one
+        window = e->window;
     }
 
     if (headless) {
         goto exit;
     }
 
-    size_t opened_tags = 0;
-    for (size_t i = 0; i < nr_tags; i++) {
-        StringView tag_sv = strview_from_cstring(tags[i]);
-        // TODO: Split `tag_lookup()` into multiple functions, to avoid
-        // duplicated clearing/loading in cases like this
-        if (tag_lookup(&e->tagfile, &tag_sv, NULL, &e->messages)) {
-            if (activate_current_message(&e->messages, e->window)) {
-                opened_tags++;
-            }
-        }
-    }
+    if (nr_tags > 0 && load_tag_file(&e->tagfile)) {
+        MessageArray *msgs = &e->messages;
+        clear_messages(msgs);
 
-    if (dview && nr_commands == 0 && opened_tags > 0) {
-        // Close default/empty buffer, if `-t` jumped to a tag and no
-        // commands were executed via `-c`
-        BUG_ON(window->views.count < 2);
-        remove_view(dview);
-        dview = NULL;
+        for (size_t i = 0; i < nr_tags; i++) {
+            StringView tagname = strview_from_cstring(tags[i]);
+            tag_lookup(&e->tagfile, &tagname, NULL, msgs);
+        }
+
+        if (activate_current_message(msgs, window) && dview && nr_commands == 0) {
+            // Close the default/empty buffer, if another buffer was opened
+            // for a tag and no commands were executed via `-c` or `-C`
+            BUG_ON(window->views.count < 2);
+            remove_view(dview);
+            dview = NULL;
+        }
     }
 
     set_fatal_error_cleanup_handler(cleanup_handler, e);

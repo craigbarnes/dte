@@ -2231,20 +2231,34 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    StringView name;
-    if (a->args[0]) {
-        name = strview_from_cstring(a->args[0]);
-    } else {
-        name = view_get_word_under_cursor(e->view);
-        if (name.length == 0) {
+    size_t nargs = a->nr_args;
+    StringView word_under_cursor;
+    if (nargs == 0) {
+        word_under_cursor = view_get_word_under_cursor(e->view);
+        if (word_under_cursor.length == 0) {
             return false;
         }
     }
 
+    MessageArray *msgs = &e->messages;
+    TagFile *tf = &e->tagfile;
+    clear_messages(msgs);
+    if (!load_tag_file(tf)) {
+        return false;
+    }
+
     const char *filename = e->buffer->abs_filename;
-    size_t ntags = tag_lookup(&e->tagfile, &name, filename, &e->messages);
-    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
-    return (ntags > 0);
+    if (nargs == 0) {
+        tag_lookup(tf, &word_under_cursor, filename, msgs);
+    }
+
+    for (size_t i = 0; i < nargs; i++) {
+        StringView tagname = strview_from_cstring(a->args[i]);
+        tag_lookup(tf, &tagname, filename, msgs);
+    }
+
+    activate_current_message_save(msgs, &e->bookmarks, e->view);
+    return (msgs->array.count > 0);
 }
 
 static bool cmd_title(EditorState *e, const CommandArgs *a)
@@ -2626,7 +2640,7 @@ static const Command cmds[] = {
     {"shift", "", NA, 1, 1, cmd_shift},
     {"show", "c", NA, 1, 2, cmd_show},
     {"suspend", "", NA, 0, 0, cmd_suspend},
-    {"tag", "r", NA, 0, 1, cmd_tag},
+    {"tag", "r", NA, 0, -1, cmd_tag},
     {"title", "", NA, 1, 1, cmd_title},
     {"toggle", "gv", NA, 1, -1, cmd_toggle},
     {"undo", "m", NA, 0, 0, cmd_undo},

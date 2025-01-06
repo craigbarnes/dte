@@ -129,6 +129,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         return;
     }
 
+    // TODO: Read all lines and support adding messages for multiple tags
     size_t pos = 0;
     StringView line = buf_slice_next_line(str->buffer, &pos, str->len);
     if (line.length == 0) {
@@ -140,6 +141,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     bool parsed = parse_ctags_line(&tag, line.data, line.length);
 
     if (parsed) {
+        // `line` is a valid tags(5) file entry; handle it directly
         char cwd[8192];
         if (unlikely(!getcwd(cwd, sizeof cwd))) {
             error_msg_errno(e->err, "getcwd() failed");
@@ -149,7 +151,11 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         clear_messages(msgs);
         add_message_for_tag(msgs, &tag, &dir);
     } else {
-        // Treat line as a simple tag name
+        // Treat `line` as a simple tag name (look it up in the tags(5) file)
+        clear_messages(&e->messages);
+        if (!load_tag_file(&e->tagfile)) {
+            return;
+        }
         if (!tag_lookup(&e->tagfile, &line, e->buffer->abs_filename, msgs)) {
             return;
         }

@@ -138,7 +138,7 @@ void tag_file_free(TagFile *tf)
     *tf = (TagFile){.filename = NULL};
 }
 
-static bool load_tag_file(TagFile *tf)
+bool load_tag_file(TagFile *tf)
 {
     char path[8192];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
@@ -288,10 +288,7 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
 
 size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, MessageArray *messages)
 {
-    clear_messages(messages);
-    if (!load_tag_file(tf)) {
-        return 0;
-    }
+    BUG_ON(!tf->filename);
 
     // Filename helps to find correct tags
     PointerArray tags = PTR_ARRAY_INIT;

@@ -542,7 +542,7 @@ static void complete_show(EditorState *e, const CommandArgs *a)
 static void complete_tag(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
-    if (a->nr_args == 0 && !cmdargs_has_flag(a, 'r')) {
+    if (!cmdargs_has_flag(a, 'r')) {
         BUG_ON(!cs->parsed);
         StringView prefix = strview_from_cstring(cs->parsed);
         collect_tags(&e->tagfile, &cs->completions, &prefix);
