@@ -17,7 +17,7 @@ void move_to_preferred_x(View *view, long preferred_x);
 void move_cursor_left(View *view);
 void move_cursor_right(View *view);
 void move_bol(View *view);
-void move_bol_smart(View *view, SmartBolType mode);
+void move_bol_smart(View *view, SmartBolType type);
 void move_eol(View *view);
 void move_up(View *view, long count);
 void move_down(View *view, long count);

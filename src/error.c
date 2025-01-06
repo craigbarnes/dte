@@ -9,6 +9,7 @@
 #include "util/log.h"
 #include "util/xstdio.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 ErrorBuffer errbuf;
 
 VPRINTF(5)
