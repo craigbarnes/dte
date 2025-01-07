@@ -72,10 +72,11 @@ void collect_exec_actions(PointerArray *a, const char *prefix, int fd)
         return;
     }
 
+    size_t prefix_len = strlen(prefix);
     unsigned int flag = 1u << fd;
     for (size_t i = 0; i < ARRAYLEN(exec_map); i++) {
         const char *action = exec_map[i].name;
-        if ((exec_map[i].flags & flag) && str_has_prefix(action, prefix)) {
+        if ((exec_map[i].flags & flag) && str_has_strn_prefix(action, prefix, prefix_len)) {
             ptr_array_append(a, xstrdup(action));
         }
     }

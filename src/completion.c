@@ -173,10 +173,11 @@ void collect_normal_aliases(EditorState *e, PointerArray *a, const char *prefix)
 
 static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const char *prefix)
 {
+    size_t prefix_len = strlen(prefix);
     char keystr[KEYCODE_STR_MAX];
     for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
         size_t keylen = keycode_to_string(it.entry->key, keystr);
-        if (str_has_prefix(keystr, prefix)) {
+        if (str_has_strn_prefix(keystr, prefix, prefix_len)) {
             ptr_array_append(a, xmemdup(keystr, keylen + 1));
         }
     }
@@ -225,13 +226,14 @@ void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)
 
 void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
-    if (strchr(prefix, '=')) {
+    size_t prefix_len = strlen(prefix);
+    if (memchr(prefix, '=', prefix_len)) {
         return;
     }
 
     for (size_t i = 0; environ[i]; i++) {
         const char *var = environ[i];
-        if (str_has_prefix(var, prefix)) {
+        if (str_has_strn_prefix(var, prefix, prefix_len)) {
             const char *delim = strchr(var, '=');
             if (likely(delim && delim != var)) {
                 ptr_array_append(a, xstrcut(var, delim - var));
@@ -356,11 +358,12 @@ static void complete_def_mode(EditorState *e, const CommandArgs *a)
     CompletionState *cs = &e->cmdline.completion;
     PointerArray *completions = &cs->completions;
     const char *prefix = cs->parsed;
+    size_t prefix_len = strlen(prefix);
 
     for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
         const char *name = it.entry->key;
         const ModeHandler *mode = it.entry->value;
-        if (!str_has_prefix(name, prefix)) {
+        if (!str_has_strn_prefix(name, prefix, prefix_len)) {
             continue;
         }
         if (mode->cmds != &normal_commands) {
@@ -974,9 +977,10 @@ void reset_completion(CommandLine *cmdline)
 
 void collect_hashmap_keys(const HashMap *map, PointerArray *a, const char *prefix)
 {
+    size_t prefix_len = strlen(prefix);
     for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); ) {
         const char *name = it.entry->key;
-        if (str_has_prefix(name, prefix)) {
+        if (str_has_strn_prefix(name, prefix, prefix_len)) {
             ptr_array_append(a, xstrdup(name));
         }
     }

@@ -278,13 +278,14 @@ void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *pref
 {
     // Insert all filetype names beginning with `prefix` into a HashSet
     // (to avoid duplicates)
-    const size_t nr_builtin_ft = ARRAYLEN(builtin_filetype_names);
     HashSet set;
+    size_t prefix_len = strlen(prefix);
+    size_t nr_builtin_ft = ARRAYLEN(builtin_filetype_names);
     hashset_init(&set, 20 + (prefix[0] == '\0' ? nr_builtin_ft : 0), false);
 
     for (size_t i = 0; i < nr_builtin_ft; i++) {
         const char *name = builtin_filetype_names[i];
-        if (str_has_prefix(name, prefix)) {
+        if (str_has_strn_prefix(name, prefix, prefix_len)) {
             hashset_insert(&set, name, strlen(name));
         }
     }
@@ -292,7 +293,7 @@ void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *pref
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
         const char *name = ft->name;
-        if (str_has_prefix(name, prefix)) {
+        if (str_has_strn_prefix(name, prefix, prefix_len)) {
             hashset_insert(&set, name, strlen(name));
         }
     }

@@ -8,6 +8,7 @@
 #include "util/string.h"
 
 typedef enum {
+    // Should be kept sorted; see find_real_style()
     BSE_ACTIVETAB,
     BSE_COMMANDLINE,
     BSE_CURRENTLINE,

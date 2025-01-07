@@ -26,9 +26,19 @@ static inline const char *xgetenv(const char *name)
 }
 
 PURE NONNULL_ARGS
+static inline bool str_has_strn_prefix(const char *str, const char *prefix, size_t plen)
+{
+    // Note that `prefix` must be a null-terminated string and `plen`
+    // should be equal to strlen(prefix). The explicit length parameter
+    // is simply for the sake of efficiency, e.g. to allow strlen() to
+    // be hoisted out of loops when `prefix` is loop-invariant.
+    return plen == 0 || strncmp(str, prefix, plen) == 0;
+}
+
+PURE NONNULL_ARGS
 static inline bool str_has_prefix(const char *str, const char *prefix)
 {
-    return strncmp(str, prefix, strlen(prefix)) == 0;
+    return str_has_strn_prefix(str, prefix, strlen(prefix));
 }
 
 PURE NONNULL_ARGS

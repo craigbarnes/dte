@@ -12,8 +12,9 @@ void collect_strings_from_flat_array (
     const char *prefix
 ) {
     const char *end = base + (nr_elements * element_len);
+    size_t prefix_len = strlen(prefix);
     for (const char *str = base; str < end; str += element_len) {
-        if (str_has_prefix(str, prefix)) {
+        if (str_has_strn_prefix(str, prefix, prefix_len)) {
             ptr_array_append(a, xstrdup(str));
         }
     }

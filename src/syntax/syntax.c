@@ -228,6 +228,7 @@ void collect_syntax_emit_names (
     PointerArray *a,
     const char *prefix
 ) {
+    size_t prefix_len = strlen(prefix);
     HashSet set;
     hashset_init(&set, 16, false);
 
@@ -236,13 +237,13 @@ void collect_syntax_emit_names (
     for (HashMapIter it = hashmap_iter(&syntax->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;
         const char *emit = get_effective_emit_name(&s->default_action);
-        if (str_has_prefix(emit, prefix)) {
+        if (str_has_strn_prefix(emit, prefix, prefix_len)) {
             hashset_insert(&set, emit, strlen(emit));
         }
         for (size_t i = 0, n = s->conds.count; i < n; i++) {
             const Condition *cond = s->conds.ptrs[i];
             emit = get_effective_emit_name(&cond->a);
-            if (str_has_prefix(emit, prefix)) {
+            if (str_has_strn_prefix(emit, prefix, prefix_len)) {
                 hashset_insert(&set, emit, strlen(emit));
             }
         }

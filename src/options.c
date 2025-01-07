@@ -20,6 +20,7 @@
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xmemrchr.h"
 #include "util/xstring.h"
 
 typedef enum {
@@ -926,12 +927,13 @@ void sanity_check_local_options(const LocalOptions *lopts)
 
 void collect_options(PointerArray *a, const char *prefix, bool local, bool global)
 {
+    size_t prefix_len = strlen(prefix);
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if ((local && !desc->local) || (global && !desc->global)) {
             continue;
         }
-        if (str_has_prefix(desc->name, prefix)) {
+        if (str_has_strn_prefix(desc->name, prefix, prefix_len)) {
             ptr_array_append(a, xstrdup(desc->name));
         }
     }
@@ -940,12 +942,13 @@ void collect_options(PointerArray *a, const char *prefix, bool local, bool globa
 // Collect options that can be set via the "option" command
 void collect_auto_options(PointerArray *a, const char *prefix)
 {
+    size_t prefix_len = strlen(prefix);
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (!desc->local || desc->on_change == filetype_changed) {
             continue;
         }
-        if (str_has_prefix(desc->name, prefix)) {
+        if (str_has_strn_prefix(desc->name, prefix, prefix_len)) {
             ptr_array_append(a, xstrdup(desc->name));
         }
     }
@@ -953,6 +956,7 @@ void collect_auto_options(PointerArray *a, const char *prefix)
 
 void collect_toggleable_options(PointerArray *a, const char *prefix, bool global)
 {
+    size_t prefix_len = strlen(prefix);
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (global && !desc->global) {
@@ -960,7 +964,7 @@ void collect_toggleable_options(PointerArray *a, const char *prefix, bool global
         }
         OptionType type = desc->type;
         bool toggleable = (type == OPT_ENUM || type == OPT_BOOL);
-        if (toggleable && str_has_prefix(desc->name, prefix)) {
+        if (toggleable && str_has_strn_prefix(desc->name, prefix, prefix_len)) {
             ptr_array_append(a, xstrdup(desc->name));
         }
     }
@@ -973,7 +977,8 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
         return;
     }
 
-    if (prefix[0] == '\0') {
+    size_t prefix_len = strlen(prefix);
+    if (prefix_len == 0) {
         char *ptr = get_option_ptr(e, desc, !desc->local);
         OptionValue value = desc_get(desc, ptr);
         ptr_array_append(a, xstrdup(desc_string(desc, value)));
@@ -988,7 +993,7 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
     const char *const *values = desc->u.enum_opt.values;
     if (type == OPT_ENUM || type == OPT_BOOL) {
         for (size_t i = 0; values[i]; i++) {
-            if (str_has_prefix(values[i], prefix)) {
+            if (str_has_strn_prefix(values[i], prefix, prefix_len)) {
                 ptr_array_append(a, xstrdup(values[i]));
             }
         }
@@ -996,12 +1001,15 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
     }
 
     BUG_ON(type != OPT_FLAG);
-    const char *comma = strrchr(prefix, ',');
-    size_t prefix_len = comma ? ++comma - prefix : 0;
+    const char *comma = xmemrchr(prefix, ',', prefix_len);
+    const size_t tail_idx = comma ? ++comma - prefix : 0;
+    const char *tail = prefix + tail_idx;
+    const size_t tail_len = prefix_len - tail_idx;
+
     for (size_t i = 0; values[i]; i++) {
         const char *str = values[i];
-        if (str_has_prefix(str, prefix + prefix_len)) {
-            ptr_array_append(a, xmemjoin(prefix, prefix_len, str, strlen(str) + 1));
+        if (str_has_strn_prefix(str, tail, tail_len)) {
+            ptr_array_append(a, xmemjoin(prefix, tail_idx, str, strlen(str) + 1));
         }
     }
 }
