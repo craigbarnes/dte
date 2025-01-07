@@ -164,7 +164,7 @@ size_t get_indent_level_bytes_left(const LocalOptions *options, BlockIter *curso
     unsigned int iw = options->indent_width;
     unsigned int tw = options->tab_width;
     ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset, iw, tw);
-    return (ibytes < 0) ? 0 : (size_t)ibytes;
+    return MAX(ibytes, 0);
 }
 
 size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *cursor)
@@ -195,5 +195,6 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *curs
             return i - cursor_offset + 1;
         }
     }
+
     return 0;
 }
