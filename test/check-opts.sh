@@ -45,23 +45,28 @@ $dte -s config/syntax/dte >/dev/null
 
 set +e
 
-check_str "$(echo xyz | $dte -C 'replace y Y' | cat)" 'xYz'
+out="$(echo xyz | $dte -C 'replace y Y' | cat)"
 check_exit 0
+check_str "$out" 'xYz'
 
-$dte -C 'quit 91'
+out="$($dte -C 'quit 91')"
 check_exit 91
+check_str "$out" ''
 
 # `replace -c` should be ignored
-check_str "$(echo xyz | $dte -C 'replace -c y Y' 2>"$logfile" | cat)" 'xyz'
+out="$(echo xyz | $dte -C 'replace -c y Y' 2>"$logfile" | cat)"
 check_exit 0
+check_str "$out" 'xyz'
 
 # `quit -p` should be ignored
-check_str "$($dte -C 'insert A; open; insert _; quit -p 98' 2>"$logfile" | cat)" 'A'
+out="$($dte -C 'insert A; open; insert _; quit -p 98' 2>"$logfile" | cat)"
 check_exit 0
+check_str "$out" 'A'
 
 # `suspend` should be ignored
-check_str "$($dte -C 'suspend; insert q; case' 2>"$logfile" | cat)" 'Q'
+out="$($dte -C 'suspend; insert q; case' 2>"$logfile" | cat)"
 check_exit 0
+check_str "$out" 'Q'
 
 
 # Check error handling -----------------------------------------------------
