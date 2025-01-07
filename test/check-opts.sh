@@ -21,7 +21,7 @@ assert_exitcode() {
 
 alias abort='error "$LINENO"'
 alias check_str='assert_streq "$LINENO"'
-alias check_exit='assert_exitcode "$LINENO"'
+alias check_exit='assert_exitcode "$LINENO" "$?"'
 
 if test "$#" != 3; then
     abort 'exactly 3 arguments required; see GNUmakefile'
@@ -46,49 +46,53 @@ $dte -s config/syntax/dte >/dev/null
 set +e
 
 check_str "$(echo xyz | $dte -C 'replace y Y' | cat)" 'xYz'
-check_exit "$?" 0
+check_exit 0
 
 $dte -C 'quit 91'
-check_exit "$?" 91
+check_exit 91
 
 # `replace -c` should be ignored
 check_str "$(echo xyz | $dte -C 'replace -c y Y' 2>"$logfile" | cat)" 'xyz'
-check_exit "$?" 0
+check_exit 0
 
 # `quit -p` should be ignored
 check_str "$($dte -C 'insert A; open; insert _; quit -p 98' 2>"$logfile" | cat)" 'A'
-check_exit "$?" 0
+check_exit 0
 
 # `suspend` should be ignored
 check_str "$($dte -C 'suspend; insert q; case' 2>"$logfile" | cat)" 'Q'
-check_exit "$?" 0
+check_exit 0
 
 
 # Check error handling -----------------------------------------------------
 
 # Unknown option
 $dte -7 2>/dev/null
-check_exit "$?" 64
+check_exit 64
 
 # Missing option argument
 $dte -r 2>/dev/null
-check_exit "$?" 64
+check_exit 64
 
 # Linting invalid syntax file
-$dte -s /dev/null 2>/dev/null
-check_exit "$?" 65
+err="$($dte -s /dev/null 2>&1)"
+check_exit 65
+check_str "$err" '/dev/null: no default syntax found'
 
 # Dumping non-existent builtin config
-$dte -b non-existent 2>/dev/null
-check_exit "$?" 64
+err="$($dte -b non-existent 2>&1)"
+check_exit 64
+check_str "$err" "Error: no built-in config with name 'non-existent'"
 
-# Too many -c options
-$dte -cquit -c2 -c3 -c4 -c5 -c6 -c7 -c8 -c9 2>/dev/null
-check_exit "$?" 64
+# Too many -c/-C options
+err="$($dte -C1 -C2 -C3 -C4 -C5 -c6 -c7 -c8 -c9 2>&1)"
+check_exit 64
+check_str "$err" 'Error: too many -c or -C options used'
 
 # Too many -t options
-$dte -cquit -t1 -t2 -t3 -t4 -t5 -t6 -t7 -t8 -t9 2>/dev/null
-check_exit "$?" 64
+err="$($dte -Cquit -t1 -t2 -t3 -t4 -t5 -t6 -t7 -t8 -t9 2>&1)"
+check_exit 64
+check_str "$err" 'Error: too many -t options used'
 
 if ! command -v setsid >/dev/null; then
     if test "$(uname -s)" = "Linux"; then
@@ -100,4 +104,4 @@ fi
 # No controlling tty
 # shellcheck disable=SC2086
 TERM=xterm-256color setsid $dte -cquit >/dev/null 2>&1 0>&1
-check_exit "$?" 74
+check_exit 74
