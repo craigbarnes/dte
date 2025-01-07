@@ -89,7 +89,9 @@ static ExitCode dump_builtin_config(const char *name)
 static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 {
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
+    e->err->print_to_stderr = true;
     BUG_ON(e->status != EDITOR_INITIALIZING);
+
     int err;
     const Syntax *s = load_syntax_file(e, filename, flags | SYN_MUST_EXIST, &err);
 
