@@ -9,7 +9,7 @@ enum {
 Block *block_new(size_t alloc)
 {
     Block *blk = xnew0(Block, 1);
-    alloc = round_size_to_next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
+    alloc = next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
     blk->data = xmalloc(alloc);
     blk->alloc = alloc;
     return blk;
@@ -18,7 +18,7 @@ Block *block_new(size_t alloc)
 void block_grow(Block *blk, size_t alloc)
 {
     if (alloc > blk->alloc) {
-        blk->alloc = round_size_to_next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
+        blk->alloc = next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
         blk->data = xrealloc(blk->data, blk->alloc);
     }
 }

@@ -2443,51 +2443,51 @@ static void test_intmap(TestContext *ctx)
     intmap_free(&map, free);
 }
 
-static void test_round_size_to_next_multiple(TestContext *ctx)
+static void test_next_multiple(TestContext *ctx)
 {
-    EXPECT_EQ(round_size_to_next_multiple(3, 8), 8);
-    EXPECT_EQ(round_size_to_next_multiple(8, 8), 8);
-    EXPECT_EQ(round_size_to_next_multiple(9, 8), 16);
-    EXPECT_EQ(round_size_to_next_multiple(0, 8), 0);
-    EXPECT_EQ(round_size_to_next_multiple(0, 16), 0);
-    EXPECT_EQ(round_size_to_next_multiple(1, 16), 16);
-    EXPECT_EQ(round_size_to_next_multiple(123, 16), 128);
-    EXPECT_EQ(round_size_to_next_multiple(4, 64), 64);
-    EXPECT_EQ(round_size_to_next_multiple(80, 64), 128);
-    EXPECT_EQ(round_size_to_next_multiple(256, 256), 256);
-    EXPECT_EQ(round_size_to_next_multiple(257, 256), 512);
-    EXPECT_EQ(round_size_to_next_multiple(8000, 256), 8192);
+    EXPECT_EQ(next_multiple(3, 8), 8);
+    EXPECT_EQ(next_multiple(8, 8), 8);
+    EXPECT_EQ(next_multiple(9, 8), 16);
+    EXPECT_EQ(next_multiple(0, 8), 0);
+    EXPECT_EQ(next_multiple(0, 16), 0);
+    EXPECT_EQ(next_multiple(1, 16), 16);
+    EXPECT_EQ(next_multiple(123, 16), 128);
+    EXPECT_EQ(next_multiple(4, 64), 64);
+    EXPECT_EQ(next_multiple(80, 64), 128);
+    EXPECT_EQ(next_multiple(256, 256), 256);
+    EXPECT_EQ(next_multiple(257, 256), 512);
+    EXPECT_EQ(next_multiple(8000, 256), 8192);
 }
 
-static void test_round_size_to_next_power_of_2(TestContext *ctx)
+static void test_next_pow2(TestContext *ctx)
 {
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(0), 1);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(1), 1);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(2), 2);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(3), 4);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(4), 4);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(5), 8);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(8), 8);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(9), 16);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(17), 32);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(61), 64);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(64), 64);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(65), 128);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(200), 256);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(1000), 1024);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(5500), 8192);
+    EXPECT_UINT_EQ(next_pow2(0), 1);
+    EXPECT_UINT_EQ(next_pow2(1), 1);
+    EXPECT_UINT_EQ(next_pow2(2), 2);
+    EXPECT_UINT_EQ(next_pow2(3), 4);
+    EXPECT_UINT_EQ(next_pow2(4), 4);
+    EXPECT_UINT_EQ(next_pow2(5), 8);
+    EXPECT_UINT_EQ(next_pow2(8), 8);
+    EXPECT_UINT_EQ(next_pow2(9), 16);
+    EXPECT_UINT_EQ(next_pow2(17), 32);
+    EXPECT_UINT_EQ(next_pow2(61), 64);
+    EXPECT_UINT_EQ(next_pow2(64), 64);
+    EXPECT_UINT_EQ(next_pow2(65), 128);
+    EXPECT_UINT_EQ(next_pow2(200), 256);
+    EXPECT_UINT_EQ(next_pow2(1000), 1024);
+    EXPECT_UINT_EQ(next_pow2(5500), 8192);
 
     const size_t size_max = (size_t)-1;
     const size_t pow2_max = ~(size_max >> 1);
     EXPECT_TRUE(IS_POWER_OF_2(pow2_max));
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(size_max >> 1), pow2_max);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(pow2_max), pow2_max);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(pow2_max - 1), pow2_max);
+    EXPECT_UINT_EQ(next_pow2(size_max >> 1), pow2_max);
+    EXPECT_UINT_EQ(next_pow2(pow2_max), pow2_max);
+    EXPECT_UINT_EQ(next_pow2(pow2_max - 1), pow2_max);
 
     // Note: returns 0 on overflow
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(pow2_max + 1), 0);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(size_max), 0);
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(size_max - 1), 0);
+    EXPECT_UINT_EQ(next_pow2(pow2_max + 1), 0);
+    EXPECT_UINT_EQ(next_pow2(size_max), 0);
+    EXPECT_UINT_EQ(next_pow2(size_max - 1), 0);
 }
 
 static void test_popcount(TestContext *ctx)
@@ -2604,7 +2604,7 @@ static void test_umax_bitwidth(TestContext *ctx)
     EXPECT_EQ(umax_bitwidth(0xFFFFFFFFFFFFFFFFULL), 64);
 }
 
-static void test_path_dirname_and_path_basename(TestContext *ctx)
+static void test_path_dirname_basename(TestContext *ctx)
 {
     static const struct {
         const char *path;
@@ -3332,15 +3332,15 @@ static const TestEntry tests[] = {
     TEST(test_hashmap),
     TEST(test_hashset),
     TEST(test_intmap),
-    TEST(test_round_size_to_next_multiple),
-    TEST(test_round_size_to_next_power_of_2),
+    TEST(test_next_multiple),
+    TEST(test_next_pow2),
     TEST(test_popcount),
     TEST(test_ctz),
     TEST(test_ffs),
     TEST(test_lsbit),
     TEST(test_clz),
     TEST(test_umax_bitwidth),
-    TEST(test_path_dirname_and_path_basename),
+    TEST(test_path_dirname_basename),
     TEST(test_path_relative),
     TEST(test_path_slice_relative),
     TEST(test_short_filename_cwd),

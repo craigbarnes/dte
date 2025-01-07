@@ -41,7 +41,7 @@ static inline size_t fnv_1a_hash_icase(const unsigned char *str, size_t n)
 }
 
 // NOTE: returns 0 if x is greater than the largest size_t power of 2
-static inline size_t round_size_to_next_power_of_2(size_t x)
+static inline size_t next_pow2(size_t x)
 {
     if (unlikely(x == 0)) {
         return 1;

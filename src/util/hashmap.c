@@ -66,7 +66,7 @@ static int hashmap_do_init(HashMap *map, size_t size)
     // Round up the size to the next power of 2, to allow using simple
     // bitwise ops (instead of modulo) to wrap the hash value and also
     // to allow quadratic probing with triangular numbers
-    size = round_size_to_next_power_of_2(size);
+    size = next_pow2(size);
     if (unlikely(size == 0)) {
         return EOVERFLOW;
     }

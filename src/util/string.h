@@ -27,7 +27,7 @@ void string_append_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1);
 
 static inline String string_new(size_t size)
 {
-    size = round_size_to_next_multiple(size, 16);
+    size = next_multiple(size, 16);
     return (String) {
         .buffer = size ? xmalloc(size) : NULL,
         .alloc = size,

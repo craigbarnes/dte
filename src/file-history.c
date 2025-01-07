@@ -154,7 +154,7 @@ void file_history_free(FileHistory *history)
 String file_history_dump(const FileHistory *history)
 {
     size_t nr_entries = history->entries.count;
-    size_t size = round_size_to_next_multiple(64 * nr_entries, 4096);
+    size_t size = next_multiple(64 * nr_entries, 4096);
     String buf = string_new(size);
     size_t n = 0;
 
@@ -176,7 +176,7 @@ String file_history_dump_relative(const FileHistory *history)
     }
 
     size_t nr_entries = history->entries.count;
-    size_t size = round_size_to_next_multiple(16 * nr_entries, 4096);
+    size_t size = next_multiple(16 * nr_entries, 4096);
     String buf = string_new(size);
     size_t n = 0;
 

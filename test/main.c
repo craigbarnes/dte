@@ -73,7 +73,7 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
         unsigned int passed = ctx->passed - prev_passed;
         unsigned int failed = ctx->failed - prev_failed;
 
-        fprintf(stderr, "   CHECK  %-35s  %5u passed", t->name, passed);
+        fprintf(stderr, "   CHECK  %-30s  %5u passed", t->name, passed);
 
         if (unlikely(failed > 0)) {
             fprintf(stderr, " %s%4u FAILED%s", ctx->boldred, failed, ctx->sgr0);

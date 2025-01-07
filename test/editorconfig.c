@@ -64,7 +64,7 @@ static void test_ini_parse(TestContext *ctx)
     EXPECT_FALSE(ini_parse(&ini));
 }
 
-static void test_editorconfig_pattern_match(TestContext *ctx)
+static void test_ec_pattern_match(TestContext *ctx)
 {
     #define patmatch(s, f) (ec_pattern_match(s, STRLEN(s), f))
 
@@ -162,7 +162,7 @@ static void test_get_editorconfig_options(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_ini_parse),
-    TEST(test_editorconfig_pattern_match),
+    TEST(test_ec_pattern_match),
     TEST(test_get_editorconfig_options),
 };
 

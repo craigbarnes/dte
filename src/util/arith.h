@@ -53,7 +53,7 @@ static inline size_t size_ssub(size_t a, size_t b)
 }
 
 // Round x up to a multiple of r (which *must* be a power of 2)
-static inline size_t round_size_to_next_multiple(size_t x, size_t r)
+static inline size_t next_multiple(size_t x, size_t r)
 DIAGNOSE_IF(!IS_POWER_OF_2(r))
 {
     r--;

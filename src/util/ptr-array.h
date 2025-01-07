@@ -34,7 +34,7 @@ void ptr_array_trim_nulls(PointerArray *array) NONNULL_ARGS;
 NONNULL_ARGS
 static inline void ptr_array_init(PointerArray *array, size_t capacity)
 {
-    capacity = round_size_to_next_multiple(capacity, 8);
+    capacity = next_multiple(capacity, 8);
     array->count = 0;
     array->ptrs = capacity ? xnew(array->ptrs, capacity) : NULL;
     array->alloc = capacity;

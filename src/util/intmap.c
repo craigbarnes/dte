@@ -71,7 +71,7 @@ static int intmap_do_init(IntMap *map, size_t size)
         size = MIN_SIZE;
     }
 
-    size = round_size_to_next_power_of_2(size);
+    size = next_pow2(size);
     if (unlikely(size == 0)) {
         return EOVERFLOW;
     }

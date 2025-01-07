@@ -128,6 +128,11 @@ static void test_normal_command_errors(TestContext *ctx)
         {"wsplit -t file", "flags -n and -t can't be used with filename"},
         {"wsplit -t; wresize nonnum; wclose", "invalid resize value"},
 
+        // Error strings produced by command_parse_error_to_string():
+        {"x '", "command syntax error: unclosed '"},
+        {"x \"", "command syntax error: unclosed \""},
+        {"x \"\\", "command syntax error: unexpected EOF"},
+
         // Error strings produced by arg_parse_error_msg():
         {"bind -nnnnnnnnnn C-k eol", "too many options given"},
         {"bind -Z C-k eol", "invalid option -Z"},

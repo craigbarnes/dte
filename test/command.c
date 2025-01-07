@@ -255,16 +255,6 @@ static void test_parse_commands(TestContext *ctx)
     ptr_array_free(&array);
 }
 
-static void test_command_parse_error_to_string(TestContext *ctx)
-{
-    const char *str = command_parse_error_to_string(CMDERR_UNCLOSED_SQUOTE);
-    EXPECT_STREQ(str, "unclosed '");
-    str = command_parse_error_to_string(CMDERR_UNCLOSED_DQUOTE);
-    EXPECT_STREQ(str, "unclosed \"");
-    str = command_parse_error_to_string(CMDERR_UNEXPECTED_EOF);
-    EXPECT_STREQ(str, "unexpected EOF");
-}
-
 static void test_find_normal_command(TestContext *ctx)
 {
     const Command *cmd = find_normal_command("alias");
@@ -585,7 +575,6 @@ static void test_add_alias(TestContext *ctx)
 static const TestEntry tests[] = {
     TEST(test_parse_command_arg),
     TEST(test_parse_commands),
-    TEST(test_command_parse_error_to_string),
     TEST(test_find_normal_command),
     TEST(test_parse_args),
     TEST(test_cached_command_new),

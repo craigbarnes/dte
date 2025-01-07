@@ -162,7 +162,7 @@ static void test_history_search(TestContext *ctx)
 // churn from insertions and removals (i.e. that it rehashes the
 // table to clean out tombstones, even when the number of real
 // entries stops growing).
-static void test_history_tombstone_pressure(TestContext *ctx)
+static void test_history_tombstones(TestContext *ctx)
 {
     History h = {.max_entries = 512};
     for (unsigned int i = 0; i < 12000; i++) {
@@ -229,7 +229,7 @@ static void test_file_history_find(TestContext *ctx)
 static const TestEntry tests[] = {
     TEST(test_history_append),
     TEST(test_history_search),
-    TEST(test_history_tombstone_pressure),
+    TEST(test_history_tombstones),
     TEST(test_file_history_find),
 };
 

@@ -12,7 +12,7 @@ static COLD void string_grow(String *s, size_t min_alloc)
     while (alloc < min_alloc) {
         alloc = (alloc * 3 + 2) / 2;
     }
-    alloc = round_size_to_next_multiple(alloc, 16);
+    alloc = next_multiple(alloc, 16);
     s->alloc = alloc;
     s->buffer = xrealloc(s->buffer, alloc);
 }

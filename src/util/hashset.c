@@ -26,7 +26,7 @@ void hashset_init(HashSet *set, size_t size, bool icase)
 
     // Round up the allocation to the next power of 2, to allow using
     // simple bitwise ops (instead of modulo) in get_slot()
-    size = round_size_to_next_power_of_2(size);
+    size = next_pow2(size);
     if (unlikely(size == 0)) {
         fatal_error(__func__, EOVERFLOW);
     }
