@@ -14,11 +14,11 @@ purposes and is *not* included in [releases]:
 * `*.{sh,awk}`: See comments at the top of each script
 
 
-[releases]: https://craigbarnes.gitlab.io/dte/releases.html
+[releases]: ../CHANGELOG.md
 [`make help`]: mk/help.mk
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [semantic patches]: https://coccinelle.gitlabpages.inria.fr/website/sp.html
 [`make check-coccinelle`]: mk/lint.mk
 [`make check-clang-tidy`]: mk/clang-tidy.mk
-[`docs/contributing.md`]: docs/contributing.md#merge-requests:~:text=make%20git-hooks
+[`docs/contributing.md`]: ../docs/contributing.md#merge-requests:~:text=make%20git%2Dhooks
 [`githooks(5)`]: https://man7.org/linux/man-pages/man5/githooks.5.html#HOOKS
