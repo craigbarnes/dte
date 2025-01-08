@@ -17,6 +17,6 @@ purposes and is *not* included in [releases]:
 [releases]: https://craigbarnes.gitlab.io/dte/releases.html
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [semantic patches]: https://coccinelle.gitlabpages.inria.fr/website/sp.html
-[`make check-coccinelle`]: ../mk/dev.mk
+[`make check-coccinelle`]: mk/dev.mk
 [`docs/contributing.md`]: docs/contributing.md#merge-requests:~:text=make%20git-hooks
 [`githooks(5)`]: https://man7.org/linux/man-pages/man5/githooks.5.html#HOOKS
