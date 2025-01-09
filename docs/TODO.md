@@ -305,9 +305,11 @@ Testing/Debugging
   * `handle_exec()`
   * `spawn_compiler()`
   * `dump_buffer()`
+  * `src/case.c`
   * `src/cmdline.c`
+  * `src/erase.c`
   * `src/load-save.c`
-  * `src/misc.c`
+  * `src/selection.c`
   * `src/show.c`
   * `src/tag.c`
   * `src/view.c`

@@ -47,12 +47,12 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
     query rxvt style terminal )
 
 editor_objects := $(call prefix-obj, build/, \
-    bind block block-iter bookmark buffer change cmdline commands \
-    compat compiler completion config convert copy ctags edit editor \
-    encoding error exec file-history file-option filetype frame history \
-    indent insert load-save lock main misc mode move msg options regexp \
-    replace search selection shift show signals spawn status tag vars \
-    view window wrap \
+    bind block block-iter bookmark buffer case change cmdline commands \
+    compat compiler completion config convert copy ctags delete edit \
+    editor encoding error exec file-history file-option filetype frame \
+    history indent insert join load-save lock main mode move msg options \
+    regexp replace search selection shift show signals spawn status tag \
+    vars view window wrap \
     $(addprefix ui-, cmdline prompt status tabbar view window) ui ) \
     $(command_objects) \
     $(editorconfig_objects) \

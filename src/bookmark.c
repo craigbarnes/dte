@@ -3,9 +3,9 @@
 #include "bookmark.h"
 #include "buffer.h"
 #include "editor.h"
-#include "misc.h"
 #include "move.h"
 #include "search.h"
+#include "selection.h"
 #include "util/debug.h"
 
 FileLocation *get_current_file_location(const View *v)

@@ -3,7 +3,6 @@
 #include "block-iter.h"
 #include "change.h"
 #include "insert.h"
-#include "misc.h"
 #include "move.h"
 #include "selection.h"
 #include "util/debug.h"

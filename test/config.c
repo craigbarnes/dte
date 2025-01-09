@@ -10,7 +10,6 @@
 #include "error.h"
 #include "frame.h"
 #include "insert.h"
-#include "misc.h"
 #include "mode.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"

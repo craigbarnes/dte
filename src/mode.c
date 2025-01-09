@@ -7,7 +7,6 @@
 #include "completion.h"
 #include "editor.h"
 #include "insert.h"
-#include "misc.h"
 #include "shift.h"
 #include "terminal/paste.h"
 #include "util/debug.h"

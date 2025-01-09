@@ -4,7 +4,6 @@
 #include "wrap.h"
 #include "buffer.h"
 #include "indent.h"
-#include "misc.h"
 #include "selection.h"
 #include "util/string-view.h"
 #include "util/string.h"

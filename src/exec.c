@@ -10,7 +10,6 @@
 #include "commands.h"
 #include "ctags.h"
 #include "error.h"
-#include "misc.h"
 #include "move.h"
 #include "msg.h"
 #include "selection.h"

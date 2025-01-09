@@ -1,5 +1,6 @@
 #include "selection.h"
 #include "editor.h"
+#include "regexp.h"
 #include "util/unicode.h"
 
 static bool include_cursor_char_in_selection(const View *view)
@@ -90,4 +91,90 @@ size_t get_nr_selected_chars(const SelectionInfo *info)
     }
 
     return nr_chars;
+}
+
+bool line_has_opening_brace(StringView line)
+{
+    static regex_t re;
+    static bool compiled;
+    if (!compiled) {
+        // TODO: Reimplement without using regex
+        static const char pat[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
+        regexp_compile_or_fatal_error(&re, pat, REG_NEWLINE | REG_NOSUB);
+        compiled = true;
+    }
+
+    regmatch_t m;
+    return regexp_exec(&re, line.data, line.length, 0, &m, 0);
+}
+
+bool line_has_closing_brace(StringView line)
+{
+    strview_trim_left(&line);
+    return line.length > 0 && line.data[0] == '}';
+}
+
+/*
+ * Stupid { ... } block selector.
+ *
+ * Because braces can be inside strings or comments and writing real
+ * parser for many programming languages does not make sense the rules
+ * for selecting a block are made very simple. Line that matches \{\s*$
+ * starts a block and line that matches ^\s*\} ends it.
+ */
+void select_block(View *view)
+{
+    BlockIter bi = view->cursor;
+    StringView line;
+    fetch_this_line(&bi, &line);
+
+    // If current line does not match \{\s*$ but matches ^\s*\} then
+    // cursor is likely at end of the block you want to select
+    if (!line_has_opening_brace(line) && line_has_closing_brace(line)) {
+        block_iter_prev_line(&bi);
+    }
+
+    BlockIter sbi;
+    int level = 0;
+    while (1) {
+        fetch_this_line(&bi, &line);
+        if (line_has_opening_brace(line)) {
+            if (level++ == 0) {
+                sbi = bi;
+                block_iter_next_line(&bi);
+                break;
+            }
+        }
+        if (line_has_closing_brace(line)) {
+            level--;
+        }
+
+        if (!block_iter_prev_line(&bi)) {
+            return;
+        }
+    }
+
+    BlockIter ebi;
+    while (1) {
+        fetch_this_line(&bi, &line);
+        if (line_has_closing_brace(line)) {
+            if (--level == 0) {
+                ebi = bi;
+                break;
+            }
+        }
+        if (line_has_opening_brace(line)) {
+            level++;
+        }
+
+        if (!block_iter_next_line(&bi)) {
+            return;
+        }
+    }
+
+    view->cursor = sbi;
+    view->sel_so = block_iter_get_offset(&ebi);
+    view->sel_eo = SEL_EO_RECALC;
+    view->selection = SELECT_LINES;
+    mark_all_lines_changed(view->buffer);
 }

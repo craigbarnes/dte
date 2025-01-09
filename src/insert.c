@@ -5,7 +5,6 @@
 #include "buffer.h"
 #include "change.h"
 #include "indent.h"
-#include "misc.h"
 #include "options.h"
 #include "selection.h"
 #include "util/utf8.h"
