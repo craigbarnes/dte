@@ -75,9 +75,9 @@ static inline char *path_join(const char *s1, const char *s2)
     return path_joinx(s1, s2, false);
 }
 
-// If path is the root directory, return false. Otherwise, mutate
-// the path argument to become its parent directory and return true.
-// Note: path *must* be canonical (i.e. as returned by path_absolute()).
+// If path is the root directory, return false. Otherwise, mutate the
+// path argument to become its parent directory and return true. Note
+// that path *must* be canonical (i.e. as returned by path_absolute()).
 static inline bool path_parent(StringView *path)
 {
     BUG_ON(!strview_has_prefix(path, "/"));
@@ -90,9 +90,10 @@ static inline bool path_parent(StringView *path)
         BUG_ON(strview_has_suffix(path, "/"));
     }
 
+    // Adjust the length, to exclude the last path component
     ssize_t slash_idx = strview_memrchr_idx(path, '/');
     BUG_ON(slash_idx < 0);
-    path->length = MAX(slash_idx, 1);
+    path->length = MAX(slash_idx, 1); // Shortest valid path is "/"
     return true;
 }
 
