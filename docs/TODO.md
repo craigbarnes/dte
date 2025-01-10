@@ -307,7 +307,6 @@ Testing/Debugging
   * `dump_buffer()`
   * `src/case.c`
   * `src/cmdline.c`
-  * `src/erase.c`
   * `src/load-save.c`
   * `src/selection.c`
   * `src/show.c`

@@ -1,0 +1,36 @@
+open
+set -l expand-tab true
+set -l emulate-tab true
+set -l indent-width 4
+
+repeat 3 insert ' 1234567890'
+delete
+repeat 2 word-fwd -s
+delete
+repeat 3 right
+repeat 3 right -c
+delete
+eol
+delete
+bol
+right
+delete
+right
+right -c
+delete
+word-fwd -s
+repeat 6 right
+repeat 2 left -c
+repeat 2 erase
+
+eol
+insert -k "\n\n\tline1\nline2\nline3"
+clear
+insert -k "\nline4\nline5\nline6"
+up
+up -l
+clear
+insert -k ...
+
+save -f build/test/delete.txt
+close
