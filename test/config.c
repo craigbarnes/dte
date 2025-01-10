@@ -110,6 +110,7 @@ static void test_exec_config(TestContext *ctx)
         "exec.txt",
         "move.txt",
         "delete.txt",
+        "tag.txt",
     };
 
     // Delete output files left over from previous runs

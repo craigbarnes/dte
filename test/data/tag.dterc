@@ -1,0 +1,15 @@
+open
+cd test/data/
+
+# This is redundant if the `tag` command finds and jumps to a tag,
+# but it's here just in case it doesn't
+bookmark
+
+tag c_syntax_test
+copy
+tag -r
+paste
+
+cd -
+save -f build/test/tag.txt
+close

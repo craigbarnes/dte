@@ -1,0 +1,1 @@
+c_syntax_test	test.c	/^int c_syntax_test(int argc, char *argv[])$/;"	f	typeref:typename:int

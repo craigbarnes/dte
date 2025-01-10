@@ -1,0 +1,1 @@
+int c_syntax_test(int argc, char *argv[])
