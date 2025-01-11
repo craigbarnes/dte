@@ -404,7 +404,7 @@ void buffer_setup(EditorState *e, Buffer *buffer)
     if (buffer->options.detect_indent && filename) {
         detect_indent(buffer);
     }
-    sanity_check_local_options(&buffer->options);
+    sanity_check_local_options(e->err, &buffer->options);
 }
 
 void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])

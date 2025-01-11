@@ -122,7 +122,7 @@ EditorState *init_editor_state(EditorFlags flags)
         }
     };
 
-    sanity_check_global_options(&e->options);
+    sanity_check_global_options(e->err, &e->options);
 
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");

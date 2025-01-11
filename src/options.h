@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "error.h"
 #include "regexp.h"
 #include "util/debug.h"
 #include "util/macros.h"
@@ -97,7 +98,7 @@ bool set_option(struct EditorState *e, const char *name, const char *value, bool
 bool set_bool_option(struct EditorState *e, const char *name, bool local, bool global);
 bool toggle_option(struct EditorState *e, const char *name, bool global, bool verbose);
 bool toggle_option_values(struct EditorState *e, const char *name, bool global, bool verbose, char **values, size_t count);
-bool validate_local_options(char **strs);
+bool validate_local_options(ErrorBuffer *ebuf, char **strs);
 void collect_options(PointerArray *a, const char *prefix, bool local, bool global);
 void collect_auto_options(PointerArray *a, const char *prefix);
 void collect_toggleable_options(PointerArray *a, const char *prefix, bool global);
@@ -106,11 +107,11 @@ String dump_options(GlobalOptions *gopts, LocalOptions *lopts);
 const char *get_option_value_string(struct EditorState *e, const char *name);
 
 #if DEBUG >= 1
-    void sanity_check_global_options(const GlobalOptions *opts);
-    void sanity_check_local_options(const LocalOptions *lopts);
+    void sanity_check_global_options(ErrorBuffer *ebuf, const GlobalOptions *opts);
+    void sanity_check_local_options(ErrorBuffer *ebuf, const LocalOptions *lopts);
 #else
-    static inline void sanity_check_global_options(const GlobalOptions* UNUSED_ARG(gopts)) {}
-    static inline void sanity_check_local_options(const LocalOptions* UNUSED_ARG(lopts)) {}
+    static inline void sanity_check_global_options(ErrorBuffer* UNUSED_ARG(ebuf), const GlobalOptions* UNUSED_ARG(gopts)) {}
+    static inline void sanity_check_local_options(ErrorBuffer* UNUSED_ARG(ebuf), const LocalOptions* UNUSED_ARG(lopts)) {}
 #endif
 
 #endif

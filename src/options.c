@@ -40,7 +40,7 @@ typedef union {
 } OptionValue;
 
 typedef union {
-    struct {bool (*validate)(const char *value);} str_opt; // OPT_STR (optional)
+    struct {bool (*validate)(ErrorBuffer *ebuf, const char *value);} str_opt; // OPT_STR (optional)
     struct {unsigned int min, max;} uint_opt; // OPT_UINT
     struct {const char *const *values;} enum_opt; // OPT_ENUM, OPT_FLAG, OPT_BOOL
 } OptionConstraint;
@@ -184,7 +184,7 @@ static void redraw_screen(EditorState *e, bool global)
     e->screen_update |= UPDATE_ALL_WINDOWS;
 }
 
-static bool validate_statusline_format(const char *value)
+static bool validate_statusline_format(ErrorBuffer *ebuf, const char *value)
 {
     size_t errpos = statusline_format_find_error(value);
     if (likely(errpos == 0)) {
@@ -192,15 +192,15 @@ static bool validate_statusline_format(const char *value)
     }
     char ch = value[errpos];
     if (ch == '\0') {
-        return error_msg_("Format character expected after '%%'");
+        return error_msg(ebuf, "Format character expected after '%%'");
     }
-    return error_msg_("Invalid format character '%c'", ch);
+    return error_msg(ebuf, "Invalid format character '%c'", ch);
 }
 
-static bool validate_filetype(const char *value)
+static bool validate_filetype(ErrorBuffer *ebuf, const char *value)
 {
     if (!is_valid_filetype_name(value)) {
-        return error_msg_("Invalid filetype name '%s'", value);
+        return error_msg(ebuf, "Invalid filetype name '%s'", value);
     }
     return true;
 }
@@ -217,9 +217,9 @@ static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
     *strp = str_intern(v.str_val);
 }
 
-static bool str_parse(const OptionDesc *d, const char *str, OptionValue *v)
+static bool str_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
-    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(str);
+    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(ebuf, str);
     v->str_val = valid ? str : NULL;
     return valid;
 }
@@ -248,7 +248,7 @@ static void re_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
     *irp = v.str_val ? regexp_intern(v.str_val) : NULL;
 }
 
-static bool re_parse(const OptionDesc* UNUSED_ARG(d), const char *str, OptionValue *v)
+static bool re_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer* UNUSED_ARG(ebuf), const char *str, OptionValue *v)
 {
     if (str[0] == '\0') {
         v->str_val = NULL;
@@ -278,17 +278,17 @@ static void uint_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
     *valp = v.uint_val;
 }
 
-static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
+static bool uint_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     unsigned int val;
     if (!str_to_uint(str, &val)) {
-        return error_msg_("Integer value for %s expected", d->name);
+        return error_msg(ebuf, "Integer value for %s expected", d->name);
     }
 
     const unsigned int min = d->u.uint_opt.min;
     const unsigned int max = d->u.uint_opt.max;
     if (val < min || val > max) {
-        return error_msg_("Value for %s must be in %u-%u range", d->name, min, max);
+        return error_msg(ebuf, "Value for %s must be in %u-%u range", d->name, min, max);
     }
 
     v->uint_val = val;
@@ -318,7 +318,7 @@ static void bool_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
     *valp = v.bool_val;
 }
 
-static bool bool_parse(const OptionDesc *d, const char *str, OptionValue *v)
+static bool bool_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     if (streq(str, "true")) {
         v->bool_val = true;
@@ -327,7 +327,7 @@ static bool bool_parse(const OptionDesc *d, const char *str, OptionValue *v)
         v->bool_val = false;
         return true;
     }
-    return error_msg_("Invalid value for %s", d->name);
+    return error_msg(ebuf, "Invalid value for %s", d->name);
 }
 
 static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
@@ -341,7 +341,7 @@ static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue 
     return *valp == v.bool_val;
 }
 
-static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
+static bool enum_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     const char *const *values = d->u.enum_opt.values;
     unsigned int i;
@@ -354,7 +354,7 @@ static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
 
     unsigned int val;
     if (!str_to_uint(str, &val) || val >= i) {
-        return error_msg_("Invalid value for %s", d->name);
+        return error_msg(ebuf, "Invalid value for %s", d->name);
     }
 
     v->uint_val = val;
@@ -366,7 +366,7 @@ static const char *enum_string(const OptionDesc *desc, OptionValue value)
     return desc->u.enum_opt.values[value.uint_val];
 }
 
-static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
+static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     // "0" is allowed for compatibility and is the same as ""
     if (str[0] == '0' && str[1] == '\0') {
@@ -388,7 +388,7 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
         }
         if (unlikely(!values[i])) {
             int flen = (int)flag.length;
-            return error_msg_("Invalid flag '%.*s' for %s", flen, flag.data, d->name);
+            return error_msg(ebuf, "Invalid flag '%.*s' for %s", flen, flag.data, d->name);
         }
     }
 
@@ -425,7 +425,7 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     return buf;
 }
 
-static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), const char *str, OptionValue *value)
+static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, const char *str, OptionValue *value)
 {
     unsigned int x;
     if (str_to_uint(str, &x)) {
@@ -444,7 +444,7 @@ static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), const char *str, Option
         }
     }
 
-    error_msg_("Invalid filesize: '%s'", str);
+    error_msg(ebuf, "Invalid filesize: '%s'", str);
     return false;
 }
 
@@ -460,7 +460,7 @@ static const char *fsize_string(const OptionDesc* UNUSED_ARG(d), OptionValue val
 static const struct {
     OptionValue (*get)(const OptionDesc *desc, void *ptr);
     void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
-    bool (*parse)(const OptionDesc *desc, const char *str, OptionValue *value);
+    bool (*parse)(const OptionDesc *desc, ErrorBuffer *ebuf, const char *str, OptionValue *value);
     const char *(*string)(const OptionDesc *desc, OptionValue value);
     bool (*equals)(const OptionDesc *desc, void *ptr, OptionValue value);
 } option_ops[] = {
@@ -578,6 +578,7 @@ UNITTEST {
     static_assert(offsetof(CommonOptions, syntax) == offsetof(LocalOptions, syntax));
     GlobalOptions gopts = {.tab_bar = true};
     LocalOptions lopts = {.filetype = NULL};
+    ErrorBuffer ebuf = {.print_to_stderr = false};
 
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
@@ -615,7 +616,7 @@ UNITTEST {
             const char *str = flag_string(desc, val);
             BUG_ON(!str);
             BUG_ON(str[0] == '\0');
-            if (!flag_parse(desc, str, &val)) {
+            if (!flag_parse(desc, &ebuf, str, &val)) {
                 BUG("flag_parse() failed for string: %s", str);
             }
             unsigned int mask = (1u << nvals) - 1;
@@ -651,9 +652,9 @@ static void desc_set(EditorState *e, const OptionDesc *desc, void *ptr, bool glo
     }
 }
 
-static bool desc_parse(const OptionDesc *desc, const char *str, OptionValue *value)
+static bool desc_parse(const OptionDesc *desc, ErrorBuffer *ebuf, const char *str, OptionValue *value)
 {
-    return option_ops[desc->type].parse(desc, str, value);
+    return option_ops[desc->type].parse(desc, ebuf, str, value);
 }
 
 static const char *desc_string(const OptionDesc *desc, OptionValue value)
@@ -673,20 +674,20 @@ static const OptionDesc *find_option(const char *name)
     return BSEARCH(name, option_desc, option_cmp);
 }
 
-static const OptionDesc *must_find_option(const char *name)
+static const OptionDesc *must_find_option(ErrorBuffer *ebuf, const char *name)
 {
     const OptionDesc *desc = find_option(name);
     if (!desc) {
-        error_msg_("No such option %s", name);
+        error_msg(ebuf, "No such option %s", name);
     }
     return desc;
 }
 
-static const OptionDesc *must_find_global_option(const char *name)
+static const OptionDesc *must_find_global_option(ErrorBuffer *ebuf, const char *name)
 {
-    const OptionDesc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(ebuf, name);
     if (desc && !desc->global) {
-        error_msg_("Option %s is not global", name);
+        error_msg(ebuf, "Option %s is not global", name);
         return NULL;
     }
     return desc;
@@ -707,7 +708,7 @@ static bool do_set_option (
     }
 
     OptionValue val;
-    if (!desc_parse(desc, value, &val)) {
+    if (!desc_parse(desc, e->err, value, &val)) {
         return false;
     }
 
@@ -729,7 +730,7 @@ static bool do_set_option (
 
 bool set_option(EditorState *e, const char *name, const char *value, bool local, bool global)
 {
-    const OptionDesc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(e->err, name);
     if (!desc) {
         return false;
     }
@@ -738,7 +739,7 @@ bool set_option(EditorState *e, const char *name, const char *value, bool local,
 
 bool set_bool_option(EditorState *e, const char *name, bool local, bool global)
 {
-    const OptionDesc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(e->err, name);
     if (!desc) {
         return false;
     }
@@ -748,14 +749,14 @@ bool set_bool_option(EditorState *e, const char *name, bool local, bool global)
     return do_set_option(e, desc, "true", local, global);
 }
 
-static const OptionDesc *find_toggle_option(const char *name, bool *global)
+static const OptionDesc *find_toggle_option(ErrorBuffer *ebuf, const char *name, bool *global)
 {
     if (*global) {
-        return must_find_global_option(name);
+        return must_find_global_option(ebuf, name);
     }
 
     // Toggle local value by default if option has both values
-    const OptionDesc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(ebuf, name);
     if (desc && !desc->local) {
         *global = true;
     }
@@ -764,7 +765,7 @@ static const OptionDesc *find_toggle_option(const char *name, bool *global)
 
 bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
 {
-    const OptionDesc *desc = find_toggle_option(name, &global);
+    const OptionDesc *desc = find_toggle_option(e->err, name, &global);
     if (!desc) {
         return false;
     }
@@ -802,7 +803,7 @@ bool toggle_option_values (
     char **values,
     size_t count
 ) {
-    const OptionDesc *desc = find_toggle_option(name, &global);
+    const OptionDesc *desc = find_toggle_option(e->err, name, &global);
     if (!desc) {
         return false;
     }
@@ -814,7 +815,7 @@ bool toggle_option_values (
     OptionValue *parsed_values = xnew(OptionValue, count);
 
     for (size_t i = 0; i < count; i++) {
-        if (desc_parse(desc, values[i], &parsed_values[i])) {
+        if (desc_parse(desc, e->err, values[i], &parsed_values[i])) {
             if (desc_equals(desc, ptr, parsed_values[i])) {
                 current = i;
             }
@@ -837,24 +838,24 @@ bool toggle_option_values (
     return !error;
 }
 
-bool validate_local_options(char **strs)
+bool validate_local_options(ErrorBuffer *ebuf, char **strs)
 {
     size_t invalid = 0;
     for (size_t i = 0; strs[i]; i += 2) {
         const char *name = strs[i];
         const char *value = strs[i + 1];
-        const OptionDesc *desc = must_find_option(name);
+        const OptionDesc *desc = must_find_option(ebuf, name);
         if (unlikely(!desc)) {
             invalid++;
         } else if (unlikely(!desc->local)) {
-            error_msg_("%s is not local", name);
+            error_msg(ebuf, "%s is not local", name);
             invalid++;
         } else if (unlikely(desc->on_change == filetype_changed)) {
-            error_msg_("filetype cannot be set via option command");
+            error_msg(ebuf, "filetype cannot be set via option command");
             invalid++;
         } else {
             OptionValue val;
-            if (unlikely(!desc_parse(desc, value, &val))) {
+            if (unlikely(!desc_parse(desc, ebuf, value, &val))) {
                 invalid++;
             }
         }
@@ -863,7 +864,7 @@ bool validate_local_options(char **strs)
 }
 
 #if DEBUG >= 1
-static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
+static void sanity_check_option_value(const OptionDesc *desc, ErrorBuffer *ebuf, OptionValue val)
 {
     // NOLINTBEGIN(bugprone-assert-side-effect)
     switch (desc->type) {
@@ -871,7 +872,7 @@ static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
         BUG_ON(!val.str_val);
         BUG_ON(val.str_val != str_intern(val.str_val));
         if (desc->u.str_opt.validate) {
-            BUG_ON(!desc->u.str_opt.validate(val.str_val));
+            BUG_ON(!desc->u.str_opt.validate(ebuf, val.str_val));
         }
         return;
     case OPT_UINT:
@@ -902,26 +903,26 @@ static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
     BUG("unhandled option type");
 }
 
-static void sanity_check_options(const void *opts, bool global)
+static void sanity_check_options(ErrorBuffer *ebuf, const void *opts, bool global)
 {
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         BUG_ON(desc->type >= ARRAYLEN(option_ops));
         if ((desc->global && desc->local) || global == desc->global) {
             OptionValue val = desc_get(desc, (char*)opts + desc->offset);
-            sanity_check_option_value(desc, val);
+            sanity_check_option_value(desc, ebuf, val);
         }
     }
 }
 
-void sanity_check_global_options(const GlobalOptions *gopts)
+void sanity_check_global_options(ErrorBuffer *ebuf, const GlobalOptions *gopts)
 {
-    sanity_check_options(gopts, true);
+    sanity_check_options(ebuf, gopts, true);
 }
 
-void sanity_check_local_options(const LocalOptions *lopts)
+void sanity_check_local_options(ErrorBuffer *ebuf, const LocalOptions *lopts)
 {
-    sanity_check_options(lopts, false);
+    sanity_check_options(ebuf, lopts, false);
 }
 #endif
 

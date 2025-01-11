@@ -1246,7 +1246,7 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
     if (unlikely(nstrs & 1)) {
         return error_msg(e->err, "missing option value");
     }
-    if (unlikely(!validate_local_options(strs))) {
+    if (unlikely(!validate_local_options(e->err, strs))) {
         return false;
     }
 
