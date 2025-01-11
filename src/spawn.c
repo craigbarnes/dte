@@ -121,7 +121,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             if (errno == EINTR) {
                 continue;
             }
-            error_msg_errno_("poll");
+            error_msg_errno(ctx->ebuf, "poll");
             return;
         }
 
@@ -132,12 +132,12 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
                 char *buf = string_reserve_space(output, 4096);
                 ssize_t rc = xread(pfd->fd, buf, output->alloc - output->len);
                 if (unlikely(rc < 0)) {
-                    error_msg_errno_("read");
+                    error_msg_errno(ctx->ebuf, "read");
                     return;
                 }
                 if (rc == 0) { // EOF
                     if (xclose(pfd->fd)) {
-                        error_msg_errno_("close");
+                        error_msg_errno(ctx->ebuf, "close");
                         return;
                     }
                     pfd->fd = -1;
@@ -150,13 +150,13 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
         if (fds[0].revents & POLLOUT) {
             ssize_t rc = xwrite(fds[0].fd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (unlikely(rc < 0)) {
-                error_msg_errno_("write");
+                error_msg_errno(ctx->ebuf, "write");
                 return;
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
                 if (xclose(fds[0].fd)) {
-                    error_msg_errno_("close");
+                    error_msg_errno(ctx->ebuf, "close");
                     return;
                 }
                 fds[0].fd = -1;
@@ -173,7 +173,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             }
             if (rev & POLLERR || (rev & (POLLHUP | POLLIN)) == POLLHUP) {
                 if (xclose(fds[i].fd)) {
-                    error_msg_errno_("close");
+                    error_msg_errno(ctx->ebuf, "close");
                 }
                 fds[i].fd = -1;
                 active_fds--;
@@ -185,46 +185,48 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
     }
 }
 
-static int open_dev_null(int flags)
+static int open_dev_null(ErrorBuffer *ebuf, int flags)
 {
     int fd = xopen("/dev/null", flags | O_CLOEXEC, 0);
     if (unlikely(fd < 0)) {
-        error_msg_errno_("Error opening /dev/null");
+        error_msg_errno(ebuf, "Error opening /dev/null");
     }
     return fd;
 }
 
-static int handle_child_error(pid_t pid)
+static int handle_child_error(ErrorBuffer *ebuf, pid_t pid)
 {
     int ret = wait_child(pid);
     if (ret < 0) {
-        error_msg_errno_("waitpid");
+        error_msg_errno(ebuf, "waitpid");
     } else if (ret >= 256) {
         int sig = ret >> 8;
         const char *str = strsignal(sig);
-        error_msg_("Child received signal %d (%s)", sig, str ? str : "??");
+        error_msg(ebuf, "Child received signal %d (%s)", sig, str ? str : "??");
     } else if (ret) {
-        error_msg_("Child returned %d", ret);
+        error_msg(ebuf, "Child returned %d", ret);
     }
     return ret;
 }
 
-static void exec_error(const char *argv0)
+static void exec_error(SpawnContext *ctx)
 {
-    error_msg_("Unable to exec '%s': %s", argv0, strerror(errno));
+    error_msg(ctx->ebuf, "Unable to exec '%s': %s", ctx->argv[0], strerror(errno));
 }
 
 bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bool read_stdout)
 {
+    BUG_ON(!ctx->argv);
     BUG_ON(!ctx->argv[0]);
+    BUG_ON(!ctx->ebuf);
 
     int fd[3];
-    fd[0] = open_dev_null(O_RDONLY);
+    fd[0] = open_dev_null(ctx->ebuf, O_RDONLY);
     if (fd[0] < 0) {
         return false;
     }
 
-    int dev_null = open_dev_null(O_WRONLY);
+    int dev_null = open_dev_null(ctx->ebuf, O_WRONLY);
     if (dev_null < 0) {
         xclose(fd[0]);
         return false;
@@ -232,7 +234,7 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bo
 
     int p[2];
     if (xpipe2(p, O_CLOEXEC) != 0) {
-        error_msg_errno_("pipe");
+        error_msg_errno(ctx->ebuf, "pipe");
         xclose(dev_null);
         xclose(fd[0]);
         return false;
@@ -249,14 +251,14 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bo
 
     pid_t pid = fork_exec(ctx->argv, NULL, fd, quiet);
     if (pid == -1) {
-        exec_error(ctx->argv[0]);
+        exec_error(ctx);
         xclose(p[1]);
     } else {
         // Must close write end of the pipe before read_errors() or
         // the read end never gets EOF!
         xclose(p[1]);
         read_errors(c, msgs, p[0], quiet);
-        handle_child_error(pid);
+        handle_child_error(ctx->ebuf, pid);
     }
 
     xclose(p[0]);
@@ -291,7 +293,9 @@ UNITTEST {
 
 int spawn(SpawnContext *ctx)
 {
+    BUG_ON(!ctx->argv);
     BUG_ON(!ctx->argv[0]);
+    BUG_ON(!ctx->ebuf);
 
     int child_fds[3] = {-1, -1, -1};
     int parent_fds[3] = {-1, -1, -1};
@@ -307,7 +311,7 @@ int spawn(SpawnContext *ctx)
             }
             // Fallthrough
         case SPAWN_NULL:
-            child_fds[i] = open_dev_null(O_RDWR);
+            child_fds[i] = open_dev_null(ctx->ebuf, O_RDWR);
             if (child_fds[i] < 0) {
                 goto error;
             }
@@ -315,7 +319,7 @@ int spawn(SpawnContext *ctx)
         case SPAWN_PIPE: {
             int p[2];
             if (xpipe2(p, O_CLOEXEC) != 0) {
-                error_msg_errno_("pipe");
+                error_msg_errno(ctx->ebuf, "pipe");
                 goto error;
             }
             BUG_ON(p[0] <= STDERR_FILENO);
@@ -323,7 +327,7 @@ int spawn(SpawnContext *ctx)
             child_fds[i] = i ? p[1] : p[0];
             parent_fds[i] = i ? p[0] : p[1];
             if (!fd_set_nonblock(parent_fds[i], true)) {
-                error_msg_errno_("fcntl");
+                error_msg_errno(ctx->ebuf, "fcntl");
                 goto error;
             }
             nr_pipes++;
@@ -337,7 +341,7 @@ int spawn(SpawnContext *ctx)
 
     pid_t pid = fork_exec(ctx->argv, ctx->env, child_fds, quiet);
     if (pid == -1) {
-        exec_error(ctx->argv[0]);
+        exec_error(ctx);
         goto error;
     }
 
@@ -349,7 +353,7 @@ int spawn(SpawnContext *ctx)
     safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
     int err = wait_child(pid);
     if (err < 0) {
-        error_msg_errno_("waitpid");
+        error_msg_errno(ctx->ebuf, "waitpid");
     }
 
     return err;

@@ -263,6 +263,7 @@ ssize_t handle_exec (
         .argv = argv,
         .outputs = {STRING_INIT, STRING_INIT},
         .quiet = quiet,
+        .ebuf = e->err,
         .env = output_to_buffer ? lines_and_columns_env(e->window) : NULL,
         .actions = {
             spawn_action_from_exec_action(actions[0]),

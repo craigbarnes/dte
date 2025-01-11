@@ -20,6 +20,7 @@ typedef struct {
     StringView input;
     String outputs[2]; // For stdout/stderr
     SpawnAction actions[3];
+    ErrorBuffer *ebuf;
     bool quiet;
 } SpawnContext;
 

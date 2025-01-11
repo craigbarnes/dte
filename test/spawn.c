@@ -9,10 +9,12 @@ static void test_spawn(TestContext *ctx)
         NULL
     };
 
+    ErrorBuffer ebuf = {.print_to_stderr = false};
     SpawnContext sc = {
         .argv = args,
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
+        .ebuf = &ebuf,
         .quiet = true,
         .actions = {
             [STDIN_FILENO] = SPAWN_PIPE,

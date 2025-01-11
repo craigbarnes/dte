@@ -438,6 +438,7 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
 
     SpawnContext ctx = {
         .argv = (const char **)a->args + 1,
+        .ebuf = e->err,
         .quiet = quiet,
     };
 
