@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include "buffer.h"
-#include "options.h"
 #include "util/macros.h"
 
 typedef struct {
@@ -15,8 +14,10 @@ typedef struct {
     bool hardlinks;
 } FileSaveContext;
 
-bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, bool must_exist) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
+struct EditorState;
+
+bool load_buffer(struct EditorState *e, Buffer *buffer, const char *filename, bool must_exist) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool save_buffer(struct EditorState *e, Buffer *buffer, const char *filename, const FileSaveContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
 bool read_blocks(Buffer *buffer, int fd, bool utf8_bom) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

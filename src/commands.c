@@ -1888,7 +1888,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         .hardlinks = hardlinks,
     };
 
-    if (!save_buffer(buffer, absolute, &ctx)) {
+    if (!save_buffer(e, buffer, absolute, &ctx)) {
         goto error;
     }
 

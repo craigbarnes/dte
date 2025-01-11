@@ -10,8 +10,10 @@
 #include "load-save.h"
 #include "block.h"
 #include "convert.h"
+#include "editor.h"
 #include "encoding.h"
 #include "error.h"
+#include "options.h"
 #include "util/debug.h"
 #include "util/fd.h"
 #include "util/list.h"
@@ -212,18 +214,19 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
-bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, bool must_exist)
+bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must_exist)
 {
     BUG_ON(buffer->abs_filename);
     BUG_ON(!list_empty(&buffer->blocks));
+    const GlobalOptions *gopts = &e->options;
 
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd < 0) {
         if (errno != ENOENT) {
-            return error_msg_("Error opening %s: %s", filename, strerror(errno));
+            return error_msg(e->err, "Error opening %s: %s", filename, strerror(errno));
         }
         if (must_exist) {
-            return error_msg_("File %s does not exist", filename);
+            return error_msg(e->err, "File %s does not exist", filename);
         }
         if (!buffer->encoding) {
             buffer->encoding = encoding_from_type(UTF8);
@@ -236,17 +239,17 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
 
     FileInfo *info = &buffer->file;
     if (!buffer_fstat(info, fd)) {
-        error_msg_("fstat failed on %s: %s", filename, strerror(errno));
+        error_msg(e->err, "fstat failed on %s: %s", filename, strerror(errno));
         goto error;
     }
     if (!S_ISREG(info->mode)) {
-        error_msg_("Not a regular file %s", filename);
+        error_msg(e->err, "Not a regular file %s", filename);
         goto error;
     }
 
     off_t size = info->size;
     if (unlikely(size < 0)) {
-        error_msg_("Invalid file size: %jd", (intmax_t)size);
+        error_msg(e->err, "Invalid file size: %jd", (intmax_t)size);
         goto error;
     }
 
@@ -254,7 +257,8 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
     if (limit_mib > 0) {
         uintmax_t size_mib = filesize_in_mib(size);
         if (unlikely(size_mib > limit_mib)) {
-            error_msg_ (
+            error_msg (
+                e->err,
                 "File size (%juMiB) exceeds 'filesize-limit' option (%uMiB): %s",
                 size_mib, limit_mib, filename
             );
@@ -263,7 +267,7 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
     }
 
     if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
-        error_msg_("Error reading %s: %s", filename, strerror(errno));
+        error_msg(e->err, "Error reading %s: %s", filename, strerror(errno));
         goto error;
     }
 
@@ -279,6 +283,7 @@ error:
 static bool write_buffer (
     Buffer *buffer,
     FileEncoder *enc,
+    ErrorBuffer *ebuf,
     const ByteOrderMark *bom,
     int fd
 ) {
@@ -286,7 +291,7 @@ static bool write_buffer (
     if (bom) {
         size = bom->len;
         if (size && xwrite_all(fd, bom->bytes, size) < 0) {
-            return error_msg_errno_("write");
+            return error_msg_errno(ebuf, "write");
         }
     }
 
@@ -294,7 +299,7 @@ static bool write_buffer (
     block_for_each(blk, &buffer->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {
-            return error_msg_errno_("write");
+            return error_msg_errno(ebuf, "write");
         }
         size += rc;
     }
@@ -302,7 +307,8 @@ static bool write_buffer (
     size_t nr_errors = file_encoder_get_nr_errors(enc);
     if (nr_errors > 0) {
         // Any real error hides this message
-        error_msg_ (
+        error_msg (
+            ebuf,
             "Warning: %zu non-reversible character conversion%s; file saved",
             nr_errors,
             (nr_errors > 1) ? "s" : ""
@@ -311,7 +317,7 @@ static bool write_buffer (
 
     // Need to truncate if writing to existing file
     if (xftruncate(fd, size)) {
-        return error_msg_errno_("ftruncate");
+        return error_msg_errno(ebuf, "ftruncate");
     }
 
     return true;
@@ -419,7 +425,7 @@ static int xfsync(int fd)
 #endif
 }
 
-bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx)
+bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const FileSaveContext *ctx)
 {
     BUG_ON(!ctx->encoding);
 
@@ -443,7 +449,7 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
-            return error_msg_errno_("open");
+            return error_msg_errno(e->err, "open");
         }
     }
 
@@ -453,24 +459,24 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
     }
 
     FileEncoder enc = file_encoder(ctx->encoding, ctx->crlf, fd);
-    if (!write_buffer(buffer, &enc, bom, fd)) {
+    if (!write_buffer(buffer, &enc, e->err, bom, fd)) {
         goto error;
     }
 
     if (buffer->options.fsync && xfsync(fd) != 0) {
-        error_msg_errno_("fsync");
+        error_msg_errno(e->err, "fsync");
         goto error;
     }
 
     int r = xclose(fd);
     fd = -1;
     if (r != 0) {
-        error_msg_errno_("close");
+        error_msg_errno(e->err, "close");
         goto error;
     }
 
     if (tmp[0] && rename(tmp, filename)) {
-        error_msg_errno_("rename");
+        error_msg_errno(e->err, "rename");
         goto error;
     }
 
