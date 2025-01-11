@@ -240,7 +240,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
             buffer->temporary = true;
         } else {
             error_msg(e->err, "Unable to read redirected stdin");
-            buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
+            buffer_remove_unlock_and_free(e, buffer);
             buffer = NULL;
         }
     }

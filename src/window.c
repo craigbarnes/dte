@@ -81,7 +81,7 @@ View *window_open_buffer (
 
     buffer = buffer_new(&e->buffers, &e->options, encoding);
     if (!load_buffer(e, buffer, filename, must_exist)) {
-        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
+        buffer_remove_unlock_and_free(e, buffer);
         free(absolute);
         return NULL;
     }
@@ -92,7 +92,7 @@ View *window_open_buffer (
     buffer_update_short_filename(buffer, &e->home_dir);
 
     if (e->options.lock_files) {
-        if (!lock_file(&e->locks_ctx, buffer->abs_filename)) {
+        if (!lock_file(&e->locks_ctx, ebuf, buffer->abs_filename)) {
             buffer->readonly = true;
         } else {
             buffer->locked = true;
@@ -189,7 +189,7 @@ size_t remove_view(View *view)
             FileHistory *hist = &e->file_history;
             file_history_append(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
         }
-        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->locks_ctx);
+        buffer_remove_unlock_and_free(e, buffer);
     }
 
     free(view);

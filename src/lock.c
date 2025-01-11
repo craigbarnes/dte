@@ -8,7 +8,6 @@
 #include <time.h>
 #include <unistd.h>
 #include "lock.h"
-#include "error.h"
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/path.h"
@@ -106,7 +105,7 @@ static pid_t rewrite_lock_file(const FileLocksContext *ctx, char *buf, size_t *s
     return other_pid;
 }
 
-static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bool lock)
+static bool lock_or_unlock(const FileLocksContext *ctx, ErrorBuffer *ebuf, const char *filename, bool lock)
 {
     const char *const file_locks = ctx->locks;
     const char *const file_locks_lock = ctx->locks_lock;
@@ -125,17 +124,18 @@ static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bo
         }
 
         if (errno != EEXIST) {
-            return error_msg_("Error creating %s: %s", file_locks_lock, strerror(errno));
+            return error_msg(ebuf, "Error creating %s: %s", file_locks_lock, strerror(errno));
         }
         if (++tries == 3) {
             if (unlink(file_locks_lock)) {
-                return error_msg_ (
+                return error_msg (
+                    ebuf,
                     "Error removing stale lock file %s: %s",
                     file_locks_lock,
                     strerror(errno)
                 );
             }
-            error_msg_("Stale lock file %s removed", file_locks_lock);
+            error_msg(ebuf, "Stale lock file %s removed", file_locks_lock);
         } else {
             struct timespec ts = {.tv_nsec = 100 * NS_PER_MS}; // 100ms
             nanosleep(&ts, NULL);
@@ -146,7 +146,7 @@ static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bo
     ssize_t ssize = read_file(file_locks, &buf, 0);
     if (ssize < 0) {
         if (errno != ENOENT) {
-            error_msg_("Error reading %s: %s", file_locks, strerror(errno));
+            error_msg(ebuf, "Error reading %s: %s", file_locks, strerror(errno));
             goto error;
         }
         ssize = 0;
@@ -162,25 +162,25 @@ static bool lock_or_unlock(const FileLocksContext *ctx, const char *filename, bo
             size += xsnprintf(buf + size, n, "%jd %s\n", p, filename);
         } else {
             intmax_t p = (intmax_t)pid;
-            error_msg_("File is locked (%s) by process %jd", file_locks, p);
+            error_msg(ebuf, "File is locked (%s) by process %jd", file_locks, p);
         }
     }
 
     if (xwrite_all(wfd, buf, size) < 0) {
-        error_msg_("Error writing %s: %s", file_locks_lock, strerror(errno));
+        error_msg(ebuf, "Error writing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
 
     int r = xclose(wfd);
     wfd = -1;
     if (r != 0) {
-        error_msg_("Error closing %s: %s", file_locks_lock, strerror(errno));
+        error_msg(ebuf, "Error closing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
 
     if (rename(file_locks_lock, file_locks)) {
         const char *err = strerror(errno);
-        error_msg_("Renaming %s to %s: %s", file_locks_lock, file_locks, err);
+        error_msg(ebuf, "Renaming %s to %s: %s", file_locks_lock, file_locks, err);
         goto error;
     }
 
@@ -196,12 +196,12 @@ error:
     return false;
 }
 
-bool lock_file(const FileLocksContext *ctx, const char *filename)
+bool lock_file(const FileLocksContext *ctx, ErrorBuffer *ebuf, const char *filename)
 {
-    return lock_or_unlock(ctx, filename, true);
+    return lock_or_unlock(ctx, ebuf, filename, true);
 }
 
-void unlock_file(const FileLocksContext *ctx, const char *filename)
+void unlock_file(const FileLocksContext *ctx, ErrorBuffer *ebuf, const char *filename)
 {
-    lock_or_unlock(ctx, filename, false);
+    lock_or_unlock(ctx, ebuf, filename, false);
 }

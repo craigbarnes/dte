@@ -204,7 +204,7 @@ void free_editor_state(EditorState *e)
     clear_messages(&e->messages);
     free_macro(&e->macro);
     tag_file_free(&e->tagfile);
-    free_buffers(&e->buffers, &e->locks_ctx);
+    free_buffers(e);
     free_file_locks_context(&e->locks_ctx);
 
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
