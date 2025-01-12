@@ -172,21 +172,24 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
         return false;
     }
 
-    BlockIter bi = block_iter(view->buffer);
-    size_t nr_bytes;
-    bool swapped = false;
+    BlockIter bi;
+    bool swapped;
+    size_t nr_bytes = 0;
     if (view->selection) {
         SelectionInfo info = init_selection(view);
+        bi = info.si;
         view->cursor = info.si;
         view->sel_so = info.so;
         view->sel_eo = info.eo;
-        swapped = info.swapped;
-        bi = view->cursor;
         nr_bytes = info.eo - info.so;
+        swapped = info.swapped;
     } else {
-        BlockIter eof = bi;
-        block_iter_eof(&eof);
-        nr_bytes = block_iter_get_offset(&eof);
+        const Block *blk;
+        block_for_each(blk, &view->buffer->blocks) {
+            nr_bytes += blk->size;
+        }
+        bi = block_iter(view->buffer); // BOF
+        swapped = false;
     }
 
     // Record multiple changes as one chain only when replacing all
