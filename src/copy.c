@@ -16,18 +16,11 @@ void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
     clip->is_lines = is_lines;
 }
 
-void copy(Clipboard *clip, View *view, size_t len, bool is_lines)
+void cut(Clipboard *clip, View *view, size_t len, bool is_lines)
 {
     if (len) {
         char *buf = block_iter_get_bytes(&view->cursor, len);
         record_copy(clip, buf, len, is_lines);
-    }
-}
-
-void cut(Clipboard *clip, View *view, size_t len, bool is_lines)
-{
-    if (len) {
-        copy(clip, view, len, is_lines);
         buffer_delete_bytes(view, len);
     }
 }

@@ -477,16 +477,19 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    View *view = e->view;
-    const BlockIter save = view->cursor;
+    const View *view = e->view;
+    BlockIter bi;
     size_t size;
     bool line_copy;
     if (view->selection) {
-        size = prepare_selection(view);
+        SelectionInfo info = init_selection(view);
+        size = info.eo - info.so;
+        bi = info.si;
         line_copy = (view->selection == SELECT_LINES);
     } else {
-        block_iter_bol(&view->cursor);
-        BlockIter tmp = view->cursor;
+        bi = view->cursor;
+        block_iter_bol(&bi);
+        BlockIter tmp = bi;
         size = block_iter_eat_line(&tmp);
         line_copy = true;
     }
@@ -495,29 +498,24 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    if (internal) {
-        copy(&e->clipboard, view, size, line_copy);
-    }
-
+    char *buf = block_iter_get_bytes(&bi, size);
     if (osc52) {
-        if (internal) {
-            view->cursor = save;
-            if (view->selection) {
-                size = prepare_selection(view);
-            }
-        }
-        char *buf = block_iter_get_bytes(&view->cursor, size);
         if (!term_osc52_copy(&term->obuf, buf, size, clipboard, primary)) {
             error_msg_errno(e->err, "OSC 52 copy failed");
         }
+    }
+
+    if (internal) {
+        // Clipboard takes ownership of `buf`
+        record_copy(&e->clipboard, buf, size, line_copy);
+    } else {
         free(buf);
     }
 
     if (!has_flag(a, 'k')) {
-        unselect(view);
+        unselect(e->view);
     }
 
-    view->cursor = save;
     // TODO: return false if term_osc52_copy() failed?
     return true;
 }

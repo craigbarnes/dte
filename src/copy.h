@@ -19,7 +19,6 @@ typedef enum {
 } PasteLinesType;
 
 void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines);
-void copy(Clipboard *clip, View *view, size_t len, bool is_lines);
 void cut(Clipboard *clip, View *view, size_t len, bool is_lines);
 void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after);
 
