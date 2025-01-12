@@ -560,20 +560,33 @@ static bool cmd_cut(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    const long x = view_get_preferred_x(view);
+    long preferred_x = view_get_preferred_x(view);
+    size_t size;
+    bool line_copy;
+
     if (view->selection) {
-        bool is_lines = view->selection == SELECT_LINES;
-        cut(&e->clipboard, view, prepare_selection(view), is_lines);
-        if (view->selection == SELECT_LINES) {
-            move_to_preferred_x(view, x);
-        }
+        line_copy = (view->selection == SELECT_LINES);
+        size = prepare_selection(view);
         unselect(view);
     } else {
+        line_copy = true;
         block_iter_bol(&view->cursor);
         BlockIter tmp = view->cursor;
-        cut(&e->clipboard, view, block_iter_eat_line(&tmp), true);
-        move_to_preferred_x(view, x);
+        size = block_iter_eat_line(&tmp);
     }
+
+    if (size == 0) {
+        return true;
+    }
+
+    char *buf = block_iter_get_bytes(&view->cursor, size);
+    record_copy(&e->clipboard, buf, size, line_copy);
+    buffer_delete_bytes(view, size);
+
+    if (line_copy) {
+        move_to_preferred_x(view, preferred_x);
+    }
+
     return true;
 }
 
