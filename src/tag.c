@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "tag.h"
+#include "editor.h"
 #include "error.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -97,7 +98,7 @@ static int tag_cmp_r(const void *ap, const void *bp, void *userdata)
 }
 
 // Find "tags" file from directory path and its parent directories
-static int open_tag_file(char *path)
+static int open_tag_file(ErrorBuffer *ebuf, char *path)
 {
     static const char tags[] = "tags";
     while (*path) {
@@ -112,13 +113,13 @@ static int open_tag_file(char *path)
             return fd;
         }
         if (errno != ENOENT) {
-            error_msg_("failed to open '%s': %s", path, strerror(errno));
+            error_msg(ebuf, "failed to open '%s': %s", path, strerror(errno));
             return -1;
         }
         *slash = '\0';
     }
 
-    error_msg_("no tags file");
+    error_msg(ebuf, "no tags file");
     return -1;
 }
 
@@ -138,14 +139,14 @@ void tag_file_free(TagFile *tf)
     *tf = (TagFile){.filename = NULL};
 }
 
-bool load_tag_file(TagFile *tf)
+bool load_tag_file(TagFile *tf, ErrorBuffer *ebuf)
 {
     char path[8192];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
-        return error_msg_errno_("getcwd");
+        return error_msg_errno(ebuf, "getcwd");
     }
 
-    int fd = open_tag_file(path);
+    int fd = open_tag_file(ebuf, path);
     if (fd < 0) {
         return false;
     }
@@ -154,12 +155,12 @@ bool load_tag_file(TagFile *tf)
     if (unlikely(fstat(fd, &st) != 0)) {
         const char *str = strerror(errno);
         xclose(fd);
-        return error_msg_("fstat: %s", str);
+        return error_msg(ebuf, "fstat: %s", str);
     }
 
     if (unlikely(st.st_size <= 0)) {
         xclose(fd);
-        return error_msg_("empty tags file");
+        return error_msg(ebuf, "empty tags file");
     }
 
     if (tf->filename) {
@@ -174,7 +175,7 @@ bool load_tag_file(TagFile *tf)
     char *buf = malloc(st.st_size);
     if (unlikely(!buf)) {
         xclose(fd);
-        return error_msg_("malloc: %s", strerror(ENOMEM));
+        return error_msg(ebuf, "malloc: %s", strerror(ENOMEM));
     }
 
     ssize_t size = xread_all(fd, buf, st.st_size);
@@ -182,7 +183,7 @@ bool load_tag_file(TagFile *tf)
     xclose(fd);
     if (size < 0) {
         free(buf);
-        return error_msg_("read: %s", strerror(err));
+        return error_msg(ebuf, "read: %s", strerror(err));
     }
 
     *tf = (TagFile) {
@@ -286,8 +287,9 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     add_message(messages, m);
 }
 
-size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, MessageArray *messages)
+size_t tag_lookup(EditorState *e, const StringView *name, const char *filename)
 {
+    TagFile *tf = &e->tagfile;
     BUG_ON(!tf->filename);
 
     // Filename helps to find correct tags
@@ -296,7 +298,7 @@ size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, Mes
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg_("Tag '%.*s' not found", (int)name->length, name->data);
+        error_msg(e->err, "Tag '%.*s' not found", (int)name->length, name->data);
         return 0;
     }
 
@@ -304,6 +306,7 @@ size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, Mes
     // call to path_join_sv() in add_message_for_tag() handles that fine
     BUG_ON(tf->dirname_len == 0);
     StringView tagfile_dir = string_view(tf->filename, tf->dirname_len);
+    MessageArray *messages = &e->messages;
 
     for (size_t i = 0; i < ntags; i++) {
         Tag *tag = tags.ptrs[i];
@@ -316,7 +319,9 @@ size_t tag_lookup(TagFile *tf, const StringView *name, const char *filename, Mes
 
 void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
 {
-    if (!load_tag_file(tf)) {
+    ErrorBuffer ebuf;
+    ebuf.print_to_stderr = false;
+    if (!load_tag_file(tf, &ebuf)) {
         return;
     }
 
@@ -333,9 +338,10 @@ void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
     }
 }
 
-String dump_tags(TagFile *tf)
+String dump_tags(EditorState *e)
 {
-    if (!load_tag_file(tf)) {
+    TagFile *tf = &e->tagfile;
+    if (!load_tag_file(tf, e->err)) {
         return string_new(0);
     }
 

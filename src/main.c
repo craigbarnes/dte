@@ -633,13 +633,13 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    if (nr_tags > 0 && load_tag_file(&e->tagfile)) {
+    if (nr_tags > 0 && load_tag_file(&e->tagfile, e->err)) {
         MessageArray *msgs = &e->messages;
         clear_messages(msgs);
 
         for (size_t i = 0; i < nr_tags; i++) {
             StringView tagname = strview_from_cstring(tags[i]);
-            tag_lookup(&e->tagfile, &tagname, NULL, msgs);
+            tag_lookup(e, &tagname, NULL);
         }
 
         if (activate_current_message(msgs, window) && dview && nr_commands == 0) {

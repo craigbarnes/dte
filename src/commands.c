@@ -2264,20 +2264,19 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
     }
 
     MessageArray *msgs = &e->messages;
-    TagFile *tf = &e->tagfile;
     clear_messages(msgs);
-    if (!load_tag_file(tf)) {
+    if (!load_tag_file(&e->tagfile, e->err)) {
         return false;
     }
 
     const char *filename = e->buffer->abs_filename;
     if (nargs == 0) {
-        tag_lookup(tf, &word_under_cursor, filename, msgs);
+        tag_lookup(e, &word_under_cursor, filename);
     }
 
     for (size_t i = 0; i < nargs; i++) {
         StringView tagname = strview_from_cstring(a->args[i]);
-        tag_lookup(tf, &tagname, filename, msgs);
+        tag_lookup(e, &tagname, filename);
     }
 
     activate_current_message_save(msgs, &e->bookmarks, e->view);

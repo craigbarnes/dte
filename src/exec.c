@@ -153,10 +153,10 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     } else {
         // Treat `line` as a simple tag name (look it up in the tags(5) file)
         clear_messages(&e->messages);
-        if (!load_tag_file(&e->tagfile)) {
+        if (!load_tag_file(&e->tagfile, e->err)) {
             return;
         }
-        if (!tag_lookup(&e->tagfile, &line, e->buffer->abs_filename, msgs)) {
+        if (!tag_lookup(e, &line, e->buffer->abs_filename)) {
             return;
         }
     }
