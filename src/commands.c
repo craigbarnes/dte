@@ -756,15 +756,50 @@ static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
 
 static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
 {
-    BUG_ON(a->nr_args == 0);
+    BUG_ON(a->nr_args == 0 || a->nr_args > 2 + ERRORFMT_CAPTURE_MAX);
     const char *name = a->args[0];
     if (a->nr_args == 1) {
         remove_compiler(&e->compilers, name);
         return true;
     }
 
+    static_assert(NR_ERRFMT_INDICES == 4);
+    size_t max_idx = 0;
+    int8_t indices[NR_ERRFMT_INDICES] = {
+        [ERRFMT_FILE] = -1,
+        [ERRFMT_LINE] = -1,
+        [ERRFMT_COLUMN] = -1,
+        [ERRFMT_MESSAGE] = 0,
+    };
+
+    for (size_t i = 0, n = a->nr_args - 2; i < n; i++) {
+        char *cap_name = a->args[i + 2];
+        if (streq(cap_name, "_")) {
+            continue;
+        }
+        ssize_t cap_idx = errorfmt_capture_name_to_index(cap_name);
+        if (unlikely(cap_idx < 0)) {
+            return error_msg(e->err, "unknown substring name %s", cap_name);
+        }
+        max_idx = i + 1;
+        indices[cap_idx] = max_idx;
+    }
+
+
+    const char *pattern = a->args[1];
+    regex_t re;
+    if (unlikely(!regexp_compile(&re, pattern, 0))) {
+        return false;
+    }
+
+    if (unlikely(max_idx > re.re_nsub)) {
+        regfree(&re);
+        return error_msg(e->err, "invalid substring count");
+    }
+
     bool ignore = has_flag(a, 'i');
-    return add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
+    add_error_fmt(&e->compilers, name, pattern, &re, indices, ignore);
+    return true;
 }
 
 static bool cmd_exec(EditorState *e, const CommandArgs *a)
