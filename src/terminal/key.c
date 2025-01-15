@@ -5,6 +5,7 @@
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/str-util.h"
+#include "util/unicode.h"
 #include "util/utf8.h"
 
 #define KEY(keyname) [KEY_ ## keyname - KEY_SPECIAL_MIN]
@@ -62,6 +63,15 @@ UNITTEST {
     static_assert(ARRAYLEN(special_names) == NR_SPECIAL_KEYS);
     CHECK_STRING_ARRAY(special_names);
     CHECK_STRUCT_ARRAY(other_keys, name);
+
+    static_assert(KEY_UNICODE_MAX == UNICODE_MAX_VALID_CODEPOINT);
+    static_assert(KEY_MASK + 1 == 1u << 21);
+    static_assert((KEY_MASK & MOD_MASK & KEYCODE_QUERY_REPLY_BIT) == 0);
+    static_assert((KEY_MASK & KEY_SPECIAL_MIN) == KEY_SPECIAL_MIN);
+    static_assert((KEY_MASK & KEY_SPECIAL_MAX) == KEY_SPECIAL_MAX);
+    static_assert((KEY_MASK & KEY_IGNORE) == KEY_IGNORE);
+    static_assert((KEY_MASK & KEYCODE_DETECTED_PASTE) == KEYCODE_DETECTED_PASTE);
+    static_assert((KEY_MASK & KEYCODE_BRACKETED_PASTE) == KEYCODE_BRACKETED_PASTE);
 }
 
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)

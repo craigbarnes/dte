@@ -21,11 +21,12 @@ enum {
     // When stored in a 32-bit integer, it only requires the first
     // 21 low-order bits, leaving 11 high-order bits available to
     // be used as bit flags.
-    KEY_UNICODE_MAX = 0x10FFFF,
+    KEY_UNICODE_MAX = 0x10FFFF, // UNICODE_MAX_VALID_CODEPOINT
+    KEY_MASK = 0x1FFFFF, // (1 << 21) - 1
 
     // In addition to the 11 unused, high-order bits, there are also
     // 983,042 unused values in the range from KEY_UNICODE_MAX + 1 to
-    // (1 << 21) - 1, which can be used to represent special keys.
+    // KEY_MASK, which can be used to represent special keys.
     KEY_SPECIAL_MIN = KEY_UNICODE_MAX + 1,
 
     // Note: these must be kept in sync with the array of names in key.c
@@ -96,7 +97,7 @@ typedef uint32_t KeyCode;
 
 static inline KeyCode keycode_get_key(KeyCode k)
 {
-    return k & ~MOD_MASK;
+    return k & KEY_MASK;
 }
 
 static inline KeyCode keycode_get_modifiers(KeyCode k)
