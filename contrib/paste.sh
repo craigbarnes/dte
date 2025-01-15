@@ -15,15 +15,21 @@ CYGWIN*)
     exec cat /dev/clipboard ;;
 esac
 
+if test "$(uname -o 2>/dev/null)" = Android && havecmd termux-clipboard-get; then
+    # This is in the "termux-api" package (pkg install termux-api)
+    # See also: https://wiki.termux.com/wiki/Termux:API
+    exec termux-clipboard-get
+fi
+
 if test "$WAYLAND_DISPLAY" && havecmd wl-paste; then
-    exec wl-paste
+    exec wl-paste --no-newline
 fi
 
 if test "$DISPLAY"; then
     if havecmd xsel; then
-        exec xsel -b
+        exec xsel -ob
     elif havecmd xclip; then
-        exec xclip -sel clip
+        exec xclip -out -selection clipboard
     fi
 fi
 
