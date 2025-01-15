@@ -89,7 +89,7 @@ static ExitCode dump_builtin_config(const char *name)
 static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 {
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
-    e->err->print_to_stderr = true;
+    e->err.print_to_stderr = true;
     BUG_ON(e->status != EDITOR_INITIALIZING);
 
     int err;
@@ -100,10 +100,10 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
         const char *plural = (n == 1) ? "" : "s";
         printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, plural);
     } else if (err == EINVAL) {
-        error_msg(e->err, "%s: no default syntax found", filename);
+        error_msg(&e->err, "%s: no default syntax found", filename);
     }
 
-    unsigned int nr_errs = e->err->nr_errors;
+    unsigned int nr_errs = e->err.nr_errors;
     free_editor_state(e);
     return nr_errs ? EC_DATA_ERROR : EC_OK;
 }
@@ -239,7 +239,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
             name = "(stdin)";
             buffer->temporary = true;
         } else {
-            error_msg(e->err, "Unable to read redirected stdin");
+            error_msg(&e->err, "Unable to read redirected stdin");
             buffer_remove_unlock_and_free(e, buffer);
             buffer = NULL;
         }
@@ -378,9 +378,9 @@ static void read_history_files(EditorState *e)
 {
     const char *dir = e->user_config_dir;
     size_t size_limit = 64u << 20; // 64 MiB
-    file_history_load(&e->file_history, path_join(dir, "file-history"), size_limit);
-    history_load(&e->command_history, path_join(dir, "command-history"), size_limit);
-    history_load(&e->search_history, path_join(dir, "search-history"), size_limit);
+    file_history_load(&e->file_history, &e->err, path_join(dir, "file-history"), size_limit);
+    history_load(&e->command_history, &e->err, path_join(dir, "command-history"), size_limit);
+    history_load(&e->search_history, &e->err, path_join(dir, "search-history"), size_limit);
 
     // There's not much sense in saving history for headless sessions, but we
     // do still load it (above), to make it available to e.g. `exec -i command`
@@ -393,17 +393,17 @@ static void read_history_files(EditorState *e)
     }
 }
 
-static void write_history_files(const EditorState *e)
+static void write_history_files(EditorState *e)
 {
     EditorFlags flags = e->flags;
     if (flags & EFLAG_SAVE_CMD_HIST) {
-        history_save(&e->command_history);
+        history_save(&e->command_history, &e->err);
     }
     if (flags & EFLAG_SAVE_SEARCH_HIST) {
-        history_save(&e->search_history);
+        history_save(&e->search_history, &e->err);
     }
     if (flags & EFLAG_SAVE_FILE_HIST) {
-        file_history_save(&e->file_history);
+        file_history_save(&e->file_history, &e->err);
     }
 }
 
@@ -545,7 +545,7 @@ int main(int argc, char *argv[])
 
     EditorState *e = init_editor_state(headless ? EFLAG_HEADLESS : 0);
     Terminal *term = &e->terminal;
-    e->err->print_to_stderr = true;
+    e->err.print_to_stderr = true;
 
     if (!headless) {
         term_init(term, getenv("TERM"), getenv("COLORTERM"));
@@ -558,7 +558,7 @@ int main(int argc, char *argv[])
     const char *cfgdir = e->user_config_dir;
     BUG_ON(!cfgdir);
     if (mkdir(cfgdir, 0755) != 0 && errno != EEXIST) {
-        error_msg(e->err, "Error creating %s: %s", cfgdir, strerror(errno));
+        error_msg(&e->err, "Error creating %s: %s", cfgdir, strerror(errno));
         load_and_save_history = false;
         e->options.lock_files = false;
     }
@@ -582,16 +582,16 @@ int main(int argc, char *argv[])
     }
 
     if (!headless) {
-        e->err->print_to_stderr = false;
+        e->err.print_to_stderr = false;
         // Initialize terminal but don't update screen yet
         if (unlikely(!term_raw())) {
             return ec_error("tcsetattr", EC_IO_ERROR);
         }
-        if (e->err->nr_errors) {
+        if (e->err.nr_errors) {
             // Display "Press any key to continue" prompt, if there were
             // errors while reading config files
             any_key(term, e->options.esc_timeout);
-            clear_error(e->err);
+            clear_error(&e->err);
         }
     }
 
@@ -633,7 +633,7 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    if (nr_tags > 0 && load_tag_file(&e->tagfile, e->err)) {
+    if (nr_tags > 0 && load_tag_file(&e->tagfile, &e->err)) {
         MessageArray *msgs = &e->messages;
         clear_messages(msgs);
 
@@ -677,7 +677,7 @@ int main(int argc, char *argv[])
     ui_end(e);
 
 exit:
-    e->err->print_to_stderr = true;
+    e->err.print_to_stderr = true;
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
 
@@ -695,7 +695,7 @@ exit:
     if (have_stdout_buffer) {
         int err = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
         if (err != 0) {
-            error_msg(e->err, "failed to write (stdout) buffer: %s", strerror(err));
+            error_msg(&e->err, "failed to write (stdout) buffer: %s", strerror(err));
             if (exit_code == EDITOR_EXIT_OK) {
                 exit_code = EC_IO_ERROR;
             }

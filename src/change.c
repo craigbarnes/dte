@@ -234,7 +234,7 @@ bool undo(View *view)
             count++;
         }
         if (count > 1) {
-            ErrorBuffer *ebuf = view->window->editor->err;
+            ErrorBuffer *ebuf = &view->window->editor->err;
             info_msg(ebuf, "Undid %lu changes", count);
         }
     } else {
@@ -247,7 +247,7 @@ bool undo(View *view)
 
 bool redo(View *view, unsigned long change_id)
 {
-    ErrorBuffer *ebuf = view->window->editor->err;
+    ErrorBuffer *ebuf = &view->window->editor->err;
     Change *change = view->buffer->cur_change;
     view_reset_preferred_x(view);
     if (!change->prev) {

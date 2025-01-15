@@ -6,7 +6,6 @@
 #include "block.h"
 #include "buildvar-iconv.h"
 #include "encoding.h"
-#include "error.h"
 #include "util/debug.h"
 #include "util/intern.h"
 #include "util/list.h"
@@ -54,7 +53,9 @@ static Block *add_utf8_line (
 
 copy:
     if (unlikely(len > SYN_HIGHLIGHT_MAX_LINE_LEN && buffer->options.syntax)) {
-        error_msg_ (
+        // TODO: Make the limit configurable and add documentation
+        // TODO: Pass in an ErrorBuffer* and use error_msg() instead of LOG_NOTICE()
+        LOG_NOTICE (
             "line length (%zu) exceeded limit (%ju); disabling syntax highlighting",
             len, (uintmax_t)SYN_HIGHLIGHT_MAX_LINE_LEN
         );

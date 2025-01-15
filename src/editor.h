@@ -75,7 +75,6 @@ typedef struct EditorState {
     ModeHandler *normal_mode;
     ModeHandler *command_mode;
     ModeHandler *search_mode;
-    ErrorBuffer *err;
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;
@@ -113,6 +112,7 @@ typedef struct EditorState {
     History search_history;
     History command_history;
     RegexpWordBoundaryTokens regexp_word_tokens;
+    ErrorBuffer err;
     const char *version;
 } EditorState;
 

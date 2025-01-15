@@ -114,7 +114,7 @@ bool search_tag(View *view, const char *pattern)
     regex_t regex;
     int err = regcomp(&regex, pattern, REG_NEWLINE);
     if (unlikely(err)) {
-        regexp_error_msg(view->window->editor->err, &regex, pattern, err);
+        regexp_error_msg(&view->window->editor->err, &regex, pattern, err);
     }
 
     BlockIter bi = block_iter(view->buffer);
@@ -124,7 +124,7 @@ bool search_tag(View *view, const char *pattern)
     if (!found) {
         // Don't center view to cursor unnecessarily
         view->force_center = false;
-        return error_msg(view->window->editor->err, "Tag not found");
+        return error_msg(&view->window->editor->err, "Tag not found");
     }
 
     view->center_on_scroll = true;
@@ -181,7 +181,7 @@ void search_set_regexp(SearchState *search, const char *pattern)
 
 bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
-    ErrorBuffer *ebuf = view->window->editor->err;
+    ErrorBuffer *ebuf = &view->window->editor->err;
     if (!search->pattern) {
         return error_msg(ebuf, "No previous search pattern");
     }

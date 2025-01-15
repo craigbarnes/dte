@@ -223,10 +223,10 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd < 0) {
         if (errno != ENOENT) {
-            return error_msg(e->err, "Error opening %s: %s", filename, strerror(errno));
+            return error_msg(&e->err, "Error opening %s: %s", filename, strerror(errno));
         }
         if (must_exist) {
-            return error_msg(e->err, "File %s does not exist", filename);
+            return error_msg(&e->err, "File %s does not exist", filename);
         }
         if (!buffer->encoding) {
             buffer->encoding = encoding_from_type(UTF8);
@@ -239,17 +239,17 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
 
     FileInfo *info = &buffer->file;
     if (!buffer_fstat(info, fd)) {
-        error_msg(e->err, "fstat failed on %s: %s", filename, strerror(errno));
+        error_msg(&e->err, "fstat failed on %s: %s", filename, strerror(errno));
         goto error;
     }
     if (!S_ISREG(info->mode)) {
-        error_msg(e->err, "Not a regular file %s", filename);
+        error_msg(&e->err, "Not a regular file %s", filename);
         goto error;
     }
 
     off_t size = info->size;
     if (unlikely(size < 0)) {
-        error_msg(e->err, "Invalid file size: %jd", (intmax_t)size);
+        error_msg(&e->err, "Invalid file size: %jd", (intmax_t)size);
         goto error;
     }
 
@@ -258,7 +258,7 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
         uintmax_t size_mib = filesize_in_mib(size);
         if (unlikely(size_mib > limit_mib)) {
             error_msg (
-                e->err,
+                &e->err,
                 "File size (%juMiB) exceeds 'filesize-limit' option (%uMiB): %s",
                 size_mib, limit_mib, filename
             );
@@ -267,7 +267,7 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
     }
 
     if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
-        error_msg(e->err, "Error reading %s: %s", filename, strerror(errno));
+        error_msg(&e->err, "Error reading %s: %s", filename, strerror(errno));
         goto error;
     }
 
@@ -449,7 +449,7 @@ bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const Fil
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
-            return error_msg_errno(e->err, "open");
+            return error_msg_errno(&e->err, "open");
         }
     }
 
@@ -459,24 +459,24 @@ bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const Fil
     }
 
     FileEncoder enc = file_encoder(ctx->encoding, ctx->crlf, fd);
-    if (!write_buffer(buffer, &enc, e->err, bom, fd)) {
+    if (!write_buffer(buffer, &enc, &e->err, bom, fd)) {
         goto error;
     }
 
     if (buffer->options.fsync && xfsync(fd) != 0) {
-        error_msg_errno(e->err, "fsync");
+        error_msg_errno(&e->err, "fsync");
         goto error;
     }
 
     int r = xclose(fd);
     fd = -1;
     if (r != 0) {
-        error_msg_errno(e->err, "close");
+        error_msg_errno(&e->err, "close");
         goto error;
     }
 
     if (tmp[0] && rename(tmp, filename)) {
-        error_msg_errno(e->err, "rename");
+        error_msg_errno(&e->err, "rename");
         goto error;
     }
 

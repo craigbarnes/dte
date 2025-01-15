@@ -200,14 +200,14 @@ void update_screen(EditorState *e, const ScreenState *s)
     }
 
     bool is_normal_mode = (e->mode->cmds == &normal_commands);
-    size_t cmdline_x = update_command_line(term, e->err, styles, &e->cmdline, &e->search, e->mode->cmds);
+    size_t cmdline_x = update_command_line(term, &e->err, styles, &e->cmdline, &e->search, e->mode->cmds);
 
     if (flags & UPDATE_CURSOR_STYLE) {
         update_cursor_style(term, buffer, e->cursor_styles, is_normal_mode);
     }
 
     if (unlikely(flags & UPDATE_DIALOG)) {
-        show_dialog(term, styles, e->err->buf);
+        show_dialog(term, styles, e->err.buf);
     } else {
         restore_cursor(term, view, is_normal_mode, cmdline_x);
         term_show_cursor(term);

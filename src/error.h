@@ -11,13 +11,6 @@ typedef struct ErrorBuffer {
     bool print_to_stderr;
 } ErrorBuffer;
 
-extern ErrorBuffer errbuf; // NOLINT(*-avoid-non-const-global-variables)
-
-// These wrapper macros are much like the functions below, but using the
-// global errbuf (temporarily, while the code transitions away from it)
-#define error_msg_(...) error_msg(&errbuf, __VA_ARGS__)
-#define error_msg_errno_(...) error_msg_errno(&errbuf, __VA_ARGS__)
-
 struct EditorState;
 
 bool error_msg(ErrorBuffer *eb, const char *format, ...) COLD PRINTF(2) NONNULL_ARGS;

@@ -298,7 +298,7 @@ size_t tag_lookup(EditorState *e, const StringView *name, const char *filename)
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg(e->err, "Tag '%.*s' not found", (int)name->length, name->data);
+        error_msg(&e->err, "Tag '%.*s' not found", (int)name->length, name->data);
         return 0;
     }
 
@@ -341,7 +341,7 @@ void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
 String dump_tags(EditorState *e)
 {
     TagFile *tf = &e->tagfile;
-    if (!load_tag_file(tf, e->err)) {
+    if (!load_tag_file(tf, &e->err)) {
         return string_new(0);
     }
 

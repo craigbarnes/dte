@@ -51,7 +51,7 @@ View *window_open_buffer (
     bool must_exist,
     const char *encoding
 ) {
-    ErrorBuffer *ebuf = window->editor->err;
+    ErrorBuffer *ebuf = &window->editor->err;
     if (unlikely(filename[0] == '\0')) {
         error_msg(ebuf, "Empty filename not allowed");
         return NULL;

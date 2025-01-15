@@ -158,7 +158,7 @@ static void test_normal_command_errors(TestContext *ctx)
     };
 
     EditorState *e = ctx->userdata;
-    ErrorBuffer *ebuf = e->err;
+    ErrorBuffer *ebuf = &e->err;
     ASSERT_NONNULL(window_open_empty_buffer(e->window));
 
     FOR_EACH_I(i, tests) {
@@ -202,7 +202,7 @@ static void test_normal_command_errors(TestContext *ctx)
     EXPECT_TRUE(ebuf->is_error);
 
     runner.lookup_alias = dummy_lookup_alias;
-    clear_error(e->err);
+    clear_error(ebuf);
     EXPECT_FALSE(handle_command(&runner, "_abc"));
     EXPECT_TRUE(str_has_prefix(ebuf->buf, "Parsing alias _abc:"));
     EXPECT_TRUE(ebuf->is_error);
@@ -211,7 +211,7 @@ static void test_normal_command_errors(TestContext *ctx)
     current_config.file = "example";
     current_config.line = 1;
     runner.lookup_alias = NULL;
-    clear_error(e->err);
+    clear_error(ebuf);
     EXPECT_FALSE(handle_command(&runner, "quit"));
     EXPECT_STREQ(ebuf->buf, "example:1: Command quit not allowed in config file");
     EXPECT_TRUE(ebuf->is_error);

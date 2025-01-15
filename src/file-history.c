@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "file-history.h"
-#include "error.h"
 #include "util/debug.h"
 #include "util/path.h"
 #include "util/readfile.h"
@@ -77,7 +76,7 @@ static bool parse_ulong_field(StringView *sv, unsigned long *valp)
     return true;
 }
 
-void file_history_load(FileHistory *history, char *filename, size_t size_limit)
+void file_history_load(FileHistory *history, ErrorBuffer *ebuf, char *filename, size_t size_limit)
 {
     BUG_ON(history->filename);
     hashmap_init(&history->entries, FILEHIST_MAX_ENTRIES);
@@ -87,7 +86,7 @@ void file_history_load(FileHistory *history, char *filename, size_t size_limit)
     const ssize_t ssize = read_file(filename, &buf, size_limit);
     if (ssize < 0) {
         if (errno != ENOENT) {
-            error_msg_("Error reading %s: %s", filename, strerror(errno));
+            error_msg(ebuf, "Error reading %s: %s", filename, strerror(errno));
         }
         return;
     }
@@ -111,7 +110,7 @@ void file_history_load(FileHistory *history, char *filename, size_t size_limit)
     free(buf);
 }
 
-void file_history_save(const FileHistory *history)
+void file_history_save(const FileHistory *history, ErrorBuffer *ebuf)
 {
     const char *filename = history->filename;
     if (!filename) {
@@ -120,7 +119,7 @@ void file_history_save(const FileHistory *history)
 
     FILE *f = xfopen(filename, "w", O_CLOEXEC, 0666);
     if (!f) {
-        error_msg_("Error creating %s: %s", filename, strerror(errno));
+        error_msg(ebuf, "Error creating %s: %s", filename, strerror(errno));
         return;
     }
 

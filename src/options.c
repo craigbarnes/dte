@@ -702,15 +702,16 @@ static bool do_set_option (
     bool local,
     bool global
 ) {
+    ErrorBuffer *ebuf = &e->err;
     if (local && !desc->local) {
-        return error_msg(e->err, "Option %s is not local", desc->name);
+        return error_msg(ebuf, "Option %s is not local", desc->name);
     }
     if (global && !desc->global) {
-        return error_msg(e->err, "Option %s is not global", desc->name);
+        return error_msg(ebuf, "Option %s is not global", desc->name);
     }
 
     OptionValue val;
-    if (!desc_parse(desc, e->err, value, &val)) {
+    if (!desc_parse(desc, ebuf, value, &val)) {
         return false;
     }
 
@@ -732,7 +733,7 @@ static bool do_set_option (
 
 bool set_option(EditorState *e, const char *name, const char *value, bool local, bool global)
 {
-    const OptionDesc *desc = must_find_option(e->err, name);
+    const OptionDesc *desc = must_find_option(&e->err, name);
     if (!desc) {
         return false;
     }
@@ -741,12 +742,12 @@ bool set_option(EditorState *e, const char *name, const char *value, bool local,
 
 bool set_bool_option(EditorState *e, const char *name, bool local, bool global)
 {
-    const OptionDesc *desc = must_find_option(e->err, name);
+    const OptionDesc *desc = must_find_option(&e->err, name);
     if (!desc) {
         return false;
     }
     if (desc->type != OPT_BOOL) {
-        return error_msg(e->err, "Option %s is not boolean", desc->name);
+        return error_msg(&e->err, "Option %s is not boolean", desc->name);
     }
     return do_set_option(e, desc, "true", local, global);
 }
@@ -767,7 +768,7 @@ static const OptionDesc *find_toggle_option(ErrorBuffer *ebuf, const char *name,
 
 bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
 {
-    const OptionDesc *desc = find_toggle_option(e->err, name, &global);
+    const OptionDesc *desc = find_toggle_option(&e->err, name, &global);
     if (!desc) {
         return false;
     }
@@ -784,7 +785,7 @@ bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
     } else if (type == OPT_BOOL) {
         value.bool_val = !value.bool_val;
     } else {
-        return error_msg(e->err, "Toggling %s requires arguments", name);
+        return error_msg(&e->err, "Toggling %s requires arguments", name);
     }
 
     desc_set(e, desc, ptr, global, value);
@@ -794,7 +795,7 @@ bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
 
     const char *prefix = (global && desc->local) ? "[global] " : "";
     const char *str = desc_string(desc, value);
-    return info_msg(e->err, "%s%s = %s", prefix, desc->name, str);
+    return info_msg(&e->err, "%s%s = %s", prefix, desc->name, str);
 }
 
 bool toggle_option_values (
@@ -805,7 +806,7 @@ bool toggle_option_values (
     char **values,
     size_t count
 ) {
-    const OptionDesc *desc = find_toggle_option(e->err, name, &global);
+    const OptionDesc *desc = find_toggle_option(&e->err, name, &global);
     if (!desc) {
         return false;
     }
@@ -817,7 +818,7 @@ bool toggle_option_values (
     OptionValue *parsed_values = xnew(OptionValue, count);
 
     for (size_t i = 0; i < count; i++) {
-        if (desc_parse(desc, e->err, values[i], &parsed_values[i])) {
+        if (desc_parse(desc, &e->err, values[i], &parsed_values[i])) {
             if (desc_equals(desc, ptr, parsed_values[i])) {
                 current = i;
             }
@@ -832,7 +833,7 @@ bool toggle_option_values (
         if (verbose) {
             const char *prefix = (global && desc->local) ? "[global] " : "";
             const char *str = desc_string(desc, parsed_values[i]);
-            info_msg(e->err, "%s%s = %s", prefix, desc->name, str);
+            info_msg(&e->err, "%s%s = %s", prefix, desc->name, str);
         }
     }
 

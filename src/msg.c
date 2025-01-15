@@ -49,12 +49,12 @@ bool activate_current_message(const MessageArray *msgs, Window *window)
         return false;
     }
 
-    ErrorBuffer *err = window->editor->err;
+    ErrorBuffer *ebuf = &window->editor->err;
     if (count == 1) {
-        return info_msg(err, "%s", m->msg);
+        return info_msg(ebuf, "%s", m->msg);
     }
 
-    return info_msg(err, "[%zu/%zu] %s", pos + 1, count, m->msg);
+    return info_msg(ebuf, "[%zu/%zu] %s", pos + 1, count, m->msg);
 }
 
 void activate_current_message_save (

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "history.h"
-#include "error.h"
 #include "util/arith.h"
 #include "util/debug.h"
 #include "util/readfile.h"
@@ -92,7 +91,7 @@ bool history_search_backward (
     return false;
 }
 
-void history_load(History *history, char *filename, size_t size_limit)
+void history_load(History *history, ErrorBuffer *ebuf, char *filename, size_t size_limit)
 {
     BUG_ON(history->filename);
     BUG_ON(history->max_entries < 2);
@@ -103,7 +102,7 @@ void history_load(History *history, char *filename, size_t size_limit)
     const ssize_t ssize = read_file(filename, &buf, size_limit);
     if (ssize < 0) {
         if (errno != ENOENT) {
-            error_msg_("Error reading %s: %s", filename, strerror(errno));
+            error_msg(ebuf, "Error reading %s: %s", filename, strerror(errno));
         }
         return;
     }
@@ -115,7 +114,7 @@ void history_load(History *history, char *filename, size_t size_limit)
     free(buf);
 }
 
-void history_save(const History *history)
+void history_save(const History *history, ErrorBuffer *ebuf)
 {
     const char *filename = history->filename;
     if (!filename) {
@@ -124,7 +123,7 @@ void history_save(const History *history)
 
     FILE *f = xfopen(filename, "w", O_CLOEXEC, 0666);
     if (!f) {
-        error_msg_("Error creating %s: %s", filename, strerror(errno));
+        error_msg(ebuf, "Error creating %s: %s", filename, strerror(errno));
         return;
     }
 

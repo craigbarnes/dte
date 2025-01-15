@@ -74,7 +74,6 @@ EditorState *init_editor_state(EditorFlags flags)
         .status = EDITOR_INITIALIZING,
         .flags = flags,
         .version = VERSION,
-        .err= &errbuf,
         .command_history = {
             .max_entries = 512,
         },
@@ -122,7 +121,7 @@ EditorState *init_editor_state(EditorFlags flags)
         }
     };
 
-    sanity_check_global_options(e->err, &e->options);
+    sanity_check_global_options(&e->err, &e->options);
 
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
@@ -334,7 +333,7 @@ int main_loop(EditorState *e)
         }
 
         const ScreenState s = get_screen_state(e->view);
-        clear_error(e->err);
+        clear_error(&e->err);
         handle_input(e, key);
         sanity_check(e->view);
         update_screen(e, &s);

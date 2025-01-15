@@ -158,7 +158,7 @@ out:
 
 bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
-    ErrorBuffer *ebuf = view->window->editor->err;
+    ErrorBuffer *ebuf = &view->window->editor->err;
     if (unlikely(pattern[0] == '\0')) {
         return error_msg(ebuf, "Search pattern must contain at least 1 character");
     }

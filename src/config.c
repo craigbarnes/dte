@@ -94,7 +94,7 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
 
 int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
-    ErrorBuffer *ebuf = runner->e->err;
+    ErrorBuffer *ebuf = &runner->e->err;
     const bool must_exist = flags & CFG_MUST_EXIST;
     const bool builtin = flags & CFG_BUILTIN;
 

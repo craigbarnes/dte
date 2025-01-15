@@ -106,7 +106,7 @@ void free_blocks(Buffer *buffer)
 static void buffer_unlock_and_free(EditorState *e, Buffer *buffer)
 {
     if (buffer->locked) {
-        unlock_file(&e->locks_ctx, e->err, buffer->abs_filename);
+        unlock_file(&e->locks_ctx, &e->err, buffer->abs_filename);
     }
 
     free_changes(&buffer->change_head);
@@ -405,7 +405,7 @@ void buffer_setup(EditorState *e, Buffer *buffer)
     if (buffer->options.detect_indent && filename) {
         detect_indent(buffer);
     }
-    sanity_check_local_options(e->err, &buffer->options);
+    sanity_check_local_options(&e->err, &buffer->options);
 }
 
 void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])

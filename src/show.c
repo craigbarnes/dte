@@ -86,13 +86,13 @@ static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag
     const char *cmd_str = find_alias(&e->aliases, alias_name);
     if (!cmd_str) {
         if (find_normal_command(alias_name)) {
-            return info_msg(e->err, "%s is a built-in command, not an alias", alias_name);
+            return info_msg(&e->err, "%s is a built-in command, not an alias", alias_name);
         }
-        return info_msg(e->err, "%s is not a known alias", alias_name);
+        return info_msg(&e->err, "%s is not a known alias", alias_name);
     }
 
     if (!cflag) {
-        return info_msg(e->err, "%s is aliased to: %s", alias_name, cmd_str);
+        return info_msg(&e->err, "%s is aliased to: %s", alias_name, cmd_str);
     }
 
     push_input_mode(e, e->command_mode);
@@ -104,7 +104,7 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 {
     KeyCode key = parse_key_string(keystr);
     if (key == KEY_NONE) {
-        return error_msg(e->err, "invalid key string: %s", keystr);
+        return error_msg(&e->err, "invalid key string: %s", keystr);
     }
 
     // Use canonical key string in printed messages
@@ -114,16 +114,16 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
     keystr = buf;
 
     if (u_is_unicode(key)) {
-        return error_msg(e->err, "%s is not a bindable key", keystr);
+        return error_msg(&e->err, "%s is not a bindable key", keystr);
     }
 
     const CachedCommand *b = lookup_binding(&e->normal_mode->key_bindings, key);
     if (!b) {
-        return info_msg(e->err, "%s is not bound to a command", keystr);
+        return info_msg(&e->err, "%s is not bound to a command", keystr);
     }
 
     if (!cflag) {
-        return info_msg(e->err, "%s is bound to: %s", keystr, b->cmd_str);
+        return info_msg(&e->err, "%s is bound to: %s", keystr, b->cmd_str);
     }
 
     push_input_mode(e, e->command_mode);
@@ -135,13 +135,13 @@ static bool show_color(EditorState *e, const char *name, bool cflag)
 {
     const TermStyle *hl = find_style(&e->styles, name);
     if (!hl) {
-        return info_msg(e->err, "no color entry with name '%s'", name);
+        return info_msg(&e->err, "no color entry with name '%s'", name);
     }
 
     if (!cflag) {
         char buf[TERM_STYLE_BUFSIZE];
         const char *style_str = term_style_to_string(buf, hl);
-        return info_msg(e->err, "color '%s' is set to: %s", name, style_str);
+        return info_msg(&e->err, "color '%s' is set to: %s", name, style_str);
     }
 
     CommandLine *c = &e->cmdline;
@@ -156,7 +156,7 @@ static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
 {
     CursorInputMode mode = cursor_mode_from_str(mode_str);
     if (mode >= NR_CURSOR_MODES) {
-        return error_msg(e->err, "no cursor entry for '%s'", mode_str);
+        return error_msg(&e->err, "no cursor entry for '%s'", mode_str);
     }
 
     TermCursorStyle style = e->cursor_styles[mode];
@@ -165,7 +165,7 @@ static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
     const char *color = cursor_color_to_str(colorbuf, style.color);
 
     if (!cflag) {
-        return info_msg(e->err, "cursor '%s' is set to: %s %s", mode_str, type, color);
+        return info_msg(&e->err, "cursor '%s' is set to: %s %s", mode_str, type, color);
     }
 
     char buf[64];
@@ -179,11 +179,11 @@ static bool show_env(EditorState *e, const char *name, bool cflag)
 {
     const char *value = getenv(name);
     if (!value) {
-        return info_msg(e->err, "no environment variable with name '%s'", name);
+        return info_msg(&e->err, "no environment variable with name '%s'", name);
     }
 
     if (!cflag) {
-        return info_msg(e->err, "$%s is set to: %s", name, value);
+        return info_msg(&e->err, "$%s is set to: %s", name, value);
     }
 
     push_input_mode(e, e->command_mode);
@@ -227,7 +227,7 @@ static bool show_builtin(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
-        return error_msg(e->err, "no built-in config with name '%s'", name);
+        return error_msg(&e->err, "no built-in config with name '%s'", name);
     }
 
     const StringView sv = cfg->text;
@@ -244,7 +244,7 @@ static bool show_compiler(EditorState *e, const char *name, bool cflag)
 {
     const Compiler *compiler = find_compiler(&e->compilers, name);
     if (!compiler) {
-        return info_msg(e->err, "no errorfmt entry found for '%s'", name);
+        return info_msg(&e->err, "no errorfmt entry found for '%s'", name);
     }
 
     String str = string_new(512);
@@ -263,11 +263,11 @@ static bool show_option(EditorState *e, const char *name, bool cflag)
 {
     const char *value = get_option_value_string(e, name);
     if (!value) {
-        return error_msg(e->err, "invalid option name: %s", name);
+        return error_msg(&e->err, "invalid option name: %s", name);
     }
 
     if (!cflag) {
-        return info_msg(e->err, "%s is set to: %s", name, value);
+        return info_msg(&e->err, "%s is set to: %s", name, value);
     }
 
     push_input_mode(e, e->command_mode);
@@ -298,7 +298,7 @@ static void do_collect_builtin_includes(EditorState* UNUSED_ARG(e), PointerArray
 static bool show_wsplit(EditorState *e, const char *name, bool cflag)
 {
     if (!streq(name, "this")) {
-        return error_msg(e->err, "invalid window: %s", name);
+        return error_msg(&e->err, "invalid window: %s", name);
     }
 
     const Window *w = e->window;
@@ -306,7 +306,7 @@ static bool show_wsplit(EditorState *e, const char *name, bool cflag)
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 
     if (!cflag) {
-        return info_msg(e->err, "current window dimensions: %s", buf);
+        return info_msg(&e->err, "current window dimensions: %s", buf);
     }
 
     push_input_mode(e, e->command_mode);
@@ -566,12 +566,12 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
     const ShowHandler *handler = lookup_show_handler(type);
     if (!handler) {
-        return error_msg(e->err, "invalid argument: '%s'", type);
+        return error_msg(&e->err, "invalid argument: '%s'", type);
     }
 
     if (key) {
         if (!handler->show) {
-            return error_msg(e->err, "'show %s' doesn't take extra arguments", type);
+            return error_msg(&e->err, "'show %s' doesn't take extra arguments", type);
         }
         return handler->show(e, key, cflag);
     }

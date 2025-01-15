@@ -9,9 +9,6 @@
 #include "util/log.h"
 #include "util/xstdio.h"
 
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-ErrorBuffer errbuf;
-
 VPRINTF(5)
 static void error_msgv (
     ErrorBuffer *eb,
@@ -70,7 +67,7 @@ bool error_msg_for_cmd(EditorState *e, const char *cmd, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    error_msgv(e->err, current_config.file, current_config.line, cmd, format, ap);
+    error_msgv(&e->err, current_config.file, current_config.line, cmd, format, ap);
     va_end(ap);
     return false;
 }
