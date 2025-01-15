@@ -788,7 +788,7 @@ static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
 
     const char *pattern = a->args[1];
     regex_t re;
-    if (unlikely(!regexp_compile(&re, pattern, 0))) {
+    if (unlikely(!regexp_compile(e->err, &re, pattern, 0))) {
         return false;
     }
 
@@ -854,31 +854,25 @@ static bool cmd_exec(EditorState *e, const CommandArgs *a)
 
 static bool cmd_ft(EditorState *e, const CommandArgs *a)
 {
+    ErrorBuffer *ebuf = e->err;
     char **args = a->args;
     const char *filetype = args[0];
     if (unlikely(!is_valid_filetype_name(filetype))) {
-        return error_msg(e->err, "Invalid filetype name: '%s'", filetype);
+        return error_msg(ebuf, "Invalid filetype name: '%s'", filetype);
     }
 
     FileDetectionType dt = FT_EXTENSION;
     switch (last_flag(a)) {
-    case 'b':
-        dt = FT_BASENAME;
-        break;
-    case 'c':
-        dt = FT_CONTENT;
-        break;
-    case 'f':
-        dt = FT_FILENAME;
-        break;
-    case 'i':
-        dt = FT_INTERPRETER;
-        break;
+        case 'b': dt = FT_BASENAME; break;
+        case 'c': dt = FT_CONTENT; break;
+        case 'f': dt = FT_FILENAME; break;
+        case 'i': dt = FT_INTERPRETER; break;
     }
 
+    PointerArray *filetypes = &e->filetypes;
     size_t nfailed = 0;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
-        if (!add_filetype(&e->filetypes, filetype, args[i], dt)) {
+        if (!add_filetype(filetypes, filetype, args[i], dt, ebuf)) {
             nfailed++;
         }
     }
@@ -1299,7 +1293,7 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
 
     PointerArray *opts = &e->file_options;
     if (has_flag(a, 'r')) {
-        FileTypeOrFileName u = {.filename = regexp_intern(arg0)};
+        FileTypeOrFileName u = {.filename = regexp_intern(e->err, arg0)};
         if (unlikely(!u.filename)) {
             return false;
         }

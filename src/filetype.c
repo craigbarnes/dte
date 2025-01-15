@@ -75,12 +75,17 @@ static bool ft_uses_regex(FileDetectionType type)
     return type == FT_CONTENT || type == FT_FILENAME;
 }
 
-bool add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type)
-{
+bool add_filetype (
+    PointerArray *filetypes,
+    const char *name,
+    const char *str,
+    FileDetectionType type,
+    ErrorBuffer *ebuf
+) {
     BUG_ON(!is_valid_filetype_name(name));
     const InternedRegexp *ir = NULL;
     if (ft_uses_regex(type)) {
-        ir = regexp_intern(str);
+        ir = regexp_intern(ebuf, str);
         if (unlikely(!ir)) {
             return false;
         }

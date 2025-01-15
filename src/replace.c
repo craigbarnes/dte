@@ -168,8 +168,9 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
     re_flags |= (flags & REPLACE_BASIC) ? 0 : DEFAULT_REGEX_FLAGS;
 
     regex_t re;
-    if (unlikely(!regexp_compile_internal(&re, pattern, re_flags))) {
-        return false;
+    int err = regcomp(&re, pattern, re_flags);
+    if (unlikely(err)) {
+        return regexp_error_msg(ebuf, &re, pattern, err);
     }
 
     BlockIter bi;

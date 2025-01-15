@@ -94,7 +94,7 @@ static void test_make_indent(TestContext *ctx)
 static void test_get_indent_for_next_line(TestContext *ctx)
 {
     const char *pattern = "\\{$";
-    const InternedRegexp *ir = regexp_intern(pattern);
+    const InternedRegexp *ir = regexp_intern(NULL, pattern);
     ASSERT_NONNULL(ir);
 
     LocalOptions options = {

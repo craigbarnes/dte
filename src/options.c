@@ -244,18 +244,20 @@ static OptionValue re_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 
 static void re_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 {
+    // Note that this function is only ever called if re_parse() has already
+    // validated the pattern
     const InternedRegexp **irp = ptr;
-    *irp = v.str_val ? regexp_intern(v.str_val) : NULL;
+    *irp = v.str_val ? regexp_intern(NULL, v.str_val) : NULL;
 }
 
-static bool re_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer* UNUSED_ARG(ebuf), const char *str, OptionValue *v)
+static bool re_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     if (str[0] == '\0') {
         v->str_val = NULL;
         return true;
     }
 
-    bool valid = regexp_is_interned(str) || regexp_is_valid(str, REG_NEWLINE);
+    bool valid = regexp_is_interned(str) || regexp_is_valid(ebuf, str, REG_NEWLINE);
     v->str_val = valid ? str : NULL;
     return valid;
 }

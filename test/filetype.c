@@ -326,28 +326,28 @@ static void test_find_ft_dynamic(TestContext *ctx)
     const char *ft = "test1";
     StringView line = STRING_VIEW_INIT;
     EXPECT_FALSE(is_ft(&a, ft));
-    EXPECT_TRUE(add_filetype(&a, ft, "ext-test", FT_EXTENSION));
+    EXPECT_TRUE(add_filetype(&a, ft, "ext-test", FT_EXTENSION, NULL));
     EXPECT_TRUE(is_ft(&a, ft));
     EXPECT_STREQ(find_ft(&a, "/tmp/file.ext-test", line), ft);
 
     ft = "test2";
-    EXPECT_TRUE(add_filetype(&a, ft, "/zdir/__[A-Z]+$", FT_FILENAME));
+    EXPECT_TRUE(add_filetype(&a, ft, "/zdir/__[A-Z]+$", FT_FILENAME, NULL));
     EXPECT_STREQ(find_ft(&a, "/tmp/zdir/__TESTFILE", line), ft);
     EXPECT_STREQ(find_ft(&a, "/tmp/zdir/__testfile", line), NULL);
 
     ft = "test3";
-    EXPECT_TRUE(add_filetype(&a, ft, "._fiLeName", FT_BASENAME));
+    EXPECT_TRUE(add_filetype(&a, ft, "._fiLeName", FT_BASENAME, NULL));
     EXPECT_STREQ(find_ft(&a, "/tmp/._fiLeName", line), ft);
     EXPECT_STREQ(find_ft(&a, "/tmp/._filename", line), NULL);
 
     ft = "test4";
     line = strview_from_cstring("!!42");
-    EXPECT_TRUE(add_filetype(&a, ft, "^!+42$", FT_CONTENT));
+    EXPECT_TRUE(add_filetype(&a, ft, "^!+42$", FT_CONTENT, NULL));
     EXPECT_STREQ(find_ft(&a, NULL, line), ft);
 
     ft = "test5";
     line = strview_from_cstring("#!/usr/bin/xyzlang4.2");
-    EXPECT_TRUE(add_filetype(&a, ft, "xyzlang", FT_INTERPRETER));
+    EXPECT_TRUE(add_filetype(&a, ft, "xyzlang", FT_INTERPRETER, NULL));
     EXPECT_STREQ(find_ft(&a, NULL, line), ft);
 
     EXPECT_TRUE(is_ft(&a, "test1"));

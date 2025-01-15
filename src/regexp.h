@@ -4,6 +4,7 @@
 #include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "error.h"
 #include "util/macros.h"
 
 enum {
@@ -34,35 +35,17 @@ typedef struct {
     char end[8];
 } RegexpWordBoundaryTokens;
 
-bool regexp_compile_internal(regex_t *re, const char *pattern, int flags) WARN_UNUSED_RESULT;
+void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags) NONNULL_ARGS;
+bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt) NONNULL_ARGS;
+bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern, int err) NONNULL_ARG(2, 3);
+char *regexp_escape(const char *pattern, size_t len) NONNULL_ARGS WARN_UNUSED_RESULT;
+size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen) NONNULL_ARG(1);
 
-WARN_UNUSED_RESULT
-static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
-{
-    return regexp_compile_internal(re, pattern, flags | DEFAULT_REGEX_FLAGS);
-}
-
-WARN_UNUSED_RESULT
-static inline bool regexp_is_valid(const char *pattern, int flags)
-{
-    regex_t re;
-    if (!regexp_compile(&re, pattern, flags | REG_NOSUB)) {
-        return false;
-    }
-    regfree(&re);
-    return true;
-}
-
-void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
-bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt);
-bool regexp_error_msg(const regex_t *re, const char *pattern, int err);
-char *regexp_escape(const char *pattern, size_t len);
-size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen);
-
-const InternedRegexp *regexp_intern(const char *pattern);
-bool regexp_is_interned(const char *pattern);
+const InternedRegexp *regexp_intern(ErrorBuffer *ebuf, const char *pattern) NONNULL_ARG(2) WARN_UNUSED_RESULT;
+bool regexp_is_interned(const char *pattern) NONNULL_ARGS;
 void free_interned_regexps(void);
 
+WARN_UNUSED_RESULT NONNULL_ARGS
 bool regexp_exec (
     const regex_t *re,
     const char *buf,
@@ -70,6 +53,24 @@ bool regexp_exec (
     size_t nmatch,
     regmatch_t *pmatch,
     int flags
-) WARN_UNUSED_RESULT;
+);
+
+WARN_UNUSED_RESULT NONNULL_ARG(2, 3)
+static inline bool regexp_compile(ErrorBuffer *ebuf, regex_t *re, const char *pattern, int flags)
+{
+    int err = regcomp(re, pattern, flags | DEFAULT_REGEX_FLAGS);
+    return !err || regexp_error_msg(ebuf, re, pattern, err);
+}
+
+WARN_UNUSED_RESULT NONNULL_ARG(2)
+static inline bool regexp_is_valid(ErrorBuffer *ebuf, const char *pattern, int flags)
+{
+    regex_t re;
+    if (!regexp_compile(ebuf, &re, pattern, flags | REG_NOSUB)) {
+        return false;
+    }
+    regfree(&re);
+    return true;
+}
 
 #endif

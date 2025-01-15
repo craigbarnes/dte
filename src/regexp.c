@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <stdlib.h>
 #include "regexp.h"
-#include "error.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
@@ -12,17 +11,14 @@
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static HashMap interned_regexps;
 
-bool regexp_error_msg(const regex_t *re, const char *pattern, int err)
+bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern, int err)
 {
+    if (!ebuf) {
+        return false;
+    }
     char msg[1024];
     regerror(err, re, msg, sizeof(msg));
-    return error_msg_("%s: %s", msg, pattern);
-}
-
-bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
-{
-    int err = regcomp(re, pattern, flags);
-    return !err || regexp_error_msg(re, pattern, err);
+    return error_msg(ebuf, "%s: %s", msg, pattern);
 }
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags)
@@ -46,14 +42,12 @@ bool regexp_exec (
     regmatch_t *pmatch,
     int flags
 ) {
-    // "If REG_STARTEND is specified, pmatch must point to at least one
-    // regmatch_t (even if nmatch is 0 or REG_NOSUB was specified), to
-    // hold the input offsets for REG_STARTEND."
-    // -- https://man.openbsd.org/regex.3
-    BUG_ON(!pmatch);
-
 // ASan's __interceptor_regexec() doesn't support REG_STARTEND
 #if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
+    // "If REG_STARTEND is specified, pmatch must point to at least
+    // one regmatch_t (even if nmatch is 0 or REG_NOSUB was specified),
+    // to hold the input offsets for REG_STARTEND."
+    // -- https://man.openbsd.org/regex.3
     pmatch[0].rm_so = 0;
     pmatch[0].rm_eo = size;
     return !regexec(re, buf, nmatch, pmatch, flags | REG_STARTEND);
@@ -125,7 +119,7 @@ char *regexp_escape(const char *pattern, size_t len)
     return buf;
 }
 
-const InternedRegexp *regexp_intern(const char *pattern)
+const InternedRegexp *regexp_intern(ErrorBuffer *ebuf, const char *pattern)
 {
     if (pattern[0] == '\0') {
         return NULL;
@@ -139,7 +133,7 @@ const InternedRegexp *regexp_intern(const char *pattern)
     ir = xnew(InternedRegexp, 1);
     int err = regcomp(&ir->re, pattern, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
     if (unlikely(err)) {
-        regexp_error_msg(&ir->re, pattern, err);
+        regexp_error_msg(ebuf, &ir->re, pattern, err);
         free(ir);
         return NULL;
     }

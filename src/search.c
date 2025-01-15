@@ -112,8 +112,9 @@ bool search_tag(View *view, const char *pattern)
     // DEFAULT_REGEX_FLAGS is not used here because pattern has been
     // escaped by parse_ex_pattern() for use as a POSIX BRE
     regex_t regex;
-    if (!regexp_compile_internal(&regex, pattern, REG_NEWLINE)) {
-        return false;
+    int err = regcomp(&regex, pattern, REG_NEWLINE);
+    if (unlikely(err)) {
+        regexp_error_msg(view->window->editor->err, &regex, pattern, err);
     }
 
     BlockIter bi = block_iter(view->buffer);
@@ -140,7 +141,7 @@ static bool has_upper(const char *str)
     return false;
 }
 
-static bool update_regex(SearchState *search, SearchCaseSensitivity cs)
+static bool update_regex(SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs)
 {
     const char *pattern = search->pattern;
     bool icase = (cs == CSS_FALSE) || (cs == CSS_AUTO && !has_upper(pattern));
@@ -154,7 +155,7 @@ static bool update_regex(SearchState *search, SearchCaseSensitivity cs)
         search->re_flags = 0;
     }
 
-    if (regexp_compile(&search->regex, pattern, flags)) {
+    if (regexp_compile(ebuf, &search->regex, pattern, flags)) {
         search->re_flags = flags;
         return true;
     }
@@ -180,11 +181,11 @@ void search_set_regexp(SearchState *search, const char *pattern)
 
 bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
-    ErrorBuffer *err = view->window->editor->err;
+    ErrorBuffer *ebuf = view->window->editor->err;
     if (!search->pattern) {
-        return error_msg(err, "No previous search pattern");
+        return error_msg(ebuf, "No previous search pattern");
     }
-    if (!update_regex(search, cs)) {
+    if (!update_regex(search, ebuf, cs)) {
         return false;
     }
 
@@ -196,7 +197,7 @@ bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, b
         }
         block_iter_bof(&bi);
         if (do_search_fwd(view, regex, &bi, false)) {
-            return info_msg(err, "Continuing at top");
+            return info_msg(ebuf, "Continuing at top");
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
@@ -205,9 +206,9 @@ bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, b
         }
         block_iter_eof(&bi);
         if (do_search_bwd(view, regex, &bi, -1, false)) {
-            return info_msg(err, "Continuing at bottom");
+            return info_msg(ebuf, "Continuing at bottom");
         }
     }
 
-    return error_msg(err, "Pattern '%s' not found", search->pattern);
+    return error_msg(ebuf, "Pattern '%s' not found", search->pattern);
 }

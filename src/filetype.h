@@ -2,6 +2,7 @@
 #define FILETYPE_H
 
 #include <stdbool.h>
+#include "error.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -29,11 +30,19 @@ static inline bool is_valid_filetype_name(const char *name)
     return is_valid_filetype_name_sv(&sv);
 }
 
-bool add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type) NONNULL_ARGS WARN_UNUSED_RESULT;
 bool is_ft(const PointerArray *filetypes, const char *name);
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line);
 void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *prefix);
 String dump_filetypes(const PointerArray *filetypes);
 void free_filetypes(PointerArray *filetypes);
+
+WARN_UNUSED_RESULT NONNULL_ARG(1, 2, 3)
+bool add_filetype (
+    PointerArray *filetypes,
+    const char *name,
+    const char *str,
+    FileDetectionType type,
+    ErrorBuffer *ebuf
+);
 
 #endif
