@@ -158,6 +158,16 @@ KeyCode parse_key_string(const char *str)
     return KEY_NONE;
 }
 
+static const char *lookup_other_key(KeyCode key)
+{
+    for (size_t i = 0; i < ARRAYLEN(other_keys); i++) {
+        if (key == other_keys[i].key) {
+            return other_keys[i].name;
+        }
+    }
+    return NULL;
+}
+
 // Writes the string representation of `k` into `buf` (which must
 // have at least `KEYCODE_STR_MAX` bytes available) and returns the
 // length of the written string.
@@ -174,10 +184,16 @@ size_t keycode_to_string(KeyCode k, char *buf)
         {'H', MOD_HYPER},
     };
 
-    size_t prefix_len;
-    if (k & KEYCODE_QUERY_REPLY_BIT) {
-        prefix_len = copyliteral(buf, "QUERY REPLY; 0x");
-        goto hex;
+    KeyCode key = keycode_get_key(k);
+    KeyCode mask = MOD_MASK | KEY_MASK;
+    bool is_key_combo = (k & mask) == k && key <= KEY_SPECIAL_MAX;
+
+    if (unlikely(!is_key_combo)) {
+        size_t n = (k & KEYCODE_QUERY_REPLY_BIT)
+            ? copyliteral(buf, "QUERY REPLY; 0x")
+            : copyliteral(buf, "INVALID; 0x")
+        ;
+        return n + buf_umax_to_hex_str(k, buf + n, 8);
     }
 
     size_t pos = 0;
@@ -189,30 +205,17 @@ size_t keycode_to_string(KeyCode k, char *buf)
     }
 
     const char *name;
-    const KeyCode key = keycode_get_key(k);
-    if (u_is_unicode(key)) {
-        for (size_t i = 0; i < ARRAYLEN(other_keys); i++) {
-            if (key == other_keys[i].key) {
-                name = other_keys[i].name;
-                goto copy;
-            }
-        }
-        pos += u_set_char(buf + pos, key);
-        buf[pos] = '\0';
-        return pos;
-    }
-
-    if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
+    if (key >= KEY_SPECIAL_MIN) {
         name = special_names[key - KEY_SPECIAL_MIN];
-        goto copy;
+    } else {
+        name = lookup_other_key(key);
+        if (!name) {
+            pos += u_set_char(buf + pos, key);
+            buf[pos] = '\0';
+            return pos;
+        }
     }
 
-    prefix_len = copyliteral(buf, "INVALID; 0x");
-
-hex:
-    return prefix_len + buf_umax_to_hex_str(k, buf + prefix_len, 8);
-
-copy:
     BUG_ON(name[0] == '\0');
     char *end = memccpy(buf + pos, name, '\0', KEYCODE_STR_MAX - pos);
     BUG_ON(!end);
