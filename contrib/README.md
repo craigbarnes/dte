@@ -51,6 +51,13 @@ Create an [`alias`] that jumps to the tag under the cursor, or opens an
 alias xtag 'exec -s -o eval -e errmsg $DTE_HOME/scripts/xtag.sh $WORD'
 ```
 
+Create an [`alias`] that inserts the contents of the system clipboard into
+the buffer (using `wl-paste`, `xclip`, `pbpaste`, etc., so no SSH support):
+
+```sh
+alias cbpaste 'exec -ms -o buffer -e errmsg $DTE_HOME/scripts/paste.sh'
+```
+
 *Note:* the above examples assume you've copied the scripts in question
 to `$DTE_HOME/scripts/` (i.e. `~/.dte/scripts/`).
 
