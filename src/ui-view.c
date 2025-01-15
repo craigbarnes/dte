@@ -230,7 +230,7 @@ static void hl_words(Terminal *term, const StyleMap *styles, const LineInfo *inf
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
-    const size_t max = info->pos + term->width * 4 + 8;
+    const size_t max = info->pos + (term->width * 4) + 8;
 
     size_t si;
     while (i < info->size) {

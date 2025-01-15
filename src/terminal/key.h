@@ -11,6 +11,7 @@ enum {
     KEYCODE_STR_MAX = 32 // sizeof("QUERY REPLY; 0x12345678")
 };
 
+// NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
 enum {
     KEY_NONE = 0,
     KEY_TAB = '\t',

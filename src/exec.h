@@ -8,6 +8,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
+// NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
 typedef enum {
     EXEC_INVALID = -1,
     // Note: items below here need to be kept sorted

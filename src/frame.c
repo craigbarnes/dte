@@ -228,10 +228,12 @@ static void subtract_from_sibling_size(const Frame *frame, int count)
 static void resize_to(Frame *frame, int size)
 {
     const Frame *parent = frame_must_get_parent(frame);
+    size_t count = parent->frames.count;
+    BUG_ON(count == 0);
+
     int total = parent->vertical ? parent->h : parent->w;
-    int count = parent->frames.count;
     int min = get_min(frame);
-    int max = total - (count - 1) * min;
+    int max = total - ((count - 1) * min);
     max = MAX(min, max);
     size = CLAMP(size, min, max);
 

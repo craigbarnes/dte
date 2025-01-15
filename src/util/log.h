@@ -8,6 +8,7 @@
 #include "debug.h"
 #include "macros.h"
 
+// NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
 typedef enum {
     LOG_LEVEL_INVALID = -1,
     LOG_LEVEL_NONE = 0,

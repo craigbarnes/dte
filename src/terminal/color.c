@@ -32,7 +32,7 @@ static int color_distance (
     uint8_t r, uint8_t g, uint8_t b
 ) {
     static_assert(INT_MAX >= 3 * 255 * 255);
-    return (R - r) * (R - r) + (G - g) * (G - g) + (B - b) * (B - b);
+    return ((R - r) * (R - r)) + ((G - g) * (G - g)) + ((B - b) * (B - b));
 }
 
 UNITTEST {
