@@ -35,6 +35,8 @@ typedef enum {
     TFLAG_256_COLOR = 0x10000, // Supports xterm-style (ISO 8613-6) indexed colors (e.g. SGR 38;5;255)
     TFLAG_TRUE_COLOR = 0x20000, // Supports 24-bit RGB ("direct") colors (e.g. SGR 38;2;50;60;70)
     TFLAG_MODIFY_OTHER_KEYS = 0x40000, // Supports xterm "modifyOtherKeys" mode (keyboard protocol)
+    TFLAG_DEL_CTRL_BACKSPACE = 0x80000, // Emits DEL character (exclusively) for Ctrl+Backspace
+    TFLAG_BS_CTRL_BACKSPACE = 0x100000, // Emits BS character for Ctrl+Backspace (and Ctrl+h, but not Backspace)
 } TermFeatureFlags;
 
 typedef enum {

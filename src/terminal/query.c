@@ -316,6 +316,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
             // TODO: Set TFLAG_SYNC for tmux 3.4+ (tmux doesn't support DECRQM)
             return tflag (
                 TFLAG_NO_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
+                | TFLAG_BS_CTRL_BACKSPACE
             );
         }
         return tflag(TFLAG_QUERY_L3);

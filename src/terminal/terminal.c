@@ -36,6 +36,8 @@ enum {
     ITERM2 = TFLAG_ITERM2,
     SYNC = TFLAG_SYNC,
     NOQUERY3 = TFLAG_NO_QUERY_L3,
+    BSCTRL = TFLAG_BS_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
+    DELCTRL = TFLAG_DEL_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
     C8 = TFLAG_8_COLOR,
     C16 = TFLAG_16_COLOR | C8,
     C256 = TFLAG_256_COLOR | C16,
@@ -73,7 +75,7 @@ static const TermEntry terms[] = {
     t("decansi", 0, C8),
     t("domterm", 0, C8 | BCE),
     t("dtterm", 0, C8),
-    t("dvtm", 0, C8),
+    t("dvtm", 0, C8 | BSCTRL),
     t("fbterm", DIM | UL, C256 | BCE),
     t("foot", 0, TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
     t("ghostty", 0, TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
@@ -96,17 +98,17 @@ static const TermEntry terms[] = {
     t("mlterm3", 0, C8 | TITLE),
     t("mrxvt", 0, C8 | RXVT | BCE | TITLE | OSC52),
     t("pcansi", UL, C8),
-    t("putty", DIM | REV | UL, C8 | BCE),
+    t("putty", DIM | REV | UL, C8 | BCE), // TODO: BSCTRL?
     t("rio", 0, TC | BCE | REP | OSC52 | SYNC),
-    t("rxvt", 0, C8 | RXVT | BCE | TITLE | OSC52),
+    t("rxvt", 0, C8 | RXVT | BCE | TITLE | OSC52 | BSCTRL),
     t("screen", 0, C8 | TITLE | OSC52),
-    t("st", 0, C8 | BCE | OSC52),
+    t("st", 0, C8 | BCE | OSC52 | BSCTRL),
     t("stterm", 0, C8 | BCE | OSC52),
     t("teken", DIM | REV, C8 | BCE),
-    t("terminator", 0, C256 | BCE | TITLE),
+    t("terminator", 0, C256 | BCE | TITLE | BSCTRL),
     t("termite", 0, C8 | TITLE),
-    t("tmux", 0, C8 | TITLE | OSC52 | NOQUERY3), // See also: parse_dcs_query_reply()
-    t("wezterm", 0, TC | BCE | REP | TITLE | OSC52 | SYNC),
+    t("tmux", 0, C8 | TITLE | OSC52 | NOQUERY3 | BSCTRL), // See also: parse_dcs_query_reply()
+    t("wezterm", 0, TC | BCE | REP | TITLE | OSC52 | SYNC | BSCTRL),
     t("xfce", 0, C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too
     // many other terminals to safely add it here.
@@ -150,8 +152,14 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 
     for (size_t i = 0; i < ARRAYLEN(terms); i++) {
-        size_t len = strlen(terms[i].name);
+        const char *name = terms[i].name;
+        size_t len = strlen(name);
         BUG_ON(terms[i].name_len != len);
+        TermFeatureFlags imode_flags = KITTYKBD | ITERM2 | BSCTRL | DELCTRL;
+        TermFeatureFlags masked = terms[i].info.features & imode_flags;
+        if (masked && !IS_POWER_OF_2(masked)) {
+            BUG("TermEntry '%s' has multiple mutually exclusive flags", name);
+        }
     }
 
     for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {

@@ -129,22 +129,43 @@ static KeyCode read_special(Terminal *term)
     return KEY_NONE;
 }
 
-static KeyCode read_simple(TermInputBuffer *input)
+/*
+ * Get implied modifiers for the BS ('\b') character, depending on the
+ * current terminal feature flags. Note that there's a flag for BS and
+ * a separate flag for DEL (only 1 of which is ever active) so that
+ * the absence of both causes both characters to produce a backspace
+ * event (i.e. neither produce C-backspace). This is done because
+ * wrongly interpreting Ctrl+Backspace as Backspace is merely annoying
+ * (assuming they're bound to erase-word and erase respectively),
+ * whereas the reverse becomes borderline unusable. It's also a safer
+ * assumption in general, when no terminal-specific details are known.
+ */
+static KeyCode modifiers_for_bs(TermFeatureFlags flags)
 {
+    return (flags & TFLAG_BS_CTRL_BACKSPACE) ? MOD_CTRL : 0;
+}
+
+// Like modifiers_for_bs(), but for handling DEL ('\x7F')
+static KeyCode modifiers_for_del(TermFeatureFlags flags)
+{
+    return (flags & TFLAG_DEL_CTRL_BACKSPACE) ? MOD_CTRL : 0;
+}
+
+static KeyCode read_simple(Terminal *term)
+{
+    TermInputBuffer *input = &term->ibuf;
     unsigned char ch = 0;
 
     // > 0 bytes in buf
     input_get_byte(input, &ch);
 
     if (ch < 0x80) {
-        // TODO: Interpret \b or 0x7F as MOD_CTRL|KEY_BACKSPACE, when appropriate
-        // (e.g. based on XTGETTCAP "kbs" or DECRQM DECBKM response)
         switch (ch) {
-        case '\b': return KEY_BACKSPACE;
+        case '\b': return KEY_BACKSPACE | modifiers_for_bs(term->features);
         case '\t': return KEY_TAB;
         case '\r': return KEY_ENTER;
         case 0x1B: return KEY_ESCAPE;
-        case 0x7F: return KEY_BACKSPACE;
+        case 0x7F: return KEY_BACKSPACE | modifiers_for_del(term->features);
         }
         return (ch >= 0x20) ? ch : MOD_CTRL | ascii_tolower(ch | 0x40);
     }
@@ -212,6 +233,8 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_256_COLOR: return "C256";
     case TFLAG_TRUE_COLOR: return "TC";
     case TFLAG_MODIFY_OTHER_KEYS: return "MOKEYS";
+    case TFLAG_BS_CTRL_BACKSPACE: return "BSCTRL";
+    case TFLAG_DEL_CTRL_BACKSPACE: return "DELCTRL";
     }
 
     return "??";
@@ -320,7 +343,7 @@ KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
     }
 
     if (input->buf[0] != '\033') {
-        return read_simple(input);
+        return read_simple(term);
     }
 
     if (input->len > 1 || input->can_be_truncated) {
@@ -353,7 +376,7 @@ KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
              * This breaks the esc-key == alt-key rule for the
              * esc-esc case but it shouldn't matter.
              */
-            return read_simple(input);
+            return read_simple(term);
         }
     }
 
@@ -363,7 +386,7 @@ KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
         // Throw escape away
         consume_input(input, 1);
 
-        KeyCode key = read_simple(input);
+        KeyCode key = read_simple(term);
         if (key == KEY_NONE) {
             return KEY_NONE;
         }
@@ -381,5 +404,5 @@ KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
         return KEY_NONE;
     }
 
-    return read_simple(input);
+    return read_simple(term);
 }
