@@ -150,6 +150,9 @@ Features
   or key bindings (the restrictions noted for [configuration commands]
   should only apply to `rc` files and built-in configs)
 
+* Extend syntax highlighting with some built-in way to handle arbitrary
+  nesting of things like e.g. OCaml comments (see also: [#132])
+
 Documentation
 -------------
 
@@ -344,6 +347,7 @@ Testing/Debugging
 [#88]: https://gitlab.com/craigbarnes/dte/-/issues/88
 [#105]: https://gitlab.com/craigbarnes/dte/-/issues/105
 [#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
+[#132]: https://gitlab.com/craigbarnes/dte/-/issues/132
 [#142]: https://gitlab.com/craigbarnes/dte/-/issues/142
 [#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
 [#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
