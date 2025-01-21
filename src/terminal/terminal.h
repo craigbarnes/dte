@@ -37,6 +37,9 @@ typedef enum {
     TFLAG_MODIFY_OTHER_KEYS = 0x40000, // Supports xterm "modifyOtherKeys" mode (keyboard protocol)
     TFLAG_DEL_CTRL_BACKSPACE = 0x80000, // Emits DEL character (exclusively) for Ctrl+Backspace
     TFLAG_BS_CTRL_BACKSPACE = 0x100000, // Emits BS character for Ctrl+Backspace (and Ctrl+h, but not Backspace)
+    TFLAG_NCV_UNDERLINE = 0x200000, // Colors can't be used with ATTR_UNDERLINE (see "ncv" in terminfo(5))
+    TFLAG_NCV_DIM = 0x400000, // Colors can't be used with ATTR_DIM
+    TFLAG_NCV_REVERSE = 0x800000, // Colors can't be used with ATTR_REVERSE
 } TermFeatureFlags;
 
 typedef enum {

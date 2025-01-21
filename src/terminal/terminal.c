@@ -13,14 +13,9 @@
 #include "util/str-util.h"
 
 typedef struct {
-    unsigned int ncv_attrs : 5; // TermStyle attributes (see "ncv" in terminfo(5))
-    unsigned int features : 27; // TermFeatureFlags
-} TermInfo;
-
-typedef struct {
     const char name[11];
     uint8_t name_len;
-    TermInfo info;
+    TermFeatureFlags features;
 } TermEntry;
 
 enum {
@@ -42,79 +37,72 @@ enum {
     C16 = TFLAG_16_COLOR | C8,
     C256 = TFLAG_256_COLOR | C16,
     TC = TFLAG_TRUE_COLOR | C256,
+    NCVUL = TFLAG_NCV_UNDERLINE,
+    NCVREV = TFLAG_NCV_REVERSE,
+    NCVDIM = TFLAG_NCV_DIM,
 };
 
-enum {
-    // Short aliases for TermStyle attributes:
-    UL = ATTR_UNDERLINE,
-    REV = ATTR_REVERSE,
-    DIM = ATTR_DIM,
-};
-
-#define t(tname, ncv, feat) { \
+#define t(tname, feat) { \
     .name = tname, \
     .name_len = STRLEN(tname), \
-    .info = { \
-        .ncv_attrs = ncv, \
-        .features = feat, \
-    }, \
+    .features = (TermFeatureFlags)feat, \
 }
 
 static const TermEntry terms[] = {
-    t("Eterm", 0, C8 | BCE),
-    t("alacritty", 0, TC | BCE | REP | OSC52 | SYNC),
-    t("ansi", UL, C8),
-    t("ansiterm", 0, 0),
-    t("aterm", 0, C8 | BCE),
-    t("contour", 0, TC | BCE | REP | TITLE | OSC52 | SYNC),
-    t("cx", 0, C8),
-    t("cx100", 0, C8),
-    t("cygwin", 0, C8),
-    t("cygwinB19", UL, C8),
-    t("cygwinDBG", UL, C8),
-    t("decansi", 0, C8),
-    t("domterm", 0, C8 | BCE),
-    t("dtterm", 0, C8),
-    t("dvtm", 0, C8 | BSCTRL),
-    t("fbterm", DIM | UL, C256 | BCE),
-    t("foot", 0, TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
-    t("ghostty", 0, TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
-    t("hurd", DIM | UL, C8 | BCE),
-    t("iTerm.app", 0, C256 | BCE),
-    t("iTerm2.app", 0, C256 | BCE | TITLE | OSC52 | ITERM2 | SYNC),
-    t("iterm", 0, C256 | BCE),
-    t("iterm2", 0, C256 | BCE | TITLE | OSC52 | ITERM2 | SYNC),
-    t("jfbterm", DIM | UL, C8 | BCE),
-    t("kitty", 0, TC | TITLE | OSC52 | KITTYKBD | SYNC),
-    t("kon", DIM | UL, C8 | BCE),
-    t("kon2", DIM | UL, C8 | BCE),
-    t("konsole", 0, C8 | BCE),
-    t("kterm", 0, C8),
-    t("linux", DIM | UL, C8 | LINUX | BCE),
-    t("mgt", 0, C8 | BCE),
-    t("mintty", 0, C8 | BCE | REP | TITLE | OSC52 | SYNC),
-    t("mlterm", 0, C8 | TITLE),
-    t("mlterm2", 0, C8 | TITLE),
-    t("mlterm3", 0, C8 | TITLE),
-    t("mrxvt", 0, C8 | RXVT | BCE | TITLE | OSC52),
-    t("pcansi", UL, C8),
-    t("putty", DIM | REV | UL, C8 | BCE), // TODO: BSCTRL?
-    t("rio", 0, TC | BCE | REP | OSC52 | SYNC),
-    t("rxvt", 0, C8 | RXVT | BCE | TITLE | OSC52 | BSCTRL),
-    t("screen", 0, C8 | TITLE | OSC52),
-    t("st", 0, C8 | BCE | OSC52 | BSCTRL),
-    t("stterm", 0, C8 | BCE | OSC52),
-    t("teken", DIM | REV, C8 | BCE),
-    t("terminator", 0, C256 | BCE | TITLE | BSCTRL),
-    t("termite", 0, C8 | TITLE),
-    t("tmux", 0, C8 | TITLE | OSC52 | NOQUERY3 | BSCTRL), // See also: parse_dcs_query_reply()
-    t("wezterm", 0, TC | BCE | REP | TITLE | OSC52 | SYNC | BSCTRL),
-    t("xfce", 0, C8 | BCE | TITLE),
+    t("Eterm", C8 | BCE),
+    t("alacritty", TC | BCE | REP | OSC52 | SYNC),
+    t("ansi", C8 | NCVUL),
+    t("ansiterm", 0),
+    t("aterm", C8 | BCE),
+    t("contour", TC | BCE | REP | TITLE | OSC52 | SYNC),
+    t("cx", C8),
+    t("cx100", C8),
+    t("cygwin", C8),
+    t("cygwinB19", C8 | NCVUL),
+    t("cygwinDBG", C8 | NCVUL),
+    t("decansi", C8),
+    t("domterm", C8 | BCE),
+    t("dtterm", C8),
+    t("dvtm", C8 | BSCTRL),
+    t("fbterm", C256 | BCE | NCVUL | NCVDIM),
+    t("foot", TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
+    t("ghostty", TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
+    t("hurd", C8 | BCE | NCVUL | NCVDIM),
+    t("iTerm.app", C256 | BCE),
+    t("iTerm2.app", C256 | BCE | TITLE | OSC52 | ITERM2 | SYNC),
+    t("iterm", C256 | BCE),
+    t("iterm2", C256 | BCE | TITLE | OSC52 | ITERM2 | SYNC),
+    t("jfbterm", C8 | BCE | NCVUL | NCVDIM),
+    t("kitty", TC | TITLE | OSC52 | KITTYKBD | SYNC),
+    t("kon", C8 | BCE | NCVUL | NCVDIM),
+    t("kon2", C8 | BCE | NCVUL | NCVDIM),
+    t("konsole", C8 | BCE),
+    t("kterm", C8),
+    t("linux", C8 | LINUX | BCE | NCVUL | NCVDIM),
+    t("mgt", C8 | BCE),
+    t("mintty", C8 | BCE | REP | TITLE | OSC52 | SYNC),
+    t("mlterm", C8 | TITLE),
+    t("mlterm2", C8 | TITLE),
+    t("mlterm3", C8 | TITLE),
+    t("mrxvt", C8 | RXVT | BCE | TITLE | OSC52),
+    t("pcansi", C8 | NCVUL),
+    t("putty", C8 | BCE | NCVUL | NCVDIM | NCVREV), // TODO: BSCTRL?
+    t("rio", TC | BCE | REP | OSC52 | SYNC),
+    t("rxvt", C8 | RXVT | BCE | TITLE | OSC52 | BSCTRL),
+    t("screen", C8 | TITLE | OSC52),
+    t("st", C8 | BCE | OSC52 | BSCTRL),
+    t("stterm", C8 | BCE | OSC52),
+    t("teken", C8 | BCE | NCVDIM | NCVREV),
+    t("terminator", C256 | BCE | TITLE | BSCTRL),
+    t("termite", C8 | TITLE),
+    t("tmux", C8 | TITLE | OSC52 | NOQUERY3 | BSCTRL), // See also: parse_dcs_query_reply()
+    t("wezterm", TC | BCE | REP | TITLE | OSC52 | SYNC | BSCTRL),
+    t("xfce", C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too
     // many other terminals to safely add it here.
     // See also: parse_xtgettcap_reply()
-    t("xterm", 0, C8 | BCE | TITLE | OSC52),
-    t("xterm.js", 0, C8 | BCE),
+    t("xterm", C8 | BCE | TITLE | OSC52),
+    t("xterm.js", C8 | BCE),
 };
 
 static const struct {
@@ -156,7 +144,7 @@ UNITTEST {
         size_t len = strlen(name);
         BUG_ON(terms[i].name_len != len);
         TermFeatureFlags imode_flags = KITTYKBD | ITERM2 | BSCTRL | DELCTRL;
-        TermFeatureFlags masked = terms[i].info.features & imode_flags;
+        TermFeatureFlags masked = terms[i].features & imode_flags;
         if (masked && !IS_POWER_OF_2(masked)) {
             BUG("TermEntry '%s' has multiple mutually exclusive flags", name);
         }
@@ -192,16 +180,12 @@ static StringView term_extract_name(const char *name, size_t len, size_t *pos)
     return root;
 }
 
-static TermInfo term_get_info(const char *name, const char *colorterm)
+static TermFeatureFlags term_get_features(const char *name, const char *colorterm)
 {
-    TermInfo info = {
-        .features = TFLAG_8_COLOR,
-        .ncv_attrs = 0,
-    };
-
+    TermFeatureFlags features = TFLAG_8_COLOR;
     if (!name || name[0] == '\0') {
         LOG_NOTICE("$TERM unset; skipping terminal info lookup");
-        return info;
+        return features;
     }
 
     LOG_INFO("TERM=%s", name);
@@ -214,20 +198,20 @@ static TermInfo term_get_info(const char *name, const char *colorterm)
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
     if (entry) {
         LOG_INFO("using built-in terminal info for '%s'", entry->name);
-        info = entry->info;
+        features = entry->features;
     }
 
     if (colorterm) {
         if (streq(colorterm, "truecolor") || streq(colorterm, "24bit")) {
-            info.features |= TC;
+            features |= TC;
             LOG_INFO("24-bit color support detected (COLORTERM=%s)", colorterm);
         } else if (colorterm[0] != '\0') {
             LOG_WARNING("unknown $COLORTERM value: '%s'", colorterm);
         }
     }
 
-    if (info.features & TFLAG_TRUE_COLOR) {
-        return info;
+    if (features & TFLAG_TRUE_COLOR) {
+        return features;
     }
 
     while (pos < name_len) {
@@ -236,33 +220,37 @@ static TermInfo term_get_info(const char *name, const char *colorterm)
             const char *suffix = color_suffixes[i].suffix;
             size_t suffix_len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, suffix_len)) {
-                TermFeatureFlags flags = color_suffixes[i].flags;
-                if (flags == 0) {
-                    info.features &= ~TC;
-                    info.ncv_attrs = 0;
+                TermFeatureFlags color_features = color_suffixes[i].flags;
+                if (color_features == 0) {
+                    features &= ~(TC | C256 | C16 | C8 | NCVUL | NCVREV | NCVDIM);
                 } else {
-                    info.features |= flags;
+                    features |= color_features;
                 }
                 LOG_INFO("color type detected from $TERM suffix '-%s'", suffix);
-                return info;
+                return features;
             }
         }
     }
 
-    return info;
+    return features;
 }
 
 void term_init(Terminal *term, const char *name, const char *colorterm)
 {
-    TermInfo info = term_get_info(name, colorterm);
-    term->features = info.features;
+    TermFeatureFlags features = term_get_features(name, colorterm);
+    term->features = features;
     term->width = 80;
     term->height = 24;
-    term->ncv_attributes = info.ncv_attrs;
 
-    if (info.features & RXVT) {
+    term->ncv_attributes =
+        (features & NCVUL) ? ATTR_UNDERLINE : 0
+        | (features & NCVDIM) ? ATTR_DIM : 0
+        | (features & NCVREV) ? ATTR_REVERSE : 0
+    ;
+
+    if (features & RXVT) {
         term->parse_input = rxvt_parse_key;
-    } else if (info.features & LINUX) {
+    } else if (features & LINUX) {
         term->parse_input = linux_parse_key;
     } else {
         term->parse_input = term_parse_sequence;
