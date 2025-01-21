@@ -278,6 +278,10 @@ Code Quality/Efficiency Improvements
 * Cache EditorConfig properties in memory, so that each `.editorconfig`
   file is read only once per session (see also: [#105])
 
+* Use 2-stage tables for looking up Unicode character properties,
+  instead of the binary searched interval tables in `src/util/unidata.h`
+  (see also: [#147])
+
 Testing/Debugging
 -----------------
 
@@ -349,6 +353,7 @@ Testing/Debugging
 [#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
 [#132]: https://gitlab.com/craigbarnes/dte/-/issues/132
 [#142]: https://gitlab.com/craigbarnes/dte/-/issues/142
+[#147]: https://gitlab.com/craigbarnes/dte/-/issues/147
 [#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
 [#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
 [#161]: https://gitlab.com/craigbarnes/dte/-/issues/161
