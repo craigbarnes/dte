@@ -76,7 +76,7 @@ static inline ssize_t bisearch_idx (
 }
 
 // This is a wrapper around strcmp(3) with void* parameters, suitable
-// for use with bsearch(3) without the need for casting
+// for use in bsearch(3) without the need for casting
 static inline int vstrcmp(const void *a, const void *b)
 {
     return strcmp(a, b);
