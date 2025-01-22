@@ -340,7 +340,7 @@ Interactively filter a shell pipeline:
 It's advised to NOT run shell pipelines with multiple interactive
 programs that try to control the terminal. For example:
 
-    echo "Don't run this example!!" | dte | less
+    echo "Don't run this example" | dte | less
 
 A shell will run these processes in parallel and both `dte` and `less`
 will then try to control the terminal at the same time; clobbering the
