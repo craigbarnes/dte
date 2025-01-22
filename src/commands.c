@@ -620,8 +620,13 @@ static bool cmd_def_mode(EditorState *e, const CommandArgs *a)
         ptr_array_append(&ftmodes, mode);
     }
 
+    static const FlagMapping map[] = {
+        {'u', MHF_NO_TEXT_INSERTION},
+        {'U', MHF_NO_TEXT_INSERTION | MHF_NO_TEXT_INSERTION_RECURSIVE},
+    };
+
     ModeHandler *mode = new_mode(modes, xstrdup(name), &normal_commands);
-    mode->insert_text_for_unicode_range = !has_flag(a, 'u');
+    mode->flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     mode->fallthrough_modes = ftmodes;
     return true;
 }
@@ -2637,7 +2642,7 @@ static const Command cmds[] = {
     {"copy", "bikp", NA, 0, 1, cmd_copy},
     {"cursor", "", RC, 0, 3, cmd_cursor},
     {"cut", "", NA, 0, 0, cmd_cut},
-    {"def-mode", "u", RC, 1, 16, cmd_def_mode},
+    {"def-mode", "Uu", RC, 1, 16, cmd_def_mode},
     {"delete", "", NA, 0, 0, cmd_delete},
     {"delete-eol", "n", NA, 0, 0, cmd_delete_eol},
     {"delete-line", "S", NA, 0, 0, cmd_delete_line},

@@ -9,11 +9,16 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
+typedef enum {
+    MHF_NO_TEXT_INSERTION = 1 << 0, // Don't insert text for keys in the Unicode range
+    MHF_NO_TEXT_INSERTION_RECURSIVE = 1 << 1, // As above, but also overriding all fallback modes
+} ModeHandlerFlags;
+
 typedef struct {
     const char *name;
     const CommandSet *cmds;
     IntMap key_bindings;
-    bool insert_text_for_unicode_range;
+    ModeHandlerFlags flags;
     PointerArray fallthrough_modes;
 } ModeHandler;
 

@@ -440,7 +440,9 @@ static String dump_modes(EditorState *e)
     for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
         const ModeHandler *mode = it.entry->value;
         string_append_literal(&buf, "def-mode ");
-        if (!mode->insert_text_for_unicode_range) {
+        if (mode->flags & MHF_NO_TEXT_INSERTION_RECURSIVE) {
+            string_append_literal(&buf, "-U ");
+        } else if (mode->flags & MHF_NO_TEXT_INSERTION) {
             string_append_literal(&buf, "-u ");
         }
         string_append_cstring(&buf, mode->name);

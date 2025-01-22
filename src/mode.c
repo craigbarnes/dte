@@ -19,7 +19,6 @@ ModeHandler *new_mode(HashMap *modes, char *name, const CommandSet *cmds)
     ModeHandler *mode = xnew0(ModeHandler, 1);
     mode->name = name;
     mode->cmds = cmds;
-    mode->insert_text_for_unicode_range = true;
     return hashmap_insert(modes, name, mode);
 }
 
@@ -42,14 +41,22 @@ static bool insert_paste(EditorState *e, const ModeHandler *handler, bool bracke
     return true;
 }
 
-static bool handle_input_single(EditorState *e, const ModeHandler *handler, KeyCode key)
-{
+static bool handle_input_single (
+    EditorState *e,
+    const ModeHandler *handler,
+    KeyCode key,
+    ModeHandlerFlags inherited_flags
+) {
     if (key == KEYCODE_DETECTED_PASTE || key == KEYCODE_BRACKETED_PASTE) {
         return insert_paste(e, handler, key == KEYCODE_BRACKETED_PASTE);
     }
 
-    const CommandSet *cmds = handler->cmds;
-    if (handler->insert_text_for_unicode_range) {
+    ModeHandlerFlags noinsert_flags = MHF_NO_TEXT_INSERTION | MHF_NO_TEXT_INSERTION_RECURSIVE;
+    ModeHandlerFlags flag_union = handler->flags | inherited_flags;
+    bool insert_unicode_range = !(flag_union & noinsert_flags);
+
+    if (insert_unicode_range) {
+        const CommandSet *cmds = handler->cmds;
         if (cmds == &normal_commands) {
             View *view = e->view;
             KeyCode shift = key & MOD_SHIFT;
@@ -84,16 +91,19 @@ static bool handle_input_single(EditorState *e, const ModeHandler *handler, KeyC
 static bool handle_input_recursive (
     EditorState *e,
     const ModeHandler *handler,
-    KeyCode key
+    KeyCode key,
+    ModeHandlerFlags inherited_flags
 ) {
-    if (handle_input_single(e, handler, key)) {
+    if (handle_input_single(e, handler, key, inherited_flags)) {
         return true;
     }
 
     const PointerArray *ftmodes = &handler->fallthrough_modes;
+    inherited_flags |= (handler->flags & MHF_NO_TEXT_INSERTION_RECURSIVE);
+
     for (size_t i = 0, n = ftmodes->count; i < n; i++) {
         const ModeHandler *h = ftmodes->ptrs[i];
-        if (handle_input_recursive(e, h, key)) {
+        if (handle_input_recursive(e, h, key, inherited_flags)) {
             return true;
         }
     }
@@ -103,5 +113,5 @@ static bool handle_input_recursive (
 
 bool handle_input(EditorState *e, KeyCode key)
 {
-    return handle_input_recursive(e, e->mode, key);
+    return handle_input_recursive(e, e->mode, key, 0);
 }
