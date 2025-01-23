@@ -2135,15 +2135,13 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         }
     }
 
-    search_set_regexp(search, pattern);
-    bool found = do_search_next(view, search, cs, use_word_under_cursor);
-
     if (!has_flag(a, 'H')) {
         history_append(&e->search_history, pattern);
     }
 
+    search_set_regexp(search, pattern);
     free(alloc);
-    return found;
+    return has_flag(a, 's') || do_search_next(view, search, cs, use_word_under_cursor);
 }
 
 static bool cmd_select_block(EditorState *e, const CommandArgs *a)
@@ -2688,7 +2686,7 @@ static const Command cmds[] = {
     {"scroll-pgdown", "chl", NA, 0, 0, cmd_scroll_pgdown},
     {"scroll-pgup", "chl", NA, 0, 0, cmd_scroll_pgup},
     {"scroll-up", "Mcl", NA, 0, 0, cmd_scroll_up},
-    {"search", "Henprw", NA, 0, 1, cmd_search},
+    {"search", "Henprsw", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
     {"set", "gl", RC, 1, -1, cmd_set},
