@@ -1493,10 +1493,10 @@ static size_t count_modified_buffers(const PointerArray *buffers, View **first)
 static bool cmd_quit(EditorState *e, const CommandArgs *a)
 {
     static const FlagMapping fmap[] = {
-        {'C', EFLAG_SAVE_CMD_HIST},
-        {'S', EFLAG_SAVE_SEARCH_HIST},
-        {'F', EFLAG_SAVE_FILE_HIST},
-        {'H', EFLAG_SAVE_ALL_HIST},
+        {'C', EFLAG_CMD_HIST},
+        {'S', EFLAG_SEARCH_HIST},
+        {'F', EFLAG_FILE_HIST},
+        {'H', EFLAG_ALL_HIST},
     };
 
     int exit_code = EDITOR_EXIT_OK;

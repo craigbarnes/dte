@@ -42,10 +42,10 @@ typedef enum {
 } EditorStatus;
 
 typedef enum {
-    EFLAG_SAVE_CMD_HIST = 1u << 0, // Update command history on quit
-    EFLAG_SAVE_SEARCH_HIST = 1u << 1, // Update search history on quit
-    EFLAG_SAVE_FILE_HIST = 1u << 2, // Update file history on quit
-    EFLAG_SAVE_ALL_HIST = (EFLAG_SAVE_FILE_HIST << 1) - 1, // All of the above
+    EFLAG_CMD_HIST = 1u << 0, // Save command history on quit
+    EFLAG_SEARCH_HIST = 1u << 1, // Save search history on quit
+    EFLAG_FILE_HIST = 1u << 2, // Save file history on quit
+    EFLAG_ALL_HIST = EFLAG_CMD_HIST | EFLAG_SEARCH_HIST | EFLAG_FILE_HIST,
     EFLAG_HEADLESS = 1u << 3, // Running in "headless" mode (no tty interaction)
 } EditorFlags;
 

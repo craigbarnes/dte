@@ -385,7 +385,7 @@ static void read_history_files(EditorState *e)
     // There's not much sense in saving history for headless sessions, but we
     // do still load it (above), to make it available to e.g. `exec -i command`
     if (!(e->flags & EFLAG_HEADLESS)) {
-        e->flags |= EFLAG_SAVE_ALL_HIST;
+        e->flags |= EFLAG_ALL_HIST;
     }
 
     if (e->search_history.last) {
@@ -396,13 +396,13 @@ static void read_history_files(EditorState *e)
 static void write_history_files(EditorState *e)
 {
     EditorFlags flags = e->flags;
-    if (flags & EFLAG_SAVE_CMD_HIST) {
+    if (flags & EFLAG_CMD_HIST) {
         history_save(&e->command_history, &e->err);
     }
-    if (flags & EFLAG_SAVE_SEARCH_HIST) {
+    if (flags & EFLAG_SEARCH_HIST) {
         history_save(&e->search_history, &e->err);
     }
-    if (flags & EFLAG_SAVE_FILE_HIST) {
+    if (flags & EFLAG_FILE_HIST) {
         file_history_save(&e->file_history, &e->err);
     }
 }
