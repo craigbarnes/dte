@@ -13,6 +13,9 @@ typedef struct {
     size_t hash;
 } HashMapEntry;
 
+// A container type for mapping between string keys and pointer values,
+// using hashing for primary lookups and quadratic probing for collision
+// resolution.
 typedef struct {
     HashMapEntry *entries;
     size_t mask; // Length of entries (which is always a power of 2) minus 1
