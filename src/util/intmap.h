@@ -15,10 +15,10 @@ typedef struct {
     void *value;
 } IntMapEntry;
 
-// This is much like the HashMap type from hashmap.h, but for uint32_t
-// values and with some of the internal details (different hash function,
-// different tombstone handling, not storing hash values in entries, etc.)
-// tweaked accordingly.
+// This is much like the HashMap type from hashmap.h, but for uint32_t keys
+// and with some of the internal details (different hash function, different
+// tombstone handling, not storing hash values in entries, etc.) tweaked
+// accordingly.
 typedef struct {
     IntMapEntry *entries;
     size_t mask; // Length of entries (which is always a power of 2) minus 1
