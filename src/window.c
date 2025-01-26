@@ -26,7 +26,7 @@ View *window_add_buffer(Window *window, Buffer *buffer)
     // View::selection and View::select_mode
     static_assert(SELECT_NONE == 0);
 
-    View *view = xnew(View, 1);
+    View *view = xmalloc(sizeof(*view));
     *view = (View) {
         .buffer = buffer,
         .window = window,

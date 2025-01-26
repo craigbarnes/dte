@@ -130,7 +130,7 @@ const InternedRegexp *regexp_intern(ErrorBuffer *ebuf, const char *pattern)
         return ir;
     }
 
-    ir = xnew(InternedRegexp, 1);
+    ir = xmalloc(sizeof(*ir));
     int err = regcomp(&ir->re, pattern, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
     if (unlikely(err)) {
         regexp_error_msg(ebuf, &ir->re, pattern, err);

@@ -46,7 +46,7 @@ void file_history_append(FileHistory *history, unsigned long row, unsigned long 
             e = hashmap_remove(map, old_first->filename);
             BUG_ON(e != old_first);
         } else {
-            e = xnew(FileHistoryEntry, 1);
+            e = xmalloc(sizeof(*e));
         }
         e->filename = xstrdup(filename);
         hashmap_insert(map, e->filename, e);

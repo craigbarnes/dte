@@ -69,7 +69,7 @@ static mode_t get_umask(void)
 
 EditorState *init_editor_state(EditorFlags flags)
 {
-    EditorState *e = xnew(EditorState, 1);
+    EditorState *e = xmalloc(sizeof(*e));
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
         .flags = flags,

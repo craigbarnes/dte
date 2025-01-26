@@ -62,7 +62,7 @@ static State *handle_heredoc (
         .delim_len = len
     };
 
-    HeredocState *s = xnew(HeredocState, 1);
+    HeredocState *s = xmalloc(sizeof(*s));
     *s = (HeredocState) {
         .state = merge_syntax(syn, &m, sm),
         .delim = delim,

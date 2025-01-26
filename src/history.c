@@ -41,7 +41,7 @@ void history_append(History *history, const char *text)
             e = hashmap_remove(map, old_first->text);
             BUG_ON(e != old_first);
         } else {
-            e = xnew(HistoryEntry, 1);
+            e = xmalloc(sizeof(*e));
         }
         e->text = xstrdup(text);
         hashmap_insert(map, e->text, e);

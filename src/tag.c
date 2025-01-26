@@ -222,11 +222,11 @@ static void tag_file_find_tags (
     const StringView *name,
     PointerArray *tags
 ) {
-    Tag *t = xnew(Tag, 1);
+    Tag *t = xmalloc(sizeof(*t));
     size_t pos = 0;
     while (next_tag(tf->buf, tf->size, &pos, name, true, t)) {
         ptr_array_append(tags, t);
-        t = xnew(Tag, 1);
+        t = xmalloc(sizeof(*t));
     }
     free(t);
 

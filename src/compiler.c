@@ -44,7 +44,7 @@ void add_error_fmt (
     int8_t idx[NR_ERRFMT_INDICES],
     bool ignore
 ) {
-    ErrorFormat *f = xnew(ErrorFormat, 1);
+    ErrorFormat *f = xmalloc(sizeof(*f));
     f->ignore = ignore;
     f->re = *re; // Takes ownership (responsible for calling regfree(3))
     memcpy(f->capture_index, idx, NR_ERRFMT_INDICES);

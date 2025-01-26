@@ -120,7 +120,7 @@ void add_file_options (
         BUG_ON(!u.filetype);
     }
 
-    FileOption *opt = xnew(FileOption, 1);
+    FileOption *opt = xmalloc(sizeof(*opt));
     opt->u = u;
     opt->type = type;
     opt->strs = copy_string_array(strs, nstrs);

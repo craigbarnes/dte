@@ -7,7 +7,7 @@
 #include "macros.h"
 
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
-#define xnew(type, n) xmalloc(xmul(sizeof(type), (n)))
+#define xnew(type, n) xmallocarray((n), sizeof(type))
 #define xnew0(type, n) xcalloc((n), sizeof(type))
 #define xrenew(mem, n) xreallocarray(mem, (n), sizeof(*mem))
 
@@ -40,6 +40,12 @@ static inline size_t xadd3(size_t a, size_t b, size_t c)
     return xadd(a, xadd(b, c));
 }
 
+XMALLOC ALLOC_SIZE(1, 2)
+static inline void *xmallocarray(size_t nmemb, size_t size)
+{
+    return xmalloc(xmul(nmemb, size));
+}
+
 RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2, 3)
 static inline void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 {
@@ -65,6 +71,7 @@ static inline char *xstrcut(const char *str, size_t size)
 XSTRDUP
 static inline char *xstrslice(const char *str, size_t pos, size_t end)
 {
+    BUG_ON(pos > end);
     return xstrcut(str + pos, end - pos);
 }
 
