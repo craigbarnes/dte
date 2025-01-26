@@ -132,20 +132,16 @@ bool next_tag (
     size_t plen = prefix->length;
     for (size_t pos = *posp; pos < buf_len; ) {
         StringView line = buf_slice_next_line(buf, &pos, buf_len);
-        if (line.length == 0 || line.data[0] == '!') {
-            continue;
+        if (
+            line.length > 0
+            && line.data[0] != '!'
+            && strview_has_strn_prefix(&line, p, plen)
+            && (!exact || line.data[plen] == '\t')
+            && parse_ctags_line(tag, line.data, line.length)
+        ) {
+            *posp = pos;
+            return true;
         }
-        if (!strview_has_strn_prefix(&line, p, plen)) {
-            continue;
-        }
-        if (exact && line.data[plen] != '\t') {
-            continue;
-        }
-        if (!parse_ctags_line(tag, line.data, line.length)) {
-            continue;
-        }
-        *posp = pos;
-        return true;
     }
     return false;
 }

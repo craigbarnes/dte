@@ -22,7 +22,7 @@ bool next_tag (
     size_t *posp,
     const StringView *prefix,
     bool exact,
-    Tag *t
+    Tag *tag
 );
 
 bool parse_ctags_line(Tag *t, const char *line, size_t line_len) NONNULL_ARG(1);
