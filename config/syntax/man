@@ -1,0 +1,20 @@
+syntax man
+
+# This is for the indented/justified man(1) output format (minus escape
+# sequences) and provides some minimal highlighting for section headings.
+# See `syntax/roff` for the roff(7) input format.
+# Example usage: open -t; set filetype man; pipe-from man dte
+
+state start text
+    char " \t" text
+    noeat heading
+
+state text
+    char "\n" start
+    eat this
+
+state heading
+    char "\n" start
+    eat this
+
+default keyword heading
