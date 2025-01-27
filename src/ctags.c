@@ -123,26 +123,29 @@ bool parse_ctags_line(Tag *tag, const char *line, size_t line_len)
 bool next_tag (
     const char *buf,
     size_t buf_len,
-    size_t *posp,
+    size_t *posp, // in-out param
     const StringView *prefix,
     bool exact,
-    Tag *tag
+    Tag *tag // out param
 ) {
     const char *p = prefix->data;
     size_t plen = prefix->length;
     for (size_t pos = *posp; pos < buf_len; ) {
         StringView line = buf_slice_next_line(buf, &pos, buf_len);
         if (
-            line.length > 0
-            && line.data[0] != '!'
-            && strview_has_strn_prefix(&line, p, plen)
-            && (!exact || line.data[plen] == '\t')
-            && parse_ctags_line(tag, line.data, line.length)
+            line.length > 0 // Line is non-empty
+            && line.data[0] != '!' // and not a comment
+            && strview_has_strn_prefix(&line, p, plen) // and starts with `prefix`
+            && (!exact || line.data[plen] == '\t') // or matches `prefix` exactly, if applicable
+            && parse_ctags_line(tag, line.data, line.length) // and is a valid tags(5) entry
         ) {
+            // Advance the position; `tag` param has been filled by parse_ctags_line()
             *posp = pos;
             return true;
         }
     }
+
+    // No matching tags remaining
     return false;
 }
 
