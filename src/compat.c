@@ -45,7 +45,7 @@ const char buildvar_string[] =
 #endif
 
 // Features detected via cpp(1) macros
-#if defined(REG_STARTEND) && ASAN_ENABLED == 1 && MSAN_ENABLED == 1
+#if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
     " REG_STARTEND"
 #endif
 #ifdef REG_ENHANCED
