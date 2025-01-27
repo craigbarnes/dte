@@ -277,6 +277,20 @@
     #define NONSTRING
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-nonnull_005fif_005fnonzero-function-attribute
+#if HAS_ATTRIBUTE(nonnull_if_nonzero)
+    #define NONNULL_ARG_IF_NONZERO_LENGTH(...) __attribute__((__nonnull_if_nonzero__, __VA_ARGS__))
+#else
+    #define NONNULL_ARG_IF_NONZERO_LENGTH(...)
+#endif
+
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-null_005fterminated_005fstring_005farg-function-attribute
+#if HAS_ATTRIBUTE(null_terminated_string_arg)
+    #define CSTR_ARG(idx) __attribute__((__null_terminated_string_arg__(idx)))
+#else
+    #define CSTR_ARG(idx)
+#endif
+
 #if HAS_ATTRIBUTE(counted_by)
     #define COUNTED_BY(member) __attribute__((counted_by(member)))
 #else
@@ -293,6 +307,17 @@
     #define DIAGNOSE_IF(x) __attribute__((diagnose_if((x), (#x), "error")))
 #else
     #define DIAGNOSE_IF(x)
+#endif
+
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-access-function-attribute
+#if HAS_ATTRIBUTE(access)
+    #define READONLY(...) __attribute__((__access__(read_only, __VA_ARGS__))) // in param
+    #define WRITEONLY(...) __attribute__((__access__(write_only, __VA_ARGS__))) // out param
+    #define READWRITE(...) __attribute__((__access__(read_write, __VA_ARGS__))) // in-out param
+#else
+    #define READONLY(...)
+    #define WRITEONLY(...)
+    #define READWRITE(...)
 #endif
 
 #define UNUSED_ARG(x) unused__ ## x UNUSED

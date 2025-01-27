@@ -31,9 +31,9 @@ void end_change_chain(View *view) NONNULL_ARGS;
 bool undo(View *view) NONNULL_ARGS WARN_UNUSED_RESULT;
 bool redo(View *view, unsigned long change_id) NONNULL_ARGS WARN_UNUSED_RESULT;
 void free_changes(Change *c) NONNULL_ARGS;
-void buffer_insert_bytes(View *view, const char *buf, size_t len) NONNULL_ARG(1);
+void buffer_insert_bytes(View *view, const char *buf, size_t len) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3);
 void buffer_delete_bytes(View *view, size_t len) NONNULL_ARGS;
 void buffer_erase_bytes(View *view, size_t len) NONNULL_ARGS;
-void buffer_replace_bytes(View *view, size_t del_count, const char *ins, size_t ins_count) NONNULL_ARG(1);
+void buffer_replace_bytes(View *view, size_t del_count, const char *ins, size_t ins_count) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(3, 4);
 
 #endif

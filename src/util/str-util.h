@@ -91,10 +91,10 @@ static inline void strn_replace_byte(char *str, size_t n, char byte, char rep)
 
 // Extract a substring between `buf + pos` and either the next `delim`
 // byte (if found) or `buf + size` (the remainder of the string). The
-// substring is returned as a StringView and the `posp` in-out-param
+// substring is returned as a StringView and the `posp` in-out param
 // is set to the offset one byte after the found delimiter (or to the
 // end of the size-bounded string, if no delimiter was found).
-NONNULL_ARGS
+NONNULL_ARGS READONLY(1, 3) READWRITE(2)
 static inline StringView get_delim(const char *buf, size_t *posp, size_t size, int delim)
 {
     size_t pos = *posp;

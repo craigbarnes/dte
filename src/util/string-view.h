@@ -80,13 +80,13 @@ static inline bool strview_equal_cstring_icase(const StringView *sv, const char 
     return strview_equal_strn_icase(sv, str, strlen(str));
 }
 
-NONNULL_ARG(1)
+NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
 static inline bool strview_has_strn_prefix(const StringView *sv, const char *p, size_t n)
 {
     return sv->length >= n && mem_equal(sv->data, p, n);
 }
 
-NONNULL_ARG(1)
+NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
 static inline bool strview_has_strn_suffix(const StringView *sv, const char *suf, size_t suflen)
 {
     // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
