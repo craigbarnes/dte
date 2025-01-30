@@ -64,12 +64,35 @@ static void test_bitset(TestContext *ctx)
     EXPECT_TRUE(bitset_contains(set, '\0'));
 
     memset(set, 0, sizeof(set));
+    bitset_add_char_range(set, "\1-?r-r^-b");
+    EXPECT_TRUE(bitset_contains(set, '\1'));
+    EXPECT_TRUE(bitset_contains(set, '\2'));
+    EXPECT_TRUE(bitset_contains(set, ' '));
+    EXPECT_TRUE(bitset_contains(set, '!'));
+    EXPECT_TRUE(bitset_contains(set, '>'));
+    EXPECT_TRUE(bitset_contains(set, '?'));
+    EXPECT_TRUE(bitset_contains(set, 'r'));
+    EXPECT_TRUE(bitset_contains(set, '^'));
+    EXPECT_TRUE(bitset_contains(set, '_'));
+    EXPECT_TRUE(bitset_contains(set, '`'));
+    EXPECT_TRUE(bitset_contains(set, 'a'));
+    EXPECT_TRUE(bitset_contains(set, 'b'));
+    EXPECT_FALSE(bitset_contains(set, '\0'));
+    EXPECT_FALSE(bitset_contains(set, '@'));
+    EXPECT_FALSE(bitset_contains(set, 'c'));
+    EXPECT_FALSE(bitset_contains(set, 'q'));
+    EXPECT_FALSE(bitset_contains(set, 's'));
+    EXPECT_FALSE(bitset_contains(set, 'A'));
+
+    memset(set, 0, sizeof(set));
+    bitset_add_char_range(set, "z-a");
     FOR_EACH_I(i, set) {
         EXPECT_UINT_EQ(set[i], 0);
     }
+
     BITSET_INVERT(set);
     FOR_EACH_I(i, set) {
-        EXPECT_UINT_EQ(set[i], ((BitSetWord)-1));
+        EXPECT_UINT_EQ(set[i], bitset_word_max());
     }
 }
 

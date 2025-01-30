@@ -16,10 +16,13 @@
 #define MAX4(a, b, c, d) MAX(a, MAX3(b, c, d))
 #define CLAMP(x, lo, hi) MIN(hi, MAX(lo, x))
 #define IS_POWER_OF_2(x) (((x) > 0) && (((x) & ((x) - 1)) == 0))
+#define DO_PRAGMA(x) _Pragma(#x)
+
+// CHAR_BIT is "required to be 8" since POSIX 2001.
+// https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/limits.h.html#tag_14_26_10:~:text=required%20to%20be%208
+#define BITSIZE(T) (sizeof(T) * 8)
 #define DECIMAL_STR_MAX(T) ((sizeof(T) * 3) + 2)
 #define HEX_STR_MAX(T) ((sizeof(T) * 2) + 2)
-#define BITSIZE(T) (sizeof(T) * 8)
-#define DO_PRAGMA(x) _Pragma(#x)
 
 // Calculate the number of elements in an array.
 // The extra division on the third line is a trick to help prevent
