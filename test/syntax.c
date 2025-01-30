@@ -85,6 +85,29 @@ static void test_bitset(TestContext *ctx)
     EXPECT_FALSE(bitset_contains(set, 'A'));
 
     memset(set, 0, sizeof(set));
+    bitset_add_char_range(set, "\x03-\xFC");
+    EXPECT_TRUE(bitset_contains(set, '\x03'));
+    EXPECT_TRUE(bitset_contains(set, '\x40'));
+    EXPECT_TRUE(bitset_contains(set, '\x7F'));
+    EXPECT_TRUE(bitset_contains(set, '\x80'));
+    EXPECT_TRUE(bitset_contains(set, '\xFC'));
+    EXPECT_FALSE(bitset_contains(set, '\x00'));
+    EXPECT_FALSE(bitset_contains(set, '\x01'));
+    EXPECT_FALSE(bitset_contains(set, '\x02'));
+    EXPECT_FALSE(bitset_contains(set, '\xFE'));
+    EXPECT_FALSE(bitset_contains(set, '\xFF'));
+    for (unsigned int i = 3; i <= 0xFC; i++) {
+        IEXPECT_TRUE(bitset_contains(set, i));
+    }
+
+    memset(set, 0, sizeof(set));
+    bitset_add_char_range(set, "?-@");
+    EXPECT_TRUE(bitset_contains(set, '?'));
+    EXPECT_TRUE(bitset_contains(set, '@'));
+    EXPECT_FALSE(bitset_contains(set, '>'));
+    EXPECT_FALSE(bitset_contains(set, 'A'));
+
+    memset(set, 0, sizeof(set));
     bitset_add_char_range(set, "z-a");
     FOR_EACH_I(i, set) {
         EXPECT_UINT_EQ(set[i], 0);
