@@ -281,30 +281,36 @@ error:
 }
 
 static bool write_buffer (
-    Buffer *buffer,
-    FileEncoder *enc,
+    const Buffer *buffer,
+    const FileSaveContext *ctx,
     ErrorBuffer *ebuf,
-    const ByteOrderMark *bom,
     int fd
 ) {
+    FileEncoder enc = file_encoder(ctx->encoding, ctx->crlf, fd);
     size_t size = 0;
-    if (bom) {
-        size = bom->len;
-        if (size && xwrite_all(fd, bom->bytes, size) < 0) {
+
+    if (unlikely(ctx->write_bom)) {
+        const EncodingType type = lookup_encoding(ctx->encoding);
+        const ByteOrderMark *bom = get_bom_for_encoding(type);
+        if (bom->len && xwrite_all(fd, bom->bytes, bom->len) < 0) {
+            file_encoder_free(&enc);
             return error_msg_errno(ebuf, "write");
         }
+        size += bom->len;
     }
 
     const Block *blk;
     block_for_each(blk, &buffer->blocks) {
-        ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
+        ssize_t rc = file_encoder_write(&enc, blk->data, blk->size);
         if (rc < 0) {
+            file_encoder_free(&enc);
             return error_msg_errno(ebuf, "write");
         }
         size += rc;
     }
 
-    size_t nr_errors = file_encoder_get_nr_errors(enc);
+    size_t nr_errors = file_encoder_get_nr_errors(&enc);
+    file_encoder_free(&enc);
     if (nr_errors > 0) {
         // Any real error hides this message
         error_msg (
@@ -453,13 +459,7 @@ bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const Fil
         }
     }
 
-    const ByteOrderMark *bom = NULL;
-    if (unlikely(ctx->write_bom)) {
-        bom = get_bom_for_encoding(lookup_encoding(ctx->encoding));
-    }
-
-    FileEncoder enc = file_encoder(ctx->encoding, ctx->crlf, fd);
-    if (!write_buffer(buffer, &enc, &e->err, bom, fd)) {
+    if (!write_buffer(buffer, ctx, &e->err, fd)) {
         goto error;
     }
 
@@ -480,14 +480,11 @@ bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const Fil
         goto error;
     }
 
-    file_encoder_free(&enc);
     buffer_stat(&buffer->file, filename);
     return true;
 
 error:
     xclose(fd);
-    file_encoder_free(&enc);
-
     if (tmp[0]) {
         unlink(tmp);
     } else {
@@ -496,6 +493,5 @@ error:
         // error later when saving the file again.
         buffer_stat(&buffer->file, filename);
     }
-
     return false;
 }
