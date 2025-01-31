@@ -162,17 +162,19 @@ static bool destination_state(EditorState *e, const char *name, State **dest)
 
 static void lint_emit_name(EditorState *e, const char *ename, const State *dest)
 {
-    if (!(e->syn.flags & SYN_LINT)) {
-        return; // Verbose linting not enabled
+    if (
+        (e->syn.flags & SYN_LINT)
+        && ename
+        && dest
+        && dest->emit_name
+        && interned_strings_equal(ename, dest->emit_name)
+    ) {
+        error_msg (
+            &e->err,
+            "emit-name '%s' not needed (destination state uses same emit-name)",
+            ename
+        );
     }
-    if (!ename || !dest || !dest->emit_name || !streq(ename, dest->emit_name)) {
-        return;
-    }
-    error_msg (
-        &e->err,
-        "emit-name '%s' not needed (destination state uses same emit-name)",
-        ename
-    );
 }
 
 static Condition *add_condition (
@@ -191,6 +193,8 @@ static Condition *add_condition (
         return NULL;
     }
 
+    emit = emit ? str_intern(emit) : NULL;
+
     if (
         type != COND_HEREDOCEND
         && type != COND_INLIST
@@ -201,7 +205,7 @@ static Condition *add_condition (
 
     Condition *c = xnew0(Condition, 1);
     c->a.destination = d;
-    c->a.emit_name = emit ? xstrdup(emit) : NULL;
+    c->a.emit_name = emit;
     c->type = type;
     ptr_array_append(&e->syn.current_state->conds, c);
     return c;
@@ -297,10 +301,10 @@ static bool cmd_eat(EditorState *e, const CommandArgs *a)
         return false;
     }
 
-    const char *emit = a->args[1];
+    const char *emit = a->args[1] ? str_intern(a->args[1]) : NULL;
     State *curstate = e->syn.current_state;
     lint_emit_name(e, emit, curstate->default_action.destination);
-    curstate->default_action.emit_name = emit ? xstrdup(emit) : NULL;
+    curstate->default_action.emit_name = emit;
     curstate->type = STATE_EAT;
     e->syn.current_state = NULL;
     return true;
@@ -390,9 +394,8 @@ static bool cmd_inlist(EditorState *e, const CommandArgs *a)
 {
     char **args = a->args;
     const char *name = args[0];
-    const char *emit = args[2] ? args[2] : name;
     ConditionType type = cmdargs_has_flag(a, 'b') ? COND_INLIST_BUFFER : COND_INLIST;
-    Condition *c = add_condition(e, type, args[1], emit);
+    Condition *c = add_condition(e, type, args[1], args[2] ? args[2] : name);
 
     if (!c) {
         return false;
@@ -510,7 +513,7 @@ static bool cmd_state(EditorState *e, const CommandArgs *a)
     }
 
     state->defined = true;
-    state->emit_name = xstrdup(a->args[1] ? a->args[1] : name);
+    state->emit_name = str_intern(a->args[1] ? a->args[1] : name);
     e->syn.current_state = state;
     return true;
 }

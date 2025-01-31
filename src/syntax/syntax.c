@@ -41,7 +41,6 @@ static void visit(State *s)
 
 static void free_condition(Condition *cond)
 {
-    free(cond->a.emit_name);
     free(cond);
 }
 
@@ -52,10 +51,8 @@ static void free_heredoc_state(HeredocState *s)
 
 static void free_state(State *s)
 {
-    free(s->emit_name);
     ptr_array_free_cb(&s->conds, FREE_FUNC(free_condition));
     ptr_array_free_cb(&s->heredoc.states, FREE_FUNC(free_heredoc_state));
-    free(s->default_action.emit_name);
     free(s);
 }
 

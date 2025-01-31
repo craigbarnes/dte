@@ -30,9 +30,6 @@ static void fix_action(const Syntax *syn, Action *a, StringView prefix, char *bu
         const char *name = fix_name(buf, prefix, a->destination->name);
         a->destination = find_state(syn, name);
     }
-    if (a->emit_name) {
-        a->emit_name = xstrdup(a->emit_name);
-    }
 }
 
 static void fix_conditions (
@@ -78,7 +75,6 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         State *s = xmemdup(it.entry->value, sizeof(State));
         s->name = xstrjoin(prefix_buf, s->name);
-        s->emit_name = xstrdup(s->emit_name);
         hashmap_insert(states, s->name, s);
 
         if (s->conds.count > 0) {

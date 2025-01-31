@@ -42,7 +42,7 @@ typedef struct {
 
     // If condition has no emit name this is set to destination state's
     // emit name or list name (COND_INLIST)
-    char *emit_name;
+    const char *emit_name; // Interned
 
     // Set after all styles have been added (config loaded)
     const TermStyle *emit_style;
@@ -77,7 +77,7 @@ typedef struct {
     HashMap states;
     struct State *start_state;
     HashMap string_lists;
-    HashMap default_styles;
+    HashMap default_styles; // Interned values
     bool heredoc;
     bool used;
     bool warned_unused_subsyntax;
@@ -85,7 +85,7 @@ typedef struct {
 
 typedef struct State {
     char *name;
-    char *emit_name;
+    const char *emit_name; // Interned
     PointerArray conds;
 
     bool defined;
