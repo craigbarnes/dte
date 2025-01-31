@@ -4,12 +4,13 @@
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
+#include "util/intern.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 #include "util/xstring.h"
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-static HashMap interned_regexps;
+static HashMap interned_regexps = {.flags = HMAP_BORROWED_KEYS};
 
 bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern, int err)
 {
@@ -138,9 +139,10 @@ const InternedRegexp *regexp_intern(ErrorBuffer *ebuf, const char *pattern)
         return NULL;
     }
 
-    char *str = xstrdup(pattern);
+    BUG_ON(!(interned_regexps.flags & HMAP_BORROWED_KEYS));
+    const char *str = str_intern(pattern);
     ir->str = str;
-    return hashmap_insert(&interned_regexps, str, ir);
+    return hashmap_insert(&interned_regexps, (char*)str, ir);
 }
 
 bool regexp_is_interned(const char *pattern)
@@ -148,8 +150,6 @@ bool regexp_is_interned(const char *pattern)
     return !!hashmap_find(&interned_regexps, pattern);
 }
 
-// Note: this does NOT free InternedRegexp::str, because it points at the
-// same string as HashMapEntry::key and is already freed by hashmap_free()
 static void free_interned_regexp(InternedRegexp *ir)
 {
     regfree(&ir->re);
@@ -158,5 +158,6 @@ static void free_interned_regexp(InternedRegexp *ir)
 
 void free_interned_regexps(void)
 {
+    BUG_ON(!(interned_regexps.flags & HMAP_BORROWED_KEYS));
     hashmap_free(&interned_regexps, (FreeFunction)free_interned_regexp);
 }

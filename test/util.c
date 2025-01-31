@@ -2206,7 +2206,7 @@ static void test_hashmap(TestContext *ctx)
     };
 
     HashMap map;
-    hashmap_init(&map, ARRAYLEN(strings));
+    hashmap_init(&map, ARRAYLEN(strings), HMAP_NO_FLAGS);
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 31);
     EXPECT_EQ(map.count, 0);
@@ -2294,14 +2294,14 @@ static void test_hashmap(TestContext *ctx)
     EXPECT_EQ(map.count, 0);
     EXPECT_EQ(map.mask, 0);
 
-    hashmap_init(&map, 0);
+    hashmap_init(&map, 0, HMAP_NO_FLAGS);
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 7);
     EXPECT_EQ(map.count, 0);
     hashmap_free(&map, NULL);
     EXPECT_NULL(map.entries);
 
-    hashmap_init(&map, 13);
+    hashmap_init(&map, 13, HMAP_NO_FLAGS);
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 31);
     EXPECT_EQ(map.count, 0);

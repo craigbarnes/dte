@@ -164,7 +164,7 @@ EditorState *init_editor_state(EditorFlags flags)
 
     term_input_init(&e->terminal.ibuf);
     term_output_init(&e->terminal.obuf);
-    hashmap_init(&e->aliases, 32);
+    hashmap_init(&e->aliases, 32, HMAP_NO_FLAGS);
     hashset_init(&e->required_syntax_files, 0, false);
     hashset_init(&e->required_syntax_builtins, 0, false);
 

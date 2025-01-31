@@ -72,12 +72,12 @@ static int hashmap_do_init(HashMap *map, size_t size)
         return EOVERFLOW;
     }
 
-    *map = (HashMap)HASHMAP_INIT;
     return hashmap_resize(map, size);
 }
 
-void hashmap_init(HashMap *map, size_t capacity)
+void hashmap_init(HashMap *map, size_t capacity, HashMapFlags flags)
 {
+    *map = (HashMap){.flags = flags};
     int err = hashmap_do_init(map, capacity);
     if (unlikely(err)) {
         fatal_error(__func__, err);
@@ -108,6 +108,13 @@ HashMapEntry *hashmap_find(const HashMap *map, const char *key)
     BUG("unexpected loop break");
 }
 
+static void hashmap_free_key(const HashMap *map, char *key)
+{
+    if (!(map->flags & HMAP_BORROWED_KEYS)) {
+        free(key);
+    }
+}
+
 void *hashmap_remove(HashMap *map, const char *key)
 {
     HashMapEntry *e = hashmap_find(map, key);
@@ -115,7 +122,7 @@ void *hashmap_remove(HashMap *map, const char *key)
         return NULL;
     }
 
-    free(e->key);
+    hashmap_free_key(map, e->key);
     e->key = NULL;
     e->hash = TOMBSTONE;
     map->count--;
@@ -155,7 +162,7 @@ static int hashmap_do_insert(HashMap *map, char *key, void *value, void **old_va
             BUG_ON(!old_value);
             BUG_ON(!e->value);
             *old_value = e->value;
-            free(key);
+            hashmap_free_key(map, key);
             key = e->key;
             map->count--;
             break;
@@ -235,7 +242,7 @@ void hashmap_clear(HashMap *map, FreeFunction free_value)
 
     size_t count = 0;
     for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); count++) {
-        free(it.entry->key);
+        hashmap_free_key(map, it.entry->key);
         if (free_value) {
             do_free_value(free_value, it.entry->value);
         }
@@ -251,5 +258,5 @@ void hashmap_free(HashMap *map, FreeFunction free_value)
 {
     hashmap_clear(map, free_value);
     free(map->entries);
-    *map = (HashMap)HASHMAP_INIT;
+    *map = (HashMap){.flags = map->flags};
 }

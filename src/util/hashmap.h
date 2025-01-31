@@ -7,6 +7,11 @@
 
 typedef void (*FreeFunction)(void *ptr);
 
+typedef enum {
+    HMAP_NO_FLAGS = 0, // For self-documentation purposes only
+    HMAP_BORROWED_KEYS = 1 << 0, // Never call free(3) on HashMapEntry::key
+} HashMapFlags;
+
 typedef struct {
     char *key;
     void *value;
@@ -21,6 +26,7 @@ typedef struct {
     size_t mask; // Length of entries (which is always a power of 2) minus 1
     size_t count; // Number of active entries
     size_t tombstones; // Number of tombstones
+    HashMapFlags flags;
 } HashMap;
 
 typedef struct {
@@ -29,11 +35,12 @@ typedef struct {
     size_t idx;
 } HashMapIter;
 
-#define HASHMAP_INIT { \
+#define HASHMAP_INIT(f) { \
     .entries = NULL, \
     .mask = 0, \
     .count = 0, \
-    .tombstones = 0 \
+    .tombstones = 0, \
+    .flags = f, \
 }
 
 static inline HashMapIter hashmap_iter(const HashMap *map)
@@ -59,7 +66,7 @@ static inline bool hashmap_next(HashMapIter *iter)
     return false;
 }
 
-void hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS;
+void hashmap_init(HashMap *map, size_t capacity, HashMapFlags flags) NONNULL_ARGS;
 void *hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS_AND_RETURN;
 void *hashmap_insert_or_replace(HashMap *map, char *key, void *value) NONNULL_ARGS;
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;

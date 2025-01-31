@@ -79,7 +79,7 @@ static bool parse_ulong_field(StringView *sv, unsigned long *valp)
 void file_history_load(FileHistory *history, ErrorBuffer *ebuf, char *filename, size_t size_limit)
 {
     BUG_ON(history->filename);
-    hashmap_init(&history->entries, FILEHIST_MAX_ENTRIES);
+    hashmap_init(&history->entries, FILEHIST_MAX_ENTRIES, HMAP_NO_FLAGS);
     history->filename = filename;
 
     char *buf;

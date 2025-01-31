@@ -24,8 +24,8 @@ enum {
 };
 
 typedef struct {
-    const char *str;
-    regex_t re;
+    const char *str; // Pattern string, interned by str_intern()
+    regex_t re; // regex(3) object, compiled with regcomp(3)
 } InternedRegexp;
 
 // Platform-specific patterns for matching word boundaries, as detected
