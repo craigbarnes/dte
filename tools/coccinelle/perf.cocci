@@ -1,8 +1,12 @@
 @@
 identifier func != {
     add_status_pos,
+    bisearch_idx,
     calculate_tabbar,
     divide_equally,
+    indent_level,
+    indent_remainder,
+    next_indent_width,
     repeat_insert,
     report,
     test_indent_level,
