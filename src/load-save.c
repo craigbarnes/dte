@@ -280,12 +280,9 @@ error:
     return false;
 }
 
-static bool write_buffer (
-    const Buffer *buffer,
-    const FileSaveContext *ctx,
-    ErrorBuffer *ebuf,
-    int fd
-) {
+static bool write_buffer(const Buffer *buffer, const FileSaveContext *ctx, int fd)
+{
+    ErrorBuffer *ebuf = ctx->ebuf;
     FileEncoder enc = file_encoder(ctx->encoding, ctx->crlf, fd);
     size_t size = 0;
 
@@ -431,13 +428,15 @@ static int xfsync(int fd)
 #endif
 }
 
-bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const FileSaveContext *ctx)
+bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx)
 {
+    ErrorBuffer *ebuf = ctx->ebuf;
+    BUG_ON(!ebuf);
     BUG_ON(!ctx->encoding);
-
     char tmp[8192];
     tmp[0] = '\0';
     int fd = -1;
+
     if (ctx->hardlinks) {
         LOG_INFO("target file has hard links; writing in-place");
     } else {
@@ -455,28 +454,28 @@ bool save_buffer(EditorState *e, Buffer *buffer, const char *filename, const Fil
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
-            return error_msg_errno(&e->err, "open");
+            return error_msg_errno(ebuf, "open");
         }
     }
 
-    if (!write_buffer(buffer, ctx, &e->err, fd)) {
+    if (!write_buffer(buffer, ctx, fd)) {
         goto error;
     }
 
     if (buffer->options.fsync && xfsync(fd) != 0) {
-        error_msg_errno(&e->err, "fsync");
+        error_msg_errno(ebuf, "fsync");
         goto error;
     }
 
     int r = xclose(fd);
     fd = -1;
     if (r != 0) {
-        error_msg_errno(&e->err, "close");
+        error_msg_errno(ebuf, "close");
         goto error;
     }
 
     if (tmp[0] && rename(tmp, filename)) {
-        error_msg_errno(&e->err, "rename");
+        error_msg_errno(ebuf, "rename");
         goto error;
     }
 

@@ -1927,6 +1927,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     }
 
     FileSaveContext ctx = {
+        .ebuf = &e->err,
         .encoding = encoding,
         .new_file_mode = e->new_file_mode,
         .crlf = crlf,
@@ -1934,7 +1935,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         .hardlinks = hardlinks,
     };
 
-    if (!save_buffer(e, buffer, absolute, &ctx)) {
+    if (!save_buffer(buffer, absolute, &ctx)) {
         goto error;
     }
 
