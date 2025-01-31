@@ -80,11 +80,13 @@ void set_editorconfig_options(Buffer *buffer)
 
 void set_file_options(EditorState *e, Buffer *buffer)
 {
-    for (size_t i = 0, n = e->file_options.count; i < n; i++) {
-        const FileOption *opt = e->file_options.ptrs[i];
+    const PointerArray *fileopts = &e->file_options;
+    const char *buffer_filetype = buffer->options.filetype;
+
+    for (size_t i = 0, n = fileopts->count; i < n; i++) {
+        const FileOption *opt = fileopts->ptrs[i];
         if (opt->type == FOPTS_FILETYPE) {
-            // Note: comparing pointers (to interned strings)
-            if (opt->u.filetype == buffer->options.filetype) {
+            if (interned_strings_equal(opt->u.filetype, buffer_filetype)) {
                 set_options(e, opt->strs);
             }
             continue;

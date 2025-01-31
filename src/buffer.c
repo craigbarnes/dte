@@ -47,7 +47,7 @@ void buffer_set_encoding(Buffer *buffer, const char *encoding, bool utf8_bom)
         BUG_ON(encoding != nenc);
     }
 
-    if (buffer->encoding == encoding) {
+    if (interned_strings_equal(buffer->encoding, encoding)) {
         return;
     }
 

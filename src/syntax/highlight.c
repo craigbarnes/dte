@@ -48,8 +48,7 @@ static State *handle_heredoc (
     delim = mem_intern(delim, len);
     for (size_t i = 0, n = state->heredoc.states.count; i < n; i++) {
         HeredocState *s = state->heredoc.states.ptrs[i];
-        // Note: this tests string equality via (interned) pointer equality
-        if (s->delim == delim) {
+        if (interned_strings_equal(s->delim, delim)) {
             BUG_ON(s->len != len);
             return s->state;
         }
