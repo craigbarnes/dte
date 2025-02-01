@@ -53,7 +53,8 @@ arch:
     needs: []
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
     script:
-        - make check-source check check-clang-tidy
+        - make check-source check-clang-tidy
+        - make check USE_SANITIZER=1
         - (cd build/ && test/test)
         - *objsize_and_bench
 
