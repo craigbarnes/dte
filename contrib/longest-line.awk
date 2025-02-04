@@ -2,6 +2,7 @@
 
 BEGIN {
     lineno = 1
+    maxlen = 0
 }
 
 {

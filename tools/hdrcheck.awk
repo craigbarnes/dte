@@ -14,6 +14,10 @@ function include_guard_name(path) {
     return toupper(path)
 }
 
+BEGIN {
+    h = H = 0
+}
+
 FNR == 1 {
     ifndef_line = -1
     print "  HCHECK  " FILENAME

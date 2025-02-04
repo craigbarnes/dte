@@ -5,6 +5,7 @@ CODESPELL ?= codespell
 TYPOS ?= typos
 SPATCH ?= spatch
 GAWK ?= gawk
+AWKLINT = >/dev/null $(GAWK) --lint=fatal --posix
 SPATCHFLAGS ?= --very-quiet
 SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
@@ -22,9 +23,19 @@ check-shell:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
 	$(Q) $(SHELLCHECK) -fgcc $(call GITATTRS, shell) >&2
 
-check-awk: $(BUILTIN_CONFIGS) $(TEST_CONFIGS)
+check-awk: src/msg.c src/msg.h
 	$(E) AWKLINT mk/config2c.awk
-	$(Q) $(GAWK) --lint=fatal -f mk/config2c.awk $^ >/dev/null
+	$(Q) $(AWKLINT) -f mk/config2c.awk $(BUILTIN_CONFIGS)
+	$(E) AWKLINT tools/hdrcheck.awk
+	$(Q) $(AWKLINT) -f tools/hdrcheck.awk $^
+	$(E) AWKLINT tools/wscheck.awk
+	$(Q) $(AWKLINT) -f tools/wscheck.awk $^
+	$(E) AWKLINT contrib/longest-line.awk
+	$(Q) $(AWKLINT) -f contrib/longest-line.awk $<
+	$(E) AWKLINT tools/git-hooks/commit-msg
+	$(Q) printf 'L1\n\nL3.\n' | $(AWKLINT) -f tools/git-hooks/commit-msg
+	$(E) AWKLINT tools/gcovr-txt.awk
+	$(Q) printf '.\n.\n.\n1 2 3 4 5\n' | $(AWKLINT) -f tools/gcovr-txt.awk
 
 check-whitespace:
 	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2

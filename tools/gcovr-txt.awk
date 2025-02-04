@@ -1,5 +1,8 @@
+#!/usr/bin/awk -f
+# This reformats gcovr's text output, so as to omit the "missing" column
+
 FNR <= 3 {
-    next
+    next # Skip the first 3 lines
 }
 
 /^---/ {

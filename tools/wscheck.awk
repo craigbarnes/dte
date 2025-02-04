@@ -1,5 +1,9 @@
 #!/usr/bin/awk -f
 
+BEGIN {
+    t = w = n = 0
+}
+
 FNR == 1 && NR > 1 && NR - 1 == lastblank {
     n++
     print lastname ":" lastblankfnr ": blank line at EOF"
@@ -25,8 +29,8 @@ FNR == 1 {
     print FILENAME ":" FNR ": trailing whitespace"
 }
 
-function plural(n) {
-    return (n == 1) ? "" : "s"
+function plural(x) {
+    return (x == 1) ? "" : "s"
 }
 
 END {
