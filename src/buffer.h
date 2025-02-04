@@ -8,6 +8,7 @@
 #include <time.h>
 #include "block-iter.h"
 #include "change.h"
+#include "error.h"
 #include "lock.h"
 #include "options.h"
 #include "syntax/syntax.h"
@@ -113,6 +114,6 @@ Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNU
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
 Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const char *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
 Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts) NONNULL_ARGS_AND_RETURN;
-void free_buffers(struct EditorState *e) NONNULL_ARGS;
+void free_buffers(PointerArray *buffers, ErrorBuffer *ebuf, const FileLocksContext *locks_ctx) NONNULL_ARGS;
 
 #endif

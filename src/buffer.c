@@ -6,7 +6,6 @@
 #include "encoding.h"
 #include "file-option.h"
 #include "filetype.h"
-#include "lock.h"
 #include "syntax/state.h"
 #include "util/intern.h"
 #include "util/path.h"
@@ -103,10 +102,13 @@ void free_blocks(Buffer *buffer)
     }
 }
 
-static void buffer_unlock_and_free(EditorState *e, Buffer *buffer)
-{
+static void buffer_unlock_and_free (
+    Buffer *buffer,
+    ErrorBuffer *ebuf,
+    const FileLocksContext *locks_ctx
+) {
     if (buffer->locked) {
-        unlock_file(&e->locks_ctx, &e->err, buffer->abs_filename);
+        unlock_file(locks_ctx, ebuf, buffer->abs_filename);
     }
 
     free_changes(&buffer->change_head);
@@ -135,12 +137,14 @@ static void buffer_unlock_and_free(EditorState *e, Buffer *buffer)
     free(buffer);
 }
 
-void free_buffers(EditorState *e)
-{
-    PointerArray *buffers = &e->buffers;
+void free_buffers (
+    PointerArray *buffers,
+    ErrorBuffer *ebuf,
+    const FileLocksContext *locks_ctx
+) {
     for (size_t i = 0, n = buffers->count; i < n; i++) {
         Buffer *buffer = buffers->ptrs[i];
-        buffer_unlock_and_free(e, buffer);
+        buffer_unlock_and_free(buffer, ebuf, locks_ctx);
         buffers->ptrs[i] = NULL;
     }
     ptr_array_free_array(buffers);
@@ -149,7 +153,7 @@ void free_buffers(EditorState *e)
 void buffer_remove_unlock_and_free(EditorState *e, Buffer *buffer)
 {
     ptr_array_remove(&e->buffers, buffer);
-    buffer_unlock_and_free(e, buffer);
+    buffer_unlock_and_free(buffer, &e->err, &e->locks_ctx);
 }
 
 static bool same_file(const Buffer *buffer, const struct stat *st)
