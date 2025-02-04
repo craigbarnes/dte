@@ -12,6 +12,8 @@ FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
 DOCFILES = $(call GITATTRS, xml markdown)
+SHELLSCRIPTS = $(call GITATTRS, shell)
+SPACE_INDENTED_FILES = $(call GITATTRS, space-indent)
 SPATCHNAMES = arraylen minmax tailcall wrap perf pitfalls staticbuf
 SPATCHFILES = $(foreach f, $(SPATCHNAMES), tools/coccinelle/$f.cocci)
 
@@ -20,8 +22,8 @@ check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
 
 check-shell:
-	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
-	$(Q) $(SHELLCHECK) -fgcc $(call GITATTRS, shell) >&2
+	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(SHELLSCRIPTS))'
+	$(Q) $(SHELLCHECK) -fgcc $(SHELLSCRIPTS) >&2
 
 check-awk: src/msg.c src/msg.h
 	$(E) AWKLINT mk/config2c.awk
@@ -38,7 +40,7 @@ check-awk: src/msg.c src/msg.h
 	$(Q) printf '.\n.\n.\n1 2 3 4 5\n' | $(AWKLINT) -f tools/gcovr-txt.awk
 
 check-whitespace:
-	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2
+	$(Q) $(WSCHECK) $(SPACE_INDENTED_FILES) >&2
 
 check-headers:
 	$(Q) $(HCHECK) $$(git ls-files -- '**.[ch]') >&2
