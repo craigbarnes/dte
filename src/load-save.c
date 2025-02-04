@@ -10,7 +10,6 @@
 #include "load-save.h"
 #include "block.h"
 #include "convert.h"
-#include "editor.h"
 #include "encoding.h"
 #include "error.h"
 #include "options.h"
@@ -214,19 +213,23 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
-bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must_exist)
-{
+bool load_buffer (
+    Buffer *buffer,
+    const char *filename,
+    const GlobalOptions *gopts,
+    ErrorBuffer *ebuf,
+    bool must_exist
+) {
     BUG_ON(buffer->abs_filename);
     BUG_ON(!list_empty(&buffer->blocks));
-    const GlobalOptions *gopts = &e->options;
 
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd < 0) {
         if (errno != ENOENT) {
-            return error_msg(&e->err, "Error opening %s: %s", filename, strerror(errno));
+            return error_msg(ebuf, "Error opening %s: %s", filename, strerror(errno));
         }
         if (must_exist) {
-            return error_msg(&e->err, "File %s does not exist", filename);
+            return error_msg(ebuf, "File %s does not exist", filename);
         }
         if (!buffer->encoding) {
             buffer->encoding = encoding_from_type(UTF8);
@@ -239,17 +242,17 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
 
     FileInfo *info = &buffer->file;
     if (!buffer_fstat(info, fd)) {
-        error_msg(&e->err, "fstat failed on %s: %s", filename, strerror(errno));
+        error_msg(ebuf, "fstat failed on %s: %s", filename, strerror(errno));
         goto error;
     }
     if (!S_ISREG(info->mode)) {
-        error_msg(&e->err, "Not a regular file %s", filename);
+        error_msg(ebuf, "Not a regular file %s", filename);
         goto error;
     }
 
     off_t size = info->size;
     if (unlikely(size < 0)) {
-        error_msg(&e->err, "Invalid file size: %jd", (intmax_t)size);
+        error_msg(ebuf, "Invalid file size: %jd", (intmax_t)size);
         goto error;
     }
 
@@ -258,7 +261,7 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
         uintmax_t size_mib = filesize_in_mib(size);
         if (unlikely(size_mib > limit_mib)) {
             error_msg (
-                &e->err,
+                ebuf,
                 "File size (%juMiB) exceeds 'filesize-limit' option (%uMiB): %s",
                 size_mib, limit_mib, filename
             );
@@ -267,7 +270,7 @@ bool load_buffer(EditorState *e, Buffer *buffer, const char *filename, bool must
     }
 
     if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
-        error_msg(&e->err, "Error reading %s: %s", filename, strerror(errno));
+        error_msg(ebuf, "Error reading %s: %s", filename, strerror(errno));
         goto error;
     }
 

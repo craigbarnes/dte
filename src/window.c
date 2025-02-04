@@ -80,7 +80,7 @@ View *window_open_buffer (
     }
 
     buffer = buffer_new(&e->buffers, &e->options, encoding);
-    if (!load_buffer(e, buffer, filename, must_exist)) {
+    if (!load_buffer(buffer, filename, &e->options, &e->err, must_exist)) {
         buffer_remove_unlock_and_free(e, buffer);
         free(absolute);
         return NULL;
