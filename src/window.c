@@ -81,7 +81,7 @@ View *window_open_buffer (
 
     buffer = buffer_new(&e->buffers, &e->options, encoding);
     if (!load_buffer(buffer, filename, &e->options, &e->err, must_exist)) {
-        buffer_remove_unlock_and_free(e, buffer);
+        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->err, &e->locks_ctx);
         free(absolute);
         return NULL;
     }
@@ -189,7 +189,7 @@ size_t remove_view(View *view)
             FileHistory *hist = &e->file_history;
             file_history_append(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
         }
-        buffer_remove_unlock_and_free(e, buffer);
+        buffer_remove_unlock_and_free(&e->buffers, buffer, &e->err, &e->locks_ctx);
     }
 
     free(view);

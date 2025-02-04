@@ -150,10 +150,14 @@ void free_buffers (
     ptr_array_free_array(buffers);
 }
 
-void buffer_remove_unlock_and_free(EditorState *e, Buffer *buffer)
-{
-    ptr_array_remove(&e->buffers, buffer);
-    buffer_unlock_and_free(buffer, &e->err, &e->locks_ctx);
+void buffer_remove_unlock_and_free (
+    PointerArray *buffers,
+    Buffer *buffer,
+    ErrorBuffer *ebuf,
+    const FileLocksContext *locks_ctx
+) {
+    ptr_array_remove(buffers, buffer);
+    buffer_unlock_and_free(buffer, ebuf, locks_ctx);
 }
 
 static bool same_file(const Buffer *buffer, const struct stat *st)
