@@ -31,7 +31,7 @@ typedef struct {
 
 typedef struct {
     const HashMap *map;
-    HashMapEntry *entry;
+    const HashMapEntry *entry;
     size_t idx;
 } HashMapIter;
 
@@ -56,7 +56,7 @@ static inline bool hashmap_next(HashMapIter *iter)
     }
 
     for (size_t i = iter->idx, n = map->mask + 1; i < n; i++) {
-        HashMapEntry *e = map->entries + i;
+        const HashMapEntry *e = map->entries + i;
         if (e->key) {
             iter->entry = e;
             iter->idx = i + 1;

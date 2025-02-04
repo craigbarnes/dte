@@ -304,10 +304,8 @@ void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *pref
     }
 
     // Append the collected strings to the PointerArray
-    for (size_t i = 0, n = set.table_size; i < n; i++) {
-        for (HashSetEntry *h = set.table[i]; h; h = h->next) {
-            ptr_array_append(a, xstrdup(h->str));
-        }
+    for (HashSetIter iter = hashset_iter(&set); hashset_next(&iter); ) {
+        ptr_array_append(a, xmemdup(iter.entry->str, iter.entry->str_len + 1));
     }
 
     hashset_free(&set);

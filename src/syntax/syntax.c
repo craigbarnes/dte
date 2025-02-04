@@ -250,11 +250,10 @@ void collect_syntax_emit_names (
     size_t ftlen = strlen(ft);
 
     // Append the collected strings to the PointerArray
-    for (size_t i = 0, n = set.table_size; i < n; i++) {
-        for (HashSetEntry *h = set.table[i]; h; h = h->next) {
-            char *str = xmemjoin3(ft, ftlen, STRN("."), h->str, h->str_len + 1);
-            ptr_array_append(a, str);
-        }
+    for (HashSetIter iter = hashset_iter(&set); hashset_next(&iter); ) {
+        const HashSetEntry *h = iter.entry;
+        char *str = xmemjoin3(ft, ftlen, STRN("."), h->str, h->str_len + 1);
+        ptr_array_append(a, str);
     }
 
     hashset_free(&set);

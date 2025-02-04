@@ -2349,10 +2349,31 @@ static void test_hashset(TestContext *ctx)
     HashSet set;
     hashset_init(&set, ARRAYLEN(strings), false);
     EXPECT_EQ(set.nr_entries, 0);
+    EXPECT_EQ(set.table_size, 16);
+    EXPECT_EQ(set.grow_at, 12);
+    EXPECT_NONNULL(set.table);
+    EXPECT_NONNULL(set.hash);
+    EXPECT_NONNULL(set.equal);
     EXPECT_NULL(hashset_get(&set, "foo", 3));
+
+    HashSetIter iter = hashset_iter(&set);
+    EXPECT_PTREQ(iter.set, &set);
+    EXPECT_NULL(iter.entry);
+    EXPECT_EQ(iter.idx, 0);
+    EXPECT_FALSE(hashset_next(&iter));
+    EXPECT_PTREQ(iter.set, &set);
+    EXPECT_NULL(iter.entry);
+    EXPECT_EQ(iter.idx, 0);
+
     FOR_EACH_I(i, strings) {
         hashset_insert(&set, strings[i], strlen(strings[i]));
     }
+
+    FOR_EACH_I(i, strings) {
+        EXPECT_TRUE(hashset_next(&iter));
+    }
+    EXPECT_FALSE(hashset_next(&iter));
+    EXPECT_FALSE(hashset_next(&iter));
 
     EXPECT_EQ(set.nr_entries, ARRAYLEN(strings));
     EXPECT_NONNULL(hashset_get(&set, "\t\xff\x80\b", 4));
