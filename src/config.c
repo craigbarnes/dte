@@ -36,9 +36,17 @@ UNITTEST {
 
 void exec_config(CommandRunner *runner, StringView config)
 {
-    String buf = string_new(1024);
+    EditorState *e = runner->e;
+    ErrorBuffer *ebuf = runner->ebuf;
+    if (unlikely(e->include_recursion_count > 64)) {
+        error_msg_for_cmd(ebuf, NULL, "config recursion limit reached");
+        return;
+    }
 
-    for (size_t i = 0, n = config.length; i < n; runner->ebuf->config_line++) {
+    String buf = string_new(1024);
+    e->include_recursion_count++;
+
+    for (size_t i = 0, n = config.length; i < n; ebuf->config_line++) {
         StringView line = buf_slice_next_line(config.data, &i, n);
         strview_trim_left(&line);
         if (buf.len == 0 && strview_has_prefix(&line, "#")) {
@@ -60,6 +68,7 @@ void exec_config(CommandRunner *runner, StringView config)
         handle_command(runner, string_borrow_cstring(&buf));
     }
 
+    e->include_recursion_count--;
     string_free(&buf);
 }
 
@@ -96,20 +105,17 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
 
     if (flags & CFG_BUILTIN) {
         const BuiltinConfig *cfg = get_builtin_config(filename);
-        int err = 0;
         if (cfg) {
             ebuf->config_filename = filename;
             ebuf->config_line = 1;
             exec_config(runner, cfg->text);
-        } else if (must_exist) {
-            error_msg (
-                ebuf,
-                "Error reading '%s': no built-in config exists for that path",
-                filename
-            );
-            err = 1;
+            return 0;
         }
-        return err;
+        if (!must_exist) {
+            return 0;
+        }
+        error_msg(ebuf, "no built-in config with name '%s'", filename);
+        return 1;
     }
 
     char *buf;

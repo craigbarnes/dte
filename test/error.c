@@ -55,7 +55,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"ft -- -name ext", "invalid filetype name"},
         {"hi xyz red green blue", "too many colors"},
         {"hi xyz _invalid_", "invalid color or attribute"},
-        {"include -b nonexistent", "no built-in config exists for that path"},
+        {"include -b nonexistent", "no built-in config with name 'nonexistent'"},
         {"include /.n-o-n-e-x-i-s-t-e-n-t/_/az_..3", "error reading"},
         {"line 0", "invalid line number"},
         {"line _", "invalid line number"},
@@ -217,7 +217,16 @@ static void test_normal_command_errors(TestContext *ctx)
     EXPECT_TRUE(ebuf->is_error);
     ebuf->config_filename = NULL;
 
-    // TODO: Cover alias recursion overflow check in run_commands()
+    // Special case errors produced by exec_config():
+    // ----------------------------------------------
+
+    // This is a special case because handle_command() currently returns true,
+    // since cmd_include() only indicates failure for I/O errors and not for
+    // failing commands in the loaded file
+    clear_error(ebuf);
+    EXPECT_TRUE(handle_command(&runner, "include test/data/recursive.dterc"));
+    EXPECT_STREQ(ebuf->buf, "test/data/recursive.dterc:1: config recursion limit reached");
+    EXPECT_TRUE(ebuf->is_error);
 }
 
 static const TestEntry tests[] = {

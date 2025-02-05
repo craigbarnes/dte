@@ -156,6 +156,7 @@ static void test_deinit(TestContext *ctx)
     EXPECT_PTREQ(e->buffer, e->buffers.ptrs[0]);
     EXPECT_FALSE(e->child_controls_terminal);
     EXPECT_EQ(e->flags, EFLAG_HEADLESS);
+    EXPECT_EQ(e->include_recursion_count, 0);
 
     frame_remove(e, e->root_frame);
     EXPECT_NULL(e->view);

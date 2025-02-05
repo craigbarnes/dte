@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "buffer.h"
 #include "cmdline.h"
 #include "command/macro.h"
@@ -84,6 +85,7 @@ typedef struct EditorState {
     mode_t new_file_mode;
     EditorFlags flags;
     ScreenUpdateFlags screen_update;
+    uint8_t include_recursion_count;
     bool child_controls_terminal;
     bool session_leader;
     Clipboard clipboard;
