@@ -13,9 +13,6 @@
 #include "util/readfile.h"
 #include "util/str-util.h"
 
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-ConfigState current_config;
-
 // Odd number of backslashes at end of line?
 static bool has_line_continuation(StringView line)
 {
@@ -41,7 +38,7 @@ void exec_config(CommandRunner *runner, StringView config)
 {
     String buf = string_new(1024);
 
-    for (size_t i = 0, n = config.length; i < n; current_config.line++) {
+    for (size_t i = 0, n = config.length; i < n; runner->ebuf->config_line++) {
         StringView line = buf_slice_next_line(config.data, &i, n);
         strview_trim_left(&line);
         if (buf.len == 0 && strview_has_prefix(&line, "#")) {
@@ -94,16 +91,15 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
 
 int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
-    ErrorBuffer *ebuf = &runner->e->err;
-    const bool must_exist = flags & CFG_MUST_EXIST;
-    const bool builtin = flags & CFG_BUILTIN;
+    ErrorBuffer *ebuf = runner->ebuf;
+    bool must_exist = flags & CFG_MUST_EXIST;
 
-    if (builtin) {
+    if (flags & CFG_BUILTIN) {
         const BuiltinConfig *cfg = get_builtin_config(filename);
         int err = 0;
         if (cfg) {
-            current_config.file = filename;
-            current_config.line = 1;
+            ebuf->config_filename = filename;
+            ebuf->config_line = 1;
             exec_config(runner, cfg->text);
         } else if (must_exist) {
             error_msg (
@@ -126,8 +122,8 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
         return err;
     }
 
-    current_config.file = filename;
-    current_config.line = 1;
+    ebuf->config_filename = filename;
+    ebuf->config_line = 1;
     exec_config(runner, string_view(buf, size));
     free(buf);
     return 0;
@@ -136,32 +132,39 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
 int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
     // Recursive
-    const ConfigState saved = current_config;
+    ErrorBuffer *ebuf = runner->ebuf;
+    const char *saved_file = ebuf->config_filename;
+    const unsigned int saved_line = ebuf->config_line;
     int ret = do_read_config(runner, filename, flags);
-    current_config = saved;
+    ebuf->config_filename = saved_file;
+    ebuf->config_line = saved_line;
     return ret;
+}
+
+static void exec_builtin_config(EditorState *e, StringView cfg, const char *name)
+{
+    ErrorBuffer *ebuf = &e->err;
+    const char *saved_file = ebuf->config_filename;
+    const unsigned int saved_line = ebuf->config_line;
+    ebuf->config_filename = name;
+    ebuf->config_line = 1;
+    exec_normal_config(e, cfg);
+    ebuf->config_filename = saved_file;
+    ebuf->config_line = saved_line;
 }
 
 void exec_builtin_color_reset(EditorState *e)
 {
     clear_hl_styles(&e->styles);
-    const StringView reset = string_view(builtin_color_reset, sizeof(builtin_color_reset) - 1);
-    const ConfigState saved = current_config;
-    current_config.file = "color/reset";
-    current_config.line = 1;
-    exec_normal_config(e, reset);
-    current_config = saved;
+    StringView reset = string_view(builtin_color_reset, sizeof(builtin_color_reset) - 1);
+    exec_builtin_config(e, reset, "color/reset");
 }
 
 void exec_builtin_rc(EditorState *e)
 {
     exec_builtin_color_reset(e);
-    const StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
-    const ConfigState saved = current_config;
-    current_config.file = "rc";
-    current_config.line = 1;
-    exec_normal_config(e, rc);
-    current_config = saved;
+    StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
+    exec_builtin_config(e, rc, "rc");
 }
 
 void collect_builtin_configs(PointerArray *a, const char *prefix)

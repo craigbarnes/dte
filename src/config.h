@@ -19,14 +19,6 @@ typedef struct {
     const StringView text;
 } BuiltinConfig;
 
-typedef struct {
-    const char *file;
-    unsigned int line;
-} ConfigState;
-
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-extern ConfigState current_config;
-
 struct EditorState;
 
 String dump_builtin_configs(void);

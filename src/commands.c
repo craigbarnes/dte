@@ -1662,9 +1662,10 @@ static bool cmd_reopen(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 
 static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 {
+    ErrorBuffer *ebuf = &e->err;
     unsigned int count;
     if (unlikely(!str_to_uint(a->args[0], &count))) {
-        return error_msg(&e->err, "Not a valid repeat count: %s", a->args[0]);
+        return error_msg(ebuf, "Not a valid repeat count: %s", a->args[0]);
     }
     if (unlikely(count == 0)) {
         return true;
@@ -1672,11 +1673,11 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 
     const Command *cmd = find_normal_command(a->args[1]);
     if (unlikely(!cmd)) {
-        return error_msg(&e->err, "No such command: %s", a->args[1]);
+        return error_msg(ebuf, "No such command: %s", a->args[1]);
     }
 
     CommandArgs a2 = cmdargs_new(a->args + 2);
-    if (unlikely(!parse_args(e, cmd, &a2))) {
+    if (unlikely(!parse_args(cmd, &a2, ebuf))) {
         return false;
     }
 
@@ -1686,7 +1687,7 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
     }
 
     while (count--) {
-        command_func_call(e, cmd, &a2);
+        command_func_call(e, ebuf, cmd, &a2);
     }
 
     // TODO: return false if fn() fails?

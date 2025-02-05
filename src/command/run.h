@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include "error.h"
 #include "util/macros.h"
 #include "util/string-view.h"
 
@@ -49,13 +50,11 @@ typedef struct {
     char* (*expand_variable)(const struct EditorState *e, const char *name);
     const StringView *home_dir;
     struct EditorState *e;
+    ErrorBuffer *ebuf;
     unsigned int recursion_count;
     bool allow_recording;
     bool expand_tilde_slash;
 } CommandRunner;
-
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-extern const Command *current_command;
 
 static inline int command_cmp(const void *key, const void *elem)
 {
@@ -66,13 +65,14 @@ static inline int command_cmp(const void *key, const void *elem)
 
 static inline bool command_func_call (
     struct EditorState *e,
+    ErrorBuffer *ebuf,
     const Command *cmd,
     const CommandArgs *args
 ) {
-    const Command *save = current_command;
-    current_command = cmd;
+    const char *saved_cmd_name = ebuf->command_name;
+    ebuf->command_name = cmd->name;
     bool r = cmd->cmd(e, args);
-    current_command = save;
+    ebuf->command_name = saved_cmd_name;
     return r;
 }
 

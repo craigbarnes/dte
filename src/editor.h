@@ -150,6 +150,7 @@ static inline CommandRunner cmdrunner(EditorState *e, const CommandSet *cmds)
         .expand_variable = normal ? expand_normal_var : NULL,
         .home_dir = &e->home_dir,
         .e = e,
+        .ebuf = &e->err,
         .allow_recording = false,
         .expand_tilde_slash = true,
     };

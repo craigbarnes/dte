@@ -48,7 +48,7 @@ bool handle_binding(EditorState *e, const ModeHandler *handler, KeyCode key)
 
     // Command is cached; call it directly
     begin_change(CHANGE_MERGE_NONE);
-    command_func_call(e, binding->cmd, &binding->a);
+    command_func_call(e, &e->err, binding->cmd, &binding->a);
     end_change();
     return true;
 }

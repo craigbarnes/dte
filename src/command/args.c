@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "args.h"
-#include "error.h"
 #include "util/str-array.h"
 #include "util/xstring.h"
 
@@ -106,39 +105,36 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 }
 
 static bool arg_parse_error_msg (
-    struct EditorState *e,
     const Command *cmd,
     const CommandArgs *a,
-    ArgParseError err
+    ArgParseError err,
+    ErrorBuffer *ebuf
 ) {
     const char *name = cmd->name;
     switch (err) {
     case ARGERR_INVALID_OPTION:
-        return error_msg_for_cmd(e, name, "Invalid option -%c", a->flags[0]);
+        return error_msg_for_cmd(ebuf, name, "Invalid option -%c", a->flags[0]);
     case ARGERR_TOO_MANY_OPTIONS:
-        return error_msg_for_cmd(e, name, "Too many options given");
+        return error_msg_for_cmd(ebuf, name, "Too many options given");
     case ARGERR_OPTION_ARGUMENT_MISSING:
-        return error_msg_for_cmd(e, name, "Option -%c requires an argument", a->flags[0]);
+        return error_msg_for_cmd(ebuf, name, "Option -%c requires an argument", a->flags[0]);
     case ARGERR_OPTION_ARGUMENT_NOT_SEPARATE:
         return error_msg_for_cmd (
-            e, name,
-            "Option -%c must be given separately because it"
-            " requires an argument",
+            ebuf, name,
+            "Option -%c must be given separately because it requires an argument",
             a->flags[0]
         );
     case ARGERR_TOO_FEW_ARGUMENTS:
         return error_msg_for_cmd (
-            e, name,
+            ebuf, name,
             "Too few arguments (got: %zu, minimum: %u)",
-            a->nr_args,
-            (unsigned int)cmd->min_args
+            a->nr_args, (unsigned int)cmd->min_args
         );
     case ARGERR_TOO_MANY_ARGUMENTS:
         return error_msg_for_cmd (
-            e, name,
+            ebuf, name,
             "Too many arguments (got: %zu, maximum: %u)",
-            a->nr_args,
-            (unsigned int)cmd->max_args
+            a->nr_args, (unsigned int)cmd->max_args
         );
     case ARGERR_NONE:
         break;
@@ -148,8 +144,8 @@ static bool arg_parse_error_msg (
     return false;
 }
 
-bool parse_args(struct EditorState *e, const Command *cmd, CommandArgs *a)
+bool parse_args(const Command *cmd, CommandArgs *a, ErrorBuffer *ebuf)
 {
     ArgParseError err = do_parse_args(cmd, a);
-    return likely(err == ARGERR_NONE) || arg_parse_error_msg(e, cmd, a, err);
+    return likely(err == ARGERR_NONE) || arg_parse_error_msg(cmd, a, err, ebuf);
 }

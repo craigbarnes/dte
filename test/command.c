@@ -201,10 +201,15 @@ static void test_parse_command_arg(TestContext *ctx)
     free(arg);
 }
 
+static CommandRunner mock_cmdrunner(const CommandSet *cmds)
+{
+    static ErrorBuffer ebuf = {.print_to_stderr = false};
+    return (CommandRunner){.cmds = cmds, .ebuf = &ebuf};
+}
+
 static void test_parse_commands(TestContext *ctx)
 {
-    EditorState *e = ctx->userdata;
-    const CommandRunner runner = normal_mode_cmdrunner(e);
+    CommandRunner runner = mock_cmdrunner(&normal_commands);
     PointerArray array = PTR_ARRAY_INIT;
     EXPECT_EQ(parse_commands(&runner, &array, " left  -c;;"), CMDERR_NONE);
     ASSERT_EQ(array.count, 5);
@@ -282,7 +287,7 @@ static void test_find_normal_command(TestContext *ctx)
 static void test_parse_args(TestContext *ctx)
 {
     const CommandSet *cmds = &normal_commands;
-    const CommandRunner runner = {.cmds = cmds};
+    const CommandRunner runner = mock_cmdrunner(cmds);
     const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
     PointerArray array = PTR_ARRAY_INIT;
     ASSERT_NONNULL(cmds);
@@ -375,7 +380,7 @@ static void test_parse_args(TestContext *ctx)
 
 static void test_cached_command_new(TestContext *ctx)
 {
-    const CommandRunner runner = {.cmds = &normal_commands};
+    const CommandRunner runner = mock_cmdrunner(&normal_commands);
     const char cmd_str[] = "open -t -e UTF-8 file.c inc.h";
     CachedCommand *cc = cached_command_new(&runner, cmd_str);
     ASSERT_NONNULL(cc);

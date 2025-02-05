@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "error.h"
 #include "run.h"
 #include "util/base64.h"
 #include "util/debug.h"
@@ -96,9 +97,7 @@ static inline unsigned int cmdargs_convert_flags (
     return val;
 }
 
-struct EditorState;
-
-bool parse_args(struct EditorState *e, const Command *cmd, CommandArgs *a) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool parse_args(const Command *cmd, CommandArgs *a, ErrorBuffer *ebuf) NONNULL_ARGS WARN_UNUSED_RESULT;
 ArgParseError do_parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

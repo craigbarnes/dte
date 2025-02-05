@@ -46,7 +46,7 @@ static void close_state(EditorState *e)
         // This error applies to the state itself rather than the last
         // command, so it doesn't make sense to include the command name
         // in the error message
-        error_msg_for_cmd(e, NULL, "No default action in state '%s'", state->name);
+        error_msg_for_cmd(&e->err, NULL, "No default action in state '%s'", state->name);
     }
 
     e->syn.current_state = NULL;
@@ -647,20 +647,22 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags f
         .saved_nr_errors = 0,
     };
 
-    const ConfigState saved = current_config;
+    const char *saved_file = e->err.config_filename;
+    const unsigned int saved_line = e->err.config_line;
     CommandRunner runner = cmdrunner_for_syntaxes(e);
     *err = do_read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
-    if (*err) {
-        current_config = saved;
-        return NULL;
-    }
 
-    if (e->syn.current_syntax) {
+    if (!*err && e->syn.current_syntax) {
         finish_syntax(e);
         find_unused_subsyntaxes(&e->syntaxes, &e->err);
     }
 
-    current_config = saved;
+    e->err.config_filename = saved_file;
+    e->err.config_line = saved_line;
+
+    if (*err) {
+        return NULL;
+    }
 
     Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
     if (!syn) {

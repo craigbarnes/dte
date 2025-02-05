@@ -207,15 +207,15 @@ static void test_normal_command_errors(TestContext *ctx)
     EXPECT_TRUE(str_has_prefix(ebuf->buf, "Parsing alias _abc:"));
     EXPECT_TRUE(ebuf->is_error);
 
-    EXPECT_NULL(current_config.file);
-    current_config.file = "example";
-    current_config.line = 1;
+    EXPECT_NULL(ebuf->config_filename);
+    ebuf->config_filename = "example";
+    ebuf->config_line = 1;
     runner.lookup_alias = NULL;
     clear_error(ebuf);
     EXPECT_FALSE(handle_command(&runner, "quit"));
     EXPECT_STREQ(ebuf->buf, "example:1: Command quit not allowed in config file");
     EXPECT_TRUE(ebuf->is_error);
-    current_config.file = NULL;
+    ebuf->config_filename = NULL;
 
     // TODO: Cover alias recursion overflow check in run_commands()
 }

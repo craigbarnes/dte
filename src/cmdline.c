@@ -412,7 +412,7 @@ static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
         history_append(&e->command_history, str);
     }
 
-    current_command = NULL;
+    e->err.command_name = NULL;
     return handle_normal_command(e, str, true);
 }
 
@@ -446,7 +446,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         macro_search_hook(&e->macro, pat, e->search.reverse, add_to_history);
     }
 
-    current_command = NULL;
+    e->err.command_name = NULL;
     bool found = search_next(e->view, &e->search, e->options.case_sensitive_search);
     cmdline_clear(c);
     pop_input_mode(e);
