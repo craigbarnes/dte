@@ -510,6 +510,7 @@ static String do_dump_filetypes(EditorState *e) {return dump_filetypes(&e->filet
 static String do_dump_messages(EditorState *e) {return dump_messages(&e->messages);}
 static String do_dump_macro(EditorState *e) {return dump_macro(&e->macro);}
 static String do_dump_buffer(EditorState *e) {return dump_buffer(e->view);}
+static String do_dump_tags(EditorState *e) {return dump_tags(&e->tagfile, &e->err);}
 static String dump_command_history(EditorState *e) {return history_dump(&e->command_history);}
 static String dump_search_history(EditorState *e) {return history_dump(&e->search_history);}
 static String dump_file_history(EditorState *e) {return file_history_dump(&e->file_history);}
@@ -542,7 +543,7 @@ static const ShowHandler show_handlers[] = {
     {"search", LASTLINE, dump_search_history, NULL, NULL},
     {"set", DTERC, do_dump_options, show_option, collect_all_options},
     {"setenv", DTERC, dump_setenv, show_env, collect_env},
-    {"tag", 0, dump_tags, NULL, NULL},
+    {"tag", 0, do_dump_tags, NULL, NULL},
     {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
 

@@ -6,7 +6,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "tag.h"
-#include "editor.h"
 #include "error.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -287,9 +286,13 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     add_message(messages, m);
 }
 
-size_t tag_lookup(EditorState *e, const StringView *name, const char *filename)
-{
-    TagFile *tf = &e->tagfile;
+size_t tag_lookup (
+    TagFile *tf,
+    MessageArray *messages,
+    ErrorBuffer *ebuf,
+    const StringView *name,
+    const char *filename
+) {
     BUG_ON(!tf->filename);
 
     // Filename helps to find correct tags
@@ -298,7 +301,7 @@ size_t tag_lookup(EditorState *e, const StringView *name, const char *filename)
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg(&e->err, "Tag '%.*s' not found", (int)name->length, name->data);
+        error_msg(ebuf, "Tag '%.*s' not found", (int)name->length, name->data);
         return 0;
     }
 
@@ -306,7 +309,6 @@ size_t tag_lookup(EditorState *e, const StringView *name, const char *filename)
     // call to path_join_sv() in add_message_for_tag() handles that fine
     BUG_ON(tf->dirname_len == 0);
     StringView tagfile_dir = string_view(tf->filename, tf->dirname_len);
-    MessageArray *messages = &e->messages;
 
     for (size_t i = 0; i < ntags; i++) {
         Tag *tag = tags.ptrs[i];
@@ -338,10 +340,9 @@ void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
     }
 }
 
-String dump_tags(EditorState *e)
+String dump_tags(TagFile *tf, ErrorBuffer *ebuf)
 {
-    TagFile *tf = &e->tagfile;
-    if (!load_tag_file(tf, &e->err)) {
+    if (!load_tag_file(tf, ebuf)) {
         return string_new(0);
     }
 

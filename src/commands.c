@@ -2304,12 +2304,12 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
 
     const char *filename = e->buffer->abs_filename;
     if (nargs == 0) {
-        tag_lookup(e, &word_under_cursor, filename);
+        tag_lookup(&e->tagfile, msgs, &e->err, &word_under_cursor, filename);
     }
 
     for (size_t i = 0; i < nargs; i++) {
         StringView tagname = strview_from_cstring(a->args[i]);
-        tag_lookup(e, &tagname, filename);
+        tag_lookup(&e->tagfile, msgs, &e->err, &tagname, filename);
     }
 
     activate_current_message_save(msgs, &e->bookmarks, e->view);

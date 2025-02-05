@@ -19,13 +19,11 @@ typedef struct {
     time_t mtime; // The modification time of the tags file (when last loaded)
 } TagFile;
 
-struct EditorState;
-
 bool load_tag_file(TagFile *tf, ErrorBuffer *ebuf) NONNULL_ARGS WARN_UNUSED_RESULT;
 void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir) NONNULL_ARGS;
-size_t tag_lookup(struct EditorState *e, const StringView *name, const char *filename) NONNULL_ARG(1, 2);
+size_t tag_lookup(TagFile *tf, MessageArray *messages, ErrorBuffer *ebuf, const StringView *name, const char *filename) NONNULL_ARG(1, 2, 3, 4);
 void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix) NONNULL_ARGS;
-String dump_tags(struct EditorState *e) NONNULL_ARGS;
+String dump_tags(TagFile *tf, ErrorBuffer *ebuf) NONNULL_ARGS;
 void tag_file_free(TagFile *tf) NONNULL_ARGS;
 
 #endif

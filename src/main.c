@@ -639,7 +639,7 @@ int main(int argc, char *argv[])
 
         for (size_t i = 0; i < nr_tags; i++) {
             StringView tagname = strview_from_cstring(tags[i]);
-            tag_lookup(e, &tagname, NULL);
+            tag_lookup(&e->tagfile, msgs, &e->err, &tagname, NULL);
         }
 
         if (activate_current_message(msgs, window) && dview && nr_commands == 0) {

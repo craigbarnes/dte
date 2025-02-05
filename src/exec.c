@@ -124,8 +124,9 @@ static void parse_and_activate_message(EditorState *e, const String *str)
 
 static void parse_and_goto_tag(EditorState *e, const String *str)
 {
+    ErrorBuffer *ebuf = &e->err;
     if (unlikely(str->len == 0)) {
-        error_msg(&e->err, "child produced no output");
+        error_msg(ebuf, "child produced no output");
         return;
     }
 
@@ -144,7 +145,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         // `line` is a valid tags(5) file entry; handle it directly
         char cwd[8192];
         if (unlikely(!getcwd(cwd, sizeof cwd))) {
-            error_msg_errno(&e->err, "getcwd() failed");
+            error_msg_errno(ebuf, "getcwd() failed");
             return;
         }
         StringView dir = strview_from_cstring(cwd);
@@ -152,11 +153,12 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         add_message_for_tag(msgs, &tag, &dir);
     } else {
         // Treat `line` as a simple tag name (look it up in the tags(5) file)
-        clear_messages(&e->messages);
-        if (!load_tag_file(&e->tagfile, &e->err)) {
+        TagFile *tf = &e->tagfile;
+        clear_messages(msgs);
+        if (!load_tag_file(tf, ebuf)) {
             return;
         }
-        if (!tag_lookup(e, &line, e->buffer->abs_filename)) {
+        if (!tag_lookup(tf, msgs, ebuf, &line, e->buffer->abs_filename)) {
             return;
         }
     }
