@@ -84,6 +84,8 @@ void *ptr_array_remove_index(PointerArray *array, size_t idx)
     return removed;
 }
 
+// Return the first array index found to contain `ptr`, or SIZE_MAX
+// if not found. See also: ptr_array_xindex(), ptr_array_bsearch().
 size_t ptr_array_index(const PointerArray *array, const void *ptr)
 {
     for (size_t i = 0, n = array->count; i < n; i++) {
