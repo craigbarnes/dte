@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "color.h"
 #include "style.h"
 #include "terminal.h"
 #include "util/macros.h"
@@ -41,13 +42,18 @@ enum {
 
 #define term_put_literal(buf, s) term_put_bytes(buf, s, STRLEN(s))
 
+#define TERM_OUTPUT_INIT { \
+    .tab_mode = TAB_CONTROL, \
+    .tab_width = 8, \
+    .style = {.fg = COLOR_DEFAULT, .bg = COLOR_DEFAULT}, \
+    .cursor_style = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT}, \
+}
+
 static inline size_t obuf_avail(TermOutputBuffer *obuf)
 {
     return TERM_OUTBUF_SIZE - obuf->count;
 }
 
-void term_output_init(TermOutputBuffer *obuf);
-void term_output_free(TermOutputBuffer *obuf);
 char *term_output_reserve_space(TermOutputBuffer *obuf, size_t count) NONNULL_ARGS_AND_RETURN;
 void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x);
 void term_put_byte(TermOutputBuffer *obuf, char ch);

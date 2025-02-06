@@ -78,6 +78,9 @@ EditorState *init_editor_state(EditorFlags flags)
         .search_history = {
             .max_entries = 128,
         },
+        .terminal = {
+            .obuf = TERM_OUTPUT_INIT,
+        },
         .cursor_styles = {
             [CURSOR_MODE_DEFAULT] = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT},
             [CURSOR_MODE_INSERT] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
@@ -160,8 +163,6 @@ EditorState *init_editor_state(EditorFlags flags)
         LOG_WARNING("no regex word boundary tokens detected");
     }
 
-    term_input_init(&e->terminal.ibuf);
-    term_output_init(&e->terminal.obuf);
     hashmap_init(&e->aliases, 32, HMAP_NO_FLAGS);
     hashset_init(&e->required_syntax_files, 0, false);
     hashset_init(&e->required_syntax_builtins, 0, false);
@@ -195,8 +196,6 @@ void free_editor_state(EditorState *e)
     history_free(&e->command_history);
     history_free(&e->search_history);
     search_free_regexp(&e->search);
-    term_output_free(&e->terminal.obuf);
-    term_input_free(&e->terminal.ibuf);
     cmdline_free(&e->cmdline);
     clear_messages(&e->messages);
     free_macro(&e->macro);

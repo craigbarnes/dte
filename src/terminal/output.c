@@ -30,42 +30,10 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-void term_output_init(TermOutputBuffer *obuf)
-{
-    *obuf = (TermOutputBuffer) {
-        .buf = xmalloc(TERM_OUTBUF_SIZE),
-        .width = 0, // To ensure term_output_reset() is called
-        .tab_mode = TAB_CONTROL,
-        .tab_width = 8,
-        .style = {
-            .fg = COLOR_DEFAULT,
-            .bg = COLOR_DEFAULT,
-        },
-        .cursor_style = {
-            .type = CURSOR_DEFAULT,
-            .color = COLOR_DEFAULT,
-        },
-    };
-}
-
-void term_output_free(TermOutputBuffer *obuf)
-{
-    free(obuf->buf);
-    *obuf = (TermOutputBuffer) {
-        .style = {
-            .fg = COLOR_INVALID,
-            .bg = COLOR_INVALID,
-        },
-        .cursor_style = {
-            .type = CURSOR_INVALID,
-            .color = COLOR_INVALID,
-        },
-    };
-}
-
 char *term_output_reserve_space(TermOutputBuffer *obuf, size_t count)
 {
     BUG_ON(count > TERM_OUTBUF_SIZE);
+    BUG_ON(obuf->count > TERM_OUTBUF_SIZE);
     if (unlikely(obuf_avail(obuf) < count)) {
         term_output_flush(obuf);
     }
@@ -461,6 +429,7 @@ void term_output_flush(TermOutputBuffer *obuf)
 {
     size_t n = obuf->count;
     if (n) {
+        BUG_ON(n > TERM_OUTBUF_SIZE);
         obuf->count = 0;
         term_direct_write(obuf->buf, n);
     }

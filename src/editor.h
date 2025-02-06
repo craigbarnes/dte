@@ -79,7 +79,6 @@ typedef struct EditorState {
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;
-    Terminal terminal;
     StringView home_dir;
     const char *user_config_dir;
     mode_t new_file_mode;
@@ -115,6 +114,7 @@ typedef struct EditorState {
     History command_history;
     RegexpWordBoundaryTokens regexp_word_tokens;
     ErrorBuffer err;
+    Terminal terminal;
 } EditorState;
 
 static inline void set_input_mode(EditorState *e, ModeHandler *mode)

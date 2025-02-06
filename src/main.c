@@ -117,12 +117,10 @@ static ExitCode showkey_loop(unsigned int terminal_query_level)
         return ec_error("tcsetattr", EC_IO_ERROR);
     }
 
-    Terminal term;
+    Terminal term = {.obuf = TERM_OUTPUT_INIT};
     TermOutputBuffer *obuf = &term.obuf;
     TermInputBuffer *ibuf = &term.ibuf;
     term_init(&term, getenv("TERM"), getenv("COLORTERM"));
-    term_input_init(ibuf);
-    term_output_init(obuf);
     term_enable_private_modes(&term);
     term_put_initial_queries(&term, terminal_query_level);
     term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
@@ -151,8 +149,6 @@ static ExitCode showkey_loop(unsigned int terminal_query_level)
     term_restore_private_modes(&term);
     term_output_flush(obuf);
     term_cooked();
-    term_input_free(ibuf);
-    term_output_free(obuf);
     return EC_OK;
 }
 

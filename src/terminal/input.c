@@ -14,19 +14,6 @@
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 
-void term_input_init(TermInputBuffer *ibuf)
-{
-    *ibuf = (TermInputBuffer) {
-        .buf = xmalloc(TERM_INBUF_SIZE)
-    };
-}
-
-void term_input_free(TermInputBuffer *ibuf)
-{
-    free(ibuf->buf);
-    *ibuf = (TermInputBuffer){.buf = NULL};
-}
-
 static void consume_input(TermInputBuffer *input, size_t len)
 {
     BUG_ON(len == 0);
@@ -40,7 +27,7 @@ static void consume_input(TermInputBuffer *input, size_t len)
             LOG_TRACE("consumed %zu bytes from input buffer: %s", len, buf);
         } else {
             LOG_TRACE (
-                "consumed %zu (of %zu) bytes from input buffer: %s",
+                "consumed %zu (of %u) bytes from input buffer: %s",
                 len, input->len, buf
             );
         }

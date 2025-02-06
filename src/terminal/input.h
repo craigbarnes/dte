@@ -16,8 +16,6 @@ static inline bool is_newly_detected_feature (
     return ~existing & detected & feature;
 }
 
-void term_input_init(TermInputBuffer *ibuf) NONNULL_ARGS;
-void term_input_free(TermInputBuffer *ibuf) NONNULL_ARGS;
 KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms) NONNULL_ARGS;
 
 #endif
