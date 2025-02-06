@@ -112,13 +112,22 @@ void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
 
 static void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 {
+    if (likely(count <= TERM_OUTBUF_SIZE)) {
+        // Repeat count fits in buffer; reserve space and tail-call memset(3)
+        char *buf = term_output_reserve_space(obuf, count);
+        obuf->count += count;
+        memset(buf, ch, count);
+        return;
+    }
+
+    // Repeat count greater than buffer size; fill buffer with `ch` and call
+    // write() repeatedly until `count` reaches zero
+    term_output_flush(obuf);
+    memset(obuf->buf, ch, TERM_OUTBUF_SIZE);
     while (count) {
-        char *buf = term_output_reserve_space(obuf, 1);
-        size_t avail = obuf_avail(obuf);
-        size_t n = MIN(count, avail);
-        memset(buf, ch, n);
-        obuf->count += n;
+        size_t n = MIN(count, TERM_OUTBUF_SIZE);
         count -= n;
+        term_direct_write(obuf->buf, n);
     }
 }
 
