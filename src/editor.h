@@ -115,7 +115,6 @@ typedef struct EditorState {
     History command_history;
     RegexpWordBoundaryTokens regexp_word_tokens;
     ErrorBuffer err;
-    const char *version;
 } EditorState;
 
 static inline void set_input_mode(EditorState *e, ModeHandler *mode)

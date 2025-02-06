@@ -72,7 +72,6 @@ EditorState *init_editor_state(EditorFlags flags)
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
         .flags = flags,
-        .version = VERSION,
         .command_history = {
             .max_entries = 512,
         },

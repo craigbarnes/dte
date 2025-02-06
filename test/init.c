@@ -13,6 +13,7 @@
 #include "util/log.h"
 #include "util/path.h"
 #include "util/xreadwrite.h"
+#include "version.h"
 
 static void test_process_sanity(TestContext *ctx)
 {
@@ -121,7 +122,7 @@ static void test_init(TestContext *ctx)
 
     const char *ver = getenv("DTE_VERSION");
     EXPECT_NONNULL(ver);
-    EXPECT_STREQ(ver, e->version);
+    EXPECT_STREQ(ver, VERSION);
 }
 
 static void test_deinit(TestContext *ctx)

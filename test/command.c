@@ -14,6 +14,7 @@
 #include "util/debug.h"
 #include "util/path.h"
 #include "util/str-util.h"
+#include "version.h"
 
 static void test_parse_command_arg(TestContext *ctx)
 {
@@ -182,7 +183,7 @@ static void test_parse_command_arg(TestContext *ctx)
 
     // Environment var (via getenv(3))
     arg = parse_command_arg(&runner, STRN("$DTE_VERSION"));
-    EXPECT_STREQ(arg, e->version);
+    EXPECT_STREQ(arg, VERSION);
     free(arg);
 
     // Tilde expansion

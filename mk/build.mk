@@ -146,6 +146,8 @@ build/config.o: build/gen/builtin-config.h
 build/test/config.o: build/gen/test-data.h
 build/main.o: build/gen/version.h
 build/editor.o: build/gen/version.h
+build/test/command.o: build/gen/version.h
+build/test/init.o: build/gen/version.h
 build/compat.o: build/gen/feature.h build/gen/buildvar-iconv.h
 build/load-save.o: build/gen/feature.h
 build/signals.o: build/gen/feature.h
