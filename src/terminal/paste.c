@@ -7,6 +7,7 @@
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/string-view.h"
+#include "util/utf8.h"
 #include "util/xmemmem.h"
 #include "util/xreadwrite.h"
 
@@ -60,36 +61,45 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
         input->len = 0;
     }
 
-    static const StringView delim = STRING_VIEW("\033[201~");
-    char *start, *end;
-    ssize_t read_len;
+    static const char delim[] = "\033[201~";
+    const size_t dlen = sizeof(delim) - 1;
+    const char *remainder;
+    size_t remainder_len;
 
     while (1) {
-        start = string_reserve_space(&str, read_max);
-        read_len = xread(STDIN_FILENO, start, read_max);
+        char *start = string_reserve_space(&str, read_max);
+        ssize_t read_len = xread(STDIN_FILENO, start, read_max);
         if (unlikely(read_len <= 0)) {
             goto read_error;
         }
-        end = xmemmem(start, read_len, delim.data, delim.length);
-        if (end) {
-            break;
+
+        // Search for the end delimiter, starting from a position that
+        // slightly overlaps into the previous read(), so as to handle
+        // boundary-straddling delimiters in a minimal amount of code
+        size_t overlap = MIN(dlen - 1, str.len);
+        unsigned char *end = xmemmem(start - overlap, read_len + overlap, delim, dlen);
+        if (!end) {
+            str.len += read_len;
+            continue;
         }
-        str.len += read_len;
+
+        size_t total_read_len = str.len + read_len;
+        size_t total_text_len = (size_t)(end - str.buffer);
+        remainder_len = total_read_len - total_text_len - dlen;
+        remainder = end + dlen;
+        str.len = total_text_len;
+        break;
     }
 
-    size_t final_chunk_len = (size_t)(end - start);
-    str.len += final_chunk_len;
-    final_chunk_len += delim.length;
-    BUG_ON(final_chunk_len > read_len);
-
-    size_t remainder = read_len - final_chunk_len;
-    if (unlikely(remainder)) {
-        // Copy anything still in the buffer beyond the end delimiter
-        // into the normal input buffer
-        LOG_DEBUG("remainder after bracketed paste: %zu", remainder);
-        BUG_ON(remainder > TERM_INBUF_SIZE);
-        memcpy(input->buf, start + final_chunk_len, remainder);
-        input->len = remainder;
+    if (remainder_len) {
+        if (log_level_debug_enabled()) {
+            char buf[32];
+            u_make_printable(remainder, remainder_len, buf, sizeof(buf), MPF_C0_SYMBOLS);
+            LOG_DEBUG("%zu byte remainder after bracketed paste: %s", remainder_len, buf);
+        }
+        BUG_ON(remainder_len > TERM_INBUF_SIZE);
+        memcpy(input->buf, remainder, remainder_len);
+        input->len = remainder_len;
     }
 
     const char *plural = (str.len == 1) ? "" : "s";
