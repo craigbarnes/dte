@@ -300,16 +300,19 @@ ssize_t handle_exec (
         if (!view->selection) {
             StringView line;
             size_t offset = fetch_this_line(&view->cursor, &line);
-            StringView word = get_word_under_cursor(line, offset);
-            if (word.length == 0) {
+            size_t start = offset;
+            size_t end = get_bounds_for_word_under_cursor(line, &start);
+            if (end == 0) {
                 break;
             }
-            // TODO: optimize this, so that the BlockIter moves by just the
-            // minimal word offset instead of iterating to a line offset
-            ctx.input.length = word.length;
-            move_bol(view);
-            view->cursor.offset += offset;
+
+            // If `start` is less than `offset` here, the subtraction wraps
+            // but nevertheless works as intended
+            view->cursor.offset += start - offset; // == view->cursor.offset -= (offset - start)
+
+            ctx.input.length = end - start;
             BUG_ON(view->cursor.offset >= view->cursor.blk->size);
+            replace_unselected_input = true;
         }
         break;
     case EXEC_MSG: {

@@ -139,9 +139,10 @@ bool view_can_close(const View *view)
     return !buffer_modified(buffer) || buffer->views.count > 1;
 }
 
-StringView get_word_under_cursor(StringView line, size_t cursor_offset)
+size_t get_bounds_for_word_under_cursor(StringView line, size_t *cursor_offset)
 {
-    size_t si = cursor_offset;
+    // Move right, until over a word char (if not already)
+    size_t si = *cursor_offset;
     while (si < line.length) {
         size_t i = si;
         if (u_is_word_char(u_get_char(line.data, line.length, &i))) {
@@ -151,9 +152,11 @@ StringView get_word_under_cursor(StringView line, size_t cursor_offset)
     }
 
     if (si == line.length) {
-        return string_view(NULL, 0);
+        // No word char between cursor and EOL; no word
+        return 0;
     }
 
+    // Move left, to start of word (if cursor is already within one)
     size_t ei = si;
     while (si > 0) {
         size_t i = si;
@@ -163,6 +166,7 @@ StringView get_word_under_cursor(StringView line, size_t cursor_offset)
         si = i;
     }
 
+    // Move right, to end of word
     while (ei < line.length) {
         size_t i = ei;
         if (!u_is_word_char(u_get_char(line.data, line.length, &i))) {
@@ -171,14 +175,24 @@ StringView get_word_under_cursor(StringView line, size_t cursor_offset)
         ei = i;
     }
 
-    return string_view(line.data + si, ei - si);
+    if (si == ei) {
+        // Zero length; no word
+        return 0;
+    }
+
+    // Update `cursor_offset` with start offset and return end offset
+    BUG_ON(ei == 0 || si >= ei);
+    *cursor_offset = si;
+    return ei;
 }
 
 StringView view_get_word_under_cursor(const View *view)
 {
     StringView line;
     size_t cursor_offset_in_line = fetch_this_line(&view->cursor, &line);
-    return get_word_under_cursor(line, cursor_offset_in_line);
+    size_t start = cursor_offset_in_line;
+    size_t end = get_bounds_for_word_under_cursor(line, &start);
+    return string_view(line.data + start, end ? end - start : 0);
 }
 
 String dump_buffer(const View *view)
