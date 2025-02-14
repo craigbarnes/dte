@@ -5,9 +5,9 @@
 #include <sys/types.h>
 #include "config.h"
 #include "builtin-config.h"
+#include "command/error.h"
 #include "commands.h"
 #include "editor.h"
-#include "error.h"
 #include "syntax/color.h"
 #include "util/debug.h"
 #include "util/readfile.h"

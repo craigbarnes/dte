@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "tag.h"
-#include "error.h"
+#include "command/error.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/path.h"

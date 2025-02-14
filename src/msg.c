@@ -2,8 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include "msg.h"
+#include "command/error.h"
 #include "editor.h"
-#include "error.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/path.h"

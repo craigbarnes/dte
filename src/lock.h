@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#include "error.h"
+#include "command/error.h"
 #include "util/macros.h"
 
 typedef struct {

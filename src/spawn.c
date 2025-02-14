@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "spawn.h"
-#include "error.h"
+#include "command/error.h"
 #include "regexp.h"
 #include "terminal/mode.h"
 #include "util/debug.h"

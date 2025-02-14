@@ -1,7 +1,7 @@
 #include "test.h"
+#include "command/error.h"
 #include "commands.h"
 #include "editor.h"
-#include "error.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "window.h"

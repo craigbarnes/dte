@@ -4,10 +4,10 @@
 #include <string.h>
 #include "state.h"
 #include "command/args.h"
+#include "command/error.h"
 #include "command/run.h"
 #include "config.h"
 #include "editor.h"
-#include "error.h"
 #include "filetype.h"
 #include "syntax/merge.h"
 #include "util/bsearch.h"

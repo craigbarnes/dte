@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include "buffer.h"
-#include "error.h"
+#include "command/error.h"
 #include "options.h"
 #include "util/macros.h"
 

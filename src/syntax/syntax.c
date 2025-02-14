@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "syntax.h"
-#include "error.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"

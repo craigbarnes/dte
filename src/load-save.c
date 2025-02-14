@@ -11,7 +11,6 @@
 #include "block.h"
 #include "convert.h"
 #include "encoding.h"
-#include "error.h"
 #include "options.h"
 #include "util/debug.h"
 #include "util/fd.h"

@@ -1,5 +1,5 @@
 #include "ui.h"
-#include "error.h"
+#include "command/error.h"
 #include "signals.h"
 #include "terminal/input.h"
 #include "terminal/paste.h"

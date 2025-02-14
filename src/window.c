@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "window.h"
+#include "command/error.h"
 #include "editor.h"
-#include "error.h"
 #include "file-history.h"
 #include "load-save.h"
 #include "lock.h"

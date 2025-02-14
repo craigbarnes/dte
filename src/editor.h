@@ -6,11 +6,11 @@
 #include <stdint.h>
 #include "buffer.h"
 #include "cmdline.h"
+#include "command/error.h"
 #include "command/macro.h"
 #include "command/run.h"
 #include "commands.h"
 #include "copy.h"
-#include "error.h"
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"

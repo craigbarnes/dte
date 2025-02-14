@@ -4,7 +4,7 @@
 #include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "error.h"
+#include "command/error.h"
 #include "util/macros.h"
 
 enum {

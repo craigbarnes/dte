@@ -5,7 +5,6 @@
 #include "buffer.h"
 #include "command/serialize.h"
 #include "editor.h"
-#include "error.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "status.h"

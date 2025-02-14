@@ -2,7 +2,7 @@
 #define FILE_HISTORY_H
 
 #include <stdbool.h>
-#include "error.h"
+#include "command/error.h"
 #include "util/hashmap.h"
 #include "util/macros.h"
 #include "util/string.h"

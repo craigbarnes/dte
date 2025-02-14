@@ -4,7 +4,6 @@
 #include <string.h>
 #include "error.h"
 #include "command/run.h"
-#include "config.h"
 #include "util/log.h"
 #include "util/xstdio.h"
 

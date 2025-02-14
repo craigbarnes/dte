@@ -1,5 +1,5 @@
 #include "ui.h"
-#include "error.h"
+#include "command/error.h"
 
 static void print_message(Terminal *term, const StyleMap *styles, const char *msg, bool is_error)
 {

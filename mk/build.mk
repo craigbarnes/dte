@@ -34,7 +34,7 @@ util_objects := $(call prefix-obj, build/util/, \
     utf8 xmalloc xmemmem xmemrchr xreadwrite xsnprintf xstdio )
 
 command_objects := $(call prefix-obj, build/command/, \
-    alias args cache macro parse run serialize )
+    alias args cache error macro parse run serialize )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
@@ -49,10 +49,10 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter bookmark buffer case change cmdline commands \
     compat compiler completion config convert copy ctags delete edit \
-    editor encoding error exec file-history file-option filetype frame \
-    history indent insert join load-save lock main mode move msg options \
-    regexp replace search selection shift show signals spawn status tag \
-    vars view window wrap \
+    editor encoding exec file-history file-option filetype frame history \
+    indent insert join load-save lock main mode move msg options regexp \
+    replace search selection shift show signals spawn status tag vars \
+    view window wrap \
     $(addprefix ui-, cmdline prompt status tabbar view window) ui ) \
     $(command_objects) \
     $(editorconfig_objects) \

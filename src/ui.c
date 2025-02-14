@@ -1,6 +1,6 @@
 #include <string.h>
 #include "ui.h"
-#include "error.h"
+#include "command/error.h"
 #include "frame.h"
 #include "terminal/cursor.h"
 #include "terminal/ioctl.h"

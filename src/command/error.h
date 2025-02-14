@@ -1,5 +1,5 @@
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef COMMAND_ERROR_H
+#define COMMAND_ERROR_H
 
 #include <stdbool.h>
 #include "util/macros.h"

@@ -10,7 +10,6 @@
 #include "bookmark.h"
 #include "compiler.h"
 #include "encoding.h"
-#include "error.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "lock.h"

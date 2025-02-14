@@ -8,7 +8,7 @@
 #include <time.h>
 #include "block-iter.h"
 #include "change.h"
-#include "error.h"
+#include "command/error.h"
 #include "lock.h"
 #include "options.h"
 #include "syntax/syntax.h"

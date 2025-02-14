@@ -2,12 +2,12 @@
 #include <unistd.h>
 #include "test.h"
 #include "config.h"
+#include "command/error.h"
 #include "command/macro.h"
 #include "command/run.h"
 #include "commands.h"
 #include "convert.h"
 #include "editor.h"
-#include "error.h"
 #include "frame.h"
 #include "insert.h"
 #include "mode.h"

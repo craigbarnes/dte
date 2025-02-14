@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "error.h"
+#include "command/error.h"
 #include "regexp.h"
 #include "util/debug.h"
 #include "util/macros.h"

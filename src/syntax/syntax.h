@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "error.h"
+#include "command/error.h"
 #include "syntax/bitset.h"
 #include "syntax/color.h"
 #include "util/hashmap.h"
