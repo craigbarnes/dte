@@ -254,8 +254,12 @@ Code Quality/Efficiency Improvements
   (without executing more commands) if `run_command()` returns `false`.
   This may be useful for `macro play`, `load_syntax_file()`, etc.
 
-* Make use of [`fstatvfs(3)`], [`posix_fallocate(3)`], [`vmsplice(2)`]
-  and [`tee(2)`][] (when available)
+* Use [`vmsplice(2)`][] (when available) in `handle_piped_data()`, for
+  piping `Block::data` segments to spawned processes (with less overhead
+  from syscalls/copying)
+
+* Use [`posix_fallocate(3)`][] (when available) to pre-allocate disk
+  space for `save_buffer()`, `history_save()` and `file_history_save()`
 
 * Use kitty's [extended clipboard protocol], when available, to allow
   writing to the clipboard in chunks (instead of as a single `OSC 52`
@@ -390,10 +394,8 @@ Testing/Debugging
 [`ed(1)`]: https://man7.org/linux/man-pages/man1/ed.1p.html#ASYNCHRONOUS_EVENTS
 [POSIX exit code rationale]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_21_18
 [`ltrace(1)`]: https://man7.org/linux/man-pages/man1/ltrace.1.html
-[`fstatvfs(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/fstatvfs.html
 [`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
 [`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
-[`tee(2)`]: https://man7.org/linux/man-pages/man2/tee.2.html
 [extended clipboard protocol]: https://sw.kovidgoyal.net/kitty/clipboard/
 [`hicpp-signed-bitwise`]: https://clang.llvm.org/extra/clang-tidy/checks/hicpp/signed-bitwise.html
 [C23 Enhanced Enumerations]: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3030.htm
