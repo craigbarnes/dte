@@ -196,10 +196,10 @@ bool load_tag_file(TagFile *tf, ErrorBuffer *ebuf)
     return true;
 }
 
-static void free_tags_cb(Tag *t)
+static void free_tags_cb(Tag *tag)
 {
-    free_tag(t);
-    free(t);
+    free_tag(tag);
+    free(tag);
 }
 
 static void free_tags(PointerArray *tags)
@@ -209,9 +209,9 @@ static void free_tags(PointerArray *tags)
 
 #if !HAVE_QSORT_R
 static const char *current_filename_global; // NOLINT(*-non-const-global-variables)
-static int tag_cmp(const void *ap, const void *bp)
+static int tag_cmp(const void *t1, const void *t2)
 {
-    return tag_cmp_r(ap, bp, (char*)current_filename_global);
+    return tag_cmp_r(t1, t2, (char*)current_filename_global);
 }
 #endif
 
@@ -221,13 +221,13 @@ static void tag_file_find_tags (
     const StringView *name,
     PointerArray *tags
 ) {
-    Tag *t = xmalloc(sizeof(*t));
+    Tag *tag = xmalloc(sizeof(*tag));
     size_t pos = 0;
-    while (next_tag(tf->buf, tf->size, &pos, name, true, t)) {
-        ptr_array_append(tags, t);
-        t = xmalloc(sizeof(*t));
+    while (next_tag(tf->buf, tf->size, &pos, name, true, tag)) {
+        ptr_array_append(tags, tag);
+        tag = xmalloc(sizeof(*tag));
     }
-    free(t);
+    free(tag);
 
     if (tags->count < 2) {
         return;
@@ -327,16 +327,16 @@ void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
         return;
     }
 
-    Tag t;
+    Tag tag;
     size_t pos = 0;
     StringView prev = STRING_VIEW_INIT;
-    while (next_tag(tf->buf, tf->size, &pos, prefix, false, &t)) {
-        BUG_ON(t.name.length == 0);
-        if (prev.length == 0 || !strview_equal(&t.name, &prev)) {
-            ptr_array_append(a, xstrcut(t.name.data, t.name.length));
-            prev = t.name;
+    while (next_tag(tf->buf, tf->size, &pos, prefix, false, &tag)) {
+        BUG_ON(tag.name.length == 0);
+        if (prev.length == 0 || !strview_equal(&tag.name, &prev)) {
+            ptr_array_append(a, xstrcut(tag.name.data, tag.name.length));
+            prev = tag.name;
         }
-        free_tag(&t);
+        free_tag(&tag);
     }
 }
 
