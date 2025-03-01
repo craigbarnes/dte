@@ -4,17 +4,26 @@ Contributing
 Please observe the following guidelines when creating new [issues]
 or [merge requests] for dte.
 
-Issues
-------
+Bugs
+----
 
 * Search for existing [issues] before opening new ones.
+* Describe how the problem can be reproduced, if possible.
 * Include any relevant error messages as Markdown [code blocks].
-* Include relevant system information (as printed by `make vars`).
-* If suggesting new features:
-  * Mention at least one real-world use case in the opening description.
-  * Search [`TODO.md`] first. Feel free to open issues for features
-    already mentioned there, but only if there's something substantive
-    to discuss.
+* Include relevant system information:
+  * dte version (e.g. "dte 1.11.1")
+  * Operating system (e.g. "Debian 12")
+  * Terminal (e.g. "kitty 0.39.1")
+  * Terminal multiplexer (if applicable, e.g. "tmux 3.5")
+  * Virtualization software (if applicable, e.g. QEMU, WSL2, Docker, etc.)
+
+Feature Requests
+----------------
+
+* Search for existing [feature request issues] before opening new ones.
+* Also search [`TODO.md`]. Feel free to open issues for features already
+  mentioned there, but only if there's something significant to discuss.
+* Describe at least one real-world use case.
 
 Merge Requests
 --------------
@@ -50,6 +59,7 @@ See Also
 
 
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues
+[feature request issues]: https://gitlab.com/craigbarnes/dte/-/issues/?sort=updated_desc&state=all&or%5Blabel_name%5D%5B%5D=Type%3A%3AFeature&or%5Blabel_name%5D%5B%5D=Type%3A%3AEnhancement&first_page_size=50
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-spans-and-blocks
 [`TODO.md`]: TODO.md
