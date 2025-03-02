@@ -261,6 +261,9 @@ Code Quality/Efficiency Improvements
 * Use [`posix_fallocate(3)`][] (when available) to pre-allocate disk
   space for `save_buffer()`, `history_save()` and `file_history_save()`
 
+* Support `posix_spawn(3)` as an alternative to `fork_exec()` (see also:
+  [#164])
+
 * Use kitty's [extended clipboard protocol], when available, to allow
   writing to the clipboard in chunks (instead of as a single `OSC 52`
   string)
@@ -361,6 +364,7 @@ Testing/Debugging
 [#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
 [#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
 [#161]: https://gitlab.com/craigbarnes/dte/-/issues/161
+[#164]: https://gitlab.com/craigbarnes/dte/-/issues/164
 [#179]: https://gitlab.com/craigbarnes/dte/-/issues/179
 [#180]: https://gitlab.com/craigbarnes/dte/-/issues/180
 [#183]: https://gitlab.com/craigbarnes/dte/-/issues/183
