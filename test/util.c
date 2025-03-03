@@ -1644,8 +1644,9 @@ static void test_u_is_special_whitespace(TestContext *ctx)
 
 static void test_u_is_unprintable(TestContext *ctx)
 {
-    // Private-use characters ------------------------------------------
-    // (https://www.unicode.org/faq/private_use.html#pua2)
+    // Private-use characters ------------------------------------------------
+    // • https://www.unicode.org/faq/private_use.html#pua2
+    // • https://www.unicode.org/versions/latest/core-spec/chapter-2/#G286941:~:text=Private%2Duse,-Usage
 
     // There are three ranges of private-use characters in the standard.
     // The main range in the BMP is U+E000..U+F8FF, containing 6,400
@@ -1662,8 +1663,17 @@ static void test_u_is_unprintable(TestContext *ctx)
     EXPECT_FALSE(u_is_unprintable(0x100000));
     EXPECT_FALSE(u_is_unprintable(0x10FFFD));
 
-    // Non-characters --------------------------------------------------
-    // (https://www.unicode.org/faq/private_use.html#noncharacters)
+    // Surrogates ------------------------------------------------------------
+    // • https://www.unicode.org/versions/latest/core-spec/chapter-3/#G2630
+    // • https://www.unicode.org/versions/latest/core-spec/chapter-2/#G286941:~:text=Surrogate,-Permanently
+    EXPECT_TRUE(u_is_unprintable(0xD800));
+    EXPECT_TRUE(u_is_unprintable(0xDBFF));
+    EXPECT_TRUE(u_is_unprintable(0xDC00));
+    EXPECT_TRUE(u_is_unprintable(0xDFFF));
+
+    // Non-characters --------------------------------------------------------
+    // • https://www.unicode.org/faq/private_use.html#noncharacters
+    // • https://www.unicode.org/versions/latest/core-spec/chapter-2/#G286941:~:text=Noncharacter,-Permanently
     unsigned int noncharacter_count = 0;
 
     // "A contiguous range of 32 noncharacters: U+FDD0..U+FDEF in the BMP"
@@ -1863,12 +1873,47 @@ static void test_u_get_char(TestContext *ctx)
 {
     static const char a[] = "//";
     size_t idx = 0;
-    EXPECT_EQ(u_get_char(a, sizeof(a), &idx), '/');
+    EXPECT_EQ(u_get_char(a, sizeof a, &idx), '/');
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(a, sizeof(a), &idx), '/');
+    EXPECT_EQ(u_get_char(a, sizeof a, &idx), '/');
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(a, sizeof(a), &idx), 0);
+    EXPECT_EQ(u_get_char(a, sizeof a, &idx), 0);
     ASSERT_EQ(idx, 3);
+
+    // UTF-8 encoding of surrogate codepoint U+D800. This is decoded
+    // successfully by u_get_char(), but will be rendered as "<??>" if
+    // passed to u_set_char() (since u_is_unprintable(0xD800) is true).
+    // • https://www.unicode.org/versions/latest/core-spec/chapter-3/#G2630
+    // • https://www.unicode.org/versions/latest/core-spec/chapter-2/#G286941:~:text=Surrogate,-Permanently
+    static const char su1[] = "\xED\xA0\x80";
+    idx = 0;
+    EXPECT_EQ(u_get_char(su1, sizeof(su1) - 1, &idx), 0xD800);
+    ASSERT_EQ(idx, 3);
+    EXPECT_TRUE(u_is_unprintable(0xD800));
+
+    // As above, but with a length bound that truncates the byte sequence
+    // (decodes as the negated first byte)
+    idx = 0;
+    EXPECT_EQ(u_get_char(su1, sizeof(su1) - 2, &idx), (CodePoint)-0xED);
+    ASSERT_EQ(idx, 1);
+
+    // Non-character U+FDD0.
+    // • https://www.unicode.org/faq/private_use.html#nonchar4:~:text=EF%20B7%2090
+    static const char nc1[] = "\xEF\xB7\x90";
+    idx = 0;
+    EXPECT_EQ(u_get_char(nc1, sizeof nc1, &idx), 0xFDD0);
+    ASSERT_EQ(idx, 3);
+    EXPECT_TRUE(u_is_unprintable(0xFDD0));
+
+    // Non-character U+FFFE
+    // • https://www.unicode.org/faq/private_use.html#nonchar4:~:text=EF%20BF%20B%23
+    static const char nc2[] = "\xEF\xBF\xBE";
+    idx = 0;
+    EXPECT_EQ(u_get_char(nc2, sizeof nc2, &idx), 0xFFFE);
+    ASSERT_EQ(idx, 3);
+    EXPECT_TRUE(u_is_unprintable(0xFFFE));
+
+    // -----------------------------------------------------------------------
 
     // "In UTF-8, the code point sequence <004D, 0430, 4E8C, 10302> is
     // represented as <4D D0 B0 E4 BA 8C F0 90 8C 82>, where <4D>
@@ -1903,31 +1948,39 @@ static void test_u_get_char(TestContext *ctx)
     // well-formed in the “First Byte” column."
     static const char ol1[] = "\xC0\xAF";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol1, 2, &idx), (CodePoint)-0xC0);
+    EXPECT_EQ(u_get_char(ol1, sizeof ol1, &idx), (CodePoint)-0xC0);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol1, 2, &idx), (CodePoint)-0xAF);
+    EXPECT_EQ(u_get_char(ol1, sizeof ol1, &idx), (CodePoint)-0xAF);
     ASSERT_EQ(idx, 2);
 
     // Overlong (3 byte) encoding of U+002F ('/')
     static const char ol2[] = "\xE0\x80\xAF";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0xE0);
+    EXPECT_EQ(u_get_char(ol2, sizeof ol2, &idx), (CodePoint)-0xE0);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0x80);
+    EXPECT_EQ(u_get_char(ol2, sizeof ol2, &idx), (CodePoint)-0x80);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(ol2, 3, &idx), (CodePoint)-0xAF);
+    EXPECT_EQ(u_get_char(ol2, sizeof ol2, &idx), (CodePoint)-0xAF);
     ASSERT_EQ(idx, 3);
+
+    // Overlong (2 byte) encoding of U+0041 ('A')
+    static const char ol3[] = "\xC1\x81";
+    idx = 0;
+    EXPECT_EQ(u_get_char(ol3, sizeof ol3, &idx), (CodePoint)-0xC1);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(ol3, sizeof ol3, &idx), (CodePoint)-0x81);
+    ASSERT_EQ(idx, 2);
 
     // "The byte sequence <E0 9F 80> is ill-formed, because in the row
     // where E0 is well-formed as a first byte, 9F is not well-formed
     // as a second byte."
-    static const char ol3[] = "\xE0\x9F\x80";
+    static const char ol4[] = "\xE0\x9F\x80";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol3, 3, &idx), (CodePoint)-0xE0);
+    EXPECT_EQ(u_get_char(ol4, sizeof ol4, &idx), (CodePoint)-0xE0);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol3, 3, &idx), (CodePoint)-0x9F);
+    EXPECT_EQ(u_get_char(ol4, sizeof ol4, &idx), (CodePoint)-0x9F);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(ol3, 3, &idx), (CodePoint)-0x80);
+    EXPECT_EQ(u_get_char(ol4, sizeof ol4, &idx), (CodePoint)-0x80);
     ASSERT_EQ(idx, 3);
 
     // "For example, in processing the UTF-8 code unit sequence
@@ -1941,13 +1994,13 @@ static void test_u_get_char(TestContext *ctx)
     // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G48534
     static const char e1[] = "\xF0\x80\x80\x41";
     idx = 0;
-    EXPECT_EQ(u_get_char(e1, 4, &idx), (CodePoint)-0xF0);
+    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), (CodePoint)-0xF0);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(e1, 4, &idx), (CodePoint)-0x80);
+    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), (CodePoint)-0x80);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(e1, 4, &idx), (CodePoint)-0x80);
+    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), (CodePoint)-0x80);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(e1, 4, &idx), 0x41);
+    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), 0x41);
     ASSERT_EQ(idx, 4);
 }
 
@@ -2986,6 +3039,8 @@ static void test_size_ssub(TestContext *ctx)
     EXPECT_UINT_EQ(size_ssub(m - 1, m - 2), 1);
     EXPECT_UINT_EQ(size_ssub(m - 1, m), 0);
     EXPECT_UINT_EQ(size_ssub(m, m), 0);
+    EXPECT_UINT_EQ(size_ssub(m, m - 1), 1);
+    EXPECT_UINT_EQ(size_ssub(m, m - 2), 2);
     EXPECT_UINT_EQ(size_ssub(0, m), 0);
     EXPECT_UINT_EQ(size_ssub(1, m), 0);
     EXPECT_UINT_EQ(size_ssub(m, 1), m - 1);
