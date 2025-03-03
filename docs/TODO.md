@@ -256,7 +256,7 @@ Code Quality/Efficiency Improvements
 
 * Use [`writev(3)`][] (when available) in `write_buffer()`, for
   writing `Block::data` segments to files saved as UTF-8/LF (with less
-  overhead from syscalls/copying)
+  overhead from syscalls; see also: [#86])
 
 * Use [`vmsplice(2)`][] (when available) in `handle_piped_data()`, for
   piping `Block::data` segments to spawned processes (with less overhead
@@ -359,6 +359,7 @@ Testing/Debugging
 [GitLab issue]: https://gitlab.com/craigbarnes/dte/-/issues
 [#14]: https://gitlab.com/craigbarnes/dte/-/issues/14
 [#70]: https://gitlab.com/craigbarnes/dte/-/issues/70
+[#86]: https://gitlab.com/craigbarnes/dte/-/issues/86
 [#88]: https://gitlab.com/craigbarnes/dte/-/issues/88
 [#105]: https://gitlab.com/craigbarnes/dte/-/issues/105
 [#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
