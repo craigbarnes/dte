@@ -29,15 +29,23 @@
 #if DEBUG >= 1
     // In DEBUG builds, BUG() cleans up the terminal, prints an error
     // message and then calls abort(3)
-    #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER)(void)
     #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
+    #define UNITTEST_ATTR CONSTRUCTOR
     noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...) COLD PRINTF(4);
 #else
     // In non-DEBUG builds, BUG() expands to UNREACHABLE(), which may
     // allow the compiler to optimize more aggressively
-    #define UNITTEST UNUSED static void XPASTE(unittest_, COUNTER)(void)
     #define BUG(...) UNREACHABLE()
+    #define UNITTEST_ATTR UNUSED
 #endif
+
+// When used as UNITTEST{...}, any code inside the braces will be run as
+// a constructor function at startup (in DEBUG builds, if the GCC/Clang
+// `constructor` attribute is supported). This can be useful for unit
+// testing `static` helper functions, as an alternative to making them
+// `extern` and testing via test/main.c. The idea was somewhat inspired
+// by D-Lang's unittest{} feature (https://dlang.org/spec/unittest.html).
+#define UNITTEST UNITTEST_ATTR static void XPASTE(unittest_, COUNTER)(void)
 
 // This environment variable is used by e.g. Valgrind to replace malloc(), etc.
 // See the various setup_client_env() functions in the following files:
