@@ -123,17 +123,6 @@ invalid:
     return -u;
 }
 
-CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
-{
-    size_t i = *idx;
-    CodePoint u = str[i];
-    if (likely(u < 0x80)) {
-        *idx = i + 1;
-        return u;
-    }
-    return u_get_nonascii(str, i + UTF8_MAX_SEQ_LEN, idx);
-}
-
 CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx)
 {
     size_t i = *idx;

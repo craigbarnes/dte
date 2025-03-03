@@ -32,12 +32,18 @@ typedef enum {
 size_t u_str_width(const unsigned char *str);
 size_t u_skip_chars(const char *str, int *width);
 CodePoint u_prev_char(const unsigned char *str, size_t *idx);
-CodePoint u_str_get_char(const unsigned char *str, size_t *idx);
 CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx);
 CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
 size_t u_set_char_raw(char *buf, CodePoint u);
 size_t u_set_char(char *buf, CodePoint u);
 size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u);
+
+static inline CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
+{
+    // We can use a dummy size here, since the null terminator in `str`
+    // guarantees u_get_char() won't read past the end
+    return u_get_char(str, *idx + UTF8_MAX_SEQ_LEN, idx);
+}
 
 // Return the number of bytes needed to encode Unicode codepoint `u`
 // in UTF-8, or 1 for codepoints exceeding UNICODE_MAX_VALID_CODEPOINT.
