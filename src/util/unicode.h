@@ -25,6 +25,12 @@ static inline bool u_is_unicode(CodePoint u)
     return u <= UNICODE_MAX_VALID_CODEPOINT;
 }
 
+// https://www.unicode.org/versions/latest/core-spec/chapter-3/#G2630
+static inline bool u_is_surrogate(CodePoint u)
+{
+    return (u >= 0xD800 && u <= 0xDFFF);
+}
+
 static inline bool u_is_cntrl(CodePoint u)
 {
     return (u < 0x20) || (u >= 0x7F && u <= 0x9F);

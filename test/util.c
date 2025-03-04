@@ -1880,23 +1880,6 @@ static void test_u_get_char(TestContext *ctx)
     EXPECT_UINT_EQ(u_get_char(a, sizeof a, &idx), 0);
     ASSERT_EQ(idx, 3);
 
-    // UTF-8 encoding of surrogate codepoint U+D800. This is decoded
-    // successfully by u_get_char(), but will be rendered as "<??>" if
-    // passed to u_set_char() (since u_is_unprintable(0xD800) is true).
-    // • https://www.unicode.org/versions/latest/core-spec/chapter-3/#G2630
-    // • https://www.unicode.org/versions/latest/core-spec/chapter-2/#G286941:~:text=Surrogate,-Permanently
-    static const char su1[] = "\xED\xA0\x80";
-    idx = 0;
-    EXPECT_EQ(u_get_char(su1, sizeof(su1) - 1, &idx), 0xD800);
-    ASSERT_EQ(idx, 3);
-    EXPECT_TRUE(u_is_unprintable(0xD800));
-
-    // As above, but with a length bound that truncates the byte sequence
-    // (decodes as the negated first byte)
-    idx = 0;
-    EXPECT_EQ(u_get_char(su1, sizeof(su1) - 2, &idx), (CodePoint)-0xED);
-    ASSERT_EQ(idx, 1);
-
     // Non-character U+FDD0.
     // • https://www.unicode.org/faq/private_use.html#nonchar4:~:text=EF%20B7%2090
     static const char nc1[] = "\xEF\xB7\x90";
@@ -2040,8 +2023,9 @@ static void test_u_get_char(TestContext *ctx)
 
     // Table 3-9. … Ill-Formed Sequences for Surrogates
     // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G67520
-    /* TODO: Handle surrogates as ill-formed sequences and uncomment these tests
     static const char s9[] = "\xED\xA0\x80\xED\xBF\xBF\xED\xAF\x41";
+    EXPECT_TRUE(u_is_surrogate(0xD800)); // "\xED\xA0\x80"
+    EXPECT_TRUE(u_is_unprintable(0xD800));
     idx = 0;
     EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xEDu);
     ASSERT_EQ(idx, 1);
@@ -2061,7 +2045,6 @@ static void test_u_get_char(TestContext *ctx)
     ASSERT_EQ(idx, 8);
     EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), 0x41u);
     ASSERT_EQ(idx, 9);
-    */
 
     // Table 3-10. … Other Ill-Formed Sequences
     // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G68064

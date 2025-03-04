@@ -46,11 +46,45 @@ static bool u_is_continuation_byte(unsigned char u)
 }
 
 // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27506
+// https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31703:~:text=%E2%80%9Cnon%2Dshortest%20form%E2%80%9D
 // https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings
 // https://en.wikipedia.org/wiki/UTF-8#Error_handling
-static bool u_seq_len_ok(CodePoint u, int len)
+static bool u_is_overlong_sequence(CodePoint u, size_t seq_len)
 {
-    return u_char_size(u) == len;
+    BUG_ON(seq_len > UTF8_MAX_SEQ_LEN);
+    return u_char_size(u) != seq_len;
+}
+
+/*
+ * Unicode §3.9.4: "A conformant encoding form conversion will treat any
+ * ill-formed code unit sequence as an error condition. (See conformance
+ * clause C10.)"
+ *
+ * C10: "When a process interprets a code unit sequence which purports
+ * to be in a Unicode character encoding form, it shall treat ill-formed
+ * code unit sequences as an error condition and shall not interpret such
+ * sequences as characters."
+ *
+ * Unicode §3.9.3:
+ *
+ * • "Before the Unicode Standard, Version 3.1, the problematic “non-shortest
+ *   form” byte sequences in UTF-8 were those where BMP characters could be
+ *   represented in more than one way. These sequences are ill-formed, because
+ *   they are not allowed by Table 3-7."
+ * • "Because surrogate code points are not Unicode scalar values, any UTF-8
+ *   byte sequence that would otherwise map to code points U+D800..U+DFFF
+ *   is ill-formed."
+ *
+ * See also:
+ *
+ * • https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31737
+ * • https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G23402
+ * • https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27506
+ * • https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31703
+ */
+static bool u_is_illformed(CodePoint u, size_t seq_len)
+{
+    return u_is_overlong_sequence(u, seq_len) || u_is_surrogate(u);
 }
 
 /*
@@ -109,7 +143,7 @@ CodePoint u_prev_char(const unsigned char *str, size_t *idx)
             break;
         } else {
             u |= (ch & u_get_first_byte_mask(len)) << shift;
-            if (!u_seq_len_ok(u, len)) {
+            if (u_is_illformed(u, len)) {
                 break;
             }
             *idx = i;
@@ -144,7 +178,7 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
     }
 
     CodePoint u = first & u_get_first_byte_mask(len);
-    int c = len - 1;
+    unsigned int c = len - 1;
     do {
         unsigned char ch = str[i++];
         if (!u_is_continuation_byte(ch)) {
@@ -153,8 +187,7 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
         u = (u << 6) | (ch & 0x3f);
     } while (--c);
 
-    if (!u_seq_len_ok(u, len)) {
-        // Overlong encoding
+    if (u_is_illformed(u, len)) {
         goto invalid;
     }
 
