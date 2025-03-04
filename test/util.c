@@ -1703,13 +1703,13 @@ static void test_u_is_unprintable(TestContext *ctx)
 
 static void test_u_str_width(TestContext *ctx)
 {
+    static const char ustr[] =
+        "\xE0\xB8\x81\xE0\xB8\xB3\xE0\xB9\x81\xE0\xB8\x9E\xE0\xB8"
+        "\x87\xE0\xB8\xA1\xE0\xB8\xB5\xE0\xB8\xAB\xE0\xB8\xB9"
+    ;
+
     EXPECT_EQ(u_str_width("foo"), 3);
-    EXPECT_EQ (
-        7, u_str_width (
-            "\xE0\xB8\x81\xE0\xB8\xB3\xE0\xB9\x81\xE0\xB8\x9E\xE0\xB8"
-            "\x87\xE0\xB8\xA1\xE0\xB8\xB5\xE0\xB8\xAB\xE0\xB8\xB9"
-        )
-    );
+    EXPECT_EQ(u_str_width(ustr), 7);
 }
 
 static void test_u_set_char_raw(TestContext *ctx)
@@ -1873,11 +1873,11 @@ static void test_u_get_char(TestContext *ctx)
 {
     static const char a[] = "//";
     size_t idx = 0;
-    EXPECT_EQ(u_get_char(a, sizeof a, &idx), '/');
+    EXPECT_UINT_EQ(u_get_char(a, sizeof a, &idx), '/');
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(a, sizeof a, &idx), '/');
+    EXPECT_UINT_EQ(u_get_char(a, sizeof a, &idx), '/');
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(a, sizeof a, &idx), 0);
+    EXPECT_UINT_EQ(u_get_char(a, sizeof a, &idx), 0);
     ASSERT_EQ(idx, 3);
 
     // UTF-8 encoding of surrogate codepoint U+D800. This is decoded
@@ -1901,7 +1901,7 @@ static void test_u_get_char(TestContext *ctx)
     // • https://www.unicode.org/faq/private_use.html#nonchar4:~:text=EF%20B7%2090
     static const char nc1[] = "\xEF\xB7\x90";
     idx = 0;
-    EXPECT_EQ(u_get_char(nc1, sizeof nc1, &idx), 0xFDD0);
+    EXPECT_UINT_EQ(u_get_char(nc1, sizeof nc1, &idx), 0xFDD0);
     ASSERT_EQ(idx, 3);
     EXPECT_TRUE(u_is_unprintable(0xFDD0));
 
@@ -1909,7 +1909,7 @@ static void test_u_get_char(TestContext *ctx)
     // • https://www.unicode.org/faq/private_use.html#nonchar4:~:text=EF%20BF%20B%23
     static const char nc2[] = "\xEF\xBF\xBE";
     idx = 0;
-    EXPECT_EQ(u_get_char(nc2, sizeof nc2, &idx), 0xFFFE);
+    EXPECT_UINT_EQ(u_get_char(nc2, sizeof nc2, &idx), 0xFFFE);
     ASSERT_EQ(idx, 3);
     EXPECT_TRUE(u_is_unprintable(0xFFFE));
 
@@ -1922,13 +1922,13 @@ static void test_u_get_char(TestContext *ctx)
     // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G31703
     static const char b[] = "\x4D\xD0\xB0\xE4\xBA\x8C\xF0\x90\x8C\x82";
     idx = 0;
-    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x004D);
+    EXPECT_UINT_EQ(u_get_char(b, sizeof b, &idx), 0x004D);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x0430);
+    EXPECT_UINT_EQ(u_get_char(b, sizeof b, &idx), 0x0430);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x4E8C);
+    EXPECT_UINT_EQ(u_get_char(b, sizeof b, &idx), 0x4E8C);
     ASSERT_EQ(idx, 6);
-    EXPECT_EQ(u_get_char(b, sizeof b, &idx), 0x10302);
+    EXPECT_UINT_EQ(u_get_char(b, sizeof b, &idx), 0x10302);
     ASSERT_EQ(idx, 10);
 
     // "The byte sequence <F4 80 83 92> is well-formed, because every
@@ -1936,7 +1936,7 @@ static void test_u_get_char(TestContext *ctx)
     // (the last row)."
     // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27288
     idx = 0;
-    EXPECT_EQ(u_get_char(STRN("\xF4\x80\x83\x92"), &idx), 0x1000D2);
+    EXPECT_UINT_EQ(u_get_char(STRN("\xF4\x80\x83\x92"), &idx), 0x1000D2);
     EXPECT_EQ(idx, 4);
 
     // Overlong encodings are consumed as individual bytes and
@@ -1948,27 +1948,27 @@ static void test_u_get_char(TestContext *ctx)
     // well-formed in the “First Byte” column."
     static const char ol1[] = "\xC0\xAF";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol1, sizeof ol1, &idx), (CodePoint)-0xC0);
+    EXPECT_UINT_EQ(u_get_char(ol1, sizeof ol1, &idx), -0xC0u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol1, sizeof ol1, &idx), (CodePoint)-0xAF);
+    EXPECT_UINT_EQ(u_get_char(ol1, sizeof ol1, &idx), -0xAFu);
     ASSERT_EQ(idx, 2);
 
     // Overlong (3 byte) encoding of U+002F ('/')
     static const char ol2[] = "\xE0\x80\xAF";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol2, sizeof ol2, &idx), (CodePoint)-0xE0);
+    EXPECT_UINT_EQ(u_get_char(ol2, sizeof ol2, &idx), -0xE0u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol2, sizeof ol2, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(ol2, sizeof ol2, &idx), -0x80u);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(ol2, sizeof ol2, &idx), (CodePoint)-0xAF);
+    EXPECT_UINT_EQ(u_get_char(ol2, sizeof ol2, &idx), -0xAFu);
     ASSERT_EQ(idx, 3);
 
     // Overlong (2 byte) encoding of U+0041 ('A')
     static const char ol3[] = "\xC1\x81";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol3, sizeof ol3, &idx), (CodePoint)-0xC1);
+    EXPECT_UINT_EQ(u_get_char(ol3, sizeof ol3, &idx), -0xC1u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol3, sizeof ol3, &idx), (CodePoint)-0x81);
+    EXPECT_UINT_EQ(u_get_char(ol3, sizeof ol3, &idx), -0x81u);
     ASSERT_EQ(idx, 2);
 
     // "The byte sequence <E0 9F 80> is ill-formed, because in the row
@@ -1976,11 +1976,11 @@ static void test_u_get_char(TestContext *ctx)
     // as a second byte."
     static const char ol4[] = "\xE0\x9F\x80";
     idx = 0;
-    EXPECT_EQ(u_get_char(ol4, sizeof ol4, &idx), (CodePoint)-0xE0);
+    EXPECT_UINT_EQ(u_get_char(ol4, sizeof ol4, &idx), -0xE0u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(ol4, sizeof ol4, &idx), (CodePoint)-0x9F);
+    EXPECT_UINT_EQ(u_get_char(ol4, sizeof ol4, &idx), -0x9Fu);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(ol4, sizeof ol4, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(ol4, sizeof ol4, &idx), -0x80u);
     ASSERT_EQ(idx, 3);
 
     // "For example, in processing the UTF-8 code unit sequence
@@ -1994,13 +1994,13 @@ static void test_u_get_char(TestContext *ctx)
     // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G48534
     static const char e1[] = "\xF0\x80\x80\x41";
     idx = 0;
-    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), (CodePoint)-0xF0);
+    EXPECT_UINT_EQ(u_get_char(e1, sizeof e1, &idx), -0xF0u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(e1, sizeof e1, &idx), -0x80u);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(e1, sizeof e1, &idx), -0x80u);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), 0x41);
+    EXPECT_UINT_EQ(u_get_char(e1, sizeof e1, &idx), 0x41u);
     ASSERT_EQ(idx, 4);
 
     // The following test cases are taken from Unicode's examples in
@@ -2019,23 +2019,23 @@ static void test_u_get_char(TestContext *ctx)
     // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G67519
     static const char s8[] = "\xC0\xAF\xE0\x80\xBF\xF0\x81\x82\x41";
     idx = 0;
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xC0);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0xC0u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xAF);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0xAFu);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xE0);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0xE0u);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0x80u);
     ASSERT_EQ(idx, 4);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xBF);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0xBFu);
     ASSERT_EQ(idx, 5);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xF0);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0xF0u);
     ASSERT_EQ(idx, 6);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0x81);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0x81u);
     ASSERT_EQ(idx, 7);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0x82);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), -0x82u);
     ASSERT_EQ(idx, 8);
-    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), 0x41);
+    EXPECT_UINT_EQ(u_get_char(s8, sizeof s8, &idx), 0x41u);
     ASSERT_EQ(idx, 9);
 
     // Table 3-9. … Ill-Formed Sequences for Surrogates
@@ -2043,23 +2043,23 @@ static void test_u_get_char(TestContext *ctx)
     /* TODO: Handle surrogates as ill-formed sequences and uncomment these tests
     static const char s9[] = "\xED\xA0\x80\xED\xBF\xBF\xED\xAF\x41";
     idx = 0;
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xED);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xEDu);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xA0);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xA0u);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0x80u);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xED);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xEDu);
     ASSERT_EQ(idx, 4);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xBF);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xBFu);
     ASSERT_EQ(idx, 5);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xBF);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xBFu);
     ASSERT_EQ(idx, 6);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xED);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xEDu);
     ASSERT_EQ(idx, 7);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xAF);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), -0xAFu);
     ASSERT_EQ(idx, 8);
-    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), 0x41);
+    EXPECT_UINT_EQ(u_get_char(s9, sizeof s9, &idx), 0x41u);
     ASSERT_EQ(idx, 9);
     */
 
@@ -2067,46 +2067,46 @@ static void test_u_get_char(TestContext *ctx)
     // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G68064
     static const char s10[] = "\xF4\x91\x92\x93\xFF\x41\x80\xBF\x42";
     idx = 0;
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0xF4);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0xF4u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x91);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0x91u);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x92);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0x92u);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x93);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0x93u);
     ASSERT_EQ(idx, 4);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0xFF);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0xFFu);
     ASSERT_EQ(idx, 5);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), 0x41);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), 0x41u);
     ASSERT_EQ(idx, 6);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0x80u);
     ASSERT_EQ(idx, 7);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0xBF);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), -0xBFu);
     ASSERT_EQ(idx, 8);
-    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), 0x42);
+    EXPECT_UINT_EQ(u_get_char(s10, sizeof s10, &idx), 0x42u);
     ASSERT_EQ(idx, 9);
 
     // Table 3-11. … Truncated Sequences
     // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G68202
     static const char s11[] = "\xE1\x80\xE2\xF0\x91\x92\xF1\xBF\x41";
     idx = 0;
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xE1);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0xE1u);
     ASSERT_EQ(idx, 1);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0x80);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0x80u);
     ASSERT_EQ(idx, 2);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xE2);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0xE2u);
     ASSERT_EQ(idx, 3);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xF0);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0xF0u);
     ASSERT_EQ(idx, 4);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0x91);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0x91u);
     ASSERT_EQ(idx, 5);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0x92);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0x92u);
     ASSERT_EQ(idx, 6);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xF1);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0xF1u);
     ASSERT_EQ(idx, 7);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xBF);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), -0xBFu);
     ASSERT_EQ(idx, 8);
-    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), 0x41);
+    EXPECT_UINT_EQ(u_get_char(s11, sizeof s11, &idx), 0x41u);
     ASSERT_EQ(idx, 9);
 
     // TODO: Provide explicit coverage for each row of Table 3-7:
@@ -2118,54 +2118,54 @@ static void test_u_prev_char(TestContext *ctx)
     const unsigned char *buf = "\xE6\xB7\xB1\xE5\x9C\xB3\xE5\xB8\x82"; // 深圳市
     size_t idx = 9;
     CodePoint c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 0x5E02);
+    EXPECT_UINT_EQ(c, 0x5E02);
     EXPECT_EQ(idx, 6);
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 0x5733);
+    EXPECT_UINT_EQ(c, 0x5733);
     EXPECT_EQ(idx, 3);
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 0x6DF1);
+    EXPECT_UINT_EQ(c, 0x6DF1);
     EXPECT_EQ(idx, 0);
 
     idx = 1;
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, -((CodePoint)0xE6UL));
+    EXPECT_UINT_EQ(c, -0xE6u);
     EXPECT_EQ(idx, 0);
 
     buf = "Shenzhen";
     idx = 8;
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 'n');
+    EXPECT_UINT_EQ(c, 'n');
     EXPECT_EQ(idx, 7);
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 'e');
+    EXPECT_UINT_EQ(c, 'e');
     EXPECT_EQ(idx, 6);
 
     buf = "\xF0\x9F\xA5\xA3\xF0\x9F\xA5\xA4"; // 🥣🥤
     idx = 8;
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 0x1F964);
+    EXPECT_UINT_EQ(c, 0x1F964);
     EXPECT_EQ(idx, 4);
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, 0x1F963);
+    EXPECT_UINT_EQ(c, 0x1F963);
     EXPECT_EQ(idx, 0);
 
     buf = "\xF0\xF5";
     idx = 2;
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, -((CodePoint)buf[1]));
+    EXPECT_UINT_EQ(-c, buf[1]);
     EXPECT_EQ(idx, 1);
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, -((CodePoint)buf[0]));
+    EXPECT_UINT_EQ(-c, buf[0]);
     EXPECT_EQ(idx, 0);
 
     buf = "\xF5\xF0";
     idx = 2;
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, -((CodePoint)buf[1]));
+    EXPECT_UINT_EQ(-c, buf[1]);
     EXPECT_EQ(idx, 1);
     c = u_prev_char(buf, &idx);
-    EXPECT_EQ(c, -((CodePoint)buf[0]));
+    EXPECT_UINT_EQ(-c, buf[0]);
     EXPECT_EQ(idx, 0);
 }
 
