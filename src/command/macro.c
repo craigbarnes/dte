@@ -84,26 +84,22 @@ void macro_search_hook (
         return;
     }
 
-    const char *args[5];
-    size_t i = 0;
-
+    char *cmd;
     if (pattern) {
-        if (reverse) {
-            args[i++] = "-r";
-        }
-        if (!add_to_history) {
-            args[i++] = "-H";
-        }
-        if (unlikely(pattern[0] == '-')) {
-            args[i++] = "--";
-        }
-        args[i++] = pattern;
+        StringView pat = strview_from_cstring(pattern);
+        String buf = string_new(pat.length + sizeof("search -r -H -- ") + 8);
+        string_append_cstring(&buf, "search ");
+        string_append_cstring(&buf, reverse ? "-r " : "");
+        string_append_cstring(&buf, add_to_history ? "" : "-H ");
+        string_append_cstring(&buf, unlikely(pattern[0] == '-') ? "-- " : "");
+        string_append_escaped_arg_sv(&buf, pat, true);
+        cmd = string_steal_cstring(&buf);
     } else {
-        args[i++] = reverse ? "-p" : "-n";
+        cmd = xstrdup(reverse ? "search -p" : "search -n");
     }
 
-    args[i] = NULL;
-    macro_command_hook(m, "search", (char**)args);
+    merge_insert_buffer(m);
+    ptr_array_append(&m->macro, cmd);
 }
 
 void macro_insert_char_hook(MacroRecorder *m, CodePoint c)
