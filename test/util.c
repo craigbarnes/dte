@@ -2002,6 +2002,115 @@ static void test_u_get_char(TestContext *ctx)
     ASSERT_EQ(idx, 3);
     EXPECT_EQ(u_get_char(e1, sizeof e1, &idx), 0x41);
     ASSERT_EQ(idx, 4);
+
+    // The following test cases are taken from Unicode's examples in
+    // Tables 3-{8,9,10,11}. We return the negation of each individual
+    // byte in an ill-formed sequence, instead of the "maximal subpart"
+    // approach mentioned there. This is explicitly permitted by the
+    // spec and is more flexible for our purposes:
+    //
+    // "Although the Unicode Standard does not require this practice for
+    // conformance, the following text describes this practice and gives
+    // detailed examples."
+    //
+    // - https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G66453
+
+    // Table 3-8. … Non-Shortest Form Sequences
+    // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G67519
+    static const char s8[] = "\xC0\xAF\xE0\x80\xBF\xF0\x81\x82\x41";
+    idx = 0;
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xC0);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xAF);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xE0);
+    ASSERT_EQ(idx, 3);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 4);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xBF);
+    ASSERT_EQ(idx, 5);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0xF0);
+    ASSERT_EQ(idx, 6);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0x81);
+    ASSERT_EQ(idx, 7);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), (CodePoint)-0x82);
+    ASSERT_EQ(idx, 8);
+    EXPECT_EQ(u_get_char(s8, sizeof s8, &idx), 0x41);
+    ASSERT_EQ(idx, 9);
+
+    // Table 3-9. … Ill-Formed Sequences for Surrogates
+    // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G67520
+    /* TODO: Handle surrogates as ill-formed sequences and uncomment these tests
+    static const char s9[] = "\xED\xA0\x80\xED\xBF\xBF\xED\xAF\x41";
+    idx = 0;
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xED);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xA0);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 3);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xED);
+    ASSERT_EQ(idx, 4);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xBF);
+    ASSERT_EQ(idx, 5);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xBF);
+    ASSERT_EQ(idx, 6);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xED);
+    ASSERT_EQ(idx, 7);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), (CodePoint)-0xAF);
+    ASSERT_EQ(idx, 8);
+    EXPECT_EQ(u_get_char(s9, sizeof s9, &idx), 0x41);
+    ASSERT_EQ(idx, 9);
+    */
+
+    // Table 3-10. … Other Ill-Formed Sequences
+    // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G68064
+    static const char s10[] = "\xF4\x91\x92\x93\xFF\x41\x80\xBF\x42";
+    idx = 0;
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0xF4);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x91);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x92);
+    ASSERT_EQ(idx, 3);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x93);
+    ASSERT_EQ(idx, 4);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0xFF);
+    ASSERT_EQ(idx, 5);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), 0x41);
+    ASSERT_EQ(idx, 6);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 7);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), (CodePoint)-0xBF);
+    ASSERT_EQ(idx, 8);
+    EXPECT_EQ(u_get_char(s10, sizeof s10, &idx), 0x42);
+    ASSERT_EQ(idx, 9);
+
+    // Table 3-11. … Truncated Sequences
+    // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G68202
+    static const char s11[] = "\xE1\x80\xE2\xF0\x91\x92\xF1\xBF\x41";
+    idx = 0;
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xE1);
+    ASSERT_EQ(idx, 1);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0x80);
+    ASSERT_EQ(idx, 2);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xE2);
+    ASSERT_EQ(idx, 3);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xF0);
+    ASSERT_EQ(idx, 4);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0x91);
+    ASSERT_EQ(idx, 5);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0x92);
+    ASSERT_EQ(idx, 6);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xF1);
+    ASSERT_EQ(idx, 7);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), (CodePoint)-0xBF);
+    ASSERT_EQ(idx, 8);
+    EXPECT_EQ(u_get_char(s11, sizeof s11, &idx), 0x41);
+    ASSERT_EQ(idx, 9);
+
+    // TODO: Provide explicit coverage for each row of Table 3-7:
+    // https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G27506
 }
 
 static void test_u_prev_char(TestContext *ctx)
