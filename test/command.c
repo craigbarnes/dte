@@ -381,8 +381,8 @@ static void test_parse_args(TestContext *ctx)
 
 static void test_cached_command_new(TestContext *ctx)
 {
+    static const char cmd_str[] = "open -t -e UTF-8 file.c inc.h";
     const CommandRunner runner = mock_cmdrunner(&normal_commands);
-    const char cmd_str[] = "open -t -e UTF-8 file.c inc.h";
     CachedCommand *cc = cached_command_new(&runner, cmd_str);
     ASSERT_NONNULL(cc);
     ASSERT_NONNULL(cc->cmd);

@@ -464,10 +464,27 @@ static void test_ascii(TestContext *ctx)
     free(saved_locale);
 }
 
+static void test_mem_equal(TestContext *ctx)
+{
+    static const char s1[] = "abcxyz";
+    static const char s2[] = "abcXYZ";
+    EXPECT_TRUE(mem_equal(NULL, NULL, 0));
+    EXPECT_TRUE(mem_equal(s1, s2, 0));
+    EXPECT_TRUE(mem_equal(s1, s2, 1));
+    EXPECT_TRUE(mem_equal(s1, s2, 2));
+    EXPECT_TRUE(mem_equal(s1, s2, 3));
+    EXPECT_TRUE(mem_equal(s1 + 1, s2 + 1, 2));
+    EXPECT_TRUE(mem_equal(s1 + 6, s2 + 6, 1));
+    EXPECT_FALSE(mem_equal(s1, s2, 4));
+    EXPECT_FALSE(mem_equal(s1, s2, 5));
+    EXPECT_FALSE(mem_equal(s1, s2, 6));
+    EXPECT_FALSE(mem_equal(s1, s2, 7));
+}
+
 static void test_mem_equal_icase(TestContext *ctx)
 {
-    const char s1[8] = "Ctrl+Up";
-    const char s2[8] = "CTRL+U_";
+    static const char s1[8] = "Ctrl+Up";
+    static const char s2[8] = "CTRL+U_";
     EXPECT_TRUE(mem_equal_icase(NULL, NULL, 0));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 0));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 1));
@@ -2465,13 +2482,13 @@ static void test_hashmap(TestContext *ctx)
     EXPECT_EQ(map.mask, 511);
     hashmap_free(&map, NULL);
 
-    const char val[] = "VAL";
+    static const char val[] = "VAL";
     char *key = xstrdup("KEY");
     EXPECT_NULL(hashmap_insert_or_replace(&map, key, (char*)val));
     EXPECT_EQ(map.count, 1);
     EXPECT_STREQ(hashmap_get(&map, "KEY"), val);
 
-    const char new_val[] = "NEW";
+    static const char new_val[] = "NEW";
     char *duplicate_key = xstrdup(key);
     EXPECT_PTREQ(val, hashmap_insert_or_replace(&map, duplicate_key, (char*)new_val));
     EXPECT_EQ(map.count, 1);
@@ -2592,7 +2609,7 @@ static void test_intmap(TestContext *ctx)
     EXPECT_NULL(intmap_get(&map, 0));
     intmap_free(&map, free);
 
-    const char value[] = "value";
+    static const char value[] = "value";
     EXPECT_NULL(intmap_insert_or_replace(&map, 0, xstrdup(value)));
     EXPECT_NULL(intmap_insert_or_replace(&map, 1, xstrdup(value)));
     EXPECT_NULL(intmap_insert_or_replace(&map, 2, xstrdup(value)));
@@ -2836,7 +2853,7 @@ static void test_path_relative(TestContext *ctx)
 
 static void test_path_slice_relative(TestContext *ctx)
 {
-    const char *abs = "/a/b/c/d";
+    static const char abs[] = "/a/b/c/d";
     EXPECT_PTREQ(path_slice_relative(abs, "/a/b/c/d/e"), abs);
     EXPECT_PTREQ(path_slice_relative(abs, "/a/b/file"), abs);
     EXPECT_STREQ(path_slice_relative(abs, "/a/b/c/d"), ".");
@@ -2866,8 +2883,8 @@ static void test_short_filename_cwd(TestContext *ctx)
     EXPECT_STREQ(s, "~/file");
     free(s);
 
-    const char abs[] = "/a/b";
-    const char cwd[] = "/a/x/c";
+    static const char abs[] = "/a/b";
+    static const char cwd[] = "/a/x/c";
     char *rel = path_relative(abs, cwd);
     EXPECT_TRUE(strlen(abs) < strlen(rel));
     EXPECT_STREQ(rel, "../../b");
@@ -2880,7 +2897,7 @@ static void test_short_filename_cwd(TestContext *ctx)
 static void test_short_filename(TestContext *ctx)
 {
     const StringView home = STRING_VIEW("/home/user");
-    const char rel[] = "test/main.c";
+    static const char rel[] = "test/main.c";
     char *abs = path_absolute(rel);
     ASSERT_NONNULL(abs);
     char *s = short_filename(abs, &home);
@@ -3458,6 +3475,7 @@ static const TestEntry tests[] = {
     TEST(test_hex_decode),
     TEST(test_hex_encode_byte),
     TEST(test_ascii),
+    TEST(test_mem_equal),
     TEST(test_mem_equal_icase),
     TEST(test_base64_decode),
     TEST(test_base64_encode_block),
