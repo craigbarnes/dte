@@ -102,8 +102,10 @@ static inline unsigned int u64_clz(uint64_t x)
     return u64_popcount(~x);
 }
 
-// Calculate number of significant bits in `x` (minimum number of
-// base 2 digits needed to represent it)
+// Calculate the number of significant bits in `x` (the minimum number
+// of base 2 digits needed to represent it). Note that this returns 0
+// for x=0, but see umax_count_base16_digits() (below) for an example
+// of how that can be special cased.
 static inline unsigned int umax_bitwidth(uintmax_t x)
 {
     USE_STDBIT(stdc_bit_width, x);
@@ -122,6 +124,22 @@ static inline unsigned int umax_bitwidth(uintmax_t x)
         width++;
     }
     return width;
+}
+
+// Calculate the number of hexadecimal digits (0-F) needed to represent
+// `x` as a string (which is 1 in the case of x=0)
+static inline size_t umax_count_base16_digits(uintmax_t x)
+{
+    unsigned int bit_width = umax_bitwidth(x);
+
+    // `bit_width` can only be 0 when `x` is 0, so this simply ensures
+    // 1 is returned in that case
+    BUG_ON(!bit_width != !x); // Improves code gen
+    unsigned int base2_digits = bit_width + !x;
+
+    // This is equivalent to `(base2_digits >> 2) + (base2_digits & 3)`,
+    // but GCC seems to generate slightly better code when done this way
+    return next_multiple(base2_digits, 4) / 4;
 }
 
 #endif

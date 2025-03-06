@@ -2800,6 +2800,23 @@ static void test_umax_bitwidth(TestContext *ctx)
     EXPECT_EQ(umax_bitwidth(0xFFFFFFFFFFFFFFFFULL), 64);
 }
 
+static void test_umax_count_base16_digits(TestContext *ctx)
+{
+    EXPECT_EQ(umax_count_base16_digits(0x0), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x1), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x9), 1);
+    EXPECT_EQ(umax_count_base16_digits(0xA), 1);
+    EXPECT_EQ(umax_count_base16_digits(0xF), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x10), 2);
+    EXPECT_EQ(umax_count_base16_digits(0x111), 3);
+    EXPECT_EQ(umax_count_base16_digits(0xFF11), 4);
+    EXPECT_EQ(umax_count_base16_digits(0x80000000ULL), 8);
+    EXPECT_EQ(umax_count_base16_digits(0x800000000ULL), 9);
+    EXPECT_EQ(umax_count_base16_digits(0X98EA412F0ULL), 9);
+    EXPECT_EQ(umax_count_base16_digits(0x8000000000000000ULL), 16);
+    EXPECT_EQ(umax_count_base16_digits(0xFFFFFFFFFFFFFFFFULL), 16);
+}
+
 static void test_path_dirname_basename(TestContext *ctx)
 {
     static const struct {
@@ -3540,6 +3557,7 @@ static const TestEntry tests[] = {
     TEST(test_lsbit),
     TEST(test_clz),
     TEST(test_umax_bitwidth),
+    TEST(test_umax_count_base16_digits),
     TEST(test_path_dirname_basename),
     TEST(test_path_relative),
     TEST(test_path_slice_relative),

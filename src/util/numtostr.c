@@ -22,22 +22,6 @@ static size_t umax_count_base10_digits(uintmax_t x)
     return digits;
 }
 
-static size_t umax_count_base16_digits(uintmax_t x)
-{
-#if HAS_BUILTIN(__builtin_clzll)
-    if (sizeof(x) == sizeof(long long)) {
-        size_t base2_digits = BITSIZE(x) - __builtin_clzll(x + !x);
-        return next_multiple(base2_digits, 4) / 4;
-    }
-#endif
-    size_t digits = 0;
-    do {
-        x >>= 4;
-        digits++;
-    } while (x);
-    return digits;
-}
-
 // Writes the decimal string representation of `x` into `buf`,
 // which must have enough space available for a known/constant
 // value of `x` or `DECIMAL_STR_MAX(x)` bytes for arbitrary values.
