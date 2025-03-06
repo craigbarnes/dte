@@ -111,8 +111,9 @@ size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
     }
 
     // Note: this block can't be empty
-    *up = bi->blk->data[offset];
-    if (likely(*up < 0x80)) {
+    unsigned char byte = bi->blk->data[offset];
+    if (likely(byte < 0x80)) {
+        *up = byte;
         bi->offset++;
         return 1;
     }
@@ -133,8 +134,9 @@ size_t block_iter_prev_char(BlockIter *bi, CodePoint *up)
     }
 
     // Note: this block can't be empty
-    *up = bi->blk->data[offset - 1];
-    if (likely(*up < 0x80)) {
+    unsigned char byte = bi->blk->data[offset - 1];
+    if (likely(byte < 0x80)) {
+        *up = byte;
         bi->offset--;
         return 1;
     }

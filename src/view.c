@@ -36,18 +36,18 @@ void view_update_cursor_x(View *view)
     long w = 0;
 
     for (size_t idx = 0; idx < cx; cx_char++) {
-        CodePoint u = line.data[idx++];
-        if (likely(u < 0x80)) {
-            if (likely(!ascii_iscntrl(u))) {
+        unsigned char ch = line.data[idx];
+        if (likely(ch < 0x80)) {
+            idx++;
+            if (likely(!ascii_iscntrl(ch))) {
                 w++;
-            } else if (u == '\t') {
+            } else if (ch == '\t') {
                 w = next_indent_width(w, tw);
             } else {
                 w += 2;
             }
         } else {
-            idx--;
-            u = u_get_nonascii(line.data, line.length, &idx);
+            CodePoint u = u_get_nonascii(line.data, line.length, &idx);
             w += u_char_width(u);
         }
     }

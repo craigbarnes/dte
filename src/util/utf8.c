@@ -97,11 +97,11 @@ static bool u_is_illformed(CodePoint u, size_t seq_len)
  * 5    0000 0011    Forbidden by RFC 3629
  * 6    0000 0001    Forbidden by RFC 3629
  */
-static unsigned int u_get_first_byte_mask(unsigned int len)
+static unsigned int u_get_first_byte_mask(unsigned int seq_len)
 {
-    BUG_ON(len < 2);
-    BUG_ON(len > UTF8_MAX_SEQ_LEN);
-    return (0x80 >> len) - 1;
+    BUG_ON(seq_len < 2);
+    BUG_ON(seq_len > UTF8_MAX_SEQ_LEN);
+    return (0x80 >> seq_len) - 1;
 }
 
 size_t u_str_width(const unsigned char *str)

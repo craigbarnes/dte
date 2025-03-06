@@ -36,21 +36,21 @@ void move_to_preferred_x(View *view, long preferred_x)
     unsigned long x = 0;
     size_t i = 0;
     while (x < view->preferred_x && i < line.length) {
-        CodePoint u = line.data[i++];
-        if (likely(u < 0x80)) {
-            if (likely(!ascii_iscntrl(u))) {
+        unsigned char ch = line.data[i];
+        if (likely(ch < 0x80)) {
+            i++;
+            if (likely(!ascii_iscntrl(ch))) {
                 x++;
-            } else if (u == '\t') {
+            } else if (ch == '\t') {
                 x = next_indent_width(x, tw);
-            } else if (u == '\n') {
+            } else if (ch == '\n') {
                 break;
             } else {
                 x += 2;
             }
         } else {
-            const size_t next = i;
-            i--;
-            u = u_get_nonascii(line.data, line.length, &i);
+            size_t next = i + 1;
+            CodePoint u = u_get_nonascii(line.data, line.length, &i);
             x += u_char_width(u);
             if (x > view->preferred_x) {
                 i = next;
@@ -58,10 +58,8 @@ void move_to_preferred_x(View *view, long preferred_x)
             }
         }
     }
-    if (x > view->preferred_x) {
-        i--;
-    }
-    view->cursor.offset += i;
+
+    view->cursor.offset += i - (x > view->preferred_x);
 
     // If cursor stopped on a zero-width char, move to the next spacing char
     CodePoint u;
