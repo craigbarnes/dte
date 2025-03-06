@@ -2804,8 +2804,16 @@ static void test_umax_count_base16_digits(TestContext *ctx)
 {
     EXPECT_EQ(umax_count_base16_digits(0x0), 1);
     EXPECT_EQ(umax_count_base16_digits(0x1), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x2), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x3), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x4), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x5), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x6), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x7), 1);
+    EXPECT_EQ(umax_count_base16_digits(0x8), 1);
     EXPECT_EQ(umax_count_base16_digits(0x9), 1);
     EXPECT_EQ(umax_count_base16_digits(0xA), 1);
+    EXPECT_EQ(umax_count_base16_digits(0xB), 1);
     EXPECT_EQ(umax_count_base16_digits(0xF), 1);
     EXPECT_EQ(umax_count_base16_digits(0x10), 2);
     EXPECT_EQ(umax_count_base16_digits(0x111), 3);

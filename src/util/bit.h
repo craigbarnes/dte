@@ -137,7 +137,7 @@ static inline size_t umax_count_base16_digits(uintmax_t x)
     BUG_ON(!bit_width != !x); // Improves code gen
     unsigned int base2_digits = bit_width + !x;
 
-    // This is equivalent to `(base2_digits >> 2) + (base2_digits & 3)`,
+    // This is equivalent to `(base2_digits >> 2) + !!(base2_digits & 3)`,
     // but GCC seems to generate slightly better code when done this way
     return next_multiple(base2_digits, 4) / 4;
 }
