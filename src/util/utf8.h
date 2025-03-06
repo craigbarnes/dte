@@ -8,7 +8,7 @@
 
 // Minimum `dest_len` value needed by u_make_printable() to guarantee
 // truncation cannot occur
-#define U_MAKE_PRINTABLE_MAXLEN(src_len) ((4 * src_len) + 1)
+#define U_MAKE_PRINTABLE_MAXLEN(src_len) ((U_SET_CHAR_MAXLEN * src_len) + 1)
 
 enum {
     // Longest UTF-8 sequence (in bytes) permitted by RFC 3629
