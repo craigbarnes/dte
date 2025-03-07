@@ -87,6 +87,7 @@ Features
   * [TOML]
   * [YAML]
   * [jq]
+  * [fish]
 
 * Extend the [`dte-syntax(5)`] command set, so as to provide a proper
   solution for handling e.g. [ambiguous regexp literals in Ruby][]
@@ -99,7 +100,9 @@ Features
 * Add an option to convert U+2103 (℃ ) into U+00B0 U+0043 (°C) when
   rendering to the terminal and perhaps do likewise for some other
   "ambiguous" width characters (see also: [foot#1665] and the related
-  todo item below)
+  todo item below). Alternatively, use the [explicit width] part of
+  [Kitty's new text scaling protocol] to make U+2103 always occupy 2
+  columns.
 
 * Add an option to allow configuring whether pastes from the terminal
   move the cursor after the inserted text (like `paste` vs `paste -m`)
@@ -305,7 +308,7 @@ Testing/Debugging
   (see: https://lists.nongnu.org/archive/html/tinycc-devel/2023-09/msg00033.html)
 
 * Add test runner option for generating JUnit XML report for GitLab CI
-  * https://docs.gitlab.com/ee/ci/testing/unit_test_reports.html
+  * https://docs.gitlab.com/ci/testing/unit_test_reports/
   * https://gitlab.com/craigbarnes/dte/-/pipelines/1404353439/test_report
 
 * Write a `LOG_*()` message every time a new file is opened, including the
@@ -382,11 +385,14 @@ Testing/Debugging
 [Rust]: https://doc.rust-lang.org/reference/
 [TOML]: https://toml.io/en/v1.0.0
 [YAML]: https://yaml.org/spec/1.2.2/
-[jq]: https://jqlang.github.io/jq/manual/#modules
+[jq]: https://jqlang.org/manual/#modules
+[fish]: https://fishshell.com/
 [ambiguous regexp literals in Ruby]: https://stackoverflow.com/questions/38333687/what-is-ambiguous-regexp-literal-in-rubocop
 [Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
+[explicit width]: https://github.com/kovidgoyal/kitty/issues/8226#issuecomment-2600509809
+[Kitty's new text scaling protocol]: https://github.com/kovidgoyal/kitty/issues/8226
 [GNU Coding Standards §4.4]: https://www.gnu.org/prep/standards/html_node/Errors.html
 [foot#1665]: https://codeberg.org/dnkl/foot/issues/1665#issuecomment-1734299
 [built-in filetype associations]: https://gitlab.com/craigbarnes/dte/-/tree/master/src/filetype

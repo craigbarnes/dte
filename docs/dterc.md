@@ -2,7 +2,7 @@
 NOTE: See https://craigbarnes.gitlab.io/dte/dterc.html for a fully rendered version of this document
 title: dterc
 section: 5
-date: October 2024
+date: March 2025
 description: Command and configuration language used by dte
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dte-syntax`"]
@@ -339,8 +339,8 @@ The _fg-color_ and _bg-color_ arguments can be one of the following:
 * `white` (`15`)
 
 Colors `16` to `231` correspond to R/G/B colors and `232` to `255` are
-grayscale values (see https://www.ditig.com/publications/256-colors-cheat-sheet
-for more details).
+grayscale values (see https://www.ditig.com/256-colors-cheat-sheet for
+more details).
 
 If the terminal has limited support for rendering colors, the _fg-color_
 and _bg-color_ arguments will fall back to the nearest supported color
