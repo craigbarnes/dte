@@ -12,7 +12,7 @@ Checklist
    5. Update `RELEASE_VERSIONS` in [`tools/mk/dist.mk`]
    6. Update `<releases>` in [`share/dte.appdata.xml`]
    7. Remove `-g` from default [`CFLAGS`]
-   8. `make bump-manpage-dates vars`
+   8. `make vars bump-manpage-dates && make man`
    9. `git commit -m "Prepare v${VER} release"`
 
 2. Tag and upload
