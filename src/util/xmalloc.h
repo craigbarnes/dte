@@ -58,23 +58,6 @@ static inline void *xmemdup(const void *ptr, size_t size)
     return memcpy(xmalloc(size), ptr, size);
 }
 
-// Return a null-terminated copy of the first `size` bytes of `str`
-XSTRDUP
-static inline char *xstrcut(const char *str, size_t size)
-{
-    char *s = xmalloc(size + 1);
-    s[size] = '\0';
-    return memcpy(s, str, size);
-}
-
-// Return a null-terminated copy of the substring between `pos` and `end`
-XSTRDUP
-static inline char *xstrslice(const char *str, size_t pos, size_t end)
-{
-    BUG_ON(pos > end);
-    return xstrcut(str + pos, end - pos);
-}
-
 // Portable version of glibc/FreeBSD mempcpy(3)
 static inline void *xmempcpy(void *restrict dest, const void *restrict src, size_t n)
 {
@@ -105,6 +88,21 @@ XSTRDUP
 static inline char *xstrjoin(const char *s1, const char *s2)
 {
     return xmemjoin(s1, strlen(s1), s2, strlen(s2) + 1);
+}
+
+// Return a null-terminated copy of the first `size` bytes of `str`
+XSTRDUP
+static inline char *xstrcut(const char *str, size_t size)
+{
+    return xmemjoin(str, size, "", 1);
+}
+
+// Return a null-terminated copy of the substring between `pos` and `end`
+XSTRDUP
+static inline char *xstrslice(const char *str, size_t pos, size_t end)
+{
+    BUG_ON(pos > end);
+    return xstrcut(str + pos, end - pos);
 }
 
 #endif
