@@ -782,20 +782,20 @@ static void test_strview_remove_matching(TestContext *ctx)
 {
     StringView sv = STRING_VIEW("ABCDEFGHIJKLMN");
     EXPECT_TRUE(strview_remove_matching_prefix(&sv, "ABC"));
-    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJKLMN"));
+    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJKLMN");
 
     EXPECT_TRUE(strview_remove_matching_suffix(&sv, "KLMN"));
-    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
 
     EXPECT_FALSE(strview_remove_matching_prefix(&sv, "A"));
     EXPECT_FALSE(strview_remove_matching_suffix(&sv, "K"));
-    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
 
     EXPECT_TRUE(strview_remove_matching_prefix(&sv, ""));
-    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
 
     EXPECT_TRUE(strview_remove_matching_suffix(&sv, ""));
-    EXPECT_TRUE(strview_equal_cstring(&sv, "DEFGHIJ"));
+    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
 
     sv.length = 0;
     sv.data = NULL;
@@ -805,7 +805,7 @@ static void test_strview_remove_matching(TestContext *ctx)
     EXPECT_FALSE(strview_remove_matching_suffix(&sv, "suf"));
     EXPECT_EQ(sv.length, 0);
     EXPECT_NULL(sv.data);
-    EXPECT_TRUE(strview_equal_cstring(&sv, ""));
+    EXPECT_STRVIEW_EQ_CSTRING(&sv, "");
 }
 
 static void test_get_delim(TestContext *ctx)
@@ -820,7 +820,7 @@ static void test_get_delim(TestContext *ctx)
         const StringView sv = get_delim(input, &pos, len, '-');
         ASSERT_TRUE(idx < nparts);
         ASSERT_TRUE(parts[idx][part_size - 1] == '\0');
-        EXPECT_TRUE(strview_equal_cstring(&sv, parts[idx]));
+        EXPECT_STRVIEW_EQ_CSTRING(&sv, parts[idx]);
     }
 
     EXPECT_EQ(idx, nparts - 1);

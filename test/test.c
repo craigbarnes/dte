@@ -85,6 +85,11 @@ void expect_uint_eq(TestContext *ctx, const char *file, int line, uintmax_t a, u
     expect(a == b, ctx, file, line, "Values not equal: 0x%jx, 0x%jx", a, b);
 }
 
+void expect_strview_eq_cstring(TestContext *ctx, const char *file, int line, const StringView *sv, const char *cstr)
+{
+    expect_memeq(ctx, file, line, sv->data, sv->length, cstr, strlen(cstr));
+}
+
 void expect_true(TestContext *ctx, const char *file, int line, bool x)
 {
     expect(x, ctx, file, line, "Unexpected false value");

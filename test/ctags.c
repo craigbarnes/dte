@@ -89,10 +89,10 @@ static void test_next_tag(TestContext *ctx)
     StringView prefix = STRING_VIEW("");
     Tag t;
     for (size_t i = 0, pos = 0; next_tag(buf, len, &pos, &prefix, false, &t); i++) {
-        IEXPECT_TRUE(strview_equal_cstring(&t.name, expected[i].name));
+        EXPECT_STRVIEW_EQ_CSTRING(&t.name, expected[i].name);
         IEXPECT_EQ(t.kind, expected[i].kind);
         IEXPECT_EQ(t.local, expected[i].local);
-        IEXPECT_TRUE(strview_equal_cstring(&t.filename, "src/util/hashmap.c"));
+        EXPECT_STRVIEW_EQ_CSTRING(&t.filename, "src/util/hashmap.c");
         IEXPECT_EQ(t.lineno, 0);
         free_tag(&t);
     }
@@ -101,7 +101,7 @@ static void test_next_tag(TestContext *ctx)
     t.name = string_view(NULL, 0);
     prefix = strview_from_cstring("hashmap_res");
     EXPECT_TRUE(next_tag(buf, len, &pos, &prefix, false, &t));
-    EXPECT_TRUE(strview_equal_cstring(&t.name, "hashmap_resize"));
+    EXPECT_STRVIEW_EQ_CSTRING(&t.name, "hashmap_resize");
     free_tag(&t);
     EXPECT_FALSE(next_tag(buf, len, &pos, &prefix, false, &t));
     pos = 0;

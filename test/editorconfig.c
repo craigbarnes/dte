@@ -28,8 +28,8 @@ static void test_ini_parse(TestContext *ctx)
     EXPECT_NULL(ini.section.data);
     EXPECT_EQ(ini.pos, 17);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_TRUE(strview_equal_cstring(&ini.name, "key"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.value, "val"));
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "key");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "val");
 
     ASSERT_TRUE(ini_parse(&ini));
     ASSERT_NONNULL(ini.name.data);
@@ -37,9 +37,9 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.section.data);
     EXPECT_EQ(ini.pos, 45);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 1"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.name, "xyz"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.value, "123"));
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "section 1");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "xyz");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "123");
 
     ASSERT_TRUE(ini_parse(&ini));
     ASSERT_NONNULL(ini.name.data);
@@ -47,9 +47,9 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.section.data);
     EXPECT_EQ(ini.pos, 78);
     EXPECT_EQ(ini.name_count, 2);
-    EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 1"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.name, "foo bar"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.value, "this;is#not#a;comment"));
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "section 1");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "foo bar");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "this;is#not#a;comment");
 
     ASSERT_TRUE(ini_parse(&ini));
     ASSERT_NONNULL(ini.name.data);
@@ -57,9 +57,9 @@ static void test_ini_parse(TestContext *ctx)
     ASSERT_NONNULL(ini.section.data);
     EXPECT_EQ(ini.pos, 94);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 2"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.name, "x"));
-    EXPECT_TRUE(strview_equal_cstring(&ini.value, "0"));
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "section 2");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "x");
+    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "0");
 
     EXPECT_FALSE(ini_parse(&ini));
 }

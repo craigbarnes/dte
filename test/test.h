@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "util/macros.h"
+#include "util/string-view.h"
 
 typedef struct {
     unsigned int passed;
@@ -53,6 +54,7 @@ typedef struct {
 #define EXPECT_MEMEQ(p1, n1, p2, n2) EXPECT(memeq, p1, n1, p2, n2)
 #define EXPECT_EQ(a, b) EXPECT(eq, a, b)
 #define EXPECT_UINT_EQ(a, b) EXPECT(uint_eq, a, b)
+#define EXPECT_STRVIEW_EQ_CSTRING(sv, cstr) EXPECT(strview_eq_cstring, sv, cstr)
 #define EXPECT_NULL(p) EXPECT(null, p)
 #define EXPECT_NONNULL(p) EXPECT(nonnull, p)
 #define EXPECT_TRUE(x) EXPECT(true, x)
@@ -76,6 +78,7 @@ void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, 
 void expect_memeq(TestContext *ctx, const char *file, int line, const void *p1, size_t n1, const void *p2, size_t n2);
 void expect_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
 void expect_uint_eq(TestContext *ctx, const char *file, int line, uintmax_t a, uintmax_t b);
+void expect_strview_eq_cstring(TestContext *ctx, const char *file, int line, const StringView *sv, const char *cstr);
 void expect_true(TestContext *ctx, const char *file, int line, bool x);
 void expect_false(TestContext *ctx, const char *file, int line, bool x);
 void expect_null(TestContext *ctx, const char *file, int line, const void *p);
