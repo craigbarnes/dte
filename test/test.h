@@ -8,6 +8,7 @@
 #include <string.h>
 #include "util/macros.h"
 #include "util/string-view.h"
+#include "util/string.h"
 
 typedef struct {
     unsigned int passed;
@@ -54,7 +55,8 @@ typedef struct {
 #define EXPECT_MEMEQ(p1, n1, p2, n2) EXPECT(memeq, p1, n1, p2, n2)
 #define EXPECT_EQ(a, b) EXPECT(eq, a, b)
 #define EXPECT_UINT_EQ(a, b) EXPECT(uint_eq, a, b)
-#define EXPECT_STRVIEW_EQ_CSTRING(sv, cstr) EXPECT(memeq, (sv)->data, (sv)->length, cstr, strlen(cstr))
+#define EXPECT_STRVIEW_EQ_CSTRING(sv, cstr) EXPECT(strview_eq_cstring, sv, cstr)
+#define EXPECT_STRING_EQ_CSTRING(s, cstr) EXPECT(string_eq_cstring, s, cstr)
 #define EXPECT_NULL(p) EXPECT(null, p)
 #define EXPECT_NONNULL(p) EXPECT(nonnull, p)
 #define EXPECT_TRUE(x) EXPECT(true, x)
@@ -89,5 +91,19 @@ void assert_ptreq(TestContext *ctx, const char *file, int line, const void *p1, 
 void assert_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
 void assert_true(TestContext *ctx, const char *file, int line, bool x);
 void assert_nonnull(TestContext *ctx, const char *file, int line, const void *ptr);
+
+static inline void expect_strview_eq_cstring (
+    TestContext *ctx, const char *file, int line,
+    const StringView *sv, const char *cstr
+) {
+    expect_memeq(ctx, file, line, sv->data, sv->length, cstr, strlen(cstr));
+}
+
+static inline void expect_string_eq_cstring (
+    TestContext *ctx, const char *file, int line,
+    const String *s, const char *cstr
+) {
+    expect_memeq(ctx, file, line, s->buffer, s->len, cstr, strlen(cstr));
+}
 
 #endif
