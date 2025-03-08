@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "block.h"
+#include "util/bit.h"
 #include "util/xmalloc.h"
 
 enum {

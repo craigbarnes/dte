@@ -2,6 +2,7 @@
 #define UTIL_PTR_ARRAY_H
 
 #include <stdlib.h>
+#include "bit.h"
 #include "debug.h"
 #include "macros.h"
 #include "xmalloc.h"

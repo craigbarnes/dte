@@ -1,6 +1,7 @@
 #ifndef UTIL_BIT_H
 #define UTIL_BIT_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include "debug.h"
 #include "macros.h"
@@ -100,6 +101,14 @@ static inline unsigned int u64_clz(uint64_t x)
     x |= x >> 16;
     x |= x >> 32;
     return u64_popcount(~x);
+}
+
+// Round x up to a multiple of r (which *must* be a power of 2)
+static inline size_t next_multiple(size_t x, size_t r)
+DIAGNOSE_IF(!IS_POWER_OF_2(r))
+{
+    r--;
+    return (x + r) & ~r;
 }
 
 // Calculate the number of significant bits in `x` (the minimum number

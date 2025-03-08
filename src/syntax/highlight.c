@@ -4,6 +4,7 @@
 #include "highlight.h"
 #include "syntax/merge.h"
 #include "util/arith.h"
+#include "util/bit.h"
 #include "util/debug.h"
 #include "util/intern.h"
 #include "util/xmalloc.h"

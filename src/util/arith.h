@@ -52,14 +52,6 @@ static inline size_t size_ssub(size_t a, size_t b)
     return (r > a) ? 0 : r;
 }
 
-// Round x up to a multiple of r (which *must* be a power of 2)
-static inline size_t next_multiple(size_t x, size_t r)
-DIAGNOSE_IF(!IS_POWER_OF_2(r))
-{
-    r--;
-    return (x + r) & ~r;
-}
-
 // This is equivalent to `(x + 1) % modulus`, given the constraints
 // imposed by BUG_ON(), but avoids expensive divisions by a non-constant
 static inline size_t size_increment_wrapped(size_t x, size_t modulus)

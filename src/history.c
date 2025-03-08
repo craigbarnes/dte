@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "history.h"
-#include "util/arith.h"
+#include "util/bit.h"
 #include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"

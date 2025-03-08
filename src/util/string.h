@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "bit.h"
 #include "macros.h"
 #include "str-util.h"
 #include "string-view.h"

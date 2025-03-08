@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "file-history.h"
+#include "util/bit.h"
 #include "util/debug.h"
 #include "util/path.h"
 #include "util/readfile.h"
