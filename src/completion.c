@@ -257,7 +257,14 @@ static void complete_alias(EditorState *e, const CommandArgs *a)
 
 static void complete_bind(EditorState *e, const CommandArgs *a)
 {
-    if (u64_popcount(a->flag_set) > 1 || a->nr_flag_args > 1) {
+    // Mask of flags that determine modes (excludes -q)
+    uint_least64_t modemask = 0;
+    modemask |= cmdargs_flagset_value('c');
+    modemask |= cmdargs_flagset_value('n');
+    modemask |= cmdargs_flagset_value('s');
+    modemask |= cmdargs_flagset_value('T');
+
+    if (u64_popcount(a->flag_set & modemask) > 1 || a->nr_flag_args > 1) {
         // Don't complete bindings for multiple modes
         return;
     }
