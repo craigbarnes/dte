@@ -88,6 +88,21 @@ static inline uint32_t u32_lsbit(uint32_t x)
     return x ? 1u << (u32_ffs(x) - 1) : 0;
 }
 
+// Return the power of 2 greater than or equal to `x`, or 0 if `x` is
+// greater than the largest size_t power of 2
+static inline size_t next_pow2(size_t x)
+{
+    if (unlikely(x == 0)) {
+        return 1;
+    }
+    x--;
+    UNROLL_LOOP(8)
+    for (size_t i = 1, n = BITSIZE(x); i < n; i <<= 1) {
+        x |= x >> i;
+    }
+    return x + 1;
+}
+
 // Count leading zeros
 static inline unsigned int u64_clz(uint64_t x)
 {

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "intmap.h"
+#include "bit.h"
 #include "debug.h"
 #include "hash.h"
 

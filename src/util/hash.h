@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "ascii.h"
+#include "bit.h"
 #include "macros.h"
 
 static inline size_t fnv_1a_init(void)
@@ -18,6 +19,7 @@ static inline size_t fnv_1a_prime(void)
     return (sizeof(size_t) >= 8) ? 1099511628211ULL : 16777619U;
 }
 
+// https://datatracker.ietf.org/doc/html/draft-eastlake-fnv-31#name-fnv-basics
 static inline size_t fnv_1a_hash(const unsigned char *str, size_t n)
 {
     const size_t prime = fnv_1a_prime();
@@ -38,20 +40,6 @@ static inline size_t fnv_1a_hash_icase(const unsigned char *str, size_t n)
         hash *= prime;
     }
     return hash;
-}
-
-// NOTE: returns 0 if x is greater than the largest size_t power of 2
-static inline size_t next_pow2(size_t x)
-{
-    if (unlikely(x == 0)) {
-        return 1;
-    }
-    x--;
-    UNROLL_LOOP(8)
-    for (size_t i = 1, n = sizeof(size_t) * CHAR_BIT; i < n; i <<= 1) {
-        x |= x >> i;
-    }
-    return x + 1;
 }
 
 #endif
