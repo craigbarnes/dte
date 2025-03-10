@@ -85,7 +85,7 @@ static inline unsigned int u32_ffs(uint32_t n)
 // Extract (isolate) least significant set bit
 static inline uint32_t u32_lsbit(uint32_t x)
 {
-    return x ? 1u << (u32_ffs(x) - 1) : 0;
+    return x & -x;
 }
 
 // Return the power of 2 greater than or equal to `x`, or 0 if `x` is
