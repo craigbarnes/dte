@@ -28,7 +28,6 @@ enum {
     OSC52 = TFLAG_OSC52_COPY,
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
     MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
-    ITERM2 = TFLAG_ITERM2,
     SYNC = TFLAG_SYNC,
     NOQUERY3 = TFLAG_NO_QUERY_L3,
     BSCTRL = TFLAG_BS_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
@@ -69,9 +68,9 @@ static const TermEntry terms[] = {
     t("ghostty", TC | BCE | REP | TITLE | OSC52 | KITTYKBD | SYNC),
     t("hurd", C8 | BCE | NCVUL | NCVDIM),
     t("iTerm.app", C256 | BCE),
-    t("iTerm2.app", C256 | BCE | TITLE | OSC52 | ITERM2 | SYNC),
+    t("iTerm2.app", C256 | BCE | TITLE | OSC52 | SYNC),
     t("iterm", C256 | BCE),
-    t("iterm2", C256 | BCE | TITLE | OSC52 | ITERM2 | SYNC),
+    t("iterm2", C256 | BCE | TITLE | OSC52 | SYNC),
     t("jfbterm", C8 | BCE | NCVUL | NCVDIM),
     t("kitty", TC | TITLE | OSC52 | KITTYKBD | SYNC),
     t("kon", C8 | BCE | NCVUL | NCVDIM),
@@ -143,7 +142,7 @@ UNITTEST {
         const char *name = terms[i].name;
         size_t len = strlen(name);
         BUG_ON(terms[i].name_len != len);
-        TermFeatureFlags imode_flags = KITTYKBD | ITERM2 | BSCTRL | DELCTRL;
+        TermFeatureFlags imode_flags = KITTYKBD | BSCTRL | DELCTRL;
         TermFeatureFlags masked = terms[i].features & imode_flags;
         if (masked && !IS_POWER_OF_2(masked)) {
             BUG("TermEntry '%s' has multiple mutually exclusive flags", name);
@@ -275,9 +274,6 @@ void term_enable_private_modes(Terminal *term)
     if (features & KITTYKBD) {
         // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
         term_put_literal(obuf, "\033[>5u");
-    } else if (features & ITERM2) {
-        // https://gitlab.com/craigbarnes/dte/-/issues/130#note_864453071
-        term_put_literal(obuf, "\033[>1u");
     } else if (features & MOKEYS) {
         // Try to use "modifyOtherKeys" mode (level 2 or 1)
         term_put_literal(obuf, "\033[>4;1m\033[>4;2m");
@@ -300,7 +296,7 @@ void term_restore_private_modes(Terminal *term)
     if (features & TFLAG_ALT_ESC) {
         term_put_literal(obuf, "\033[?1039l"); // DECRST 1039 (altSendsEscape)
     }
-    if (features & (KITTYKBD | ITERM2)) {
+    if (features & KITTYKBD) {
         term_put_literal(obuf, "\033[<u");
     } else if (features & MOKEYS) {
         term_put_literal(obuf, "\033[>4m");

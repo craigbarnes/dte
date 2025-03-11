@@ -25,7 +25,6 @@ typedef enum {
     TFLAG_META_ESC = 0x40, // Enable xterm "metaSendsEscape" mode (via DECSET 1036)
     TFLAG_ALT_ESC = 0x80, // Enable xterm "altSendsEscape" mode (via DECSET 1039)
     TFLAG_KITTY_KEYBOARD = 0x100, // Supports kitty keyboard protocol
-    TFLAG_ITERM2 = 0x200, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
     TFLAG_SYNC = 0x400, // Supports synchronized updates via DECSET private mode 2026
     TFLAG_QUERY_L2 = 0x800, // Supports or tolerates queries sent by term_put_level_2_queries()
     TFLAG_QUERY_L3 = 0x1000, // Supports or tolerates queries sent by term_put_level_3_queries()

@@ -176,13 +176,24 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
     }
 
     if (u_is_ascii_upper(key) && (mods & MOD_CTRL)) {
-        // This is done only for the sake of (older versions of) iTerm2
+        // This was originally done for the sake of iTerm2's `CSI u` mode,
+        // which could be activated with `CSI > 1 u` but didn't fully
+        // conform to Kitty's key encoding scheme. This mode has seemingly
+        // been replaced with more complete support for the Kitty protocol
+        // and explicit support for activating the old mode has been also
+        // been removed from dte. However, this code is retained for now,
+        // since the `CSI u` encoding pre-dates the Kitty keyboard protocol
+        // and it's not clear yet whether removing it would regress support
+        // in less modern terminals and/or improve correctness for exotic
+        // keyboard layouts in modern (Kitty protocol supporting) terminals.
         // See also:
         // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_870592688
         // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_864512674
         // • https://gitlab.com/gnachman/iterm2/-/issues/10017
         // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7
+        // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7#1d96fc7f79950509a8bc22bc59a1a82a438c890d_0_17
         // • https://gitlab.com/gnachman/iterm2/-/issues/7440#note_129599012
+        // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#bugs-in-fixterms:~:text=Incorrectly%20encoding%20shifted%20keys%20when%20shift%20modifier%20is%20used
         return ascii_tolower(key);
     }
 
