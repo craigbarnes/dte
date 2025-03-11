@@ -157,7 +157,7 @@ void insert_ch(View *view, CodePoint ch)
     size_t ins_count = 0;
 
     if (view->selection) {
-        // Prepare deleted text (selection)
+        // Prepare text to be deleted (selection)
         del_count = prepare_selection(view);
         unselect(view);
     } else if (options->overwrite) {
@@ -183,21 +183,22 @@ void insert_ch(View *view, CodePoint ch)
         }
     }
 
-    // Prepare inserted text
+    // Prepare text to be inserted
     if (ch == '\t' && options->expand_tab) {
-        ins_count = options->indent_width;
         static_assert(sizeof(buf) >= INDENT_WIDTH_MAX);
+        ins_count = options->indent_width;
         memset(ins, ' ', ins_count);
     } else {
+        static_assert(sizeof(buf) >= UTF8_MAX_SEQ_LEN);
         ins_count += u_set_char_raw(ins + ins_count, ch);
     }
 
-    // Record change
+    // Make edit to Buffer (and record Change in undo history)
     begin_change(del_count ? CHANGE_MERGE_NONE : CHANGE_MERGE_INSERT);
     buffer_replace_bytes(view, del_count, ins, ins_count);
     end_change();
     free(alloc);
 
-    // Move after inserted text
+    // Move cursor after inserted text
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
