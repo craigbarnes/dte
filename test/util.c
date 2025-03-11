@@ -855,6 +855,17 @@ static void test_get_delim_str(TestContext *ctx)
     substr = get_delim_str(str2, &pos, len, '-');
     EXPECT_STREQ(substr, "no delimiter...");
     EXPECT_EQ(pos, len);
+
+    static const char after[] = "\0\0\0\0aa\0b\0c\0dd\0\0";
+    char before[] = ",,,,aa,b,c,dd,,";
+    unsigned int iters = 0;
+    unsigned int width = 0;
+    for (pos = 0, len = sizeof(before) - 1; pos < len; iters++) {
+        width += strlen(get_delim_str(before, &pos, len, ','));
+    }
+    EXPECT_MEMEQ(before, sizeof(before), after, sizeof(after));
+    EXPECT_EQ(width, 6);
+    EXPECT_EQ(iters, 9);
 }
 
 static void test_str_replace_byte(TestContext *ctx)
