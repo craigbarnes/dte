@@ -174,7 +174,7 @@ void collect_normal_aliases(EditorState *e, PointerArray *a, const char *prefix)
 static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const char *prefix)
 {
     size_t prefix_len = strlen(prefix);
-    char keystr[KEYCODE_STR_MAX];
+    char keystr[KEYCODE_STR_BUFSIZE];
     for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
         size_t keylen = keycode_to_string(it.entry->key, keystr);
         if (str_has_strn_prefix(keystr, prefix, prefix_len)) {

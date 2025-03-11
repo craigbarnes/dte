@@ -169,9 +169,9 @@ static const char *lookup_other_key(KeyCode key)
 }
 
 // Writes the string representation of `k` into `buf` (which must
-// have at least `KEYCODE_STR_MAX` bytes available) and returns the
-// length of the written string.
-size_t keycode_to_string(KeyCode k, char *buf)
+// have at least `KEYCODE_STR_BUFSIZE` bytes available) and returns
+// the length of the written string.
+size_t keycode_to_string(KeyCode k, char buf[KEYCODE_STR_BUFSIZE])
 {
     static const struct {
         char prefix;
@@ -217,7 +217,7 @@ size_t keycode_to_string(KeyCode k, char *buf)
     }
 
     BUG_ON(name[0] == '\0');
-    char *end = memccpy(buf + pos, name, '\0', KEYCODE_STR_MAX - pos);
+    char *end = memccpy(buf + pos, name, '\0', KEYCODE_STR_BUFSIZE - pos);
     BUG_ON(!end);
     BUG_ON(end <= buf);
     return (size_t)(end - buf) - 1;

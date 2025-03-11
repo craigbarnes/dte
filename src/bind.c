@@ -101,7 +101,7 @@ bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
     qsort(array, count, sizeof(array[0]), binding_cmp);
 
     // Serialize the bindings in sorted order
-    char keystr[KEYCODE_STR_MAX];
+    char keystr[KEYCODE_STR_BUFSIZE];
     for (size_t i = 0; i < count; i++) {
         string_append_literal(buf, "bind ");
         if (flag[0] != '\0' && flag[0] != '-') {

@@ -7,8 +7,8 @@
 #include "util/macros.h"
 
 enum {
-    // Maximum length of string produced by keycode_to_string()
-    KEYCODE_STR_MAX = 32 // sizeof("QUERY REPLY; 0x12345678")
+    // Buffer size for keycode_to_string()
+    KEYCODE_STR_BUFSIZE = 32 // next_pow2(sizeof("QUERY REPLY; 0x12345678"))
 };
 
 // NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
@@ -107,6 +107,6 @@ static inline KeyCode keycode_get_modifiers(KeyCode k)
 }
 
 KeyCode parse_key_string(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;
-size_t keycode_to_string(KeyCode key, char *buf) NONNULL_ARGS;
+size_t keycode_to_string(KeyCode key, char buf[KEYCODE_STR_BUFSIZE]) NONNULL_ARGS;
 
 #endif

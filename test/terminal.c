@@ -10,6 +10,7 @@
 #include "terminal/rxvt.h"
 #include "terminal/style.h"
 #include "terminal/terminal.h"
+#include "util/bit.h"
 #include "util/str-array.h"
 #include "util/unicode.h"
 #include "util/utf8.h"
@@ -35,8 +36,8 @@ static void iexpect_keycode_eq (
         return;
     }
 
-    char a_str[KEYCODE_STR_MAX];
-    char b_str[KEYCODE_STR_MAX];
+    char a_str[KEYCODE_STR_BUFSIZE];
+    char b_str[KEYCODE_STR_BUFSIZE];
     char seq_str[64];
     keycode_to_string(a, a_str);
     keycode_to_string(b, b_str);
@@ -75,7 +76,7 @@ static void expect_parse_seq (
     }
 
     if (unlikely(key != expected_key)) {
-        char str[2][KEYCODE_STR_MAX];
+        char str[2][KEYCODE_STR_BUFSIZE];
         keycode_to_string(key, str[0]);
         keycode_to_string(expected_key, str[1]);
         test_fail (
@@ -1155,8 +1156,9 @@ static void test_keycode_to_string(TestContext *ctx)
 #endif
     };
 
-    char buf[KEYCODE_STR_MAX];
-    ASSERT_TRUE(sizeof(buf) >= sizeof("QUERY REPLY; 0xFFFFFFFF"));
+    char buf[KEYCODE_STR_BUFSIZE];
+    ASSERT_TRUE(sizeof(buf) >= sizeof("QUERY REPLY; 0x12345678"));
+    EXPECT_EQ(KEYCODE_STR_BUFSIZE, next_pow2(sizeof("QUERY REPLY; 0x12345678")));
 
     FOR_EACH_I(i, tests) {
         const char *str = tests[i].str;

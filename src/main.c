@@ -126,7 +126,7 @@ static ExitCode showkey_loop(unsigned int terminal_query_level)
     term_put_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
-    char buf[KEYCODE_STR_MAX + 4];
+    char buf[KEYCODE_STR_BUFSIZE + STRLEN("  \r\n")];
     for (bool loop = true; loop; ) {
         KeyCode key = term_read_input(&term, 100);
         switch (key) {
