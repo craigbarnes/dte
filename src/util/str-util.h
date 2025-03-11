@@ -116,24 +116,16 @@ static inline StringView get_delim(const char *buf, size_t *posp, size_t size, i
 NONNULL_ARGS
 static inline char *get_delim_str(char *buf, size_t *posp, size_t size, int delim)
 {
-    size_t pos = *posp;
-    BUG_ON(pos >= size);
-    size_t len = size - pos;
-    char *start = buf + pos;
-    char *found = memchr(start, delim, len);
-    if (found) {
-        *found = '\0';
-        *posp += (size_t)(found - start) + 1;
-    } else {
-        // If no delimiter is found, write the null-terminator 1 byte
-        // beyond the `size` bound. Callers must ensure this is safe
-        // to do. Thus, when calling this function (perhaps repeatedly)
-        // to consume an entire string, either buf[size-1] must be a
-        // delim byte or buf[size] must be in-bounds, writable memory.
-        start[len] = '\0';
-        *posp += len;
-    }
-    return start;
+    char *substr = buf + *posp;
+    StringView sv = get_delim(buf, posp, size, delim);
+
+    // If no delimiter was found, this writes the null-terminator 1 byte
+    // beyond the `size` bound. Callers must ensure this is safe to do.
+    // Thus, when calling this function (perhaps repeatedly) to consume
+    // an entire string, either buf[size-1] must be a delim byte or
+    // buf[size] must be in-bounds, writable memory.
+    substr[sv.length] = '\0';
+    return substr;
 }
 
 NONNULL_ARGS
