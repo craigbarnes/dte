@@ -27,24 +27,20 @@ typedef struct {
 // to widths of 1, 2, 4 and 8, which covers all of the sensible ones.
 static inline size_t indent_level(size_t x, size_t d)
 {
-    BUG_ON(d - 1 > 7);
+    BUG_ON(d - 1 >= INDENT_WIDTH_MAX);
     return likely(IS_POWER_OF_2(d)) ? x >> u32_ctz(d) : x / d;
 }
 
 static inline size_t indent_remainder(size_t x, size_t m)
 {
-    BUG_ON(m - 1 > 7);
+    BUG_ON(m - 1 >= INDENT_WIDTH_MAX);
     return likely(IS_POWER_OF_2(m)) ? x & (m - 1) : x % m;
 }
 
-static inline size_t next_indent_width(size_t x, size_t mul)
+static inline size_t next_indent_width(size_t x, size_t m)
 {
-    BUG_ON(mul - 1 > 7);
-    if (likely(IS_POWER_OF_2(mul))) {
-        size_t mask = ~(mul - 1);
-        return (x & mask) + mul;
-    }
-    return ((x + mul) / mul) * mul;
+    BUG_ON(m - 1 >= INDENT_WIDTH_MAX);
+    return likely(IS_POWER_OF_2(m)) ? next_multiple(x + 1, m) : ((x + m) / m) * m;
 }
 
 char *make_indent(const LocalOptions *options, size_t width);
