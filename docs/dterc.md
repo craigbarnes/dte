@@ -242,6 +242,7 @@ See also:
 * The [key bindings] section in the [`dte`] man page
 * The [`-K`][`dte -K`] option in the [`dte`] man page
 * The [`show bind`] command (below)
+* The [output][`binding/default`] of `dte -b binding/default`
 * [Kitty's keyboard protocol] documentation (if seeking technical details)
 
 ### **set** [**-gl**] _option_ [_value_] ...
@@ -460,7 +461,8 @@ specified list are checked for a match in the same order they were added.
 If only 1 argument (i.e. _compiler_) is given, all patterns previously
 added for that compiler name will be removed.
 
-For a basic example of usage, see the output of `dte -b compiler/go`.
+For a basic example of usage, see the [output][`compiler/go`] of
+`dte -b compiler/go`.
 
 `-i`
 :   Ignore this error
@@ -1661,7 +1663,9 @@ errors should be highlighted. Set to `""` to disable.
 [`pipe-from cat file.txt`]: #exec:~:text=alias%20pipe%2Dfrom
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings
+[`binding/default`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/binding/default
 [`color/reset`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/reset
+[`compiler/go`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/compiler/go
 [`ascii(7)`]: https://www.man7.org/linux/man-pages/man7/ascii.7.html#DESCRIPTION
 [standard streams]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
 [external scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/contrib
