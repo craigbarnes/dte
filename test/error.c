@@ -166,13 +166,13 @@ static void test_normal_command_errors(TestContext *ctx)
         const char *substr = tests[i].expected_error_substr;
         ASSERT_NONNULL(cmd);
         ASSERT_NONNULL(substr);
-        ASSERT_TRUE(substr[0] != '\0');
-        ASSERT_TRUE(substr[1] != '\0');
+        ASSERT_NE(substr[0], '\0');
+        ASSERT_NE(substr[1], '\0');
         ASSERT_TRUE(!ascii_isupper(substr[0]));
 
         clear_error(ebuf);
         EXPECT_FALSE(handle_normal_command(e, cmd, false));
-        EXPECT_FALSE(ebuf->buf[0] == '\0');
+        EXPECT_NE(ebuf->buf[0], '\0');
         EXPECT_TRUE(ebuf->is_error);
 
         // Check for substring in error message (ignoring capitalization)

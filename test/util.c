@@ -819,7 +819,7 @@ static void test_get_delim(TestContext *ctx)
     for (size_t pos = 0, len = sizeof(input) - 1; pos < len; idx++) {
         const StringView sv = get_delim(input, &pos, len, '-');
         ASSERT_TRUE(idx < nparts);
-        ASSERT_TRUE(parts[idx][part_size - 1] == '\0');
+        ASSERT_EQ(parts[idx][part_size - 1], '\0');
         EXPECT_STRVIEW_EQ_CSTRING(&sv, parts[idx]);
     }
 
@@ -3266,7 +3266,7 @@ static void test_xstdio(TestContext *ctx)
 
     char buf[16];
     EXPECT_NULL(xfgets(buf, sizeof(buf), f));
-    EXPECT_TRUE(xfputs("str", f) != EOF);
+    EXPECT_NE(xfputs("str", f), EOF);
     EXPECT_EQ(xfputc(' ', f), ' ');
     EXPECT_EQ(xfprintf(f, "fmt %d", 42), 6);
     EXPECT_EQ(xfflush(f), 0);
@@ -3332,7 +3332,7 @@ static void test_fork_exec(TestContext *ctx)
 
     const char *argv[] = {"sh", "-c", "exit 95", NULL};
     pid_t pid = fork_exec(argv, NULL, fd, true);
-    ASSERT_TRUE(pid != -1);
+    ASSERT_NE(pid, -1);
     int r = wait_child(pid);
     EXPECT_EQ(r, 95);
 
@@ -3340,7 +3340,7 @@ static void test_fork_exec(TestContext *ctx)
     argv[1] = "5";
     argv[2] = NULL;
     pid = fork_exec(argv, NULL, fd, true);
-    ASSERT_TRUE(pid != -1);
+    ASSERT_NE(pid, -1);
     EXPECT_EQ(kill(pid, SIGINT), 0);
     r = wait_child(pid);
     EXPECT_TRUE(r >= 256);

@@ -54,6 +54,7 @@ typedef struct {
 #define EXPECT_PTREQ(p1, p2) EXPECT(ptreq, p1, p2)
 #define EXPECT_MEMEQ(p1, n1, p2, n2) EXPECT(memeq, p1, n1, p2, n2)
 #define EXPECT_EQ(a, b) EXPECT(eq, a, b)
+#define EXPECT_NE(a, b) EXPECT(ne, a, b)
 #define EXPECT_UINT_EQ(a, b) EXPECT(uint_eq, a, b)
 #define EXPECT_STRVIEW_EQ_CSTRING(sv, cstr) EXPECT(strview_eq_cstring, sv, cstr)
 #define EXPECT_STRING_EQ_CSTRING(s, cstr) EXPECT(string_eq_cstring, s, cstr)
@@ -66,6 +67,7 @@ typedef struct {
 #define IEXPECT_TRUE(x) IEXPECT(true, x)
 #define ASSERT_PTREQ(p1, p2) ASSERT(ptreq, p1, p2)
 #define ASSERT_EQ(a, b) ASSERT(eq, a, b)
+#define ASSERT_NE(a, b) ASSERT(ne, a, b)
 #define ASSERT_TRUE(x) ASSERT(true, x)
 #define ASSERT_NONNULL(ptr) ASSERT(nonnull, ptr)
 
@@ -79,6 +81,7 @@ void expect_streq(TestContext *ctx, const char *file, int line, const char *s1, 
 void expect_ptreq(TestContext *ctx, const char *file, int line, const void *p1, const void *p2);
 void expect_memeq(TestContext *ctx, const char *file, int line, const void *p1, size_t n1, const void *p2, size_t n2);
 void expect_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
+void expect_ne(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
 void expect_uint_eq(TestContext *ctx, const char *file, int line, uintmax_t a, uintmax_t b);
 void expect_true(TestContext *ctx, const char *file, int line, bool x);
 void expect_false(TestContext *ctx, const char *file, int line, bool x);
@@ -89,6 +92,7 @@ void iexpect_eq(TestContext *ctx, const char *file, int line, size_t i, intmax_t
 void iexpect_true(TestContext *ctx, const char *file, int line, size_t i, bool x);
 void assert_ptreq(TestContext *ctx, const char *file, int line, const void *p1, const void *p2);
 void assert_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
+void assert_ne(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);
 void assert_true(TestContext *ctx, const char *file, int line, bool x);
 void assert_nonnull(TestContext *ctx, const char *file, int line, const void *ptr);
 

@@ -80,6 +80,11 @@ void expect_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_
     expect(a == b, ctx, file, line, "Values not equal: %jd, %jd", a, b);
 }
 
+void expect_ne(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b)
+{
+    expect(a != b, ctx, file, line, "Unexpected equal values: %jd, %jd", a, b);
+}
+
 void expect_uint_eq(TestContext *ctx, const char *file, int line, uintmax_t a, uintmax_t b)
 {
     expect(a == b, ctx, file, line, "Values not equal: 0x%jx, 0x%jx", a, b);
@@ -132,6 +137,12 @@ void assert_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_
 {
     expect_eq(ctx, file, line, a, b);
     abort_if_false(a == b);
+}
+
+void assert_ne(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b)
+{
+    expect_ne(ctx, file, line, a, b);
+    abort_if_false(a != b);
 }
 
 void assert_true(TestContext *ctx, const char *file, int line, bool x)
