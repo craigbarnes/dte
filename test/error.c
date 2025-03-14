@@ -134,7 +134,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"x \"\\", "command syntax error: unexpected EOF"},
 
         // Error strings produced by arg_parse_error_msg():
-        {"bind -nnnnnnnnnn C-k eol", "too many options given"},
+        {"bind -nnnnnnnnnnnnnn C-k eol", "too many options given"},
         {"bind -Z C-k eol", "invalid option -Z"},
         {"bind -Tsearch C-k eol", "option -T must be given separately"},
         {"bind -T ", "option -T requires an argument"},

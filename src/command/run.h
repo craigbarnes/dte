@@ -13,7 +13,7 @@ typedef struct {
     char **args; // Positional args, with flag args moved to the front
     size_t nr_args; // Number of args (not including flag args)
     uint_least64_t flag_set; // Bitset of used flags
-    char flags[10]; // Flags in parsed order
+    char flags[14]; // Flags in parsed order
     uint8_t nr_flags; // Number of parsed flags
     uint8_t nr_flag_args; // Number of flag args
 } CommandArgs;

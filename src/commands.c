@@ -2091,8 +2091,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     if (use_word_under_cursor) {
         StringView word = view_get_word_under_cursor(view);
         if (word.length == 0) {
-            // Error message would not be very useful here
-            return false;
+            return false; // Error message wouldn't be very useful here
         }
         const RegexpWordBoundaryTokens *rwbt = &e->regexp_word_tokens;
         const size_t bmax = sizeof(rwbt->start);
@@ -2106,8 +2105,14 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         pattern = pattbuf;
     }
 
-    SearchState *search = &e->search;
     SearchCaseSensitivity cs = e->options.case_sensitive_search;
+    switch (cmdargs_pick_winning_flag(a, "ais")) {
+        case 'a': cs = CSS_AUTO; break;
+        case 'i': cs = CSS_FALSE; break;
+        case 's': cs = CSS_TRUE; break;
+    }
+
+    SearchState *search = &e->search;
     unselect(view);
 
     if (has_flag(a, 'n')) {
@@ -2137,7 +2142,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
 
     search_set_regexp(search, pattern);
     free(alloc);
-    return has_flag(a, 's') || do_search_next(view, search, cs, use_word_under_cursor);
+    return has_flag(a, 'x') || do_search_next(view, search, cs, use_word_under_cursor);
 }
 
 static bool cmd_select_block(EditorState *e, const CommandArgs *a)
@@ -2682,7 +2687,7 @@ static const Command cmds[] = {
     {"scroll-pgdown", "chl", NA, 0, 0, cmd_scroll_pgdown},
     {"scroll-pgup", "chl", NA, 0, 0, cmd_scroll_pgup},
     {"scroll-up", "Mcl", NA, 0, 0, cmd_scroll_up},
-    {"search", "Henprsw", NA, 0, 1, cmd_search},
+    {"search", "Haeinprswx", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
     {"set", "gl", RC, 1, -1, cmd_set},
