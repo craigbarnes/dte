@@ -252,14 +252,8 @@ static bool cmd_bof(EditorState *e, const CommandArgs *a)
 
 static bool cmd_bol(EditorState *e, const CommandArgs *a)
 {
-    const uint_least64_t flagset =
-        cmdargs_flagset_value('r')
-        | cmdargs_flagset_value('s')
-        | cmdargs_flagset_value('t')
-    ;
-
     SmartBolType type = BOL_SIMPLE;
-    switch (cmdargs_pick_winning_flag_from_set(a, flagset)) {
+    switch (cmdargs_pick_winning_flag(a, "rst")) {
         case 'r': type = BOL_TOGGLE_LR; break;
         case 's': type = BOL_INDENT; break;
         case 't': type = BOL_TOGGLE_RL; break;
@@ -1393,7 +1387,7 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 
 static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
-    char ac_flag = cmdargs_pick_winning_flag(a, 'a', 'c');
+    char ac_flag = cmdargs_pick_winning_flag(a, "ac");
     PasteLinesType type = PASTE_LINES_BELOW_CURSOR;
     if (ac_flag == 'a') {
         type = PASTE_LINES_ABOVE_CURSOR;
@@ -1775,7 +1769,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         return info_msg(&e->err, "%s can't be saved; it will be piped to stdout on exit", f);
     }
 
-    char du_flag = cmdargs_pick_winning_flag(a, 'd', 'u');
+    char du_flag = cmdargs_pick_winning_flag(a, "du");
     bool crlf = du_flag ? (du_flag == 'd') : buffer->crlf_newlines;
 
     const char *requested_encoding = NULL;
@@ -1815,7 +1809,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
     }
 
-    char b_flag = cmdargs_pick_winning_flag(a, 'b', 'B');
+    char b_flag = cmdargs_pick_winning_flag(a, "bB");
     bom = b_flag ? (b_flag == 'b') : bom;
 
     char *absolute = buffer->abs_filename;
@@ -2834,7 +2828,7 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
 
     for (size_t i = 0, n = ARRAYLEN(cmds); i < n; i++) {
-        // Check that flags arrays is null-terminated within bounds
+        // Check that flags array is null-terminated within bounds
         const char *const flags = cmds[i].flags;
         BUG_ON(flags[ARRAYLEN(cmds[0].flags) - 1] != '\0');
 

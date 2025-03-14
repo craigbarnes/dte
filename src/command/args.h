@@ -72,12 +72,14 @@ static inline char cmdargs_pick_winning_flag_from_set(const CommandArgs *a, uint
     return 0;
 }
 
-static inline char cmdargs_pick_winning_flag(const CommandArgs *a, char f1, char f2)
+static inline char cmdargs_pick_winning_flag(const CommandArgs *a, const char *flagstr)
 {
-    uint_least64_t set = cmdargs_flagset_value(f1) | cmdargs_flagset_value(f2);
-    char flag = cmdargs_pick_winning_flag_from_set(a, set);
-    BUG_ON(flag && flag != f1 && flag != f2);
-    return flag;
+    uint_least64_t set = 0;
+    UNROLL_LOOP(16)
+    for (size_t i = 0, n = strlen(flagstr); i < n; i++) {
+        set |= cmdargs_flagset_value(flagstr[i]);
+    }
+    return cmdargs_pick_winning_flag_from_set(a, set);
 }
 
 // Convert CommandArgs::flag_set to bit flags of a different format,
