@@ -287,6 +287,37 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
     return flags ? tflag(flags) : KEY_IGNORE;
 }
 
+static KeyCode parse_xtversion_reply(const StringView *reply)
+{
+    LOG_INFO("XTVERSION reply: %.*s", (int)reply->length, reply->data);
+
+    if (strview_has_prefix(reply, "XTerm(")) {
+        return tflag (
+            TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
+        );
+    }
+
+    if (strview_has_prefix(reply, "tmux ")) {
+        // tmux gained support for XTVERSION in release 3.2, so any response
+        // starting with "tmux " implies support for all tmux 3.2 features.
+        // It also has bugs related to DECRQSS queries, including crashing
+        // and spuriously printing "SIXEL IMAGE (1x1)", so we also set the
+        // TFLAG_NO_QUERY_L3 flag here.
+        // See also:
+        // • https://github.com/tmux/tmux/wiki/FAQ#how-often-is-tmux-released-what-is-the-version-number-scheme
+        // • https://github.com/tmux/tmux/commit/9dd58470e41bfb (XTVERSION; v3.2)
+        // • https://github.com/tmux/tmux/commit/5fc0be50450e75 (REP; v2.6)
+        // TODO: Set TFLAG_MODIFY_OTHER_KEYS conditionally, for tmux 3.5a+ (or 3.6+?)
+        // TODO: Set TFLAG_SYNC for tmux 3.4+ (tmux doesn't support DECRQM)
+        return tflag (
+            TFLAG_NO_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
+            | TFLAG_BS_CTRL_BACKSPACE
+        );
+    }
+
+    return tflag(TFLAG_QUERY_L3);
+}
+
 KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 {
     const char *note = "";
@@ -297,29 +328,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 
     StringView seq = string_view(data, len);
     if (strview_remove_matching_prefix(&seq, ">|")) {
-        LOG_INFO("XTVERSION reply: %.*s", (int)seq.length, seq.data);
-        if (strview_has_prefix(&seq, "XTerm(")) {
-            return tflag (
-                TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
-            );
-        } else if (strview_has_prefix(&seq, "tmux ")) {
-            // tmux gained support for XTVERSION in release 3.2, so any response
-            // starting with "tmux " implies support for all tmux 3.2 features.
-            // It also has bugs related to DECRQSS queries, including crashing
-            // and spuriously printing "SIXEL IMAGE (1x1)", so we also set the
-            // TFLAG_NO_QUERY_L3 flag here.
-            // See also:
-            // • https://github.com/tmux/tmux/wiki/FAQ#how-often-is-tmux-released-what-is-the-version-number-scheme
-            // • https://github.com/tmux/tmux/commit/9dd58470e41bfb (XTVERSION; v3.2)
-            // • https://github.com/tmux/tmux/commit/5fc0be50450e75 (REP; v2.6)
-            // TODO: Set TFLAG_MODIFY_OTHER_KEYS conditionally, for tmux 3.5a+ (or 3.6+?)
-            // TODO: Set TFLAG_SYNC for tmux 3.4+ (tmux doesn't support DECRQM)
-            return tflag (
-                TFLAG_NO_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
-                | TFLAG_BS_CTRL_BACKSPACE
-            );
-        }
-        return tflag(TFLAG_QUERY_L3);
+        return parse_xtversion_reply(&seq);
     }
 
     // https://vt100.net/docs/vt510-rm/DA3.html
