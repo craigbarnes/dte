@@ -9,7 +9,7 @@ enum {
 
 Block *block_new(size_t alloc)
 {
-    Block *blk = xnew0(Block, 1);
+    Block *blk = xcalloc(1, sizeof(*blk));
     alloc = next_multiple(alloc, BLOCK_ALLOC_MULTIPLE);
     blk->data = xmalloc(alloc);
     blk->alloc = alloc;

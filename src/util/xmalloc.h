@@ -7,8 +7,6 @@
 #include "macros.h"
 
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
-#define xnew(type, n) xmallocarray((n), sizeof(type))
-#define xnew0(type, n) xcalloc((n), sizeof(type))
 #define xrenew(mem, n) xreallocarray(mem, (n), sizeof(*mem))
 
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);

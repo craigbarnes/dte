@@ -15,7 +15,7 @@
 
 Window *new_window(EditorState *e)
 {
-    Window *window = xnew0(Window, 1);
+    Window *window = xcalloc(1, sizeof(Window));
     window->editor = e;
     return window;
 }

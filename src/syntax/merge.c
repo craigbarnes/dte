@@ -80,7 +80,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
         if (s->conds.count > 0) {
             // Deep copy conds PointerArray
             BUG_ON(s->conds.alloc < s->conds.count);
-            void **ptrs = xnew(void*, s->conds.alloc);
+            void **ptrs = xmallocarray(s->conds.alloc, sizeof(*ptrs));
             for (size_t i = 0, n = s->conds.count; i < n; i++) {
                 ptrs[i] = xmemdup(s->conds.ptrs[i], sizeof(Condition));
             }

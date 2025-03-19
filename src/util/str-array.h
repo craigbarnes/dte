@@ -43,7 +43,7 @@ static inline bool string_array_contains_str(char **strs, const char *str)
 
 static inline char **copy_string_array(char **src, size_t count)
 {
-    char **dst = xnew(char*, count + 1);
+    char **dst = xmallocarray(count + 1, sizeof(*dst));
     for (size_t i = 0; i < count; i++) {
         dst[i] = xstrdup(src[i]);
     }

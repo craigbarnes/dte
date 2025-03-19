@@ -13,7 +13,7 @@ static void alloc_table(HashSet *set, size_t size)
     BUG_ON(size < 8);
     BUG_ON(!IS_POWER_OF_2(size));
     set->table_size = size;
-    set->table = xnew0(HashSetEntry*, size);
+    set->table = xcalloc(size, sizeof(set->table[0]));
     set->grow_at = size - (size / 4); // 75% load factor (size * 0.75)
 }
 

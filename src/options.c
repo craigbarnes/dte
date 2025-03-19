@@ -814,7 +814,7 @@ bool toggle_option_values (
     size_t current = 0;
     bool error = false;
     char *ptr = get_option_ptr(e, desc, global);
-    OptionValue *parsed_values = xnew(OptionValue, count);
+    OptionValue *parsed_values = xmallocarray(count, sizeof(*parsed_values));
 
     for (size_t i = 0; i < count; i++) {
         if (desc_parse(desc, &e->err, values[i], &parsed_values[i])) {

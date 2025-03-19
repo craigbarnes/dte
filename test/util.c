@@ -154,7 +154,7 @@ static void test_xmalloc(TestContext *ctx)
     EXPECT_STREQ(str, "123::456");
     free(str);
 
-    str = xnew0(char, 4);
+    str = xcalloc(4, sizeof(str[0]));
     ASSERT_NONNULL(str);
     EXPECT_EQ(str[3], 0);
     str = xrenew(str, 64);

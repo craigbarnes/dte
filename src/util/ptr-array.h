@@ -37,7 +37,7 @@ static inline void ptr_array_init(PointerArray *array, size_t capacity)
 {
     capacity = next_multiple(capacity, 8);
     array->count = 0;
-    array->ptrs = capacity ? xnew(array->ptrs, capacity) : NULL;
+    array->ptrs = capacity ? xmallocarray(capacity, sizeof(array->ptrs[0])) : NULL;
     array->alloc = capacity;
 }
 

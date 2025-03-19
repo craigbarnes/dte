@@ -110,12 +110,12 @@ static void divide_equally(const Frame *frame)
     BUG_ON(count == 0);
     BUG_ON(!ptrs);
 
-    int *min = xnew(int, count);
+    int *min = xmallocarray(count, sizeof(int));
     for (size_t i = 0; i < count; i++) {
         min[i] = get_min(ptrs[i]);
     }
 
-    int *size = xnew0(int, count);
+    int *size = xcalloc(count, sizeof(int));
     int s = get_container_size(frame);
     int q, r, used;
     size_t n = count;
@@ -151,8 +151,8 @@ static void fix_size(const Frame *frame)
 {
     void **ptrs = frame->frames.ptrs;
     size_t count = frame->frames.count;
-    int *size = xnew(int, count);
-    int *min = xnew(int, count);
+    int *size = xmallocarray(count, sizeof(int));
+    int *min = xmallocarray(count, sizeof(int));
     int total = 0;
 
     for (size_t i = 0; i < count; i++) {
@@ -266,7 +266,7 @@ static bool rightmost_frame(const Frame *frame)
 
 static Frame *new_frame(void)
 {
-    Frame *frame = xnew0(Frame, 1);
+    Frame *frame = xcalloc(1, sizeof(*frame));
     frame->equal_size = true;
     return frame;
 }

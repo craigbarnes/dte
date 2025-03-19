@@ -115,7 +115,7 @@ String dump_hl_styles(const StyleMap *styles)
     }
 
     // Copy the HashMap entries into an array
-    HlStyle *array = xnew(HlStyle, count);
+    HlStyle *array = xmallocarray(count, sizeof(*array));
     size_t n = 0;
     for (HashMapIter it = hashmap_iter(hl_styles); hashmap_next(&it); ) {
         const TermStyle *style = it.entry->value;

@@ -334,7 +334,7 @@ static String dump_normal_aliases(EditorState *e)
     }
 
     // Clone the contents of the HashMap as an array of name/value pairs
-    CommandAlias *array = xnew(CommandAlias, count);
+    CommandAlias *array = xmallocarray(count, sizeof(*array));
     size_t n = 0;
     for (HashMapIter it = hashmap_iter(&e->aliases); hashmap_next(&it); ) {
         array[n++] = (CommandAlias) {
@@ -395,7 +395,7 @@ static String dump_all_bindings(EditorState *e)
 
     if (count) {
         // Clone custom modes in HashMap as an array
-        ModeHandlerEntry *array = xnew(ModeHandlerEntry, count);
+        ModeHandlerEntry *array = xmallocarray(count, sizeof(*array));
         size_t n = 0;
         for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
             const char *name = it.entry->key;

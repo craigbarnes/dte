@@ -59,7 +59,7 @@ static State *find_or_add_state(EditorState *e, const char *name)
         return state;
     }
 
-    state = xnew0(State, 1);
+    state = xcalloc(1, sizeof(*state));
     state->name = xstrdup(name);
     state->defined = false;
     state->type = STATE_INVALID;
@@ -203,7 +203,7 @@ static Condition *add_condition (
         lint_emit_name(e, emit, d);
     }
 
-    Condition *c = xnew0(Condition, 1);
+    Condition *c = xcalloc(1, sizeof(*c));
     c->a.destination = d;
     c->a.emit_name = emit;
     c->type = type;
@@ -373,7 +373,7 @@ static bool cmd_list(EditorState *e, const CommandArgs *a)
     const char *name = args[0];
     StringList *list = find_string_list(e->syn.current_syntax, name);
     if (!list) {
-        list = xnew0(StringList, 1);
+        list = xcalloc(1, sizeof(*list));
         hashmap_insert(&e->syn.current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
         return error_msg(&e->err, "List '%s' already exists", name);
@@ -404,7 +404,7 @@ static bool cmd_inlist(EditorState *e, const CommandArgs *a)
     StringList *list = find_string_list(e->syn.current_syntax, name);
     if (unlikely(!list)) {
         // Add undefined list
-        list = xnew0(StringList, 1);
+        list = xcalloc(1, sizeof(*list));
         hashmap_insert(&e->syn.current_syntax->string_lists, xstrdup(name), list);
     }
 
@@ -563,7 +563,7 @@ static bool cmd_syntax(EditorState *e, const CommandArgs *a)
         finish_syntax(e);
     }
 
-    Syntax *syntax = xnew0(Syntax, 1);
+    Syntax *syntax = xcalloc(1, sizeof(*syntax));
     syntax->name = xstrdup(a->args[0]);
     if (is_subsyntax(syntax) && !(e->syn.flags & SYN_WARN_ON_UNUSED_SUBSYN)) {
         syntax->warned_unused_subsyntax = true;

@@ -86,7 +86,7 @@ bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
     }
 
     // Clone the contents of the map as an array of key/command pairs
-    KeyBinding *array = xnew(*array, count);
+    KeyBinding *array = xmallocarray(count, sizeof(*array));
     size_t n = 0;
     for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
         const CachedCommand *cc = it.entry->value;
