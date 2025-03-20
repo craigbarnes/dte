@@ -274,6 +274,7 @@
     #define RETURNS_NONNULL
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-nonstring-variable-attribute
 #if GNUC_AT_LEAST(8, 0) || HAS_ATTRIBUTE(nonstring)
     #define NONSTRING __attribute__((__nonstring__))
 #else
@@ -282,9 +283,9 @@
 
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-nonnull_005fif_005fnonzero-function-attribute
 #if HAS_ATTRIBUTE(nonnull_if_nonzero)
-    #define NONNULL_ARG_IF_NONZERO_LENGTH(...) __attribute__((__nonnull_if_nonzero__, __VA_ARGS__))
+    #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx) __attribute__((__nonnull_if_nonzero__, arg_idx, len_idx))
 #else
-    #define NONNULL_ARG_IF_NONZERO_LENGTH(...)
+    #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx)
 #endif
 
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-null_005fterminated_005fstring_005farg-function-attribute
@@ -294,18 +295,24 @@
     #define CSTR_ARG(idx)
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
+// https://clang.llvm.org/docs/AttributeReference.html#counted-by
 #if HAS_ATTRIBUTE(counted_by)
     #define COUNTED_BY(member) __attribute__((counted_by(member)))
 #else
     #define COUNTED_BY(member)
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-no_005fsanitize-function-attribute
+// https://clang.llvm.org/docs/AttributeReference.html#no-sanitize
 #if HAS_ATTRIBUTE(no_sanitize)
     #define NO_SANITIZE(...) __attribute__((no_sanitize(__VA_ARGS__)))
 #else
     #define NO_SANITIZE(...)
 #endif
 
+// https://clang.llvm.org/docs/AttributeReference.html#diagnose-if
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79459
 #if HAS_ATTRIBUTE(diagnose_if)
     #define DIAGNOSE_IF(x) __attribute__((diagnose_if((x), (#x), "error")))
 #else
@@ -359,6 +366,7 @@
 #endif
 
 // https://gcc.gnu.org/onlinedocs/gcc-3.1.1/gcc/Other-Builtins.html#:~:text=__builtin_types_compatible_p
+// https://clang.llvm.org/docs/LanguageExtensions.html#builtin-functions:~:text=__builtin_types_compatible_p
 #if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_types_compatible_p)
     #define HAS_BUILTIN_TYPES_COMPATIBLE_P 1
 #endif
@@ -382,12 +390,16 @@
     #define static_assert_offsetof(obj, field, offset)
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html#index-pragma_002c-diagnostic
+// https://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas
 #if GNUC_AT_LEAST(4, 2) || defined(__clang__)
     #define DISABLE_WARNING(wflag) DO_PRAGMA(GCC diagnostic ignored wflag)
 #else
     #define DISABLE_WARNING(wflag)
 #endif
 
+// https://clang.llvm.org/docs/AttributeReference.html#pragma-clang-loop
+// https://gcc.gnu.org/onlinedocs/gcc/Loop-Specific-Pragmas.html#index-pragma-GCC-unroll-n
 #if CLANG_AT_LEAST(3, 6)
     #define UNROLL_LOOP(n) DO_PRAGMA(clang loop unroll_count(n))
 #elif GNUC_AT_LEAST(8, 0)
@@ -396,12 +408,16 @@
     #define UNROLL_LOOP(n)
 #endif
 
-#ifdef __COUNTER__ // Supported by GCC 4.3+ and Clang
+// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html (since GCC 4.3)
+// https://clang.llvm.org/docs/LanguageExtensions.html#builtin-macros
+#ifdef __COUNTER__
     #define COUNTER __COUNTER__
 #else
     #define COUNTER __LINE__
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+// https://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas
 #ifdef __clang__
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(clang diagnostic push) \
