@@ -43,14 +43,24 @@ static inline unsigned int cmdargs_flagset_idx(unsigned char c)
     return idx + 1;
 }
 
-static inline uint_least64_t cmdargs_flagset_value(unsigned char flag)
+static inline uint_least64_t cmdargs_flagset_bit(unsigned char flag)
 {
     return UINT64_C(1) << cmdargs_flagset_idx(flag);
 }
 
+static inline uint_least64_t cmdargs_flagset_from_str(const char *flags)
+{
+    uint_least64_t set = 0;
+    UNROLL_LOOP(16)
+    for (size_t i = 0, n = strlen(flags); i < n; i++) {
+        set |= cmdargs_flagset_bit(flags[i]);
+    }
+    return set;
+}
+
 static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
 {
-    uint_least64_t bitmask = cmdargs_flagset_value(flag);
+    uint_least64_t bitmask = cmdargs_flagset_bit(flag);
     static_assert_compatible_types(bitmask, a->flag_set);
     return (a->flag_set & bitmask) != 0;
 }
@@ -64,7 +74,7 @@ static inline char cmdargs_pick_winning_flag_from_set(const CommandArgs *a, uint
     BUG_ON(a->nr_flags > ARRAYLEN(a->flags));
     for (size_t n = a->nr_flags, i = n - 1; i < n; i--) {
         char flag = a->flags[i];
-        if (flagset & cmdargs_flagset_value(flag)) {
+        if (flagset & cmdargs_flagset_bit(flag)) {
             return flag;
         }
     }
@@ -74,11 +84,7 @@ static inline char cmdargs_pick_winning_flag_from_set(const CommandArgs *a, uint
 
 static inline char cmdargs_pick_winning_flag(const CommandArgs *a, const char *flagstr)
 {
-    uint_least64_t set = 0;
-    UNROLL_LOOP(16)
-    for (size_t i = 0, n = strlen(flagstr); i < n; i++) {
-        set |= cmdargs_flagset_value(flagstr[i]);
-    }
+    uint_least64_t set = cmdargs_flagset_from_str(flagstr);
     return cmdargs_pick_winning_flag_from_set(a, set);
 }
 

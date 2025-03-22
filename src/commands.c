@@ -1136,7 +1136,7 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
 static bool cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
-    uint_least64_t np = cmdargs_flagset_value('n') | cmdargs_flagset_value('p');
+    uint_least64_t np = cmdargs_flagset_from_str("np");
     if (u64_popcount(a->flag_set & np) + !!str >= 2) {
         return error_msg(&e->err, "flags [-n|-p] and [number] argument are mutually exclusive");
     }
@@ -2070,10 +2070,7 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
 
 static unsigned int count_npw_flags(const CommandArgs *a)
 {
-    uint_least64_t npw = 0;
-    npw |= cmdargs_flagset_value('n');
-    npw |= cmdargs_flagset_value('p');
-    npw |= cmdargs_flagset_value('w');
+    const uint_least64_t npw = cmdargs_flagset_from_str("npw");
     return u64_popcount(a->flag_set & npw);
 }
 

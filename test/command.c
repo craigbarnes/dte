@@ -521,6 +521,27 @@ static void test_cmdargs_flagset_idx(TestContext *ctx)
     }
 }
 
+static void test_cmdargs_flagset_from_str(TestContext *ctx)
+{
+    uint_least64_t r = 0;
+    r |= cmdargs_flagset_bit('c');
+    r |= cmdargs_flagset_bit('n');
+    r |= cmdargs_flagset_bit('s');
+    r |= cmdargs_flagset_bit('T');
+    EXPECT_EQ(u64_popcount(r), 4);
+    EXPECT_UINT_EQ(r, cmdargs_flagset_from_str("cnsT"));
+
+    r = 0;
+    r |= cmdargs_flagset_bit('a');
+    r |= cmdargs_flagset_bit('d');
+    r |= cmdargs_flagset_bit('0');
+    r |= cmdargs_flagset_bit('1');
+    r |= cmdargs_flagset_bit('8');
+    r |= cmdargs_flagset_bit('Z');
+    EXPECT_EQ(u64_popcount(r), 6);
+    EXPECT_UINT_EQ(r, cmdargs_flagset_from_str("ad018Z"));
+}
+
 static void test_cmdargs_convert_flags_1(TestContext *ctx)
 {
     static const FlagMapping map[] = {
@@ -530,10 +551,7 @@ static void test_cmdargs_convert_flags_1(TestContext *ctx)
         {'i', REPLACE_IGNORE_CASE},
     };
 
-    const CommandArgs a = {
-        .flag_set = cmdargs_flagset_value('c') | cmdargs_flagset_value('g')
-    };
-
+    const CommandArgs a = {.flag_set = cmdargs_flagset_from_str("cg")};
     ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL);
 }
@@ -547,19 +565,19 @@ static void test_cmdargs_convert_flags_2(TestContext *ctx)
         {'H', EFLAG_ALL_HIST},
     };
 
-    CommandArgs a = {.flag_set = cmdargs_flagset_value('C')};
+    CommandArgs a = {.flag_set = cmdargs_flagset_bit('C')};
     EditorFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
     EXPECT_EQ(flags, EFLAG_CMD_HIST);
 
-    a.flag_set |= cmdargs_flagset_value('F');
+    a.flag_set |= cmdargs_flagset_bit('F');
     flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
     EXPECT_EQ(flags, EFLAG_CMD_HIST | EFLAG_FILE_HIST);
 
-    a.flag_set |= cmdargs_flagset_value('S');
+    a.flag_set |= cmdargs_flagset_bit('S');
     flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
     EXPECT_EQ(flags, EFLAG_ALL_HIST);
 
-    a.flag_set = cmdargs_flagset_value('H');
+    a.flag_set = cmdargs_flagset_bit('H');
     EXPECT_EQ(flags, cmdargs_convert_flags(&a, map, ARRAYLEN(map)));
 }
 
@@ -587,6 +605,7 @@ static const TestEntry tests[] = {
     TEST(test_string_append_escaped_arg),
     TEST(test_command_struct_layout),
     TEST(test_cmdargs_flagset_idx),
+    TEST(test_cmdargs_flagset_from_str),
     TEST(test_cmdargs_convert_flags_1),
     TEST(test_cmdargs_convert_flags_2),
     TEST(test_add_alias),

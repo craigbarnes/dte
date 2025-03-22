@@ -533,6 +533,11 @@ static void test_complete_command_extra(TestContext *ctx)
     EXPECT_STRING_EQ_CSTRING(&c->buf, "bind -T command tab complete-next ");
     reset_completion(c);
 
+    cmdline_set_text(c, "bind -qc C-left ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ_CSTRING(&c->buf, "bind -qc C-left word-bwd ");
+    reset_completion(c);
+
     cmdline_set_text(c, "compile -1s bas");
     complete_command_next(e);
     EXPECT_STRING_EQ_CSTRING(&c->buf, "compile -1s basic ");

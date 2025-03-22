@@ -49,7 +49,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
                 return ARGERR_INVALID_OPTION;
             }
 
-            a->flag_set |= cmdargs_flagset_value(flag);
+            a->flag_set |= cmdargs_flagset_bit(flag);
             a->flags[nr_flags++] = flag;
             if (unlikely(nr_flags == ARRAYLEN(a->flags))) {
                 return ARGERR_TOO_MANY_OPTIONS;
