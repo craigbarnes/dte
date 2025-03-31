@@ -12,14 +12,12 @@ void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen
 #endif
 
     // Note: this fallback implementation isn't well suited to general
-    // purpose use and can exhibit poor performance under certain
-    // inputs. A library-quality memmem(3) is not a trivial thing to
-    // implement, but fortunately almost every modern platform already
-    // has one in libc and it's been added to the POSIX base spec in
-    // issue 8[1]. Therefore, this code isn't likely to be used, and
-    // even when it is, it should be acceptable for the uses in this
-    // codebase.
-    // [1]: https://www.austingroupbugs.net/view.php?id=1061
+    // purpose use and can exhibit poor performance under certain inputs.
+    // A library-quality memmem(3) isn't a trivial thing to implement,
+    // but fortunately almost every modern platform already has one in
+    // libc and it was added to the POSIX base spec in issue 8. Therefore,
+    // this code isn't likely to be used, and even when it is, it should
+    // be acceptable for the uses in this codebase.
 
     const char *start = haystack;
     int first_char = ((const unsigned char*)needle)[0];
