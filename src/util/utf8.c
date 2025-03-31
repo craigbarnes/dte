@@ -171,22 +171,23 @@ CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
 {
     size_t i = *idx;
     unsigned int first = str[i++];
-    int len = u_seq_len(first);
-    if (unlikely(len < 2 || len > size - i + 1)) {
+    int seq_len = u_seq_len(first);
+    if (unlikely(seq_len < 2 || seq_len > size - i + 1)) {
         goto invalid;
     }
 
-    CodePoint u = first & u_get_first_byte_mask(len);
-    unsigned int c = len - 1;
+    unsigned int count = seq_len - 2;
+    CodePoint u = first & u_get_first_byte_mask(seq_len);
+
     do {
         unsigned char ch = str[i++];
         if (!u_is_continuation_byte(ch)) {
             goto invalid;
         }
         u = (u << 6) | (ch & 0x3f);
-    } while (--c);
+    } while (count--);
 
-    if (u_is_illformed(u, len)) {
+    if (u_is_illformed(u, seq_len)) {
         goto invalid;
     }
 
