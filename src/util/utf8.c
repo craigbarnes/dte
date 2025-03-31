@@ -99,8 +99,7 @@ static bool u_is_illformed(CodePoint u, size_t seq_len)
  */
 static unsigned int u_get_first_byte_mask(unsigned int seq_len)
 {
-    BUG_ON(seq_len < 2);
-    BUG_ON(seq_len > UTF8_MAX_SEQ_LEN);
+    BUG_ON(seq_len < 2 || seq_len > UTF8_MAX_SEQ_LEN);
     return (0x80 >> seq_len) - 1;
 }
 

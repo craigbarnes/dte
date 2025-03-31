@@ -44,7 +44,7 @@ void string_append_byte(String *s, unsigned char byte)
 
 size_t string_append_codepoint(String *s, CodePoint u)
 {
-    string_reserve_space(s, 4);
+    string_reserve_space(s, UTF8_MAX_SEQ_LEN);
     size_t n = u_set_char_raw(s->buffer + s->len, u);
     s->len += n;
     return n;

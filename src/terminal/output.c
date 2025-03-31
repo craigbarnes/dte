@@ -469,10 +469,10 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
 
     if (u_is_unprintable(u)) {
         static_assert(U_SET_HEX_LEN == 4);
-        BUG_ON(n > 3);
-        char tmp[8] = {'\0'};
+        BUG_ON(n >= U_SET_HEX_LEN);
+        char tmp[2 * U_SET_HEX_LEN] = {'\0'};
         u_set_hex(tmp, u);
-        memcpy(buf, tmp + 4 - n, 4);
+        memcpy(buf, tmp + U_SET_HEX_LEN - n, U_SET_HEX_LEN);
         obuf->count += n;
         return;
     }
