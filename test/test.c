@@ -62,16 +62,13 @@ void expect_memeq (
     }
 
     char buf[2048];
-    int buflen1 = u_make_printable(p1, n1, buf, sizeof(buf), 0);
-    size_t avail = sizeof(buf) - buflen1;
-    int buflen2 = u_make_printable(p2, n2, buf + buflen1, avail, 0);
+    size_t m1 = u_make_printable(p1, n1, buf, sizeof(buf) - 64, 0);
+    size_t m2 = u_make_printable(p2, n2, buf + m1, sizeof(buf) - m1, 0);
 
     test_fail (
         ctx, file, line,
         "Memory areas not equal: lengths: %zu, %zu; contents:  %.*s  %.*s",
-        n1, n2,
-        buflen1, buf,
-        buflen2, buf + buflen1
+        n1, n2, (int)m1, buf, (int)m2, buf + m1
     );
 }
 
