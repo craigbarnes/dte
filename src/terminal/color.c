@@ -4,23 +4,19 @@
 
 int32_t parse_rgb(const char *str, size_t len)
 {
+    unsigned int n3 = (len == 3);
+    if (unlikely(!n3 && len != 6)) {
+        return COLOR_INVALID;
+    }
+
     unsigned int mask = 0;
     unsigned int val = 0;
 
-    if (len == 6) {
-        for (size_t i = 0; i < len; i++) {
-            unsigned int digit = hex_decode(str[i]);
-            mask |= digit;
-            val = val << 4 | digit;
-        }
-    } else if (len == 3) {
-        for (size_t i = 0; i < len; i++) {
-            unsigned int digit = hex_decode(str[i]);
-            mask |= digit;
-            val = val << 8 | digit << 4 | digit;
-        }
-    } else {
-        return COLOR_INVALID;
+    for (size_t i = 0; i < 6; i++) {
+        // The right shift here produces `i / 2` if `len == 3`
+        unsigned int digit = hex_decode(str[i >> n3]);
+        mask |= digit;
+        val = val << 4 | digit;
     }
 
     return unlikely(mask & HEX_INVALID) ? COLOR_INVALID : COLOR_RGB(val);
