@@ -14,12 +14,18 @@ GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)')
 DOCFILES = $(call GITATTRS, xml markdown)
 SHELLSCRIPTS = $(call GITATTRS, shell)
 SPACE_INDENTED_FILES = $(call GITATTRS, space-indent)
-SPATCHNAMES = arraylen minmax tailcall wrap perf pitfalls staticbuf
-SPATCHFILES = $(foreach f, $(SPATCHNAMES), tools/coccinelle/$f.cocci)
+# TODO: Re-enable `wrap`, after diagnosing/fixing the extreme slowness
+SPATCHNAMES = arraylen minmax tailcall perf pitfalls staticbuf
+SPATCHTARGETS = $(addprefix check-coccinelle-, $(SPATCHNAMES))
 
+check-coccinelle: $(SPATCHTARGETS)
 check-source: check-whitespace check-headers check-codespell check-shell check-awk
 check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
+
+$(SPATCHTARGETS): check-coccinelle-%:
+	$(E) SPATCH $*
+	$(Q) $(SPATCH) $(SPATCHFLAGS) --sp-file 'tools/coccinelle/$*.cocci' $(all_sources) $(SPATCHFILTER)
 
 check-shell:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(SHELLSCRIPTS))'
@@ -66,14 +72,8 @@ check-docs:
 	@echo '$(DOCFILES) ' | tr ' ' '\n'
 	$(Q) $(FINDLINKS) $(DOCFILES) | sort | uniq | $(XARGS_P) -I@1 $(CHECKURL)
 
-check-coccinelle:
-	$(Q) $(foreach sp, $(SPATCHFILES), \
-	  $(LOG) SPATCH $(sp); \
-	  $(SPATCH) $(SPATCHFLAGS) --sp-file $(sp) $(all_sources) $(SPATCHFILTER); \
-	)
-
 
 .PHONY: \
-    check-all check-source check-aux check-typos check-coccinelle check-docs \
-    check-whitespace check-headers check-codespell check-shell check-awk \
-    check-desktop-file check-appstream
+    check-all check-source check-aux check-coccinelle $(SPATCHTARGETS) \
+    check-shell check-awk check-whitespace check-headers check-codespell \
+    check-typos check-desktop-file check-appstream check-docs
