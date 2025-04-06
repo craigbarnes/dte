@@ -369,22 +369,30 @@
     #define HAS_BUILTIN_TYPES_COMPATIBLE_P 1
 #endif
 
+// ARRAYLEN() calculates the number of elements in an array and also
+// performs some sanity checks to prevent accidental pointer arguments
 #if defined(HAS_STATIC_ASSERT) && defined(HAS_BUILTIN_TYPES_COMPATIBLE_P)
+    // https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3369.pdf
     #define SAME_TYPE(a, b) __builtin_types_compatible_p(__typeof__(a), __typeof__(b))
     #define DECAY(a) (&*(a))
     #define IS_ARRAY(a) (!SAME_TYPE(a, DECAY(a)))
     #define MUST_BE(e) (0 * sizeof(struct {_Static_assert(e, #e); int see_n3369;}))
     #define SIZEOF_ARRAY(a) (sizeof(a) + MUST_BE(IS_ARRAY(a)))
-    // Calculate the number of elements in an array.
-    // See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3369.pdf
     #define ARRAYLEN(a) (SIZEOF_ARRAY(a) / sizeof((a)[0]))
+//#elif HAS_EXTENSION(c_countof)
+    // https://clang.llvm.org/docs/LanguageExtensions.html#c2y-countof
+    // https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3469.htm#:~:text=_Countof
+    // https://github.com/llvm/llvm-project/commit/00c43ae23524d72707701620da89ad248393a8e4
+    // https://github.com/llvm/llvm-project/issues/102836#issuecomment-2681819243
+    // TODO: Enable this if/when _Countof() becomes more certain and/or available
+    // in a Clang release:
+    //#define ARRAYLEN(a) _Countof(a)
 #else
-    // The extra division on the third line is a trick to help prevent
-    // passing pointer arguments, much like the implementation above, but
-    // done using only standard ISO C features (and producing "division by
-    // zero" error messages, instead of the clearer ones above). Note that
-    // the GCC/Clang `-Werror=div-by-zero` warning is used (if available),
-    // so as to turn such warnings into compile-time errors.
+    // The extra division on the third line produces a `div-by-zero`
+    // warning if `a` is a pointer (instead of an array). The GCC/Clang
+    // `-Werror=div-by-zero` option is also used by the build system
+    // (if available; see `mk/compiler.sh`), so as to turn such warnings
+    // into compile-time errors.
     #define ARRAYLEN(a) ( \
         (sizeof(a) / sizeof((a)[0])) \
         / ((size_t)(!(sizeof(a) % sizeof((a)[0])))) \
