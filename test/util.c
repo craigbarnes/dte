@@ -670,7 +670,7 @@ static void test_string(TestContext *ctx)
     free(cstr);
 
     // This is mostly for UBSan coverage
-    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
+    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
     s = string_new(0);
     EXPECT_NULL(s.buffer);
     EXPECT_EQ(s.len, 0);

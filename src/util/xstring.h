@@ -30,7 +30,7 @@ static inline const char *xstrrchr(const char *str, int ch)
     return ptr;
 }
 
-// See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
+// See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
 static inline bool mem_equal(const void *s1, const void *s2, size_t n)
 {
     BUG_ON(n && (!s1 || !s2));

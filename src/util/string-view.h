@@ -89,7 +89,7 @@ static inline bool strview_has_strn_prefix(const StringView *sv, const char *p, 
 NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
 static inline bool strview_has_strn_suffix(const StringView *sv, const char *suf, size_t suflen)
 {
-    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3261.pdf
+    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
     size_t len = sv->length;
     return suflen == 0 || (len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen));
 }
