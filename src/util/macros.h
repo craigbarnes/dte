@@ -24,15 +24,6 @@
 #define DECIMAL_STR_MAX(T) ((sizeof(T) * 3) + 2)
 #define HEX_STR_MAX(T) ((sizeof(T) * 2) + 2)
 
-// Calculate the number of elements in an array.
-// The extra division on the third line is a trick to help prevent
-// passing a pointer to the first element of an array instead of a
-// reference to the array itself.
-#define ARRAYLEN(x) ( \
-    (sizeof(x) / sizeof((x)[0])) \
-    / ((size_t)(!(sizeof(x) % sizeof((x)[0])))) \
-)
-
 #define VERCMP(x, y, cx, cy) ((cx > x) || ((cx == x) && (cy >= y)))
 
 #if defined(__GNUC__) && defined(__GNUC_MINOR__)
@@ -354,11 +345,18 @@
 #endif
 
 #if __STDC_VERSION__ >= 202311L
+    // static_assert is a standard keyword in ISO C23 (§6.4.1) and the
+    // second argument is optional (§6.7.11)
     #define HAS_STATIC_ASSERT 1
 #elif __STDC_VERSION__ >= 201112L
+    // ISO C11 provides _Static_assert (§6.4.1), with a mandatory second
+    // argument (§6.7.10)
     #define static_assert(x) _Static_assert((x), #x)
     #define HAS_STATIC_ASSERT 1
 #elif GNUC_AT_LEAST(4, 6) || HAS_EXTENSION(c_static_assert)
+    // GCC 4.6+ and Clang allow _Static_assert (as a language extension),
+    // even in pre-C11 standards modes:
+    // https://clang.llvm.org/docs/LanguageExtensions.html#c11-static-assert
     #define static_assert(x) __extension__ _Static_assert((x), #x)
     #define HAS_STATIC_ASSERT 1
 #else
@@ -369,6 +367,28 @@
 // https://clang.llvm.org/docs/LanguageExtensions.html#builtin-functions:~:text=__builtin_types_compatible_p
 #if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_types_compatible_p)
     #define HAS_BUILTIN_TYPES_COMPATIBLE_P 1
+#endif
+
+#if defined(HAS_STATIC_ASSERT) && defined(HAS_BUILTIN_TYPES_COMPATIBLE_P)
+    #define SAME_TYPE(a, b) __builtin_types_compatible_p(__typeof__(a), __typeof__(b))
+    #define DECAY(a) (&*(a))
+    #define IS_ARRAY(a) (!SAME_TYPE(a, DECAY(a)))
+    #define MUST_BE(e) (0 * sizeof(struct {_Static_assert(e, #e); int see_n3369;}))
+    #define SIZEOF_ARRAY(a) (sizeof(a) + MUST_BE(IS_ARRAY(a)))
+    // Calculate the number of elements in an array.
+    // See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3369.pdf
+    #define ARRAYLEN(a) (SIZEOF_ARRAY(a) / sizeof((a)[0]))
+#else
+    // The extra division on the third line is a trick to help prevent
+    // passing pointer arguments, much like the implementation above, but
+    // done using only standard ISO C features (and producing "division by
+    // zero" error messages, instead of the clearer ones above). Note that
+    // the GCC/Clang `-Werror=div-by-zero` warning is used (if available),
+    // so as to turn such warnings into compile-time errors.
+    #define ARRAYLEN(a) ( \
+        (sizeof(a) / sizeof((a)[0])) \
+        / ((size_t)(!(sizeof(a) % sizeof((a)[0])))) \
+    )
 #endif
 
 #if defined(HAS_STATIC_ASSERT) && defined(HAS_BUILTIN_TYPES_COMPATIBLE_P)
