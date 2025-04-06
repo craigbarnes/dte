@@ -159,10 +159,9 @@ char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 
     if (hundredth) {
         uintmax_t remainder = bytes & (unit - 1);
-        // TODO: Use shifting here, to avoid emitting a divide instruction
-        fpart = remainder / hundredth;
-        ipart += (fpart > 99);
-        fpart = (fpart > 99) ? 0 : fpart;
+        unsigned int f = remainder / hundredth;
+        ipart += (f > 99);
+        fpart = (f > 99) ? 0 : f;
     }
 
     size_t i = buf_umax_to_str(ipart, buf);

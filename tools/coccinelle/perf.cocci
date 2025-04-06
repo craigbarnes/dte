@@ -4,6 +4,7 @@ identifier func != {
     bisearch_idx,
     calculate_tabbar,
     divide_equally,
+    human_readable_size,
     indent_level,
     indent_remainder,
     next_indent_width,
