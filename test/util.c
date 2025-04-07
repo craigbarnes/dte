@@ -293,27 +293,98 @@ static void test_ascii(TestContext *ctx)
     EXPECT_TRUE(ascii_isspace('\t'));
     EXPECT_TRUE(ascii_isspace('\r'));
     EXPECT_TRUE(ascii_isspace('\n'));
+    EXPECT_FALSE(ascii_isspace('\v')); // (differs from POSIX)
+    EXPECT_FALSE(ascii_isspace('\f')); // (differs from POSIX)
     EXPECT_FALSE(ascii_isspace('\0'));
     EXPECT_FALSE(ascii_isspace('a'));
     EXPECT_FALSE(ascii_isspace(0x7F));
     EXPECT_FALSE(ascii_isspace(0x80));
 
-    EXPECT_TRUE(ascii_iscntrl('\0'));
-    EXPECT_TRUE(ascii_iscntrl('\a'));
-    EXPECT_TRUE(ascii_iscntrl('\b'));
-    EXPECT_TRUE(ascii_iscntrl('\t'));
-    EXPECT_TRUE(ascii_iscntrl('\n'));
-    EXPECT_TRUE(ascii_iscntrl('\v'));
-    EXPECT_TRUE(ascii_iscntrl('\f'));
-    EXPECT_TRUE(ascii_iscntrl('\r'));
-    EXPECT_TRUE(ascii_iscntrl(0x0E));
-    EXPECT_TRUE(ascii_iscntrl(0x1F));
-    EXPECT_TRUE(ascii_iscntrl(0x7F));
-    EXPECT_FALSE(ascii_iscntrl(' '));
-    EXPECT_FALSE(ascii_iscntrl('a'));
-    EXPECT_FALSE(ascii_iscntrl(0x7E));
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=cntrl,-%3Calert
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=may%20add%20additional%20characters
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap06.html
+    EXPECT_TRUE(ascii_iscntrl('\0')); // <NUL>
+    EXPECT_TRUE(ascii_iscntrl('\a')); // <alert>, <BEL>
+    EXPECT_TRUE(ascii_iscntrl('\b')); // <backspace>, <BS>
+    EXPECT_TRUE(ascii_iscntrl('\t')); // <tab>, <HT>
+    EXPECT_TRUE(ascii_iscntrl('\n')); // <newline>, <LF>
+    EXPECT_TRUE(ascii_iscntrl('\v')); // <vertical-tab>, <VT>
+    EXPECT_TRUE(ascii_iscntrl('\f')); // <form-feed>, <FF>
+    EXPECT_TRUE(ascii_iscntrl('\r')); // <carriage-return>, <CR>
+    EXPECT_TRUE(ascii_iscntrl(0x0E)); // <SO>
+    EXPECT_TRUE(ascii_iscntrl(0x1F)); // <IS1>, <US>
+    EXPECT_TRUE(ascii_iscntrl(0x7F)); // <DEL>
+    EXPECT_FALSE(ascii_iscntrl(' ')); // <space>
+    EXPECT_FALSE(ascii_iscntrl('a')); // <a>
+    EXPECT_FALSE(ascii_iscntrl('~')); // <tilde>
     EXPECT_FALSE(ascii_iscntrl(0x80));
     EXPECT_FALSE(ascii_iscntrl(0xFF));
+
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=cntrl,-%3Calert
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=space,-%3Ctab
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=may%20add%20additional%20characters
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap06.html
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\0')); // <NUL>
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\a')); // <alert>, <BEL>
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\b')); // <backspace>, <BS>
+    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x0E)); // <SO>
+    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x1F)); // <IS1>, <US>
+    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x7F)); // <DEL>
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\v')); // <vertical-tab>, <VT> (differs from POSIX)
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\f')); // <form-feed>, <FF> (differs from POSIX)
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('\t')); // <tab>, <HT>
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('\n')); // <newline>, <LF>
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('\r')); // <carriage-return>, <CR>
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(' ')); // <space>
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('a'));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(0x7E));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(0x80));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(0xFF));
+
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=punct,-%3Cexclamation
+    // https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01:~:text=may%20add%20additional%20characters
+    EXPECT_TRUE(ascii_ispunct('!'));
+    EXPECT_TRUE(ascii_ispunct('"'));
+    EXPECT_TRUE(ascii_ispunct('#'));
+    EXPECT_TRUE(ascii_ispunct('$'));
+    EXPECT_TRUE(ascii_ispunct('%'));
+    EXPECT_TRUE(ascii_ispunct('&'));
+    EXPECT_TRUE(ascii_ispunct('\''));
+    EXPECT_TRUE(ascii_ispunct('('));
+    EXPECT_TRUE(ascii_ispunct(')'));
+    EXPECT_TRUE(ascii_ispunct('*'));
+    EXPECT_TRUE(ascii_ispunct('+'));
+    EXPECT_TRUE(ascii_ispunct(','));
+    EXPECT_TRUE(ascii_ispunct('-'));
+    EXPECT_TRUE(ascii_ispunct('.'));
+    EXPECT_TRUE(ascii_ispunct('/'));
+    EXPECT_TRUE(ascii_ispunct(':'));
+    EXPECT_TRUE(ascii_ispunct(';'));
+    EXPECT_TRUE(ascii_ispunct('<'));
+    EXPECT_TRUE(ascii_ispunct('='));
+    EXPECT_TRUE(ascii_ispunct('>'));
+    EXPECT_TRUE(ascii_ispunct('?'));
+    EXPECT_TRUE(ascii_ispunct('@'));
+    EXPECT_TRUE(ascii_ispunct('['));
+    EXPECT_TRUE(ascii_ispunct('\\'));
+    EXPECT_TRUE(ascii_ispunct(']'));
+    EXPECT_TRUE(ascii_ispunct('^'));
+    EXPECT_TRUE(ascii_ispunct('_'));
+    EXPECT_TRUE(ascii_ispunct('`'));
+    EXPECT_TRUE(ascii_ispunct('{'));
+    EXPECT_TRUE(ascii_ispunct('|'));
+    EXPECT_TRUE(ascii_ispunct('}'));
+    EXPECT_TRUE(ascii_ispunct('~'));
+    EXPECT_FALSE(ascii_ispunct(' '));
+    EXPECT_FALSE(ascii_ispunct('0'));
+    EXPECT_FALSE(ascii_ispunct('9'));
+    EXPECT_FALSE(ascii_ispunct('A'));
+    EXPECT_FALSE(ascii_ispunct('Z'));
+    EXPECT_FALSE(ascii_ispunct('a'));
+    EXPECT_FALSE(ascii_ispunct('z'));
+    EXPECT_FALSE(ascii_ispunct(0x00));
+    EXPECT_FALSE(ascii_ispunct(0x7F));
+    EXPECT_FALSE(ascii_ispunct(0xFF));
 
     EXPECT_TRUE(ascii_isdigit('0'));
     EXPECT_TRUE(ascii_isdigit('1'));
@@ -324,21 +395,6 @@ static void test_ascii(TestContext *ctx)
     EXPECT_FALSE(ascii_isdigit(':'));
     EXPECT_FALSE(ascii_isdigit('\0'));
     EXPECT_FALSE(ascii_isdigit(0xFF));
-
-    EXPECT_TRUE(ascii_is_nonspace_cntrl('\0'));
-    EXPECT_TRUE(ascii_is_nonspace_cntrl('\a'));
-    EXPECT_TRUE(ascii_is_nonspace_cntrl('\b'));
-    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x0E));
-    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x1F));
-    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x7F));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl('\t'));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl('\n'));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl('\r'));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl(' '));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl('a'));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl(0x7E));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl(0x80));
-    EXPECT_FALSE(ascii_is_nonspace_cntrl(0xFF));
 
     EXPECT_TRUE(ascii_isprint(' '));
     EXPECT_TRUE(ascii_isprint('!'));
@@ -434,14 +490,14 @@ static void test_ascii(TestContext *ctx)
     char *saved_locale = xstrdup(locale);
 
     // Check that the ascii_is*() functions behave like their corresponding
-    // <ctype.h> macros, when in the standard "C" locale
+    // <ctype.h> macros, when in the standard C/POSIX locale.
+    // See also: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_01_01
     ASSERT_NONNULL(setlocale(LC_CTYPE, "C"));
     for (int i = -1; i < 256; i++) {
         EXPECT_EQ(ascii_isalpha(i), !!isalpha(i));
         EXPECT_EQ(ascii_isalnum(i), !!isalnum(i));
         EXPECT_EQ(ascii_islower(i), !!islower(i));
         EXPECT_EQ(ascii_isupper(i), !!isupper(i));
-        EXPECT_EQ(ascii_iscntrl(i), !!iscntrl(i));
         EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
         EXPECT_EQ(ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(ascii_isprint(i), !!isprint(i));
@@ -451,9 +507,9 @@ static void test_ascii(TestContext *ctx)
         EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum(i) || i == '_');
         if (i != '\v' && i != '\f') {
             EXPECT_EQ(ascii_isspace(i), !!isspace(i));
-            EXPECT_EQ(ascii_is_nonspace_cntrl(i), !!iscntrl(i) && !isspace(i));
         }
         if (i != -1) {
+            EXPECT_EQ(is_word_byte(i), !!isalnum(i) || i == '_' || i >= 0x80);
             EXPECT_EQ(ascii_tolower(i), tolower(i));
             EXPECT_EQ(ascii_toupper(i), toupper(i));
         }

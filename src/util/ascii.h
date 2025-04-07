@@ -15,11 +15,11 @@ typedef enum {
     ASCII_REGEX = 0x08, // [$()*+.?[^{|\]
     ASCII_LOWER = 0x10,
     ASCII_UPPER = 0x20,
-    ASCII_UNDERSCORE = 0x40,
-    ASCII_NONASCII = 0x80,
+    ASCII_PUNCT = 0x40,
+    ASCII_UNDERSCORE = 0x80,
     ASCII_ALPHA = ASCII_LOWER | ASCII_UPPER,
     ASCII_ALNUM = ASCII_ALPHA | ASCII_DIGIT,
-    ASCII_WORDBYTE = ASCII_ALNUM | ASCII_UNDERSCORE | ASCII_NONASCII,
+    ASCII_NONWORD = ASCII_SPACE | ASCII_CNTRL | ASCII_PUNCT,
 } AsciiCharType;
 
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
@@ -28,16 +28,21 @@ typedef enum {
 #define ascii_isupper(x) ascii_test(x, ASCII_UPPER)
 #define ascii_isalpha(x) ascii_test(x, ASCII_ALPHA)
 #define ascii_isalnum(x) ascii_test(x, ASCII_ALNUM)
-#define ascii_isprint(x) (!ascii_test(x, ASCII_CNTRL | ASCII_NONASCII))
+#define ascii_ispunct(x) ascii_test(x, ASCII_PUNCT | ASCII_UNDERSCORE)
 
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
 #define is_regex_special_char(x) ascii_test(x, ASCII_REGEX)
-#define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
+#define is_word_byte(x) !ascii_test(x, ASCII_NONWORD) // See comment in ascii.c
 
 static inline bool ascii_test(unsigned char c, AsciiCharType mask)
 {
     return (ascii_table[c] & mask) != 0;
+}
+
+static inline bool ascii_isprint(unsigned char c)
+{
+    return c >= ' ' && c <= '~';
 }
 
 static inline bool ascii_isblank(unsigned char c)
