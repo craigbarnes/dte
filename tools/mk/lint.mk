@@ -3,11 +3,10 @@ HCHECK = $(AWK) -f tools/hdrcheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
 TYPOS ?= typos
-SPATCH ?= spatch
 GAWK ?= gawk
 AWKLINT = >/dev/null $(GAWK) --lint=fatal --posix
+SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
-SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
@@ -24,8 +23,9 @@ check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
 
 $(SPATCHTARGETS): check-coccinelle-%:
-	$(E) SPATCH $*
-	$(Q) $(SPATCH) $(SPATCHFLAGS) --sp-file 'tools/coccinelle/$*.cocci' $(all_sources) $(SPATCHFILTER)
+	$(E) SPATCH 'tools/coccinelle/$*.cocci'
+	$(Q) $(SPATCH) $(SPATCHFLAGS) --sp-file 'tools/coccinelle/$*.cocci' \
+	     $(all_sources) 2>&1 | sed '/egrep is obsolescent/d'
 
 check-shell:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(SHELLSCRIPTS))'
