@@ -56,7 +56,8 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
         abort();
     }
 
-    bool timing = ctx->timing;
+    struct timespec times[2];
+    bool timing = ctx->timing && !clock_gettime(CLOCK_MONOTONIC, &times[0]);
 
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
         if (unlikely(!t->name || !t->func)) {
@@ -66,13 +67,11 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
 
         unsigned int prev_passed = ctx->passed;
         unsigned int prev_failed = ctx->failed;
-        struct timespec times[2];
-        timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[0]);
         t->func(ctx);
         timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[1]);
+
         unsigned int passed = ctx->passed - prev_passed;
         unsigned int failed = ctx->failed - prev_failed;
-
         fprintf(stderr, "   CHECK  %-30s  %5u passed", t->name, passed);
 
         if (unlikely(failed > 0)) {
@@ -81,6 +80,7 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
 
         if (timing) {
             print_timing(ctx, times);
+            times[0] = times[1];
         }
 
         fputc('\n', stderr);
