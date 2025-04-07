@@ -52,7 +52,7 @@ static inline bool ascii_isblank(unsigned char c)
 
 static inline bool ascii_isdigit(unsigned char c)
 {
-    return (unsigned int)c - '0' <= 9;
+    return c >= '0' && c <= '9';
 }
 
 static inline bool ascii_is_digit_or_dot(unsigned char c)

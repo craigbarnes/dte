@@ -21,4 +21,5 @@ const uint8_t ascii_table[256] = {
     U, U, U, U, U, U, U, U, U, U, U, R, R, P, R, u, // 0x50  PQRSTUVWXYZ[\]^_
     P, L, L, L, L, L, L, L, L, L, L, L, L, L, L, L, // 0x60  `abcdefghijklmno
     L, L, L, L, L, L, L, L, L, L, L, R, R, P, P, C, // 0x70  pqrstuvwxyz{|}~
+    // 0x80..0xFF: implicitly 0
 };
