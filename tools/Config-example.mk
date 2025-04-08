@@ -13,6 +13,7 @@ CC = ccache gcc
 # • https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
 # • mk/compiler.sh (CC_SANITIZER_FLAGS)
 # • mk/build.mk (DEBUG, USE_SANITIZER)
+# • docs/packaging.md, mk/prelude.mk (NO_CONFIG_MK)
 ifeq "$(RELEASE_LTO)" "1"
  CFLAGS = -O3 -march=native -flto
 else ifeq "$(RELEASE)" "1"

@@ -79,6 +79,9 @@ The `Config.mk` file should be in the project base directory alongside
 a stable aspect of the build system and will *not* be renamed or removed
 unless the major version number is bumped.
 
+To prevent `Config.mk` from being loaded for a specific `make` command,
+`make NO_CONFIG_MK=1 ...` can be used.
+
 Stable release tarballs
 -----------------------
 

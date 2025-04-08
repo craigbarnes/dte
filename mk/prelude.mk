@@ -13,6 +13,7 @@ endif
 
 include mk/util.mk
 
+# See: "persistent configuration" in docs/packaging.md
 ifneq "$(NO_CONFIG_MK)" "1"
   -include Config.mk
 endif
