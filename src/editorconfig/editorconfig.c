@@ -114,24 +114,62 @@ static void editorconfig_option_set (
     }
 }
 
+// See: https://editorconfig.org/#wildcards and ec_pattern_match()
+static bool is_ec_special_char(char c)
+{
+    return c == '*' || c == ',' || c == '-' || c == '?' || c == '['
+        || c == ']' || c == '{' || c == '}' || c == '\\';
+}
+
+static bool section_matches_path(StringView section, StringView dir, const char *path)
+{
+    BUG_ON(section.length == 0);
+    String pattern = string_new(dir.length + section.length + 16);
+
+    // Add `dir` prefix to `pattern`, escaping any special characters
+    for (size_t i = 0, n = dir.length; i < n; i++) {
+        const char c = dir.data[i];
+        if (is_ec_special_char(c)) {
+            string_append_byte(&pattern, '\\');
+        }
+        string_append_byte(&pattern, c);
+    }
+
+    if (!strview_memchr(&section, '/')) {
+        // Section contains no slashes; insert "**/" between `dir` and `section`
+        string_append_literal(&pattern, "**/");
+    } else if (section.data[0] != '/') {
+        // Section contains slashes, but not at the start; insert '/' between
+        // `dir` and `section`
+        string_append_byte(&pattern, '/');
+    }
+
+    // Append the section heading (from the .editorconfig file) to the
+    // prefix constructed above and test whether the resulting `pattern`
+    // matches against `path`
+    string_append_strview(&pattern, &section);
+    bool r = ec_pattern_match(pattern.buffer, pattern.len, path);
+    string_free(&pattern);
+    return r;
+}
+
+static bool is_root_key(const IniParser *ini)
+{
+    return strview_equal_cstring_icase(&ini->name, "root")
+        && strview_equal_cstring_icase(&ini->value, "true");
+}
+
 static void editorconfig_parse(const char *buf, size_t size, UserData *data)
 {
     IniParser ini = {
         .input = buf,
         .input_len = size,
+        .pos = (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) ? 3 : 0, // Skip UTF-8 BOM
     };
-
-    if (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) {
-        // Skip past UTF-8 BOM
-        ini.pos += 3;
-    }
 
     while (ini_parse(&ini)) {
         if (ini.section.length == 0) {
-            if (
-                strview_equal_cstring_icase(&ini.name, "root")
-                && strview_equal_cstring_icase(&ini.value, "true")
-            ) {
+            if (is_root_key(&ini)) {
                 // root=true, clear all previous values
                 data->options = editorconfig_options_init();
             }
@@ -142,38 +180,8 @@ static void editorconfig_parse(const char *buf, size_t size, UserData *data)
             // If name_count is 1, it indicates that the name/value pair is
             // the first in the section and therefore requires a new pattern
             // to be built and tested for a match
-            const StringView ecdir = data->config_file_dir;
-            String pattern = string_new(ecdir.length + ini.section.length + 16);
-
-            // Escape editorconfig special chars in path
-            for (size_t i = 0, n = ecdir.length; i < n; i++) {
-                const char ch = ecdir.data[i];
-                switch (ch) {
-                case '*': case ',': case '-':
-                case '?': case '[': case '\\':
-                case ']': case '{': case '}':
-                    string_append_byte(&pattern, '\\');
-                    // Fallthrough
-                default:
-                    string_append_byte(&pattern, ch);
-                }
-            }
-
-            if (!strview_memchr(&ini.section, '/')) {
-                // No slash in pattern, append "**/"
-                string_append_literal(&pattern, "**/");
-            } else if (ini.section.data[0] != '/') {
-                // Pattern contains at least one slash but not at the start, add one
-                string_append_byte(&pattern, '/');
-            }
-
-            string_append_strview(&pattern, &ini.section);
-            data->match = ec_pattern_match (
-                pattern.buffer,
-                pattern.len,
-                data->pathname
-            );
-            string_free(&pattern);
+            StringView dir = data->config_file_dir;
+            data->match = section_matches_path(ini.section, dir, data->pathname);
         } else {
             // Otherwise, the section is the same as was passed for the first
             // name/value pair in the section and the value of data->match
