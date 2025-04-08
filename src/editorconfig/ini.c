@@ -31,12 +31,11 @@ bool ini_parse(IniParser *ctx)
 
         strview_trim_right(&line);
         BUG_ON(line.length == 0);
-        if (line.data[0] == '[') {
+
+        if (strview_remove_matching_prefix_and_suffix(&line, "[", "]")) {
             // Keep track of (and skip past) section headings
-            if (strview_has_suffix(&line, "]")) {
-                ctx->section = string_view(line.data + 1, line.length - 2);
-                ctx->name_count = 0;
-            }
+            ctx->section = line;
+            ctx->name_count = 0;
             continue;
         }
 

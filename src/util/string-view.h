@@ -94,6 +94,17 @@ static inline bool strview_has_strn_suffix(const StringView *sv, const char *suf
     return suflen == 0 || (len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen));
 }
 
+NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3) NONNULL_ARG_IF_NONZERO_LENGTH(4, 5)
+static inline bool strview_has_strn_prefix_and_suffix (
+    const StringView *sv,
+    const char *prefix, size_t prefix_len,
+    const char *suffix, size_t suffix_len
+) {
+    return prefix_len + suffix_len <= sv->length
+        && strview_has_strn_prefix(sv, prefix, prefix_len)
+        && strview_has_strn_suffix(sv, suffix, suffix_len);
+}
+
 NONNULL_ARGS
 static inline bool strview_has_prefix(const StringView *sv, const char *p)
 {
@@ -163,6 +174,12 @@ static inline void strview_remove_prefix(StringView *sv, size_t len)
     }
 }
 
+static inline void strview_remove_suffix(StringView *sv, size_t len)
+{
+    BUG_ON(len > sv->length);
+    sv->length -= len;
+}
+
 static inline bool strview_remove_matching_prefix(StringView *sv, const char *prefix)
 {
     size_t prefix_len = strlen(prefix);
@@ -181,6 +198,21 @@ static inline bool strview_remove_matching_suffix(StringView *sv, const char *su
     }
     sv->length -= suffix_len;
     return true;
+}
+
+static inline bool strview_remove_matching_prefix_and_suffix (
+    StringView *sv,
+    const char *prefix,
+    const char *suffix
+) {
+    size_t plen = strlen(prefix);
+    size_t slen = strlen(suffix);
+    if (strview_has_strn_prefix_and_suffix(sv, prefix, plen, suffix, slen)) {
+        strview_remove_prefix(sv, plen);
+        strview_remove_suffix(sv, slen);
+        return true;
+    }
+    return false;
 }
 
 NONNULL_ARGS
