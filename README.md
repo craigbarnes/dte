@@ -79,6 +79,17 @@ For example:
     brew install make
     gmake && sudo gmake install
 
+Requirements
+------------
+
+In addition to the build dependencies mentioned above, the following are
+also needed for a correctly/fully functioning editor:
+
+* [POSIX] 2008 conforming operating system
+* Properly configured [UTF-8][] [locale]
+* [ECMA-48] compatible terminal (supporting at least the `CUP` and `EL`
+  control functions)
+
 Documentation
 -------------
 
@@ -156,6 +167,9 @@ Public License version 2 for more details.
 [Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 ["synchronized updates"]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2
+[UTF-8]: https://datatracker.ietf.org/doc/html/rfc3629
+[locale]: https://man7.org/linux/man-pages/man7/locale.7.html
+[ECMA-48]: https://ecma-international.org/publications-and-standards/standards/ecma-48/
 
 [Debian]: https://packages.debian.org/source/dte
 [Ubuntu]: https://launchpad.net/ubuntu/+source/dte
