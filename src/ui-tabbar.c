@@ -34,11 +34,11 @@ static size_t get_first_tab_idx(const Window *window)
 
 static void calculate_tabbar(Window *window)
 {
+    const size_t ntabs = window->views.count;
     void **ptrs = window->views.ptrs;
-    size_t n = window->views.count;
-    int total_w = 0;
+    unsigned int total_w = 0;
 
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < ntabs; i++) {
         View *view = ptrs[i];
         if (view == window->view) {
             // Make sure current tab is visible
@@ -58,10 +58,10 @@ static void calculate_tabbar(Window *window)
 
     // Truncate all wide tabs
     total_w = 0;
-    int truncated_count = 0;
-    for (size_t i = 0; i < n; i++) {
+    unsigned int truncated_count = 0;
+    for (size_t i = 0; i < ntabs; i++) {
         View *view = ptrs[i];
-        int truncated_w = 20;
+        unsigned int truncated_w = 20;
         if (view->tt_width > truncated_w) {
             view->tt_truncated_width = truncated_w;
             total_w += truncated_w;
@@ -78,35 +78,35 @@ static void calculate_tabbar(Window *window)
     }
 
     // All tabs fit after truncating wide tabs
-    int extra = window->w - total_w;
+    unsigned int extra = window->w - total_w;
 
     // Divide extra space between truncated tabs
     while (extra > 0) {
         BUG_ON(truncated_count == 0);
-        int extra_avg = extra / truncated_count;
-        int extra_mod = extra % truncated_count;
+        unsigned int extra_avg = extra / truncated_count;
+        unsigned int extra_mod = extra % truncated_count;
 
-        for (size_t i = 0; i < n; i++) {
+        for (size_t i = 0; i < ntabs; i++) {
             View *view = ptrs[i];
-            int add = view->tt_width - view->tt_truncated_width;
+            unsigned int add = view->tt_width - view->tt_truncated_width;
             if (add == 0) {
                 continue;
             }
 
-            int avail = extra_avg;
-            if (extra_mod) {
+            unsigned int avail = extra_avg;
+            if (extra_mod && extra_avg == 0) {
                 // This is needed for equal divide
-                if (extra_avg == 0) {
-                    avail++;
-                    extra_mod--;
-                }
+                avail++;
+                extra_mod--;
             }
+
             if (add > avail) {
                 add = avail;
             } else {
                 truncated_count--;
             }
 
+            BUG_ON(add > extra);
             view->tt_truncated_width += add;
             extra -= add;
         }
@@ -118,17 +118,13 @@ static void calculate_tabbar(Window *window)
 static void print_tab_title(Terminal *term, const StyleMap *styles, const View *view, size_t idx)
 {
     const char *filename = buffer_filename(view->buffer);
-    int skip = view->tt_width - view->tt_truncated_width;
-    if (skip > 0) {
-        filename += u_skip_chars(filename, skip);
-    }
-
     const char *tab_number = uint_to_str((unsigned int)idx + 1);
     TermOutputBuffer *obuf = &term->obuf;
     bool is_active_tab = (view == view->window->view);
     bool is_modified = buffer_modified(view->buffer);
     bool left_overflow = (obuf->x == 0 && idx > 0);
 
+    filename += u_skip_chars(filename, view->tt_width - view->tt_truncated_width);
     set_builtin_style(term, styles, is_active_tab ? BSE_ACTIVETAB : BSE_INACTIVETAB);
     term_put_char(obuf, left_overflow ? '<' : ' ');
     term_put_str(obuf, tab_number);
