@@ -262,11 +262,15 @@ size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u)
     return U_SET_HEX_LEN;
 }
 
-size_t u_skip_chars(const char *str, int width)
+// Return the number of bytes that must be skipped at the start of `str`
+// in order to trim at least `width` columns of display width. This can
+// be used to obtain the longest suffix of `str` that can be displayed
+// in a limited terminal width.
+size_t u_skip_chars(const char *str, unsigned int skip_width)
 {
     size_t idx = 0;
-    while (str[idx] && width > 0) {
-        width -= u_char_width(u_str_get_char(str, &idx));
+    for (unsigned int w = 0; str[idx] && w < skip_width; ) {
+        w += u_char_width(u_str_get_char(str, &idx));
     }
     return idx;
 }
