@@ -2242,30 +2242,32 @@ static void test_u_skip_chars(TestContext *ctx)
     EXPECT_EQ(u_skip_chars("12345", 3), 3);
     EXPECT_EQ(u_skip_chars("12345", 0), 0);
 
-    // Display: <c1>  x  ^G  y  ^G  z  ^G  .
-    static const char str[] = "\xc1x\ay\az\a.";
+    // Display: <c1>  x  ^G  y  😁  z  ^G  .
+    static const char str[] = "\xc1x\ay\xF0\x9F\x98\x81z\a.";
     const size_t w = u_str_width(str);
     const size_t n = sizeof(str) - 1;
     EXPECT_EQ(w, 4 + 1 + 2 + 1 + 2 + 1 + 2 + 1);
     EXPECT_EQ(w, 14);
-    EXPECT_EQ(n, 8);
+    EXPECT_EQ(n, 11);
 
-    EXPECT_EQ(u_skip_chars(str, 1), 1);
+    EXPECT_EQ(u_skip_chars(str, 1), 1); // <c1>
     EXPECT_EQ(u_skip_chars(str, 2), 1);
     EXPECT_EQ(u_skip_chars(str, 3), 1);
     EXPECT_EQ(u_skip_chars(str, 4), 1);
-    EXPECT_EQ(u_skip_chars(str, 5), 2);
-    EXPECT_EQ(u_skip_chars(str, 6), 3);
+    EXPECT_EQ(u_skip_chars(str, 5), 2); // x
+    EXPECT_EQ(u_skip_chars(str, 6), 3); // ^G
     EXPECT_EQ(u_skip_chars(str, 7), 3);
-    EXPECT_EQ(u_skip_chars(str, 8), 4);
-    EXPECT_EQ(u_skip_chars(str, 9), 5);
-    EXPECT_EQ(u_skip_chars(str, 10), 5);
-    EXPECT_EQ(u_skip_chars(str, 11), 6);
-    EXPECT_EQ(u_skip_chars(str, 12), 7);
-    EXPECT_EQ(u_skip_chars(str, 13), 7);
-    EXPECT_EQ(u_skip_chars(str, 14), n); // 14 == w
-    EXPECT_EQ(u_skip_chars(str, 15), n); // 15 > w
-    EXPECT_EQ(u_skip_chars(str, 16), n); // 16 > w
+    EXPECT_EQ(u_skip_chars(str, 8), 4); // y
+    EXPECT_EQ(u_skip_chars(str, 9), 8); // 😁
+    EXPECT_EQ(u_skip_chars(str, 10), 8);
+    EXPECT_EQ(u_skip_chars(str, 11), 9); // z
+    EXPECT_EQ(u_skip_chars(str, 12), 10); // ^G
+    EXPECT_EQ(u_skip_chars(str, 13), 10);
+    EXPECT_EQ(14, w);
+    EXPECT_EQ(u_skip_chars(str, 14), n); // .
+    EXPECT_TRUE(15 > w);
+    EXPECT_EQ(u_skip_chars(str, 15), n);
+    EXPECT_EQ(u_skip_chars(str, 16), n);
 }
 
 static void test_ptr_array(TestContext *ctx)
