@@ -2236,6 +2236,38 @@ static void test_u_prev_char(TestContext *ctx)
     EXPECT_EQ(idx, 0);
 }
 
+static void test_u_skip_chars(TestContext *ctx)
+{
+    EXPECT_EQ(u_skip_chars("12345", 5), 5);
+    EXPECT_EQ(u_skip_chars("12345", 3), 3);
+    EXPECT_EQ(u_skip_chars("12345", 0), 0);
+
+    // Display: <c1>  x  ^G  y  ^G  z  ^G  .
+    static const char str[] = "\xc1x\ay\az\a.";
+    const size_t w = u_str_width(str);
+    const size_t n = sizeof(str) - 1;
+    EXPECT_EQ(w, 4 + 1 + 2 + 1 + 2 + 1 + 2 + 1);
+    EXPECT_EQ(w, 14);
+    EXPECT_EQ(n, 8);
+
+    EXPECT_EQ(u_skip_chars(str, 1), 1);
+    EXPECT_EQ(u_skip_chars(str, 2), 1);
+    EXPECT_EQ(u_skip_chars(str, 3), 1);
+    EXPECT_EQ(u_skip_chars(str, 4), 1);
+    EXPECT_EQ(u_skip_chars(str, 5), 2);
+    EXPECT_EQ(u_skip_chars(str, 6), 3);
+    EXPECT_EQ(u_skip_chars(str, 7), 3);
+    EXPECT_EQ(u_skip_chars(str, 8), 4);
+    EXPECT_EQ(u_skip_chars(str, 9), 5);
+    EXPECT_EQ(u_skip_chars(str, 10), 5);
+    EXPECT_EQ(u_skip_chars(str, 11), 6);
+    EXPECT_EQ(u_skip_chars(str, 12), 7);
+    EXPECT_EQ(u_skip_chars(str, 13), 7);
+    EXPECT_EQ(u_skip_chars(str, 14), n); // 14 == w
+    EXPECT_EQ(u_skip_chars(str, 15), n); // 15 > w
+    EXPECT_EQ(u_skip_chars(str, 16), n); // 16 > w
+}
+
 static void test_ptr_array(TestContext *ctx)
 {
     PointerArray a = PTR_ARRAY_INIT;
@@ -3617,6 +3649,7 @@ static const TestEntry tests[] = {
     TEST(test_u_make_printable),
     TEST(test_u_get_char),
     TEST(test_u_prev_char),
+    TEST(test_u_skip_chars),
     TEST(test_ptr_array),
     TEST(test_ptr_array_move),
     TEST(test_ptr_array_insert),

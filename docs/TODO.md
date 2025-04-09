@@ -322,7 +322,6 @@ Testing/Debugging
 * Improve error/log messages in `set_and_check_locale()`
 
 * Improve test coverage for:
-  * `u_skip_chars()`
   * `handle_exec()`
   * `spawn_compiler()`
   * `dump_buffer()`
