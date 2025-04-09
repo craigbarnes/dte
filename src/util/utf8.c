@@ -262,25 +262,11 @@ size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u)
     return U_SET_HEX_LEN;
 }
 
-/*
- * Total width of skipped characters is stored back to @width.
- *
- * Stored @width can be 1 more than given width if the last skipped
- * character was double width or even 3 more if the last skipped
- * character was invalid (<xx>).
- *
- * Returns number of bytes skipped.
- */
-size_t u_skip_chars(const char *str, int *width)
+size_t u_skip_chars(const char *str, int width)
 {
-    int w = *width;
     size_t idx = 0;
-    while (str[idx] && w > 0) {
-        w -= u_char_width(u_str_get_char(str, &idx));
+    while (str[idx] && width > 0) {
+        width -= u_char_width(u_str_get_char(str, &idx));
     }
-
-    // Add 1..3 if skipped 'too much' (the last char was double
-    // width or invalid (<xx>))
-    *width -= w;
     return idx;
 }

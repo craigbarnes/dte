@@ -120,7 +120,7 @@ static void print_tab_title(Terminal *term, const StyleMap *styles, const View *
     const char *filename = buffer_filename(view->buffer);
     int skip = view->tt_width - view->tt_truncated_width;
     if (skip > 0) {
-        filename += u_skip_chars(filename, &skip);
+        filename += u_skip_chars(filename, skip);
     }
 
     const char *tab_number = uint_to_str((unsigned int)idx + 1);

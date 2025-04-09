@@ -30,7 +30,7 @@ typedef enum {
 } MakePrintableFlags;
 
 size_t u_str_width(const unsigned char *str);
-size_t u_skip_chars(const char *str, int *width);
+size_t u_skip_chars(const char *str, int width);
 CodePoint u_prev_char(const unsigned char *str, size_t *idx);
 CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx);
 CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx);
