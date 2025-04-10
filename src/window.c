@@ -282,25 +282,21 @@ View *window_open_new_file(Window *window)
     return view;
 }
 
-static bool buffer_is_empty_and_untouched(const Buffer *b)
+static bool buffer_is_untouched(const Buffer *b)
 {
     return !b->abs_filename && b->change_head.nr_prev == 0 && !b->display_filename;
-}
-
-// If window contains only one untouched buffer it'll be closed after
-// opening another file. This is done because closing the last buffer
-// causes an empty buffer to be opened (windows must contain at least
-// one buffer).
-static bool is_useless_empty_view(const View *v)
-{
-    return v && v->window->views.count == 1 && buffer_is_empty_and_untouched(v->buffer);
 }
 
 static View *maybe_set_view(Window *window, View *view, View *prev, bool set_prev)
 {
     if (view && view != prev) {
+        bool useless_prev = prev && buffer_is_untouched(prev->buffer);
         set_view(view);
-        if (is_useless_empty_view(prev)) {
+        if (useless_prev && window->views.count == 2) {
+            // If window contains only one untouched buffer it'll be closed
+            // after opening another view. This is done because closing the
+            // last view (with window_close_current_view()) causes an empty
+            // view to be opened (windows must contain at least one buffer).
             remove_view(prev);
         } else if (set_prev) {
             window->prev_view = prev;
