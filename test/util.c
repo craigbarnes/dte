@@ -46,6 +46,10 @@ static void test_util_macros(TestContext *ctx)
     EXPECT_EQ(STRLEN("a"), 1);
     EXPECT_EQ(STRLEN("123456789"), 9);
 
+    EXPECT_EQ(BITSIZE(char), 8);
+    EXPECT_EQ(DECIMAL_STR_MAX(char), sizeof("255") + 1);
+    EXPECT_EQ(HEX_STR_MAX(char), sizeof("FF") + 1);
+
     EXPECT_EQ(ARRAYLEN(""), 1);
     EXPECT_EQ(ARRAYLEN("a"), 2);
     EXPECT_EQ(ARRAYLEN("123456789"), 10);
@@ -61,6 +65,10 @@ static void test_util_macros(TestContext *ctx)
     EXPECT_EQ(MIN(99, 100), 99);
     EXPECT_EQ(MIN(-10, 10), -10);
 
+    EXPECT_EQ(MIN3(2, 1, 0), 0);
+    EXPECT_EQ(MIN3(10, 20, 30), 10);
+    EXPECT_EQ(MIN3(10, 20, -10), -10);
+
     EXPECT_EQ(MAX(0, 1), 1);
     EXPECT_EQ(MAX(99, 100), 100);
     EXPECT_EQ(MAX(-10, 10), 10);
@@ -70,6 +78,23 @@ static void test_util_macros(TestContext *ctx)
     EXPECT_EQ(MAX4(-10, 10, 0, -20), 10);
     EXPECT_EQ(MAX4(40, 41, 42, 41), 42);
     EXPECT_EQ(MAX4(-10, -20, -50, -80), -10);
+
+    EXPECT_EQ(CLAMP(1, 50, 100), 50);
+    EXPECT_EQ(CLAMP(200, 50, 100), 100);
+    EXPECT_EQ(CLAMP(200, 100, 50), 50); // Invalid edge case (lo > hi)
+    EXPECT_EQ(CLAMP(-55, 50, 100), 50);
+    EXPECT_EQ(CLAMP(10, -10, -20), -20); // lo > hi
+    EXPECT_EQ(CLAMP(10, -20, -10), -10);
+    EXPECT_EQ(CLAMP(-15, -10, -20), -20); // lo > hi
+    EXPECT_EQ(CLAMP(-15, -20, -10), -15);
+
+    EXPECT_TRUE(VERSION_GE(0, 0, 0, 0));
+    EXPECT_TRUE(VERSION_GE(1, 0, 0, 0));
+    EXPECT_TRUE(VERSION_GE(4, 1, 4, 1));
+    EXPECT_TRUE(VERSION_GE(4, 2, 4, 1));
+    EXPECT_FALSE(VERSION_GE(0, 1, 1, 0));
+    EXPECT_FALSE(VERSION_GE(0, 9, 1, 0));
+    EXPECT_FALSE(VERSION_GE(4, 0, 4, 1));
 
     EXPECT_UINT_EQ(UNSIGNED_MAX_VALUE(123U), UINT_MAX);
     EXPECT_UINT_EQ(UNSIGNED_MAX_VALUE(456UL), ULONG_MAX);

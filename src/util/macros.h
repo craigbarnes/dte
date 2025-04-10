@@ -24,16 +24,16 @@
 #define DECIMAL_STR_MAX(T) ((sizeof(T) * 3) + 2)
 #define HEX_STR_MAX(T) ((sizeof(T) * 2) + 2)
 
-#define VERCMP(x, y, cx, cy) ((cx > x) || ((cx == x) && (cy >= y)))
+#define VERSION_GE(L, l, R, r) ((L > R) || ((L == R) && (l >= r)))
 
 #if defined(__GNUC__) && defined(__GNUC_MINOR__)
-    #define GNUC_AT_LEAST(x, y) VERCMP(x, y, __GNUC__, __GNUC_MINOR__)
+    #define GNUC_AT_LEAST(x, y) VERSION_GE(__GNUC__, __GNUC_MINOR__, x, y)
 #else
     #define GNUC_AT_LEAST(x, y) 0
 #endif
 
 #if defined(__clang_major__) && defined(__clang_minor__)
-    #define CLANG_AT_LEAST(x, y) VERCMP(x, y, __clang_major__, __clang_minor__)
+    #define CLANG_AT_LEAST(x, y) VERSION_GE(__clang_major__, __clang_minor__, x, y)
 #else
     #define CLANG_AT_LEAST(x, y) 0
 #endif
