@@ -233,7 +233,7 @@ void set_view(View *view)
 
     // Forget `prev_view` when called for any command except those that use
     // window_open_new_file(), window_open_file() and/or window_open_files()
-    // (which is currently `open`, `show` and `exec`)
+    // (currently cmd_open(), cmd_reopen(), cmd_show() and cmd_exec())
     if (e->window) {
         e->window->prev_view = NULL;
     }
