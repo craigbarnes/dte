@@ -1633,8 +1633,8 @@ static bool cmd_reopen(EditorState *e, const CommandArgs* UNUSED_ARG(a))
         const char *path = h->filename;
         // The combination of walking the history and doing a linear search
         // (with find_buffer()) here makes this O(m*n) in the worst case,
-        // although n will typically be small and m is bounded by
-        // FILEHIST_MAX_ENTRIES
+        // although n (e->buffers.count) will typically be small and m
+        // (e->file_history.entries.count) is bounded by FILEHIST_MAX_ENTRIES
         if (
             !find_buffer(&e->buffers, path) // Not already open in the editor
             && access(path, R_OK) == 0 // File exists and is readable
