@@ -47,8 +47,20 @@ static void test_util_macros(TestContext *ctx)
     EXPECT_EQ(STRLEN("123456789"), 9);
 
     EXPECT_EQ(BITSIZE(char), 8);
-    EXPECT_EQ(DECIMAL_STR_MAX(char), sizeof("255") + 1);
+    EXPECT_EQ(BITSIZE(uint16_t), 16);
+    EXPECT_EQ(BITSIZE(uint32_t), 32);
+    EXPECT_EQ(BITSIZE(uint64_t), 64);
+    EXPECT_EQ(BITSIZE("123456789"), sizeof("123456789") * 8);
+
     EXPECT_EQ(HEX_STR_MAX(char), sizeof("FF") + 1);
+    EXPECT_EQ(HEX_STR_MAX(uint16_t), sizeof("FFFF") + 1);
+    EXPECT_EQ(HEX_STR_MAX(uint32_t), sizeof("FFFFFFFF") + 1);
+    EXPECT_EQ(HEX_STR_MAX(uint64_t), sizeof("FFFFFFFFFFFFFFFF") + 1);
+
+    EXPECT_TRUE(DECIMAL_STR_MAX(char) >= sizeof("255"));
+    EXPECT_TRUE(DECIMAL_STR_MAX(uint16_t) >= sizeof("65535"));
+    EXPECT_TRUE(DECIMAL_STR_MAX(uint32_t) >= sizeof("4294967295"));
+    EXPECT_TRUE(DECIMAL_STR_MAX(uint64_t) >= sizeof("18446744073709551615"));
 
     EXPECT_EQ(ARRAYLEN(""), 1);
     EXPECT_EQ(ARRAYLEN("a"), 2);
