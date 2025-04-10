@@ -222,6 +222,8 @@ static void restore_cursor_from_history(const FileHistory *hist, View *view)
     }
 }
 
+// Make `view` the current View in the editor, so that it takes input
+// focus and becomes the active tab in its Window
 void set_view(View *view)
 {
     EditorState *e = view->window->editor;
@@ -229,17 +231,23 @@ void set_view(View *view)
         return;
     }
 
-    // Forget previous view when changing view using any other command but open
+    // Forget `prev_view` when called for any command except those that use
+    // window_open_new_file(), window_open_file() and/or window_open_files()
+    // (which is currently `open`, `show` and `exec`)
     if (e->window) {
         e->window->prev_view = NULL;
     }
 
     e->view = view;
     e->buffer = view->buffer;
-    e->window = view->window;
+    e->window = view->window; // Parent Window becomes current Window
     e->window->view = view;
 
     if (!view->buffer->setup) {
+        // Run deferred initialization for view->buffer. This is done when
+        // buffers are activated instead of when they're first opened so as
+        // to allow opening many files without a sudden flood of extra work
+        // (e.g. loading multiple dte-syntax(5) files).
         buffer_setup(e, view->buffer);
         if (view->buffer->options.file_history && view->buffer->abs_filename) {
             restore_cursor_from_history(&e->file_history, view);
