@@ -153,8 +153,13 @@ byte.
 
 ### **recolor** _color_ [_count_]
 
-If _count_ is given, recolor _count_ previous bytes, otherwise
+If _count_ is given, recolor _count_ previous bytes. Otherwise,
 recolor buffered bytes.
+
+This command should be used sparingly, since it recolors text that was
+already consumed and colored by the other commands above. In most cases
+it makes sense to assign the correct color on the first pass, unless
+doing so is not possible or is considerably more verbose.
 
 # Sub-syntaxes
 

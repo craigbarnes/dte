@@ -218,8 +218,13 @@ Don't stop buffering
 .SS Other commands
 \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
 .RS
-If \fIcount\fR is given, recolor \fIcount\fR previous bytes, otherwise
+If \fIcount\fR is given, recolor \fIcount\fR previous bytes. Otherwise,
 recolor buffered bytes.
+.P
+This command should be used sparingly, since it recolors text that was
+already consumed and colored by the other commands above. In most cases
+it makes sense to assign the correct color on the first pass, unless
+doing so is not possible or is considerably more verbose.
 .P
 .RE
 .SH SUB\-SYNTAXES
