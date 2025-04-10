@@ -1258,14 +1258,7 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
         paths = globbuf.gl_pathv;
     }
 
-    View *first_opened;
-    if (!paths[1]) {
-        // Previous view is remembered when opening single file
-        first_opened = window_open_file(window, paths[0], encoding);
-    } else {
-        // It makes no sense to remember previous view when opening multiple files
-        first_opened = window_open_files(window, paths, encoding);
-    }
+    View *first_opened = window_open_files(window, paths, encoding);
 
     if (use_glob) {
         globfree(&globbuf);

@@ -288,42 +288,43 @@ static bool is_useless_empty_view(const View *v)
     return v && v->window->views.count == 1 && buffer_is_empty_and_untouched(v->buffer);
 }
 
-View *window_open_file(Window *window, const char *filename, const char *encoding)
+static View *maybe_set_view(Window *window, View *view, View *prev, bool set_prev)
 {
-    View *prev = window->view;
-    bool useless = is_useless_empty_view(prev);
-    View *view = window_open_buffer(window, filename, false, encoding);
-    if (view) {
+    if (view && view != prev) {
         set_view(view);
-        if (useless) {
+        if (is_useless_empty_view(prev)) {
             remove_view(prev);
-        } else {
+        } else if (set_prev) {
             window->prev_view = prev;
         }
     }
     return view;
 }
 
+View *window_open_file(Window *window, const char *filename, const char *encoding)
+{
+    View *prev = window->view;
+    View *view = window_open_buffer(window, filename, false, encoding);
+    return maybe_set_view(window, view, prev, true);
+}
+
 // Open multiple files in window and return the first opened View
 View *window_open_files(Window *window, char **filenames, const char *encoding)
 {
-    View *empty = window->view;
-    bool useless = is_useless_empty_view(empty);
+    View *prev = window->view;
     View *first = NULL;
+    size_t prev_nr_views = window->views.count;
 
     for (size_t i = 0; filenames[i]; i++) {
         View *view = window_open_buffer(window, filenames[i], false, encoding);
         if (view && !first) {
-            set_view(view);
             first = view;
         }
     }
 
-    if (useless && window->view != empty) {
-        remove_view(empty);
-    }
-
-    return first;
+    // `Window::prev_view` is set only if a single new view was opened
+    size_t nr_new_views = window->views.count - prev_nr_views;
+    return maybe_set_view(window, first, prev, nr_new_views == 1);
 }
 
 void buffer_mark_tabbars_changed(Buffer *buffer)
