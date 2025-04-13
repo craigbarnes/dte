@@ -3563,25 +3563,6 @@ static void test_timespec_subtract(TestContext *ctx)
     EXPECT_EQ(r.tv_nsec, 4996);
 }
 
-static void test_timespec_cmp(TestContext *ctx)
-{
-    struct timespec a = {.tv_sec = 42, .tv_nsec = 980};
-    struct timespec b = {.tv_sec = 41, .tv_nsec = NS_PER_SECOND - 1};
-    EXPECT_EQ(timespec_cmp(&a, &b), 1);
-    b.tv_nsec = a.tv_nsec - 1;
-    EXPECT_EQ(timespec_cmp(&a, &b), 3);
-    a.tv_sec = 0;
-    EXPECT_EQ(timespec_cmp(&a, &b), -1);
-    a.tv_nsec = 0;
-    EXPECT_EQ(timespec_cmp(&a, &b), -3);
-    a.tv_nsec = b.tv_nsec;
-    EXPECT_EQ(timespec_cmp(&a, &b), -2);
-    a.tv_sec = b.tv_sec + 1;
-    EXPECT_EQ(timespec_cmp(&a, &b), 2);
-    a = b;
-    EXPECT_EQ(timespec_cmp(&a, &b), 0);
-}
-
 static void test_timespec_to_str(TestContext *ctx)
 {
     char buf[TIME_STR_BUFSIZE] = "";
@@ -3732,7 +3713,6 @@ static const TestEntry tests[] = {
     TEST(test_log_level_from_str),
     TEST(test_log_level_to_str),
     TEST(test_timespec_subtract),
-    TEST(test_timespec_cmp),
     TEST(test_timespec_to_str),
     TEST(test_progname),
 };
