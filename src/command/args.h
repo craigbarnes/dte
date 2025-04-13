@@ -65,6 +65,10 @@ static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
     return (a->flag_set & bitmask) != 0;
 }
 
+// Return the rightmost flag in CommandArgs::flags[] that is also a member of
+// `flagset`, or 0 if no such flags are present. CommandFunc handlers can use
+// this to accept multiple, mutually exclusive flags and ignore all except the
+// last. For example, `exec -s -t -s` is equivalent to `exec -s`.
 static inline char cmdargs_pick_winning_flag_from_set(const CommandArgs *a, CommandFlagSet flagset)
 {
     if (!(a->flag_set & flagset)) {
