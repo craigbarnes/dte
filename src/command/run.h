@@ -9,6 +9,8 @@
 #include "util/macros.h"
 #include "util/string-view.h"
 
+typedef uint_least64_t CommandFlagSet;
+
 typedef struct {
     char **args; // Positional args, with flag args moved to the front
     size_t nr_args; // Number of args (not including flag args)

@@ -258,7 +258,7 @@ static void complete_alias(EditorState *e, const CommandArgs *a)
 static void complete_bind(EditorState *e, const CommandArgs *a)
 {
     // Mask of flags that determine modes (excludes -q)
-    uint_least64_t modemask = cmdargs_flagset_from_str("cnsT");
+    CommandFlagSet modemask = cmdargs_flagset_from_str("cnsT");
 
     if (u64_popcount(a->flag_set & modemask) > 1 || a->nr_flag_args > 1) {
         // Don't complete bindings for multiple modes

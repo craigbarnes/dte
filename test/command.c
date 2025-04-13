@@ -523,7 +523,7 @@ static void test_cmdargs_flagset_idx(TestContext *ctx)
 
 static void test_cmdargs_flagset_from_str(TestContext *ctx)
 {
-    uint_least64_t r = 0;
+    CommandFlagSet r = 0;
     r |= cmdargs_flagset_bit('c');
     r |= cmdargs_flagset_bit('n');
     r |= cmdargs_flagset_bit('s');
