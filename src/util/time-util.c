@@ -2,7 +2,7 @@
 #include "time-util.h"
 #include "numtostr.h"
 
-char *timespec_to_str(const struct timespec *ts, char *buf, size_t bufsize)
+char *timespec_to_str(const struct timespec *ts, char buf[TIME_STR_BUFSIZE])
 {
     if (unlikely(ts->tv_nsec < 0 || ts->tv_nsec >= NS_PER_SECOND)) {
         errno = EINVAL;
@@ -15,28 +15,17 @@ char *timespec_to_str(const struct timespec *ts, char *buf, size_t bufsize)
     }
 
     // Append date and time
-    char *ptr = buf;
-    size_t max = bufsize;
-    size_t n = strftime(ptr, max, "%F %T.", &tm);
-    ptr += n;
-    max -= n;
-    if (unlikely(n == 0 || max < 10)) {
-        errno = ENOBUFS;
+    size_t i = strftime(buf, TIME_STR_BUFSIZE, "%F %T.", &tm);
+    bool overflow = TIME_STR_BUFSIZE < i + sizeof("123456789 +0600");
+    if (unlikely(i == 0 || overflow)) {
+        errno = overflow ? ERANGE : errno;
         return NULL;
     }
 
     // Append nanoseconds
-    n = buf_umax_to_str(ts->tv_nsec, ptr);
-    BUG_ON(n == 0 || n > 9);
-    ptr += n;
-    max -= n;
+    i += buf_umax_to_str(ts->tv_nsec, buf + i);
 
     // Append timezone
-    n = strftime(ptr, max, " %z", &tm);
-    if (unlikely(n == 0)) {
-        errno = ENOBUFS;
-        return NULL;
-    }
-
-    return buf;
+    size_t zlen = strftime(buf + i, TIME_STR_BUFSIZE - i, " %z", &tm);
+    return likely(zlen) ? buf : NULL;
 }

@@ -357,7 +357,7 @@ String dump_tags(TagFile *tf, ErrorBuffer *ebuf)
         "%s %s\n%s %s\n%s %s\n\n"
         "Tag entries\n-----------\n\n",
         "     Path:", tf->filename,
-        " Modified:", timespec_to_str(&ts, tstr, sizeof(tstr)) ? tstr : "-",
+        " Modified:", timespec_to_str(&ts, tstr) ? tstr : "-",
         "     Size:", filesize_to_str(tf->size, sizestr)
     );
 

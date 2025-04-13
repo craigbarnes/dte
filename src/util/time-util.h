@@ -43,6 +43,6 @@ static inline bool timespecs_equal(const struct timespec *a, const struct timesp
     return a->tv_sec == b->tv_sec && a->tv_nsec == b->tv_nsec;
 }
 
-char *timespec_to_str(const struct timespec *ts, char *buf, size_t bufsize) NONNULL_ARGS WARN_UNUSED_RESULT;
+char *timespec_to_str(const struct timespec *ts, char buf[TIME_STR_BUFSIZE]) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

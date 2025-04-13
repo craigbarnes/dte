@@ -3566,30 +3566,29 @@ static void test_timespec_subtract(TestContext *ctx)
 static void test_timespec_to_str(TestContext *ctx)
 {
     char buf[TIME_STR_BUFSIZE] = "";
-    size_t size = sizeof(buf) - 1;
     struct timespec ts = {.tv_sec = 0};
     EXPECT_TRUE(timespecs_equal(&ts, &ts));
 
     errno = 0;
     ts.tv_nsec = NS_PER_SECOND;
-    EXPECT_NULL(timespec_to_str(&ts, buf, size));
+    EXPECT_NULL(timespec_to_str(&ts, buf));
     EXPECT_EQ(errno, EINVAL);
 
     errno = 0;
     ts.tv_nsec = -1;
-    EXPECT_NULL(timespec_to_str(&ts, buf, size));
+    EXPECT_NULL(timespec_to_str(&ts, buf));
     EXPECT_EQ(errno, EINVAL);
 
     // Note: $TZ is set to "UTC" in test_init()
     ts.tv_sec = 4321;
     ts.tv_nsec = 9876;
-    const char *r = timespec_to_str(&ts, buf, size);
+    const char *r = timespec_to_str(&ts, buf);
     EXPECT_STREQ(r, "1970-01-01 01:12:01.9876 +0000");
     EXPECT_PTREQ(r, buf);
 
     ts.tv_sec = -1;
     ts.tv_nsec = NS_PER_SECOND - 1;
-    r = timespec_to_str(&ts, buf, size);
+    r = timespec_to_str(&ts, buf);
     EXPECT_STREQ(r, "1969-12-31 23:59:59.999999999 +0000");
 }
 
