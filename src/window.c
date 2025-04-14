@@ -231,9 +231,9 @@ void set_view(View *view)
         return;
     }
 
-    // Forget `prev_view` when called for any command except those that use
-    // window_open_new_file(), window_open_file() and/or window_open_files()
-    // (currently cmd_open(), cmd_reopen(), cmd_show() and cmd_exec())
+    // Forget `prev_view` when switching views. cmd_open(), cmd_reopen(),
+    // cmd_show() and cmd_exec() subsequently set it as appropriate, via
+    // window_open_new_file() or maybe_set_view().
     if (e->window) {
         e->window->prev_view = NULL;
     }
@@ -245,7 +245,7 @@ void set_view(View *view)
 
     if (!view->buffer->setup) {
         // Run deferred initialization for view->buffer. This is done when
-        // buffers are activated instead of when they're first opened so as
+        // buffers are first viewed instead of when they're opened, so as
         // to allow opening many files without a sudden flood of extra work
         // (e.g. loading multiple dte-syntax(5) files).
         buffer_setup(e, view->buffer);
