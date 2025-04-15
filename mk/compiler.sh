@@ -66,16 +66,13 @@ if cc_option -fvisibility=hidden; then
 fi
 
 # https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#index-fstrict-flex-arrays
+# https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wstrict-flex-arrays
 # https://gcc.gnu.org/gcc-13/changes.html#c-family
 # https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-fstrict-flex-arrays
-if cc_option -fstrict-flex-arrays; then
+if cc_option -fstrict-flex-arrays -Wstrict-flex-arrays; then
+    echo 'BASIC_CFLAGS += -fstrict-flex-arrays -Wstrict-flex-arrays'
+elif cc_option -fstrict-flex-arrays; then
     echo 'BASIC_CFLAGS += -fstrict-flex-arrays'
-fi
-
-# https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wstrict-flex-arrays
-# (available since GCC 13 but not in the release notes, unlike -fstrict-flex-arrays)
-if cc_option -Wstrict-flex-arrays; then
-    echo 'BASIC_CFLAGS += -Wstrict-flex-arrays'
 fi
 
 if cc_option $GCC_4_8_WARNINGS; then
