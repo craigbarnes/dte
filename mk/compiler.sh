@@ -99,6 +99,8 @@ if cc_option -fno-asynchronous-unwind-tables; then
     echo "NO_UNWIND_TABLES = -fno-asynchronous-unwind-tables"
 fi
 
+echo "CC_TARGET = $($CC -dumpmachine)"
+
 # $(echo ...) is used here to remove newlines and extra spaces
 SANITIZER_FLAGS="$(echo $SANITIZER_FLAGS)"
 

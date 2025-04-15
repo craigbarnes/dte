@@ -22,6 +22,9 @@ NO_INSTALL_XDG_CLUTTER='
 # See also: docs/packaging.md ("installation targets") and GNUmakefile
 NO_INSTALL_XDG_CLUTTER = 1'
 
+# TODO: Use the compiler's target ($CC_TARGET) to set these variables,
+# so as to avoid doing the wrong thing when cross-compiling. $KERNEL
+# can still be used as a fallback, if the target can't be determined.
 case "$KERNEL" in
 Linux)
     OS="$(uname -o)"
