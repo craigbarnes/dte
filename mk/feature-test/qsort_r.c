@@ -1,7 +1,7 @@
 #include "defs.h"
 #include <stdlib.h>
 
-// https://austingroupbugs.net/view.php?id=900
+// https://www.austingroupbugs.net/view.php?id=900
 // https://man7.org/linux/man-pages/man3/qsort.3.html
 // https://git.musl-libc.org/cgit/musl/commit/?id=b76f37fd5625d038141b52184956fb4b7838e9a5
 // https://man.freebsd.org/cgi/man.cgi?qsort(3)#HISTORY

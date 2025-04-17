@@ -10,7 +10,7 @@ KERNEL = ${KERNEL:-unknown}
 NPROC = ${NPROC:-1}"
 
 # Check for `xargs -P` (parallel execution) support
-# See also: https://austingroupbugs.net/view.php?id=1801
+# See also: https://www.austingroupbugs.net/view.php?id=1801
 if test "$NPROC" -gt 1 && printf "1\n2" | xargs -P2 -I@ echo '@' >/dev/null; then
     echo "XARGS_P = xargs -P$NPROC"
 else
