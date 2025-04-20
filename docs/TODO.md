@@ -88,6 +88,7 @@ Features
   * [YAML]
   * [jq]
   * [fish]
+  * [Slint]
 
 * Extend the [`dte-syntax(5)`] command set, so as to provide a proper
   solution for handling e.g. [ambiguous regexp literals in Ruby][]
@@ -386,6 +387,7 @@ Testing/Debugging
 [YAML]: https://yaml.org/spec/1.2.2/
 [jq]: https://jqlang.org/manual/#modules
 [fish]: https://fishshell.com/
+[Slint]: https://docs.slint.dev/latest/docs/slint/guide/language/concepts/slint-language/
 [ambiguous regexp literals in Ruby]: https://stackoverflow.com/questions/38333687/what-is-ambiguous-regexp-literal-in-rubocop
 [Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks

@@ -199,6 +199,7 @@ static const struct FileExtensionMap {
     {"sh", SH},
     {"sld", SCHEME},
     {"slice", INI},
+    {"slint", SLINT},
     {"sls", SCHEME},
     {"socket", INI},
     {"spec", RPMSPEC},
