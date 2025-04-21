@@ -78,8 +78,8 @@ bind C-] tag
 bind M-b bof
 bind M-c 'toggle -v case-sensitive-search'
 bind M-e eof
-bind M-f 'search -w'
-bind M-S-f 'search -wr'
+bind M-f 'search -sw'
+bind M-S-f 'search -swr'
 bind M-j wrap-paragraph
 bind M-n 'msg -n'
 bind M-p 'msg -p'
