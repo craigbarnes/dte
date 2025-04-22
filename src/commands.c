@@ -1166,7 +1166,9 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
 {
-    new_line(e->view, has_flag(a, 'a'));
+    bool auto_indent = e->buffer->options.auto_indent;
+    bool above_cursor = has_flag(a, 'a');
+    new_line(e->view, auto_indent, above_cursor);
     return true;
 }
 

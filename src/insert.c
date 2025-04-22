@@ -22,40 +22,45 @@ void insert_text(View *view, const char *text, size_t size, bool move_after)
     }
 }
 
-void new_line(View *view, bool above)
+static size_t replace_bytes_with_nl_and_indent (
+    View *view,
+    char *indent,
+    size_t del_count
+) {
+    const char *ins = "\n";
+    size_t ins_count = 1;
+
+    if (indent) {
+        ins_count = strlen(indent);
+        memmove(indent + 1, indent, ins_count++);
+        indent[0] = '\n';
+        ins = indent;
+    }
+
+    buffer_replace_bytes(view, del_count, ins, ins_count);
+    return ins_count;
+}
+
+void new_line(View *view, bool auto_indent, bool above_cursor)
 {
-    if (above && block_iter_prev_line(&view->cursor) == 0) {
+    if (above_cursor && block_iter_prev_line(&view->cursor) == 0) {
         // Already on first line; insert newline at bof
         block_iter_bol(&view->cursor);
         buffer_insert_bytes(view, "\n", 1);
         return;
     }
 
-    const LocalOptions *options = &view->buffer->options;
-    char *ins = NULL;
     block_iter_eol(&view->cursor);
+    BlockIter tmp = view->cursor;
+    char *indent = NULL;
 
-    if (options->auto_indent) {
-        BlockIter bi = view->cursor;
-        if (block_iter_find_non_empty_line_bwd(&bi)) {
-            StringView line = block_iter_get_line(&bi);
-            ins = get_indent_for_next_line(options, &line);
-        }
+    if (auto_indent && block_iter_find_non_empty_line_bwd(&tmp)) {
+        StringView line = block_iter_get_line(&tmp);
+        indent = get_indent_for_next_line(&view->buffer->options, &line);
     }
 
-    size_t ins_count;
-    if (ins) {
-        ins_count = strlen(ins);
-        memmove(ins + 1, ins, ins_count);
-        ins[0] = '\n';
-        ins_count++;
-        buffer_insert_bytes(view, ins, ins_count);
-        free(ins);
-    } else {
-        ins_count = 1;
-        buffer_insert_bytes(view, "\n", 1);
-    }
-
+    size_t ins_count = replace_bytes_with_nl_and_indent(view, indent, 0);
+    free(indent);
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
@@ -81,7 +86,7 @@ static void insert_nl(View *view)
 
     // Prepare inserted indentation
     const LocalOptions *options = &view->buffer->options;
-    char *ins = NULL;
+    char *indent = NULL;
     if (options->auto_indent) {
         // Current line will be split at cursor position
         BlockIter bi = view->cursor;
@@ -93,28 +98,16 @@ static void insert_nl(View *view)
             // non whitespace only line
             if (block_iter_prev_line(&bi) && block_iter_find_non_empty_line_bwd(&bi)) {
                 line = block_iter_get_line(&bi);
-                ins = get_indent_for_next_line(options, &line);
+                indent = get_indent_for_next_line(options, &line);
             }
         } else {
-            ins = get_indent_for_next_line(options, &line);
+            indent = get_indent_for_next_line(options, &line);
         }
     }
 
-    size_t ins_count;
     begin_change(CHANGE_MERGE_NONE);
-
-    if (ins) {
-        ins_count = strlen(ins);
-        memmove(ins + 1, ins, ins_count);
-        ins[0] = '\n'; // Add newline before indent
-        ins_count++;
-        buffer_replace_bytes(view, del_count, ins, ins_count);
-        free(ins);
-    } else {
-        ins_count = 1;
-        buffer_replace_bytes(view, del_count, "\n", ins_count);
-    }
-
+    size_t ins_count = replace_bytes_with_nl_and_indent(view, indent, del_count);
+    free(indent);
     end_change();
     block_iter_skip_bytes(&view->cursor, ins_count); // Move after inserted text
 }
