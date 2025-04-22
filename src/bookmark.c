@@ -37,8 +37,7 @@ bool file_location_go(Window *window, const FileLocation *loc)
         move_to_filepos(view, loc->line, MAX(loc->column, 1));
     }
 
-    unselect(view);
-    return true;
+    return unselect(view);
 }
 
 static bool file_location_return(Window *window, const FileLocation *loc)
@@ -61,9 +60,8 @@ static bool file_location_return(Window *window, const FileLocation *loc)
     }
 
     set_view(view);
-    unselect(view);
     move_to_filepos(view, loc->line, loc->column);
-    return true;
+    return unselect(view);
 }
 
 void file_location_free(FileLocation *loc)

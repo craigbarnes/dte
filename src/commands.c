@@ -506,12 +506,8 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         free(buf);
     }
 
-    if (!has_flag(a, 'k')) {
-        unselect(e->view);
-    }
-
     // TODO: return false if term_osc52_copy() failed?
-    return true;
+    return has_flag(a, 'k') || unselect(e->view);
 }
 
 static bool cmd_cursor(EditorState *e, const CommandArgs *a)
@@ -1557,8 +1553,7 @@ static bool cmd_redo(EditorState *e, const CommandArgs *a)
         return false;
     }
 
-    unselect(e->view);
-    return true;
+    return unselect(e->view);
 }
 
 static bool cmd_refresh(EditorState *e, const CommandArgs *a)
@@ -2350,19 +2345,13 @@ static bool cmd_undo(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    if (!undo(view)) {
-        return false;
-    }
-
-    unselect(view);
-    return true;
+    return undo(view) && unselect(view);
 }
 
 static bool cmd_unselect(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    unselect(e->view);
-    return true;
+    return unselect(e->view);
 }
 
 static bool cmd_up(EditorState *e, const CommandArgs *a)

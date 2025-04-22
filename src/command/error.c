@@ -52,10 +52,7 @@ bool error_msg(ErrorBuffer *eb, const char *format, ...)
     va_start(ap, format);
     error_msgv(eb, format, ap);
     va_end(ap);
-
-    // Always return false, to allow tail-calling as `return error_msg(...);`
-    // from command handlers, instead of `error_msg(...); return false;`
-    return false;
+    return false; // To allow tail-calling from command handlers
 }
 
 bool error_msg_for_cmd(ErrorBuffer *eb, const char *cmd, const char *format, ...)
