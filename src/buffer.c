@@ -69,6 +69,11 @@ Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const char
         buffer_set_encoding(buffer, encoding, gopts->utf8_bom);
     }
 
+    // Note that using sizeof(CommonOptions) may cause this memcpy() to
+    // overwrite some LocalOptions-specific members with padding bytes.
+    // Thus, all LocalOptions members that are not also in CommonOptions
+    // *must* be explicitly initialized after this memcpy() and the fact
+    // they were originally zeroed by xcalloc() cannot be relied upon.
     static_assert(sizeof(*gopts) >= sizeof(CommonOptions));
     memcpy(&buffer->options, gopts, sizeof(CommonOptions));
     buffer->options.brace_indent = 0;
