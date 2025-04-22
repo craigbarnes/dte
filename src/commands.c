@@ -257,8 +257,6 @@ static bool cmd_bol(EditorState *e, const CommandArgs *a)
         case 'r': type = BOL_TOGGLE_LR; break;
         case 's': type = BOL_INDENT; break;
         case 't': type = BOL_TOGGLE_RL; break;
-        case 0: break;
-        default: BUG("unhandled flag");
     }
 
     handle_selection_flags(e->view, a);
@@ -1378,12 +1376,10 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 
 static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
-    char ac_flag = cmdargs_pick_winning_flag(a, "ac");
     PasteLinesType type = PASTE_LINES_BELOW_CURSOR;
-    if (ac_flag == 'a') {
-        type = PASTE_LINES_ABOVE_CURSOR;
-    } else if (ac_flag == 'c') {
-        type = PASTE_LINES_INLINE;
+    switch (cmdargs_pick_winning_flag(a, "ac")) {
+        case 'a': type = PASTE_LINES_ABOVE_CURSOR; break;
+        case 'c': type = PASTE_LINES_INLINE; break;
     }
 
     bool move_after = has_flag(a, 'm');
