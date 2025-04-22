@@ -2779,6 +2779,14 @@ static void test_intmap(TestContext *ctx)
 
 static void test_next_multiple(TestContext *ctx)
 {
+    EXPECT_EQ(next_multiple(0, 1), 0);
+    EXPECT_EQ(next_multiple(1, 1), 1);
+    EXPECT_EQ(next_multiple(2, 1), 2);
+    EXPECT_EQ(next_multiple(3, 1), 3);
+    EXPECT_EQ(next_multiple(0, 2), 0);
+    EXPECT_EQ(next_multiple(1, 2), 2);
+    EXPECT_EQ(next_multiple(5, 2), 6);
+    EXPECT_EQ(next_multiple(1, 8), 8);
     EXPECT_EQ(next_multiple(3, 8), 8);
     EXPECT_EQ(next_multiple(8, 8), 8);
     EXPECT_EQ(next_multiple(9, 8), 16);
@@ -2791,6 +2799,22 @@ static void test_next_multiple(TestContext *ctx)
     EXPECT_EQ(next_multiple(256, 256), 256);
     EXPECT_EQ(next_multiple(257, 256), 512);
     EXPECT_EQ(next_multiple(8000, 256), 8192);
+
+    const size_t size_max = (size_t)-1;
+    const size_t pow2_max = size_max & ~(size_max >> 1);
+    EXPECT_TRUE(IS_POWER_OF_2(pow2_max));
+    EXPECT_UINT_EQ(next_multiple(size_max, 1), size_max);
+    EXPECT_UINT_EQ(next_multiple(pow2_max, 1), pow2_max);
+    EXPECT_UINT_EQ(next_multiple(pow2_max, pow2_max), pow2_max);
+
+    // Note: returns 0 on overflow
+    EXPECT_UINT_EQ(next_multiple(pow2_max + 1, pow2_max), 0);
+    EXPECT_UINT_EQ(next_multiple(size_max + 0, pow2_max), 0);
+    EXPECT_UINT_EQ(next_multiple(size_max - 1, pow2_max), 0);
+
+    const size_t a = pow2_max >> 1;
+    EXPECT_UINT_EQ(next_multiple(a, a), a);
+    EXPECT_UINT_EQ(next_multiple(a + 1, a), pow2_max);
 }
 
 static void test_next_pow2(TestContext *ctx)
