@@ -26,8 +26,12 @@ char *make_indent(const LocalOptions *options, size_t width)
     return memset(str, '\t', ntabs);
 }
 
-static bool indent_inc(const LocalOptions *options, const StringView *line)
-{
+// Return true if the contents of `line` triggers an additional level
+// of auto-indent on the next line
+static bool line_contents_increases_indent (
+    const LocalOptions *options,
+    const StringView *line
+) {
     static regex_t re1, re2;
     static bool compiled;
     if (!compiled) {
@@ -59,13 +63,12 @@ static bool indent_inc(const LocalOptions *options, const StringView *line)
     return regexp_exec(&ir->re, line->data, line->length, 0, &m, 0);
 }
 
-char *get_indent_for_next_line(const LocalOptions *options, const StringView *line)
+char *get_indent_for_next_line(const LocalOptions *opts, const StringView *line)
 {
-    size_t width = get_indent_width(line, options->tab_width);
-    if (indent_inc(options, line)) {
-        width = next_indent_width(width, options->indent_width);
-    }
-    return make_indent(options, width);
+    size_t curr_width = get_indent_width(line, opts->tab_width);
+    size_t next_width = next_indent_width(curr_width, opts->indent_width);
+    bool increase = line_contents_increases_indent(opts, line);
+    return make_indent(opts, increase ? next_width : curr_width);
 }
 
 IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
