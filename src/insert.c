@@ -22,22 +22,27 @@ void insert_text(View *view, const char *text, size_t size, bool move_after)
     }
 }
 
-static size_t replace_bytes_with_nl_and_indent (
+static size_t insert_nl_and_autoindent (
     View *view,
-    char *indent,
+    const StringView *prev_line,
     size_t del_count
 ) {
     const char *ins = "\n";
     size_t ins_count = 1;
+    char *indent = NULL;
 
-    if (indent) {
-        ins_count = strlen(indent);
-        memmove(indent + 1, indent, ins_count++);
-        indent[0] = '\n';
-        ins = indent;
+    if (prev_line->length) {
+        indent = get_indent_for_next_line(&view->buffer->options, prev_line);
+        if (indent) {
+            ins_count = strlen(indent);
+            memmove(indent + 1, indent, ins_count++);
+            indent[0] = '\n';
+            ins = indent;
+        }
     }
 
     buffer_replace_bytes(view, del_count, ins, ins_count);
+    free(indent);
     return ins_count;
 }
 
@@ -52,15 +57,13 @@ void new_line(View *view, bool auto_indent, bool above_cursor)
 
     block_iter_eol(&view->cursor);
     BlockIter tmp = view->cursor;
-    char *indent = NULL;
+    StringView line = STRING_VIEW_INIT;
 
     if (auto_indent && block_iter_find_non_empty_line_bwd(&tmp)) {
-        StringView line = block_iter_get_line(&tmp);
-        indent = get_indent_for_next_line(&view->buffer->options, &line);
+        line = block_iter_get_line(&tmp);
     }
 
-    size_t ins_count = replace_bytes_with_nl_and_indent(view, indent, 0);
-    free(indent);
+    size_t ins_count = insert_nl_and_autoindent(view, &line, 0);
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
@@ -84,30 +87,26 @@ static void insert_nl(View *view)
         del_count = goto_beginning_of_whitespace(&view->cursor);
     }
 
-    // Prepare inserted indentation
-    const LocalOptions *options = &view->buffer->options;
-    char *indent = NULL;
-    if (options->auto_indent) {
-        // Current line will be split at cursor position
+    // Get reference line, for caculating auto-indent size (if applicable)
+    StringView line = STRING_VIEW_INIT;
+    if (view->buffer->options.auto_indent) {
         BlockIter bi = view->cursor;
         size_t len = block_iter_bol(&bi);
-        StringView line = block_iter_get_line(&bi);
-        line.length = len;
+        line = block_iter_get_line(&bi);
+        line.length = len; // Current line will be split at cursor position
         if (strview_isblank(&line)) {
-            // This line is (or will become) white space only; find previous,
-            // non whitespace only line
+            // This line is (or will become) whitespace only; find previous,
+            // non-whitespace line
             if (block_iter_prev_line(&bi) && block_iter_find_non_empty_line_bwd(&bi)) {
                 line = block_iter_get_line(&bi);
-                indent = get_indent_for_next_line(options, &line);
+            } else {
+                line.length = 0;
             }
-        } else {
-            indent = get_indent_for_next_line(options, &line);
         }
     }
 
     begin_change(CHANGE_MERGE_NONE);
-    size_t ins_count = replace_bytes_with_nl_and_indent(view, indent, del_count);
-    free(indent);
+    size_t ins_count = insert_nl_and_autoindent(view, &line, del_count);
     end_change();
     block_iter_skip_bytes(&view->cursor, ins_count); // Move after inserted text
 }
