@@ -260,7 +260,7 @@ static bool cmd_bol(EditorState *e, const CommandArgs *a)
     }
 
     handle_selection_flags(e->view, a);
-    move_bol_smart(e->view, type);
+    move_bol(e->view, type);
     return true;
 }
 

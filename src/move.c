@@ -98,16 +98,11 @@ void move_cursor_right(View *view)
     view_reset_preferred_x(view);
 }
 
-void move_bol(View *view)
-{
-    block_iter_bol(&view->cursor);
-    view_reset_preferred_x(view);
-}
-
-void move_bol_smart(View *view, SmartBolType type)
+void move_bol(View *view, SmartBolType type)
 {
     if (type == BOL_SIMPLE) {
-        move_bol(view);
+        block_iter_bol(&view->cursor);
+        view_reset_preferred_x(view);
         return;
     }
 

@@ -278,7 +278,7 @@ ssize_t handle_exec (
     case EXEC_LINE:
         input_from_buffer = true;
         if (!view->selection) {
-            move_bol(view);
+            move_bol(view, BOL_SIMPLE);
             StringView line = block_iter_get_line(&view->cursor);
             ctx.input.length = line.length;
             replace_unselected_input = true;
