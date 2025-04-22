@@ -131,10 +131,14 @@
     #define UNUSED
 #endif
 
-#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned) || defined(__TINYC__)
-    #define ALIGNED(x) __attribute__((__aligned__(x)))
+#if __STDC_VERSION__ >= 202311L
+    #define ALIGNAS(type) alignas(type)
+#elif __STDC_VERSION__ >= 201112L
+    #define ALIGNAS(type) _Alignas(type)
+#elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned) || defined(__TINYC__)
+    #define ALIGNAS(type) __attribute__((__aligned__(ALIGNOF(type))))
 #else
-    #define ALIGNED(x)
+    #define ALIGNAS(type)
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(malloc)

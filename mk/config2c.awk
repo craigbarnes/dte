@@ -29,7 +29,7 @@ BEGIN {
 
     print \
         "#ifdef __linux__\n" \
-        "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)\n" \
+        "#define CONFIG_SECTION SECTION(\".dte.config\") MAXALIGN\n" \
         "#else\n" \
         "#define CONFIG_SECTION\n" \
         "#endif\n\n" \

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "command/run.h"
+#include "util/align.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
