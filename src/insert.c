@@ -87,7 +87,7 @@ static void insert_nl(View *view)
         del_count = goto_beginning_of_whitespace(&view->cursor);
     }
 
-    // Get reference line, for caculating auto-indent size (if applicable)
+    // Get reference line, for calculating auto-indent size (if applicable)
     StringView line = STRING_VIEW_INIT;
     if (view->buffer->options.auto_indent) {
         BlockIter bi = view->cursor;
