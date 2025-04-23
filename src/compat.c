@@ -13,6 +13,9 @@ const char buildvar_string[] =
 #if HAVE_DUP3
     " dup3"
 #endif
+#if HAVE_EMBED
+    " embed"
+#endif
 #if HAVE_PIPE2
     " pipe2"
 #endif

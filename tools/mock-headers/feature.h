@@ -1,4 +1,5 @@
 #define HAVE_DUP3 0
+#define HAVE_EMBED 0
 #define HAVE_PIPE2 0
 #define HAVE_FSYNC 0
 #define HAVE_MEMMEM 0

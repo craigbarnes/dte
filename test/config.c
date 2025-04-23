@@ -1,3 +1,4 @@
+#include "feature.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include "test.h"
@@ -14,7 +15,6 @@
 #include "syntax/state.h"
 #include "syntax/syntax.h"
 #include "terminal/terminal.h"
-#include "test-data.h"
 #include "util/debug.h"
 #include "util/path.h"
 #include "util/readfile.h"
@@ -22,6 +22,12 @@
 #include "util/string-view.h"
 #include "util/xsnprintf.h"
 #include "window.h"
+
+#if HAVE_EMBED
+    #include "test-data-embed.h"
+#else
+    #include "test-data.h"
+#endif
 
 static void test_builtin_configs(TestContext *ctx)
 {

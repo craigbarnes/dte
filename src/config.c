@@ -1,10 +1,10 @@
+#include "feature.h"
 #include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include "config.h"
-#include "builtin-config.h"
 #include "command/error.h"
 #include "commands.h"
 #include "editor.h"
@@ -12,6 +12,12 @@
 #include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
+
+#if HAVE_EMBED
+    #include "builtin-config-embed.h"
+#else
+    #include "builtin-config.h"
+#endif
 
 // Odd number of backslashes at end of line?
 static bool has_line_continuation(StringView line)

@@ -68,7 +68,7 @@ test_objects := $(call prefix-obj, build/test/, \
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
-    dup3 pipe2 fsync memmem memrchr mkostemp sigisemptyset TIOCGWINSZ \
+    dup3 embed pipe2 fsync memmem memrchr mkostemp sigisemptyset TIOCGWINSZ \
     TIOCNOTTY tcgetwinsize posix_madvise qsort_r ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
@@ -140,10 +140,10 @@ $(build_subdirs): | build/
 $(all_objects) $(feature_tests): build/gen/platform.mk build/gen/compiler.mk
 $(feature_tests): mk/feature-test/defs.h build/gen/all.cflags
 build/convert.o: build/gen/buildvar-iconv.h
-build/gen/builtin-config.h: build/gen/builtin-config.mk
-build/gen/test-data.h: build/gen/test-data.mk
-build/config.o: build/gen/builtin-config.h
-build/test/config.o: build/gen/test-data.h
+build/gen/builtin-config.h build/gen/builtin-config-embed.h: build/gen/builtin-config.mk
+build/gen/test-data.h build/gen/test-data-embed.h: build/gen/test-data.mk
+build/config.o: build/gen/feature.h build/gen/builtin-config.h build/gen/builtin-config-embed.h
+build/test/config.o: build/gen/feature.h build/gen/test-data.h build/gen/test-data-embed.h
 build/main.o: build/gen/version.h
 build/editor.o: build/gen/version.h
 build/test/command.o: build/gen/version.h
@@ -199,9 +199,17 @@ build/gen/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/gen/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
+build/gen/builtin-config-embed.h: $(BUILTIN_CONFIGS) mk/config2embed.sh | build/gen/
+	$(E) GEN $@
+	$(Q) mk/config2embed.sh $(BUILTIN_CONFIGS) > $@
+
 build/gen/test-data.h: $(TEST_CONFIGS) mk/config2c.awk | build/gen/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
+
+build/gen/test-data-embed.h: $(TEST_CONFIGS) mk/config2embed.sh | build/gen/
+	$(E) GEN $@
+	$(Q) mk/config2embed.sh $(TEST_CONFIGS) > $@
 
 build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 	$(E) GEN $@
