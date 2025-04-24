@@ -20,9 +20,9 @@ void move_to_preferred_x(View *view, long preferred_x)
     block_iter_bol(&view->cursor);
     StringView line = block_iter_get_line(&view->cursor);
 
-    if (options->emulate_tab && view->preferred_x < line.length) {
+    if (options->emulate_tab && preferred_x < line.length) {
         const size_t iw = options->indent_width;
-        const size_t ilevel = indent_level(view->preferred_x, iw);
+        const size_t ilevel = indent_level(preferred_x, iw);
         for (size_t i = 0; i < line.length && line.data[i] == ' '; i++) {
             if (i + 1 == (ilevel + 1) * iw) {
                 // Force cursor to beginning of the indentation level
@@ -35,7 +35,8 @@ void move_to_preferred_x(View *view, long preferred_x)
     const unsigned int tw = options->tab_width;
     unsigned long x = 0;
     size_t i = 0;
-    while (x < view->preferred_x && i < line.length) {
+
+    while (x < preferred_x && i < line.length) {
         unsigned char ch = line.data[i];
         if (likely(ch < 0x80)) {
             i++;
@@ -52,14 +53,14 @@ void move_to_preferred_x(View *view, long preferred_x)
             size_t next = i + 1;
             CodePoint u = u_get_nonascii(line.data, line.length, &i);
             x += u_char_width(u);
-            if (x > view->preferred_x) {
+            if (x > preferred_x) {
                 i = next;
                 break;
             }
         }
     }
 
-    view->cursor.offset += i - (x > view->preferred_x);
+    view->cursor.offset += i - (x > preferred_x);
 
     // If cursor stopped on a zero-width char, move to the next spacing char
     CodePoint u;

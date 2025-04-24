@@ -32,12 +32,9 @@ static size_t get_last_paired_brace_index(const char *str, size_t len)
             break;
         }
     }
-    if (open_braces == 0) {
-        return last_paired_index;
-    } else {
-        // If there are unclosed braces, just return 0
-        return 0;
-    }
+
+    // If there are unclosed braces, just return 0
+    return open_braces ? 0 : last_paired_index;
 }
 
 static size_t handle_bracket_expression(const char *pat, size_t len, String *buf)
@@ -152,7 +149,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
         }
         case '}':
             if (i > last_paired_brace_index || brace_level == 0) {
-                goto add_byte;
+                goto append_byte;
             }
             string_append_byte(&buf, ')');
             if (brace_group_has_empty_alternate[brace_level]) {
@@ -163,7 +160,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             break;
         case ',': {
             if (i >= last_paired_brace_index || brace_level == 0) {
-                goto add_byte;
+                goto append_byte;
             }
             size_t skip = skip_empty_alternates(pattern + i, pattern_len - i);
             if (skip > 0) {
@@ -183,7 +180,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
                 i += 3;
                 break;
             }
-            goto add_byte;
+            goto append_byte;
         case '.':
         case '(':
         case ')':
@@ -192,7 +189,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             string_append_byte(&buf, '\\');
             // Fallthrough
         default:
-        add_byte:
+        append_byte:
             string_append_byte(&buf, ch);
         }
     }
