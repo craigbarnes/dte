@@ -703,6 +703,7 @@ static void collect_command_flag_args (
     // TODO: Completions for `open -e` and `save -e`
 }
 
+// Only recurses for cmdname="repeat" and typically not more than once
 // NOLINTNEXTLINE(misc-no-recursion)
 static void collect_completions(EditorState *e, char **args, size_t argc)
 {

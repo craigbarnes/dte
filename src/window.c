@@ -408,6 +408,8 @@ unsigned int window_get_scroll_margin(const Window *window)
     return MIN(max, scroll_margin);
 }
 
+// Recursion is bounded by the number of descendant frames, which is
+// typically not more than 5 or so
 // NOLINTNEXTLINE(misc-no-recursion)
 void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), void *data)
 {

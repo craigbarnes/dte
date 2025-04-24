@@ -9,6 +9,7 @@
 #include "util/xmalloc.h"
 #include "window.h"
 
+// Recurses at most once
 // NOLINTNEXTLINE(misc-no-recursion)
 static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
 {

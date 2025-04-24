@@ -87,6 +87,8 @@ static bool handle_input_single (
     return handle_binding(e, handler, key);
 }
 
+// Recursion is bounded by the depth of fallthrough modes, which is
+// typically not more than 5 or so
 // NOLINTNEXTLINE(misc-no-recursion)
 static bool handle_input_recursive (
     EditorState *e,

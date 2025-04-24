@@ -20,6 +20,9 @@ Syntax *find_any_syntax(const HashMap *syntaxes, const char *name)
     return hashmap_get(syntaxes, name);
 }
 
+// Each State is visited at most once (when reachable) and recursion
+// is bounded by the longest chain of `Action::destination` pointers
+// (typically not more than 20 or so)
 // NOLINTNEXTLINE(misc-no-recursion)
 static void visit(State *s)
 {

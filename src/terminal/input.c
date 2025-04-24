@@ -95,6 +95,7 @@ static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
     return true;
 }
 
+// Recursion via tail call; no overflow possible
 // NOLINTNEXTLINE(misc-no-recursion)
 static KeyCode read_special(Terminal *term)
 {

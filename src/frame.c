@@ -8,6 +8,8 @@ enum {
     WINDOW_MIN_HEIGHT = 3,
 };
 
+// Recursion is bounded by the number of descendant frames, which is
+// typically not more than 5 or so
 // NOLINTBEGIN(misc-no-recursion)
 
 static void sanity_check_frame(const Frame *frame)

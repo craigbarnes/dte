@@ -6,8 +6,13 @@
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
 
+enum {
+    MAX_RECURSION_DEPTH = 16, // Maximum number of `alias` expansions
+};
+
 static bool run_commands(CommandRunner *runner, const PointerArray *array);
 
+// Recursion is limited by MAX_RECURSION_DEPTH
 // NOLINTNEXTLINE(misc-no-recursion)
 static bool run_command(CommandRunner *runner, char **av)
 {
@@ -69,10 +74,11 @@ static bool run_command(CommandRunner *runner, char **av)
     return r;
 }
 
+// Recursion is limited by MAX_RECURSION_DEPTH
 // NOLINTNEXTLINE(misc-no-recursion)
 static bool run_commands(CommandRunner *runner, const PointerArray *array)
 {
-    if (unlikely(runner->recursion_count > 16)) {
+    if (unlikely(runner->recursion_count > MAX_RECURSION_DEPTH)) {
         return error_msg_for_cmd(runner->ebuf, NULL, "alias recursion limit reached");
     }
 
