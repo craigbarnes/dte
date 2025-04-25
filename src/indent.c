@@ -63,12 +63,12 @@ static bool line_contents_increases_indent (
     return regexp_exec(&ir->re, line->data, line->length, 0, &m, 0);
 }
 
-char *get_indent_for_next_line(const LocalOptions *opts, const StringView *line)
+char *get_indent_for_next_line(const LocalOptions *options, const StringView *line)
 {
-    size_t curr_width = get_indent_width(line, opts->tab_width);
-    size_t next_width = next_indent_width(curr_width, opts->indent_width);
-    bool increase = line_contents_increases_indent(opts, line);
-    return make_indent(opts, increase ? next_width : curr_width);
+    size_t curr_width = get_indent_width(line, options->tab_width);
+    size_t next_width = next_indent_width(curr_width, options->indent_width);
+    bool increase = line_contents_increases_indent(options, line);
+    return make_indent(options, increase ? next_width : curr_width);
 }
 
 IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)

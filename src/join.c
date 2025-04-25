@@ -62,7 +62,7 @@ void join_lines(View *view, const char *delim, size_t delim_len)
     }
 
     // Create an iterator and position it at the beginning of the next line
-    // (or return early, if there is no next line)
+    // (or return early, if there's no next line)
     BlockIter next = view->cursor;
     if (!block_iter_next_line(&next) || block_iter_is_eof(&next)) {
         return;

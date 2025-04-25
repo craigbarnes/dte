@@ -5,7 +5,7 @@
 #include <stdint.h> // intptr_t, intmax_t
 #include "macros.h" // ALIGNAS(), ALIGNOF()
 
-union pseudo_max_align {
+union MaxAlign {
     void *a;
     size_t b;
     long long c;
@@ -21,7 +21,7 @@ union pseudo_max_align {
     // https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Variable-Attributes.html
     #define MAXALIGN __attribute__((__aligned__(__BIGGEST_ALIGNMENT__)))
 #else
-    #define MAXALIGN ALIGNAS(union pseudo_max_align)
+    #define MAXALIGN ALIGNAS(union MaxAlign)
 #endif
 
 #endif
