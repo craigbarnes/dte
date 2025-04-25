@@ -147,7 +147,7 @@ Public License version 2 for more details.
 [Macro]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
 [color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [compiler error]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
-[copy]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
+[copy]: https://craigbarnes.gitlab.io/dte/dterc.html#copy:~:text=Copy%20to%20system%20clipboard
 [external commands]: https://craigbarnes.gitlab.io/dte/dterc.html#external-commands
 [key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [redo]: https://craigbarnes.gitlab.io/dte/dterc.html#redo
@@ -163,7 +163,7 @@ Public License version 2 for more details.
 [GNU Make]: https://www.gnu.org/software/make/
 [POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
 [terminfo]: https://man7.org/linux/man-pages/man5/terminfo.5.html
-[OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+[OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands:~:text=5%202%20%20%E2%87%92%C2%A0%20Manipulate%20Selection%20Data
 [Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 ["synchronized updates"]: https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/2

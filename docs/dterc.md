@@ -901,7 +901,7 @@ Copy current line or selection.
 :   Copy to system "primary selection"
 
 Note that the **-b** and **-p** flags depend upon the terminal
-supporting "OSC 52" escape sequences. If the terminal lacks this
+supporting [OSC 52] escape sequences. If the terminal lacks this
 support, these flags will simply do nothing. OSC 52 sends data over
 the wire, so it can be used over SSH and still work as expected,
 unlike most other methods of copying to the system clipboard.
@@ -1675,6 +1675,7 @@ errors should be highlighted. Set to `""` to disable.
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
 [`tags`]: https://docs.ctags.io/en/stable/man/tags.5.html
 [Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands:~:text=5%202%20%20%E2%87%92%C2%A0%20Manipulate%20Selection%20Data
 
 [`alias`]: #alias
 [`bind`]: #bind
