@@ -466,7 +466,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 static const Command common_cmds[] = {
     CMD("bol", "st", 0, 0, cmd_bol), // Ignored flags: s, t
     CMD("cancel", "", 0, 0, cmd_cancel),
-    CMD("clear", "i", 0, 0, cmd_clear), // Ignored flag: i
+    CMD("clear", "Ii", 0, 0, cmd_clear), // Ignored flags: I, i
     CMD("copy", "bikp", 0, 0, cmd_copy), // Ignored flag: k
     CMD("delete", "", 0, 0, cmd_delete),
     CMD("delete-eol", "n", 0, 0, cmd_delete_eol), // Ignored flag: n

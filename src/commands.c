@@ -360,7 +360,8 @@ static bool cmd_center_view(EditorState *e, const CommandArgs *a)
 
 static bool cmd_clear(EditorState *e, const CommandArgs *a)
 {
-    bool auto_indent = e->buffer->options.auto_indent && !has_flag(a, 'i');
+    char iflag = cmdargs_pick_winning_flag(a, "iI");
+    bool auto_indent = iflag ? (iflag == 'i') : e->buffer->options.auto_indent;
     clear_lines(e->view, auto_indent);
     return true;
 }
@@ -1160,7 +1161,8 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
 {
-    bool auto_indent = e->buffer->options.auto_indent;
+    char iflag = cmdargs_pick_winning_flag(a, "iI");
+    bool auto_indent = iflag ? (iflag == 'i') : e->buffer->options.auto_indent;
     bool above_cursor = has_flag(a, 'a');
     new_line(e->view, auto_indent, above_cursor);
     return true;
@@ -2611,7 +2613,7 @@ static const Command cmds[] = {
     {"case", "lu", NA, 0, 0, cmd_case},
     {"cd", "", RC, 1, 1, cmd_cd},
     {"center-view", "", NA, 0, 0, cmd_center_view},
-    {"clear", "i", NA, 0, 0, cmd_clear},
+    {"clear", "Ii", NA, 0, 0, cmd_clear},
     {"close", "fpqw", NA, 0, 0, cmd_close},
     {"command", "", NFAA, 0, 1, cmd_command},
     {"compile", "1ps", NFAA, 2, -1, cmd_compile},
@@ -2644,7 +2646,7 @@ static const Command cmds[] = {
     {"mode", "", RC, 1, 1, cmd_mode},
     {"move-tab", "", NA, 1, 1, cmd_move_tab},
     {"msg", "np", NA, 0, 1, cmd_msg},
-    {"new-line", "a", NA, 0, 0, cmd_new_line},
+    {"new-line", "Iai", NA, 0, 0, cmd_new_line},
     {"next", "", NA, 0, 0, cmd_next},
     {"open", "e=gt", NA, 0, -1, cmd_open},
     {"option", "r", RC | NFAA, 3, -1, cmd_option},

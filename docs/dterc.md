@@ -947,24 +947,35 @@ possibilities a message is displayed:
 If the change was not the one you wanted, just run `undo` and
 then, for example, `redo 1`.
 
-### **clear**
+### **clear** [**-i**|**-I**]
 
-Clear current line.
+Clear the current line (or selection), leaving just a newline and
+(optionally) an [`auto-indent`].
 
 `-i`
-:   Do not [`auto-indent`] the line after clearing
+:   Behave as if [`auto-indent`] is set to `true`
+
+`-I`
+:   Behave as if [`auto-indent`] is set to `false`
 
 ### **join** [_delimiter_]
 
 Join selection or next line to current using _delimiter_. If _delimiter_
 is not provided, a space is used.
 
-### **new-line** [**-a**]
+### **new-line** [**-a**] [**-i**|**-I**]
 
-Insert empty line below current line.
+Insert an empty line and (optionally) an [`auto-indent`] below the
+current line
 
 `-a`
-:   Insert above current line, instead of below
+:   Insert above the current line, instead of below
+
+`-i`
+:   Behave as if [`auto-indent`] is set to `true`
+
+`-I`
+:   Behave as if [`auto-indent`] is set to `false`
 
 ### **delete**
 
@@ -1025,7 +1036,7 @@ Insert _text_ into the buffer.
 `-k`
 :   Insert one character at a time, as if manually typed (normally
     _text_ is inserted exactly as specified, but this option allows
-    it to be affected by special input handling like auto-indents,
+    it to be affected by special input handling like [`auto-indent`],
     whitespace trimming, line-by-line undo, etc.)
 
 `-m`
@@ -1532,8 +1543,7 @@ Note: buffers opened from existing UTF-8 files will have their BOM
 
 ### **brace-indent** [false]
 
-Scan for `{` and `}` characters when calculating indentation size.
-Depends on the [`auto-indent`] option.
+Scan for `{` and `}` characters when calculating [`auto-indent`] sizes.
 
 ### **filetype** [none]
 
@@ -1542,8 +1552,9 @@ command.
 
 ### **indent-regex** [""]
 
-If this [`regex`] pattern matches the current line when enter is
-pressed and [`auto-indent`] is true then indentation is increased.
+If this [`regex`] pattern matches the line when an [`auto-indent`] is
+inserted, the indent size is increased by 1 level.
+
 Set to `""` to disable.
 
 ## Local and global options
@@ -1553,11 +1564,10 @@ local (per-file) options.
 
 ### **auto-indent** [true]
 
-Automatically insert indentation when pressing enter.
-Indentation is copied from previous non-empty line. If also the
-[`indent-regex`] local option is set then indentation is
-automatically increased if the regular expression matches
-current line.
+Automatically insert indentation when the Enter key is pressed or the
+[`clear`] or [`new-line`] commands are used. Indentation is copied from
+the first non-blank line at or above the cursor and also increased by
+1 level if the [`indent-regex`] or [`brace-indent`] options apply.
 
 ### **detect-indent** [""]
 
@@ -1681,6 +1691,7 @@ errors should be highlighted. Set to `""` to disable.
 [`bind`]: #bind
 [`bookmark -r`]: #bookmark
 [`bookmark`]: #bookmark
+[`clear`]: #clear
 [`command`]: #command
 [`compile`]: #compile
 [`copy`]: #copy
@@ -1698,6 +1709,7 @@ errors should be highlighted. Set to `""` to disable.
 [`left`]: #left
 [`macro`]: #macro
 [`msg`]: #msg
+[`new-line`]: #new-line
 [`open`]: #open
 [`open -t`]: #open
 [`option`]: #option
@@ -1721,6 +1733,7 @@ errors should be highlighted. Set to `""` to disable.
 [`wsplit`]: #wsplit
 
 [`auto-indent`]: #auto-indent
+[`brace-indent`]: #brace-indent
 [`emulate-tab`]: #emulate-tab
 [`expand-tab`]: #expand-tab
 [`file-history`]: #file-history

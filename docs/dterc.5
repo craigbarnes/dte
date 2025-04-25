@@ -146,11 +146,11 @@ Editing Commands:
 .br
    \fBredo\fR [\fIchoice\fR]
 .br
-   \fBclear\fR
+   \fBclear\fR [\fB\-i\fR|\fB\-I\fR]
 .br
    \fBjoin\fR [\fIdelimiter\fR]
 .br
-   \fBnew\-line\fR [\fB\-a\fR]
+   \fBnew\-line\fR [\fB\-a\fR] [\fB\-i\fR|\fB\-I\fR]
 .br
    \fBdelete\fR
 .br
@@ -1491,13 +1491,18 @@ If the change was not the one you wanted, just run \fBundo\fR and
 then, for example, \fBredo 1\fR.
 .P
 .RE
-\fBclear\fR
+\fBclear\fR [\fB\-i\fR|\fB\-I\fR]
 .RS
-Clear current line.
+Clear the current line (or selection), leaving just a newline and
+(optionally) an \fBauto\-indent\fR.
 .P
 .TP
 \fB\-i\fR
-Do not \fBauto\-indent\fR the line after clearing
+Behave as if \fBauto\-indent\fR is set to \fBtrue\fR
+.PP
+.TP
+\fB\-I\fR
+Behave as if \fBauto\-indent\fR is set to \fBfalse\fR
 .PP
 .RE
 \fBjoin\fR [\fIdelimiter\fR]
@@ -1506,13 +1511,22 @@ Join selection or next line to current using \fIdelimiter\fR. If \fIdelimiter\fR
 is not provided, a space is used.
 .P
 .RE
-\fBnew\-line\fR [\fB\-a\fR]
+\fBnew\-line\fR [\fB\-a\fR] [\fB\-i\fR|\fB\-I\fR]
 .RS
-Insert empty line below current line.
+Insert an empty line and (optionally) an \fBauto\-indent\fR below the
+current line
 .P
 .TP
 \fB\-a\fR
-Insert above current line, instead of below
+Insert above the current line, instead of below
+.PP
+.TP
+\fB\-i\fR
+Behave as if \fBauto\-indent\fR is set to \fBtrue\fR
+.PP
+.TP
+\fB\-I\fR
+Behave as if \fBauto\-indent\fR is set to \fBfalse\fR
 .PP
 .RE
 \fBdelete\fR
@@ -1589,7 +1603,7 @@ Insert \fItext\fR into the buffer.
 \fB\-k\fR
 Insert one character at a time, as if manually typed (normally
 \fItext\fR is inserted exactly as specified, but this option allows
-it to be affected by special input handling like auto\-indents,
+it to be affected by special input handling like \fBauto\-indent\fR,
 whitespace trimming, line\-by\-line undo, etc.)
 .PP
 .TP
@@ -2226,8 +2240,7 @@ Note: buffers opened from existing UTF\-8 files will have their BOM
 .SS Local options
 \fBbrace\-indent\fR [false]
 .RS
-Scan for \fB{\fR and \fB}\fR characters when calculating indentation size.
-Depends on the \fBauto\-indent\fR option.
+Scan for \fB{\fR and \fB}\fR characters when calculating \fBauto\-indent\fR sizes.
 .P
 .RE
 \fBfiletype\fR [none]
@@ -2238,8 +2251,9 @@ command.
 .RE
 \fBindent\-regex\fR [""]
 .RS
-If this \fBregex\fR(7) pattern matches the current line when enter is
-pressed and \fBauto\-indent\fR is true then indentation is increased.
+If this \fBregex\fR(7) pattern matches the line when an \fBauto\-indent\fR is
+inserted, the indent size is increased by 1 level.
+.P
 Set to \fB""\fR to disable.
 .P
 .RE
@@ -2249,11 +2263,10 @@ local (per\-file) options.
 .P
 \fBauto\-indent\fR [true]
 .RS
-Automatically insert indentation when pressing enter.
-Indentation is copied from previous non\-empty line. If also the
-\fBindent\-regex\fR local option is set then indentation is
-automatically increased if the regular expression matches
-current line.
+Automatically insert indentation when the Enter key is pressed or the
+\fBclear\fR or \fBnew\-line\fR commands are used. Indentation is copied from
+the first non\-blank line at or above the cursor and also increased by
+1 level if the \fBindent\-regex\fR or \fBbrace\-indent\fR options apply.
 .P
 .RE
 \fBdetect\-indent\fR [""]
