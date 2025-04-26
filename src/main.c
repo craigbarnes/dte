@@ -21,6 +21,7 @@
 #include "history.h"
 #include "load-save.h"
 #include "move.h"
+#include "palette.h"
 #include "search.h"
 #include "signals.h"
 #include "syntax/state.h"
@@ -431,7 +432,7 @@ static const char usage[] =
 // NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKRVC:Q:S:b:c:t:r:s:";
+    static const char optstring[] = "hBHKPRVC:Q:S:b:c:t:r:s:";
     const char *rc = NULL;
     const char *commands[8];
     const char *tags[8];
@@ -478,6 +479,8 @@ int main(int argc, char *argv[])
         case 'H':
             load_and_save_history = false;
             break;
+        case 'P':
+            return print_256_color_palette();
         case 'Q':
             if (!str_to_uint(optarg, &terminal_query_level)) {
                 fprintf(stderr, "Error: invalid argument for -Q: '%s'\n", optarg);
