@@ -56,6 +56,11 @@ seealso: ["`dterc`", "`dte-syntax`"]
 :   Start in a special mode that continuously reads input and prints the
     symbolic name of each pressed key.
 
+`-P`
+:   Print the terminal color palette to `stdout` and exit. This can be
+    used as a quick visual reference for the palette colors accepted by
+    the [`hi`] command (see [`dterc`]).
+
 `-h`
 :   Display the help summary and exit.
 
@@ -379,6 +384,7 @@ input/output of both.
 [`cd`]: dterc.html#cd
 [`compile`]: dterc.html#compile
 [`exec`]: dterc.html#exec
+[`hi`]: dterc.html#hi
 [`show bind`]: dterc.html#show
 [`show buffer`]: dterc.html#show
 [`next`]: dterc.html#next

@@ -733,8 +733,7 @@ The \fIfg\-color\fR and \fIbg\-color\fR arguments can be one of the following:
 .br
 .P
 Colors \fB16\fR to \fB231\fR correspond to R/G/B colors and \fB232\fR to \fB255\fR are
-grayscale values (see https://www.ditig.com/256\-colors\-cheat\-sheet for
-more details).
+grayscale values. For a quick color reference, see \fBdte \-P\fR.
 .P
 If the terminal has limited support for rendering colors, the \fIfg\-color\fR
 and \fIbg\-color\fR arguments will fall back to the nearest supported color
@@ -768,11 +767,10 @@ NOTE: Because \fBkeep\fR is both a color and an attribute you need to
 specify both \fIfg\-color\fR and \fIbg\-color\fR if you want to set the \fBkeep\fR
 \fIattribute\fR.
 .P
-Unset fg/bg colors are inherited from highlight color \fBdefault\fR.
-If you don't set fg/bg for the highlight color \fBdefault\fR then
-terminal's default fg/bg is used.
+Any omitted fg/bg colors are inherited from the highlight color
+\fBdefault\fR or (if unset) from the terminal's own default fg/bg colors.
 .P
-If \fBhi\fR is run without any arguments, all highlight colors are
+If \fBhi\fR is used without any arguments, all highlight colors are
 removed and a baseline set of defaults is then loaded (as if by
 running \fBinclude \-b\fR on the built\-in \fBcolor/reset\fR config).
 .P

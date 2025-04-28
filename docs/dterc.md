@@ -340,8 +340,7 @@ The _fg-color_ and _bg-color_ arguments can be one of the following:
 * `white` (`15`)
 
 Colors `16` to `231` correspond to R/G/B colors and `232` to `255` are
-grayscale values (see https://www.ditig.com/256-colors-cheat-sheet for
-more details).
+grayscale values. For a quick color reference, see [`dte -P`].
 
 If the terminal has limited support for rendering colors, the _fg-color_
 and _bg-color_ arguments will fall back to the nearest supported color
@@ -366,11 +365,10 @@ NOTE: Because `keep` is both a color and an attribute you need to
 specify both _fg-color_ and _bg-color_ if you want to set the `keep`
 _attribute_.
 
-Unset fg/bg colors are inherited from highlight color `default`.
-If you don't set fg/bg for the highlight color `default` then
-terminal's default fg/bg is used.
+Any omitted fg/bg colors are inherited from the highlight color
+`default` or (if unset) from the terminal's own default fg/bg colors.
 
-If `hi` is run without any arguments, all highlight colors are
+If `hi` is used without any arguments, all highlight colors are
 removed and a baseline set of defaults is then loaded (as if by
 running [`include -b`] on the built-in [`color/reset`] config).
 
@@ -1658,6 +1656,7 @@ errors should be highlighted. Set to `""` to disable.
 [`dte-syntax`]: dte-syntax.html
 [`dte -H`]: dte.html#options
 [`dte -K`]: dte.html#options
+[`dte -P`]: dte.html#options
 [normal mode]: dte.html#normal-mode
 [command mode]: dte.html#command-mode
 [search mode]: dte.html#search-mode
