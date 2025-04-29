@@ -49,7 +49,8 @@ void update_status_line(const Window *window)
             gap_method = (m == TERM_SET_BYTES_REP) ? "REP" : "spaces";
         } else {
             int n = term_clear_eol(term);
-            gap_method = (n >= 0) ? "spaces" : (n == -1 ? "EL" : "REP");
+            bool el = (n == TERM_CLEAR_EOL_USED_EL);
+            gap_method = (n >= 0) ? "spaces" : (el ? "EL" : "REP");
             if (lw > w && rw > w) {
                 draw_sides = "none";
                 gap_width = w;
