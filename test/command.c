@@ -130,7 +130,7 @@ static void test_parse_command_arg(TestContext *ctx)
 
     // Trailing backslash
     // Note: `s` is unterminated, to allow ASan to catch OOB reads
-    static const NONSTRING char s[4] = "123\\";
+    static const char s[4] = "123\\";
     arg = parse_command_arg(&runner, s, sizeof s);
     EXPECT_STREQ(arg, "123");
     free(arg);

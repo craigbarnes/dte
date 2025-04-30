@@ -9,8 +9,8 @@
 #include "bit.h"
 #include "debug.h"
 
-const char NONSTRING hextab_lower[16] = "0123456789abcdef";
-const char NONSTRING hextab_upper[16] = "0123456789ABCDEF";
+const char hextab_lower[16] = "0123456789abcdef";
+const char hextab_upper[16] = "0123456789ABCDEF";
 
 static size_t umax_count_base10_digits(uintmax_t x)
 {
@@ -123,7 +123,7 @@ size_t buf_uint_to_str(unsigned int x, char *buf)
  */
 char *file_permissions_to_str(mode_t mode, char buf[10])
 {
-    static const char NONSTRING xmap[8] = "-xSs-xTt";
+    static const char xmap[8] = "-xSs-xTt";
 
     // Owner
     buf[0] = (mode & S_IRUSR) ? 'r' : '-';
@@ -149,7 +149,7 @@ char *file_permissions_to_str(mode_t mode, char buf[10])
 // a 2 digit decimal fraction
 char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 {
-    static const char NONSTRING suffixes[8] = "KMGTPEZY";
+    static const char suffixes[8] = "KMGTPEZY";
     unsigned int sigbits = umax_bitwidth(bytes);
     unsigned int nr_unit_shifts = (sigbits - !!sigbits) / 10;
     uintmax_t ipart = bytes >> (nr_unit_shifts * 10);

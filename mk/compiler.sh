@@ -80,6 +80,17 @@ detect_cflags "$GCC_4_8_WARNINGS"
 detect_cflags_any "$GCC_14_WARNINGS" "$CLANG_18_WARNINGS"
 detect_cflags "$GCC_15_WARNINGS"
 
+# This is enabled by default in GCC 15, despite not being documented in the
+# list of changes (https://gcc.gnu.org/gcc-15/changes.html). The workaround
+# suggested in the warning message (use the `nonstring` attribute) isn't
+# easy to make portable, since it produces `-Wattributes` warnings in older
+# GCC ("'nonstring' attribute ignored on objects of type 'const char[][8]'").
+# See also
+# • Commit 9932f4c68b8c7070095fb64e0394bf973d218947
+# • The commit immediately following the above (TODO: insert commit id here)
+# • https://gitlab.com/craigbarnes/dte/-/jobs/9886035875
+detect_cflags '-Wno-unterminated-string-initialization'
+
 # https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#index-fstrict-flex-arrays
 # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wstrict-flex-arrays
 # https://gcc.gnu.org/gcc-13/changes.html#c-family

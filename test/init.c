@@ -38,7 +38,7 @@ static void test_posix_sanity(TestContext *ctx)
     // Some snprintf(3) implementations historically returned -1 in case of
     // truncation. C99 and POSIX 2001 both require that it return the full
     // size of the formatted string, as if there had been enough space.
-    char NONSTRING buf[8] = "........";
+    char buf[8] = "........";
     ASSERT_EQ(snprintf(buf, 8, "0123456789"), 10);
     ASSERT_EQ(buf[7], '\0');
     EXPECT_STREQ(buf, "0123456");
