@@ -204,7 +204,7 @@ static void add_status_pos(Formatter *f)
 static void add_misc_status(Formatter *f)
 {
     static const struct {
-        const char str[24];
+        const char NONSTRING str[24];
         size_t len;
     } css_strs[] = {
         [CSS_FALSE] = {STRN("[case-sensitive = false]")},

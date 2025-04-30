@@ -13,7 +13,7 @@
 #include "util/readfile.h"
 #include "util/str-util.h"
 
-#if HAVE_EMBED
+#if 0 && HAVE_EMBED // Disabled for now; GCC 15.1.1 #embed appears to be buggy
     #include "builtin-config-embed.h"
 #else
     #include "builtin-config.h"

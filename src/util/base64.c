@@ -25,7 +25,7 @@ const uint8_t base64_decode_table[256] = {
      I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I
 };
 
-const char base64_encode_table[64] = {
+const char NONSTRING base64_encode_table[64] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789+/"

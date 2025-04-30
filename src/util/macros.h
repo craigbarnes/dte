@@ -278,7 +278,7 @@
 
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-nonnull_005fif_005fnonzero-function-attribute
 #if HAS_ATTRIBUTE(nonnull_if_nonzero)
-    #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx) __attribute__((__nonnull_if_nonzero__, arg_idx, len_idx))
+    #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx) __attribute__((__nonnull_if_nonzero__(arg_idx, len_idx)))
 #else
     #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx)
 #endif

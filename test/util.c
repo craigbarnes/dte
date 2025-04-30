@@ -941,7 +941,7 @@ static void test_get_delim_str(TestContext *ctx)
     // Note: str2 is not null-terminated and there are no delimiters present,
     // but there's one extra, writable byte in the buffer that falls outside
     // the length bound
-    char str2[16] = "no delimiter...!";
+    char NONSTRING str2[16] = "no delimiter...!";
     len = sizeof(str2) - 1;
     ASSERT_EQ(str2[len], '!');
     pos = 0;
@@ -1016,7 +1016,7 @@ static void test_buf_parse_uintmax(TestContext *ctx)
     EXPECT_EQ(buf_parse_uintmax("0098765", 5, &val), 5);
     EXPECT_EQ(val, 987);
 
-    char buf[4] = " 90/";
+    char NONSTRING buf[4] = " 90/";
     buf[0] = CHAR_MAX;
     EXPECT_EQ(buf_parse_uintmax(buf, 4, &val), 0);
 

@@ -1031,7 +1031,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
     }
 
     static const struct {
-        char seq[6];
+        char NONSTRING seq[6];
         uint8_t seq_length;
         int8_t expected_length;
         KeyCode expected_key;
@@ -1068,7 +1068,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
 static void test_linux_parse_key(TestContext *ctx)
 {
     static const struct {
-        char seq[6];
+        char NONSTRING seq[6];
         uint8_t seq_length;
         int8_t expected_length;
         KeyCode expected_key;

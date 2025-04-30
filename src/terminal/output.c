@@ -437,7 +437,7 @@ void term_output_flush(TermOutputBuffer *obuf)
 
 static const char *get_tab_str(TermTabOutputMode tab_mode)
 {
-    static const char tabstr[][8] = {
+    static const char NONSTRING tabstr[][8] = {
         [TAB_NORMAL]  = "        ",
         [TAB_SPECIAL] = ">-------",
         // TAB_CONTROL is printed with u_set_char() and is thus omitted
