@@ -87,7 +87,7 @@ detect_cflags "$GCC_15_WARNINGS"
 # GCC ("'nonstring' attribute ignored on objects of type 'const char[][8]'").
 # See also
 # • Commit 9932f4c68b8c7070095fb64e0394bf973d218947
-# • The commit immediately following the above (TODO: insert commit id here)
+# • Commit 9cca48c804ba618be3b607d138033194858314e2
 # • https://gitlab.com/craigbarnes/dte/-/jobs/9886035875
 detect_cflags '-Wno-unterminated-string-initialization'
 
