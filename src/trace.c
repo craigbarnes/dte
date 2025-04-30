@@ -40,8 +40,8 @@ TraceLoggingFlags trace_flags_from_str(const char *flag_str)
         return TRACE_ALL;
     }
 
-    // Copy flag_str into a mutable buffer, so get_delim_str() can be
-    // used to split (and null-terminate) comma-delimited pieces
+    // Copy flag_str into a mutable buffer, so that get_delim_str() can be
+    // used to split (and null-terminate) the comma-delimited substrings
     char buf[128];
     const char *end = memccpy(buf, flag_str, '\0', sizeof(buf));
     if (!end) {

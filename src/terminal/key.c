@@ -66,7 +66,8 @@ UNITTEST {
 
     static_assert(KEY_UNICODE_MAX == UNICODE_MAX_VALID_CODEPOINT);
     static_assert(KEY_MASK + 1 == 1u << 21);
-    static_assert((KEY_MASK & MOD_MASK & KEYCODE_QUERY_REPLY_BIT) == 0);
+    static_assert((KEY_MASK & MOD_MASK) == 0);
+    static_assert(((KEY_MASK | MOD_MASK) & KEYCODE_QUERY_REPLY_BIT) == 0);
     static_assert((KEY_MASK & KEY_SPECIAL_MIN) == KEY_SPECIAL_MIN);
     static_assert((KEY_MASK & KEY_SPECIAL_MAX) == KEY_SPECIAL_MAX);
     static_assert((KEY_MASK & KEY_IGNORE) == KEY_IGNORE);
