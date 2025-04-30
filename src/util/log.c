@@ -11,6 +11,7 @@
 // so they're deemed an acceptable use of non-const globals:
 // NOLINTBEGIN(*-avoid-non-const-global-variables)
 static LogLevel log_level = LOG_LEVEL_NONE;
+static TraceLoggingFlags trace_flags = 0;
 static int logfd = -1;
 static char dim[] = "\033[2m";
 static char sgr0[] = "\033[0m";
@@ -82,8 +83,8 @@ LogLevel log_open(const char *filename, LogLevel level, bool use_color)
         return LOG_LEVEL_NONE;
     }
 
-    int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
-    int fd = xopen(filename, flags, 0666);
+    int oflags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
+    int fd = xopen(filename, oflags, 0666);
     if (unlikely(fd < 0)) {
         return LOG_LEVEL_NONE;
     }
@@ -109,6 +110,12 @@ LogLevel log_open(const char *filename, LogLevel level, bool use_color)
 bool log_close(void)
 {
     return log_level == LOG_LEVEL_NONE || xclose(logfd) == 0;
+}
+
+void set_trace_logging_flags(TraceLoggingFlags flags)
+{
+    BUG_ON(trace_flags); // Should only be called once
+    trace_flags = flags;
 }
 
 bool log_level_enabled(LogLevel level)
@@ -170,5 +177,16 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     log_msgv(level, file, line, fmt, ap);
+    va_end(ap);
+}
+
+void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...)
+{
+    if (!log_level_trace_enabled() || !(flags & trace_flags)) {
+        return;
+    }
+    va_list ap;
+    va_start(ap, fmt);
+    log_msgv(LOG_LEVEL_TRACE, file, line, fmt, ap);
     va_end(ap);
 }

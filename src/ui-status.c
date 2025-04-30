@@ -1,5 +1,6 @@
 #include "ui.h"
 #include "status.h"
+#include "trace.h"
 #include "util/log.h"
 
 void update_status_line(const Window *window)
@@ -67,6 +68,7 @@ void update_status_line(const Window *window)
     }
 
     LOG_TRACE (
+        TRACE_STATUSLINE,
         "drawing statusline: left=%zu right=%zu gap=%d(%s) show=%s",
         lw, rw, gap_width, gap_method, draw_sides
     );

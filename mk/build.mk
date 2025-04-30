@@ -52,7 +52,7 @@ editor_objects := $(call prefix-obj, build/, \
     editor encoding exec file-history file-option filetype frame history \
     indent insert join load-save lock main mode move msg options palette \
     regexp replace search selection shift show signals spawn status tag \
-    vars view window wrap \
+    trace vars view window wrap \
     $(addprefix ui-, cmdline prompt status tabbar view window) ui ) \
     $(command_objects) \
     $(editorconfig_objects) \
@@ -63,7 +63,7 @@ editor_objects := $(call prefix-obj, build/, \
 test_objects := $(call prefix-obj, build/test/, \
     bind bookmark buffer cmdline command config ctags dump editorconfig \
     encoding error filetype frame history indent init main options regexp \
-    shift spawn status syntax terminal test util )
+    shift spawn status syntax terminal test trace util )
 
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 

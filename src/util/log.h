@@ -21,6 +21,12 @@ typedef enum {
     LOG_LEVEL_TRACE,
 } LogLevel;
 
+// This is intended to hold a set of bitflags (defined elsewhere) that
+// determine whether a specific LOG_TRACE() call produces log output.
+// It's typedef'd only for self-documentation purposes and is separate
+// from the actual flag definitions to keep this header generic.
+typedef unsigned int TraceLoggingFlags;
+
 #define LOG(level, ...) log_msg(level, __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_CRITICAL(...) LOG(LOG_LEVEL_CRITICAL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
@@ -41,10 +47,10 @@ bool log_level_enabled(LogLevel level);
 #endif
 
 #if DEBUG >= 3
-    #define LOG_TRACE(...) LOG(LOG_LEVEL_TRACE, __VA_ARGS__)
+    #define LOG_TRACE(flags, ...) log_trace(flags, __FILE__, __LINE__, __VA_ARGS__)
     static inline bool log_level_trace_enabled(void) {return log_level_enabled(LOG_LEVEL_TRACE);}
 #else
-    static inline PRINTF(1) void LOG_TRACE(const char* UNUSED_ARG(fmt), ...) {}
+    static inline PRINTF(2) void LOG_TRACE(TraceLoggingFlags UNUSED_ARG(flags), const char* UNUSED_ARG(fmt), ...) {}
     static inline bool log_level_trace_enabled(void) {return false;}
 #endif
 
@@ -52,9 +58,11 @@ LogLevel log_open(const char *filename, LogLevel level, bool use_color);
 bool log_close(void);
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap) VPRINTF(4);
+void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_write(LogLevel level, const char *str, size_t len);
 LogLevel log_level_default(void);
 LogLevel log_level_from_str(const char *str);
 const char *log_level_to_str(LogLevel level);
+void set_trace_logging_flags(TraceLoggingFlags flags);
 
 #endif

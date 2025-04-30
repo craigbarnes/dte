@@ -35,6 +35,7 @@ extern const TestGroup spawn_tests;
 extern const TestGroup status_tests;
 extern const TestGroup syntax_tests;
 extern const TestGroup terminal_tests;
+extern const TestGroup trace_tests;
 extern const TestGroup util_tests;
 
 static void print_timing(const TestContext *ctx, const struct timespec ts[2])
@@ -176,6 +177,7 @@ int main(int argc, char *argv[])
 
     run_tests(&ctx, &init_tests);
     run_tests(&ctx, &util_tests);
+    run_tests(&ctx, &trace_tests);
     run_tests(&ctx, &indent_tests);
     run_tests(&ctx, &regexp_tests);
     run_tests(&ctx, &command_tests);

@@ -3,6 +3,7 @@
 #include "cache.h"
 #include "args.h"
 #include "parse.h"
+#include "trace.h"
 #include "util/log.h"
 #include "util/ptr-array.h"
 #include "util/str-array.h"
@@ -60,7 +61,7 @@ CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_s
     return cached;
 
 nocache:
-    LOG_TRACE("skipping command cache (%s): %s", reason, cmd_str);
+    LOG_TRACE(TRACE_COMMAND, "skipping command cache (%s): %s", reason, cmd_str);
     ptr_array_free(&array);
     cached->cmd = NULL;
     return cached;

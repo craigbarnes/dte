@@ -34,6 +34,7 @@
 #include "terminal/output.h"
 #include "terminal/paste.h"
 #include "terminal/terminal.h"
+#include "trace.h"
 #include "ui.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
@@ -279,12 +280,14 @@ static int buffer_write_blocks_and_free(Buffer *buffer, int fd)
     return err;
 }
 
-static ExitCode init_logging(const char *filename, const char *req_level_str)
+static ExitCode init_logging(void)
 {
-    if (!filename || filename[0] == '\0') {
+    const char *filename = xgetenv("DTE_LOG");
+    if (!filename) {
         return EC_OK;
     }
 
+    const char *req_level_str = getenv("DTE_LOG_LEVEL");
     LogLevel req_level = log_level_from_str(req_level_str);
     if (req_level == LOG_LEVEL_NONE) {
         return EC_OK;
@@ -315,6 +318,14 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
 
     if (no_color) {
         LOG_INFO("log colors disabled ($NO_COLOR)");
+    }
+
+    if (got_level >= LOG_LEVEL_TRACE) {
+        TraceLoggingFlags tflags = trace_flags_from_str(getenv("DTE_LOG_TRACE"));
+        set_trace_logging_flags(tflags);
+        if (tflags == 0) {
+            LOG_NOTICE("DTE_LOG_LEVEL=trace used with no effect; DTE_LOG_TRACE also needed");
+        }
     }
 
     return EC_OK;
@@ -509,7 +520,7 @@ int main(int argc, char *argv[])
         return r;
     }
 
-    r = init_logging(getenv("DTE_LOG"), getenv("DTE_LOG_LEVEL"));
+    r = init_logging();
     if (unlikely(r != EC_OK)) {
         return r;
     }
