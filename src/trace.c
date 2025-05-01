@@ -9,7 +9,7 @@
 static const char trace_names[][8] = {
     "command",
     "input",
-    "status",
+    "output",
 };
 
 UNITTEST {
@@ -37,7 +37,7 @@ TraceLoggingFlags trace_flags_from_str(const char *flag_str)
     }
 
     if (streq(flag_str, "all")) {
-        return TRACE_ALL;
+        return TRACE_FLAGS_ALL;
     }
 
     // Copy flag_str into a mutable buffer, so that get_delim_str() can be

@@ -25,10 +25,9 @@ static void consume_input(TermInputBuffer *input, size_t len)
         char buf[256];
         u_make_printable(input->buf, len, buf, sizeof(buf), MPF_C0_SYMBOLS);
         if (len == input->len) {
-            LOG_TRACE(TRACE_INPUT, "consumed %zu bytes from input buffer: %s", len, buf);
+            TRACE_INPUT("consumed %zu bytes from input buffer: %s", len, buf);
         } else {
-            LOG_TRACE (
-                TRACE_INPUT,
+            TRACE_INPUT (
                 "consumed %zu (of %u) bytes from input buffer: %s",
                 len, input->len, buf
             );
@@ -58,7 +57,7 @@ static bool fill_buffer(TermInputBuffer *input)
         return false;
     }
 
-    LOG_TRACE(TRACE_INPUT, "read %zu bytes into input buffer", (size_t)rc);
+    TRACE_INPUT("read %zu bytes into input buffer", (size_t)rc);
     input->len += (size_t)rc;
     return true;
 }

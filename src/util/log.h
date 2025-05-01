@@ -22,7 +22,7 @@ typedef enum {
 } LogLevel;
 
 // This is intended to hold a set of bitflags (defined elsewhere) that
-// determine whether a specific LOG_TRACE() call produces log output.
+// determine whether a specific log_trace() call produces log output.
 // It's typedef'd only for self-documentation purposes and is separate
 // from the actual flag definitions to keep this header generic.
 typedef unsigned int TraceLoggingFlags;

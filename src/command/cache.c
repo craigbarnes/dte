@@ -61,7 +61,7 @@ CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_s
     return cached;
 
 nocache:
-    LOG_TRACE(TRACE_COMMAND, "skipping command cache (%s): %s", reason, cmd_str);
+    TRACE_CMD("skipping command cache (%s): %s", reason, cmd_str);
     ptr_array_free(&array);
     cached->cmd = NULL;
     return cached;

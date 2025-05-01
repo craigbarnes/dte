@@ -67,8 +67,7 @@ void update_status_line(const Window *window)
         term_put_str(obuf, rbuf);
     }
 
-    LOG_TRACE (
-        TRACE_STATUSLINE,
+    TRACE_OUTPUT (
         "drawing statusline: left=%zu right=%zu gap=%d(%s) show=%s",
         lw, rw, gap_width, gap_method, draw_sides
     );
