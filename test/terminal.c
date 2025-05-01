@@ -10,6 +10,7 @@
 #include "terminal/rxvt.h"
 #include "terminal/style.h"
 #include "terminal/terminal.h"
+#include "ui.h" // update_term_title()
 #include "util/bit.h"
 #include "util/str-array.h"
 #include "util/unicode.h"
@@ -1717,6 +1718,36 @@ static void test_term_put_level_1_queries(TestContext *ctx)
     EXPECT_EQ(obuf->x, 0);
 }
 
+static void test_update_term_title(TestContext *ctx)
+{
+    static const char prefix[] = "\033]2;";
+    static const char suffix[] = " - dte\033\\";
+    size_t plen = sizeof(prefix) - 1;
+    size_t slen = sizeof(suffix) - 1;
+    Terminal term = {.obuf = TERM_OUTPUT_INIT, .features = TFLAG_SET_WINDOW_TITLE};
+    TermOutputBuffer *obuf = &term.obuf;
+
+    static const char expected[] = "\033]2;example filename - dte\033\\";
+    update_term_title(&term, "example filename", false);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, expected, sizeof(expected) - 1);
+    EXPECT_EQ(obuf->x, 0);
+    obuf->count = 0;
+
+    // Very long filename, for edge case coverage
+    char filename[TERM_OUTBUF_SIZE];
+    memset(filename, 'a', sizeof(filename));
+    filename[sizeof(filename) - 1] = '\0';
+    update_term_title(&term, filename, false);
+
+    size_t tlen = obuf->count - (plen + slen);
+    EXPECT_EQ(sizeof(filename), 8192);
+    EXPECT_EQ(obuf->count, 8188);
+    EXPECT_EQ(tlen, 8176);
+    EXPECT_MEMEQ(obuf->buf, plen, prefix, plen);
+    EXPECT_MEMEQ(obuf->buf + plen, tlen, filename, tlen);
+    EXPECT_MEMEQ(obuf->buf + plen + tlen, slen, suffix, slen);
+}
+
 static void test_is_newly_detected_feature(TestContext *ctx)
 {
     EXPECT_FALSE(is_newly_detected_feature(1, 1, 1));
@@ -1758,6 +1789,7 @@ static const TestEntry tests[] = {
     TEST(test_term_restore_cursor_style),
     TEST(test_term_begin_sync_update),
     TEST(test_term_put_level_1_queries),
+    TEST(test_update_term_title),
     TEST(test_is_newly_detected_feature),
 };
 

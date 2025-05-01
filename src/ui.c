@@ -76,7 +76,7 @@ void update_term_title(Terminal *term, const char *filename, bool is_modified)
     // Using u_make_printable() here ensures that there are no control
     // characters or invalid UTF-8 sequences in the emitted OSC string
     size_t i = copystrn(buf, prefix, sizeof(prefix) - 1);
-    i += u_make_printable(filename, filename_len, buf + i, print_max, 0);
+    i += u_make_printable(filename, filename_len, buf + i, reserved - extra_len, 0);
     i += copystrn(buf + i, suffix, sizeof(suffix) - 1);
     BUG_ON(i >= reserved);
     term->obuf.count += i;
