@@ -1727,9 +1727,16 @@ static void test_update_term_title(TestContext *ctx)
     Terminal term = {.obuf = TERM_OUTPUT_INIT, .features = TFLAG_SET_WINDOW_TITLE};
     TermOutputBuffer *obuf = &term.obuf;
 
-    static const char expected[] = "\033]2;example filename - dte\033\\";
+    static const char expected1[] = "\033]2;example filename - dte\033\\";
     update_term_title(&term, "example filename", false);
-    EXPECT_MEMEQ(obuf->buf, obuf->count, expected, sizeof(expected) - 1);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, expected1, sizeof(expected1) - 1);
+    EXPECT_EQ(obuf->x, 0);
+    obuf->count = 0;
+
+    // Control char escaping
+    static const char expected2[] = "\033]2;x^I^H^[y - dte\033\\";
+    update_term_title(&term, "x\t\b\033y", false);
+    EXPECT_MEMEQ(obuf->buf, obuf->count, expected2, sizeof(expected2) - 1);
     EXPECT_EQ(obuf->x, 0);
     obuf->count = 0;
 
