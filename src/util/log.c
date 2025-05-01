@@ -182,9 +182,11 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
 
 void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...)
 {
+    BUG_ON(!flags);
     if (!log_level_trace_enabled() || !(flags & trace_flags)) {
         return;
     }
+
     va_list ap;
     va_start(ap, fmt);
     log_msgv(LOG_LEVEL_TRACE, file, line, fmt, ap);
