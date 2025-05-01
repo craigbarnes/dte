@@ -52,23 +52,50 @@ static String term_read_detected_paste(TermInputBuffer *input)
     return str;
 }
 
+static void log_bpaste_remainder(const char *remainder, size_t remainder_len)
+{
+    if (!log_level_debug_enabled()) {
+        return;
+    }
+    char buf[32];
+    u_make_printable(remainder, remainder_len, buf, sizeof(buf), MPF_C0_SYMBOLS);
+    LOG_DEBUG("%zu byte remainder after bracketed paste: %s", remainder_len, buf);
+}
+
 static String term_read_bracketed_paste(TermInputBuffer *input)
 {
-    size_t read_max = TERM_INBUF_SIZE;
+    static const char delim[] = "\033[201~";
+    const size_t dlen = sizeof(delim) - 1;
+    const size_t read_max = TERM_INBUF_SIZE;
+    size_t nreads = 1;
     String str = string_new(read_max + input->len);
+
     if (input->len) {
+        char *end = xmemmem(input->buf, input->len, delim, dlen);
+        if (end) {
+            // End delim already in input buffer; no need for more reads
+            size_t text_len = (size_t)(end - input->buf);
+            string_append_buf(&str, input->buf, text_len);
+            input->len -= text_len + dlen;
+            if (input->len) {
+                memmove(input->buf, end + dlen, input->len);
+                log_bpaste_remainder(input->buf, input->len);
+            }
+            goto out;
+        }
+        // Some payload text (but no end delim) already in input buffer;
+        // append it to `str` and clear buffer
         string_append_buf(&str, input->buf, input->len);
         input->len = 0;
     }
 
-    static const char delim[] = "\033[201~";
-    const size_t dlen = sizeof(delim) - 1;
     const char *remainder;
     size_t remainder_len;
 
     while (1) {
         char *start = string_reserve_space(&str, read_max);
         ssize_t read_len = xread(STDIN_FILENO, start, read_max);
+        nreads++;
         if (unlikely(read_len <= 0)) {
             goto read_error;
         }
@@ -92,18 +119,18 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
     }
 
     if (remainder_len) {
-        if (log_level_debug_enabled()) {
-            char buf[32];
-            u_make_printable(remainder, remainder_len, buf, sizeof(buf), MPF_C0_SYMBOLS);
-            LOG_DEBUG("%zu byte remainder after bracketed paste: %s", remainder_len, buf);
-        }
+        log_bpaste_remainder(remainder, remainder_len);
         BUG_ON(remainder_len > TERM_INBUF_SIZE);
         memcpy(input->buf, remainder, remainder_len);
         input->len = remainder_len;
     }
 
-    const char *plural = (str.len == 1) ? "" : "s";
-    LOG_DEBUG("received bracketed paste of %zu byte%s", str.len, plural);
+out:
+    LOG_DEBUG (
+        "received bracketed paste of %zu byte%s (in %zu read%s)",
+        str.len, (str.len == 1) ? "" : "s",
+        nreads, (nreads == 1) ? "" : "s"
+    );
     string_replace_byte(&str, '\r', '\n');
     return str;
 
