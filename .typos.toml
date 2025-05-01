@@ -1,7 +1,7 @@
 [type.c]
 extend-glob = ["*.c", "*.h"]
 extend-ignore-words-re = [
-    "^BRE|clen|doas|ede|mak$",
+    "^BRE|Pn|clen|doas|ede|mak|typ$",
     "^(?i:iterm)$",
 ]
 

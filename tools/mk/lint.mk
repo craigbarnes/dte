@@ -55,9 +55,11 @@ check-codespell:
 	$(E) CODESPL 'src/ mk/ *.md *.xml'
 	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES)
 
+# The options and redirections here are to ensure that `make check-typos`
+# is useable in dte command mode
 check-typos:
 	$(E) TYPOS 'src/ mk/ *.md *.xml'
-	$(Q) $(TYPOS) --format brief src/ mk/ $(DOCFILES)
+	$(Q) $(TYPOS) --format brief --color never src/ mk/ $(DOCFILES) >&2
 
 check-desktop-file:
 	$(E) LINT share/dte.desktop
