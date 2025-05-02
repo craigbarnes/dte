@@ -37,7 +37,7 @@ static inline void check_bsearch_array (
     size_t name_size,
     StringCompareFunction cmp
 ) {
-    if (DEBUG < 1) {
+    if (!DEBUG_ASSERTIONS_ENABLED) {
         return;
     }
 

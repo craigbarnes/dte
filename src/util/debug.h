@@ -29,12 +29,14 @@
 #if DEBUG >= 1
     // In DEBUG builds, BUG() cleans up the terminal, prints an error
     // message and then calls abort(3)
+    #define DEBUG_ASSERTIONS_ENABLED 1
     #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
     #define UNITTEST_ATTR CONSTRUCTOR
     noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...) COLD PRINTF(4);
 #else
     // In non-DEBUG builds, BUG() expands to UNREACHABLE(), which may
     // allow the compiler to optimize more aggressively
+    #define DEBUG_ASSERTIONS_ENABLED 0
     #define BUG(...) UNREACHABLE()
     #define UNITTEST_ATTR UNUSED
 #endif

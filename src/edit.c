@@ -13,7 +13,7 @@ enum {
 
 static void sanity_check_blocks(const View *view, bool check_newlines)
 {
-    if (DEBUG < 1) {
+    if (!DEBUG_ASSERTIONS_ENABLED) {
         return;
     }
 

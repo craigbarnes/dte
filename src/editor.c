@@ -232,7 +232,7 @@ static bool buffer_contains_block(const Buffer *buffer, const Block *ref)
 
 static void sanity_check(const View *view)
 {
-    if (DEBUG < 1) {
+    if (!DEBUG_ASSERTIONS_ENABLED) {
         return;
     }
     const BlockIter *cursor = &view->cursor;

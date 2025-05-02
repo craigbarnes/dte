@@ -106,7 +106,7 @@ void collect_option_values(struct EditorState *e, PointerArray *a, const char *o
 String dump_options(GlobalOptions *gopts, LocalOptions *lopts);
 const char *get_option_value_string(struct EditorState *e, const char *name);
 
-#if DEBUG >= 1
+#if DEBUG_ASSERTIONS_ENABLED
     void sanity_check_global_options(ErrorBuffer *ebuf, const GlobalOptions *opts);
     void sanity_check_local_options(ErrorBuffer *ebuf, const LocalOptions *lopts);
 #else

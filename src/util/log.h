@@ -39,18 +39,22 @@ typedef unsigned int TraceLoggingFlags;
 bool log_level_enabled(LogLevel level);
 
 #if DEBUG >= 2
+    #define DEBUG_LOGGING_ENABLED 1
     #define LOG_DEBUG(...) LOG(LOG_LEVEL_DEBUG, __VA_ARGS__)
     static inline bool log_level_debug_enabled(void) {return log_level_enabled(LOG_LEVEL_DEBUG);}
 #else
+    #define DEBUG_LOGGING_ENABLED 0
     static inline PRINTF(1) void LOG_DEBUG(const char* UNUSED_ARG(fmt), ...) {}
     static inline bool log_level_debug_enabled(void) {return false;}
 #endif
 
 #if DEBUG >= 3
+    #define TRACE_LOGGING_ENABLED 1
     #define LOG_TRACE(flags, ...) log_trace(flags, __FILE__, __LINE__, __VA_ARGS__)
     void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...) PRINTF(4);
     bool log_trace_enabled(TraceLoggingFlags flags);
 #else
+    #define TRACE_LOGGING_ENABLED 0
     static inline PRINTF(2) void LOG_TRACE(TraceLoggingFlags UNUSED_ARG(flags), const char* UNUSED_ARG(fmt), ...) {}
     static inline bool log_trace_enabled(TraceLoggingFlags UNUSED_ARG(flags)) {return false;}
 #endif

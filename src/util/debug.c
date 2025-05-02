@@ -68,7 +68,7 @@ static void print_stack_trace(void)
     #endif
 }
 
-#if DEBUG >= 1
+#if DEBUG_ASSERTIONS_ENABLED
 noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...)
 {

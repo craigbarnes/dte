@@ -41,7 +41,7 @@ const char *buffer_filename(const Buffer *buffer)
 
 void buffer_set_encoding(Buffer *buffer, const char *encoding, bool utf8_bom)
 {
-    if (DEBUG >= 1) {
+    if (DEBUG_ASSERTIONS_ENABLED) {
         const char *nenc = encoding_normalize(encoding);
         BUG_ON(encoding != nenc);
     }

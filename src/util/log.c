@@ -43,12 +43,12 @@ UNITTEST {
 
 LogLevel log_level_default(void)
 {
-    return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
+    return DEBUG_LOGGING_ENABLED ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
 }
 
 static LogLevel log_level_max(void)
 {
-    return (DEBUG >= 3) ? LOG_LEVEL_TRACE : log_level_default();
+    return TRACE_LOGGING_ENABLED ? LOG_LEVEL_TRACE : log_level_default();
 }
 
 LogLevel log_level_from_str(const char *str)
@@ -114,7 +114,7 @@ bool log_close(void)
 
 void set_trace_logging_flags(TraceLoggingFlags flags)
 {
-    if (DEBUG >= 3 && log_level_enabled(LOG_LEVEL_TRACE)) {
+    if (TRACE_LOGGING_ENABLED && log_level_enabled(LOG_LEVEL_TRACE)) {
         BUG_ON(trace_flags); // Should only be called once
         trace_flags = flags;
     }
@@ -182,7 +182,7 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
     va_end(ap);
 }
 
-#if DEBUG >= 3
+#if TRACE_LOGGING_ENABLED
 // Return true if *any* 1 bits in `flags` are enabled in `trace_flags`
 bool log_trace_enabled(TraceLoggingFlags flags)
 {

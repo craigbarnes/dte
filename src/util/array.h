@@ -100,7 +100,7 @@ static inline void check_array (
     size_t elem_size,
     size_t name_size
 ) {
-    if (DEBUG < 1) {
+    if (!DEBUG_ASSERTIONS_ENABLED) {
         return;
     }
 

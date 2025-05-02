@@ -412,7 +412,7 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     for (size_t i = 0, avail = sizeof(buf); values[i]; i++) {
         if (flags & (1u << i)) {
             char *next = memccpy(ptr, values[i], '\0', avail);
-            if (DEBUG >= 1) {
+            if (DEBUG_ASSERTIONS_ENABLED) {
                 BUG_ON(!next);
                 avail -= (size_t)(next - ptr);
             }
@@ -865,7 +865,7 @@ bool validate_local_options(ErrorBuffer *ebuf, char **strs)
     return !invalid;
 }
 
-#if DEBUG >= 1
+#if DEBUG_ASSERTIONS_ENABLED
 static void sanity_check_option_value(const OptionDesc *desc, ErrorBuffer *ebuf, OptionValue val)
 {
     // NOLINTBEGIN(bugprone-assert-side-effect)

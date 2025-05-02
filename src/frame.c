@@ -500,7 +500,7 @@ void dump_frame(const Frame *frame, size_t level, String *str)
     }
 }
 
-#if DEBUG >= 1
+#if DEBUG_ASSERTIONS_ENABLED
 void frame_debug(const Frame *frame)
 {
     sanity_check_frame(frame);
