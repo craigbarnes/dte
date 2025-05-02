@@ -221,7 +221,7 @@ build/gen/platform.mk: mk/platform.sh mk/nproc.sh | build/gen/
 
 build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
 	$(E) GEN $@
-	$(Q) mk/compiler.sh '$(CC)' >$@ 2>$(@:.mk=.log)
+	$(Q) mk/compiler.sh '$(CC)' '$(CFLAGS_FILTERED)' >$@ 2>$(@:.mk=.log)
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/feature/
 	$(E) DETECT $@

@@ -4,6 +4,7 @@
 
 set -eu
 CC="$1"
+CFLAGS="$2"
 
 # The following compiler options are divided into "sets", which are
 # tested all at once, in order to keep process spawning overhead to
@@ -107,7 +108,7 @@ if cc_option -fno-asynchronous-unwind-tables; then
     echo "NO_UNWIND_TABLES = -fno-asynchronous-unwind-tables"
 fi
 
-echo "CC_TARGET = $($CC -dumpmachine)"
+echo "CC_TARGET = $($CC $CFLAGS -dumpmachine)"
 
 if cc_option $SANITIZER_FLAGS; then
     fmt_var 'CC_SANITIZER_FLAGS' "$SANITIZER_FLAGS"
