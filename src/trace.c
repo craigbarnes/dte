@@ -37,7 +37,7 @@ TraceLoggingFlags trace_flags_from_str(const char *flag_str)
     }
 
     if (streq(flag_str, "all")) {
-        return TRACE_FLAGS_ALL;
+        return TRACEFLAGS_ALL;
     }
 
     // Copy flag_str into a mutable buffer, so that get_delim_str() can be

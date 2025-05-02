@@ -20,7 +20,7 @@ static void consume_input(TermInputBuffer *input, size_t len)
     BUG_ON(len == 0);
     BUG_ON(len > input->len);
 
-    if (log_level_trace_enabled()) {
+    if (log_trace_enabled(TRACEFLAG_INPUT)) {
         // Note that this occurs *after* e.g. query responses have been logged
         char buf[256];
         u_make_printable(input->buf, len, buf, sizeof(buf), MPF_C0_SYMBOLS);

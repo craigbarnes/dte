@@ -48,17 +48,17 @@ bool log_level_enabled(LogLevel level);
 
 #if DEBUG >= 3
     #define LOG_TRACE(flags, ...) log_trace(flags, __FILE__, __LINE__, __VA_ARGS__)
-    static inline bool log_level_trace_enabled(void) {return log_level_enabled(LOG_LEVEL_TRACE);}
+    void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...) PRINTF(4);
+    bool log_trace_enabled(TraceLoggingFlags flags);
 #else
     static inline PRINTF(2) void LOG_TRACE(TraceLoggingFlags UNUSED_ARG(flags), const char* UNUSED_ARG(fmt), ...) {}
-    static inline bool log_level_trace_enabled(void) {return false;}
+    static inline bool log_trace_enabled(TraceLoggingFlags UNUSED_ARG(flags)) {return false;}
 #endif
 
 LogLevel log_open(const char *filename, LogLevel level, bool use_color);
 bool log_close(void);
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap) VPRINTF(4);
-void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_write(LogLevel level, const char *str, size_t len);
 LogLevel log_level_default(void);
 LogLevel log_level_from_str(const char *str);

@@ -114,8 +114,10 @@ bool log_close(void)
 
 void set_trace_logging_flags(TraceLoggingFlags flags)
 {
-    BUG_ON(trace_flags); // Should only be called once
-    trace_flags = flags;
+    if (DEBUG >= 3 && log_level_enabled(LOG_LEVEL_TRACE)) {
+        BUG_ON(trace_flags); // Should only be called once
+        trace_flags = flags;
+    }
 }
 
 bool log_level_enabled(LogLevel level)
@@ -180,15 +182,21 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
     va_end(ap);
 }
 
+#if DEBUG >= 3
+// Return true if *any* 1 bits in `flags` are enabled in `trace_flags`
+bool log_trace_enabled(TraceLoggingFlags flags)
+{
+    return !!(trace_flags & flags);
+}
+
 void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...)
 {
-    BUG_ON(!flags);
-    if (!log_level_trace_enabled() || !(flags & trace_flags)) {
+    if (!log_trace_enabled(flags)) {
         return;
     }
-
     va_list ap;
     va_start(ap, fmt);
     log_msgv(LOG_LEVEL_TRACE, file, line, fmt, ap);
     va_end(ap);
 }
+#endif
