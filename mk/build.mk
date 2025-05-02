@@ -157,7 +157,10 @@ build/util/fd.o: build/gen/feature.h
 build/util/xmemmem.o: build/gen/feature.h
 build/util/xmemrchr.o: build/gen/feature.h
 
+# `-fexceptions` is in some distro's packaging CFLAGS by default, but all it
+# does here is add ~60KiB of useless binary bloat (see commit ba36a8333de9e2)
 CFLAGS_FILTERED = $(filter-out -fexceptions, $(CFLAGS))
+
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS_FILTERED) $(BASIC_CPPFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS_FILTERED) $(LDFLAGS) $(BASIC_LDFLAGS)
 CFLAGS_FTEST = $(filter-out --coverage, $(CFLAGS_ALL)) -Werror
