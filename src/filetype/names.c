@@ -54,6 +54,7 @@ typedef enum {
     JAVASCRIPT,
     JQ,
     JSON,
+    JSONC, // JSON with comments
     JULIA,
     KDL,
     KOTLIN,
@@ -180,6 +181,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [JAVASCRIPT] = "javascript",
     [JQ] = "jq",
     [JSON] = "json",
+    [JSONC] = "jsonc",
     [JULIA] = "julia",
     [KDL] = "kdl",
     [KOTLIN] = "kotlin",

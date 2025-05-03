@@ -112,6 +112,7 @@ static const struct FileExtensionMap {
     {"js", JAVASCRIPT},
     {"jslib", JAVASCRIPT},
     {"json", JSON},
+    {"jsonc", JSONC},
     {"jsonl", JSON},
     {"jspre", JAVASCRIPT},
     {"kdl", KDL},
