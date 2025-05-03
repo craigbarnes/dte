@@ -295,7 +295,7 @@ static void unhandled(bool *var, int line, const char *fmt, ...)
     }
 
     *var = true;
-    if (DEBUG >= 2) {
+    if (DEBUG_LOGGING_ENABLED) {
         va_list ap;
         va_start(ap, fmt);
         log_msgv(LOG_LEVEL_DEBUG, __FILE__, line, fmt, ap);
