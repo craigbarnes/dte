@@ -81,7 +81,7 @@ detect_cflags "$GCC_4_8_WARNINGS"
 detect_cflags_any "$GCC_14_WARNINGS" "$CLANG_18_WARNINGS"
 detect_cflags "$GCC_15_WARNINGS"
 
-# This is enabled by default in GCC 15, despite not being documented in the
+# This is enabled by -Wextra in GCC 15, despite not being documented in the
 # list of changes (https://gcc.gnu.org/gcc-15/changes.html). The workaround
 # suggested in the warning message (use the `nonstring` attribute) isn't
 # easy to make portable, since it produces `-Wattributes` warnings in older
