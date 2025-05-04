@@ -1724,35 +1724,34 @@ static void test_update_term_title(TestContext *ctx)
     static const char suffix[] = " - dte\033\\";
     size_t plen = sizeof(prefix) - 1;
     size_t slen = sizeof(suffix) - 1;
-    Terminal term = {.obuf = TERM_OUTPUT_INIT, .features = TFLAG_SET_WINDOW_TITLE};
-    TermOutputBuffer *obuf = &term.obuf;
+    TermOutputBuffer obuf = TERM_OUTPUT_INIT;
 
     static const char expected1[] = "\033]2;example filename - dte\033\\";
-    update_term_title(&term, "example filename", false);
-    EXPECT_MEMEQ(obuf->buf, obuf->count, expected1, sizeof(expected1) - 1);
-    EXPECT_EQ(obuf->x, 0);
-    obuf->count = 0;
+    update_term_title(&obuf, "example filename", false);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, expected1, sizeof(expected1) - 1);
+    EXPECT_EQ(obuf.x, 0);
+    obuf.count = 0;
 
     // Control char escaping
     static const char expected2[] = "\033]2;x^I^H^[y - dte\033\\";
-    update_term_title(&term, "x\t\b\033y", false);
-    EXPECT_MEMEQ(obuf->buf, obuf->count, expected2, sizeof(expected2) - 1);
-    EXPECT_EQ(obuf->x, 0);
-    obuf->count = 0;
+    update_term_title(&obuf, "x\t\b\033y", false);
+    EXPECT_MEMEQ(obuf.buf, obuf.count, expected2, sizeof(expected2) - 1);
+    EXPECT_EQ(obuf.x, 0);
+    obuf.count = 0;
 
     // Very long filename, for edge case coverage
     char filename[TERM_OUTBUF_SIZE];
     memset(filename, 'a', sizeof(filename));
     filename[sizeof(filename) - 1] = '\0';
-    update_term_title(&term, filename, false);
+    update_term_title(&obuf, filename, false);
 
-    size_t tlen = obuf->count - (plen + slen);
+    size_t tlen = obuf.count - (plen + slen);
     EXPECT_EQ(sizeof(filename), 8192);
-    EXPECT_EQ(obuf->count, 8188);
+    EXPECT_EQ(obuf.count, 8188);
     EXPECT_EQ(tlen, 8176);
-    EXPECT_MEMEQ(obuf->buf, plen, prefix, plen);
-    EXPECT_MEMEQ(obuf->buf + plen, tlen, filename, tlen);
-    EXPECT_MEMEQ(obuf->buf + plen + tlen, slen, suffix, slen);
+    EXPECT_MEMEQ(obuf.buf, plen, prefix, plen);
+    EXPECT_MEMEQ(obuf.buf + plen, tlen, filename, tlen);
+    EXPECT_MEMEQ(obuf.buf + plen + tlen, slen, suffix, slen);
 }
 
 static void test_is_newly_detected_feature(TestContext *ctx)

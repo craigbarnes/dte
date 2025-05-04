@@ -72,6 +72,7 @@ void term_end_sync_update(Terminal *term);
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y);
 void term_save_title(Terminal *term);
 void term_restore_title(Terminal *term);
+void term_restore_and_save_title(Terminal *term);
 bool term_can_clear_eol_with_el_sequence(const Terminal *term);
 int term_clear_eol(Terminal *term);
 void term_clear_screen(TermOutputBuffer *obuf);

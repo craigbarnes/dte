@@ -268,13 +268,15 @@ void ui_resize(EditorState *e)
 void ui_start(EditorState *e)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
+    Terminal *term = &e->terminal;
 
     // Note: the order of these calls is important - Kitty saves/restores
     // some terminal state when switching buffers, so switching to the
     // alternate screen buffer needs to happen before modes are enabled
-    term_use_alt_screen_buffer(&e->terminal);
-    term_enable_private_modes(&e->terminal);
+    term_use_alt_screen_buffer(term);
+    term_enable_private_modes(term);
 
+    term_restore_and_save_title(term);
     ui_resize(e);
 }
 
@@ -291,15 +293,23 @@ void ui_first_start(EditorState *e, unsigned int terminal_query_level)
     term_use_alt_screen_buffer(term);
     term_enable_private_modes(term);
 
+    term_save_title(term);
     term_put_initial_queries(term, terminal_query_level);
     ui_resize(e);
 }
 
-void ui_end(EditorState *e)
+void ui_end(EditorState *e, bool final)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
+
+    if (final) {
+        term_restore_title(term);
+    } else {
+        term_restore_and_save_title(term);
+    }
+
     term_clear_screen(obuf);
     term_move_cursor(obuf, 0, term->height - 1);
     term_restore_cursor_style(term);

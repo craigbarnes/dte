@@ -56,7 +56,7 @@ static void cleanup_handler(void *userdata)
     EditorState *e = userdata;
     set_fatal_error_cleanup_handler(NULL, NULL);
     if (!e->child_controls_terminal) {
-        ui_end(e);
+        ui_end(e, true);
         term_cooked();
     }
 }
@@ -577,7 +577,6 @@ int main(int argc, char *argv[])
         e->options.lock_files = false;
     }
 
-    term_save_title(term);
     exec_builtin_rc(e);
 
     if (read_rc) {
@@ -688,7 +687,7 @@ int main(int argc, char *argv[])
      * to be echoed to the terminal (before the shell takes over again
      * and prints its prompt).
      */
-    ui_end(e);
+    ui_end(e, true);
 
 exit:
     e->err.print_to_stderr = true;

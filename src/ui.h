@@ -20,6 +20,7 @@
 // screen need to be redrawn
 typedef struct {
     bool is_modified;
+    bool set_window_title;
     unsigned long id;
     long cy;
     long vx;
@@ -30,6 +31,7 @@ static inline ScreenState get_screen_state(const View *view)
 {
     return (ScreenState) {
         .is_modified = buffer_modified(view->buffer),
+        .set_window_title = view->window->editor->options.set_window_title,
         .id = view->buffer->id,
         .cy = view->cy,
         .vx = view->vx,
@@ -39,7 +41,7 @@ static inline ScreenState get_screen_state(const View *view)
 
 // ui.c
 void update_screen(EditorState *e, const ScreenState *s);
-void update_term_title(Terminal *term, const char *filename, bool is_modified);
+void update_term_title(TermOutputBuffer *obuf, const char *filename, bool is_modified);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
 void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);

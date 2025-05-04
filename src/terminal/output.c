@@ -356,20 +356,31 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
     obuf->count += i;
 }
 
+// Save (push) window title on XTWINOPS stack
+// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=Save%20xterm%20window%20title%20on%20stack
 void term_save_title(Terminal *term)
 {
     if (term->features & TFLAG_SET_WINDOW_TITLE) {
-        // Save window title on stack (XTWINOPS)
-        // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         term_put_literal(&term->obuf, "\033[22;2t");
     }
 }
 
+// Restore (pop) window title from XTWINOPS stack
+// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=Restore%20xterm%20window%20title%20from%20stack
 void term_restore_title(Terminal *term)
 {
     if (term->features & TFLAG_SET_WINDOW_TITLE) {
-        // Restore window title from stack (XTWINOPS)
         term_put_literal(&term->obuf, "\033[23;2t");
+    }
+}
+
+// Restore saved title as current title, then immediately save again.
+// Used when yielding to and resuming from child processes or when the
+// `set_window_title` option changes from true to false.
+void term_restore_and_save_title(Terminal *term)
+{
+    if (term->features & TFLAG_SET_WINDOW_TITLE) {
+        term_put_literal(&term->obuf, "\033[23;2t\033[22;2t");
     }
 }
 

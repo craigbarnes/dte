@@ -128,24 +128,10 @@ static void filetype_changed(EditorState *e, bool global)
     buffer_update_syntax(e, e->buffer);
 }
 
-// TODO: Set a flag to be interpreted elsewhere, instead of emitting output here
 static void set_window_title_changed(EditorState *e, bool global)
 {
     BUG_ON(!global);
-    if (e->flags & EFLAG_HEADLESS) {
-        return;
-    }
-
-    Terminal *term = &e->terminal;
-    if (e->options.set_window_title) {
-        if (e->status == EDITOR_RUNNING) {
-            const Buffer *b = e->buffer;
-            update_term_title(term, buffer_filename(b), buffer_modified(b));
-        }
-    } else {
-        term_restore_title(term);
-        term_save_title(term);
-    }
+    e->screen_update |= UPDATE_TERM_TITLE;
 }
 
 static void syntax_changed(EditorState *e, bool global)

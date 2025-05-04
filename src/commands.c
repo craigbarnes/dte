@@ -2252,7 +2252,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
         return error_msg(&e->err, "Session leader can't suspend");
     }
 
-    ui_end(e);
+    ui_end(e, false);
     term_cooked();
     LOG_INFO("suspending");
 

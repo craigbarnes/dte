@@ -145,9 +145,6 @@ Features
 
 * Show raw escape sequences in `dte -K` output (see also: [#151])
 
-* Update the terminal window title after running child processes, in
-  case it was changed and not restored (see also: [#14])
-
 * Allow custom colors/attributes in the statusline (see also: [#70])
 
 * Allow [`include`] to run *any* command when used from command mode

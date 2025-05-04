@@ -253,6 +253,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
 {
     const TermFeatureFlags existing = term->features;
     TermFeatureFlags detected = key & ~KEYCODE_QUERY_REPLY_BIT;
+    term->features |= detected;
     if (unlikely(log_level_enabled(LOG_LEVEL_INFO))) {
         log_detected_features(existing, detected);
     }
@@ -312,11 +313,16 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         flush = true;
     }
 
+    if (is_newly_detected_feature(existing, detected, TFLAG_SET_WINDOW_TITLE)) {
+        BUG_ON(!(term->features & TFLAG_SET_WINDOW_TITLE));
+        term_save_title(term);
+        flush = true;
+    }
+
     if (flush) {
         term_output_flush(obuf);
     }
 
-    term->features |= detected;
     return KEY_NONE;
 }
 

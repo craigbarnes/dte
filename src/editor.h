@@ -168,7 +168,7 @@ void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
 int main_loop(EditorState *e) NONNULL_ARGS;
 void ui_first_start(EditorState *e, unsigned int terminal_query_level) NONNULL_ARGS;
 void ui_start(EditorState *e) NONNULL_ARGS;
-void ui_end(EditorState *e) NONNULL_ARGS;
+void ui_end(EditorState *e, bool final) NONNULL_ARGS;
 void ui_resize(EditorState *e) NONNULL_ARGS;
 
 #endif
