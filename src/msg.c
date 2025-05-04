@@ -33,6 +33,7 @@ void add_message(MessageArray *msgs, Message *m)
     ptr_array_append(&msgs->array, m);
 }
 
+// Jump to the FileLocation of the current Message
 bool activate_current_message(const MessageArray *msgs, Window *window)
 {
     size_t count = msgs->array.count;
@@ -57,6 +58,8 @@ bool activate_current_message(const MessageArray *msgs, Window *window)
     return info_msg(ebuf, "[%zu/%zu] %s", pos + 1, count, m->msg);
 }
 
+// Like activate_current_message(), but also pushing the previous
+// FileLocation on the bookmark stack if the cursor moves
 void activate_current_message_save (
     const MessageArray *msgs,
     PointerArray *bookmarks,
@@ -74,6 +77,7 @@ void activate_current_message_save (
 
     const BlockIter *cursor = &view->window->editor->view->cursor;
     if (nmsgs == 1 && cursor->blk == save.blk && cursor->offset == save.offset) {
+        // Only one message and cursor position not changed; don't bookmark.
         // TODO: Make this condition configurable (some people may prefer
         // to *always* push a bookmark)
         return;
