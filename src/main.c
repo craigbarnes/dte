@@ -553,7 +553,11 @@ int main(int argc, char *argv[])
         set_basic_signal_dispositions();
     }
 
-    EditorState *e = init_editor_state(headless ? EFLAG_HEADLESS : 0);
+    // Note that we set EFLAG_HEADLESS here, regardless of whether -C was used,
+    // because the terminal isn't properly initialized until later and we don't
+    // want commands running via -c or -C interacting with it
+    EditorState *e = init_editor_state(EFLAG_HEADLESS);
+
     Terminal *term = &e->terminal;
     e->err.print_to_stderr = true;
 
@@ -629,7 +633,10 @@ int main(int argc, char *argv[])
     View *dview = window->views.count ? NULL : window_open_empty_buffer(window);
 
     set_view(window_get_first_view(window));
-    ui_first_start(e, terminal_query_level);
+
+    if (!headless) {
+        update_screen_size(term, e->root_frame);
+    }
 
     if (nr_commands) {
         for (size_t i = 0; i < nr_commands; i++) {
@@ -665,11 +672,8 @@ int main(int argc, char *argv[])
     set_fatal_signal_handlers();
     set_sigwinch_handler();
 
-    if (nr_commands + nr_tags > 0) {
-        const ScreenState s = get_screen_state(e->view);
-        update_screen(e, &s);
-    }
-
+    e->flags &= ~EFLAG_HEADLESS; // See comment for init_editor_state() call above
+    ui_first_start(e, terminal_query_level);
     main_loop(e);
     term_restore_title(term);
 

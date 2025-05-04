@@ -284,10 +284,7 @@ void ui_start(EditorState *e)
 // ui_start() + term_put_initial_queries() + term_output_flush()).
 void ui_first_start(EditorState *e, unsigned int terminal_query_level)
 {
-    if (e->flags & EFLAG_HEADLESS) {
-        return;
-    }
-
+    BUG_ON(e->flags & EFLAG_HEADLESS);
     Terminal *term = &e->terminal;
 
     // The order of these calls is important; see ui_start()
