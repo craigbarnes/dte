@@ -25,8 +25,9 @@ seealso: ["`dterc`", "`dte-syntax`"]
     arguments. See [`dterc`] for available commands.
 
 `-t` _ctag_
-:   Jump to source location of _ctag_. Requires [`tags`] file generated
-    by [`ctags`].
+:   Jump to the source location of _ctag_, in the same way as the [`tag`]
+    command. These options are always processed after `-c` options, so
+    `-c 'tag ctag; ...'` should be used if a specific ordering is needed.
 
 `-r` _rcfile_
 :   Read configuration from _rcfile_ instead of `~/.dte/rc`.
@@ -385,19 +386,18 @@ input/output of both.
 [`compile`]: dterc.html#compile
 [`exec`]: dterc.html#exec
 [`hi`]: dterc.html#hi
-[`show bind`]: dterc.html#show
-[`show buffer`]: dterc.html#show
 [`next`]: dterc.html#next
-[`prev`]: dterc.html#prev
 [`open`]: dterc.html#open
+[`prev`]: dterc.html#prev
+[`quit`]: dterc.html#quit
 [`save`]: dterc.html#save
 [`search`]: dterc.html#search
-[`quit`]: dterc.html#quit
+[`show bind`]: dterc.html#show
+[`show buffer`]: dterc.html#show
+[`tag`]: dterc.html#tag
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
 
-[`ctags`]: https://en.wikipedia.org/wiki/Ctags
-[`tags`]: https://docs.ctags.io/en/stable/man/tags.5.html
 [`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html

@@ -22,8 +22,9 @@ arguments. See \fBdterc\fR(5) for available commands.
 .PP
 .TP
 \fB\-t\fR \fIctag\fR
-Jump to source location of \fIctag\fR. Requires \fBtags\fR(5) file generated
-by \fBctags\fR(1).
+Jump to the source location of \fIctag\fR, in the same way as the \fBtag\fR
+command. These options are always processed after \fB\-c\fR options, so
+\fB\-c \[aq]tag ctag; ...\[aq]\fR should be used if a specific ordering is needed.
 .PP
 .TP
 \fB\-r\fR \fIrcfile\fR
