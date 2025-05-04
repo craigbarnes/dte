@@ -309,21 +309,22 @@ static void mark_tabbar_changed(Window *window, void* UNUSED_ARG(data))
 static bool cmd_cd(EditorState *e, const CommandArgs *a)
 {
     const char *dir = a->args[0];
+    ErrorBuffer *ebuf = &e->err;
     if (unlikely(dir[0] == '\0')) {
-        return error_msg(&e->err, "directory argument cannot be empty");
+        return error_msg(ebuf, "directory argument cannot be empty");
     }
 
     if (streq(dir, "-")) {
         dir = xgetenv("OLDPWD");
         if (!dir) {
-            return error_msg(&e->err, "OLDPWD not set");
+            return error_msg(ebuf, "OLDPWD not set");
         }
     }
 
     char buf[8192];
     const char *cwd = getcwd(buf, sizeof(buf));
     if (chdir(dir) != 0) {
-        return error_msg_errno(&e->err, "changing directory failed");
+        return error_msg_errno(ebuf, "changing directory failed");
     }
 
     if (likely(cwd)) {
@@ -348,7 +349,9 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
     e->screen_update |= UPDATE_TERM_TITLE;
-    return true;
+
+    bool verbose = has_flag(a, 'v');
+    return !verbose || info_msg(ebuf, "changed directory to: %s", cwd ? cwd : dir);
 }
 
 static bool cmd_center_view(EditorState *e, const CommandArgs *a)
@@ -2611,7 +2614,7 @@ static const Command cmds[] = {
     {"bolsf", "cl", NA, 0, 0, cmd_bolsf},
     {"bookmark", "r", NA, 0, 0, cmd_bookmark},
     {"case", "lu", NA, 0, 0, cmd_case},
-    {"cd", "", RC, 1, 1, cmd_cd},
+    {"cd", "v", RC, 1, 1, cmd_cd},
     {"center-view", "", NA, 0, 0, cmd_center_view},
     {"clear", "Ii", NA, 0, 0, cmd_clear},
     {"close", "fpqw", NA, 0, 0, cmd_close},

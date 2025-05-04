@@ -59,7 +59,7 @@ seealso: ["`dterc`", "`dte-syntax`"]
 
 `-P`
 :   Print the terminal color palette to `stdout` and exit. This can be
-    used as a quick visual reference for the palette colors accepted by
+    used as a quick, visual reference for the palette colors accepted by
     the [`hi`] command (see [`dterc`]).
 
 `-h`
