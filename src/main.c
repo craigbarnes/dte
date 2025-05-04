@@ -382,7 +382,7 @@ static void exec_user_rc(EditorState *e, const char *filename)
     read_normal_config(e, filename, flags);
 }
 
-static void read_history_files(EditorState *e)
+static void read_history_files(EditorState *e, bool headless)
 {
     const char *dir = e->user_config_dir;
     size_t size_limit = 64u << 20; // 64 MiB
@@ -392,7 +392,7 @@ static void read_history_files(EditorState *e)
 
     // There's not much sense in saving history for headless sessions, but we
     // do still load it (above), to make it available to e.g. `exec -i command`
-    if (!(e->flags & EFLAG_HEADLESS)) {
+    if (!headless) {
         e->flags |= EFLAG_ALL_HIST;
     }
 
@@ -592,7 +592,7 @@ int main(int argc, char *argv[])
     e->root_frame = new_root_frame(window);
 
     if (load_and_save_history) {
-        read_history_files(e);
+        read_history_files(e, headless);
     }
 
     if (!headless) {
