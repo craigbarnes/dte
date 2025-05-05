@@ -23,7 +23,7 @@
 #include "util/xsnprintf.h"
 #include "window.h"
 
-#if 0 && HAVE_EMBED // Disabled for now; GCC 15.1.1 #embed appears to be buggy
+#if HAVE_EMBED
     #include "test-data-embed.h"
 #else
     #include "test-data.h"

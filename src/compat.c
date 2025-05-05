@@ -13,7 +13,7 @@ const char buildvar_string[] =
 #if HAVE_DUP3
     " dup3"
 #endif
-#if 0 && HAVE_EMBED // Disabled for now; GCC 15.1.1 #embed appears to be buggy
+#if HAVE_EMBED
     " embed"
 #endif
 #if HAVE_PIPE2

@@ -92,6 +92,17 @@ detect_cflags "$GCC_15_WARNINGS"
 # • https://gitlab.com/craigbarnes/dte/-/jobs/9886035875
 detect_cflags '-Wno-unterminated-string-initialization'
 
+# The GCC 15 manual states "there are no default directories for #embed"
+# and without this option it indeed doesn't seem to find any files (even
+# those specified relative to the working directory). Clang appears to
+# find such files by default, but also supports an `--embed-dir` option
+# with the same semantics as GCC.
+# See also:
+# • mk/feature-test/embed.c
+# • https://gcc.gnu.org/onlinedocs/gcc-15.1.0/gcc/Directory-Options.html#index-embed-dir
+# • https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-embed-dir
+detect_cflags '--embed-dir=.'
+
 # https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#index-fstrict-flex-arrays
 # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wstrict-flex-arrays
 # https://gcc.gnu.org/gcc-13/changes.html#c-family
