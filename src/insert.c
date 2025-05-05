@@ -118,7 +118,7 @@ static int get_indent_of_matching_brace(const View *view)
     int level = 0;
 
     while (block_iter_prev_line(&bi)) {
-        StringView line = get_current_line(&bi);
+        StringView line = block_iter_get_line(&bi);
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
                 return get_indent_width(&line, tab_width);
