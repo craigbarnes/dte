@@ -87,16 +87,15 @@ size_t block_iter_get_char(const BlockIter *bi, CodePoint *up) WARN_UNUSED_RESUL
 char *block_iter_get_bytes(const BlockIter *bi, size_t len) WARN_UNUSED_RESULT;
 StringView block_iter_get_line_with_nl(BlockIter *bi);
 
-// Return the contents of the line (excluding newline) that extends from `bi`
-// (which should already be at BOL)
+// Like block_iter_get_line_with_nl(), but excluding the newline
 static inline StringView block_iter_get_line(BlockIter *bi)
 {
     StringView line = block_iter_get_line_with_nl(bi);
-    line.length -= (line.length > 0); // Trim the newline
+    line.length -= (line.length > 0); // Trim the newline (if any)
     return line;
 }
 
-// Like block_iter_get_line(), but without the pre-condition
+// Like block_iter_get_line(), but always returning whole lines
 static inline StringView get_current_line(const BlockIter *bi)
 {
     BlockIter tmp = *bi;

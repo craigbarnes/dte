@@ -363,7 +363,8 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
     return buf;
 }
 
-// bi should be at bol
+// Return the contents of the line that extends from `bi`. Callers
+// should ensure `bi` is already at BOL, if whole lines are needed.
 StringView block_iter_get_line_with_nl(BlockIter *bi)
 {
     block_iter_normalize(bi);
