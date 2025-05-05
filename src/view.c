@@ -31,7 +31,7 @@ void view_update_cursor_x(View *view)
 {
     StringView line;
     const unsigned int tw = view->buffer->options.tab_width;
-    const size_t cx = fetch_this_line(&view->cursor, &line);
+    const size_t cx = get_current_line_and_offset(&view->cursor, &line);
     long cx_char = 0;
     long w = 0;
 
@@ -189,7 +189,7 @@ size_t get_bounds_for_word_under_cursor(StringView line, size_t *cursor_offset)
 StringView view_get_word_under_cursor(const View *view)
 {
     StringView line;
-    size_t cursor_offset_in_line = fetch_this_line(&view->cursor, &line);
+    size_t cursor_offset_in_line = get_current_line_and_offset(&view->cursor, &line);
     size_t start = cursor_offset_in_line;
     size_t end = get_bounds_for_word_under_cursor(line, &start);
     return string_view(line.data + start, end ? end - start : 0);

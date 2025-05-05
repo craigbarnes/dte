@@ -386,21 +386,3 @@ StringView block_iter_get_line_with_nl(BlockIter *bi)
     BUG_ON(line.length == 0);
     return line;
 }
-
-StringView block_iter_get_line(BlockIter *bi)
-{
-    StringView line = block_iter_get_line_with_nl(bi);
-    line.length -= (line.length > 0); // Trim the newline
-    return line;
-}
-
-// Set the `line` argument to point to the current line and return
-// the offset of the cursor, relative to the start of the line
-// (zero means cursor is at bol)
-size_t fetch_this_line(const BlockIter *bi, StringView *line)
-{
-    BlockIter tmp = *bi;
-    size_t count = block_iter_bol(&tmp);
-    *line = block_iter_get_line(&tmp);
-    return count;
-}

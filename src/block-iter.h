@@ -85,8 +85,33 @@ void block_iter_goto_line(BlockIter *bi, size_t line);
 size_t block_iter_get_offset(const BlockIter *bi) WARN_UNUSED_RESULT;
 size_t block_iter_get_char(const BlockIter *bi, CodePoint *up) WARN_UNUSED_RESULT;
 char *block_iter_get_bytes(const BlockIter *bi, size_t len) WARN_UNUSED_RESULT;
-StringView block_iter_get_line(BlockIter *bi);
 StringView block_iter_get_line_with_nl(BlockIter *bi);
-size_t fetch_this_line(const BlockIter *bi, StringView *line);
+
+// Return the contents of the line (excluding newline) that extends from `bi`
+// (which should already be at BOL)
+static inline StringView block_iter_get_line(BlockIter *bi)
+{
+    StringView line = block_iter_get_line_with_nl(bi);
+    line.length -= (line.length > 0); // Trim the newline
+    return line;
+}
+
+// Like block_iter_get_line(), but without the pre-condition
+static inline StringView get_current_line(const BlockIter *bi)
+{
+    BlockIter tmp = *bi;
+    block_iter_bol(&tmp);
+    return block_iter_get_line(&tmp);
+}
+
+// Like get_current_line(), but returning the cursor offset (relative to BOL)
+// and setting `line` via an out-param
+static inline size_t get_current_line_and_offset(const BlockIter *bi, StringView *line)
+{
+    BlockIter tmp = *bi;
+    size_t count = block_iter_bol(&tmp);
+    *line = block_iter_get_line(&tmp);
+    return count;
+}
 
 #endif

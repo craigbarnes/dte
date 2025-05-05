@@ -159,7 +159,7 @@ static ssize_t get_current_indent_bytes (
 size_t get_indent_level_bytes_left(const LocalOptions *options, BlockIter *cursor)
 {
     StringView line;
-    size_t cursor_offset = fetch_this_line(cursor, &line);
+    size_t cursor_offset = get_current_line_and_offset(cursor, &line);
     if (!cursor_offset) {
         return 0;
     }
@@ -175,7 +175,7 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *curs
     unsigned int iw = options->indent_width;
     unsigned int tw = options->tab_width;
     StringView line;
-    size_t cursor_offset = fetch_this_line(cursor, &line);
+    size_t cursor_offset = get_current_line_and_offset(cursor, &line);
     ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset, iw, tw);
     if (ibytes < 0) {
         return 0;

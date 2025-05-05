@@ -108,7 +108,7 @@ void move_bol(View *view, SmartBolType type)
     }
 
     StringView line;
-    size_t cursor_offset = fetch_this_line(&view->cursor, &line);
+    size_t cursor_offset = get_current_line_and_offset(&view->cursor, &line);
     bool at_bol = (cursor_offset == 0);
     if (at_bol && type == BOL_INDENT) {
         // At BOL and not using toggle; nothing to do

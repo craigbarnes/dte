@@ -151,8 +151,7 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_EQ(view->cx, 0);
     ASSERT_EQ(view->cy, line_nr - 1);
 
-    StringView line;
-    fetch_this_line(&view->cursor, &line);
+    StringView line = get_current_line(&view->cursor);
     ASSERT_EQ(line.length, 65);
 
     bool next_changed;

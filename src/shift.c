@@ -28,8 +28,7 @@ static void shift_right(View *view, size_t nr_lines, size_t count)
     char *indent = alloc_indent(options, count, &indent_size);
 
     for (size_t i = 0; true; ) {
-        StringView line;
-        fetch_this_line(&view->cursor, &line);
+        StringView line = get_current_line(&view->cursor);
         IndentInfo info = get_indent_info(options, &line);
         if (info.wsonly) {
             if (info.bytes) {
@@ -62,8 +61,7 @@ static void shift_left(View *view, size_t nr_lines, size_t count)
     const bool space_indent = use_spaces_for_indent(options);
 
     for (size_t i = 0; true; ) {
-        StringView line;
-        fetch_this_line(&view->cursor, &line);
+        StringView line = get_current_line(&view->cursor);
         IndentInfo info = get_indent_info(options, &line);
         if (info.wsonly) {
             if (info.bytes) {

@@ -115,11 +115,10 @@ static int get_indent_of_matching_brace(const View *view)
 {
     unsigned int tab_width = view->buffer->options.tab_width;
     BlockIter bi = view->cursor;
-    StringView line;
     int level = 0;
 
     while (block_iter_prev_line(&bi)) {
-        fetch_this_line(&bi, &line);
+        StringView line = get_current_line(&bi);
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
                 return get_indent_width(&line, tab_width);
@@ -157,14 +156,13 @@ void insert_ch(View *view, CodePoint ch)
         BlockIter bi = view->cursor;
         del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
     } else if (ch == '}' && options->auto_indent && options->brace_indent) {
-        StringView curlr;
-        fetch_this_line(&view->cursor, &curlr);
-        if (strview_isblank(&curlr)) {
+        StringView line = get_current_line(&view->cursor);
+        if (strview_isblank(&line)) {
             int width = get_indent_of_matching_brace(view);
             if (width >= 0) {
                 // Replace current (ws only) line with some indent + '}'
                 block_iter_bol(&view->cursor);
-                del_count = curlr.length;
+                del_count = line.length;
                 if (width) {
                     alloc = make_indent(options, width);
                     ins = alloc;

@@ -299,7 +299,7 @@ ssize_t handle_exec (
         input_from_buffer = true;
         if (!view->selection) {
             StringView line;
-            size_t offset = fetch_this_line(&view->cursor, &line);
+            size_t offset = get_current_line_and_offset(&view->cursor, &line);
             size_t start = offset;
             size_t end = get_bounds_for_word_under_cursor(line, &start);
             if (end == 0) {
