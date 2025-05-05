@@ -54,16 +54,16 @@ static inline size_t buf_parse_hex_uint(const char *str, size_t len, unsigned in
 }
 
 size_t size_str_width(size_t x) CONST_FN WARN_UNUSED_RESULT;
-size_t buf_parse_uintmax(const char *str, size_t len, uintmax_t *valp) WARN_UNUSED_RESULT;
-size_t buf_parse_ulong(const char *str, size_t len, unsigned long *valp) WARN_UNUSED_RESULT;
-size_t buf_parse_uint(const char *str, size_t len, unsigned int *valp) WARN_UNUSED_RESULT;
-size_t buf_parse_size(const char *str, size_t len, size_t *valp) WARN_UNUSED_RESULT;
-bool str_to_int(const char *str, int *valp) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool str_to_uint(const char *str, unsigned int *valp) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool str_to_size(const char *str, size_t *valp) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool str_to_filepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool str_to_xfilepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT;
+size_t buf_parse_uintmax(const char *str, size_t len, uintmax_t *valp) WARN_UNUSED_RESULT WRITEONLY(3);
+size_t buf_parse_ulong(const char *str, size_t len, unsigned long *valp) WARN_UNUSED_RESULT WRITEONLY(3);
+size_t buf_parse_uint(const char *str, size_t len, unsigned int *valp) WARN_UNUSED_RESULT WRITEONLY(3);
+size_t buf_parse_size(const char *str, size_t len, size_t *valp) WARN_UNUSED_RESULT WRITEONLY(3);
+bool str_to_int(const char *str, int *valp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2);
+bool str_to_uint(const char *str, unsigned int *valp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2);
+bool str_to_size(const char *str, size_t *valp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2);
+bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2);
+bool str_to_filepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2) WRITEONLY(3);
+bool str_to_xfilepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2) WRITEONLY(3);
 intmax_t parse_filesize(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

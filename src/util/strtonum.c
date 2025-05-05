@@ -215,9 +215,10 @@ out:
 // need to do anything different for e.g. "32" vs. "32:1".
 bool str_to_filepos(const char *str, size_t *linep, size_t *colp)
 {
-    bool r = str_to_xfilepos(str, linep, colp);
-    if (r && *colp == 0) {
-        *colp = 1;
+    size_t col;
+    bool r = str_to_xfilepos(str, linep, &col);
+    if (r) {
+        *colp = col + !col;
     }
     return r;
 }
