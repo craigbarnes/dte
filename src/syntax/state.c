@@ -685,14 +685,16 @@ Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
 
     const char *cfgdir = e->user_config_dir;
     char filename[8192];
-    int err;
-
     xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
+
+    int err;
     Syntax *syn = load_syntax_file(e, filename, 0, &err);
     if (syn || err != ENOENT) {
         return syn;
     }
 
-    xsnprintf(filename, sizeof filename, "syntax/%s", filetype);
-    return load_syntax_file(e, filename, SYN_BUILTIN, &err);
+    // Skip past "%s/" (cfgdir) part of formatted string from above and
+    // try to load a built-in syntax named `syntax/<filetype>`
+    const char *builtin_name = filename + strlen(cfgdir) + STRLEN("/");
+    return load_syntax_file(e, builtin_name, SYN_BUILTIN, &err);
 }
