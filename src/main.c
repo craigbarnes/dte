@@ -443,7 +443,7 @@ static const char usage[] =
 // NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKPRVC:Q:S:b:c:t:r:s:";
+    static const char optstring[] = "hBHKPRVZC:Q:S:b:c:t:r:s:";
     const char *rc = NULL;
     const char *commands[8];
     const char *tags[8];
@@ -503,6 +503,9 @@ int main(int argc, char *argv[])
             return showkey_loop(terminal_query_level);
         case 'V':
             return write_stdout(copyright, sizeof(copyright));
+        case 'Z':
+            fprintf(stdout, "features:%s\n", buildvar_string);
+            return EC_OK;
         case 'h':
             printf(usage, progname(argc, argv, "dte"));
             return EC_OK;
