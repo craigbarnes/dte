@@ -101,20 +101,20 @@ void move_cursor_right(View *view)
 
 void move_bol(View *view, SmartBolType type)
 {
+    BlockIter bol = view->cursor;
+    size_t cursor_offset = block_iter_bol(&bol);
     if (type == BOL_SIMPLE) {
-        block_iter_bol(&view->cursor);
-        view_reset_preferred_x(view);
-        return;
+        view->cursor = bol;
+        goto out;
     }
 
-    StringView line;
-    size_t cursor_offset = get_current_line_and_offset(&view->cursor, &line);
     bool at_bol = (cursor_offset == 0);
     if (at_bol && type == BOL_INDENT) {
         // At BOL and not using toggle; nothing to do
         goto out;
     }
 
+    StringView line = block_iter_get_line(&bol);
     size_t indent = ascii_blank_prefix_length(line.data, line.length);
     if (at_bol) {
         // At BOL and using toggle; move right to first non-blank char
