@@ -191,6 +191,7 @@ static const struct FileExtensionMap {
     {"rst", RST},
     {"ru", RUBY},
     {"sarif", JSON},
+    {"scad", SCAD},
     {"scala", SCALA},
     {"scm", SCHEME},
     {"scss", SCSS},
