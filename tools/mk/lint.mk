@@ -53,7 +53,7 @@ check-headers:
 
 check-codespell:
 	$(E) CODESPL 'src/ mk/ *.md *.xml'
-	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES)
+	$(Q) $(CODESPELL) -Linpu,iterm,clen,ede src/ mk/ $(DOCFILES)
 
 # The options and redirections here are to ensure that `make check-typos`
 # is useable in dte command mode

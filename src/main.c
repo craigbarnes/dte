@@ -320,10 +320,9 @@ static ExitCode init_logging(void)
         LOG_INFO("log colors disabled ($NO_COLOR)");
     }
 
-    if (got_level >= LOG_LEVEL_TRACE) {
-        TraceLoggingFlags tflags = trace_flags_from_str(getenv("DTE_LOG_TRACE"));
-        set_trace_logging_flags(tflags);
-        if (tflags == 0) {
+    if (TRACE_LOGGING_ENABLED && got_level >= LOG_LEVEL_TRACE) {
+        const char *flagstr = xgetenv("DTE_LOG_TRACE");
+        if (!flagstr || !set_trace_logging_flags(flagstr)) {
             LOG_NOTICE("DTE_LOG_LEVEL=trace used with no effect; DTE_LOG_TRACE also needed");
         }
     }

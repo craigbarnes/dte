@@ -1,10 +1,14 @@
 [type.c]
 extend-glob = ["*.c", "*.h"]
 extend-ignore-words-re = [
-    "^BRE|Pn|clen|doas|ede|mak|typ$",
+    "^BRE|Pn|clen|doas|ede|inpu|mak|typ$",
     "^(?i:iterm)$",
 ]
 
 [type.devmk]
 extend-glob = ["dev.mk"]
 extend-ignore-words-re = ["^clen|ede$"]
+
+[type.buildmk]
+extend-glob = ["build.mk"]
+extend-ignore-words-re = ["^ba$"]

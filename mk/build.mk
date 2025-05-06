@@ -63,7 +63,7 @@ editor_objects := $(call prefix-obj, build/, \
 test_objects := $(call prefix-obj, build/test/, \
     bind bookmark buffer cmdline command config ctags dump editorconfig \
     encoding error filetype frame history indent init main options regexp \
-    shift spawn status syntax terminal test trace util )
+    shift spawn status syntax terminal test util )
 
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 

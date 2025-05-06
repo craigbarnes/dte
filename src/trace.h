@@ -21,13 +21,11 @@ typedef enum {
     #define LOG_TRACE(flags, ...) log_trace(flags, __FILE__, __LINE__, __VA_ARGS__)
     void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...) PRINTF(4);
     bool log_trace_enabled(TraceLoggingFlags flags);
-    void set_trace_logging_flags(TraceLoggingFlags flags);
+    bool set_trace_logging_flags(const char *flag_str);
 #else
     static inline PRINTF(2) void LOG_TRACE(TraceLoggingFlags UNUSED_ARG(flags), const char* UNUSED_ARG(fmt), ...) {}
     static inline bool log_trace_enabled(TraceLoggingFlags UNUSED_ARG(flags)) {return false;}
-    static inline void set_trace_logging_flags(TraceLoggingFlags UNUSED_ARG(flags)) {}
+    static inline bool set_trace_logging_flags(const char* UNUSED_ARG(flag_str)) {return false;}
 #endif
-
-TraceLoggingFlags trace_flags_from_str(const char *str);
 
 #endif
