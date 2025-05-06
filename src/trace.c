@@ -2,9 +2,12 @@
 #include "trace.h"
 #include "util/array.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xstring.h"
+
+#if TRACE_LOGGING_ENABLED
+static TraceLoggingFlags trace_flags = 0; // NOLINT(*-avoid-non-const-global-variables)
+#endif
 
 static const char trace_names[][8] = {
     "command",
@@ -59,3 +62,30 @@ TraceLoggingFlags trace_flags_from_str(const char *flag_str)
 
     return flags;
 }
+
+#if TRACE_LOGGING_ENABLED
+void set_trace_logging_flags(TraceLoggingFlags flags)
+{
+    if (log_level_enabled(LOG_LEVEL_TRACE)) {
+        BUG_ON(trace_flags); // Should only be called once
+        trace_flags = flags;
+    }
+}
+
+// Return true if *any* 1 bits in `flags` are enabled in `trace_flags`
+bool log_trace_enabled(TraceLoggingFlags flags)
+{
+    return !!(trace_flags & flags);
+}
+
+void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...)
+{
+    if (!log_trace_enabled(flags)) {
+        return;
+    }
+    va_list ap;
+    va_start(ap, fmt);
+    log_msgv(LOG_LEVEL_TRACE, file, line, fmt, ap);
+    va_end(ap);
+}
+#endif

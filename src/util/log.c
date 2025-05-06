@@ -11,7 +11,6 @@
 // so they're deemed an acceptable use of non-const globals:
 // NOLINTBEGIN(*-avoid-non-const-global-variables)
 static LogLevel log_level = LOG_LEVEL_NONE;
-static TraceLoggingFlags trace_flags = 0;
 static int logfd = -1;
 static char dim[] = "\033[2m";
 static char sgr0[] = "\033[0m";
@@ -112,14 +111,6 @@ bool log_close(void)
     return log_level == LOG_LEVEL_NONE || xclose(logfd) == 0;
 }
 
-void set_trace_logging_flags(TraceLoggingFlags flags)
-{
-    if (TRACE_LOGGING_ENABLED && log_level_enabled(LOG_LEVEL_TRACE)) {
-        BUG_ON(trace_flags); // Should only be called once
-        trace_flags = flags;
-    }
-}
-
 bool log_level_enabled(LogLevel level)
 {
     BUG_ON(level <= LOG_LEVEL_NONE || level > LOG_LEVEL_TRACE);
@@ -181,22 +172,3 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
     log_msgv(level, file, line, fmt, ap);
     va_end(ap);
 }
-
-#if TRACE_LOGGING_ENABLED
-// Return true if *any* 1 bits in `flags` are enabled in `trace_flags`
-bool log_trace_enabled(TraceLoggingFlags flags)
-{
-    return !!(trace_flags & flags);
-}
-
-void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...)
-{
-    if (!log_trace_enabled(flags)) {
-        return;
-    }
-    va_list ap;
-    va_start(ap, fmt);
-    log_msgv(LOG_LEVEL_TRACE, file, line, fmt, ap);
-    va_end(ap);
-}
-#endif
