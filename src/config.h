@@ -9,6 +9,14 @@
 #include "util/string-view.h"
 #include "util/string.h"
 
+#ifdef __linux__
+    // Used in generated headers (`build/gen/{test-data,builtin-config}*.h`)
+    // included by `src/config.c` and `test/config.c`
+    #define CONFIG_SECTION SECTION(".dte.config") MAXALIGN
+#else
+    #define CONFIG_SECTION
+#endif
+
 typedef enum {
     CFG_NOFLAGS = 0,
     CFG_MUST_EXIST = 1 << 0,

@@ -27,14 +27,7 @@ BEGIN {
         exit(1)
     }
 
-    print \
-        "#ifdef __linux__\n" \
-        "#define CONFIG_SECTION SECTION(\".dte.config\") MAXALIGN\n" \
-        "#else\n" \
-        "#define CONFIG_SECTION\n" \
-        "#endif\n\n" \
-        "IGNORE_WARNING(\"-Woverlength-strings\")\n"
-
+    print "IGNORE_WARNING(\"-Woverlength-strings\")\n"
     nfiles = 0
 }
 
