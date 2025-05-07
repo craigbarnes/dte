@@ -51,8 +51,8 @@ editor_objects := $(call prefix-obj, build/, \
     compat compiler completion config convert copy ctags delete edit \
     editor encoding exec file-history file-option filetype frame history \
     indent insert join load-save lock main mode move msg options palette \
-    regexp replace search selection shift show signals spawn status tag \
-    trace vars view window wrap \
+    regexp replace search selection shift show showkey signals spawn \
+    status tag trace vars view window wrap \
     $(addprefix ui-, cmdline prompt status tabbar view window) ui ) \
     $(command_objects) \
     $(editorconfig_objects) \
