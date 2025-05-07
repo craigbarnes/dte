@@ -47,7 +47,7 @@ static const struct FileBasenameMap {
     {"bazelrc", CONFIG, true},
     {"build.gradle", GRADLE, false},
     {"buildozer.spec", INI, false},
-    {"bun.lock", JSON, false}, // TODO: Use JSONC, when there's a syntax highlighter
+    {"bun.lock", JSONC, false}, // https://bun.sh/blog/bun-lock-text-lockfile#tooling-compatibility
     {"clang-format", YAML, true},
     {"clang-tidy", YAML, true},
     {"colordiffrc", CONFIG, true},

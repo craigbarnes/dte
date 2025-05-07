@@ -1,0 +1,46 @@
+require c-comment
+require c-uchar
+require json-num
+
+# JSON with comments:
+# • https://code.visualstudio.com/docs/languages/json#_json-with-comments
+# • https://github.com/Microsoft/node-jsonc-parser
+# • https://codeberg.org/JSONC-Spec/JSONC-Spec/
+# • https://github.com/Alexays/Waybar/blob/0332d2ebf84392c82c86d615079f762f27de94ba/man/waybar.5.scd.in#L9
+
+syntax jsonc
+
+state start code
+    char -b a-zA-Z_ ident
+    char '"' string
+    char / slash comment
+    char -n 0-9 this
+    noeat .json-num:this
+
+state ident code
+    char -b a-zA-Z0-9_ this
+    inlist constant this
+    noeat start
+
+state string
+    char '"' start string
+    char "\\" string-escape
+    char "\n" start
+    eat this
+
+state string-escape special
+    char '"\/bfnrt' string special
+    char u .c-uchar4:string special
+    eat string error
+
+state slash comment
+    char / line-comment
+    char * .c-comment:start
+    recolor error 1
+    eat start error
+
+state line-comment comment
+    char "\n" start
+    eat this
+
+list constant true false null
