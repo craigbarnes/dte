@@ -1,13 +1,14 @@
 require c-uchar
+require json-num
 
+# https://www.json.org
 syntax json
 
 state value code
     char -b a-zA-Z_ ident
-    char \" string
-    char 0 zero
-    char 1-9 number
-    eat this
+    char '"' string
+    char -n 0-9 this
+    noeat .json-num:this
 
 state ident code
     char -b a-zA-Z0-9_ this
@@ -15,43 +16,14 @@ state ident code
     noeat value
 
 state string
-    char \" value string
-    char \\ string-escape
+    char '"' value string
+    char "\\" string-escape
     char "\n" value
     eat this
 
 state string-escape special
-    char \"\\/bfnrt string special
+    char '"\/bfnrt' string special
     char u .c-uchar4:string special
     eat string error
-
-state zero numeric
-    char . fraction
-    char eE exponent
-    noeat check-num-suffix
-
-state number numeric
-    char 0-9 this
-    char . fraction
-    char eE exponent
-    noeat check-num-suffix
-
-state fraction numeric
-    char 0-9 this
-    char eE exponent
-    noeat check-num-suffix
-
-state exponent numeric
-    char +- exponent-signed
-    char -b 0-9 this
-    noeat check-num-suffix
-
-state exponent-signed numeric
-    char 0-9 this
-    noeat check-num-suffix
-
-state check-num-suffix error
-    char a-zA-Z0-9_ this
-    noeat value
 
 list constant true false null

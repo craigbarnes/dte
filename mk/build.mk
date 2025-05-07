@@ -13,7 +13,7 @@ BUILTIN_SYNTAX_FILES ?= \
     haskell ini java javascript json lisp lua mail make man markdown meson \
     nftables nginx ninja php python robotstxt roff ruby scheme sed sh sql \
     tex texmfcnf tmux vala weechatlog xml xresources zig \
-    inc/c-comment inc/c-uchar inc/diff
+    inc/c-comment inc/c-uchar inc/diff inc/json-num
 
 BUILTIN_CONFIGS = $(addprefix config/, \
     rc binding/default compiler/gcc compiler/go \

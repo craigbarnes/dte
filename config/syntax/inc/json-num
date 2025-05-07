@@ -1,0 +1,37 @@
+syntax .json-num
+
+state start
+    char 0 zero
+    char 1-9 number
+    # This is unreachable when the state is entered with e.g.
+    # `char -n 0-9 dest; noeat .json-num:this`
+    eat END error
+
+state zero numeric
+    char . fraction
+    char eE exponent
+    noeat check-suffix
+
+state number numeric
+    char 0-9 this
+    char . fraction
+    char eE exponent
+    noeat check-suffix
+
+state fraction numeric
+    char 0-9 this
+    char eE exponent
+    noeat check-suffix
+
+state exponent numeric
+    char +- exponent-signed
+    char -b 0-9 this
+    noeat check-suffix
+
+state exponent-signed numeric
+    char 0-9 this
+    noeat check-suffix
+
+state check-suffix error
+    char a-zA-Z0-9_ this
+    noeat END
