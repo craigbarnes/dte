@@ -42,8 +42,8 @@ ExitCode print_256_color_palette(void)
 
     // First half of color cube (light foreground)
     str("\033[38;5;253m");
-    for (int i = 0; i < 6; i++) {
-        int start = 16 + (i * 36); // Sequence: 16 52 88 124 160 196
+    for (unsigned int i = 0; i < 6; i++) {
+        unsigned int start = 16 + (i * 36); // Sequence: 16 52 88 124 160 196
         str("   ");
         seq("48;5;", start, start + 17, 3, "", false);
         str("\033[49m\n");
@@ -51,8 +51,8 @@ ExitCode print_256_color_palette(void)
 
     // Second half of color cube (dark foreground)
     str("\033[38;5;235m");
-    for (int i = 0; i < 6; i++) {
-        int start = 34 + (i * 36); // Sequence: 34 70 106 142 178 214
+    for (unsigned int i = 0; i < 6; i++) {
+        unsigned int start = 34 + (i * 36); // Sequence: 34 70 106 142 178 214
         str("   ");
         seq("48;5;", start, start + 17, 3, "", false);
         str("\033[49m\n");

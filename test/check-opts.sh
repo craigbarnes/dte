@@ -39,6 +39,8 @@ check_str "$($dte -b rc)" "$(cat config/rc)"
 
 $dte -h >/dev/null
 $dte -s config/syntax/dte >/dev/null
+$dte -P >/dev/null
+$dte -Z >/dev/null
 
 
 # Check headless mode ------------------------------------------------------
@@ -51,6 +53,10 @@ check_str "$out" 'xYz'
 
 out="$($dte -C 'quit 91')"
 check_exit 91
+check_str "$out" ''
+
+out="$($dte -H -Q0 -r/dev/null -C 'quit 77')"
+check_exit 77
 check_str "$out" ''
 
 # `replace -c` should be ignored
@@ -98,6 +104,11 @@ check_str "$err" 'Error: too many -c or -C options used'
 err="$($dte -Cquit -t1 -t2 -t3 -t4 -t5 -t6 -t7 -t8 -t9 2>&1)"
 check_exit 64
 check_str "$err" 'Error: too many -t options used'
+
+# Invalid -Q argument
+err="$($dte -Qxyz 2>&1)"
+check_exit 64
+check_str "$err" "Error: invalid argument for -Q: 'xyz'"
 
 if ! command -v setsid >/dev/null; then
     if test "$(uname -s)" = "Linux"; then
