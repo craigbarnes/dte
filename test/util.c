@@ -1339,11 +1339,7 @@ static void test_uint_to_str(TestContext *ctx)
     EXPECT_STREQ(uint_to_str(101), "101");
     EXPECT_STREQ(uint_to_str(21904), "21904");
 
-    // See test_posix_sanity()
-    static_assert(sizeof(unsigned int) >= 4);
-    static_assert(CHAR_BIT == 8);
-    static_assert(UINT_MAX >= 4294967295u);
-    static_assert(4294967295u == 0xFFFFFFFF);
+    // See also: test_posix_sanity()
     EXPECT_STREQ(uint_to_str(4294967295u), "4294967295");
 }
 

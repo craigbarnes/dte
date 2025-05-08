@@ -10,13 +10,12 @@
 
 static inline size_t fnv_1a_init(void)
 {
-    static_assert(8 * CHAR_BIT == 64);
-    return (sizeof(size_t) >= 8) ? 14695981039346656037ULL : 2166136261U;
+    return (BITSIZE(size_t) >= 64) ? 14695981039346656037ULL : 2166136261U;
 }
 
 static inline size_t fnv_1a_prime(void)
 {
-    return (sizeof(size_t) >= 8) ? 1099511628211ULL : 16777619U;
+    return (BITSIZE(size_t) >= 64) ? 1099511628211ULL : 16777619U;
 }
 
 // https://datatracker.ietf.org/doc/html/draft-eastlake-fnv-31#name-fnv-basics

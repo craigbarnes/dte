@@ -29,9 +29,17 @@ static void test_process_sanity(TestContext *ctx)
 static void test_posix_sanity(TestContext *ctx)
 {
     // This is not guaranteed by ISO C99, but it is required by POSIX
-    // and is relied upon by this codebase:
+    // and is relied upon by this codebase.
+    // See: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/limits.h.html#tag_14_26_03_06
     ASSERT_EQ(CHAR_BIT, 8);
     ASSERT_TRUE(sizeof(int) >= 4);
+    ASSERT_TRUE(BITSIZE(int) >= 32);
+    ASSERT_EQ(SCHAR_MIN, -128);
+    ASSERT_EQ(SCHAR_MAX, 127);
+    ASSERT_EQ(UCHAR_MAX, 255);
+    ASSERT_TRUE(UINT_MAX >= 0xFFFFFFFFu);
+    ASSERT_TRUE(INT_MAX >= 0x7FFFFFFF);
+    ASSERT_TRUE(INT_MIN <= -0x80000000);
 
     IGNORE_WARNING("-Wformat-truncation")
 
