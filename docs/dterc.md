@@ -762,13 +762,19 @@ beginning of file.
 
 Incrementally move to end of line, then end of screen, then end of file.
 
-### **scroll-up**
+### **scroll-up** [**-M**]
 
 Scroll view up one line. Keeps cursor position unchanged if possible.
 
-### **scroll-down**
+`-M`
+:   Never move cursor (even at [scroll margins])
+
+### **scroll-down** [**-M**]
 
 Scroll view down one line. Keeps cursor position unchanged if possible.
+
+`-M`
+:   Never move cursor (even at [scroll margins])
 
 ### **scroll-pgup**
 
@@ -1669,6 +1675,7 @@ errors should be highlighted. Set to `""` to disable.
 [global options]: #global-options
 [local options]: #local-options
 [common options]: #local-and-global-options
+[scroll margins]: #scroll-margin
 [`pipe-from cat file.txt`]: #exec:~:text=alias%20pipe%2Dfrom
 [`$DTE_HOME`]: dte.html#environment
 [double quotes]: #double-quoted-strings

@@ -111,9 +111,9 @@ Movement Commands:
 .br
    \fBeolsf\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBscroll\-up\fR
+   \fBscroll\-up\fR [\fB\-M\fR]
 .br
-   \fBscroll\-down\fR
+   \fBscroll\-down\fR [\fB\-M\fR]
 .br
    \fBscroll\-pgup\fR
 .br
@@ -1258,15 +1258,23 @@ beginning of file.
 Incrementally move to end of line, then end of screen, then end of file.
 .P
 .RE
-\fBscroll\-up\fR
+\fBscroll\-up\fR [\fB\-M\fR]
 .RS
 Scroll view up one line. Keeps cursor position unchanged if possible.
 .P
+.TP
+\fB\-M\fR
+Never move cursor (even at scroll margins)
+.PP
 .RE
-\fBscroll\-down\fR
+\fBscroll\-down\fR [\fB\-M\fR]
 .RS
 Scroll view down one line. Keeps cursor position unchanged if possible.
 .P
+.TP
+\fB\-M\fR
+Never move cursor (even at scroll margins)
+.PP
 .RE
 \fBscroll\-pgup\fR
 .RS
