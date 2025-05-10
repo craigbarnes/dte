@@ -36,7 +36,7 @@ Editor Commands:
 .br
    \fBsuspend\fR
 .br
-   \fBcd\fR \fIdirectory\fR
+   \fBcd\fR [\fB\-v\fR] \fIdirectory\fR
 .br
    \fBcommand\fR [\fItext\fR]
 .br
@@ -934,11 +934,15 @@ See also:
 Suspend the editor (run \fBfg\fR in the shell to resume).
 .P
 .RE
-\fBcd\fR \fIdirectory\fR
+\fBcd\fR [\fB\-v\fR] \fIdirectory\fR
 .RS
 Change the working directory and update \fB$PWD\fR and \fB$OLDPWD\fR. Running
 \fBcd \-\fR changes to the previous directory (\fB$OLDPWD\fR).
 .P
+.TP
+\fB\-v\fR
+Display new working directory
+.PP
 .RE
 \fBcommand\fR [\fItext\fR]
 .RS

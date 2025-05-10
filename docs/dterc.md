@@ -501,10 +501,13 @@ See also:
 
 Suspend the editor (run `fg` in the shell to resume).
 
-### **cd** _directory_
+### **cd** [**-v**] _directory_
 
 Change the working directory and update `$PWD` and `$OLDPWD`. Running
 `cd -` changes to the previous directory (`$OLDPWD`).
+
+`-v`
+:   Display new working directory
 
 ### **command** [_text_]
 
