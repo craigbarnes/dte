@@ -155,6 +155,10 @@ Special keys:
 * `enter`
 * `tab`
 * `space`
+* `menu`
+* `print`
+* `scrlock`
+* `pause`
 * `begin` (keypad "5" with Num Lock off)
 * `F1`..`F20`
 
