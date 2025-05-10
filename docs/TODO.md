@@ -234,9 +234,6 @@ Code Quality/Efficiency Improvements
   `ConditionData::bitset` population count is 255 and the destination is
   the current state (i.e. as set by `char -n . this`)
 
-* Use `sysconf(_SC_PAGESIZE)` instead of hard-coding `4096` (or multiples
-  thereof) in various places?
-
 * Use [`ltrace(1)`] to find and reduce unnecessary library calls
 
 * Check `TermOutputBuffer::cursor_style` fields inidividually in
