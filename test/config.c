@@ -298,12 +298,9 @@ void init_headless_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     ASSERT_NONNULL(e);
-    e->terminal.features = TFLAG_8_COLOR;
-    e->terminal.width = 80;
-    e->terminal.height = 24;
     exec_builtin_rc(e);
     update_all_syntax_styles(&e->syntaxes, &e->styles);
-    e->options.lock_files = false;
+    log_config_counts(e);
     e->window = new_window(e);
     e->root_frame = new_root_frame(e->window);
     set_view(window_open_empty_buffer(e->window));

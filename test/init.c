@@ -111,6 +111,14 @@ static void test_init(TestContext *ctx)
 
     LogLevel lvl = LOG_LEVEL_WARNING;
     ASSERT_EQ(log_open("build/test/log.txt", lvl, false), lvl);
+    EXPECT_FALSE(log_level_debug_enabled());
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_NOTICE));
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_INFO));
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_DEBUG));
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_TRACE));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_WARNING));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_ERROR));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_CRITICAL));
     LOG_CRITICAL("%s: testing LOG_CRITICAL()", __func__);
     LOG_ERROR("%s: testing LOG_ERROR()", __func__);
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
@@ -122,12 +130,20 @@ static void test_init(TestContext *ctx)
     log_write(LOG_LEVEL_INFO, STRN("testing log_write()"));
 
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
-    ctx->userdata = e;
     ASSERT_NONNULL(e);
     ASSERT_NONNULL(e->user_config_dir);
     ASSERT_NONNULL(e->home_dir.data);
-    EXPECT_NONNULL(e->terminal.obuf.buf);
-    EXPECT_NONNULL(e->terminal.ibuf.buf);
+    e->options.lock_files = false;
+    ctx->userdata = e;
+
+    Terminal *term = &e->terminal;
+    EXPECT_EQ(term->features, 0);
+    EXPECT_EQ(term->width, 0);
+    EXPECT_EQ(term->height, 0);
+    term_init(term, "decansi", NULL);
+    EXPECT_EQ(term->features, TFLAG_8_COLOR);
+    EXPECT_EQ(term->width, 80);
+    EXPECT_EQ(term->height, 24);
 
     const char *ver = getenv("DTE_VERSION");
     EXPECT_NONNULL(ver);
@@ -167,6 +183,7 @@ static void test_deinit(TestContext *ctx)
     EXPECT_FALSE(e->child_controls_terminal);
     EXPECT_EQ(e->flags, EFLAG_HEADLESS);
     EXPECT_EQ(e->include_recursion_count, 0);
+    EXPECT_FALSE(e->options.lock_files);
 
     frame_remove(e, e->root_frame);
     EXPECT_NULL(e->view);

@@ -40,5 +40,6 @@ void exec_builtin_color_reset(struct EditorState *e);
 void exec_builtin_rc(struct EditorState *e);
 void collect_builtin_configs(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_builtin_includes(PointerArray *a, const char *prefix) NONNULL_ARGS;
+void log_config_counts(const struct EditorState *e) NONNULL_ARGS;
 
 #endif

@@ -5,11 +5,16 @@
 #include <string.h>
 #include <sys/types.h>
 #include "config.h"
+#include "command/cache.h"
 #include "command/error.h"
 #include "commands.h"
+#include "compiler.h"
 #include "editor.h"
 #include "syntax/color.h"
 #include "util/debug.h"
+#include "util/hashmap.h"
+#include "util/intmap.h"
+#include "util/log.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 
@@ -18,6 +23,13 @@
 #else
     #include "builtin-config.h"
 #endif
+
+UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
+    BUG_ON(!get_builtin_config("rc"));
+    BUG_ON(!get_builtin_config("color/reset"));
+    // NOLINTEND(bugprone-assert-side-effect)
+}
 
 // Odd number of backslashes at end of line?
 static bool has_line_continuation(StringView line)
@@ -204,9 +216,39 @@ void collect_builtin_includes(PointerArray *a, const char *prefix)
     }
 }
 
-UNITTEST {
-    // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(!get_builtin_config("rc"));
-    BUG_ON(!get_builtin_config("color/reset"));
-    // NOLINTEND(bugprone-assert-side-effect)
+void log_config_counts(const EditorState *e)
+{
+    if (!log_level_enabled(LOG_LEVEL_INFO)) {
+        return;
+    }
+
+    size_t nbinds = 0;
+    size_t nbinds_cached = 0;
+    for (HashMapIter modeiter = hashmap_iter(&e->modes); hashmap_next(&modeiter); ) {
+        const ModeHandler *mode = modeiter.entry->value;
+        const IntMap *binds = &mode->key_bindings;
+        nbinds += binds->count;
+        for (IntMapIter binditer = intmap_iter(binds); intmap_next(&binditer); ) {
+            const CachedCommand *cc = binditer.entry->value;
+            nbinds_cached += !!cc->cmd;
+        }
+    }
+
+    size_t nerrorfmts = 0;
+    for (HashMapIter it = hashmap_iter(&e->compilers); hashmap_next(&it); ) {
+        const Compiler *compiler = it.entry->value;
+        nerrorfmts += compiler->error_formats.count;
+    }
+
+    LOG_INFO (
+        "bind=%zu(%zu) alias=%zu hi=%zu ft=%zu option=%zu errorfmt=%zu(%zu)",
+        nbinds,
+        nbinds_cached,
+        e->aliases.count,
+        e->styles.other.count + NR_BSE,
+        e->filetypes.count,
+        e->file_options.count,
+        e->compilers.count,
+        nerrorfmts
+    );
 }
