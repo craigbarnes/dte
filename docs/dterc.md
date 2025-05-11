@@ -1198,14 +1198,7 @@ Actions for stderr (`-e`):
 * `errmsg` - if _command_ exits non-zero, display first line of stderr
   output as an error message
 
-`-i` _action_
-:   Specify standard input action
-
-`-o` _action_
-:   Specify standard output action
-
-`-e` _action_
-:   Specify standard error action
+Other flags:
 
 `-p`
 :   Display "press any key to continue" prompt
