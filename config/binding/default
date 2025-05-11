@@ -59,9 +59,7 @@ bind C-c 'copy -k'
 bind C-f search
 bind C-g 'search -n'
 bind C-h erase
-# C-i == Tab
 bind C-l 'command line\ '
-# C-m == Enter
 bind C-n open
 bind C-o 'command open\ '
 bind C-q 'quit -p'
@@ -74,6 +72,13 @@ bind C-x cut
 bind C-y redo
 bind C-z undo
 bind C-] tag
+
+# These only work in terminals that support the Kitty keyboard protocol
+# and/or XTerm's "modifyOtherKeys=2" protocol
+bind C-tab next
+bind C-S-tab prev
+bind C-S-g 'search -p'
+bind C-S-t reopen
 
 bind M-b bof
 bind M-c 'toggle -v case-sensitive-search'
@@ -111,15 +116,13 @@ bind M-: command
 bind M-? 'search -r'
 bind M-! 'move-tab left'
 bind M-@ 'move-tab right'
-
-# Kitty Keyboard Protocol encodings:
+# Kitty Keyboard Protocol encodings of the above:
 bind M-S-, wprev
 bind M-S-. wnext
 bind M-S-\; command
 bind M-S-/ 'search -r'
 bind M-S-1 'move-tab left'
 bind M-S-2 'move-tab right'
-
 # Xterm "modifyOtherKeys" encodings of the above (see commit 923e4e3a3540):
 bind M-S-< wprev
 bind M-S-> wnext
@@ -132,13 +135,6 @@ bind F1 'run man dterc'
 bind F3 'search -n'
 bind F4 'search -p'
 bind F5 refresh
-
-# Most terminals don't support sending these modifier+key combinations
-# as distinct sequences, so don't be surprised if they don't work.
-bind C-tab next
-bind C-S-tab prev
-bind C-S-g 'search -p'
-bind C-S-t reopen
 
 # Command/search mode bindings:
 bind -cs left left
