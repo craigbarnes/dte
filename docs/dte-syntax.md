@@ -210,7 +210,7 @@ tree is copied into the main syntax and all destination states in the
 sub-syntax whose name is `END` are replaced with `c`.
 
 
-[`dte -b`]: https://craigbarnes.gitlab.io/dte/dte.html#synopsis
+[`dte -b`]: https://craigbarnes.gitlab.io/dte/dte.html#options:~:text=%2Db%20rcname,-Dump
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [built-in syntax files]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax

@@ -1667,9 +1667,9 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
-[`dte -H`]: dte.html#options
-[`dte -K`]: dte.html#options
-[`dte -P`]: dte.html#options
+[`dte -H`]: dte.html#options:~:text=%2DH,-Don%27t%20load
+[`dte -K`]: dte.html#options:~:text=%2DK,-Start%20in
+[`dte -P`]: dte.html#options:~:text=%2DP,-Print%20the
 [normal mode]: dte.html#normal-mode
 [command mode]: dte.html#command-mode
 [search mode]: dte.html#search-mode
