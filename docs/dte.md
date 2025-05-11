@@ -11,10 +11,10 @@ seealso: ["`dterc`", "`dte-syntax`"]
 # Synopsis
 
 **dte**
-\[**-HR**]
+\[**-H**]
+\[**-R**|**-r** _rcfile_]
 \[**-c** _command_]
 \[**-t** _ctag_]
-\[**-r** _rcfile_]
 \[\[+_line_\[,_column_]] _file_]...\
 **dte** \[**-h**|**-B**|**-K**|**-V**|**-b** _rcname_|**-s** _file_]
 
