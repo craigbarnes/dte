@@ -76,14 +76,13 @@ static State *handle_heredoc (
 // Set styles in range [start,end] and return number of styles set
 static size_t set_style_range (
     const TermStyle **styles,
-    const Action *action,
+    const TermStyle *emit_style,
     size_t start,
     size_t end
 ) {
     BUG_ON(start > end);
-    const TermStyle *style = action->emit_style;
     for (size_t i = start; i < end; i++) {
-        styles[i] = style;
+        styles[i] = emit_style;
     }
     return end - start;
 }
@@ -118,8 +117,10 @@ static const TermStyle **highlight_line (
     for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
         const Condition *cond = state->conds.ptrs[ci];
         const ConditionData *u = &cond->u;
-        const Action *a = &cond->a;
-        switch (cond->type) {
+        const ConditionType condtype = cond->type;
+        const TermStyle *style = cond->a.emit_style;
+        State *dest = cond->a.destination;
+        switch (condtype) {
         case COND_CHAR_BUFFER:
             if (!bitset_contains(u->bitset, line[i])) {
                 break;
@@ -127,62 +128,56 @@ static const TermStyle **highlight_line (
             if (sidx < 0) {
                 sidx = i;
             }
-            styles[i++] = a->emit_style;
-            state = a->destination;
+            styles[i++] = style;
+            state = dest;
             goto top;
         case COND_BUFIS:
             if (sidx < 0 || !bufis(u, line + sidx, i - sidx)) {
                 break;
             }
-            set_style_range(styles, a, sidx, i);
+            set_style_range(styles, style, sidx, i);
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
         case COND_BUFIS_ICASE:
             if (sidx < 0 || !bufis_icase(u, line + sidx, i - sidx)) {
                 break;
             }
-            set_style_range(styles, a, sidx, i);
+            set_style_range(styles, style, sidx, i);
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
         case COND_CHAR:
             if (!bitset_contains(u->bitset, line[i])) {
                 break;
             }
-            styles[i++] = a->emit_style;
+            styles[i++] = style;
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
         case COND_CHAR1:
             if (u->ch != line[i]) {
                 break;
             }
-            styles[i++] = a->emit_style;
+            styles[i++] = style;
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
         case COND_INLIST:
-            if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
-                break;
-            }
-            set_style_range(styles, a, sidx, i);
-            sidx = -1;
-            state = a->destination;
-            goto top;
         case COND_INLIST_BUFFER:
             if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
                 break;
             }
-            set_style_range(styles, a, sidx, i);
-            state = a->destination;
+            set_style_range(styles, style, sidx, i);
+            sidx = (condtype == COND_INLIST) ? -1 : sidx;
+            state = dest;
             goto top;
         case COND_RECOLOR:
-            set_style_range(styles, a, size_ssub(i, u->recolor_len), i);
+            set_style_range(styles, style, size_ssub(i, u->recolor_len), i);
             break;
         case COND_RECOLOR_BUFFER:
             if (sidx >= 0) {
-                set_style_range(styles, a, sidx, i);
+                set_style_range(styles, style, sidx, i);
                 sidx = -1;
             }
             break;
@@ -192,9 +187,9 @@ static const TermStyle **highlight_line (
             if (len < end || !mem_equal(u->str.buf, line + i, slen)) {
                 break;
             }
-            i += set_style_range(styles, a, i, end);
+            i += set_style_range(styles, style, i, end);
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
             }
         case COND_STR_ICASE: {
@@ -203,9 +198,9 @@ static const TermStyle **highlight_line (
             if (len < end || !mem_equal_icase(u->str.buf, line + i, slen)) {
                 break;
             }
-            i += set_style_range(styles, a, i, end);
+            i += set_style_range(styles, style, i, end);
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
             }
         case COND_STR2:
@@ -213,19 +208,19 @@ static const TermStyle **highlight_line (
             if (len < i + 2 || !mem_equal(u->str.buf, line + i, 2)) {
                 break;
             }
-            styles[i++] = a->emit_style;
-            styles[i++] = a->emit_style;
+            styles[i++] = style;
+            styles[i++] = style;
             sidx = -1;
-            state = a->destination;
+            state = dest;
             goto top;
         case COND_HEREDOCEND: {
             const char *str = u->heredocend.data;
             size_t slen = u->heredocend.length;
             size_t end = i + slen;
             if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
-                i += set_style_range(styles, a, i, end);
+                i += set_style_range(styles, style, i, end);
                 sidx = -1;
-                state = a->destination;
+                state = dest;
                 goto top;
             }
             } break;
