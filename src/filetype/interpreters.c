@@ -25,9 +25,12 @@ static const struct FileInterpreterMap {
     {"gjs", JAVASCRIPT},
     {"gmake", MAKE},
     {"gnuplot", GNUPLOT},
+    {"gojq", JQ}, // https://github.com/itchyny/gojq
     {"groovy", GROOVY},
     {"gsed", SED},
     {"guile", SCHEME},
+    {"jaq", JQ}, // https://github.com/01mf02/jaq
+    {"jq", JQ},
     {"jruby", RUBY},
     {"julia", JULIA},
     {"ksh", SH},
