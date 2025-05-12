@@ -122,7 +122,7 @@ static void parse_and_activate_message(EditorState *e, const String *str)
     activate_current_message(msgs, e->window);
 }
 
-static void parse_and_goto_tag(EditorState *e, const String *str)
+static void parse_and_activate_tags(EditorState *e, const String *str)
 {
     ErrorBuffer *ebuf = &e->err;
     if (unlikely(str->len == 0)) {
@@ -130,36 +130,46 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         return;
     }
 
-    // TODO: Read all lines and support adding messages for multiple tags
-    size_t pos = 0;
-    StringView line = buf_slice_next_line(str->buffer, &pos, str->len);
-    if (line.length == 0) {
+    char cwd[8192];
+    if (unlikely(!getcwd(cwd, sizeof cwd))) {
+        error_msg_errno(ebuf, "getcwd() failed");
         return;
     }
 
+    const StringView dir = strview_from_cstring(cwd);
+    const char *buffer_filename = e->buffer->abs_filename;
+    TagFile *tf = &e->tagfile;
+    enum {NOT_LOADED, LOADED, FAILED} tf_status = NOT_LOADED;
     MessageArray *msgs = &e->messages;
-    Tag tag;
-    bool parsed = parse_ctags_line(&tag, line.data, line.length);
+    clear_messages(msgs);
 
-    if (parsed) {
-        // `line` is a valid tags(5) file entry; handle it directly
-        char cwd[8192];
-        if (unlikely(!getcwd(cwd, sizeof cwd))) {
-            error_msg_errno(ebuf, "getcwd() failed");
-            return;
+    for (size_t pos = 0, len = str->len; pos < len; ) {
+        Tag tag;
+        StringView line = buf_slice_next_line(str->buffer, &pos, len);
+        if (line.length == 0) {
+            continue;
         }
-        StringView dir = strview_from_cstring(cwd);
-        clear_messages(msgs);
-        add_message_for_tag(msgs, &tag, &dir);
-    } else {
+
+        bool parsed = parse_ctags_line(&tag, line.data, line.length);
+        if (parsed) {
+            // `line` is a valid tags(5) file entry; handle it directly
+            add_message_for_tag(msgs, &tag, &dir);
+            continue;
+        }
+
         // Treat `line` as a simple tag name (look it up in the tags(5) file)
-        TagFile *tf = &e->tagfile;
-        clear_messages(msgs);
-        if (!load_tag_file(tf, ebuf)) {
-            return;
-        }
-        if (!tag_lookup(tf, msgs, ebuf, &line, e->buffer->abs_filename)) {
-            return;
+        switch (tf_status) {
+        case NOT_LOADED:
+            tf_status = load_tag_file(tf, ebuf) ? LOADED : FAILED;
+            if (tf_status == FAILED) {
+                continue;
+            }
+            // Fallthrough
+        case LOADED:
+            tag_lookup(tf, msgs, ebuf, &line, buffer_filename);
+            continue;
+        case FAILED:
+            continue;
         }
     }
 
@@ -436,7 +446,7 @@ ssize_t handle_exec (
         open_files_from_string(e, output);
         break;
     case EXEC_TAG:
-        parse_and_goto_tag(e, output);
+        parse_and_activate_tags(e, output);
         break;
     case EXEC_EVAL:
         exec_normal_config(e, strview_from_string(output));

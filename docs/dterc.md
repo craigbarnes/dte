@@ -1191,7 +1191,7 @@ Actions for stdout (`-o`):
 * `msg` - run [`msg`] command with numerical argument parsed from first
   line of output
 * `open` - run [`open`] command with each line of output as an argument
-* `tag` - run [`tag`] command with first line of output as an argument
+* `tag` - run [`tag`] command with each line of output as an argument
 
 Actions for stderr (`-e`):
 
@@ -1238,7 +1238,7 @@ Examples:
     exec-open -s git ls-files --modified
     exec-open fzf -m --reverse
     exec-tag -s echo main
-    exec-tag sh -c 'readtags -l | cut -f1 | sort | uniq | fzf --reverse'
+    exec-tag sh -c 'readtags -l | cut -f1 | sort | uniq | fzf -m --reverse'
 
 When passing the buffer through a `filter` command, the cursor is
 moved to line 1 and the whole contents is replaced with the output.

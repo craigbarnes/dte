@@ -1805,7 +1805,7 @@ line of output
 .br
 \(bu \fBopen\fR \- run \fBopen\fR command with each line of output as an argument
 .br
-\(bu \fBtag\fR \- run \fBtag\fR command with first line of output as an argument
+\(bu \fBtag\fR \- run \fBtag\fR command with each line of output as an argument
 .br
 .P
 Actions for stderr (\fB\-e\fR):
@@ -1867,7 +1867,7 @@ exec\-open\ \-s\ find\ .\ \-type\ f\ \-name\ *.h
 exec\-open\ \-s\ git\ ls\-files\ \-\-modified
 exec\-open\ fzf\ \-m\ \-\-reverse
 exec\-tag\ \-s\ echo\ main
-exec\-tag\ sh\ \-c\ \[aq]readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-reverse\[aq]
+exec\-tag\ sh\ \-c\ \[aq]readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-m\ \-\-reverse\[aq]
 \f[]
 .fi
 .PP

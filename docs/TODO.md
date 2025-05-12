@@ -32,11 +32,6 @@ Features
 * Retain the last 10 or so recorded macros and allow them to be viewed
   (with e.g. `show macro 7`) and executed (with e.g. `macro play 7`)
 
-* Allow multiple tags to be specified when using e.g. `dte -t A -t B`,
-  `tag A B` or `exec -s -o tag echo "A\nB\n"` (if specifying one tag
-  can create multiple messages, we may as well use the same mechanism
-  to support multiple tags)
-
 * Add option to [`wrap-paragraph`] to allow finding and removing a common
   prefix string from every line and then re-inserting it afterwards
   (see also: [#118])
