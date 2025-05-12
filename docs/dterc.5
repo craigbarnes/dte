@@ -138,7 +138,7 @@ Editing Commands:
 .br
    \fBcut\fR
 .br
-   \fBcopy\fR [\fB\-bikp\fR]
+   \fBcopy\fR [\fB\-bikp\fR] [\fItext\fR]
 .br
    \fBpaste\fR [\fB\-m\fR] [\fB\-a\fR|\fB\-c\fR]
 .br
@@ -1420,12 +1420,13 @@ Previous message
 .SS Editing Commands
 \fBcut\fR
 .RS
-Cut current line or selection.
+Cut the current selection (if there is one) or the current line.
 .P
 .RE
-\fBcopy\fR [\fB\-bikp\fR]
+\fBcopy\fR [\fB\-bikp\fR] [\fItext\fR]
 .RS
-Copy current line or selection.
+Copy \fItext\fR (if provided) or the current selection (if there is one)
+or the current line.
 .P
 .TP
 \fB\-b\fR
@@ -1456,7 +1457,7 @@ copying to multiple targets in a single command. For example:
 .IP
 .nf
 \f[C]
-copy\ \-ib
+copy\ \-ib\ xyz
 \f[]
 .fi
 .PP

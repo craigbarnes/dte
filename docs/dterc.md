@@ -892,11 +892,12 @@ other input clears it.
 
 ### **cut**
 
-Cut current line or selection.
+Cut the current selection (if there is one) or the current line.
 
-### **copy** [**-bikp**]
+### **copy** [**-bikp**] [_text_]
 
-Copy current line or selection.
+Copy _text_ (if provided) or the current selection (if there is one)
+or the current line.
 
 `-b`
 :   Copy to system clipboard
@@ -920,7 +921,7 @@ unlike most other methods of copying to the system clipboard.
 The **-i**, **-b** and **-p** flags can be used together, to allow
 copying to multiple targets in a single command. For example:
 
-    copy -ib
+    copy -ib xyz
 
 ### **paste** [**-m**] [**-a**|**-c**]
 
