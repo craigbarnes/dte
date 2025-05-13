@@ -162,8 +162,6 @@ Documentation
   * `argument ...`: Argument is repeatable
   * `[expression] ...`: Entire expression within `[ ]` is repeatable
 
-* Improve documentation for [`search`] command
-
 * For the [`hi`] command, mention that `gray`, `darkgray` and `white` are
   different from the names used by some other applications and perhaps
   give a brief explanation why (no real standard for aixterm "bright"

@@ -802,13 +802,20 @@ Center view to cursor.
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of `{}[]()<>`.
 
-### **search** [**-Her**] [**-n**|**-p**|**-w**|_pattern_]
+### **search** [**-Her**] [**-a**|**-i**|**-s**] [**-n**|**-p**|**-w**|_pattern_]
 
-If no flags (or just `-r` and no _pattern_) are given then dte changes to
-[search mode], where you can type a [regular expression][`regex`] to search.
+Perform a [`regex`] search in the current buffer and move the cursor to
+the next match (if any).
+
+If no **-npw** flag or _pattern_ argument is provided, the editor will
+instead switch to [search mode], where a pattern can be entered and some
+other conveniences (e.g. history navigation with up/down arrow keys) can
+be used. In this case, **-Heais** flags are ignored (but see the [`bind`]
+command, the [`case-sensitive-search`] option and the [search mode] section
+in the [`dte`] man page for equivalents).
 
 `-H`
-:   Don't add _pattern_ to search history
+:   Don't add _pattern_ to the search history
 
 `-e`
 :   Escape [`regex`] special characters in _pattern_, so that the search
@@ -817,14 +824,23 @@ If no flags (or just `-r` and no _pattern_) are given then dte changes to
 `-r`
 :   Start searching backwards
 
+`-a`
+:   Behave as if the [`case-sensitive-search`] option is set to `auto`
+
+`-i`
+:   Behave as if the [`case-sensitive-search`] option is set to `false`
+
+`-s`
+:   Behave as if the [`case-sensitive-search`] option is set to `true`
+
 `-n`
-:   Search next
+:   Search for the next occurrence of the most recent pattern
 
 `-p`
-:   Search previous
+:   Search for the previous occurrence of the most recent pattern
 
 `-w`
-:   Search word under cursor
+:   Use the word under the cursor in place of _pattern_
 
 ### **line** [**-c**|**-l**] _lineno_[`,`_colno_]
 
@@ -1741,6 +1757,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`auto-indent`]: #auto-indent
 [`brace-indent`]: #brace-indent
+[`case-sensitive-search`]: #case-sensitive-search
 [`emulate-tab`]: #emulate-tab
 [`expand-tab`]: #expand-tab
 [`file-history`]: #file-history

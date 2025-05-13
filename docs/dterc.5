@@ -123,7 +123,7 @@ Movement Commands:
 .br
    \fBmatch\-bracket\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBsearch\fR [\fB\-Her\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
+   \fBsearch\fR [\fB\-Her\fR] [\fB\-a\fR|\fB\-i\fR|\fB\-s\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .br
    \fBline\fR [\fB\-c\fR|\fB\-l\fR] \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .br
@@ -1311,14 +1311,21 @@ Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of \fB{}[]()<>\fR.
 .P
 .RE
-\fBsearch\fR [\fB\-Her\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
+\fBsearch\fR [\fB\-Her\fR] [\fB\-a\fR|\fB\-i\fR|\fB\-s\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .RS
-If no flags (or just \fB\-r\fR and no \fIpattern\fR) are given then dte changes to
-search mode, where you can type a regular expression to search.
+Perform a \fBregex\fR(7) search in the current buffer and move the cursor to
+the next match (if any).
+.P
+If no \fB\-npw\fR flag or \fIpattern\fR argument is provided, the editor will
+instead switch to search mode, where a pattern can be entered and some
+other conveniences (e.g. history navigation with up/down arrow keys) can
+be used. In this case, \fB\-Heais\fR flags are ignored (but see the \fBbind\fR
+command, the \fBcase\-sensitive\-search\fR option and the search mode section
+in the \fBdte\fR(1) man page for equivalents).
 .P
 .TP
 \fB\-H\fR
-Don't add \fIpattern\fR to search history
+Don't add \fIpattern\fR to the search history
 .PP
 .TP
 \fB\-e\fR
@@ -1330,16 +1337,28 @@ becomes effectively "plain text"
 Start searching backwards
 .PP
 .TP
+\fB\-a\fR
+Behave as if the \fBcase\-sensitive\-search\fR option is set to \fBauto\fR
+.PP
+.TP
+\fB\-i\fR
+Behave as if the \fBcase\-sensitive\-search\fR option is set to \fBfalse\fR
+.PP
+.TP
+\fB\-s\fR
+Behave as if the \fBcase\-sensitive\-search\fR option is set to \fBtrue\fR
+.PP
+.TP
 \fB\-n\fR
-Search next
+Search for the next occurrence of the most recent pattern
 .PP
 .TP
 \fB\-p\fR
-Search previous
+Search for the previous occurrence of the most recent pattern
 .PP
 .TP
 \fB\-w\fR
-Search word under cursor
+Use the word under the cursor in place of \fIpattern\fR
 .PP
 .RE
 \fBline\fR [\fB\-c\fR|\fB\-l\fR] \fIlineno\fR[\fB,\fR\fIcolno\fR]
