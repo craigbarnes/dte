@@ -32,13 +32,13 @@ ExitCode print_256_color_palette(void)
     seq("4", 0, 6, 2, " ", false);
     str("\033[30;47m  7 \033[0m");
     seq("3", 0, 7, 2, " ", false);
-    str("\033[0m Default \033[0m\n   ");
+    str("\033[0m default \033[0m\n   ");
 
     // Row 2: aixterm-style "bright" palette colors
     seq("10", 8, 14, 2, " ", true);
     str("\033[30;107m 15 \033[0m");
     seq("9", 8, 15, 2, " ", true);
-    str("\033[0;2m   Faint\033[0m\n\n");
+    str("\033[0;2m     dim\033[0m\n\n");
 
     // First half of color cube (light foreground)
     str("\033[38;5;253m");
