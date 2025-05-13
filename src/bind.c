@@ -42,7 +42,7 @@ bool handle_binding(EditorState *e, const ModeHandler *handler, KeyCode key)
     if (!binding->cmd || (cmds->macro_record && macro_is_recording(&e->macro))) {
         // Parse and run command string
         CommandRunner runner = cmdrunner(e, cmds);
-        runner.allow_recording = true;
+        runner.flags |= CMDRUNNER_ALLOW_RECORDING;
         return handle_command(&runner, binding->cmd_str);
     }
 

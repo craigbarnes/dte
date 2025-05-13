@@ -20,12 +20,12 @@ static void test_parse_command_arg(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     CommandRunner runner = normal_mode_cmdrunner(e);
-    runner.expand_tilde_slash = false;
+    runner.flags &= ~CMDRUNNER_EXPAND_TILDE_SLASH;
+    EXPECT_UINT_EQ(runner.flags, 0);
     ASSERT_PTREQ(runner.e, e);
     ASSERT_PTREQ(runner.cmds, &normal_commands);
     EXPECT_PTREQ(runner.lookup_alias, find_normal_alias);
     EXPECT_PTREQ(runner.home_dir, &e->home_dir);
-    EXPECT_FALSE(runner.allow_recording);
     EXPECT_EQ(runner.recursion_count, 0);
 
     // Single, unquoted argument
@@ -187,12 +187,12 @@ static void test_parse_command_arg(TestContext *ctx)
     free(arg);
 
     // Tilde expansion
-    runner.expand_tilde_slash = true;
+    runner.flags |= CMDRUNNER_EXPAND_TILDE_SLASH;
     arg = parse_command_arg(&runner, STRN("~/filename"));
     EXPECT_TRUE(str_has_suffix(arg, "/test/HOME/filename"));
     free(arg);
 
-    runner.expand_tilde_slash = false;
+    runner.flags &= ~CMDRUNNER_EXPAND_TILDE_SLASH;
     arg = parse_command_arg(&runner, STRN("'xyz"));
     EXPECT_STREQ(arg, "xyz");
     free(arg);

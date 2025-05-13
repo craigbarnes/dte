@@ -135,7 +135,7 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
     StringView esc = cs->escaped;
     if (strview_has_prefix(&esc, "~/")) {
         CommandRunner runner = normal_mode_cmdrunner(e);
-        runner.expand_tilde_slash = false;
+        runner.flags &= ~CMDRUNNER_EXPAND_TILDE_SLASH;
         char *str = parse_command_arg(&runner, esc.data, esc.length);
         const char *slash = xstrrchr(str, '/');
         cs->tilde_expanded = true;

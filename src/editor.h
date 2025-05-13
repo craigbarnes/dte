@@ -152,8 +152,7 @@ static inline CommandRunner cmdrunner(EditorState *e, const CommandSet *cmds)
         .home_dir = &e->home_dir,
         .e = e,
         .ebuf = &e->err,
-        .allow_recording = false,
-        .expand_tilde_slash = true,
+        .flags = CMDRUNNER_EXPAND_TILDE_SLASH,
     };
 }
 

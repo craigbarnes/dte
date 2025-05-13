@@ -2788,7 +2788,8 @@ const char *find_normal_alias(const EditorState *e, const char *name)
 bool handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
 {
     CommandRunner runner = normal_mode_cmdrunner(e);
-    runner.allow_recording = allow_recording;
+    BUG_ON(runner.flags & CMDRUNNER_ALLOW_RECORDING);
+    runner.flags |= allow_recording ? CMDRUNNER_ALLOW_RECORDING : 0;
     return handle_command(&runner, cmd);
 }
 

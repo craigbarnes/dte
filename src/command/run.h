@@ -46,6 +46,11 @@ typedef struct {
     void (*macro_record)(struct EditorState *e, const Command *cmd, char **args);
 } CommandSet;
 
+typedef enum {
+    CMDRUNNER_ALLOW_RECORDING = 1u << 0,
+    CMDRUNNER_EXPAND_TILDE_SLASH = 1u << 1,
+} CommandRunnerFlags;
+
 typedef struct {
     const CommandSet *cmds;
     const char* (*lookup_alias)(const struct EditorState *e, const char *name);
@@ -54,8 +59,7 @@ typedef struct {
     struct EditorState *e;
     ErrorBuffer *ebuf;
     unsigned int recursion_count;
-    bool allow_recording;
-    bool expand_tilde_slash;
+    CommandRunnerFlags flags;
 } CommandRunner;
 
 static inline int command_cmp(const void *key, const void *elem)

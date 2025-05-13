@@ -115,7 +115,7 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
 char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len)
 {
     const StringView *home = runner->home_dir;
-    bool expand_ts = runner->expand_tilde_slash;
+    bool expand_ts = (runner->flags & CMDRUNNER_EXPAND_TILDE_SLASH);
     bool tilde_slash = expand_ts && len >= 2 && mem_equal(cmd, "~/", 2);
     String buf = string_new(len + 1 + (tilde_slash ? home->length : 0));
     size_t pos = 0;

@@ -26,8 +26,7 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_PTREQ(runner.cmds, &cmd_mode_commands);
     EXPECT_NULL(runner.lookup_alias);
     EXPECT_EQ(runner.recursion_count, 0);
-    EXPECT_FALSE(runner.allow_recording);
-    EXPECT_TRUE(runner.expand_tilde_slash);
+    EXPECT_UINT_EQ(runner.flags, CMDRUNNER_EXPAND_TILDE_SLASH);
 
     // Delete at end-of-line should do nothing
     CommandRunner *r = &runner;

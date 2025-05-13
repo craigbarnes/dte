@@ -59,7 +59,7 @@ static bool run_command(CommandRunner *runner, char **av)
 
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
-    if (runner->allow_recording && runner->cmds->macro_record) {
+    if ((runner->flags & CMDRUNNER_ALLOW_RECORDING) && runner->cmds->macro_record) {
         runner->cmds->macro_record(e, cmd, av + 1);
     }
 
