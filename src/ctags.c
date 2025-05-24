@@ -7,40 +7,44 @@
 #include "util/xmalloc.h"
 #include "util/xstring.h"
 
-static size_t parse_ex_pattern(const char *buf, size_t size, char **escaped)
-{
-    BUG_ON(size == 0);
-    BUG_ON(buf[0] != '/' && buf[0] != '?');
+// Convert an ex(1) style pattern from a tags(5) file to a basic POSIX
+// regex ("BRE"), so that it can be compiled with regcomp(3)
+static size_t regex_from_ex_pattern (
+    const char *ex_str,
+    size_t len,
+    char **regex_str // out param
+) {
+    BUG_ON(len == 0);
+    const char open_delim = ex_str[0];
+    BUG_ON(open_delim != '/' && open_delim != '?');
+    char *buf = xmalloc(xmul(2, len));
 
-    // The search pattern is not a real regular expression; special characters
-    // need to be escaped
-    char *pattern = xmalloc(size * 2);
-    char open_delim = buf[0];
-    for (size_t i = 1, j = 0; i < size; i++) {
-        if (unlikely(buf[i] == '\0')) {
+    // The pattern isn't a real regex; special chars need to be escaped
+    for (size_t i = 1, j = 0; i < len; i++) {
+        char c = ex_str[i];
+        if (c == '\0') {
             break;
-        }
-        if (buf[i] == '\\' && i + 1 < size) {
-            i++;
-            if (buf[i] == '\\') {
-                pattern[j++] = '\\';
+        } else if (c == '\\') {
+            if (unlikely(++i >= len)) {
+                break;
             }
-            pattern[j++] = buf[i];
-            continue;
-        }
-        if (buf[i] == open_delim) {
-            pattern[j] = '\0';
-            *escaped = pattern;
+            c = ex_str[i];
+            if (c == '\\') {
+                // Escape "\\" as "\\" (any other "\x" becomes just "x")
+                buf[j++] = '\\';
+            }
+        } else if (c == '*' || c == '[' || c == ']') {
+            buf[j++] = '\\';
+        } else if (c == open_delim) {
+            buf[j] = '\0';
+            *regex_str = buf;
             return i + 1;
         }
-        char c = buf[i];
-        if (c == '*' || c == '[' || c == ']') {
-            pattern[j++] = '\\';
-        }
-        pattern[j++] = buf[i];
+        buf[j++] = c;
     }
 
-    free(pattern);
+    // End of string reached without a matching end delimiter; invalid input
+    free(buf);
     return 0;
 }
 
@@ -52,7 +56,7 @@ static size_t parse_ex_cmd(Tag *tag, const char *buf, size_t size)
 
     size_t n;
     if (buf[0] == '/' || buf[0] == '?') {
-        n = parse_ex_pattern(buf, size, &tag->pattern);
+        n = regex_from_ex_pattern(buf, size, &tag->pattern);
     } else {
         n = buf_parse_ulong(buf, size, &tag->lineno);
     }
@@ -61,11 +65,8 @@ static size_t parse_ex_cmd(Tag *tag, const char *buf, size_t size)
         return 0;
     }
 
-    if (n + 1 < size && mem_equal(buf + n, ";\"", 2)) {
-        n += 2;
-    }
-
-    return n;
+    bool trailing_comment = (n + 1 < size) && mem_equal(buf + n, ";\"", 2);
+    return n + (trailing_comment ? 2 : 0);
 }
 
 bool parse_ctags_line(Tag *tag, const char *line, size_t line_len)
@@ -136,10 +137,10 @@ bool next_tag (
             line.length > 0 // Line is non-empty
             && line.data[0] != '!' // and not a comment
             && strview_has_strn_prefix(&line, p, plen) // and starts with `prefix`
-            && (!exact || line.data[plen] == '\t') // or matches `prefix` exactly, if applicable
+            && (!exact || line.data[plen] == '\t') // and matches `prefix` exactly, if applicable
             && parse_ctags_line(tag, line.data, line.length) // and is a valid tags(5) entry
         ) {
-            // Advance the position; `tag` param has been filled by parse_ctags_line()
+            // Advance the position; `tag` has been filled by parse_ctags_line()
             *posp = pos;
             return true;
         }
