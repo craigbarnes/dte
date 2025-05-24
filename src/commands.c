@@ -180,7 +180,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
 {
     const char *keystr = a->args[a->nr_flag_args];
     const char *cmd = a->args[a->nr_flag_args + 1];
-    KeyCode key = parse_key_string(keystr);
+    KeyCode key = keycode_from_str(keystr);
     if (unlikely(key == KEY_NONE)) {
         if (has_flag(a, 'q')) {
             LOG_INFO("bind -q: dropped invalid key string: %s", keystr);

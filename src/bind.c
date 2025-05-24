@@ -111,7 +111,7 @@ bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
         } else {
             string_append_cstring(buf, flag);
         }
-        size_t keylen = keycode_to_string(array[i].key, keystr);
+        size_t keylen = keycode_to_str(array[i].key, keystr);
         string_append_escaped_arg_sv(buf, string_view(keystr, keylen), true);
         string_append_byte(buf, ' ');
         string_append_escaped_arg(buf, array[i].cmd, true);

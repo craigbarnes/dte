@@ -176,7 +176,7 @@ static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const ch
     size_t prefix_len = strlen(prefix);
     char keystr[KEYCODE_STR_BUFSIZE];
     for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
-        size_t keylen = keycode_to_string(it.entry->key, keystr);
+        size_t keylen = keycode_to_str(it.entry->key, keystr);
         if (str_has_strn_prefix(keystr, prefix, prefix_len)) {
             ptr_array_append(a, xmemdup(keystr, keylen + 1));
         }
@@ -292,7 +292,7 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
         return;
     }
 
-    KeyCode key = parse_key_string(a->args[a->nr_flag_args]);
+    KeyCode key = keycode_from_str(a->args[a->nr_flag_args]);
     if (key == KEY_NONE) {
         return;
     }

@@ -102,14 +102,14 @@ static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag
 
 static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 {
-    KeyCode key = parse_key_string(keystr);
+    KeyCode key = keycode_from_str(keystr);
     if (key == KEY_NONE) {
         return error_msg(&e->err, "invalid key string: %s", keystr);
     }
 
     // Use canonical key string in printed messages
     char buf[KEYCODE_STR_BUFSIZE];
-    size_t len = keycode_to_string(key, buf);
+    size_t len = keycode_to_str(key, buf);
     BUG_ON(len == 0);
     keystr = buf;
 

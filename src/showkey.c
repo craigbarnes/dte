@@ -44,7 +44,7 @@ ExitCode showkey_loop(unsigned int terminal_query_level)
             loop = false;
         }
         size_t n = copyliteral(buf, "  ");
-        n += keycode_to_string(key, buf + n);
+        n += keycode_to_str(key, buf + n);
         n += copyliteral(buf + n, "\r\n");
         (void)!xwrite_all(STDOUT_FILENO, buf, n);
     }

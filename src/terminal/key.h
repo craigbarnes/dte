@@ -7,7 +7,7 @@
 #include "util/macros.h"
 
 enum {
-    // Buffer size for keycode_to_string()
+    // Buffer size for keycode_to_str()
     KEYCODE_STR_BUFSIZE = 32 // next_pow2(sizeof("QUERY REPLY; 0x12345678"))
 };
 
@@ -106,7 +106,7 @@ static inline KeyCode keycode_get_modifiers(KeyCode k)
     return k & MOD_MASK;
 }
 
-KeyCode parse_key_string(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;
-size_t keycode_to_string(KeyCode key, char buf[KEYCODE_STR_BUFSIZE]) NONNULL_ARGS;
+KeyCode keycode_from_str(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;
+size_t keycode_to_str(KeyCode key, char buf[KEYCODE_STR_BUFSIZE]) NONNULL_ARGS;
 
 #endif
