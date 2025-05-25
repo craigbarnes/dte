@@ -299,6 +299,27 @@ The following environment variables are set by dte:
 :   List of files currently open in a dte process (if the [`lock-files`]
     option is enabled).
 
+# Standard Input
+
+If [`stdin`] isn't the [controlling terminal] at startup, the editor will
+attempt to read from it (until [end-of-file]) and populate a buffer with
+its contents.
+
+# Standard Output
+
+If [`stdout`] isn't the [controlling terminal] at startup, a special
+buffer will be opened for it. When the editor exits, the most recent
+contents of this buffer will then be written to the corresponding file
+descriptor.
+
+If buffers are to be created for both `stdin` and `stdout` (as described
+above), they will instead be merged into a single buffer that is both
+populated at startup and written out at exit (see ["examples"] below).
+
+# Standard Error
+
+[`stderr`] is used only for diagnostic messages.
+
 # Exit Status
 
 `0`
@@ -333,7 +354,7 @@ Run several commands at startup:
 
     dte -c 'set filetype sh; insert -m "#!/bin/sh\n"'
 
-Read a buffer from standard input:
+Read a buffer from [standard input](#standard-input):
 
     echo 'Hello, World!' | dte
 
@@ -367,6 +388,7 @@ input/output of both.
 [command mode]: #command-mode
 [search mode]: #search-mode
 ["synopsis"]: #synopsis
+["examples"]: #examples
 
 [Close]: dterc.html#close
 [Copy]: dterc.html#copy
@@ -406,3 +428,8 @@ input/output of both.
 [`towlower`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/towlower.html
 [`towupper`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/towupper.html
 [`locale`]: https://man7.org/linux/man-pages/man7/locale.7.html
+[`stdin`]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
+[`stdout`]: https://man7.org/linux/man-pages/man3/stdout.3.html#DESCRIPTION
+[`stderr`]: https://man7.org/linux/man-pages/man3/stderr.3.html#DESCRIPTION
+[controlling terminal]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap11.html#tag_11_01_03
+[end-of-file]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/read.html#:~:text=after%20the-,end%2Dof%2Dfile,-%2C%200%20shall

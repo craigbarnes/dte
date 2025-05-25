@@ -355,6 +355,24 @@ History of search patterns used while in search mode.
 List of files currently open in a dte process (if the \fBlock\-files\fR
 option is enabled).
 .PP
+.SH STANDARD INPUT
+If \fBstdin\fR(3) isn't the controlling terminal at startup, the editor will
+attempt to read from it (until end\-of\-file) and populate a buffer with
+its contents.
+.P
+.SH STANDARD OUTPUT
+If \fBstdout\fR(3) isn't the controlling terminal at startup, a special
+buffer will be opened for it. When the editor exits, the most recent
+contents of this buffer will then be written to the corresponding file
+descriptor.
+.P
+If buffers are to be created for both \fBstdin\fR(3) and \fBstdout\fR(3) (as described
+above), they will instead be merged into a single buffer that is both
+populated at startup and written out at exit (see "examples" below).
+.P
+.SH STANDARD ERROR
+\fBstderr\fR(3) is used only for diagnostic messages.
+.P
 .SH EXIT STATUS
 .TP
 \fB0\fR

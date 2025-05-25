@@ -24,6 +24,7 @@ local crossrefs = {
     tzset = "(3)",
     glob = "(7)",
     regex = "(7)",
+    stdin = "(3)",
     stdout = "(3)",
     stderr = "(3)",
     sysexits = "(3)",
