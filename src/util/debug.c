@@ -69,8 +69,7 @@ static void print_stack_trace(void)
 }
 
 #if DEBUG_ASSERTIONS_ENABLED
-noreturn
-void bug(const char *file, int line, const char *func, const char *fmt, ...)
+noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...)
 {
     char buf[512];
     va_list ap;

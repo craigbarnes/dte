@@ -151,12 +151,16 @@ static ExitCode init_std_fds_headless(int std_fds[2])
     FILE *streams[] = {stdin, stdout};
     for (int i = 0; i < ARRAYLEN(streams); i++) {
         if (!isatty(i)) {
+            // Try to duplicate redirected stdin/stdout, as described
+            // in init_std_fds()
             int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
             if (fd == -1 && errno != EBADF) {
                 return ec_error("fcntl", EC_OS_ERROR);
             }
             std_fds[i] = fd;
         }
+        // Always reopen stdin and stdout as /dev/null, regardless of
+        // whether they were duplicated above
         if (!freopen("/dev/null", i ? "w" : "r", streams[i])) {
             return ec_error("freopen", EC_IO_ERROR);
         }
@@ -174,6 +178,8 @@ static ExitCode init_std_fds_headless(int std_fds[2])
     return EC_OK;
 }
 
+// Open special Buffers for duplicated stdin and/or stdout FDs, as created
+// by init_std_fds()
 static Buffer *init_std_buffer(EditorState *e, int fds[2])
 {
     const char *name = NULL;
@@ -210,10 +216,14 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     return buffer;
 }
 
+// Write the contents of the special `stdout` Buffer (as created by
+// init_std_buffer()) to `stdout` and free its remaining allocations
 static int buffer_write_blocks_and_free(Buffer *buffer, int fd)
 {
-    int err = 0;
+    BUG_ON(!buffer->stdout_buffer);
     const Block *blk;
+    int err = 0;
+
     block_for_each(blk, &buffer->blocks) {
         if (xwrite_all(fd, blk->data, blk->size) < 0) {
             err = errno;
@@ -221,8 +231,8 @@ static int buffer_write_blocks_and_free(Buffer *buffer, int fd)
         }
     }
 
-    // Note: the other allocations for buffer should have already been
-    // freed by buffer_unlock_and_free()
+    // Other allocations for `buffer` should have already been freed
+    // by buffer_unlock_and_free()
     free_blocks(buffer);
     free(buffer);
     return err;

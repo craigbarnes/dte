@@ -41,9 +41,9 @@ void dump_frame(const Frame *frame, size_t level, String *str);
 void update_window_coordinates(Frame *frame);
 
 #if DEBUG_ASSERTIONS_ENABLED
-  void frame_debug(const Frame *frame);
+    void frame_debug(const Frame *frame);
 #else
-  static inline void frame_debug(const Frame* UNUSED_ARG(frame)) {}
+    static inline void frame_debug(const Frame* UNUSED_ARG(frame)) {}
 #endif
 
 #endif
