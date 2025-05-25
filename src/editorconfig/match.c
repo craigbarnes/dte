@@ -67,13 +67,11 @@ static size_t handle_bracket_expression(const char *pat, size_t len, String *buf
     // of just copying the bracket expression to be interpreted as
     // regex
 
-    string_append_byte(buf, '[');
-    if (pat[0] == '!') {
-        string_append_byte(buf, '^');
-        string_append_buf(buf, pat + 1, i - 1);
-    } else {
-        string_append_buf(buf, pat, i);
-    }
+    char *s = string_reserve_space(buf, i + 1);
+    s[0] = '[';
+    memcpy(s + 1, pat, i);
+    s[1] = (s[1] == '!') ? '^' : s[1]; // Replace any leading ! with ^
+    buf->len += i + 1;
     return i;
 }
 
