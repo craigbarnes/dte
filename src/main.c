@@ -62,19 +62,11 @@ static void cleanup_handler(void *userdata)
     }
 }
 
-static ExitCode write_stdout(const char *str, size_t len)
-{
-    if (xwrite_all(STDOUT_FILENO, str, len) < 0) {
-        return ec_error("write", EC_IO_ERROR);
-    }
-    return EC_OK;
-}
-
 static ExitCode list_builtin_configs(void)
 {
     String str = dump_builtin_configs();
     BUG_ON(!str.buffer);
-    ExitCode e = write_stdout(str.buffer, str.len);
+    ExitCode e = ec_write_stdout(str.buffer, str.len);
     string_free(&str);
     return e;
 }
@@ -83,10 +75,9 @@ static ExitCode dump_builtin_config(const char *name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
-        fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
-        return EC_USAGE_ERROR;
+        return ec_usage_error("no built-in config with name '%s'", name);
     }
-    return write_stdout(cfg->text.data, cfg->text.length);
+    return ec_write_stdout(cfg->text.data, cfg->text.length);
 }
 
 static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
@@ -250,8 +241,7 @@ static ExitCode init_logging(void)
         return EC_OK;
     }
     if (req_level == LOG_LEVEL_INVALID) {
-        fprintf(stderr, "Invalid $DTE_LOG_LEVEL value: '%s'\n", req_level_str);
-        return EC_USAGE_ERROR;
+        return ec_usage_error("invalid $DTE_LOG_LEVEL value: '%s'", req_level_str);
     }
 
     // https://no-color.org/
@@ -381,55 +371,35 @@ int main(int argc, char *argv[])
             // Fallthrough
         case 'c':
             if (unlikely(nr_commands >= ARRAYLEN(commands))) {
-                fputs("Error: too many -c or -C options used\n", stderr);
-                return EC_USAGE_ERROR;
+                return ec_usage_error("too many -c or -C options used");
             }
             commands[nr_commands++] = optarg;
             break;
         case 't':
             if (unlikely(nr_tags >= ARRAYLEN(tags))) {
-                fputs("Error: too many -t options used\n", stderr);
-                return EC_USAGE_ERROR;
+                return ec_usage_error("too many -t options used");
             }
             tags[nr_tags++] = optarg;
             break;
-        case 'r':
-            rc = optarg;
-            break;
-        case 's':
-        case 'S':
-            return lint_syntax(optarg, ch == 'S' ? SYN_LINT : 0);
-        case 'R':
-            read_rc = false;
-            break;
-        case 'b':
-            return dump_builtin_config(optarg);
-        case 'B':
-            return list_builtin_configs();
-        case 'H':
-            load_and_save_history = false;
-            break;
-        case 'P':
-            return print_256_color_palette();
         case 'Q':
             if (!str_to_uint(optarg, &terminal_query_level)) {
-                fprintf(stderr, "Error: invalid argument for -Q: '%s'\n", optarg);
-                return EC_USAGE_ERROR;
+                return ec_usage_error("invalid argument for -Q: '%s'", optarg);
             }
             explicit_term_query_level = true;
             break;
-        case 'K':
-            return showkey_loop(terminal_query_level);
-        case 'V':
-            return write_stdout(copyright, sizeof(copyright));
-        case 'Z':
-            fprintf(stdout, "features:%s\n", buildvar_string);
-            return EC_OK;
-        case 'h':
-            printf(usage, progname(argc, argv, "dte"));
-            return EC_OK;
-        default:
-            return EC_USAGE_ERROR;
+        case 'H': load_and_save_history = false; break;
+        case 'r': rc = optarg; break;
+        case 'R': read_rc = false; break;
+        case 'b': return dump_builtin_config(optarg);
+        case 'B': return list_builtin_configs();
+        case 'h': return ec_printf_ok(usage, progname(argc, argv, "dte"));
+        case 'K': return showkey_loop(terminal_query_level);
+        case 'P': return print_256_color_palette();
+        case 's': return lint_syntax(optarg, 0);
+        case 'S': return lint_syntax(optarg, SYN_LINT);
+        case 'V': return ec_write_stdout(copyright, sizeof(copyright));
+        case 'Z': return ec_printf_ok("features:%s\n", buildvar_string);
+        default: return EC_USAGE_ERROR;
         }
     }
 
