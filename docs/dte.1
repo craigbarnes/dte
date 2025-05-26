@@ -405,6 +405,31 @@ The editor itself can only exit non\-zero during early startup (i.e.
 because initialization failed). However, the exit code may also be
 set to values in the range \fB0\fR..\fB125\fR by the \fBquit\fR command.
 .P
+.SH ASYNCHRONOUS EVENTS
+Signal actions configured at startup:
+.P
+.TP
+\fBSIGINT\fR, \fBSIGQUIT\fR, \fBSIGTSTP\fR, \fBSIGTTIN\fR, \fBSIGTTOU\fR, \fBSIGXFSZ\fR, \fBSIGPIPE\fR
+Ignored.
+.PP
+.TP
+\fBSIGUSR1\fR, \fBSIGUSR2\fR
+Ignored (reserved for future use).
+.PP
+.TP
+\fBSIGCHLD\fR, \fBSIGURG\fR, \fBSIGCONT\fR
+Restored to the respective defaults (in case ignored actions were
+inherited; see below).
+.PP
+All other signals for which the default action is \fBT\fR (terminate)
+or \fBA\fR (terminate with core dump) are caught and handled explicitly.
+This is to allow the state of the terminal be cleaned up (as if
+exiting normally), prior to the process being terminated.
+.P
+Signals marked as "ignored" (above) are restored to their default
+actions in child processes created by the \fBexec\fR and \fBcompile\fR
+commands, so that they inherit a clean execution environment.
+.P
 .SH EXAMPLES
 Open \fB/etc/passwd\fR with cursor on line 3, column 8:
 .P

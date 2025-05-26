@@ -347,6 +347,29 @@ The editor itself can only exit non-zero during early startup (i.e.
 because initialization failed). However, the exit code may also be
 set to values in the range `0`..`125` by the [`quit`] command.
 
+# Asynchronous Events
+
+Signal actions configured at startup:
+
+`SIGINT`, `SIGQUIT`, `SIGTSTP`, `SIGTTIN`, `SIGTTOU`, `SIGXFSZ`, `SIGPIPE`
+:   Ignored.
+
+`SIGUSR1`, `SIGUSR2`
+:   Ignored (reserved for future use).
+
+`SIGCHLD`, `SIGURG`, `SIGCONT`
+:   Restored to the respective defaults (in case ignored actions were
+    inherited; see below).
+
+All other signals for which the [default action] is `T` (terminate)
+or `A` (terminate with core dump) are caught and handled explicitly.
+This is to allow the state of the terminal be cleaned up (as if
+exiting normally), prior to the process being terminated.
+
+Signals marked as "ignored" (above) are restored to their default
+actions in child processes created by the [`exec`] and [`compile`]
+commands, so that they inherit a clean [execution environment].
+
 # Examples
 
 Open `/etc/passwd` with cursor on line 3, column 8:
@@ -436,3 +459,5 @@ input/output of both.
 [`stderr`]: https://man7.org/linux/man-pages/man3/stderr.3.html#DESCRIPTION
 [controlling terminal]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap11.html#tag_11_01_03
 [end-of-file]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/read.html#:~:text=after%20the-,end%2Dof%2Dfile,-%2C%200%20shall
+[default action]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/signal.h.html#:~:text=Signal-,Default%20Action,-Description
+[execution environment]: https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_13

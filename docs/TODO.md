@@ -189,9 +189,6 @@ Documentation
   program for those unfamiliar (see also: [`nano(1)`], [`micro(1)`],
   [`ed(1)`], etc.)
 
-* Add `ASYNCHRONOUS EVENTS`, `STDOUT`, `STDERR` and `OPERANDS` sections
-  to the [`dte(1)`] man page, similar to the ones in [`ed(1)`]
-
 * Cross-reference [`clear`] and [`delete-line`] commands (mention how
   they're similar and how they're different)
 
