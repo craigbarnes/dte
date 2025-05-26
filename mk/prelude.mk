@@ -3,14 +3,15 @@
 # at that file and find the parts relevant to installation, without
 # this obscure mess being the first thing they see.
 
-include build/gen/platform.mk
-
 filter-cmdgoals = $(filter $(1), $(or $(MAKECMDGOALS),all))
 
 ifeq "" "$(call filter-cmdgoals, clean help git-hooks dist docs man html%)"
+  # Only generate and load this makefile if $(MAKECMDGOALS) contains
+  # a target other than those listed above
   include build/gen/compiler.mk
 endif
 
+include build/gen/platform.mk
 include mk/util.mk
 
 # See: "persistent configuration" in docs/packaging.md

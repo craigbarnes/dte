@@ -17,32 +17,43 @@ else
     echo 'XARGS_P = xargs'
 fi
 
-NO_INSTALL_XDG_CLUTTER='
-# This causes `make install` to exclude .desktop/icon/AppStream files
-# See also: docs/packaging.md ("installation targets") and GNUmakefile
-NO_INSTALL_XDG_CLUTTER = 1'
+# The use of $(CC_TARGET) here means that `include build/gen/compiler.mk`
+# MUST come before `include build/gen/platform.mk` (see `mk/prelude.mk`)
+condvars() {
+    printf '\nifeq "" "$(CC_TARGET)"\n'
+    printf '%s' "$1" | sed -E "/^ *\$/d; s/^ */ /"
+    printf 'endif'
+}
 
-# TODO: Use the compiler's target ($CC_TARGET) to set these variables,
-# so as to avoid doing the wrong thing when cross-compiling. $KERNEL
-# can still be used as a fallback, if the target can't be determined.
+# These fallbacks are only used if $(CC_TARGET) can't be determined
 case "$KERNEL" in
 Linux)
     OS="$(uname -o)"
     if test "$OS" = Android; then
-        echo 'LDLIBS_ICONV = -liconv'
-        echo "$NO_INSTALL_XDG_CLUTTER"
+        condvars '
+            LDLIBS_ICONV = -liconv
+            NO_INSTALL_XDG_CLUTTER = 1
+        '
     fi ;;
 Darwin)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo "$NO_INSTALL_XDG_CLUTTER" ;;
+    condvars '
+        LDLIBS_ICONV = -liconv
+        NO_INSTALL_XDG_CLUTTER = 1
+    ' ;;
 OpenBSD)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'BASIC_CPPFLAGS += -I/usr/local/include'
-    echo 'BASIC_LDFLAGS += -L/usr/local/lib' ;;
+    condvars '
+        LDLIBS_ICONV = -liconv
+        BASIC_CPPFLAGS += -I/usr/local/include
+        BASIC_LDFLAGS += -L/usr/local/lib
+    ' ;;
 NetBSD)
-    echo 'BASIC_CPPFLAGS += -I/usr/pkg/include'
-    echo 'BASIC_LDFLAGS += -L/usr/pkg/lib' ;;
+    condvars '
+        BASIC_CPPFLAGS += -I/usr/pkg/include
+        BASIC_LDFLAGS += -L/usr/pkg/lib
+    ' ;;
 CYGWIN*)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'EXEC_SUFFIX = .exe' ;;
+    condvars '
+        LDLIBS_ICONV = -liconv
+        EXEC_SUFFIX = .exe
+    ' ;;
 esac

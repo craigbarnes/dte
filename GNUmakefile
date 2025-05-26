@@ -55,6 +55,7 @@ CONTRIB_SCRIPTS = \
 INSTALL_TARGETS_BASIC := bin man bash-completion fish-completion zsh-completion
 INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) icons desktop-file appstream
 
+# See "installation targets" in docs/packaging.md
 ifeq "$(NO_INSTALL_XDG_CLUTTER)" "1"
  INSTALL_TARGETS := $(INSTALL_TARGETS_BASIC)
 else
