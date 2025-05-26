@@ -813,7 +813,7 @@ bool toggle_option_values (
     }
 
     if (!error) {
-        size_t i = size_increment_wrapped(current, count);
+        size_t i = wrapping_increment(current, count);
         desc_set(e, desc, ptr, global, parsed_values[i]);
         if (verbose) {
             const char *prefix = (global && desc->local) ? "[global] " : "";

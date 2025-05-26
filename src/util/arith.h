@@ -54,7 +54,7 @@ static inline size_t size_ssub(size_t a, size_t b)
 
 // This is equivalent to `(x + 1) % modulus`, given the constraints
 // imposed by BUG_ON(), but avoids expensive divisions by a non-constant
-static inline size_t size_increment_wrapped(size_t x, size_t modulus)
+static inline size_t wrapping_increment(size_t x, size_t modulus)
 {
     BUG_ON(modulus == 0);
     BUG_ON(x >= modulus);
@@ -62,7 +62,7 @@ static inline size_t size_increment_wrapped(size_t x, size_t modulus)
 }
 
 // As above, but for decrementing `x` instead of incrementing it
-static inline size_t size_decrement_wrapped(size_t x, size_t modulus)
+static inline size_t wrapping_decrement(size_t x, size_t modulus)
 {
     BUG_ON(modulus == 0);
     BUG_ON(x >= modulus);

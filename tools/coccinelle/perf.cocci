@@ -12,8 +12,8 @@ identifier func != {
     report,
     test_indent_level,
     test_next_indent_width,
-    test_size_decrement_wrapped,
-    test_size_increment_wrapped,
+    test_wrapping_decrement,
+    test_wrapping_increment,
     view_update_vx
 };
 identifier ident !~ "^[A-Z][A-Z0-9_]+$";

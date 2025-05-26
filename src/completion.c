@@ -948,7 +948,7 @@ void complete_command_next(EditorState *e)
         return;
     }
     if (!init) {
-        cs->idx = size_increment_wrapped(cs->idx, count);
+        cs->idx = wrapping_increment(cs->idx, count);
     }
     do_complete_command(&e->cmdline);
 }
@@ -965,7 +965,7 @@ void complete_command_prev(EditorState *e)
         return;
     }
     if (!init) {
-        cs->idx = size_decrement_wrapped(cs->idx, count);
+        cs->idx = wrapping_decrement(cs->idx, count);
     }
     do_complete_command(&e->cmdline);
 }
