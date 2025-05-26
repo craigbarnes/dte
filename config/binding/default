@@ -15,11 +15,17 @@ bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
 bind C-up up
 bind C-down down
+bind C-home 'bol -t'
+bind C-end eol
+bind C-backspace 'erase-word -s'
+bind C-delete 'delete-word -s'
+
 bind M-left bol
 bind M-right eol
 bind M-up pgup
 bind M-down pgdown
-bind C-backspace 'erase-word -s'
+bind M-home 'bol -r'
+bind M-end eol
 bind M-backspace 'erase-word -s'
 bind M-delete 'delete-word -s'
 bind M-C-delete 'delete-line'
@@ -37,6 +43,8 @@ bind C-S-left 'word-bwd -cs'
 bind C-S-right 'word-fwd -cs'
 bind C-S-up 'up -l'
 bind C-S-down 'down -l'
+bind C-S-home 'bol -tc'
+bind C-S-end 'eol -c'
 bind C-S-pgup 'pgup -l'
 bind C-S-pgdown 'pgdown -l'
 bind C-S-delete 'delete-eol'
@@ -45,6 +53,8 @@ bind M-S-left 'bol -c'
 bind M-S-right 'eol -c'
 bind M-S-up 'pgup -c'
 bind M-S-down 'pgdown -c'
+bind M-S-home 'bol -rc'
+bind M-S-end 'eol -c'
 bind M-S-delete 'delete-eol'
 
 bind C-M-S-left 'bol -c'
