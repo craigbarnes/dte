@@ -195,9 +195,6 @@ Documentation
 * Cross-reference [`clear`] and [`delete-line`] commands (mention how
   they're similar and how they're different)
 
-* Mention [POSIX exit code rationale] in docs for [`quit`] and/or
-  ["EXIT STATUS"]
-
 * Provide dark color scheme for website
   * Define existing light scheme with `:root {color-scheme: light; ...}`
   * Replace all existing color values with `var(--xyz)`
@@ -395,7 +392,6 @@ Testing/Debugging
 [`micro(1)`]: https://man.archlinux.org/man/micro.1.en
 [`fzf(1)`]: https://man.archlinux.org/man/fzf.1.en
 [`ed(1)`]: https://man7.org/linux/man-pages/man1/ed.1p.html#ASYNCHRONOUS_EVENTS
-[POSIX exit code rationale]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_21_18
 [`ltrace(1)`]: https://man7.org/linux/man-pages/man1/ltrace.1.html
 [`posix_fallocate(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_fallocate.html
 [`writev(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/writev.html

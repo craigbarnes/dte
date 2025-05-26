@@ -322,6 +322,9 @@ populated at startup and written out at exit (see ["examples"] below).
 
 # Exit Status
 
+The following exit codes are used by the editor, with values in
+accordance with [`sysexits`]:
+
 `0`
 :   Program exited normally.
 
@@ -340,9 +343,9 @@ populated at startup and written out at exit (see ["examples"] below).
 `78`
 :   Configuration error.
 
-Note: the above exit codes are set by the editor itself, with values in
-accordance with [`sysexits`]. The exit code may also be set to values
-in the range `0`..`125` by the [`quit`] command.
+The editor itself can only exit non-zero during early startup (i.e.
+because initialization failed). However, the exit code may also be
+set to values in the range `0`..`125` by the [`quit`] command.
 
 # Examples
 

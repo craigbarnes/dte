@@ -499,6 +499,7 @@ in the range `0`..`125`, or defaults to `0` if unspecified.
 See also:
 
 * The `dte` [`-H`][`dte -H`] flag
+* The `dte` ["exit status"] section
 * The [`file-history`] option
 
 ### **suspend**
@@ -1684,6 +1685,7 @@ errors should be highlighted. Set to `""` to disable.
 [command mode]: dte.html#command-mode
 [search mode]: dte.html#search-mode
 [history file]: dte.html#files
+["exit status"]: dte.html#exit-status
 [configuration files]: dte.html#files:~:text=%24DTE_HOME/rc
 [key bindings]: dte.html#key-bindings
 [command]: #commands

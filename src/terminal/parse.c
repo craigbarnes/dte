@@ -268,7 +268,7 @@ static ByteType get_byte_type(unsigned char byte)
         x = BYTE_OTHER,
     };
 
-    // ECMA 48 divides bytes ("bit combinations") into rows of 16 columns.
+    // ECMA-48 divides bytes ("bit combinations") into rows of 16 columns.
     // The byte classifications mostly fall into their own rows:
     static const uint8_t rows[16] = {
         C, C, I, P, F, F, F, f,
