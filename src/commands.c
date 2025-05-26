@@ -1134,9 +1134,11 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
 static bool cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
-    CommandFlagSet np = cmdargs_flagset_from_str("np");
-    if (u64_popcount(a->flag_set & np) + !!str >= 2) {
-        return error_msg(&e->err, "flags [-n|-p] and [number] argument are mutually exclusive");
+    if (str && a->nr_flags) {
+        return error_msg (
+            &e->err,
+            "flags [-n|-p|-N|-P] can't be used with [number] argument"
+        );
     }
 
     MessageArray *msgs = &e->messages;
@@ -1146,16 +1148,18 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     size_t p = msgs->pos;
-    BUG_ON(p >= count);
-    if (has_flag(a, 'n')) {
-        p = MIN(p + 1, count - 1);
-    } else if (has_flag(a, 'p')) {
-        p -= (p > 0);
-    } else if (str) {
-        if (!str_to_size(str, &p) || p == 0) {
-            return error_msg(&e->err, "invalid message index: %s", str);
+    switch (cmdargs_pick_winning_flag(a, "npNP")) {
+    case 'n': p = saturating_increment(p, count - 1); break;
+    case 'p': p = saturating_decrement(p); break;
+    case 'N': p = wrapping_increment(p, count); break;
+    case 'P': p = wrapping_decrement(p, count); break;
+    case 0:
+        if (str) {
+            if (!str_to_size(str, &p) || p == 0) {
+                return error_msg(&e->err, "invalid message index: %s", str);
+            }
+            p = MIN(p - 1, count - 1);
         }
-        p = MIN(p - 1, count - 1);
     }
 
     msgs->pos = p;
@@ -2646,7 +2650,7 @@ static const Command cmds[] = {
     {"match-bracket", "cl", NA, 0, 0, cmd_match_bracket},
     {"mode", "", RC, 1, 1, cmd_mode},
     {"move-tab", "", NA, 1, 1, cmd_move_tab},
-    {"msg", "np", NA, 0, 1, cmd_msg},
+    {"msg", "NPnp", NA, 0, 1, cmd_msg},
     {"new-line", "Iai", NA, 0, 0, cmd_new_line},
     {"next", "", NA, 0, 0, cmd_next},
     {"open", "e=gt", NA, 0, -1, cmd_open},

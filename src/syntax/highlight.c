@@ -173,7 +173,7 @@ static const TermStyle **highlight_line (
             state = dest;
             goto top;
         case COND_RECOLOR:
-            set_style_range(styles, style, size_ssub(i, u->recolor_len), i);
+            set_style_range(styles, style, saturating_subtract(i, u->recolor_len), i);
             break;
         case COND_RECOLOR_BUFFER:
             if (sidx >= 0) {

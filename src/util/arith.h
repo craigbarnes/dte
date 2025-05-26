@@ -45,13 +45,6 @@ static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
     CHECKED_ADD(a, b, result);
 }
 
-// Saturating subtract
-static inline size_t size_ssub(size_t a, size_t b)
-{
-    size_t r = a - b;
-    return (r > a) ? 0 : r;
-}
-
 // This is equivalent to `(x + 1) % modulus`, given the constraints
 // imposed by BUG_ON(), but avoids expensive divisions by a non-constant
 static inline size_t wrapping_increment(size_t x, size_t modulus)
@@ -67,6 +60,22 @@ static inline size_t wrapping_decrement(size_t x, size_t modulus)
     BUG_ON(modulus == 0);
     BUG_ON(x >= modulus);
     return (x ? x : modulus) - 1;
+}
+
+static inline size_t saturating_increment(size_t x, size_t max)
+{
+    BUG_ON(x > max);
+    return x + (x < max);
+}
+
+static inline size_t saturating_decrement(size_t x)
+{
+    return x - (x > 0);
+}
+
+static inline size_t saturating_subtract(size_t a, size_t b)
+{
+    return (a > b) ? a - b : 0;
 }
 
 #endif

@@ -3259,6 +3259,48 @@ static void test_wrapping_decrement(TestContext *ctx)
     }
 }
 
+static void test_saturating_increment(TestContext *ctx)
+{
+    EXPECT_UINT_EQ(saturating_increment(0, 0), 0);
+    EXPECT_UINT_EQ(saturating_increment(1, 1), 1);
+    EXPECT_UINT_EQ(saturating_increment(6, 7), 7);
+    EXPECT_UINT_EQ(saturating_increment(7, 7), 7);
+
+    const size_t m = SIZE_MAX;
+    EXPECT_UINT_EQ(saturating_increment(m - 2, m), m - 1);
+    EXPECT_UINT_EQ(saturating_increment(m - 1, m), m);
+    EXPECT_UINT_EQ(saturating_increment(m, m), m);
+}
+
+static void test_saturating_decrement(TestContext *ctx)
+{
+    EXPECT_UINT_EQ(saturating_decrement(0), 0);
+    EXPECT_UINT_EQ(saturating_decrement(1), 0);
+    EXPECT_UINT_EQ(saturating_decrement(2), 1);
+    EXPECT_UINT_EQ(saturating_decrement(3), 2);
+
+    const size_t m = SIZE_MAX;
+    EXPECT_UINT_EQ(saturating_decrement(m), m - 1);
+}
+
+static void test_saturating_subtract(TestContext *ctx)
+{
+    EXPECT_UINT_EQ(saturating_subtract(0, 1), 0);
+    EXPECT_UINT_EQ(saturating_subtract(1, 1), 0);
+    EXPECT_UINT_EQ(saturating_subtract(2, 1), 1);
+    EXPECT_UINT_EQ(saturating_subtract(191, 170), 21);
+
+    const size_t m = SIZE_MAX;
+    EXPECT_UINT_EQ(saturating_subtract(m - 1, m - 2), 1);
+    EXPECT_UINT_EQ(saturating_subtract(m - 1, m), 0);
+    EXPECT_UINT_EQ(saturating_subtract(m, m), 0);
+    EXPECT_UINT_EQ(saturating_subtract(m, m - 1), 1);
+    EXPECT_UINT_EQ(saturating_subtract(m, m - 2), 2);
+    EXPECT_UINT_EQ(saturating_subtract(0, m), 0);
+    EXPECT_UINT_EQ(saturating_subtract(1, m), 0);
+    EXPECT_UINT_EQ(saturating_subtract(m, 1), m - 1);
+}
+
 static void test_size_multiply_overflows(TestContext *ctx)
 {
     size_t r = 0;
@@ -3318,24 +3360,6 @@ static void test_xadd(TestContext *ctx)
     EXPECT_UINT_EQ(xadd3(max - 3, 2, 1), max);
     EXPECT_UINT_EQ(xadd3(11, 9, 5071), 5091);
     EXPECT_UINT_EQ(xadd3(0, 0, 0), 0);
-}
-
-static void test_size_ssub(TestContext *ctx)
-{
-    EXPECT_UINT_EQ(size_ssub(0, 1), 0);
-    EXPECT_UINT_EQ(size_ssub(1, 1), 0);
-    EXPECT_UINT_EQ(size_ssub(2, 1), 1);
-    EXPECT_UINT_EQ(size_ssub(191, 170), 21);
-
-    const size_t m = SIZE_MAX;
-    EXPECT_UINT_EQ(size_ssub(m - 1, m - 2), 1);
-    EXPECT_UINT_EQ(size_ssub(m - 1, m), 0);
-    EXPECT_UINT_EQ(size_ssub(m, m), 0);
-    EXPECT_UINT_EQ(size_ssub(m, m - 1), 1);
-    EXPECT_UINT_EQ(size_ssub(m, m - 2), 2);
-    EXPECT_UINT_EQ(size_ssub(0, m), 0);
-    EXPECT_UINT_EQ(size_ssub(1, m), 0);
-    EXPECT_UINT_EQ(size_ssub(m, 1), m - 1);
 }
 
 static void test_mem_intern(TestContext *ctx)
@@ -3715,11 +3739,13 @@ static const TestEntry tests[] = {
     TEST(test_path_parent),
     TEST(test_wrapping_increment),
     TEST(test_wrapping_decrement),
+    TEST(test_saturating_increment),
+    TEST(test_saturating_decrement),
+    TEST(test_saturating_subtract),
     TEST(test_size_multiply_overflows),
     TEST(test_size_add_overflows),
     TEST(test_xmul),
     TEST(test_xadd),
-    TEST(test_size_ssub),
     TEST(test_mem_intern),
     TEST(test_read_file),
     TEST(test_xfopen),
