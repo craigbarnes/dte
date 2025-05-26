@@ -2525,7 +2525,7 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
     bool empty = temporary || has_flag(a, 'n');
 
     if (unlikely(empty && a->nr_args > 0)) {
-        return error_msg(&e->err, "flags -n and -t can't be used with filename arguments");
+        return error_msg(&e->err, "flags [-n|-t] can't be used with [filename] arguments");
     }
 
     char **paths = a->args;

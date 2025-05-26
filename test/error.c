@@ -125,7 +125,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"view 0", "invalid view index"},
         {"wrap-paragraph _", "invalid paragraph width"},
         {"wrap-paragraph 90000", "width must be between"},
-        {"wsplit -t file", "flags -n and -t can't be used with filename"},
+        {"wsplit -t file", "flags [-n|-t] can't be used with [filename] arguments"},
         {"wsplit -t; wresize nonnum; wclose", "invalid resize value"},
 
         // Error strings produced by command_parse_error_to_string():
