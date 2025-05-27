@@ -133,10 +133,22 @@ elif cc-option -MD -MF /dev/null; then
     echo 'DEPFLAGS = -MD -MF $(@:.o=.mk)'
 fi
 
-CC_TARGET="$($CC $CFLAGS -dumpmachine)"
-echo "CC_TARGET = $CC_TARGET"
+TARGET="$($CC $CFLAGS -dumpmachine)"
+echo "CC_TARGET = $TARGET"
 
-case "$CC_TARGET" in
+if test -z "$TARGET"; then
+    # If $TARGET is empty, fall back to using a value derived from uname(1)
+    # output (for the purpose of setting platform-specific variables below)
+    case "$(uname -s)" in
+        Linux) test "$(uname -o)" != Android || TARGET='x-linux-android' ;;
+        Darwin) TARGET='x-darwin' ;;
+        OpenBSD) TARGET='x-openbsd' ;;
+        NetBSD) TARGET='x-netbsd' ;;
+        CYGWIN*) TARGET='x-cygwin' ;;
+    esac
+fi
+
+case "$TARGET" in
 *-linux-android*|*-darwin*)
     echo 'LDLIBS_ICONV = -liconv'
     echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
