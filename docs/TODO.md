@@ -278,7 +278,7 @@ Code Quality/Efficiency Improvements
   instead of the binary searched interval tables in `src/util/unidata.h`
   (see also: [#147])
 
-* Detect whether linking with `-liconv` is needed (i.e. because its not
+* Detect whether linking with `-liconv` is needed (i.e. because it's not
   a core part of the platform's libc) by using a [feature test], instead
   of matching a known set of compiler targets
 
