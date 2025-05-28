@@ -131,6 +131,8 @@ if cc_option -MMD -MP -MF /dev/null; then
     echo 'DEPFLAGS = -MMD -MP -MF $(@:.o=.mk)'
 elif cc-option -MD -MF /dev/null; then
     echo 'DEPFLAGS = -MD -MF $(@:.o=.mk)'
+else
+    echo 'DEPFLAGS =' # Avoid inheriting from environment variable
 fi
 
 TARGET="$($CC $CFLAGS -dumpmachine)"
@@ -163,3 +165,11 @@ case "$TARGET" in
     echo 'LDLIBS_ICONV = -liconv'
     echo 'EXEC_SUFFIX = .exe' ;;
 esac
+
+# https://stackoverflow.com/questions/22017484/detect-if-a-compiler-is-using-ccache/61282413#61282413
+# https://ccache.dev/manual/latest.html#_extra_options
+if $CC -c -o /dev/null --ccache-skip -Dxyz=1 mk/feature-test/basic.c; then
+    echo 'CC_IS_CCACHE = 1'
+else
+    echo 'CC_IS_CCACHE = 0'
+fi
