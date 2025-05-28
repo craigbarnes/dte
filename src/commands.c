@@ -2232,10 +2232,14 @@ static bool cmd_shift(EditorState *e, const CommandArgs *a)
 static bool cmd_show(EditorState *e, const CommandArgs *a)
 {
     bool write_to_cmdline = has_flag(a, 'c');
-    if (write_to_cmdline && a->nr_args < 2) {
+    size_t nr_args = a->nr_args;
+    if (write_to_cmdline && nr_args < 2) {
         return error_msg(&e->err, "\"show -c\" requires 2 arguments");
     }
-    return show(e, a->args[0], a->args[1], write_to_cmdline);
+
+    const char *type = (nr_args > 0) ? a->args[0] : NULL;
+    const char *key = (nr_args > 1) ? a->args[1] : NULL;
+    return show(e, type, key, write_to_cmdline);
 }
 
 static bool cmd_suspend(EditorState *e, const CommandArgs *a)
@@ -2677,7 +2681,7 @@ static const Command cmds[] = {
     {"set", "gl", RC, 1, -1, cmd_set},
     {"setenv", "", RC, 1, 2, cmd_setenv},
     {"shift", "", NA, 1, 1, cmd_shift},
-    {"show", "c", NA, 1, 2, cmd_show},
+    {"show", "c", NA, 0, 2, cmd_show},
     {"suspend", "", NA, 0, 0, cmd_suspend},
     {"tag", "r", NA, 0, -1, cmd_tag},
     {"title", "", NA, 1, 1, cmd_title},

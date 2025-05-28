@@ -48,9 +48,10 @@ static void open_temporary_buffer (
     const char *cmd_arg,
     ShowHandlerFlags flags
 ) {
+    const char *sp = cmd_arg[0] ? " " : "";
     View *view = window_open_new_file(e->window);
     Buffer *buffer = view->buffer;
-    buffer_set_display_filename(buffer, xasprintf("(%s %s)", cmd, cmd_arg));
+    buffer_set_display_filename(buffer, xasprintf("(%s%s%s)", cmd, sp, cmd_arg));
     buffer->temporary = true;
 
     if (flags & SHOW_DTERC) {
@@ -567,6 +568,21 @@ UNITTEST {
 
 bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
+    ShowHandlerFlags showflags = 0;
+    String str = STRING_INIT;
+
+    if (!type) {
+        str = string_new(256);
+        for (size_t i = 0; i < ARRAYLEN(show_handlers); i++) {
+            string_append_cstring(&str, show_handlers[i].name);
+            // TODO: Add description strings to each show_handlers[] entry
+            // and include them in this output
+            string_append_byte(&str, '\n');
+        }
+        type = "";
+        goto open_buffer;
+    }
+
     const ShowHandler *handler = lookup_show_handler(type);
     if (!handler) {
         return error_msg(&e->err, "invalid argument: '%s'", type);
@@ -579,8 +595,11 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag)
         return handler->show(e, key, cflag);
     }
 
-    String str = handler->dump(e);
-    open_temporary_buffer(e, str.buffer, str.len, "show", type, handler->flags);
+    str = handler->dump(e);
+    showflags = handler->flags;
+
+open_buffer:
+    open_temporary_buffer(e, str.buffer, str.len, "show", type, showflags);
     string_free(&str);
     return true;
 }
