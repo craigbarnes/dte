@@ -617,7 +617,7 @@ exit:
         }
     }
 
-    if (DEBUG >= 1 || ASAN_ENABLED == 1 || xgetenv(ld_preload_env_var())) {
+    if (DEBUG >= 1 || ASAN_ENABLED || xgetenv(ld_preload_env_var())) {
         // Only free EditorState in debug builds or when a library/tool is
         // checking for leaks; otherwise it's pointless to do so immediately
         // before exiting

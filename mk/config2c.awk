@@ -38,7 +38,7 @@ FNR == 1 {
     name = FILENAME
     gsub(/^config\//, "", name)
     ident = "builtin_" escape_ident(name)
-    print "static CONFIG_SECTION const char " ident "[] ="
+    print "CONFIG_SECTION static const char " ident "[] ="
     names[++nfiles] = name
     idents[nfiles] = ident
 }
@@ -61,7 +61,7 @@ END {
         "    .name = n, \\\n" \
         "    .text = {.data = t, .length = sizeof(t) - 1} \\\n" \
         "}\n\n" \
-        "static CONFIG_SECTION const BuiltinConfig builtin_configs[] = {"
+        "CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {"
 
     for (i = 1; i <= nfiles; i++) {
         print "    cfg(\"" names[i] "\", " idents[i] "),"

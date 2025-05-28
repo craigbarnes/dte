@@ -5,6 +5,8 @@ default:
     before_script:
         - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-ct
         - export CC="ccache ${CC:-gcc}"
+        # Perform basic test, to ensure ccache(1) and $CC are working
+        - $CC -Udummyvar -Werror -c -o /dev/null mk/feature-test/basic.c
         # Ensure upstream "v*" tags are present, regardless of whether
         # this job is running for a fork or the upstream repo
         - git fetch https://gitlab.com/craigbarnes/dte.git 'refs/tags/v*:refs/tags/v*'

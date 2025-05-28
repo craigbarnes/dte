@@ -4,7 +4,7 @@ filename_to_ident() {
     echo "builtin_${1#config/}" | sed 's|[+/.-]|_|g'
 }
 
-template='static CONFIG_SECTION const char %s[] = {
+template='CONFIG_SECTION static const char %s[] = {
     #embed "%s"
 };
 '
@@ -20,7 +20,7 @@ echo '#define cfg(n, t) { \
     .text = {.data = t, .length = sizeof(t)} \
 }
 
-static CONFIG_SECTION const BuiltinConfig builtin_configs[] = {'
+CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {'
 
 for file in "$@"; do
     name="${file#config/}"
