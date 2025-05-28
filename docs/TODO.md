@@ -278,6 +278,10 @@ Code Quality/Efficiency Improvements
   instead of the binary searched interval tables in `src/util/unidata.h`
   (see also: [#147])
 
+* Detect whether linking with `-liconv` is needed (i.e. because its not
+  a core part of the platform's libc) by using a [feature test], instead
+  of matching a known set of compiler targets
+
 Testing/Debugging
 -----------------
 
@@ -394,5 +398,6 @@ Testing/Debugging
 [`writev(3)`]: https://pubs.opengroup.org/onlinepubs/9799919799/functions/writev.html
 [`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
 [extended clipboard protocol]: https://sw.kovidgoyal.net/kitty/clipboard/
+[feature test]: https://gitlab.com/craigbarnes/dte/-/tree/master/mk/feature-test#c-library-feature-tests
 [`hicpp-signed-bitwise`]: https://clang.llvm.org/extra/clang-tidy/checks/hicpp/signed-bitwise.html
 [C23 Enhanced Enumerations]: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3030.htm
