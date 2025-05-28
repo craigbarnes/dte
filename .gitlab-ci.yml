@@ -8,7 +8,7 @@ default:
         # Ensure upstream "v*" tags are present, regardless of whether
         # this job is running for a fork or the upstream repo
         - git fetch https://gitlab.com/craigbarnes/dte.git 'refs/tags/v*:refs/tags/v*'
-        - make vars || (make -v; exit 1)
+        - make vvars || (make -v; exit 1)
 
 .fragment-1:
     script: &objsize_and_bench
@@ -124,7 +124,7 @@ coverage:
     script:
         - make docs htmlgz-aux
         - make gcovr-html
-        - make vars check CC=musl-gcc LDFLAGS=-static DEBUG=0 SANE_WCTYPE=1
+        - make vvars check CC=musl-gcc LDFLAGS=-static DEBUG=0 SANE_WCTYPE=1
         - strip dte
         - tools/objsize.sh dte
         - ldd dte || true

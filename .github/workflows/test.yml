@@ -17,7 +17,7 @@ jobs:
             - uses: actions/checkout@v4
               with: {filter: "tree:0", fetch-depth: 0}
             - run: brew install make
-            - run: gmake vars
+            - run: gmake vvars
             - run: gmake build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
             - run: gmake -Otarget check
@@ -31,7 +31,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with: {filter: "tree:0", fetch-depth: 0}
-            - run: make vars
+            - run: make vvars
             - run: make build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
             - run: make -Otarget check
