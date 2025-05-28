@@ -151,7 +151,9 @@ if test -z "$TARGET"; then
 fi
 
 case "$TARGET" in
-*-linux-android*|*-darwin*)
+*-linux-android*)
+    echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
+*-darwin*)
     echo 'LDLIBS_ICONV = -liconv'
     echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
 *-openbsd*)
