@@ -578,6 +578,11 @@ static void test_term_parse_sequence(TestContext *ctx)
     EXPECT_PARSE_SEQN("\033O", TPARSE_PARTIAL_MATCH, 0);
     EXPECT_PARSE_SEQN("\033[\033", 2, KEY_IGNORE);
     EXPECT_PARSE_SEQN("\033[\030", 3, KEY_IGNORE);
+    EXPECT_PARSE_SEQN("\033[1\030;2A", 4, KEY_IGNORE); // Cancelled by CAN
+    EXPECT_PARSE_SEQN("\033[1\031;2A", 7, MOD_SHIFT | KEY_UP); // EM ignored
+    EXPECT_PARSE_SEQN("\033[1\032;2A", 4, KEY_IGNORE); // Cancelled by SUB
+    EXPECT_PARSE_SEQN("\033[1\033;2A", 3, KEY_IGNORE); // Cancelled by (unconsumed) ESC
+    EXPECT_PARSE_SEQN("\033[1\177;2A", 7, MOD_SHIFT | KEY_UP); // DEL ignored
     EXPECT_PARSE_SEQ("\033[A", KEY_UP);
     EXPECT_PARSE_SEQ("\033[B", KEY_DOWN);
     EXPECT_PARSE_SEQ("\033[C", KEY_RIGHT);
