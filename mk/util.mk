@@ -10,6 +10,11 @@ MAKEFLAGS += -r
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))
 OPTCHECK = mk/optcheck.sh
 
+USE_COLOR = $(if $(MAKE_TERMOUT),$(if $(NO_COLOR),,1))
+GREEN = $(if $(USE_COLOR),\033[32m)
+BOLD = $(if $(USE_COLOR),\033[1m)
+SGR0 = $(if $(USE_COLOR),\033[0m)
+
 ifneq "$(MAKE_S)" ""
   # Make "-s" flag was used (silent build)
   LOG = :

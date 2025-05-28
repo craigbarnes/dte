@@ -2,8 +2,8 @@ DISTRO = $(shell (. /etc/os-release 2>/dev/null && echo "$$NAME $$VERSION_ID") |
 ARCH = $(shell uname -m 2>/dev/null)
 _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
-PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
-PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
+PRINTVAR = printf '$(BOLD)%15s$(SGR0) = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
+PRINTVARX = $(call PRINTVAR,$(1), $(GREEN)(%s)$(SGR0), '$(origin $(1))')
 
 USERVARS = \
     CC CFLAGS CPPFLAGS LDFLAGS LDLIBS DEBUG AWK
@@ -20,7 +20,7 @@ USERVARS_VERBOSE = \
     SANE_WCTYPE USE_SANITIZER NO_DEPS NO_CONFIG_MK PANDOC LUA
 
 AUTOVARS_VERBOSE = \
-    .FEATURES MAKE_TERMOUT MAKE_TERMERR CFLAGS_ALL LDFLAGS_ALL
+    .FEATURES MAKE_TERMOUT MAKE_TERMERR USE_COLOR CFLAGS_ALL LDFLAGS_ALL
 
 vvars: USERVARS += $(USERVARS_VERBOSE)
 vvars: AUTOVARS += $(AUTOVARS_VERBOSE)
