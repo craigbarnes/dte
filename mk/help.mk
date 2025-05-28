@@ -4,14 +4,27 @@ _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
 PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
 PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
-USERVARS = CC CFLAGS CPPFLAGS LDFLAGS LDLIBS DEBUG
+
+USERVARS = \
+    CC CFLAGS CPPFLAGS LDFLAGS LDLIBS DEBUG AWK
 
 AUTOVARS = \
     VERSION KERNEL \
     $(if $(call streq,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
-    TERM SHELL LANG $(call echo-if-set, LC_CTYPE LC_ALL) \
-    MAKE_VERSION MAKEFLAGS CC_VERSION CC_TARGET
+    TERM SHELL LANG $(call echo-if-set, LC_CTYPE LC_ALL) XARGS_P \
+    MAKEFLAGS MAKE_VERSION AWK_VERSION CC_VERSION CC_TARGET
+
+USERVARS_VERBOSE = \
+    prefix bindir mandir DESTDIR V WERROR ICONV_DISABLE \
+    SANE_WCTYPE USE_SANITIZER NO_DEPS NO_CONFIG_MK PANDOC LUA
+
+AUTOVARS_VERBOSE = \
+    .FEATURES MAKE_TERMOUT MAKE_TERMERR CFLAGS_ALL LDFLAGS_ALL
+
+vvars: USERVARS += $(USERVARS_VERBOSE)
+vvars: AUTOVARS += $(AUTOVARS_VERBOSE)
+vvars: vars
 
 vars:
 	@echo
@@ -24,6 +37,7 @@ help:
 	@printf '\n Targets:\n\n'
 	$P all 'Build $(dte) (default target)'
 	$P vars 'Print system/build information'
+	$P vvars 'Verbose version of "make vars"'
 	$P tags 'Create tags(5) file using ctags(1)'
 	$P clean 'Remove generated files'
 	$P install 'Equivalent to the first 8 (5 on macOS/Android) install-* targets below'
@@ -74,4 +88,15 @@ ifeq "$(DEVMK)" "loaded"
 	@echo
 endif
 
-.PHONY: vars help
+# --version: gawk, nawk, goawk
+# -version: FreeBSD
+# -V: OpenBSD, gawk
+# -Wversion: mawk, gawk
+AWK_VERSION = $(or \
+    $(shell $(AWK) --version 2>/dev/null | head -n1), \
+    $(shell $(AWK) -V 2>/dev/null | head -n1), \
+    $(shell $(AWK) -version 2>/dev/null | head -n1), \
+    $(shell $(AWK) -Wversion 2>/dev/null | head -n1), \
+)
+
+.PHONY: vars vvars help
