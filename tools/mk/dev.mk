@@ -11,6 +11,7 @@ include tools/mk/show-sizes.mk
 
 CTAGS ?= ctags
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
+GEN_MKFILES = $(foreach f, platform compiler, build/gen/$(f).mk build/gen/$(f).log)
 
 git-hooks: $(GIT_HOOKS)
 
@@ -21,6 +22,11 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 tags:
 	$(CTAGS) src/*.[ch] src/*/*.[ch] test/*.[ch]
 
+# For conveniently inspecting generated makefiles and their associated logs,
+# if something goes wrong
+dump-generated-makefiles: $(GEN_MKFILES)
+	$(Q) $(AWK) -f tools/cat.awk $^
+
 
 DEVMK := loaded
-.PHONY: git-hooks tags
+.PHONY: git-hooks tags dump-generated-makefiles
