@@ -3,6 +3,7 @@
 #include "strtonum.h"
 #include "arith.h"
 #include "ascii.h"
+#include "debug.h"
 #include "xstring.h"
 
 enum {
@@ -11,24 +12,18 @@ enum {
     I = HEX_INVALID
 };
 
-const uint8_t hex_decode_table[256] = {
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, I, I, I, I, I, I,
-    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I
+// Indices are offset by 48 ('0'; 0x30)
+const uint8_t hex_decode_table[64] = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, I, I, I, I, I, I, // 0x30
+    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I, // 0x40
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, // 0x50
+    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I, // 0x60
 };
+
+UNITTEST {
+    static_assert((I & 0xF) == 0);
+    BUG_ON(hex_decode_table[sizeof(hex_decode_table) - 1] != I);
+}
 
 size_t buf_parse_uintmax(const char *str, size_t len, uintmax_t *valp)
 {
