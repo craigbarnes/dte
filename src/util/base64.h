@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "macros.h"
 
-extern const uint8_t base64_decode_table[256];
+extern const uint8_t base64_decode_table[80];
 extern const char base64_encode_table[64];
 
 enum {
@@ -17,7 +17,8 @@ enum {
 // or one of the special enum values above
 static inline unsigned int base64_decode(unsigned char c)
 {
-    return base64_decode_table[c];
+    c -= '+'; // Lookup table starts at '+'
+    return base64_decode_table[(c < sizeof(base64_decode_table)) ? c : 1];
 }
 
 // Like base64_decode(), but implemented in a way that's more amenable to

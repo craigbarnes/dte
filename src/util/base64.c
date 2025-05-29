@@ -6,23 +6,13 @@ enum {
     P = BASE64_PADDING,
 };
 
-const uint8_t base64_decode_table[256] = {
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I, 62,  I,  I,  I, 63, // ...........+.../
-    52, 53, 54, 55, 56, 57, 58, 59, 60, 61,  I,  I,  I,  P,  I,  I, // 0123456789...=..
-     I,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, // .ABCDEFGHIJKLMNO
-    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,  I,  I,  I,  I,  I, // PQRSTUVWXYZ.....
-     I, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, // .abcdefghijklmno
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,  I,  I,  I,  I,  I, // pqrstuvwxyz.....
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I
+// Indices are offset by 43 ('+')
+const uint8_t base64_decode_table[80] = {
+    62,  I,  I,  I, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,  I, // +.../0123456789.
+     I,  I,  P,  I,  I,  I,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, // ..=...ABCDEFGHIJ
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, // KLMNOPQRSTUVWXYZ
+     I,  I,  I,  I,  I,  I, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, // ......abcdefghij
+    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51  // klmnopqrstuvwxyz
 };
 
 const char base64_encode_table[64] = {
@@ -30,6 +20,13 @@ const char base64_encode_table[64] = {
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789+/"
 };
+
+UNITTEST {
+    static_assert(((I | P) & 63) == 0);
+    BUG_ON(base64_decode_table[1] != I); // See base64_decode()
+    BUG_ON(base64_decode_table[sizeof(base64_decode_table) - 1] != 51);
+    BUG_ON(base64_encode_table[sizeof(base64_encode_table) - 1] != '/');
+}
 
 size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
 {

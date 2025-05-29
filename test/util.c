@@ -600,9 +600,6 @@ static void test_base64_decode(TestContext *ctx)
     EXPECT_EQ(base64_decode('9'), 61);
     EXPECT_EQ(base64_decode('+'), 62);
     EXPECT_EQ(base64_decode('/'), 63);
-    EXPECT_EQ(base64_decode('='), BASE64_PADDING);
-    EXPECT_EQ(base64_decode(0x00), BASE64_INVALID);
-    EXPECT_EQ(base64_decode(0xFF), BASE64_INVALID);
 
     EXPECT_EQ(base64_encode_table[0], 'A');
     EXPECT_EQ(base64_encode_table[25], 'Z');
@@ -612,6 +609,23 @@ static void test_base64_decode(TestContext *ctx)
     EXPECT_EQ(base64_encode_table[61], '9');
     EXPECT_EQ(base64_encode_table[62], '+');
     EXPECT_EQ(base64_encode_table[63], '/');
+
+    EXPECT_EQ(base64_decode('='), BASE64_PADDING);
+    EXPECT_EQ(base64_decode(' '), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('*'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(','), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(':'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('?'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('@'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('['), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('`'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('{'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('~'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode('}'), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(0), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(127), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(128), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(255), BASE64_INVALID);
 
     for (unsigned int i = 'A'; i <= 'Z'; i++) {
         IEXPECT_EQ(base64_decode(i), i - 'A');
