@@ -5,14 +5,15 @@ default:
     before_script:
         - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-ct
         - export CC="ccache ${CC:-gcc}"
-        # Perform basic test, to ensure ccache(1) and $CC are working
-        - $CC -Udummyvar -Werror -c -o /dev/null mk/feature-test/basic.c
         # Ensure upstream "v*" tags are present, regardless of whether
         # this job is running for a fork or the upstream repo
         - git fetch https://gitlab.com/craigbarnes/dte.git 'refs/tags/v*:refs/tags/v*'
-        - make vvars || (make dump-generated-makefiles; exit 1)
 
 .fragment-1:
+    script: &vvars
+        - make vvars || (make dump-generated-makefiles; exit 1)
+
+.fragment-2:
     script: &objsize_and_bench
         - make DEBUG=0 && make installcheck
         - strip dte && du -k -h dte
@@ -23,6 +24,7 @@ default:
     stage: test
     needs: []
     script:
+        - *vvars
         - make
         - cat build/gen/feature.h
         - ldd dte
@@ -55,6 +57,7 @@ arch:
     needs: []
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
     script:
+        - *vvars
         - make check-source check-clang-tidy
         - make check USE_SANITIZER=1
         - (cd build/ && test/test)
@@ -69,6 +72,8 @@ debian-stable:
         - make check CC='ccache clang' LDFLAGS=-static
         - make check CC='ccache gcc'
         - make check CC='ccache gcc' LDFLAGS=-static
+        - make check CFLAGS='-Og -funsigned-char'
+        - make check CFLAGS='-Og -fsigned-char'
         - make check
         - make installcheck
 
