@@ -14,10 +14,10 @@ enum {
 
 // Indices are offset by 48 ('0'; 0x30)
 const uint8_t hex_decode_table[64] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, I, I, I, I, I, I, // 0x30
-    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I, // 0x40
-    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, // 0x50
-    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I, // 0x60
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, I, I, I, I, I, I, // 0x30  0123456789......
+    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I, // 0x40  .ABCDEF.........
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, // 0x50  ................
+    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I, // 0x60  .abcdef.........
 };
 
 UNITTEST {

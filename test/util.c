@@ -276,6 +276,7 @@ static void test_hex_decode(TestContext *ctx)
     EXPECT_EQ(hex_decode('F'), 15);
     EXPECT_EQ(hex_decode('g'), HEX_INVALID);
     EXPECT_EQ(hex_decode('G'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('`'), HEX_INVALID);
     EXPECT_EQ(hex_decode('@'), HEX_INVALID);
     EXPECT_EQ(hex_decode('/'), HEX_INVALID);
     EXPECT_EQ(hex_decode(':'), HEX_INVALID);
@@ -283,6 +284,22 @@ static void test_hex_decode(TestContext *ctx)
     EXPECT_EQ(hex_decode('~'), HEX_INVALID);
     EXPECT_EQ(hex_decode('\0'), HEX_INVALID);
     EXPECT_EQ(hex_decode(0xFF), HEX_INVALID);
+
+    for (unsigned int i = '0'; i <= '9'; i++) {
+        IEXPECT_EQ(hex_decode(i), i - '0');
+    }
+
+    for (unsigned int i = 'A'; i <= 'F'; i++) {
+        unsigned int expected = 10 + (i - 'A');
+        IEXPECT_EQ(hex_decode(i), expected);
+        IEXPECT_EQ(hex_decode(ascii_tolower(i)), expected);
+    }
+
+    for (unsigned int i = 0; i < 256; i++) {
+        unsigned int decoded = hex_decode(i);
+        bool is_hex = ascii_isalnum(i) && ascii_toupper(i) <= 'F';
+        IEXPECT_EQ(decoded, is_hex ? (decoded & 0xF) : HEX_INVALID);
+    }
 }
 
 static void test_hex_encode_byte(TestContext *ctx)
