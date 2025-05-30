@@ -614,7 +614,7 @@ UNITTEST {
     }
 
     // Ensure option_desc[] is properly sorted
-    CHECK_BSEARCH_ARRAY(option_desc, name, strcmp);
+    CHECK_BSEARCH_ARRAY(option_desc, name);
 }
 
 static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue value)

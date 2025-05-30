@@ -26,7 +26,7 @@ static const char builtin_style_names[NR_BSE][16] = {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_STR_ARRAY(builtin_style_names, strcmp);
+    CHECK_BSEARCH_STR_ARRAY(builtin_style_names);
 }
 
 static TermStyle *find_real_style(StyleMap *styles, const char *name)

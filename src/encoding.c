@@ -47,7 +47,7 @@ static const ByteOrderMark boms[] = {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(encoding_aliases, alias, ascii_strcmp_icase);
+    CHECK_BSEARCH_ARRAY_ICASE(encoding_aliases, alias);
     CHECK_STRING_ARRAY(encoding_names);
     static_assert(ARRAYLEN(encoding_names) == UNKNOWN_ENCODING);
     static_assert(ARRAYLEN(boms) == UNKNOWN_ENCODING);

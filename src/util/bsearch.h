@@ -15,17 +15,16 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
 #define BSEARCH(key, a, cmp) bsearch(key, a, ARRAYLEN(a), sizeof(a[0]), cmp)
 #define BSEARCH_IDX(key, a, cmp) bisearch_idx(key, a, ARRAYLEN(a), sizeof(a[0]), cmp)
 
-#define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
+#define DO_CHECK_BSEARCH_ARRAY(a, field, cmp) \
     static_assert_flat_struct_array(a, field); \
-    check_bsearch_array ( \
-        a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field), cmp \
-    ); \
-} while (0)
+    check_bsearch_array(a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field), cmp)
 
-#define CHECK_BSEARCH_STR_ARRAY(a, cmp) do { \
+#define CHECK_BSEARCH_STR_ARRAY(a) \
     static_assert_flat_string_array(a); \
-    check_bsearch_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0]), cmp); \
-} while (0)
+    check_bsearch_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0]), strcmp)
+
+#define CHECK_BSEARCH_ARRAY(a, field) DO_CHECK_BSEARCH_ARRAY(a, field, strcmp)
+#define CHECK_BSEARCH_ARRAY_ICASE(a, field) DO_CHECK_BSEARCH_ARRAY(a, field, ascii_strcmp_icase)
 
 // NOLINTNEXTLINE(readability-function-size): 7 param debug function is fine
 static inline void check_bsearch_array (

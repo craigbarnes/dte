@@ -127,7 +127,7 @@ static const BuiltinVar normal_vars[] = {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(normal_vars, name, strcmp);
+    CHECK_BSEARCH_ARRAY(normal_vars, name);
 }
 
 char *expand_normal_var(const EditorState *e, const char *name)

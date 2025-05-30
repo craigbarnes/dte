@@ -606,7 +606,7 @@ static const CompletionHandler completion_handlers[] = {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(completion_handlers, cmd_name, strcmp);
+    CHECK_BSEARCH_ARRAY(completion_handlers, cmd_name);
     // Ensure handlers are kept in sync with renamed/removed commands
     for (size_t i = 0; i < ARRAYLEN(completion_handlers); i++) {
         const char *name = completion_handlers[i].cmd_name;

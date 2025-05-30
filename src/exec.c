@@ -55,7 +55,7 @@ static const struct {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(exec_map, name, strcmp);
+    CHECK_BSEARCH_ARRAY(exec_map, name);
 }
 
 ExecAction lookup_exec_action(const char *name, int fd)

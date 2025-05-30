@@ -39,12 +39,12 @@ static int ft_compare(const void *key, const void *elem)
 
 UNITTEST {
     static_assert(NR_BUILTIN_FILETYPES < 256);
-    CHECK_BSEARCH_ARRAY(basenames, name, strcmp);
-    CHECK_BSEARCH_ARRAY(extensions, ext, strcmp);
-    CHECK_BSEARCH_ARRAY(interpreters, key, strcmp);
-    CHECK_BSEARCH_ARRAY(emacs_modes, name, strcmp);
-    CHECK_BSEARCH_STR_ARRAY(ignored_extensions, strcmp);
-    CHECK_BSEARCH_STR_ARRAY(builtin_filetype_names, strcmp);
+    CHECK_BSEARCH_ARRAY(basenames, name);
+    CHECK_BSEARCH_ARRAY(extensions, ext);
+    CHECK_BSEARCH_ARRAY(interpreters, key);
+    CHECK_BSEARCH_ARRAY(emacs_modes, name);
+    CHECK_BSEARCH_STR_ARRAY(ignored_extensions);
+    CHECK_BSEARCH_STR_ARRAY(builtin_filetype_names);
 
     for (size_t i = 0; i < ARRAYLEN(builtin_filetype_names); i++) {
         const char *name = builtin_filetype_names[i];

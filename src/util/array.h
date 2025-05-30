@@ -8,38 +8,32 @@
 #include "ptr-array.h"
 #include "xstring.h"
 
-#define static_assert_flat_string_array(a) do { \
+#define static_assert_flat_string_array(a) \
     static_assert_incompatible_types(a[0], const char*); \
     static_assert_incompatible_types(a[0], char*); \
-    static_assert_compatible_types(a[0][0], char); \
-} while(0)
+    static_assert_compatible_types(a[0][0], char)
 
-#define static_assert_flat_struct_array(a, field) do { \
+#define static_assert_flat_struct_array(a, field) \
     static_assert_offsetof(a[0], field, 0); \
     static_assert_incompatible_types(a[0].field, const char*); \
     static_assert_incompatible_types(a[0].field, char*); \
-    static_assert_compatible_types(a[0].field[0], char); \
-} while(0)
+    static_assert_compatible_types(a[0].field[0], char)
 
-#define CHECK_STRING_ARRAY(a) do { \
+#define CHECK_STRING_ARRAY(a) \
     static_assert_flat_string_array(a); \
-    check_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0])); \
-} while (0)
+    check_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0]))
 
-#define CHECK_STRUCT_ARRAY(a, field) do { \
+#define CHECK_STRUCT_ARRAY(a, field) \
     static_assert_flat_struct_array(a, field); \
-    check_array(a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field)); \
-} while (0)
+    check_array(a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field))
 
-#define COLLECT_STRINGS(a, ptrs, prefix) do { \
+#define COLLECT_STRINGS(a, ptrs, prefix) \
     static_assert_flat_string_array(a); \
-    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
-} while (0)
+    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix)
 
-#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) do { \
+#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) \
     static_assert_flat_struct_array(a, field); \
-    collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
-} while (0)
+    collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix)
 
 #define STR_TO_ENUM_WITH_OFFSET(str, a, nfval, off) \
     str_to_enum(str, a[0], ARRAYLEN(a), sizeof(a[0]), off, nfval)

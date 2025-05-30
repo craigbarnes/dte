@@ -28,7 +28,7 @@ typedef enum {
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
 #define LOG_NOTICE(...) LOG(LOG_LEVEL_NOTICE, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
-#define WARN_ON(a) do {if (unlikely(a)) {LOG_WARNING("%s", #a);}} while (0)
+#define WARN_ON(a) if (unlikely(a)) {LOG_WARNING("%s", #a);}
 
 bool log_level_enabled(LogLevel level);
 

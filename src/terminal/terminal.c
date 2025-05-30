@@ -126,7 +126,7 @@ static int term_name_compare(const void *key, const void *elem)
 }
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(terms, name, strcmp);
+    CHECK_BSEARCH_ARRAY(terms, name);
     CHECK_STRUCT_ARRAY(color_suffixes, suffix);
 
     // NOLINTBEGIN(bugprone-assert-side-effect)

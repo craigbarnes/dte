@@ -2819,7 +2819,7 @@ void collect_normal_commands(PointerArray *a, const char *prefix)
 }
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
+    CHECK_BSEARCH_ARRAY(cmds, name);
 
     for (size_t i = 0, n = ARRAYLEN(cmds); i < n; i++) {
         // Check that flags array is null-terminated within bounds

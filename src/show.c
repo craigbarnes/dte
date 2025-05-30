@@ -556,7 +556,7 @@ const ShowHandler *lookup_show_handler(const char *name)
 
 UNITTEST {
     // NOLINTBEGIN(bugprone-assert-side-effect)
-    CHECK_BSEARCH_ARRAY(show_handlers, name, strcmp);
+    CHECK_BSEARCH_ARRAY(show_handlers, name);
     BUG_ON(!lookup_show_handler("alias"));
     BUG_ON(!lookup_show_handler("set"));
     BUG_ON(!lookup_show_handler("wsplit"));
