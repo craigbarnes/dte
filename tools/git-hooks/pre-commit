@@ -66,6 +66,7 @@ fi
 changed_indented_files=$(changed_files ':(attr:space-indent)')
 changed_shell_files=$(changed_files ':(attr:shell)')
 changed_c_files=$(changed_files '**.[ch]')
+changed_make_files=$(changed_files ':(attr:make)')
 changed_full_check_files=$(changed_files ':(attr:change-triggers-full-check)')
 changed_basic_check_files=$(changed_files ':(attr:change-triggers-basic-check)')
 
@@ -82,6 +83,11 @@ fi
 # Check for header-related errors in changed C files
 if test "$changed_c_files"; then
     tools/hdrcheck.awk $changed_c_files
+fi
+
+# Check for lint in changed makefiles
+if test "$changed_make_files"; then
+    tools/mkcheck.awk $changed_make_files
 fi
 
 if test "$changed_full_check_files"; then

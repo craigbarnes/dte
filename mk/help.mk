@@ -10,7 +10,7 @@ USERVARS = \
     $(call echo-if-set, LC_CTYPE LC_ALL) \
     DEBUG AWK CC CFLAGS \
     $(call echo-if-set, CPPFLAGS LDFLAGS LDLIBS TESTFLAGS WERROR V) \
-    $(call echo-if-set, ICONV_DISABLE NO_DEPS NO_COLOR NO_CONFIG_MK) \
+    $(call echo-if-set, ICONV_DISABLE NO_DEPS NO_COLOR NO_CONFIG_MK)
 
 USERVARS_VERBOSE = \
     PANDOC LUA DESTDIR prefix bindir mandir \
@@ -84,11 +84,12 @@ ifeq "$(DEVMK)" "loaded"
 	$P check-awk 'Check AWK scripts with gawk --lint=fatal'
 	$P check-whitespace 'Check source files for indent/newline errors'
 	$P check-headers 'Check C headers and includes for various mistakes'
+	$P check-makefiles 'Check makefiles for various mistakes'
 	$P check-docs 'Check HTTP status of URLs found in docs'
 	$P check-clang-tidy 'Run clang-tidy(1) checks from .clang-tidy'
 	$P check-desktop-file 'Run desktop-file-validate(1) checks'
 	$P check-appstream 'Run appstream-util(1) checks'
-	$P check-source 'Equivalent to "make check-{whitespace,headers,codespell,shell,awk}"'
+	$P check-source 'Equivalent to "make check-{whitespace,headers,makefiles,codespell,shell,awk}"'
 	$P check-aux 'Equivalent to "make check-{desktop-file,appstream}"'
 	$P distcheck 'Run "make check" on the unpacked "make dist" tarball'
 	$P 'check TESTFLAGS=-t' 'Same as "make check", but also showing timing info'

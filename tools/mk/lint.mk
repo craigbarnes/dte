@@ -1,5 +1,6 @@
 WSCHECK = $(AWK) -f tools/wscheck.awk
 HCHECK = $(AWK) -f tools/hdrcheck.awk
+MKCHECK = $(AWK) -f tools/mkcheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
 TYPOS ?= typos
@@ -13,14 +14,15 @@ GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)')
 DOCFILES = $(call GITATTRS, xml markdown)
 SHELLSCRIPTS = $(call GITATTRS, shell)
 SPACE_INDENTED_FILES = $(call GITATTRS, space-indent)
+MK_FILES = $(call GITATTRS, make)
 # TODO: Re-enable `wrap`, after diagnosing/fixing the extreme slowness
 SPATCHNAMES = arraylen minmax tailcall perf pitfalls staticbuf
 SPATCHTARGETS = $(addprefix check-coccinelle-, $(SPATCHNAMES))
 
-check-coccinelle: $(SPATCHTARGETS)
-check-source: check-whitespace check-headers check-codespell check-shell check-awk
-check-aux: check-desktop-file check-appstream
 check-all: check-source check-aux check distcheck check-clang-tidy
+check-source: $(addprefix check-, whitespace headers makefiles codespell shell awk)
+check-aux: check-desktop-file check-appstream
+check-coccinelle: $(SPATCHTARGETS)
 
 $(SPATCHTARGETS): check-coccinelle-%:
 	$(E) SPATCH 'tools/coccinelle/$*.cocci'
@@ -38,6 +40,8 @@ check-awk: src/msg.c src/msg.h
 	$(Q) $(AWKLINT) -f tools/hdrcheck.awk $^
 	$(E) AWKLINT tools/wscheck.awk
 	$(Q) $(AWKLINT) -f tools/wscheck.awk $^
+	$(E) AWKLINT tools/mkcheck.awk
+	$(Q) $(AWKLINT) -f tools/mkcheck.awk $^
 	$(E) AWKLINT contrib/longest-line.awk
 	$(Q) $(AWKLINT) -f contrib/longest-line.awk $<
 	$(E) AWKLINT tools/git-hooks/commit-msg
@@ -50,6 +54,9 @@ check-whitespace:
 
 check-headers:
 	$(Q) $(HCHECK) $$(git ls-files -- '**.[ch]') >&2
+
+check-makefiles:
+	$(Q) $(MKCHECK) $(MK_FILES) >&2
 
 check-codespell:
 	$(E) CODESPL 'src/ mk/ *.md *.xml'
@@ -76,6 +83,7 @@ check-docs:
 
 
 .PHONY: \
-    check-all check-source check-aux check-coccinelle $(SPATCHTARGETS) \
-    check-shell check-awk check-whitespace check-headers check-codespell \
-    check-typos check-desktop-file check-appstream check-docs
+    $(SPATCHTARGETS) \
+    $(addprefix check-, all source aux coccinelle shell awk whitespace) \
+    $(addprefix check-, headers makefiles codespell typos desktop-file) \
+    $(addprefix check-, appstream docs)
