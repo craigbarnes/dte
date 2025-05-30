@@ -138,7 +138,6 @@ $(editorconfig_objects): | build/editorconfig/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
-$(all_objects) $(feature_tests): build/gen/platform.mk build/gen/compiler.mk
 $(feature_tests): mk/feature-test/defs.h build/gen/all.cflags
 build/convert.o: build/gen/buildvar-iconv.h
 build/gen/builtin-config.h build/gen/builtin-config-embed.h: build/gen/builtin-config.mk
