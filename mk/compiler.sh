@@ -128,16 +128,16 @@ detect_cflags_for_var CC_SANITIZER_FLAGS "$SANITIZER_FLAGS"
 # https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-fasynchronous-unwind-tables
 # https://gitlab.com/craigbarnes/dte/-/commit/e4ae49d35aee7f0826d38c8c2d01ee2a2bf49519
 # https://gitlab.com/craigbarnes/dte/-/commit/e7e8c48aa8d979006463ba0ee5b98171b56090ae
-detect_cflags_for_var NO_UNWIND_TABLES '-fno-asynchronous-unwind-tables'
+detect_cflags_for_var CC_NO_UNWIND_TABLES '-fno-asynchronous-unwind-tables'
 
 # https://gcc.gnu.org/onlinedocs/cpp/Invocation.html#index-MD
 # https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-MD
 if cc_option -MMD -MP -MF /dev/null; then
-    echo 'DEPFLAGS = -MMD -MP -MF $(@:.o=.mk)'
+    echo 'CC_DEPFLAGS = -MMD -MP -MF $(@:.o=.mk)'
 elif cc-option -MD -MF /dev/null; then
-    echo 'DEPFLAGS = -MD -MF $(@:.o=.mk)'
+    echo 'CC_DEPFLAGS = -MD -MF $(@:.o=.mk)'
 else
-    echo 'DEPFLAGS =' # Avoid inheriting from environment variable
+    echo 'CC_DEPFLAGS =' # Avoid inheriting from environment variable
 fi
 
 TARGET="$($CC $CFLAGS -dumpmachine)"

@@ -106,7 +106,7 @@ else
 endif
 
 ifeq "$(DEBUG)" "0"
-  BASIC_CFLAGS += $(NO_UNWIND_TABLES)
+  BASIC_CFLAGS += $(CC_NO_UNWIND_TABLES)
 else
   BASIC_CPPFLAGS += -DDEBUG=$(DEBUG)
 endif
@@ -171,11 +171,11 @@ $(dte) $(test) $(bench): build/gen/all.ldflags
 
 $(editor_objects): build/%.o: src/%.c build/gen/all.cflags | build/
 	$(E) CC $@
-	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
+	$(Q) $(CC) $(CFLAGS_ALL) $(CC_DEPFLAGS) -c -o $@ $<
 
 $(test_objects) $(bench_objects): build/test/%.o: test/%.c build/gen/all.cflags | build/test/
 	$(E) CC $@
-	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
+	$(Q) $(CC) $(CFLAGS_ALL) $(CC_DEPFLAGS) -c -o $@ $<
 
 build/gen/all.ldflags: FORCE | build/gen/
 	@$(OPTCHECK) '$(CC) $(LDFLAGS_ALL) $(LDLIBS)' $@
