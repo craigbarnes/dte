@@ -124,6 +124,7 @@ ifeq "" "$(filter-out install%,$(or $(MAKECMDGOALS),all))"
   OPTCHECK += -R
 endif
 
+# See: mk/README.md
 ifndef NO_DEPS
   -include $(patsubst %.o, %.mk, $(all_objects))
 endif
@@ -218,10 +219,12 @@ build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 	$(E) GEN $@
 	$(Q) cat $^ > $@
 
+# See: mk/README.md
 build/gen/platform.mk: mk/platform.sh mk/nproc.sh | build/gen/
 	$(E) GEN $@
 	$(Q) mk/platform.sh >$@ 2>$(@:.mk=.log)
 
+# See: mk/README.md
 build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
 	$(E) GEN $@
 	$(Q) mk/compiler.sh '$(CC)' '$(CFLAGS_FILTERED)' >$@ 2>$(@:.mk=.log) || (cat $(@:.mk=.log) >&2; exit 1)
