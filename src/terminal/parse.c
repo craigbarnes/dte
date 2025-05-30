@@ -22,7 +22,7 @@ typedef enum {
     BYTE_FINAL_PRIVATE, // 0x70..0x7E
     BYTE_DELETE,        // 0x7F
     BYTE_OTHER,         // 0x80..0xFF
-} ByteType;
+} Ecma48ByteType;
 
 // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#legacy-functional-keys
 static KeyCode decode_key_from_final_byte(uint8_t byte)
@@ -257,7 +257,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     return i;
 }
 
-static ByteType get_byte_type(unsigned char byte)
+static Ecma48ByteType get_byte_type(unsigned char byte)
 {
     enum {
         C = BYTE_CONTROL,
@@ -276,12 +276,10 @@ static ByteType get_byte_type(unsigned char byte)
     };
 
     // ... with the exception of byte 127 (DEL), which falls into rows[7]
-    // but isn't a final byte like the others in that row:
-    if (unlikely(byte == 127)) {
-        return BYTE_DELETE;
-    }
-
-    return rows[(byte >> 4) & 0xF];
+    // but isn't a private final byte like the others in that row:
+    static_assert(BYTE_FINAL_PRIVATE + 1 == BYTE_DELETE);
+    unsigned int del_offset = (byte == 127);
+    return rows[byte >> 4] + del_offset;
 }
 
 #define UNHANDLED(var, ...) unhandled(var, __LINE__, __VA_ARGS__)
