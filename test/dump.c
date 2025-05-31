@@ -13,24 +13,41 @@
 #include "syntax/color.h"
 #include "util/str-util.h"
 
+typedef enum {
+    CHECK_NAME = 1u << 0, // Non-blank lines must begin with `name`
+    CHECK_PARSE = 1u << 1, // Non-blank lines must be parseable by parse_commands()
+    ALLOW_EMPTY = 1u << 2, // Dumped string may be empty
+} DumpCheckFlags;
+
 static const struct {
     const char name[9];
-    bool check_name;
+    uint8_t flags; // DumpCheckFlags
 } handlers[] = {
-    {"alias", true},
-    {"bind", true},
-    {"buffer", false},
-    {"cursor", true},
-    {"def-mode", true},
-    {"errorfmt", true},
-    {"ft", true},
-    {"hi", true},
-    {"include", false},
-    {"macro", false},
-    {"open", false},
-    {"option", false},
-    {"set", true},
-    {"wsplit", false},
+    {"alias", CHECK_NAME | CHECK_PARSE},
+    {"bind", CHECK_NAME | CHECK_PARSE},
+    {"buffer", 0},
+    {"builtin", 0}, // Same as `include`
+    {"color", CHECK_PARSE}, // Same as `hi`
+    {"command", ALLOW_EMPTY},
+    {"cursor", CHECK_NAME | CHECK_PARSE},
+    {"def-mode", CHECK_NAME | CHECK_PARSE},
+    {"env", 0}, // Similar to `setenv`
+    {"errorfmt", CHECK_NAME | CHECK_PARSE},
+    {"ft", CHECK_NAME | CHECK_PARSE},
+    {"hi", CHECK_NAME | CHECK_PARSE},
+    {"include", 0},
+    {"macro", 0},
+    {"msg", ALLOW_EMPTY},
+    {"msgA", ALLOW_EMPTY},
+    {"msgB", ALLOW_EMPTY},
+    {"msgC", ALLOW_EMPTY},
+    {"open", 0},
+    {"option", CHECK_PARSE},
+    {"search", ALLOW_EMPTY},
+    {"set", CHECK_NAME | CHECK_PARSE},
+    {"setenv", CHECK_NAME | CHECK_PARSE},
+    // {"tag", 0}, // Depends on filesystem state not controlled by the test runner
+    {"wsplit", 0},
 };
 
 static void test_dump_handlers(TestContext *ctx)
@@ -44,30 +61,48 @@ static void test_dump_handlers(TestContext *ctx)
     const CommandSet *cmds = runner.cmds;
     ASSERT_NONNULL(cmds);
     ASSERT_NONNULL(cmds->lookup);
+    clear_all_messages(e); // Clear messages for previous `tag` tests
 
     for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
-        const char *name = handlers[i].name;
-        const ShowHandler *handler = lookup_show_handler(name);
-        ASSERT_NONNULL(handler);
-        ASSERT_NONNULL(handler->dump);
-        String str = handler->dump(e);
+        bool check_parse = (handlers[i].flags & CHECK_PARSE);
+        bool check_name = (handlers[i].flags & CHECK_NAME);
+        bool allow_empty_str = (handlers[i].flags & ALLOW_EMPTY);
+        EXPECT_TRUE(!check_name || check_parse);
 
-        if (str.len == 0) {
-            // Returning an empty string is fine in general, but none of
-            // the handlers being tested here are expected to do so
-            TEST_FAIL("'show %s' handler returned an empty String", name);
-        } else {
-            test_pass(ctx);
-            // The last line of generated text must end with a newline
-            // (see comment in get_delim_str())
-            ASSERT_EQ(str.buffer[str.len - 1], '\n');
+        const char *name = handlers[i].name;
+        DumpFunc dump = get_dump_function(name);
+        EXPECT_NONNULL(dump);
+        if (!dump) {
+            continue;
         }
 
-        for (size_t pos = 0, len = str.len; pos < len; ) {
-            bool check_parse = !!(handler->flags & SHOW_DTERC);
-            bool check_name = handlers[i].check_name;
-            EXPECT_TRUE(!check_name || check_parse);
+        String str = dump(e);
+        if (str.len == 0) {
+            if (!allow_empty_str) {
+                TEST_FAIL("'show %s' handler returned an empty String", name);
+            } else {
+                test_pass(ctx);
+            }
+            EXPECT_EQ(str.alloc, 0);
+            EXPECT_NULL(str.buffer);
+            string_free(&str);
+            continue;
+        }
 
+        if (allow_empty_str) {
+            TEST_FAIL (
+                "ALLOW_EMPTY flag set for '%s', but dump() produced:  %s",
+                name, string_borrow_cstring(&str)
+            );
+        } else {
+            test_pass(ctx);
+        }
+
+        // The last line of generated text must end with a newline
+        // (see comment in get_delim_str())
+        ASSERT_EQ(str.buffer[str.len - 1], '\n');
+
+        for (size_t pos = 0, len = str.len; pos < len; ) {
             const char *line = buf_next_line(str.buffer, &pos, len);
             ASSERT_NONNULL(line);
             if (line[0] == '\0' || line[0] == '#' || !check_parse) {

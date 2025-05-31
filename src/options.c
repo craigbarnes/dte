@@ -461,6 +461,7 @@ static const struct {
 };
 
 static const char *const bool_enum[] = {"false", "true", NULL};
+static const char *const msg_enum[] = {"A", "B", "C", NULL};
 static const char *const newline_enum[] = {"unix", "dos", NULL};
 static const char *const tristate_enum[] = {"false", "true", "auto", NULL};
 static const char *const save_unmodified_enum[] = {"none", "touch", "full", NULL};
@@ -501,6 +502,8 @@ static const OptionDesc option_desc[] = {
     REGEX_OPT("indent-regex", L(indent_regex), NULL),
     UINT_OPT("indent-width", C(indent_width), 1, INDENT_WIDTH_MAX, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),
+    ENUM_OPT("msg-compile", G(msg_compile), msg_enum, NULL),
+    ENUM_OPT("msg-tag", G(msg_tag), msg_enum, NULL),
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
     BOOL_OPT("optimize-true-color", G(optimize_true_color), redraw_screen),
     BOOL_OPT("overwrite", C(overwrite), overwrite_changed),

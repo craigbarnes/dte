@@ -98,6 +98,10 @@ bind M-S-f 'search -swr'
 bind M-j wrap-paragraph
 bind M-n 'msg -n'
 bind M-p 'msg -p'
+bind M-C-n 'msg -Bn'
+bind M-C-p 'msg -Bp'
+bind M-S-n 'msg -Cn'
+bind M-S-p 'msg -Cp'
 bind M-t 'insert -m "\t"'
 bind M-x command
 bind M-z suspend

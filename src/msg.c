@@ -99,13 +99,14 @@ void clear_messages(MessageArray *msgs)
 
 String dump_messages(const MessageArray *messages)
 {
-    String buf = string_new(4096);
+    size_t count = messages->array.count;
     char cwd[8192];
-    if (unlikely(!getcwd(cwd, sizeof cwd))) {
-        return buf;
+    if (unlikely(!getcwd(cwd, sizeof cwd)) || count == 0) {
+        return string_new(0);
     }
 
-    for (size_t i = 0, n = messages->array.count; i < n; i++) {
+    String buf = string_new(4096);
+    for (size_t i = 0; i < count; i++) {
         char *ptr = string_reserve_space(&buf, DECIMAL_STR_MAX(i));
         buf.len += buf_umax_to_str(i + 1, ptr);
         string_append_literal(&buf, ": ");

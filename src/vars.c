@@ -85,10 +85,14 @@ static char *expand_lineno(const EditorState *e)
     return e->view ? xstrdup(umax_to_str(e->view->cy + 1)) : NULL;
 }
 
-static char *expand_msgpos(const EditorState *e)
+static char *msgpos(const EditorState *e, size_t idx)
 {
-    return xstrdup(umax_to_str(e->messages.pos + 1));
+    return xstrdup(umax_to_str(e->messages[idx].pos + 1));
 }
+
+static char *expand_msgpos_a(const EditorState *e) {return msgpos(e, 0);}
+static char *expand_msgpos_b(const EditorState *e) {return msgpos(e, 1);}
+static char *expand_msgpos_c(const EditorState *e) {return msgpos(e, 2);}
 
 static char *expand_word(const EditorState *e)
 {
@@ -120,7 +124,10 @@ static const BuiltinVar normal_vars[] = {
     {"FILEDIR", expand_file_dir},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
-    {"MSGPOS", expand_msgpos},
+    {"MSGPOS", expand_msgpos_a},
+    {"MSGPOS_A", expand_msgpos_a},
+    {"MSGPOS_B", expand_msgpos_b},
+    {"MSGPOS_C", expand_msgpos_c},
     {"RFILE", expand_rfile},
     {"RFILEDIR", expand_rfiledir},
     {"WORD", expand_word},

@@ -108,7 +108,7 @@ typedef struct EditorState {
     PointerArray filetypes;
     PointerArray file_options;
     PointerArray bookmarks;
-    MessageArray messages;
+    MessageArray messages[3];
     FileHistory file_history;
     History search_history;
     History command_history;
@@ -163,6 +163,7 @@ static inline CommandRunner normal_mode_cmdrunner(EditorState *e)
 
 EditorState *init_editor_state(EditorFlags flags) RETURNS_NONNULL;
 void free_editor_state(EditorState *e) NONNULL_ARGS;
+void clear_all_messages(EditorState *e) NONNULL_ARGS;
 void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
 int main_loop(EditorState *e) NONNULL_ARGS;
 void ui_first_start(EditorState *e, unsigned int terminal_query_level) NONNULL_ARGS;

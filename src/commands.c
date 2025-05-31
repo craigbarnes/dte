@@ -438,7 +438,9 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
         .quiet = quiet,
     };
 
-    MessageArray *messages = &e->messages;
+    char abc = cmdargs_pick_winning_flag(a, "ABC");
+    size_t idx = abc ? abc - 'A' : e->options.msg_compile;
+    MessageArray *messages = &e->messages[idx];
     clear_messages(messages);
 
     yield_terminal(e, quiet);
@@ -1134,14 +1136,17 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
 static bool cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
-    if (str && a->nr_flags) {
+    CommandFlagSet npflags = cmdargs_flagset_from_str("npNP");
+    if (str && (a->flag_set & npflags)) {
         return error_msg (
             &e->err,
             "flags [-n|-p|-N|-P] can't be used with [number] argument"
         );
     }
 
-    MessageArray *msgs = &e->messages;
+    char abc = cmdargs_pick_winning_flag(a, "ABC");
+    size_t idx = abc ? abc - 'A' : 0;
+    MessageArray *msgs = &e->messages[idx];
     size_t count = msgs->array.count;
     if (count == 0) {
         return true;
@@ -2290,7 +2295,9 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
         }
     }
 
-    MessageArray *msgs = &e->messages;
+    char abc = cmdargs_pick_winning_flag(a, "ABC");
+    size_t idx = abc ? abc - 'A' : e->options.msg_tag;
+    MessageArray *msgs = &e->messages[idx];
     clear_messages(msgs);
     if (!load_tag_file(&e->tagfile, &e->err)) {
         return false;
@@ -2625,7 +2632,7 @@ static const Command cmds[] = {
     {"clear", "Ii", NA, 0, 0, cmd_clear},
     {"close", "fpqw", NA, 0, 0, cmd_close},
     {"command", "", NFAA, 0, 1, cmd_command},
-    {"compile", "1ps", NFAA, 2, -1, cmd_compile},
+    {"compile", "1ABCps", NFAA, 2, -1, cmd_compile},
     {"copy", "bikp", NA, 0, 1, cmd_copy},
     {"cursor", "", RC, 0, 3, cmd_cursor},
     {"cut", "", NA, 0, 0, cmd_cut},
@@ -2654,7 +2661,7 @@ static const Command cmds[] = {
     {"match-bracket", "cl", NA, 0, 0, cmd_match_bracket},
     {"mode", "", RC, 1, 1, cmd_mode},
     {"move-tab", "", NA, 1, 1, cmd_move_tab},
-    {"msg", "NPnp", NA, 0, 1, cmd_msg},
+    {"msg", "ABCNPnp", NA, 0, 1, cmd_msg},
     {"new-line", "Iai", NA, 0, 0, cmd_new_line},
     {"next", "", NA, 0, 0, cmd_next},
     {"open", "e=gt", NA, 0, -1, cmd_open},
@@ -2683,7 +2690,7 @@ static const Command cmds[] = {
     {"shift", "", NA, 1, 1, cmd_shift},
     {"show", "c", NA, 0, 2, cmd_show},
     {"suspend", "", NA, 0, 0, cmd_suspend},
-    {"tag", "r", NA, 0, -1, cmd_tag},
+    {"tag", "ABCr", NA, 0, -1, cmd_tag},
     {"title", "", NA, 1, 1, cmd_title},
     {"toggle", "gv", NA, 1, -1, cmd_toggle},
     {"undo", "m", NA, 0, 0, cmd_undo},

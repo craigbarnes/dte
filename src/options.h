@@ -81,6 +81,8 @@ typedef struct {
     unsigned int crlf_newlines; // Default value for new files
     unsigned int case_sensitive_search; // SearchCaseSensitivity
     unsigned int window_separator; // WindowSeparatorType
+    unsigned int msg_compile; // Default EditorState::messages[] index for `compile`
+    unsigned int msg_tag; // Default EditorState::messages[] index for `tag`
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;

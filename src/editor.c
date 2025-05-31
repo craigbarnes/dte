@@ -118,6 +118,8 @@ EditorState *init_editor_state(EditorFlags flags)
             .tab_bar = true,
             .utf8_bom = false,
             .window_separator = WINSEP_BAR,
+            .msg_compile = 0,
+            .msg_tag = 0,
         }
     };
 
@@ -185,6 +187,13 @@ static void free_mode_handler(ModeHandler *handler)
     free(handler);
 }
 
+void clear_all_messages(EditorState *e)
+{
+    for (size_t i = 0; i < ARRAYLEN(e->messages); i++) {
+        clear_messages(&e->messages[i]);
+    }
+}
+
 void free_editor_state(EditorState *e)
 {
     free(e->clipboard.buf);
@@ -195,8 +204,8 @@ void free_editor_state(EditorState *e)
     history_free(&e->command_history);
     history_free(&e->search_history);
     search_free_regexp(&e->search);
+    clear_all_messages(e);
     cmdline_free(&e->cmdline);
-    clear_messages(&e->messages);
     free_macro(&e->macro);
     tag_file_free(&e->tagfile);
     free_buffers(&e->buffers, &e->err, &e->locks_ctx);

@@ -45,11 +45,17 @@ static const struct {
     [EXEC_EVAL] = {"eval", OUT},
     [EXEC_LINE] = {"line", IN},
     [EXEC_MSG] = {"msg", IN | OUT},
+    [EXEC_MSG_A] = {"msgA", IN | OUT},
+    [EXEC_MSG_B] = {"msgB", IN | OUT},
+    [EXEC_MSG_C] = {"msgC", IN | OUT},
     [EXEC_NULL] = {"null", ALL},
     [EXEC_OPEN] = {"open", IN | OUT},
     [EXEC_OPEN_REL] = {"open-rel", IN},
     [EXEC_SEARCH] = {"search", IN},
     [EXEC_TAG] = {"tag", OUT},
+    [EXEC_TAG_A] = {"tagA", OUT},
+    [EXEC_TAG_B] = {"tagB", OUT},
+    [EXEC_TAG_C] = {"tagC", OUT},
     [EXEC_TTY] = {"tty", ALL},
     [EXEC_WORD] = {"word", IN},
 };
@@ -104,16 +110,19 @@ static void open_files_from_string(EditorState *e, const String *str)
     ptr_array_free_array(&filenames);
 }
 
-static void parse_and_activate_message(EditorState *e, const String *str)
+static void parse_and_activate_message(EditorState *e, const String *str, ExecAction action)
 {
     if (unlikely(str->len == 0)) {
         error_msg(&e->err, "child produced no output");
         return;
     }
 
-    MessageArray *msgs = &e->messages;
+    size_t msgs_idx = (action == EXEC_MSG) ? 0 : action - EXEC_MSG_A;
+    BUG_ON(msgs_idx >= ARRAYLEN(e->messages));
+    MessageArray *msgs = &e->messages[msgs_idx];
     size_t count = msgs->array.count;
     size_t x;
+
     if (!count || !buf_parse_size(str->buffer, str->len, &x) || !x) {
         return;
     }
@@ -122,7 +131,7 @@ static void parse_and_activate_message(EditorState *e, const String *str)
     activate_current_message(msgs, e->window);
 }
 
-static void parse_and_activate_tags(EditorState *e, const String *str)
+static void parse_and_activate_tags(EditorState *e, const String *str, ExecAction action)
 {
     ErrorBuffer *ebuf = &e->err;
     if (unlikely(str->len == 0)) {
@@ -140,7 +149,10 @@ static void parse_and_activate_tags(EditorState *e, const String *str)
     const char *buffer_filename = e->buffer->abs_filename;
     TagFile *tf = &e->tagfile;
     enum {NOT_LOADED, LOADED, FAILED} tf_status = NOT_LOADED;
-    MessageArray *msgs = &e->messages;
+
+    size_t msgs_idx = (action == EXEC_TAG) ? e->options.msg_tag : action - EXEC_TAG_A;
+    BUG_ON(msgs_idx >= ARRAYLEN(e->messages));
+    MessageArray *msgs = &e->messages[msgs_idx];
     clear_messages(msgs);
 
     for (size_t pos = 0, len = str->len; pos < len; ) {
@@ -284,7 +296,8 @@ ssize_t handle_exec (
         },
     };
 
-    switch (actions[STDIN_FILENO]) {
+    ExecAction in_action = actions[STDIN_FILENO];
+    switch (in_action) {
     case EXEC_LINE:
         input_from_buffer = true;
         if (!view->selection) {
@@ -325,8 +338,13 @@ ssize_t handle_exec (
             replace_unselected_input = true;
         }
         break;
-    case EXEC_MSG: {
-        String messages = dump_messages(&e->messages);
+    case EXEC_MSG:
+    case EXEC_MSG_A:
+    case EXEC_MSG_B:
+    case EXEC_MSG_C: {
+        size_t msgs_idx = (in_action == EXEC_MSG) ? 0 : in_action - EXEC_MSG_A;
+        BUG_ON(msgs_idx >= ARRAYLEN(e->messages));
+        String messages = dump_messages(&e->messages[msgs_idx]);
         ctx.input = strview_from_string(&messages);
         alloc = messages.buffer;
         break;
@@ -361,6 +379,9 @@ ssize_t handle_exec (
     // These can't be used as input actions and should be prevented by
     // the validity checks in cmd_exec():
     case EXEC_TAG:
+    case EXEC_TAG_A:
+    case EXEC_TAG_B:
+    case EXEC_TAG_C:
     case EXEC_ECHO:
     case EXEC_EVAL:
     case EXEC_ERRMSG:
@@ -423,7 +444,8 @@ ssize_t handle_exec (
         mark_all_lines_changed(view->buffer);
     }
 
-    switch (actions[STDOUT_FILENO]) {
+    ExecAction out_action = actions[STDOUT_FILENO];
+    switch (out_action) {
     case EXEC_BUFFER:
         if (view->selection) {
             insert_to_selection(view, output, &info);
@@ -440,13 +462,19 @@ ssize_t handle_exec (
         }
         break;
     case EXEC_MSG:
-        parse_and_activate_message(e, output);
+    case EXEC_MSG_A:
+    case EXEC_MSG_B:
+    case EXEC_MSG_C:
+        parse_and_activate_message(e, output, out_action);
         break;
     case EXEC_OPEN:
         open_files_from_string(e, output);
         break;
     case EXEC_TAG:
-        parse_and_activate_tags(e, output);
+    case EXEC_TAG_A:
+    case EXEC_TAG_B:
+    case EXEC_TAG_C:
+        parse_and_activate_tags(e, output, out_action);
         break;
     case EXEC_EVAL:
         exec_normal_config(e, strview_from_string(output));

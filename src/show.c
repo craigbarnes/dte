@@ -40,13 +40,31 @@
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 extern char **environ;
 
+typedef enum {
+    SHOW_BOF, // Leave cursor at beginning of file
+    SHOW_LASTLINE, // Move cursor to last line
+    SHOW_MSG_A, // Move cursor to line corresponding to `e->messages[0].pos`
+    SHOW_MSG_B, // As above, but s/0/1/
+    SHOW_MSG_C, // As above, but s/0/2/
+} CursorPositionType;
+
+typedef struct {
+    const char name[10];
+    bool use_dte_filetype;
+    uint8_t initial_cursor_pos; // CursorPositionType
+    DumpFunc dump;
+    bool (*show)(EditorState *e, const char *name, bool cmdline);
+    void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
+} ShowHandler;
+
 static void open_temporary_buffer (
     EditorState *e,
     const char *text,
     size_t text_len,
     const char *cmd,
     const char *cmd_arg,
-    ShowHandlerFlags flags
+    CursorPositionType cursor_pos,
+    bool use_dte_filetype
 ) {
     const char *sp = cmd_arg[0] ? " " : "";
     View *view = window_open_new_file(e->window);
@@ -54,7 +72,7 @@ static void open_temporary_buffer (
     buffer_set_display_filename(buffer, xasprintf("(%s%s%s)", cmd, sp, cmd_arg));
     buffer->temporary = true;
 
-    if (flags & SHOW_DTERC) {
+    if (use_dte_filetype) {
         buffer->options.filetype = str_intern("dte");
         set_file_options(e, buffer);
         buffer_update_syntax(e, buffer);
@@ -74,11 +92,16 @@ static void open_temporary_buffer (
     }
     do_insert(view, text, text_len);
 
-    if (flags & SHOW_LASTLINE) {
+    if (cursor_pos == SHOW_LASTLINE) {
         block_iter_eof(&view->cursor);
         block_iter_prev_line(&view->cursor);
-    } else if ((flags & SHOW_MSGLINE) && e->messages.array.count > 0) {
-        block_iter_goto_line(&view->cursor, e->messages.pos);
+    } else if (cursor_pos >= SHOW_MSG_A && cursor_pos <= SHOW_MSG_C) {
+        size_t idx = cursor_pos - SHOW_MSG_A;
+        BUG_ON(idx >= ARRAYLEN(e->messages));
+        const MessageArray *msgs = &e->messages[idx];
+        if (msgs->array.count > 0) {
+            block_iter_goto_line(&view->cursor, msgs->pos);
+        }
     }
 }
 
@@ -235,7 +258,7 @@ static bool show_builtin(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, sv.data, sv.length);
     } else {
-        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, SHOW_DTERC);
+        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, SHOW_BOF, true);
     }
 
     return true;
@@ -253,7 +276,7 @@ static bool show_compiler(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, SHOW_DTERC);
+        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, SHOW_BOF, true);
     }
 
     string_free(&str);
@@ -508,7 +531,9 @@ static String do_dump_options(EditorState *e) {return dump_options(&e->options, 
 static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e)) {return dump_builtin_configs();}
 static String do_dump_hl_styles(EditorState *e) {return dump_hl_styles(&e->styles);}
 static String do_dump_filetypes(EditorState *e) {return dump_filetypes(&e->filetypes);}
-static String do_dump_messages(EditorState *e) {return dump_messages(&e->messages);}
+static String do_dump_messages_a(EditorState *e) {return dump_messages(&e->messages[0]);}
+static String do_dump_messages_b(EditorState *e) {return dump_messages(&e->messages[1]);}
+static String do_dump_messages_c(EditorState *e) {return dump_messages(&e->messages[2]);}
 static String do_dump_macro(EditorState *e) {return dump_macro(&e->macro);}
 static String do_dump_buffer(EditorState *e) {return dump_buffer(e->view);}
 static String do_dump_tags(EditorState *e) {return dump_tags(&e->tagfile, &e->err);}
@@ -516,45 +541,48 @@ static String dump_command_history(EditorState *e) {return history_dump(&e->comm
 static String dump_search_history(EditorState *e) {return history_dump(&e->search_history);}
 static String dump_file_history(EditorState *e) {return file_history_dump(&e->file_history);}
 
-// Shorter aliases for ShowHandlerFlags
-enum {
-    DTERC = SHOW_DTERC,
-    LASTLINE = SHOW_LASTLINE,
-    MSGLINE = SHOW_MSGLINE,
-};
-
 static const ShowHandler show_handlers[] = {
-    {"alias", DTERC, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
-    {"bind", DTERC, dump_all_bindings, show_binding, collect_bound_normal_keys},
-    {"buffer", 0, do_dump_buffer, NULL, NULL},
-    {"builtin", 0, do_dump_builtin_configs, show_builtin, do_collect_builtin_configs},
-    {"color", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
-    {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
-    {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
-    {"def-mode", DTERC, dump_modes, NULL, NULL},
-    {"env", 0, dump_env, show_env, collect_env},
-    {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
-    {"ft", DTERC, do_dump_filetypes, NULL, NULL},
-    {"hi", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
-    {"include", 0, do_dump_builtin_configs, show_builtin, do_collect_builtin_includes},
-    {"macro", DTERC, do_dump_macro, NULL, NULL},
-    {"msg", MSGLINE, do_dump_messages, NULL, NULL},
-    {"open", LASTLINE, dump_file_history, NULL, NULL},
-    {"option", DTERC, dump_options_and_fileopts, show_option, collect_all_options},
-    {"search", LASTLINE, dump_search_history, NULL, NULL},
-    {"set", DTERC, do_dump_options, show_option, collect_all_options},
-    {"setenv", DTERC, dump_setenv, show_env, collect_env},
-    {"tag", 0, do_dump_tags, NULL, NULL},
-    {"wsplit", 0, dump_frames, show_wsplit, NULL},
+    {"alias", true, SHOW_BOF, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
+    {"bind", true, SHOW_BOF, dump_all_bindings, show_binding, collect_bound_normal_keys},
+    {"buffer", false, SHOW_BOF, do_dump_buffer, NULL, NULL},
+    {"builtin", false, SHOW_BOF, do_dump_builtin_configs, show_builtin, do_collect_builtin_configs},
+    {"color", true, SHOW_BOF, do_dump_hl_styles, show_color, collect_hl_styles},
+    {"command", true, SHOW_LASTLINE, dump_command_history, NULL, NULL},
+    {"cursor", true, SHOW_BOF, dump_cursors, show_cursor, do_collect_cursor_modes},
+    {"def-mode", true, SHOW_BOF, dump_modes, NULL, NULL},
+    {"env", false, SHOW_BOF, dump_env, show_env, collect_env},
+    {"errorfmt", true, SHOW_BOF, dump_compilers, show_compiler, collect_compilers},
+    {"ft", true, SHOW_BOF, do_dump_filetypes, NULL, NULL},
+    {"hi", true, SHOW_BOF, do_dump_hl_styles, show_color, collect_hl_styles},
+    {"include", false, SHOW_BOF, do_dump_builtin_configs, show_builtin, do_collect_builtin_includes},
+    {"macro", true, SHOW_BOF, do_dump_macro, NULL, NULL},
+    {"msg", false, SHOW_MSG_A, do_dump_messages_a, NULL, NULL},
+    {"msgA", false, SHOW_MSG_A, do_dump_messages_a, NULL, NULL},
+    {"msgB", false, SHOW_MSG_B, do_dump_messages_b, NULL, NULL},
+    {"msgC", false, SHOW_MSG_C, do_dump_messages_c, NULL, NULL},
+    {"open", false, SHOW_LASTLINE, dump_file_history, NULL, NULL},
+    {"option", true, SHOW_BOF, dump_options_and_fileopts, show_option, collect_all_options},
+    {"search", false, SHOW_LASTLINE, dump_search_history, NULL, NULL},
+    {"set", true, SHOW_BOF, do_dump_options, show_option, collect_all_options},
+    {"setenv", true, SHOW_BOF, dump_setenv, show_env, collect_env},
+    {"tag", false, SHOW_BOF, do_dump_tags, NULL, NULL},
+    {"wsplit", false, SHOW_BOF, dump_frames, show_wsplit, NULL},
 };
 
-const ShowHandler *lookup_show_handler(const char *name)
+static const ShowHandler *lookup_show_handler(const char *name)
 {
     const ShowHandler *handler = BSEARCH(name, show_handlers, vstrcmp);
     return handler;
 }
 
+DumpFunc get_dump_function(const char *name)
+{
+    const ShowHandler *handler = lookup_show_handler(name);
+    return handler ? handler->dump : NULL;
+}
+
 UNITTEST {
+    static_assert(SHOW_BOF == 0);
     // NOLINTBEGIN(bugprone-assert-side-effect)
     CHECK_BSEARCH_ARRAY(show_handlers, name);
     BUG_ON(!lookup_show_handler("alias"));
@@ -563,12 +591,15 @@ UNITTEST {
     BUG_ON(lookup_show_handler("alia"));
     BUG_ON(lookup_show_handler("sete"));
     BUG_ON(lookup_show_handler(""));
+    BUG_ON(!get_dump_function("msg"));
+    BUG_ON(get_dump_function("_"));
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
 bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
-    ShowHandlerFlags showflags = 0;
+    CursorPositionType cpos = SHOW_BOF;
+    bool ftdte = false;
     String str = STRING_INIT;
 
     if (!type) {
@@ -596,10 +627,11 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag)
     }
 
     str = handler->dump(e);
-    showflags = handler->flags;
+    cpos = handler->initial_cursor_pos;
+    ftdte = handler->use_dte_filetype;
 
 open_buffer:
-    open_temporary_buffer(e, str.buffer, str.len, "show", type, showflags);
+    open_temporary_buffer(e, str.buffer, str.len, "show", type, cpos, ftdte);
     string_free(&str);
     return true;
 }

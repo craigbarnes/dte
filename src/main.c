@@ -552,7 +552,7 @@ int main(int argc, char *argv[])
     }
 
     if (nr_tags > 0 && load_tag_file(&e->tagfile, &e->err)) {
-        MessageArray *msgs = &e->messages;
+        MessageArray *msgs = &e->messages[e->options.msg_tag];
         clear_messages(msgs);
 
         for (size_t i = 0; i < nr_tags; i++) {
