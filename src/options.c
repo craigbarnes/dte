@@ -307,11 +307,9 @@ static void bool_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 
 static bool bool_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
-    if (streq(str, "true")) {
-        v->bool_val = true;
-        return true;
-    } else if (streq(str, "false")) {
-        v->bool_val = false;
+    bool t = streq(str, "true");
+    if (t || streq(str, "false")) {
+        v->bool_val = t;
         return true;
     }
     return error_msg(ebuf, "Invalid value for %s", d->name);
