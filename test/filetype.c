@@ -373,6 +373,7 @@ static void test_is_ft(TestContext *ctx)
     EXPECT_TRUE(is_ft(&a, "c"));
     EXPECT_TRUE(is_ft(&a, "d"));
     EXPECT_TRUE(is_ft(&a, "dte"));
+    EXPECT_TRUE(is_ft(&a, "hare"));
     EXPECT_TRUE(is_ft(&a, "java"));
     EXPECT_TRUE(is_ft(&a, "javascript"));
     EXPECT_TRUE(is_ft(&a, "lua"));

@@ -1,0 +1,74 @@
+syntax .hare-escape-sequence
+state hare-escape-sequence literal
+    char "\"0afrv'\\bnt" END literal
+    char "xuU" END literal
+    eat END
+
+#
+# Entry point
+#
+
+syntax hare
+state hare syntax
+    char -b "a-zA-Z" identifier
+    char -b "@" attribute
+    char -b "0-9" numeric
+    char "\'" rune
+    char "\"" string
+    char "`" rawstring
+    str "//" comment
+    eat this
+
+state identifier
+    char -b "a-zA-Z0-9_" this
+    inlist type hare
+    inlist keyword hare
+    noeat hare
+
+state attribute
+    char -b "a-z" this
+    inlist attribute hare
+    noeat hare
+
+state numeric literal
+    char -b "0-9" this
+    char -b "xob" this
+    char -b "iuz" this
+    noeat hare
+
+state string string
+    char "\\" .hare-escape-sequence:this
+    char "\"" hare string
+    eat this
+
+state rawstring string
+    char "`" hare string
+    eat this
+
+state rune string
+    char "\\" .hare-escape-sequence:this
+    char "\'" hare string
+    eat this
+
+state comment-ref code
+    str "]]" comment code
+    eat this
+
+state comment comment
+    char "\n" hare comment
+    str "[[" comment-ref
+    eat this
+
+list keyword \
+    abort align alloc append as assert bool break case const continue def \
+    defer delete done else enum export f32 f64 false fn for free i16 i32 \
+    i64 i8 if insert int is len let match never null nullable offset \
+    opaque return rune size static str struct switch true type u16 u32 \
+    u64 u8 uint uintptr union use vaarg vaend valist vastart void yield _
+
+list type \
+    bool done never opaque rune str valist void null i8 i16 i32 i64 u8 \
+    u16 u32 u64 int uint size uintptr f32 f64
+
+list attribute \
+    @fini @init @offset @packed @symbol @test @threadlocal

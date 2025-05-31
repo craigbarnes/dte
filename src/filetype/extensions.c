@@ -94,6 +94,7 @@ static const struct FileExtensionMap {
     {"grxml", XML},
     {"gsed", SED},
     {"gv", DOT},
+    {"ha", HARE},
     {"har", JSON},
     {"hcl", HCL},
     {"hh", CPLUSPLUS},
