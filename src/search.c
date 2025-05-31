@@ -23,10 +23,10 @@ static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
         regmatch_t match;
         StringView line = block_iter_get_line(bi);
 
-        // NOTE: If this is the first iteration then line.data contains
-        // partial line (text starting from the cursor position) and
-        // if match.rm_so is 0 then match is at beginning of the text
-        // which is same as the cursor position.
+        // NOTE: If this is the first iteration then `line.data` contains
+        // a partial line (text starting from the cursor position) and if
+        // `match.rm_so` is 0 then the match is at the beginning of the
+        // text, which is the same as the cursor position.
         if (regexp_exec(regex, line.data, line.length, 1, &match, flags)) {
             if (skip && match.rm_so == 0) {
                 // Ignore match at current cursor position
