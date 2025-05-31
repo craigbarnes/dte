@@ -2066,22 +2066,21 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static unsigned int count_npw_flags(const CommandArgs *a)
-{
-    const CommandFlagSet npw = cmdargs_flagset_from_str("npw");
-    return u64_popcount(a->flag_set & npw);
-}
-
 static bool cmd_search(EditorState *e, const CommandArgs *a)
 {
     const char *pattern = a->args[0];
-    if (count_npw_flags(a) + !!pattern > 1) {
-        return error_msg(&e->err, "flags [-n|-p|-w] and [pattern] argument are mutually exclusive");
+    char npflag = cmdargs_pick_winning_flag(a, "np");
+    bool use_word_under_cursor = has_flag(a, 'w');
+
+    if (!!npflag + use_word_under_cursor + !!pattern > 1) {
+        return error_msg (
+            &e->err,
+            "flags [-n|-p|-w] and [pattern] argument are mutually exclusive"
+        );
     }
 
     View *view = e->view;
     char pattbuf[4096];
-    bool use_word_under_cursor = has_flag(a, 'w');
 
     if (use_word_under_cursor) {
         StringView word = view_get_word_under_cursor(view);
@@ -2100,6 +2099,19 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         pattern = pattbuf;
     }
 
+    SearchState *search = &e->search;
+    search->reverse = has_flag(a, 'r');
+
+    if (!npflag && !pattern) {
+        push_input_mode(e, e->search_mode);
+        return true;
+    }
+
+    // TODO: Make [-c|-l] selection flags apply to search mode (as handled above)
+    // and/or add `[-c|-l]` flags to the search mode `accept` command and bind to
+    // Shift+Enter and Ctrl+Shift+Enter
+    handle_selection_flags(view, a);
+
     SearchCaseSensitivity cs = e->options.case_sensitive_search;
     switch (cmdargs_pick_winning_flag(a, "ais")) {
         case 'a': cs = CSS_AUTO; break;
@@ -2107,23 +2119,14 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         case 's': cs = CSS_TRUE; break;
     }
 
-    SearchState *search = &e->search;
-    unselect(view);
-
-    if (has_flag(a, 'n')) {
-        return search_next(view, search, cs);
-    }
-    if (has_flag(a, 'p')) {
-        return search_prev(view, search, cs);
+    switch (npflag) {
+        case 'n': return search_next(view, search, cs);
+        case 'p': return search_prev(view, search, cs);
     }
 
-    search->reverse = has_flag(a, 'r');
-    if (!pattern) {
-        push_input_mode(e, e->search_mode);
-        return true;
-    }
-
+    BUG_ON(!pattern);
     char *alloc = NULL;
+
     if (!use_word_under_cursor && has_flag(a, 'e')) {
         size_t len = strlen(pattern);
         if (strn_contains_ascii_char_type(pattern, len, ASCII_REGEX)) {
@@ -2682,7 +2685,7 @@ static const Command cmds[] = {
     {"scroll-pgdown", "chl", NA, 0, 0, cmd_scroll_pgdown},
     {"scroll-pgup", "chl", NA, 0, 0, cmd_scroll_pgup},
     {"scroll-up", "Mcl", NA, 0, 0, cmd_scroll_up},
-    {"search", "Haeinprswx", NA, 0, 1, cmd_search},
+    {"search", "Haceilnprswx", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
     {"set", "gl", RC, 1, -1, cmd_set},
@@ -2721,9 +2724,10 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         CommandArgs a = cmdargs_new(args_copy);
         bool ret = true;
         if (do_parse_args(cmd, &a) == ARGERR_NONE) {
-            if (a.nr_args + count_npw_flags(&a) == 0) {
-                // If command is "search" with no pattern argument and without
-                // flags -n, -p or -w, the command would put the editor into
+            CommandFlagSet npw = cmdargs_flagset_from_str("npw");
+            if (a.nr_args == 0 && !(a.flag_set & npw)) {
+                // If command is "search" with no [pattern] argument or
+                // [-n|-p|-w] flags, the command would put the editor into
                 // search mode, which shouldn't be recorded.
                 ret = false;
             }
