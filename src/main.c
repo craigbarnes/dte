@@ -281,6 +281,8 @@ static ExitCode init_logging(void)
         const char *flagstr = xgetenv("DTE_LOG_TRACE");
         if (!flagstr || !set_trace_logging_flags(flagstr)) {
             LOG_NOTICE("DTE_LOG_LEVEL=trace used with no effect; DTE_LOG_TRACE also needed");
+        } else {
+            LOG_INFO("DTE_LOG_TRACE=%s", flagstr);
         }
     }
 
