@@ -16,19 +16,6 @@ static const char trace_names[][8] = {
     "output",
 };
 
-// Example valid input: "command"
-static TraceLoggingFlags trace_flags_from_single_str(const char *name)
-{
-    for (size_t i = 0; i < ARRAYLEN(trace_names); i++) {
-        if (streq(name, trace_names[i])) {
-            return 1u << i;
-        }
-    }
-
-    LOG_WARNING("unrecognized trace flag: '%s'", name);
-    return 0;
-}
-
 // Example valid input: "command,status,input"
 static TraceLoggingFlags trace_flags_from_str(const char *flag_str)
 {
@@ -54,7 +41,12 @@ static TraceLoggingFlags trace_flags_from_str(const char *flag_str)
 
     for (size_t pos = 0, len = end - buf - 1; pos < len; ) {
         const char *piece = get_delim_str(buf, &pos, len, ',');
-        flags |= trace_flags_from_single_str(piece);
+        ssize_t idx = FIND_STR_IDX(piece, trace_names);
+        if (unlikely(idx < 0)) {
+            LOG_WARNING("unrecognized trace flag: '%s'", piece);
+            continue;
+        }
+        flags |= 1u << idx;
     }
 
     return flags;
