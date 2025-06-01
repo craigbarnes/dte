@@ -16,7 +16,7 @@ SHELLSCRIPTS = $(call GITATTRS, shell)
 SPACE_INDENTED_FILES = $(call GITATTRS, space-indent)
 MK_FILES = $(call GITATTRS, make)
 # TODO: Re-enable `wrap`, after diagnosing/fixing the extreme slowness
-SPATCHNAMES = arraylen minmax tailcall perf pitfalls staticbuf
+SPATCHNAMES = arraylen minmax tailcall perf pitfalls stat-mtime staticbuf
 SPATCHTARGETS = $(addprefix check-coccinelle-, $(SPATCHNAMES))
 
 check-all: check-source check-aux check distcheck check-clang-tidy

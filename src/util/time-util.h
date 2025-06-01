@@ -16,11 +16,13 @@
 
 static inline const struct timespec *get_stat_mtime(const struct stat *st)
 {
-#if defined(__APPLE__)
-    return &st->st_mtimespec;
-#else
-    // https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html#tag_13_61_03
+#if !defined(__APPLE__)
+    // https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html#tag_13_61_03:~:text=struct%20timespec%20st_mtim
     return &st->st_mtim;
+#else
+    // macOS doesn't conform to POSIX 2008 and uses its own, platform-specific
+    // naming for the `struct stat` timespec member
+    return &st->st_mtimespec;
 #endif
 }
 
