@@ -57,6 +57,7 @@ static inline void *xmemdup(const void *ptr, size_t size)
 }
 
 // Portable version of glibc/FreeBSD mempcpy(3)
+NONNULL_ARGS_AND_RETURN
 static inline void *xmempcpy(void *restrict dest, const void *restrict src, size_t n)
 {
     memcpy(dest, src, n);
