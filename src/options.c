@@ -350,7 +350,7 @@ static const char *enum_string(const OptionDesc *desc, OptionValue value)
 static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     // "0" is allowed for compatibility and is the same as ""
-    if (str[0] == '0' && str[1] == '\0') {
+    if (streq(str, "0")) {
         v->uint_val = 0;
         return true;
     }
