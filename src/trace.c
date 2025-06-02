@@ -17,39 +17,13 @@ static const char trace_names[][8] = {
 };
 
 // Example valid input: "command,status,input"
-static TraceLoggingFlags trace_flags_from_str(const char *flag_str)
+static TraceLoggingFlags trace_flags_from_str(const char *str)
 {
-    if (!flag_str || flag_str[0] == '\0') {
+    if (!str || str[0] == '\0') {
         return 0;
     }
-
-    if (streq(flag_str, "all")) {
-        return TRACEFLAGS_ALL;
-    }
-
-    // Copy flag_str into a mutable buffer, so that get_delim_str() can be
-    // used to split (and null-terminate) the comma-delimited substrings
-    char buf[128];
-    const char *end = memccpy(buf, flag_str, '\0', sizeof(buf));
-    if (!end) {
-        LOG_ERROR("trace flags string too long");
-        return 0;
-    }
-
-    BUG_ON(end <= buf);
-    TraceLoggingFlags flags = 0;
-
-    for (size_t pos = 0, len = end - buf - 1; pos < len; ) {
-        const char *piece = get_delim_str(buf, &pos, len, ',');
-        ssize_t idx = FIND_STR_IDX(piece, trace_names);
-        if (unlikely(idx < 0)) {
-            LOG_WARNING("unrecognized trace flag: '%s'", piece);
-            continue;
-        }
-        flags |= 1u << idx;
-    }
-
-    return flags;
+    bool all = streq(str, "all");
+    return all ? TRACEFLAGS_ALL : STR_TO_BITFLAGS(str, trace_names, true);
 }
 
 UNITTEST {

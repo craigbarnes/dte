@@ -44,6 +44,9 @@
 #define STR_TO_ENUM(str, a, nfval) \
     STR_TO_ENUM_WITH_OFFSET(str, a, nfval, 0)
 
+#define STR_TO_BITFLAGS(str, a, tolerate_errors) \
+    str_to_bitflags(str, a[0], ARRAYLEN(a), sizeof(a[0]), tolerate_errors)
+
 #define FIND_STR_IDX(str, a) \
     find_str_idx(str, (char*)a, ARRAYLEN(a), sizeof(a[0]), streq)
 
@@ -122,5 +125,7 @@ static inline void check_array (
         }
     }
 }
+
+unsigned int str_to_bitflags(const char *str, const char *base, size_t nstrs, size_t size, bool tolerate_errors);
 
 #endif

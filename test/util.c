@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "test.h"
 #include "util/arith.h"
+#include "util/array.h"
 #include "util/ascii.h"
 #include "util/base64.h"
 #include "util/bit.h"
@@ -3629,6 +3630,14 @@ static void test_xmemrchr(TestContext *ctx)
     EXPECT_PTREQ(xmemrchr(str, 'z', sizeof(str) - 1), NULL);
 }
 
+static void test_str_to_bitflags(TestContext *ctx)
+{
+    static const char strs[][8] = {"zero", "one", "two", "three"};
+    EXPECT_UINT_EQ(STR_TO_BITFLAGS("one,three", strs, true), 1 << 1 | 1 << 3);
+    EXPECT_UINT_EQ(STR_TO_BITFLAGS("two,invalid,zero", strs, true), 1 << 2 | 1 << 0);
+    EXPECT_UINT_EQ(STR_TO_BITFLAGS("two,invalid,zero", strs, false), 0);
+}
+
 static void test_log_level_from_str(TestContext *ctx)
 {
     EXPECT_EQ(log_level_from_str("none"), LOG_LEVEL_NONE);
@@ -3825,6 +3834,7 @@ static const TestEntry tests[] = {
     TEST(test_fork_exec),
     TEST(test_xmemmem),
     TEST(test_xmemrchr),
+    TEST(test_str_to_bitflags),
     TEST(test_log_level_from_str),
     TEST(test_log_level_to_str),
     TEST(test_timespec_subtract),
