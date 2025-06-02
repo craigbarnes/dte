@@ -26,6 +26,7 @@
 #include "util/progname.h"
 #include "util/ptr-array.h"
 #include "util/readfile.h"
+#include "util/str-array.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/string.h"
@@ -1005,6 +1006,43 @@ static void test_strn_replace_byte(TestContext *ctx)
     char str[] = /* ........... */ "..a.b.c..\n\0\0.d.e.f...\0g.h..\0\0";
     strn_replace_byte(str, sizeof(str), '.', '|');
     EXPECT_MEMEQ(str, sizeof(str), expected, sizeof(expected));
+}
+
+static void test_string_array_concat(TestContext *ctx)
+{
+    static const char *const strs[] = {"A", "B", "CC", "D", "EE"};
+    char buf[64] = "\0";
+    size_t nstrs = ARRAYLEN(strs);
+
+    const char *delim = ",";
+    const char *str = "A,B,CC,D,EE";
+    size_t delim_len = strlen(delim);
+    size_t n = strlen(str);
+    ASSERT_TRUE(n + 1 < sizeof(buf));
+    memset(buf, '@', sizeof(buf) - 1);
+    EXPECT_FALSE(string_array_concat_(buf, n, strs, nstrs, delim, delim_len));
+    memset(buf, '@', sizeof(buf) - 1);
+    EXPECT_TRUE(string_array_concat_(buf, n + 1, strs, nstrs, delim, delim_len));
+    EXPECT_STREQ(buf, str);
+
+    delim = " ... ";
+    delim_len = strlen(delim);
+    str = "A ... B ... CC ... D ... EE";
+    n = strlen(str);
+    ASSERT_TRUE(n + 1 < sizeof(buf));
+    memset(buf, '@', sizeof(buf) - 1);
+    EXPECT_FALSE(string_array_concat_(buf, n, strs, nstrs, delim, delim_len));
+    memset(buf, '@', sizeof(buf) - 1);
+    EXPECT_TRUE(string_array_concat_(buf, n + 1, strs, nstrs, delim, delim_len));
+    EXPECT_STREQ(buf, str);
+
+    for (size_t i = 0; i < n; i++) {
+        EXPECT_FALSE(string_array_concat_(buf, n - i, strs, nstrs, delim, delim_len));
+    }
+
+    memset(buf, '@', sizeof(buf) - 1);
+    EXPECT_TRUE(string_array_concat_(buf, sizeof(buf), strs, 0, delim, delim_len));
+    EXPECT_STREQ(buf, "");
 }
 
 static void test_size_str_width(TestContext *ctx)
@@ -3706,6 +3744,7 @@ static const TestEntry tests[] = {
     TEST(test_get_delim_str),
     TEST(test_str_replace_byte),
     TEST(test_strn_replace_byte),
+    TEST(test_string_array_concat),
     TEST(test_size_str_width),
     TEST(test_buf_parse_uintmax),
     TEST(test_buf_parse_ulong),

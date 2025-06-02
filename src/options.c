@@ -312,7 +312,7 @@ static bool bool_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
         v->bool_val = t;
         return true;
     }
-    return error_msg(ebuf, "Invalid value for %s", d->name);
+    return error_msg(ebuf, "Invalid value for %s; expected: true, false", d->name);
 }
 
 static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
@@ -329,21 +329,17 @@ static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue 
 static bool enum_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
 {
     const char *const *values = d->u.enum_opt.values;
-    unsigned int i;
-    for (i = 0; values[i]; i++) {
-        if (streq(values[i], str)) {
-            v->uint_val = i;
+    unsigned int n;
+    for (n = 0; values[n]; n++) {
+        if (streq(values[n], str)) {
+            v->uint_val = n;
             return true;
         }
     }
 
-    unsigned int val;
-    if (!str_to_uint(str, &val) || val >= i) {
-        return error_msg(ebuf, "Invalid value for %s", d->name);
-    }
-
-    v->uint_val = val;
-    return true;
+    char expected[64];
+    string_array_concat(expected, sizeof(expected), values, n, STRN(", "));
+    return error_msg(ebuf, "Invalid value for %s; expected: %s", d->name, expected);
 }
 
 static const char *enum_string(const OptionDesc *desc, OptionValue value)
@@ -364,16 +360,21 @@ static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
 
     for (size_t pos = 0, len = strlen(str); pos < len; ) {
         const StringView flag = get_delim(str, &pos, len, ',');
-        size_t i;
-        for (i = 0; values[i]; i++) {
-            if (strview_equal_cstring(&flag, values[i])) {
-                flags |= 1u << i;
+        size_t n;
+        for (n = 0; values[n]; n++) {
+            if (strview_equal_cstring(&flag, values[n])) {
+                flags |= 1u << n;
                 break;
             }
         }
-        if (unlikely(!values[i])) {
-            int flen = (int)flag.length;
-            return error_msg(ebuf, "Invalid flag '%.*s' for %s", flen, flag.data, d->name);
+        if (unlikely(!values[n])) {
+            char expected[128];
+            string_array_concat(expected, sizeof(expected), values, n, STRN(", "));
+            return error_msg (
+                ebuf,
+                "Invalid flag '%.*s' for %s; expected: %s",
+                (int)flag.length, flag.data, d->name, expected
+            );
         }
     }
 
@@ -383,30 +384,24 @@ static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
 
 static const char *flag_string(const OptionDesc *desc, OptionValue value)
 {
-    static char buf[128];
-    unsigned int flags = value.uint_val;
-    if (!flags) {
-        buf[0] = '0';
-        buf[1] = '\0';
-        return buf;
-    }
-
-    char *ptr = buf;
     const char *const *values = desc->u.enum_opt.values;
-    for (size_t i = 0, avail = sizeof(buf); values[i]; i++) {
+    const char *tmp[16];
+    const unsigned int flags = value.uint_val;
+    size_t nstrs = 0;
+
+    // Collect any `values` strings that correspond to set `flags` into
+    // a temporary array
+    for (size_t i = 0; values[i]; i++) {
+        BUG_ON(i >= ARRAYLEN(tmp));
         if (flags & (1u << i)) {
-            char *next = memccpy(ptr, values[i], '\0', avail);
-            if (DEBUG_ASSERTIONS_ENABLED) {
-                BUG_ON(!next);
-                avail -= (size_t)(next - ptr);
-            }
-            ptr = next;
-            ptr[-1] = ',';
+            tmp[nstrs++] = values[i];
         }
     }
 
-    BUG_ON(ptr == buf);
-    ptr[-1] = '\0';
+    // ...so that string_array_concat() can be used to concatenate them
+    // into a comma-separated list
+    static char buf[128];
+    string_array_concat(buf, sizeof(buf), tmp, nstrs, STRN(","));
     return buf;
 }
 

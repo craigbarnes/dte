@@ -101,13 +101,27 @@ static void test_normal_command_errors(TestContext *ctx)
         {"set tab-width s", "integer value for tab-width expected"},
         {"set indent-width 9", "must be in 1-8 range"},
         {"set emulate-tab x", "invalid value"},
-        {"set case-sensitive-search z", "invalid value"},
-        {"set msg-compile xyz", "invalid value"},
-        {"set msg-tag xyz", "invalid value"},
-        {"set newline xyz", "invalid value"},
-        {"set save-unmodified xyz", "invalid value"},
-        {"set window-separator xyz", "invalid value"},
-        {"set ws-error A", "invalid flag"},
+        {"set msg-compile xyz", "invalid value for msg-compile; expected: A, B, C"},
+        {"set msg-tag xyz", "invalid value for msg-tag; expected: A, B, C"},
+        {"set newline xyz", "invalid value for newline; expected: unix, dos"},
+        {
+            "set case-sensitive-search z",
+            "invalid value for case-sensitive-search; expected: false, true, auto"
+        },
+        {
+            "set save-unmodified xyz",
+            "invalid value for save-unmodified; expected: none, touch, full"
+        },
+        {
+            "set window-separator xyz",
+            "invalid value for window-separator; expected: blank, bar"
+        },
+        {
+            "set ws-error A",
+            "invalid flag 'A' for ws-error; expected: space-indent,"
+            " space-align, tab-indent, tab-after-indent, special,"
+            " auto-indent, trailing, all-trailing"
+        },
         {"set non-existent 1", "no such option"},
         {"set -g filetype c", "not global"},
         {"set -l statusline-right _", "not local"},
