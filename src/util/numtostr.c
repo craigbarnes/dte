@@ -9,6 +9,7 @@
 #include "bit.h"
 #include "debug.h"
 
+static const char filesize_unit_prefixes[8] = "KMGTPEZY";
 const char hextab_lower[16] = "0123456789abcdef";
 const char hextab_upper[16] = "0123456789ABCDEF";
 
@@ -149,7 +150,6 @@ char *file_permissions_to_str(mode_t mode, char buf[10])
 // a 2 digit decimal fraction
 char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 {
-    static const char suffixes[8] = "KMGTPEZY";
     unsigned int sigbits = umax_bitwidth(bytes);
     unsigned int nr_unit_shifts = (sigbits - !!sigbits) / 10;
     uintmax_t ipart = bytes >> (nr_unit_shifts * 10);
@@ -174,12 +174,12 @@ char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 
     if (nr_unit_shifts > 0) {
         buf[i++] = ' ';
-        buf[i++] = suffixes[nr_unit_shifts - 1];
+        buf[i++] = filesize_unit_prefixes[nr_unit_shifts - 1];
         buf[i++] = 'i';
         buf[i++] = 'B';
     }
 
-    buf[i++] = '\0';
+    buf[i] = '\0';
     return buf;
 }
 
@@ -196,6 +196,27 @@ char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX])
     buf[i++] = '(';
     i += buf_umax_to_str(bytes, buf + i);
     buf[i++] = ')';
+    buf[i] = '\0';
+    return buf;
+}
+
+// Like human_readable_size(), but done in a way that's always round-trippable
+// (without loss in precision) and thus only made as "human readable" as is
+// possible under that constraint. While filesize_to_str() takes the approach
+// of also including the exact number of bytes in parentheses, this function is
+// for uses cases that call for a single, trivially parseable integer and unit.
+// In practical terms this means that 1.5GiB (3 << 29) is printed as "1536 MiB".
+char *filesize_to_str_precise(uintmax_t bytes, char buf[PRECISE_FILESIZE_STR_MAX])
+{
+    unsigned int tzcount = bytes ? umax_ctz(bytes) : 0; // Special case zero
+    unsigned int nr_unit_shifts = tzcount / 10;
+    unsigned int shift = nr_unit_shifts * 10;
+    size_t i = buf_umax_to_str(bytes >> shift, buf);
+    if (nr_unit_shifts) {
+        buf[i++] = filesize_unit_prefixes[nr_unit_shifts - 1];
+        buf[i++] = 'i';
+        buf[i++] = 'B';
+    }
     buf[i] = '\0';
     return buf;
 }

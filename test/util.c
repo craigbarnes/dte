@@ -1601,6 +1601,26 @@ static void test_filesize_to_str(TestContext *ctx)
     EXPECT_STREQ(filesize_to_str(17446744073709551615ull, buf), "15.13 EiB (17446744073709551615)");
 }
 
+static void test_filesize_to_str_precise(TestContext *ctx)
+{
+    char buf[PRECISE_FILESIZE_STR_MAX];
+    EXPECT_STREQ(filesize_to_str_precise(0, buf), "0");
+    EXPECT_STREQ(filesize_to_str_precise(1, buf), "1");
+    EXPECT_STREQ(filesize_to_str_precise(99, buf), "99");
+    EXPECT_STREQ(filesize_to_str_precise(1023, buf), "1023");
+    EXPECT_STREQ(filesize_to_str_precise(1024, buf), "1KiB");
+    EXPECT_STREQ(filesize_to_str_precise(1025, buf), "1025");
+    EXPECT_STREQ(filesize_to_str_precise(2047, buf), "2047");
+    EXPECT_STREQ(filesize_to_str_precise(2048, buf), "2KiB");
+    EXPECT_STREQ(filesize_to_str_precise(3 << 9, buf), "1536"); // Exactly 1.5 KiB
+    EXPECT_STREQ(filesize_to_str_precise(3 << 19, buf), "1536KiB"); // Exactly 1.5 MiB
+    EXPECT_STREQ(filesize_to_str_precise(3 << 29, buf), "1536MiB"); // Exactly 1.5 GiB
+    EXPECT_STREQ(filesize_to_str_precise(0x8000000000000000ull, buf), "8EiB");
+    EXPECT_STREQ(filesize_to_str_precise(0xF000000000000000ull, buf), "15EiB");
+    EXPECT_STREQ(filesize_to_str_precise(0xFF00000000000000ull, buf), "16320PiB");
+    EXPECT_STREQ(filesize_to_str_precise(0xFFFFFFFFFFFFFFFFull, buf), "18446744073709551615");
+}
+
 static void test_u_char_size(TestContext *ctx)
 {
     EXPECT_EQ(u_char_size('\0'), 1);
@@ -2958,8 +2978,22 @@ static void test_ctz(TestContext *ctx)
     EXPECT_EQ(u32_ctz(255), 0);
     EXPECT_EQ(u32_ctz(UINT32_MAX), 0);
     EXPECT_EQ(u32_ctz(UINT32_MAX - 1), 1);
-    EXPECT_EQ(u32_ctz(U32(0xE10F02C9)), 0);
-    EXPECT_EQ(u32_ctz(U32(0xE10F02CC)), 2);
+    EXPECT_EQ(u32_ctz(0xE10F02C9u), 0);
+    EXPECT_EQ(u32_ctz(0xE10F02CCu), 2);
+
+    EXPECT_EQ(umax_ctz(1), 0);
+    EXPECT_EQ(umax_ctz(11), 0);
+    EXPECT_EQ(umax_ctz(127), 0);
+    EXPECT_EQ(umax_ctz(128), 7);
+    EXPECT_EQ(umax_ctz(129), 0);
+    EXPECT_EQ(umax_ctz(130), 1);
+    EXPECT_EQ(umax_ctz(255), 0);
+    EXPECT_EQ(umax_ctz(0xE10F02C9u), 0);
+    EXPECT_EQ(umax_ctz(0xE10F02CCu), 2);
+    EXPECT_EQ(umax_ctz(0x8000000000000000ull), 63);
+    EXPECT_EQ(umax_ctz(UINTMAX_MAX), 0);
+    EXPECT_EQ(umax_ctz(UINTMAX_MAX - 1), 1);
+    EXPECT_EQ(umax_ctz(UINTMAX_MAX - 7), 3);
 }
 
 static void test_ffs(TestContext *ctx)
@@ -3773,6 +3807,7 @@ static const TestEntry tests[] = {
     TEST(test_file_permissions_to_str),
     TEST(test_human_readable_size),
     TEST(test_filesize_to_str),
+    TEST(test_filesize_to_str_precise),
     TEST(test_u_char_size),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),

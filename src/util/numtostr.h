@@ -9,6 +9,7 @@
 enum {
     HRSIZE_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN(".99 GiB"),
     FILESIZE_STR_MAX = HRSIZE_MAX + DECIMAL_STR_MAX(uintmax_t) + STRLEN(" ()"),
+    PRECISE_FILESIZE_STR_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN("GiB"),
 };
 
 extern const char hextab_lower[16];
@@ -32,5 +33,6 @@ const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;
 char *file_permissions_to_str(mode_t mode, char buf[10]) NONNULL_ARGS_AND_RETURN;
 char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX]) NONNULL_ARGS_AND_RETURN;
 char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
+char *filesize_to_str_precise(uintmax_t bytes, char buf[PRECISE_FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
 
 #endif

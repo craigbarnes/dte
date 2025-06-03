@@ -75,6 +75,22 @@ static inline unsigned int u32_ctz(uint32_t n)
     return u32_popcount(~n & (n - 1));
 }
 
+static inline unsigned int umax_ctz(uintmax_t n)
+{
+    BUG_ON(n == 0);
+    USE_STDBIT(stdc_trailing_zeros, n);
+    USE_BUILTIN(ctz, n);
+
+    unsigned int count = 0;
+    while (n) {
+        uint32_t part = (uint32_t)(n & 0xFFFFFFFFUL);
+        count += part ? u32_ctz(part) : 32;
+        n >>= 32;
+    }
+
+    return count;
+}
+
 // Find position of first (least significant) set bit (starting at 1)
 static inline unsigned int u32_ffs(uint32_t n)
 {

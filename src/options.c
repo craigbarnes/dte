@@ -430,11 +430,14 @@ static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, cons
 
 static const char *fsize_string(const OptionDesc* UNUSED_ARG(d), OptionValue value)
 {
-    // TODO: Count trailing zeros and use GiB/TiB/etc. when appropriate
-    static char buf[DECIMAL_STR_MAX(value.uint_val) + 4];
-    size_t ndigits = buf_uint_to_str(value.uint_val, buf);
-    copyliteral(buf + ndigits, "MiB");
-    return buf;
+    static char buf[PRECISE_FILESIZE_STR_MAX];
+    uintmax_t mib = value.uint_val;
+    uintmax_t bytes = mib << 20;
+    if (unlikely(bytes >> 20 != mib)) {
+        buf_umax_to_str(bytes, buf);
+        return buf;
+    }
+    return filesize_to_str_precise(bytes, buf);
 }
 
 static const struct {
