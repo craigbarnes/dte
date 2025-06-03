@@ -638,17 +638,24 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
+static const char *arg_hint_for_subcmd(const ShowHandler *handler)
+{
+    const void *show = handler->show;
+    return (show == show_binding) ? " [key]" : (show ? " [name]" : "");
+}
+
 bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
-    ShowHandlerFlags flags = 0;
+    ShowHandlerFlags flags = DTERC;
     String str = STRING_INIT;
 
     if (!type) {
         str = string_new(256);
+        string_append_literal(&str, "# Available `show` sub-commands:\n");
         for (size_t i = 0; i < ARRAYLEN(show_handlers); i++) {
-            string_append_cstring(&str, show_handlers[i].name);
-            // TODO: Add description strings to each show_handlers[] entry
-            // and include them in this output
+            const ShowHandler *handler = &show_handlers[i];
+            string_append_cstring(&str, handler->name);
+            string_append_cstring(&str, arg_hint_for_subcmd(handler));
             string_append_byte(&str, '\n');
         }
         type = "";
