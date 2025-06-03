@@ -113,7 +113,31 @@ static bool handle_input_recursive (
     return false;
 }
 
+void string_append_def_mode(String *buf, const ModeHandler *mode)
+{
+    string_append_literal(buf, "def-mode ");
+    if (mode->flags & MHF_NO_TEXT_INSERTION_RECURSIVE) {
+        string_append_literal(buf, "-U ");
+    } else if (mode->flags & MHF_NO_TEXT_INSERTION) {
+        string_append_literal(buf, "-u ");
+    }
+
+    string_append_cstring(buf, mode->name);
+
+    const PointerArray *ftmodes = &mode->fallthrough_modes;
+    for (size_t i = 0, n = ftmodes->count; i < n; i++) {
+        const ModeHandler *ftmode = ftmodes->ptrs[i];
+        string_append_byte(buf, ' ');
+        string_append_cstring(buf, ftmode->name);
+    }
+}
+
 bool handle_input(EditorState *e, KeyCode key)
 {
     return handle_input_recursive(e, e->mode, key, 0);
+}
+
+void collect_modes(const HashMap *modes, PointerArray *a, const char *prefix)
+{
+    collect_hashmap_keys(modes, a, prefix);
 }

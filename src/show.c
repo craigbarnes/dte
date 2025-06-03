@@ -241,6 +241,44 @@ static String dump_setenv(EditorState* UNUSED_ARG(e))
     return buf;
 }
 
+static const char *flag_for_builtin_mode(const EditorState *e, const ModeHandler *m)
+{
+    if (m == e->normal_mode) {
+        return "";
+    } else if (m == e->command_mode) {
+        return "-c ";
+    } else if (m == e->search_mode) {
+        return "-s ";
+    }
+    return NULL;
+}
+
+static bool show_mode(EditorState *e, const char *name, bool cflag)
+{
+    const ModeHandler *mode = get_mode_handler(&e->modes, name);
+    if (!mode) {
+        return info_msg(&e->err, "no mode with name '%s'", name);
+    }
+
+    String str = string_new(4096);
+    const char *flag = flag_for_builtin_mode(e, mode);
+    if (!flag) {
+        string_append_def_mode(&str, mode);
+        string_append_byte(&str, '\n');
+    }
+
+    dump_bindings(&mode->key_bindings, flag ? flag : name, &str);
+
+    if (cflag) {
+        buffer_insert_bytes(e->view, str.buffer, str.len);
+    } else {
+        open_temporary_buffer(e, str.buffer, str.len, "def-mode", name, DTERC);
+    }
+
+    string_free(&str);
+    return true;
+}
+
 static bool show_builtin(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -336,6 +374,11 @@ static void do_collect_builtin_includes(EditorState* UNUSED_ARG(e), PointerArray
     collect_builtin_includes(a, prefix);
 }
 
+static void do_collect_modes(EditorState *e, PointerArray *a, const char *prefix)
+{
+    collect_modes(&e->modes, a, prefix);
+}
+
 static void collect_show_msg_args(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
     static const char args[][2] = {"A", "B", "C"};
@@ -424,11 +467,6 @@ static int mhe_cmp(const void *ap, const void *bp)
     return strcmp(a->name, b->name);
 }
 
-static bool is_builtin_mode(const EditorState *e, const ModeHandler *m)
-{
-    return m == e->normal_mode || m == e->command_mode || m == e->search_mode;
-}
-
 static String dump_all_bindings(EditorState *e)
 {
     String buf = string_new(4096);
@@ -447,7 +485,8 @@ static String dump_all_bindings(EditorState *e)
         for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
             const char *name = it.entry->key;
             const ModeHandler *handler = it.entry->value;
-            if (is_builtin_mode(e, handler)) {
+            bool is_builtin_mode = !!flag_for_builtin_mode(e, handler);
+            if (is_builtin_mode) {
                 continue;
             }
             array[n++] = (ModeHandlerEntry) {
@@ -481,27 +520,13 @@ static String dump_all_bindings(EditorState *e)
 
 static String dump_modes(EditorState *e)
 {
-    String buf = string_new(256);
-
     // TODO: Serialize in alphabetical order, instead of table order?
+    String buf = string_new(256);
     for (HashMapIter it = hashmap_iter(&e->modes); hashmap_next(&it); ) {
         const ModeHandler *mode = it.entry->value;
-        string_append_literal(&buf, "def-mode ");
-        if (mode->flags & MHF_NO_TEXT_INSERTION_RECURSIVE) {
-            string_append_literal(&buf, "-U ");
-        } else if (mode->flags & MHF_NO_TEXT_INSERTION) {
-            string_append_literal(&buf, "-u ");
-        }
-        string_append_cstring(&buf, mode->name);
-        const PointerArray *ftmodes = &mode->fallthrough_modes;
-        for (size_t i = 0, n = ftmodes->count; i < n; i++) {
-            const ModeHandler *ftmode = ftmodes->ptrs[i];
-            string_append_byte(&buf, ' ');
-            string_append_cstring(&buf, ftmode->name);
-        }
+        string_append_def_mode(&buf, mode);
         string_append_byte(&buf, '\n');
     }
-
     return buf;
 }
 
@@ -570,7 +595,7 @@ static const ShowHandler show_handlers[] = {
     {"color", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
     {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
     {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
-    {"def-mode", DTERC, dump_modes, NULL, NULL},
+    {"def-mode", DTERC, dump_modes, show_mode, do_collect_modes},
     {"env", 0, dump_env, show_env, collect_env},
     {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
     {"ft", DTERC, do_dump_filetypes, NULL, NULL},

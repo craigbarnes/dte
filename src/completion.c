@@ -694,7 +694,7 @@ static void collect_command_flag_args (
     char flag = a->flags[0];
     if (streq(cmd, "bind")) {
         WARN_ON(flag != 'T');
-        collect_hashmap_keys(&e->modes, array, prefix);
+        collect_modes(&e->modes, array, prefix);
     } else if (streq(cmd, "exec")) {
         int fd = (flag == 'i') ? 0 : (flag == 'o' ? 1 : 2);
         WARN_ON(fd == 2 && flag != 'e');
