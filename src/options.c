@@ -434,7 +434,10 @@ static const char *fsize_string(const OptionDesc* UNUSED_ARG(d), OptionValue val
     uintmax_t mib = value.uint_val;
     uintmax_t bytes = mib << 20;
     if (unlikely(bytes >> 20 != mib)) {
-        buf_umax_to_str(bytes, buf);
+        // An optimizing compiler will usually drop this code entirely, since
+        // the condition isn't possible when `BITSIZE(int) == 32`
+        size_t i = buf_umax_to_str(mib, buf);
+        copyliteral(buf + i, "MiB\0");
         return buf;
     }
     return filesize_to_str_precise(bytes, buf);
