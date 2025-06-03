@@ -267,6 +267,7 @@ static SpawnAction spawn_action_from_exec_action(ExecAction action)
     }
 }
 
+// NOLINTNEXTLINE(readability-function-size)
 ssize_t handle_exec (
     EditorState *e,
     const char **argv,
