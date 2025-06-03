@@ -43,9 +43,7 @@ extern char **environ;
 typedef enum {
     SHOW_BOF, // Leave cursor at beginning of file
     SHOW_LASTLINE, // Move cursor to last line
-    SHOW_MSG_A, // Move cursor to line corresponding to `e->messages[0].pos`
-    SHOW_MSG_B, // As above, but s/0/1/
-    SHOW_MSG_C, // As above, but s/0/2/
+    SHOW_MSG, // Move cursor to line corresponding to `e->messages[0].pos`
 } CursorPositionType;
 
 typedef struct {
@@ -96,10 +94,8 @@ static void open_temporary_buffer (
     if (cursor_pos == SHOW_LASTLINE) {
         block_iter_eof(&view->cursor);
         block_iter_prev_line(&view->cursor);
-    } else if (cursor_pos >= SHOW_MSG_A && cursor_pos <= SHOW_MSG_C) {
-        size_t idx = cursor_pos - SHOW_MSG_A;
-        BUG_ON(idx >= ARRAYLEN(e->messages));
-        const MessageArray *msgs = &e->messages[idx];
+    } else if (cursor_pos == SHOW_MSG) {
+        const MessageArray *msgs = &e->messages[0];
         if (msgs->array.count > 0) {
             block_iter_goto_line(&view->cursor, msgs->pos);
         }
@@ -284,6 +280,29 @@ static bool show_compiler(EditorState *e, const char *name, bool cflag)
     return true;
 }
 
+static bool show_msg(EditorState *e, const char *name, bool cflag)
+{
+    size_t idx = name[0] - 'A';
+    if (idx >= ARRAYLEN(e->messages) || name[1] != '\0') {
+        return info_msg(&e->err, "no message list '%s'", name);
+    }
+
+    const MessageArray *msgs = &e->messages[idx];
+    String str = dump_messages(msgs);
+
+    if (cflag) {
+        buffer_insert_bytes(e->view, str.buffer, str.len);
+    } else {
+        open_temporary_buffer(e, str.buffer, str.len, "msg", name, SHOW_BOF, false);
+        if (msgs->array.count > 0) {
+            block_iter_goto_line(&e->view->cursor, msgs->pos);
+        }
+    }
+
+    string_free(&str);
+    return true;
+}
+
 static bool show_option(EditorState *e, const char *name, bool cflag)
 {
     const char *value = get_option_value_string(e, name);
@@ -318,6 +337,12 @@ static void do_collect_builtin_configs(EditorState* UNUSED_ARG(e), PointerArray 
 static void do_collect_builtin_includes(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
     collect_builtin_includes(a, prefix);
+}
+
+static void collect_show_msg_args(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
+{
+    static const char args[][2] = {"A", "B", "C"};
+    COLLECT_STRINGS(args, a, prefix);
 }
 
 static bool show_wsplit(EditorState *e, const char *name, bool cflag)
@@ -533,8 +558,6 @@ static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e)) {return dump_b
 static String do_dump_hl_styles(EditorState *e) {return dump_hl_styles(&e->styles);}
 static String do_dump_filetypes(EditorState *e) {return dump_filetypes(&e->filetypes);}
 static String do_dump_messages_a(EditorState *e) {return dump_messages(&e->messages[0]);}
-static String do_dump_messages_b(EditorState *e) {return dump_messages(&e->messages[1]);}
-static String do_dump_messages_c(EditorState *e) {return dump_messages(&e->messages[2]);}
 static String do_dump_macro(EditorState *e) {return dump_macro(&e->macro);}
 static String do_dump_buffer(EditorState *e) {return dump_buffer(e->view);}
 static String do_dump_tags(EditorState *e) {return dump_tags(&e->tagfile, &e->err);}
@@ -557,10 +580,7 @@ static const ShowHandler show_handlers[] = {
     {"hi", true, SHOW_BOF, do_dump_hl_styles, show_color, collect_hl_styles},
     {"include", false, SHOW_BOF, do_dump_builtin_configs, show_builtin, do_collect_builtin_includes},
     {"macro", true, SHOW_BOF, do_dump_macro, NULL, NULL},
-    {"msg", false, SHOW_MSG_A, do_dump_messages_a, NULL, NULL},
-    {"msgA", false, SHOW_MSG_A, do_dump_messages_a, NULL, NULL},
-    {"msgB", false, SHOW_MSG_B, do_dump_messages_b, NULL, NULL},
-    {"msgC", false, SHOW_MSG_C, do_dump_messages_c, NULL, NULL},
+    {"msg", false, SHOW_MSG, do_dump_messages_a, show_msg, collect_show_msg_args},
     {"open", false, SHOW_LASTLINE, dump_file_history, NULL, NULL},
     {"option", true, SHOW_BOF, dump_options_and_fileopts, show_option, collect_all_options},
     {"search", false, SHOW_LASTLINE, dump_search_history, NULL, NULL},
