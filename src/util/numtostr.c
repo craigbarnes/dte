@@ -205,7 +205,8 @@ char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX])
 // possible under that constraint. While filesize_to_str() takes the approach
 // of also including the exact number of bytes in parentheses, this function is
 // for uses cases that call for a single, trivially parseable integer and unit.
-// In practical terms this means that 1.5GiB (3 << 29) is printed as "1536 MiB".
+// In practical terms this means that 1.5GiB (3 << 29) is printed as "1536MiB"
+// and `(3 << 29) + 1` is printed as "1610612737".
 char *filesize_to_str_precise(uintmax_t bytes, char buf[PRECISE_FILESIZE_STR_MAX])
 {
     unsigned int tzcount = bytes ? umax_ctz(bytes) : 0; // Special case zero

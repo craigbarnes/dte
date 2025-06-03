@@ -1615,6 +1615,7 @@ static void test_filesize_to_str_precise(TestContext *ctx)
     EXPECT_STREQ(filesize_to_str_precise(3 << 9, buf), "1536"); // Exactly 1.5 KiB
     EXPECT_STREQ(filesize_to_str_precise(3 << 19, buf), "1536KiB"); // Exactly 1.5 MiB
     EXPECT_STREQ(filesize_to_str_precise(3 << 29, buf), "1536MiB"); // Exactly 1.5 GiB
+    EXPECT_STREQ(filesize_to_str_precise((3 << 29) + 1, buf), "1610612737");
     EXPECT_STREQ(filesize_to_str_precise(0x8000000000000000ull, buf), "8EiB");
     EXPECT_STREQ(filesize_to_str_precise(0xF000000000000000ull, buf), "15EiB");
     EXPECT_STREQ(filesize_to_str_precise(0xFF00000000000000ull, buf), "16320PiB");
