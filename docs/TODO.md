@@ -365,7 +365,7 @@ Testing/Debugging
 [#203]: https://gitlab.com/craigbarnes/dte/-/issues/203
 [#220]: https://gitlab.com/craigbarnes/dte/-/issues/220
 [Utility Syntax Guideline 6]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02:~:text=Guideline%C2%A06
-[AtomicUndo]: https://ne.di.unimi.it/docs/AtomicUndo.html
+[AtomicUndo]: https://github.com/vigna/ne/blob/7afc7f875a37fd475384393964f0d63837889a3d/doc/ne.texinfo#L3571-L3595
 [Typst]: https://typst.app/docs/reference/syntax/
 [Rust]: https://doc.rust-lang.org/reference/
 [TOML]: https://toml.io/en/v1.0.0

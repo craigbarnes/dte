@@ -8,8 +8,6 @@ GAWK ?= gawk
 AWKLINT = >/dev/null $(GAWK) --lint=fatal --posix
 SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
-FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
-CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
 DOCFILES = $(call GITATTRS, xml markdown)
 SHELLSCRIPTS = $(call GITATTRS, shell)
@@ -76,14 +74,9 @@ check-appstream:
 	$(E) LINT share/dte.appdata.xml
 	$(Q) appstream-util --nonet validate share/dte.appdata.xml | sed '/OK$$/d' >&2
 
-check-docs:
-	@printf '\nChecking links from:\n\n'
-	@echo '$(DOCFILES) ' | tr ' ' '\n'
-	$(Q) $(FINDLINKS) $(DOCFILES) | sort | uniq | $(XARGS_P) -I@1 $(CHECKURL)
-
 
 .PHONY: \
     $(SPATCHTARGETS) \
     $(addprefix check-, all source aux coccinelle shell awk whitespace) \
     $(addprefix check-, headers makefiles codespell typos desktop-file) \
-    $(addprefix check-, appstream docs)
+    $(addprefix check-, appstream)

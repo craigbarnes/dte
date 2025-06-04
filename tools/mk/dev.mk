@@ -6,6 +6,7 @@ include tools/mk/clang-tidy.mk
 include tools/mk/coverage.mk
 include tools/mk/dist.mk
 include tools/mk/lint.mk
+include tools/mk/doclint.mk
 include tools/mk/portable.mk
 include tools/mk/show-sizes.mk
 
