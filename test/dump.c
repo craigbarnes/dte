@@ -43,6 +43,7 @@ static const struct {
     {"search", ALLOW_EMPTY},
     {"set", CHECK_NAME | CHECK_PARSE},
     {"setenv", CHECK_NAME | CHECK_PARSE},
+    {"show", CHECK_NAME | CHECK_PARSE},
     // {"tag", 0}, // Depends on filesystem state not controlled by the test runner
     {"wsplit", 0},
 };

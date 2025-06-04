@@ -586,6 +586,7 @@ static String do_dump_tags(EditorState *e) {return dump_tags(&e->tagfile, &e->er
 static String dump_command_history(EditorState *e) {return history_dump(&e->command_history);}
 static String dump_search_history(EditorState *e) {return history_dump(&e->search_history);}
 static String dump_file_history(EditorState *e) {return file_history_dump(&e->file_history);}
+static String dump_show_subcmds(EditorState *e); // Forward declaration
 
 static const ShowHandler show_handlers[] = {
     {"alias", DTERC, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
@@ -608,9 +609,30 @@ static const ShowHandler show_handlers[] = {
     {"search", LASTLINE, dump_search_history, NULL, NULL},
     {"set", DTERC, do_dump_options, show_option, collect_all_options},
     {"setenv", DTERC, dump_setenv, show_env, collect_env},
+    {"show", DTERC, dump_show_subcmds, NULL, NULL},
     {"tag", 0, do_dump_tags, NULL, NULL},
     {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
+
+static const char *arg_hint_for_subcmd(const ShowHandler *handler)
+{
+    const void *show = handler->show;
+    return (show == show_binding) ? " [key]" : (show ? " [name]" : "");
+}
+
+static String dump_show_subcmds(EditorState* UNUSED_ARG(e))
+{
+    String str = string_new(256);
+    string_append_literal(&str, "# Available `show` sub-commands:\n");
+    for (size_t i = 0; i < ARRAYLEN(show_handlers); i++) {
+        const ShowHandler *handler = &show_handlers[i];
+        string_append_cstring(&str, "show ");
+        string_append_cstring(&str, handler->name);
+        string_append_cstring(&str, arg_hint_for_subcmd(handler));
+        string_append_byte(&str, '\n');
+    }
+    return str;
+}
 
 static const ShowHandler *lookup_show_handler(const char *name)
 {
@@ -629,6 +651,7 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(show_handlers, name);
     BUG_ON(!lookup_show_handler("alias"));
     BUG_ON(!lookup_show_handler("set"));
+    BUG_ON(!lookup_show_handler("show"));
     BUG_ON(!lookup_show_handler("wsplit"));
     BUG_ON(lookup_show_handler("alia"));
     BUG_ON(lookup_show_handler("sete"));
@@ -638,33 +661,15 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
-static const char *arg_hint_for_subcmd(const ShowHandler *handler)
-{
-    const void *show = handler->show;
-    return (show == show_binding) ? " [key]" : (show ? " [name]" : "");
-}
-
 bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
-    ShowHandlerFlags flags = DTERC;
-    String str = STRING_INIT;
-
-    if (!type) {
-        str = string_new(256);
-        string_append_literal(&str, "# Available `show` sub-commands:\n");
-        for (size_t i = 0; i < ARRAYLEN(show_handlers); i++) {
-            const ShowHandler *handler = &show_handlers[i];
-            string_append_cstring(&str, handler->name);
-            string_append_cstring(&str, arg_hint_for_subcmd(handler));
-            string_append_byte(&str, '\n');
-        }
-        type = "";
-        goto open_buffer;
-    }
-
-    const ShowHandler *handler = lookup_show_handler(type);
+    const ShowHandler *handler = lookup_show_handler(type ? type : "show");
     if (!handler) {
         return error_msg(&e->err, "invalid argument: '%s'", type);
+    }
+
+    if (!type) {
+        type = "";
     }
 
     if (key) {
@@ -674,11 +679,8 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag)
         return handler->show(e, key, cflag);
     }
 
-    str = handler->dump(e);
-    flags = handler->flags;
-
-open_buffer:
-    open_temporary_buffer(e, str.buffer, str.len, "show", type, flags);
+    String str = handler->dump(e);
+    open_temporary_buffer(e, str.buffer, str.len, "show", type, handler->flags);
     string_free(&str);
     return true;
 }
