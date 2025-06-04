@@ -20,7 +20,7 @@ jobs:
             - run: gmake vvars
             - run: gmake build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
-            - run: gmake -Otarget check
+            - run: gmake check
             - run: gmake bench CFLAGS=-O3 DEBUG=0
 
     linux:
@@ -34,5 +34,5 @@ jobs:
             - run: make vvars
             - run: make build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log
-            - run: make -Otarget check
+            - run: make check
             - run: make bench CFLAGS=-O3 DEBUG=0
