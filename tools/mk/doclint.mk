@@ -1,4 +1,3 @@
-CURL = curl
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 DOCURLS = $(shell $(FINDLINKS) $(DOCFILES) | sort | uniq)
 

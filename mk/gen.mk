@@ -1,5 +1,6 @@
 GEN_MK = $(lastword $(MAKEFILE_LIST))
-FETCH = curl -LSs -o $@
+CURL = curl
+FETCH = $(CURL) -LSs -o '$@'
 LUA = lua
 STRIPNL = sed '$${/^$$/d}'
 
