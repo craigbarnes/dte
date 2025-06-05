@@ -506,7 +506,11 @@ int main(int argc, char *argv[])
     struct utsname u;
     if (likely(uname(&u) >= 0)) {
         LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
-        if (!explicit_term_query_level && str_has_suffix(u.release, "-WSL2")) {
+        if (
+            !headless
+            && !explicit_term_query_level
+            && str_has_suffix(u.release, "-WSL2")
+        ) {
             // There appears to be an issue on WSL2 where the DA1 query
             // response is interpreted as pasted text and then inserted
             // into the buffer at startup. For now, we simply disable
