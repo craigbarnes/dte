@@ -84,6 +84,10 @@ Features
   * [jq]
   * [fish]
   * [Slint]
+  * `gitcommit-markdown`: A hypothetical syntax that behaves like the
+    current `gitcommit` syntax for `# comment` lines and everything below
+    the "scissors" line, but treating the subject and message body as
+    Markdown (perhaps a restricted subset for the subject line)
 
 * Extend the [`dte-syntax(5)`] command set, so as to provide a proper
   solution for handling e.g. [ambiguous regexp literals in Ruby][]
