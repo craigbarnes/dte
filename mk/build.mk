@@ -226,10 +226,6 @@ build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
 	$(E) GEN $@
 	$(Q) mk/compiler.sh '$(CC)' >$@ 2>$(logfile) || $(dumplog_and_exit1)
 
-build/gen/cc-target.mk: mk/cc-target.sh build/gen/cc-version.txt build/gen/all.cflags
-	$(E) GEN $@
-	$(Q) mk/cc-target.sh '$(CC)' '$(CFLAGS_FILTERED)' >$@ 2>$(logfile) || $(dumplog_and_exit1)
-
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/feature/
 	$(E) DETECT $@
 	$(Q) mk/feature.sh '$*' $(CC) $(CFLAGS_FTEST) -o $(@:.h=.o) $< 2>$(logfile) >$@
