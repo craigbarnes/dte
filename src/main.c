@@ -349,6 +349,35 @@ static void write_history_files(EditorState *e)
     }
 }
 
+static void lookup_tags (
+    EditorState *e,
+    const char *tags[],
+    size_t nr_tags,
+    View *closeable_default_view
+) {
+    if (nr_tags == 0 || !load_tag_file(&e->tagfile, &e->err)) {
+        return;
+    }
+
+    MessageArray *msgs = &e->messages[e->options.msg_tag];
+    clear_messages(msgs);
+
+    for (size_t i = 0; i < nr_tags; i++) {
+        StringView tagname = strview_from_cstring(tags[i]);
+        tag_lookup(&e->tagfile, msgs, &e->err, &tagname, NULL);
+    }
+
+    if (
+        activate_current_message(msgs, e->window)
+        && closeable_default_view
+        && e->window->views.count >= 2
+    ) {
+        // Close the default/empty buffer, if another buffer is opened
+        // for a tag (and no commands were executed via `-c` or `-C`)
+        remove_view(closeable_default_view);
+    }
+}
+
 static View *open_initial_buffers (
     Window *window,
     Buffer *std_buffer,
@@ -573,23 +602,7 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    if (nr_tags > 0 && load_tag_file(&e->tagfile, &e->err)) {
-        MessageArray *msgs = &e->messages[e->options.msg_tag];
-        clear_messages(msgs);
-
-        for (size_t i = 0; i < nr_tags; i++) {
-            StringView tagname = strview_from_cstring(tags[i]);
-            tag_lookup(&e->tagfile, msgs, &e->err, &tagname, NULL);
-        }
-
-        if (activate_current_message(msgs, window) && dview && nr_commands == 0) {
-            // Close the default/empty buffer, if another buffer was opened
-            // for a tag and no commands were executed via `-c` or `-C`
-            BUG_ON(window->views.count < 2);
-            remove_view(dview);
-            dview = NULL;
-        }
-    }
+    lookup_tags(e, tags, nr_tags, nr_commands ? NULL : dview);
 
     set_fatal_error_cleanup_handler(cleanup_handler, e);
     set_fatal_signal_handlers();
