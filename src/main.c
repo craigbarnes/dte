@@ -299,8 +299,21 @@ static void exec_user_rc(EditorState *e, const char *filename)
         xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
         filename = buf;
     }
+
     LOG_INFO("loading configuration from %s", filename);
     read_normal_config(e, filename, flags);
+}
+
+static void exec_rc_files(EditorState *e, const char *user_rc_filename)
+{
+    exec_builtin_rc(e);
+
+    if (user_rc_filename) {
+        exec_user_rc(e, user_rc_filename);
+    }
+
+    log_config_counts(e);
+    update_all_syntax_styles(&e->syntaxes, &e->styles);
 }
 
 static void read_history_files(EditorState *e, bool headless)
@@ -336,6 +349,39 @@ static void write_history_files(EditorState *e)
     }
 }
 
+static View *open_initial_buffers (
+    Window *window,
+    Buffer *std_buffer,
+    char *args[],
+    size_t len
+) {
+    // Open files specified as command-line arguments
+    for (size_t i = 0, line = 0, col = 0; i < len; i++) {
+        const char *str = args[i];
+        if (line == 0 && *str == '+' && str_to_filepos(str + 1, &line, &col)) {
+            continue;
+        }
+        View *view = window_open_buffer(window, str, false, NULL);
+        if (line == 0) {
+            continue;
+        }
+        set_view(view);
+        move_to_filepos(view, line, col);
+        line = 0;
+    }
+
+    if (std_buffer) {
+        // Open special buffer for redirected stdin/stdout
+        window_add_buffer(window, std_buffer);
+    }
+
+    // Open default buffer, if none were opened above
+    View *dview = window->views.count ? NULL : window_open_empty_buffer(window);
+
+    set_view(dview ? dview : window_get_first_view(window));
+    return dview;
+}
+
 static const char copyright[] =
     "dte " VERSION "\n"
     "(C) 2013-2024 Craig Barnes\n"
@@ -361,7 +407,6 @@ static const char usage[] =
     "   -V          Display version number and exit\n"
     "\n";
 
-// NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char *argv[])
 {
     static const char optstring[] = "hBHKPRVZC:Q:S:b:c:t:r:s:";
@@ -481,14 +526,7 @@ int main(int argc, char *argv[])
         e->options.lock_files = false;
     }
 
-    exec_builtin_rc(e);
-
-    if (read_rc) {
-        exec_user_rc(e, rc);
-    }
-
-    log_config_counts(e);
-    update_all_syntax_styles(&e->syntaxes, &e->styles);
+    exec_rc_files(e, read_rc ? rc : NULL);
 
     Window *window = new_window(e);
     e->window = window;
@@ -514,28 +552,10 @@ int main(int argc, char *argv[])
 
     e->status = EDITOR_RUNNING;
 
-    for (size_t i = optind, line = 0, col = 0; i < argc; i++) {
-        const char *str = argv[i];
-        if (line == 0 && *str == '+' && str_to_filepos(str + 1, &line, &col)) {
-            continue;
-        }
-        View *view = window_open_buffer(window, str, false, NULL);
-        if (line == 0) {
-            continue;
-        }
-        set_view(view);
-        move_to_filepos(view, line, col);
-        line = 0;
-    }
-
-    if (std_buffer) {
-        window_add_buffer(window, std_buffer);
-    }
-
-    // Open a default buffer, if none were opened for arguments
-    View *dview = window->views.count ? NULL : window_open_empty_buffer(window);
-
-    set_view(window_get_first_view(window));
+    BUG_ON(optind > argc);
+    argc -= optind;
+    argv += optind;
+    View *dview = open_initial_buffers(window, std_buffer, argv, argc);
 
     if (!headless) {
         update_screen_size(term, e->root_frame);
