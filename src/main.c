@@ -304,12 +304,12 @@ static void exec_user_rc(EditorState *e, const char *filename)
     read_normal_config(e, filename, flags);
 }
 
-static void exec_rc_files(EditorState *e, const char *user_rc_filename)
+static void exec_rc_files(EditorState *e, const char *user_rc, bool read_rc)
 {
     exec_builtin_rc(e);
 
-    if (user_rc_filename) {
-        exec_user_rc(e, user_rc_filename);
+    if (read_rc) {
+        exec_user_rc(e, user_rc);
     }
 
     log_config_counts(e);
@@ -559,7 +559,7 @@ int main(int argc, char *argv[])
         e->options.lock_files = false;
     }
 
-    exec_rc_files(e, read_rc ? rc : NULL);
+    exec_rc_files(e, rc, read_rc);
 
     Window *window = new_window(e);
     e->window = window;
