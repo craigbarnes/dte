@@ -8,9 +8,10 @@ include build/gen/platform.mk
 filter-cmdgoals = $(filter $(1), $(or $(MAKECMDGOALS),all))
 
 ifeq "" "$(call filter-cmdgoals, clean help git-hooks dist docs man html%)"
-  # Only generate and load this makefile if $(MAKECMDGOALS) contains
+  # Only generate and load these makefiles if $(MAKECMDGOALS) contains
   # a target other than those listed above
   include build/gen/compiler.mk
+  include build/gen/cc-target.mk
 endif
 
 include mk/util.mk

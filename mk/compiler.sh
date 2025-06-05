@@ -4,7 +4,6 @@
 
 set -eu
 CC="$1"
-CFLAGS="$2"
 
 # The following compiler options are divided into "sets", which are
 # tested all at once, in order to keep process spawning overhead to
@@ -139,39 +138,6 @@ elif cc-option -MD -MF /dev/null; then
 else
     echo 'CC_DEPFLAGS =' # Avoid inheriting from environment variable
 fi
-
-TARGET="$($CC $CFLAGS -dumpmachine)"
-echo "CC_TARGET = $TARGET"
-
-if test -z "$TARGET"; then
-    # If $TARGET is empty, fall back to using a value derived from uname(1)
-    # output (for the purpose of setting platform-specific variables below)
-    case "$(uname -s)" in
-        Linux) test "$(uname -o)" != Android || TARGET='x-linux-android' ;;
-        Darwin) TARGET='x-darwin' ;;
-        OpenBSD) TARGET='x-openbsd' ;;
-        NetBSD) TARGET='x-netbsd' ;;
-        CYGWIN*) TARGET='x-cygwin' ;;
-    esac
-fi
-
-case "$TARGET" in
-*-linux-android*)
-    echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
-*-darwin*)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
-*-openbsd*)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'BASIC_CPPFLAGS += -I/usr/local/include'
-    echo 'BASIC_LDFLAGS += -L/usr/local/lib' ;;
-*-netbsd*)
-    echo 'BASIC_CPPFLAGS += -I/usr/pkg/include'
-    echo 'BASIC_LDFLAGS += -L/usr/pkg/lib' ;;
-*-cygwin*)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'EXEC_SUFFIX = .exe' ;;
-esac
 
 # https://stackoverflow.com/questions/22017484/detect-if-a-compiler-is-using-ccache/61282413#61282413
 # https://ccache.dev/manual/latest.html#_extra_options
