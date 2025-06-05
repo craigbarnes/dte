@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
+#include "arith.h"
 #include "debug.h"
 #include "utf8.h"
 #include "xmalloc.h"

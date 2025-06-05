@@ -14,29 +14,6 @@ void *xcalloc(size_t nmemb, size_t size) XMALLOC ALLOC_SIZE(1, 2);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
-size_t xmul_(size_t a, size_t b);
-size_t xadd(size_t a, size_t b);
-
-// Equivalent to `a * b`, but calling fatal_error() for arithmetic overflow.
-// Note that if either operand is 2, adding 1 to the result can never
-// overflow (often useful when doubling a buffer plus 1 extra byte). Similar
-// observations can be made when multiplying by other powers of 2 (except 1)
-// due to the equivalence with left shifting.
-static inline size_t xmul(size_t a, size_t b)
-{
-    // If either argument is known at compile-time to be 1, the multiplication
-    // can't overflow and is thus safe to be inlined without checks
-    if ((IS_CT_CONSTANT(a) && a <= 1) || (IS_CT_CONSTANT(b) && b <= 1)) {
-        return a * b; // GCOVR_EXCL_LINE
-    }
-    // Otherwise, emit a call to the checked implementation
-    return xmul_(a, b);
-}
-
-static inline size_t xadd3(size_t a, size_t b, size_t c)
-{
-    return xadd(a, xadd(b, c));
-}
 
 XMALLOC ALLOC_SIZE(1, 2)
 static inline void *xmallocarray(size_t nmemb, size_t size)

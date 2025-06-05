@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include "regexp.h"
+#include "util/arith.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/hashmap.h"

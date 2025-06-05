@@ -15,24 +15,6 @@ static void *check_alloc(void *alloc)
     return alloc;
 }
 
-size_t xmul_(size_t a, size_t b)
-{
-    size_t result;
-    if (unlikely(size_multiply_overflows(a, b, &result))) {
-        fatal_error(__func__, EOVERFLOW);
-    }
-    return result;
-}
-
-size_t xadd(size_t a, size_t b)
-{
-    size_t result;
-    if (unlikely(size_add_overflows(a, b, &result))) {
-        fatal_error(__func__, EOVERFLOW);
-    }
-    return result;
-}
-
 // Like malloc(3), but calling fatal_error() on OOM and forbidding
 // zero-sized allocations (thus never returning NULL)
 void *xmalloc(size_t size)

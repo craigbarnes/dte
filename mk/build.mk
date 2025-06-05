@@ -29,9 +29,10 @@ CC_VERSION = $(or \
     $(shell $(CC) -v 2>&1 | grep version) )
 
 util_objects := $(call prefix-obj, build/util/, \
-    array ascii base64 debug exitcode fd fork-exec hashmap hashset intern \
-    intmap log numtostr path ptr-array readfile string strtonum time-util \
-    unicode utf8 xmalloc xmemmem xmemrchr xreadwrite xsnprintf xstdio )
+    arith array ascii base64 debug exitcode fd fork-exec hashmap hashset \
+    intern intmap log numtostr path ptr-array readfile string strtonum \
+    time-util unicode utf8 xmalloc xmemmem xmemrchr xreadwrite xsnprintf \
+    xstdio )
 
 command_objects := $(call prefix-obj, build/command/, \
     alias args cache error macro parse run serialize )

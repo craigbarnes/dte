@@ -6,6 +6,7 @@
 #include "block.h"
 #include "buildvar-iconv.h"
 #include "encoding.h"
+#include "util/arith.h"
 #include "util/debug.h"
 #include "util/intern.h"
 #include "util/list.h"
