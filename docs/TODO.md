@@ -153,6 +153,11 @@ Features
 * Extend syntax highlighting with some built-in way to handle arbitrary
   nesting of things like e.g. OCaml comments (see also: [#132])
 
+* Allow [`dte(1)`] options that take filename arguments to use `-` as
+  the argument, so as to allow reading from `stdin` instead of a regular
+  file. The regression test for 7cf2b19320a4c2 in `test/check-opts.sh`
+  is one existing use case for this.
+
 Documentation
 -------------
 

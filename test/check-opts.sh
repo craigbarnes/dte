@@ -45,6 +45,7 @@ $dte -Z >/dev/null
 
 # Check headless mode ------------------------------------------------------
 
+echo >"$logfile" # Clear previous log contents
 set +e
 
 out="$(echo xyz | $dte -C 'replace y Y' | cat)"
@@ -60,20 +61,27 @@ check_exit 77
 check_str "$out" ''
 
 # `replace -c` should be ignored
-out="$(echo xyz | $dte -C 'replace -c y Y' 2>"$logfile" | cat)"
+out="$(echo xyz | $dte -C 'replace -c y Y' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" 'xyz'
 
 # `quit -p` should be ignored
-out="$($dte -C 'insert A; open; insert _; quit -p 98' 2>"$logfile" | cat)"
+out="$($dte -C 'insert A; open; insert _; quit -p 98' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" 'A'
 
 # `suspend` should be ignored
-out="$($dte -C 'suspend; insert q; case' 2>"$logfile" | cat)"
+out="$($dte -C 'suspend; insert q; case' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" 'Q'
 
+# Regression test for commit 7cf2b19320a4c2
+out="$($dte -r test/check-opts.dterc -C 'ins42' | cat)"
+check_exit 0
+check_str "$out" '42'
+out="$($dte -R -r test/check-opts.dterc -C 'ins42' 2>>"$logfile" | cat)"
+check_exit 0
+check_str "$out" ''
 
 # Check error handling -----------------------------------------------------
 
