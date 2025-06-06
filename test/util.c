@@ -181,6 +181,11 @@ static void test_xmalloc(TestContext *ctx)
     EXPECT_MEMEQ(str, 4, "\0\0\0\0", 4);
     free(str);
 
+    str = xcalloc1(4);
+    ASSERT_NONNULL(str);
+    EXPECT_MEMEQ(str, 4, "\0\0\0\0", 4);
+    free(str);
+
     str = xstrslice("one two three", 4, 7);
     EXPECT_STREQ(str, "two");
     free(str);

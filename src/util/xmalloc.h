@@ -15,6 +15,12 @@ void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL WARN_UNUSED_RESULT ALLOC_
 char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 
+XMALLOC ALLOC_SIZE(1)
+static inline void *xcalloc1(size_t size)
+{
+    return xcalloc(1, size);
+}
+
 XMALLOC ALLOC_SIZE(1, 2)
 static inline void *xmallocarray(size_t nmemb, size_t size)
 {

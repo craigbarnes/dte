@@ -58,7 +58,7 @@ void buffer_set_encoding(Buffer *buffer, const char *encoding, bool utf8_bom)
 Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const char *encoding)
 {
     static unsigned long id;
-    Buffer *buffer = xcalloc(1, sizeof(*buffer));
+    Buffer *buffer = xcalloc1(sizeof(*buffer));
     list_init(&buffer->blocks);
     buffer->cur_change = &buffer->change_head;
     buffer->saved_change = &buffer->change_head;

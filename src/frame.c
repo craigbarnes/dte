@@ -268,7 +268,7 @@ static bool rightmost_frame(const Frame *frame)
 
 static Frame *new_frame(void)
 {
-    Frame *frame = xcalloc(1, sizeof(*frame));
+    Frame *frame = xcalloc1(sizeof(*frame));
     frame->equal_size = true;
     return frame;
 }

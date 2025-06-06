@@ -33,7 +33,7 @@ ssize_t errorfmt_capture_name_to_index(const char *name)
 static Compiler *find_or_add_compiler(HashMap *compilers, const char *name)
 {
     Compiler *c = find_compiler(compilers, name);
-    return c ? c : hashmap_insert(compilers, xstrdup(name), xcalloc(1, sizeof(*c)));
+    return c ? c : hashmap_insert(compilers, xstrdup(name), xcalloc1(sizeof(*c)));
 }
 
 void add_error_fmt (

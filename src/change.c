@@ -18,7 +18,7 @@ static Change *change_barrier;
 
 static Change *alloc_change(void)
 {
-    return xcalloc(1, sizeof(Change));
+    return xcalloc1(sizeof(Change));
 }
 
 static void add_change(Buffer *buffer, Change *change)

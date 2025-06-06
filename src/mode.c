@@ -16,7 +16,7 @@
 
 ModeHandler *new_mode(HashMap *modes, char *name, const CommandSet *cmds)
 {
-    ModeHandler *mode = xcalloc(1, sizeof(*mode));
+    ModeHandler *mode = xcalloc1(sizeof(*mode));
     mode->name = name;
     mode->cmds = cmds;
     return hashmap_insert(modes, name, mode);
