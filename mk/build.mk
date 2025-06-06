@@ -106,10 +106,10 @@ else
   DEBUG ?= 0
 endif
 
-ifeq "$(DEBUG)" "0"
+ifeq "$(strip $(DEBUG))" "0"
   BASIC_CFLAGS += $(CC_NO_UNWIND_TABLES)
 else
-  BASIC_CPPFLAGS += -DDEBUG=$(DEBUG)
+  BASIC_CPPFLAGS += -DDEBUG='$(strip $(DEBUG))'
 endif
 
 ifeq "$(WERROR)" "1"
@@ -191,7 +191,7 @@ build/gen/version.h: FORCE | build/gen/
 	@$(OPTCHECK) '$(HASH)define VERSION "$(VERSION)"' $@
 
 build/gen/buildvar-iconv.h: FORCE | build/gen/
-	@$(OPTCHECK) '$(HASH)define ICONV_DISABLE $(if $(call streq,$(ICONV_DISABLE),1),1,0)' $@
+	@$(OPTCHECK) '$(HASH)define ICONV_DISABLE $(if $(call xstreq,$(ICONV_DISABLE),1),1,0)' $@
 
 build/gen/builtin-config.mk: FORCE | build/gen/
 	@$(OPTCHECK) '$(@:.mk=.h): $(BUILTIN_CONFIGS)' $@

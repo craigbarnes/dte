@@ -1,4 +1,5 @@
 streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
+xstreq = $(call streq,$(strip $(1)),$(strip $(2)))
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
 echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 
@@ -18,7 +19,7 @@ dumplog_and_exit1 = (cat $(logfile) >&2; exit 1)
 HASH := \#
 
 MAKEFLAGS += -r
-VEQ1 = $(call streq,$(V),1)
+VEQ1 = $(call xstreq, $(V), 1)
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))
 OPTCHECK = mk/optcheck.sh $(if $(MAKE_S), -s)
 
