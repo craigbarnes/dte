@@ -1,12 +1,6 @@
 name: Test
 on: [push]
 
-env:
-    V: 1
-    DEBUG: 3
-    WERROR: 1
-    TESTFLAGS: -ct
-
 jobs:
     macos:
         strategy:
@@ -16,6 +10,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with: {filter: "tree:0", fetch-depth: 0}
+            - run: ln -s tools/Config-CI.mk Config.mk
             - run: brew install make
             - run: gmake vvars
             - run: gmake build/gen/feature.h
@@ -31,6 +26,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with: {filter: "tree:0", fetch-depth: 0}
+            - run: ln -s tools/Config-CI.mk Config.mk
             - run: make vvars
             - run: make build/gen/feature.h
             - run: cat build/gen/feature.h build/feature/*.log

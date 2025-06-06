@@ -3,7 +3,7 @@ stages: [test, dist]
 default:
     interruptible: true
     before_script:
-        - export DEBUG=3 WERROR=1 V=1 TESTFLAGS=-ct
+        - ln -s tools/Config-CI.mk Config.mk
         - export CC="ccache ${CC:-gcc}"
         # Ensure upstream "v*" tags are present, regardless of whether
         # this job is running for a fork or the upstream repo
