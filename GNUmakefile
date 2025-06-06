@@ -192,7 +192,6 @@ INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic contrib
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean install% uninstall%
-MAKEFLAGS += -Otarget
 
 ifeq "" "$(call filter-cmdgoals, $(NON_PARALLEL_TARGETS))"
   ifeq "" "$(filter -j%, $(MAKEFLAGS))"
