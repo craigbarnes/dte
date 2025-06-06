@@ -18,29 +18,19 @@ dumplog_and_exit1 = (cat $(logfile) >&2; exit 1)
 HASH := \#
 
 MAKEFLAGS += -r
+VEQ1 = $(call streq,$(V),1)
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))
-OPTCHECK = mk/optcheck.sh
+OPTCHECK = mk/optcheck.sh $(if $(MAKE_S), -s)
 
 USE_COLOR = $(if $(MAKE_TERMOUT),$(if $(NO_COLOR),,1))
 GREEN = $(if $(USE_COLOR),\033[32m)
 BOLD = $(if $(USE_COLOR),\033[1m)
 SGR0 = $(if $(USE_COLOR),\033[0m)
 
-ifneq "$(MAKE_S)" ""
-  # Make "-s" flag was used (silent build)
-  LOG = :
-  Q = @
-  OPTCHECK += -s
-else ifeq "$(V)" "1"
-  # "V=1" variable was set (verbose build)
-  LOG = :
-  Q =
-else
-  # Normal build
-  LOG = printf ' %7s  %s\n'
-  Q = @
-endif
-
+# Recipe prefix macros for custom build output, including special
+# handling of `make V=1` (verbose) and `make -s` (silent)
+LOG = $(if $(MAKE_S)$(VEQ1), :, printf ' %7s  %s\n')
+Q = $(if $(MAKE_S), @, $(if $(VEQ1),, @))
 E = @$(LOG)
 
 .PHONY: FORCE
