@@ -193,6 +193,9 @@ INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic contrib
 
 NON_PARALLEL_TARGETS += clean install% uninstall%
 
+# Enable parallel builds automatically, if `make -jN` wasn't used explicitly
+# and no non-parallel targets are being rebuilt (and MAKE_VERSION >= 4.3).
+# https://lists.gnu.org/archive/html/info-gnu/2020-01/msg00004.html#:~:text=their-,MAKEFLAGS
 ifeq "" "$(call filter-cmdgoals, $(NON_PARALLEL_TARGETS))"
   ifeq "" "$(filter -j%, $(MAKEFLAGS))"
     MAKEFLAGS += -j$(NPROC)
