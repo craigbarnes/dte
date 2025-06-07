@@ -37,15 +37,15 @@ check_str "$($dte -V | head -n1)" "dte $ver"
 check_str "$($dte -B | grep -c '^rc$')" "1"
 check_str "$($dte -b rc)" "$(cat config/rc)"
 
+echo "$dte -V: $ver" >"$logfile" # Clear previous log contents
+$dte -Z >>"$logfile"
+$dte -s config/syntax/dte >>"$logfile"
 $dte -h >/dev/null
-$dte -s config/syntax/dte >/dev/null
 $dte -P >/dev/null
-$dte -Z >/dev/null
 
 
 # Check headless mode ------------------------------------------------------
 
-echo >"$logfile" # Clear previous log contents
 set +e
 
 out="$(echo xyz | $dte -C 'replace y Y' | cat)"
@@ -85,12 +85,12 @@ check_str "$out" ''
 
 # Check error handling -----------------------------------------------------
 
-# Unknown option
-$dte -7 2>/dev/null
+# Unknown option (error message is from getopt(3), so not checked)
+$dte -7 2>>"$logfile"
 check_exit 64
 
-# Missing option argument
-$dte -r 2>/dev/null
+# Missing option argument (error message is from getopt(3), so not checked)
+$dte -r 2>>"$logfile"
 check_exit 64
 
 # Linting invalid syntax file
@@ -127,5 +127,5 @@ fi
 
 # No controlling tty
 # shellcheck disable=SC2086
-TERM=xterm-256color setsid $dte -cquit >/dev/null 2>&1 0>&1
+TERM=xterm-256color setsid $dte -cquit </dev/null >/dev/null 2>>"$logfile"
 check_exit 74
