@@ -14,11 +14,11 @@ bool term_drop_controlling_tty(int fd)
 {
 #if HAVE_TIOCNOTTY
     return ioctl(fd, TIOCNOTTY) != -1;
-#else
+#endif
+
     (void)fd;
     errno = ENOSYS;
     return false;
-#endif
 }
 
 // NOLINTNEXTLINE(*-non-const-parameter)
@@ -38,9 +38,9 @@ bool term_get_size(unsigned int *w, unsigned int *h)
     *w = ws.ws_col;
     *h = ws.ws_row;
     return true;
-#else
+#endif
+
     (void)w;
     (void)h;
     return false;
-#endif
 }
