@@ -2,6 +2,7 @@
 #define TRACE_H
 
 #include <stdbool.h>
+#include "util/debug.h"
 #include "util/log.h"
 #include "util/macros.h"
 
@@ -21,11 +22,13 @@ typedef enum {
     #define LOG_TRACE(flags, ...) log_trace(flags, __FILE__, __LINE__, __VA_ARGS__)
     void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *fmt, ...) PRINTF(4);
     bool log_trace_enabled(TraceLoggingFlags flags);
-    bool set_trace_logging_flags(const char *flag_str);
+    void set_trace_logging_flags(TraceLoggingFlags flags);
+    TraceLoggingFlags trace_flags_from_str(const char *str);
 #else
     static inline PRINTF(2) void LOG_TRACE(TraceLoggingFlags UNUSED_ARG(flags), const char* UNUSED_ARG(fmt), ...) {}
     static inline bool log_trace_enabled(TraceLoggingFlags UNUSED_ARG(flags)) {return false;}
-    static inline bool set_trace_logging_flags(const char* UNUSED_ARG(flag_str)) {return false;}
+    static inline void set_trace_logging_flags(TraceLoggingFlags flags) {BUG_ON(!flags);}
+    static inline TraceLoggingFlags trace_flags_from_str(const char* UNUSED_ARG(str)) {BUG("unexpected call"); return 0;}
 #endif
 
 #endif

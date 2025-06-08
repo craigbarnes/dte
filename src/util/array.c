@@ -21,10 +21,10 @@ void collect_strings_from_flat_array (
     }
 }
 
-// Take a comma-delimited string like e.g. "str3,str7" (where those
-// substrings are at array[3] and array[7] respectively) and return
-// bitflags corresponding to the indices of substrings found in the
-// array (e.g. `1 << 3 | 1 << 7`)
+// Return bitflags corresponding to a set of comma-delimited substrings
+// found in an array. For example, if the string is "str3,str7" and
+// those 2 substrings are found at array[3] and array[7] respectively,
+// the returned value will be `1 << 3 | 1 << 7`.
 unsigned int str_to_bitflags (
     const char *str,
     const char *base, // Pointer to start of char[nstrs][size] array

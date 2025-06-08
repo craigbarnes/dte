@@ -238,6 +238,28 @@ static int buffer_write_blocks_and_free(Buffer *buffer, int fd)
     return err;
 }
 
+static void init_trace_logging(LogLevel level)
+{
+    if (!TRACE_LOGGING_ENABLED || level < LOG_LEVEL_TRACE) {
+        return;
+    }
+
+    const char *flagstr = xgetenv("DTE_LOG_TRACE");
+    if (!flagstr) {
+        LOG_NOTICE("DTE_LOG_LEVEL=trace used with no effect; DTE_LOG_TRACE also needed");
+        return;
+    }
+
+    TraceLoggingFlags flags = trace_flags_from_str(flagstr);
+    if (!flags) {
+        LOG_WARNING("no known flags in DTE_LOG_TRACE='%s'", flagstr);
+        return;
+    }
+
+    LOG_INFO("DTE_LOG_TRACE=%s", flagstr);
+    set_trace_logging_flags(flags);
+}
+
 static ExitCode init_logging(void)
 {
     const char *filename = xgetenv("DTE_LOG");
@@ -254,9 +276,7 @@ static ExitCode init_logging(void)
         return ec_usage_error("invalid $DTE_LOG_LEVEL value: '%s'", req_level_str);
     }
 
-    // https://no-color.org/
-    const char *no_color = xgetenv("NO_COLOR");
-
+    const char *no_color = xgetenv("NO_COLOR"); // https://no-color.org/
     LogLevel got_level = log_open(filename, req_level, !no_color);
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
@@ -277,15 +297,7 @@ static ExitCode init_logging(void)
         LOG_INFO("log colors disabled ($NO_COLOR)");
     }
 
-    if (TRACE_LOGGING_ENABLED && got_level >= LOG_LEVEL_TRACE) {
-        const char *flagstr = xgetenv("DTE_LOG_TRACE");
-        if (!flagstr || !set_trace_logging_flags(flagstr)) {
-            LOG_NOTICE("DTE_LOG_LEVEL=trace used with no effect; DTE_LOG_TRACE also needed");
-        } else {
-            LOG_INFO("DTE_LOG_TRACE=%s", flagstr);
-        }
-    }
-
+    init_trace_logging(got_level);
     return EC_OK;
 }
 

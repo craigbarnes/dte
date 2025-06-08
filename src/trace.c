@@ -1,7 +1,6 @@
 #include <string.h>
 #include "trace.h"
 #include "util/array.h"
-#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/xstring.h"
 
@@ -17,7 +16,7 @@ static const char trace_names[][8] = {
 };
 
 // Example valid input: "command,status,input"
-static TraceLoggingFlags trace_flags_from_str(const char *str)
+TraceLoggingFlags trace_flags_from_str(const char *str)
 {
     if (!str || str[0] == '\0') {
         return 0;
@@ -39,15 +38,12 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
-bool set_trace_logging_flags(const char *flag_str)
+void set_trace_logging_flags(TraceLoggingFlags flags)
 {
-    if (!log_level_enabled(LOG_LEVEL_TRACE)) {
-        return false;
-    }
-
-    BUG_ON(trace_flags); // Should only be called once
-    trace_flags = trace_flags_from_str(flag_str);
-    return (trace_flags != 0);
+    BUG_ON(trace_flags); // Should be called at most once
+    BUG_ON(!flags); // ... with non-zero flags
+    BUG_ON(!log_level_enabled(LOG_LEVEL_TRACE)); // ... and only when enabled
+    trace_flags = flags;
 }
 
 // Return true if *any* 1 bits in `flags` are enabled in `trace_flags`

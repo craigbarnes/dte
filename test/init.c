@@ -109,25 +109,45 @@ static void test_init(TestContext *ctx)
     ASSERT_EQ(unsetenv("TERM"), 0);
     ASSERT_EQ(unsetenv("COLORTERM"), 0);
 
-    LogLevel lvl = LOG_LEVEL_WARNING;
-    ASSERT_EQ(log_open("build/test/log.txt", lvl, false), lvl);
-    EXPECT_FALSE(log_level_debug_enabled());
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_CRITICAL));
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_ERROR));
+    EXPECT_FALSE(log_level_enabled(LOG_LEVEL_WARNING));
     EXPECT_FALSE(log_level_enabled(LOG_LEVEL_NOTICE));
     EXPECT_FALSE(log_level_enabled(LOG_LEVEL_INFO));
     EXPECT_FALSE(log_level_enabled(LOG_LEVEL_DEBUG));
     EXPECT_FALSE(log_level_enabled(LOG_LEVEL_TRACE));
-    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_WARNING));
-    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_ERROR));
+    EXPECT_FALSE(log_level_debug_enabled());
+
+    const LogLevel def_lvl = log_level_default();
+    const LogLevel max_lvl = TRACE_LOGGING_ENABLED ? LOG_LEVEL_TRACE : def_lvl;
+    const LogLevel req_lvl = LOG_LEVEL_TRACE;
+    ASSERT_EQ(log_open("build/test/log.txt", req_lvl, false), max_lvl);
     EXPECT_TRUE(log_level_enabled(LOG_LEVEL_CRITICAL));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_ERROR));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_WARNING));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_NOTICE));
+    EXPECT_TRUE(log_level_enabled(LOG_LEVEL_INFO));
+    EXPECT_EQ(log_level_enabled(LOG_LEVEL_DEBUG), DEBUG_LOGGING_ENABLED);
+    EXPECT_EQ(log_level_enabled(LOG_LEVEL_TRACE), TRACE_LOGGING_ENABLED);
+    EXPECT_EQ(log_level_debug_enabled(), DEBUG_LOGGING_ENABLED);
+    EXPECT_FALSE(log_trace_enabled(TRACEFLAGS_ALL));
     LOG_CRITICAL("%s: testing LOG_CRITICAL()", __func__);
     LOG_ERROR("%s: testing LOG_ERROR()", __func__);
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
     LOG_NOTICE("%s: testing LOG_NOTICE()", __func__);
     LOG_INFO("%s: testing LOG_INFO()", __func__);
     LOG_DEBUG("%s: testing LOG_DEBUG()", __func__);
-    LOG_TRACE(TRACEFLAGS_ALL, "%s: testing LOG_TRACE()", __func__);
-    log_write(LOG_LEVEL_WARNING, STRN("testing log_write()"));
+    LOG_TRACE(TRACEFLAGS_ALL, "should always fail; trace flags not yet set");
+    log_write(LOG_LEVEL_TRACE, STRN("as above"));
     log_write(LOG_LEVEL_INFO, STRN("testing log_write()"));
+
+    const TraceLoggingFlags all = TRACEFLAGS_ALL;
+    set_trace_logging_flags(all);
+    EXPECT_EQ(log_trace_enabled(all), TRACE_LOGGING_ENABLED);
+    LOG_TRACE(all, "%s: testing LOG_TRACE()", __func__);
+    TRACE_CMD("%s: testing TRACE_CMD()", __func__);
+    TRACE_INPUT("%s: testing TRACE_INPUT()", __func__);
+    TRACE_OUTPUT("%s: testing TRACE_OUTPUT()", __func__);
 
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
     ASSERT_NONNULL(e);
