@@ -45,6 +45,7 @@ static const struct FileBasenameMap {
     {"bash_profile", SH, true},
     {"bashrc", SH, true},
     {"bazelrc", CONFIG, true},
+    {"btop.conf", CONFIG, true},
     {"build.gradle", GRADLE, false},
     {"buildozer.spec", INI, false},
     {"bun.lock", JSONC, false}, // https://bun.sh/blog/bun-lock-text-lockfile#tooling-compatibility
