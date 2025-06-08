@@ -514,16 +514,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    // This must be done before calling init_logging(), otherwise an
-    // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
-    // cause the logging fd to be opened as STDIN_FILENO
+    // stdio(3) fds must be handled before calling init_logging(), otherwise
+    // an invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could cause the
+    // logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
     ExitCode r = headless ? init_std_fds_headless(std_fds) : init_std_fds(std_fds);
-    if (unlikely(r != EC_OK)) {
-        return r;
-    }
-
-    r = init_logging();
+    r = r ? r : init_logging();
     if (unlikely(r != EC_OK)) {
         return r;
     }
