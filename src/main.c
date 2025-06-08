@@ -391,12 +391,19 @@ static void lookup_tags (
 }
 
 static View *open_initial_buffers (
-    Window *window,
+    EditorState *e,
     Buffer *std_buffer,
     char *args[],
-    size_t len
+    size_t len,
+    bool headless
 ) {
+    // Don't print error messages to `stderr`, unless in headless mode
+    const unsigned int nerrs_save = e->err.nr_errors;
+    const bool ptse_save = e->err.print_to_stderr;
+    e->err.print_to_stderr = headless;
+
     // Open files specified as command-line arguments
+    Window *window = e->window;
     for (size_t i = 0, line = 0, col = 0; i < len; i++) {
         const char *str = args[i];
         if (line == 0 && *str == '+' && str_to_filepos(str + 1, &line, &col)) {
@@ -418,8 +425,14 @@ static View *open_initial_buffers (
 
     // Open default buffer, if none were opened above
     View *dview = window->views.count ? NULL : window_open_empty_buffer(window);
-
     set_view(dview ? dview : window_get_first_view(window));
+
+    // Restore `nr_errors` from the value saved above, so that any
+    // errors not printed to stderr are also excluded from the
+    // `any_key()` condition in `main()`.
+    e->err.nr_errors = nerrs_save;
+    e->err.print_to_stderr = ptse_save;
+
     return dview;
 }
 
@@ -573,48 +586,36 @@ int main(int argc, char *argv[])
 
     exec_rc_files(e, rc, read_rc);
 
-    Window *window = new_window(e);
-    e->window = window;
-    e->root_frame = new_root_frame(window);
+    e->window = new_window(e);
+    e->root_frame = new_root_frame(e->window);
 
     if (load_and_save_history) {
         read_history_files(e, headless);
     }
 
-    if (!headless) {
-        e->err.print_to_stderr = false;
-        // Initialize terminal but don't update screen yet
-        if (unlikely(!term_raw())) {
-            return ec_error("tcsetattr", EC_IO_ERROR);
-        }
-        if (e->err.nr_errors) {
-            // Display "Press any key to continue" prompt, if there were
-            // errors while reading config files
-            any_key(term, e->options.esc_timeout);
-            clear_error(&e->err);
-        }
-    }
-
     e->status = EDITOR_RUNNING;
-
-    BUG_ON(optind > argc);
-    argc -= optind;
-    argv += optind;
-    View *dview = open_initial_buffers(window, std_buffer, argv, argc);
+    char **files = argv + optind;
+    size_t nfiles = argc - optind;
+    View *dview = open_initial_buffers(e, std_buffer, files, nfiles, headless);
 
     if (!headless) {
         update_screen_size(term, e->root_frame);
     }
 
-    if (nr_commands) {
-        for (size_t i = 0; i < nr_commands; i++) {
-            handle_normal_command(e, commands[i], false);
-        }
-        // Refresh Window pointer; in case `wsplit` opened a new one
-        window = e->window;
+    for (size_t i = 0; i < nr_commands; i++) {
+        handle_normal_command(e, commands[i], false);
     }
 
-    if (headless) {
+    bool fast_exit = e->status != EDITOR_RUNNING;
+    if (headless || fast_exit) {
+        // Headless mode implicitly exits after commands have finished
+        // running. We may also exit here (without drawing the UI,
+        // emitting terminal queries or entering main_loop()) if a `-c`
+        // command has already quit the editor. This prevents commands
+        // like e.g. `dte -HR -cquit` from emitting terminal queries
+        // and exiting before the responses have been read (which would
+        // typically cause the parent shell process to read them
+        // instead).
         goto exit;
     }
 
@@ -624,6 +625,19 @@ int main(int argc, char *argv[])
     set_fatal_signal_handlers();
     set_sigwinch_handler();
 
+    if (unlikely(!term_raw())) {
+        e->status = ec_error("tcsetattr", EC_IO_ERROR);
+        fast_exit = true;
+        goto exit;
+    }
+
+    if (e->err.nr_errors) {
+        // Display "press any key to continue" prompt for stderr errors
+        any_key(term, e->options.esc_timeout);
+        clear_error(&e->err);
+    }
+
+    e->err.print_to_stderr = false;
     e->flags &= ~EFLAG_HEADLESS; // See comment for init_editor_state() call above
     ui_first_start(e, terminal_query_level);
     main_loop(e);
@@ -646,11 +660,9 @@ exit:
     e->err.print_to_stderr = true;
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
+    int exit_code = headless ? MAX(e->status, EDITOR_EXIT_OK) : e->status;
 
-    int exit_code = e->status;
-    if (headless) {
-        exit_code = MAX(exit_code, EDITOR_EXIT_OK);
-    } else {
+    if (!headless && !fast_exit) {
         // This must be done before calling buffer_write_blocks_and_free(),
         // since output modes need to be restored to get proper line ending
         // translation and std_fds[STDOUT_FILENO] may be a pipe to the

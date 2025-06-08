@@ -196,6 +196,15 @@ void clear_all_messages(EditorState *e)
 
 void free_editor_state(EditorState *e)
 {
+    size_t n = e->terminal.obuf.count;
+    if (n) {
+        LOG_DEBUG("%zu unflushed bytes in terminal output buffer", n);
+    }
+    n = e->terminal.ibuf.len;
+    if (n) {
+        LOG_DEBUG("%zu unprocessed bytes in terminal input buffer", n);
+    }
+
     free(e->clipboard.buf);
     free_file_options(&e->file_options);
     free_filetypes(&e->filetypes);
