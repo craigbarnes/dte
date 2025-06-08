@@ -48,11 +48,11 @@ $dte -P >/dev/null
 
 set +e
 
-out="$(echo xyz | $dte -C 'replace y Y' | cat)"
+out="$(echo xyz | $dte -HRC 'replace y Y' | cat)"
 check_exit 0
 check_str "$out" 'xYz'
 
-out="$($dte -C 'quit 91')"
+out="$($dte -HRC 'quit 91')"
 check_exit 91
 check_str "$out" ''
 
@@ -61,25 +61,25 @@ check_exit 77
 check_str "$out" ''
 
 # `replace -c` should be ignored
-out="$(echo xyz | $dte -C 'replace -c y Y' 2>>"$logfile" | cat)"
+out="$(echo xyz | $dte -HRC 'replace -c y Y' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" 'xyz'
 
 # `quit -p` should be ignored
-out="$($dte -C 'insert A; open; insert _; quit -p 98' 2>>"$logfile" | cat)"
+out="$($dte -HRC 'insert A; open; insert _; quit -p 98' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" 'A'
 
 # `suspend` should be ignored
-out="$($dte -C 'suspend; insert q; case' 2>>"$logfile" | cat)"
+out="$($dte -HRC 'suspend; insert q; case' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" 'Q'
 
 # Regression test for commit 7cf2b19320a4c2
-out="$($dte -r test/check-opts.dterc -C 'ins42' | cat)"
+out="$($dte -Hr test/check-opts.dterc -C 'ins42' | cat)"
 check_exit 0
 check_str "$out" '42'
-out="$($dte -R -r test/check-opts.dterc -C 'ins42' 2>>"$logfile" | cat)"
+out="$($dte -HRr test/check-opts.dterc -C 'ins42' 2>>"$logfile" | cat)"
 check_exit 0
 check_str "$out" ''
 
@@ -127,5 +127,5 @@ fi
 
 # No controlling tty
 # shellcheck disable=SC2086
-TERM=xterm-256color setsid $dte -cquit </dev/null >/dev/null 2>>"$logfile"
+TERM=xterm-256color setsid $dte -HR -cquit </dev/null >/dev/null 2>>"$logfile"
 check_exit 74
