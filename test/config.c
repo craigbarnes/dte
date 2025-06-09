@@ -298,9 +298,7 @@ void init_headless_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     ASSERT_NONNULL(e);
-    exec_builtin_rc(e);
-    update_all_syntax_styles(&e->syntaxes, &e->styles);
-    log_config_counts(e);
+    exec_rc_files(e, NULL, false);
     e->window = new_window(e);
     e->root_frame = new_root_frame(e->window);
     set_view(window_open_empty_buffer(e->window));

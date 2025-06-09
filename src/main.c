@@ -301,33 +301,6 @@ static ExitCode init_logging(void)
     return EC_OK;
 }
 
-static void exec_user_rc(EditorState *e, const char *filename)
-{
-    ConfigFlags flags = CFG_NOFLAGS;
-    char buf[8192];
-    if (filename) {
-        flags |= CFG_MUST_EXIST;
-    } else {
-        xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
-        filename = buf;
-    }
-
-    LOG_INFO("loading configuration from %s", filename);
-    read_normal_config(e, filename, flags);
-}
-
-static void exec_rc_files(EditorState *e, const char *user_rc, bool read_rc)
-{
-    exec_builtin_rc(e);
-
-    if (read_rc) {
-        exec_user_rc(e, user_rc);
-    }
-
-    log_config_counts(e);
-    update_all_syntax_styles(&e->syntaxes, &e->styles);
-}
-
 static void read_history_files(EditorState *e, bool headless)
 {
     const char *dir = e->user_config_dir;

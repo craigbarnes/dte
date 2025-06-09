@@ -17,6 +17,7 @@
 #include "util/log.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
+#include "util/xsnprintf.h"
 
 #if HAVE_EMBED
     #include "builtin-config-embed.h"
@@ -184,39 +185,29 @@ void exec_builtin_color_reset(EditorState *e)
     exec_builtin_config(e, reset, "color/reset");
 }
 
-void exec_builtin_rc(EditorState *e)
+static void exec_builtin_rc(EditorState *e)
 {
     exec_builtin_color_reset(e);
     StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
     exec_builtin_config(e, rc, "rc");
 }
 
-void collect_builtin_configs(PointerArray *a, const char *prefix)
+static void exec_user_rc(EditorState *e, const char *filename)
 {
-    size_t prefix_len = strlen(prefix);
-    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
-        const char *name = builtin_configs[i].name;
-        if (str_has_strn_prefix(name, prefix, prefix_len)) {
-            ptr_array_append(a, xstrdup(name));
-        }
+    ConfigFlags flags = CFG_NOFLAGS;
+    char buf[8192];
+    if (filename) {
+        flags |= CFG_MUST_EXIST;
+    } else {
+        xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
+        filename = buf;
     }
+
+    LOG_INFO("loading configuration from %s", filename);
+    read_normal_config(e, filename, flags);
 }
 
-void collect_builtin_includes(PointerArray *a, const char *prefix)
-{
-    size_t prefix_len = strlen(prefix);
-    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
-        const char *name = builtin_configs[i].name;
-        if (
-            str_has_strn_prefix(name, prefix, prefix_len)
-            && !str_has_prefix(name, "syntax/")
-        ) {
-            ptr_array_append(a, xstrdup(name));
-        }
-    }
-}
-
-void log_config_counts(const EditorState *e)
+static void log_config_counts(const EditorState *e)
 {
     if (!log_level_enabled(LOG_LEVEL_INFO)) {
         return;
@@ -251,4 +242,41 @@ void log_config_counts(const EditorState *e)
         e->compilers.count,
         nerrorfmts
     );
+}
+
+void exec_rc_files(EditorState *e, const char *user_rc, bool read_rc)
+{
+    exec_builtin_rc(e);
+
+    if (read_rc) {
+        exec_user_rc(e, user_rc);
+    }
+
+    log_config_counts(e);
+    update_all_syntax_styles(&e->syntaxes, &e->styles);
+}
+
+void collect_builtin_configs(PointerArray *a, const char *prefix)
+{
+    size_t prefix_len = strlen(prefix);
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
+        const char *name = builtin_configs[i].name;
+        if (str_has_strn_prefix(name, prefix, prefix_len)) {
+            ptr_array_append(a, xstrdup(name));
+        }
+    }
+}
+
+void collect_builtin_includes(PointerArray *a, const char *prefix)
+{
+    size_t prefix_len = strlen(prefix);
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
+        const char *name = builtin_configs[i].name;
+        if (
+            str_has_strn_prefix(name, prefix, prefix_len)
+            && !str_has_prefix(name, "syntax/")
+        ) {
+            ptr_array_append(a, xstrdup(name));
+        }
+    }
 }

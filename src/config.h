@@ -37,9 +37,8 @@ void exec_config(CommandRunner *runner, StringView config);
 int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags) WARN_UNUSED_RESULT;
 int read_config(CommandRunner *runner, const char *filename, ConfigFlags f);
 void exec_builtin_color_reset(struct EditorState *e);
-void exec_builtin_rc(struct EditorState *e);
+void exec_rc_files(struct EditorState *e, const char *user_rc, bool read_rc) NONNULL_ARG(1);
 void collect_builtin_configs(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_builtin_includes(PointerArray *a, const char *prefix) NONNULL_ARGS;
-void log_config_counts(const struct EditorState *e) NONNULL_ARGS;
 
 #endif
