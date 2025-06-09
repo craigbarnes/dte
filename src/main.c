@@ -629,7 +629,7 @@ exit:
     e->err.print_to_stderr = true;
     frame_remove(e, e->root_frame); // Unlock files and add to file history
     write_history_files(e);
-    int exit_code = headless ? MAX(e->status, EDITOR_EXIT_OK) : e->status;
+    int exit_code = MAX(e->status, EDITOR_EXIT_OK);
 
     if (!headless && !fast_exit) {
         // This must be done before calling buffer_write_blocks_and_free(),
