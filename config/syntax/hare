@@ -1,14 +1,12 @@
 syntax .hare-escape-sequence
+
 state hare-escape-sequence literal
     char "\"0afrv'\\bnt" END literal
     char "xuU" END literal
     eat END
 
-#
-# Entry point
-#
-
 syntax hare
+
 state hare syntax
     char -b "a-zA-Z" identifier
     char -b "@" attribute
@@ -50,8 +48,8 @@ state rune string
     char "\'" hare string
     eat this
 
-state comment-ref code
-    str "]]" comment code
+state comment-ref
+    str "]]" comment comment-ref
     eat this
 
 state comment comment
@@ -72,3 +70,5 @@ list type \
 
 list attribute \
     @fini @init @offset @packed @symbol @test @threadlocal
+
+default comment comment-ref
