@@ -1,17 +1,20 @@
 #include "defs.h"
 #include <fcntl.h> // O_CLOEXEC
-#include <stdlib.h> // mkostemp(), glibc
-#include <unistd.h> // mkostemp(), macOS
+#include <unistd.h> // mkostemp(): macOS
+#include <stdlib.h> // mkostemp(): Linux, BSDs, POSIX 2024
 
 /*
- Note: for some reason macOS declares mkostemp() in <unistd.h>, despite
- the fact it originated in glibc, which declares it in <stdlib.h>.
+ Testing for: mkostemp()
+ Supported by: Linux, OpenBSD 5.7+, FreeBSD 10+, NetBSD 7+, macOS
+ Standardized by: POSIX 2024
 
  See also:
-
- - https://man7.org/linux/man-pages/man3/mkostemp.3.html
- - https://www.gnu.org/software/gnulib/manual/html_node/mkostemp.html
- - https://opensource.apple.com/source/Libc/Libc-1439.40.11/include/unistd.h.auto.html
+ • https://pubs.opengroup.org/onlinepubs/9799919799/functions/mkdtemp.html#:~:text=adding%20mkostemp
+ • https://www.gnu.org/software/gnulib/manual/html_node/mkostemp.html
+ • https://man7.org/linux/man-pages/man3/mkostemp.3.html
+ • https://man.openbsd.org/mkostemp#:~:text=int-,mkostemp
+ • https://man.freebsd.org/cgi/man.cgi?query=mkostemp#:~:text=int-,mkostemp
+ • https://man.netbsd.org/mkstemp.3#:~:text=int-,mkostemp
 */
 
 int main(void)

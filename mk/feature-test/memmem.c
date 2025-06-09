@@ -2,11 +2,17 @@
 #include <string.h>
 
 /*
- memmem(3) was accepted into the POSIX specification in Issue 8 (2024), but
- since we target Issue 7 (2008) we nevertheless don't assume its presence.
+ Testing for: memmem(3)
+ Supported by: Linux (glibc), OpenBSD, FreeBSD, NetBSD
+ Standardized by: POSIX 2024
+
  See also:
- • https://www.austingroupbugs.net/view.php?id=1061#:~:text=Resolution-,Accepted%20As%20Marked
  • https://pubs.opengroup.org/onlinepubs/9799919799/functions/memmem.html#:~:text=First%20released%20in%20Issue%208
+ • https://www.austingroupbugs.net/view.php?id=1061#:~:text=Resolution-,Accepted%20As%20Marked
+ • https://www.man7.org/linux/man-pages/man3/memmem.3.html
+ • https://man.openbsd.org/memmem.3
+ • https://man.freebsd.org/cgi/man.cgi?query=memmem&sektion=3
+ • https://man.netbsd.org/memmem.3
 */
 
 int main(void)
