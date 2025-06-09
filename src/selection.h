@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "block-iter.h"
 #include "buffer.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/string-view.h"
 #include "view.h"
@@ -15,6 +16,19 @@ typedef struct {
     size_t eo;
     bool swapped;
 } SelectionInfo;
+
+void view_do_set_selection_type(View *view, SelectionType sel) NOINLINE;
+
+static inline void view_set_selection_type(View *view, SelectionType sel)
+{
+    if (likely(sel == view->selection)) {
+        // If `sel` is SELECT_NONE here, it's always equal to select_mode
+        BUG_ON(!sel && view->select_mode);
+        return;
+    }
+
+    view_do_set_selection_type(view, sel);
+}
 
 static inline bool unselect(View *view)
 {

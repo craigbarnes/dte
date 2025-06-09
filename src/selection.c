@@ -177,3 +177,33 @@ void select_block(View *view)
     view->selection = SELECT_LINES;
     mark_all_lines_changed(view->buffer);
 }
+
+void view_do_set_selection_type(View *view, SelectionType sel)
+{
+    // Should only be called from view_set_selection_type()
+    BUG_ON(sel == view->selection);
+
+    if (sel == SELECT_NONE) {
+        unselect(view);
+        return;
+    }
+
+    if (view->selection) {
+        if (view->selection != sel) {
+            view->selection = sel;
+            // TODO: be less brute force about this; only the first/last
+            // line of the selection can change in this case
+            mark_all_lines_changed(view->buffer);
+        }
+        return;
+    }
+
+    view->sel_so = block_iter_get_offset(&view->cursor);
+    view->sel_eo = SEL_EO_RECALC;
+    view->selection = sel;
+
+    // Need to mark current line changed because cursor might
+    // move up or down before screen is updated
+    view_update_cursor_y(view);
+    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+}

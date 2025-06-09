@@ -11,6 +11,7 @@
 #include "options.h"
 #include "regexp.h"
 #include "search.h"
+#include "selection.h"
 #include "terminal/osc52.h"
 #include "util/arith.h"
 #include "util/ascii.h"
@@ -446,6 +447,9 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     if (e->macro.recording) {
         macro_search_hook(&e->macro, pat, e->search.reverse, add_to_history);
     }
+
+    // Unselect, unless selection mode is active
+    view_set_selection_type(e->view, e->view->select_mode);
 
     e->err.command_name = NULL;
     bool found = search_next(e->view, &e->search, e->options.case_sensitive_search);

@@ -71,48 +71,6 @@
 #include "window.h"
 #include "wrap.h"
 
-NOINLINE
-static void do_selection_noinline(View *view, SelectionType sel)
-{
-    // Should only be called from do_selection()
-    BUG_ON(sel == view->selection);
-
-    if (sel == SELECT_NONE) {
-        unselect(view);
-        return;
-    }
-
-    if (view->selection) {
-        if (view->selection != sel) {
-            view->selection = sel;
-            // TODO: be less brute force about this; only the first/last
-            // line of the selection can change in this case
-            mark_all_lines_changed(view->buffer);
-        }
-        return;
-    }
-
-    view->sel_so = block_iter_get_offset(&view->cursor);
-    view->sel_eo = SEL_EO_RECALC;
-    view->selection = sel;
-
-    // Need to mark current line changed because cursor might
-    // move up or down before screen is updated
-    view_update_cursor_y(view);
-    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
-}
-
-static void do_selection(View *view, SelectionType sel)
-{
-    if (likely(sel == view->selection)) {
-        // If `sel` is SELECT_NONE here, it's always equal to select_mode
-        BUG_ON(!sel && view->select_mode);
-        return;
-    }
-
-    do_selection_noinline(view, sel);
-}
-
 static char last_flag_or_default(const CommandArgs *a, char def)
 {
     size_t n = a->nr_flags;
@@ -131,16 +89,10 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
 
 static void handle_selection_flags(View *view, const CommandArgs *a)
 {
-    SelectionType sel;
-    if (has_flag(a, 'l')) {
-        sel = SELECT_LINES;
-    } else if (has_flag(a, 'c')) {
-        static_assert(SELECT_CHARS < SELECT_LINES);
-        sel = MAX(SELECT_CHARS, view->select_mode);
-    } else {
-        sel = view->select_mode;
-    }
-    do_selection(view, sel);
+    CommandFlagSet c = has_flag(a, 'c');
+    CommandFlagSet l = has_flag(a, 'l');
+    SelectionType sel = l ? SELECT_LINES : (c ? SELECT_CHARS : SELECT_NONE);
+    view_set_selection_type(view, MAX(sel, view->select_mode));
 }
 
 static bool cmd_alias(EditorState *e, const CommandArgs *a)
@@ -2162,7 +2114,7 @@ static bool cmd_select(EditorState *e, const CommandArgs *a)
     }
 
     view->select_mode = sel;
-    do_selection(view, sel);
+    view_set_selection_type(view, sel);
     return true;
 }
 
