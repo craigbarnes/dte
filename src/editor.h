@@ -96,7 +96,7 @@ typedef struct EditorState {
     HashSet required_syntax_files;
     HashSet required_syntax_builtins;
     StyleMap styles;
-    SyntaxLoadState syn;
+    SyntaxLoader syn;
     MacroRecorder macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];
     FileLocksContext locks_ctx;

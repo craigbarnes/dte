@@ -15,7 +15,7 @@ typedef struct {
     State *current_state;
     SyntaxLoadFlags flags;
     unsigned int saved_nr_errors; // Used to check if nr_errors changed
-} SyntaxLoadState;
+} SyntaxLoader;
 
 struct EditorState;
 

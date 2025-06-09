@@ -640,7 +640,7 @@ static int read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags fla
 
 Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags flags, int *err)
 {
-    e->syn = (SyntaxLoadState) {
+    e->syn = (SyntaxLoader) {
         .current_syntax = NULL,
         .current_state = NULL,
         .flags = flags | SYN_WARN_ON_UNUSED_SUBSYN,
