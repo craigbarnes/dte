@@ -8,7 +8,7 @@
 
  See also:
  • https://pubs.opengroup.org/onlinepubs/9799919799/functions/memmem.html#:~:text=First%20released%20in%20Issue%208
- • https://www.austingroupbugs.net/view.php?id=1061#:~:text=Resolution-,Accepted%20As%20Marked
+ • https://austingroupbugs.net/view.php?id=1061#:~:text=Resolution-,Accepted%20As%20Marked
  • https://www.man7.org/linux/man-pages/man3/memmem.3.html
  • https://man.openbsd.org/memmem.3
  • https://man.freebsd.org/cgi/man.cgi?query=memmem&sektion=3

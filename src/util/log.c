@@ -123,7 +123,7 @@ void log_write(LogLevel level, const char *str, size_t len)
 {
     // log_level is a non-const global, but as noted above, it's never
     // modified after early startup and so poses no signal safety issues
-    // (see https://www.austingroupbugs.net/view.php?id=728#c6430)
+    // (see https://austingroupbugs.net/view.php?id=728#c6430)
     if (!log_level_enabled(level)) {
         return;
     }

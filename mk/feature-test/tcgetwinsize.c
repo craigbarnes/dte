@@ -8,7 +8,7 @@
 
  See also:
  • https://pubs.opengroup.org/onlinepubs/9799919799/functions/tcgetwinsize.html#:~:text=First%20released%20in%20Issue%208
- • https://www.austingroupbugs.net/view.php?id=1151
+ • https://austingroupbugs.net/view.php?id=1151
  • https://git.musl-libc.org/cgit/musl/commit/?id=4d5786544bb52c62fc1ae84d91684ef2268afa05
  • https://man.freebsd.org/cgi/man.cgi?query=tcgetwinsize#:~:text=int-,tcgetwinsize
  • https://man.netbsd.org/tcgetwinsize.3#:~:text=int-,tcgetwinsize
