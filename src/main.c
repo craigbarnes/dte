@@ -549,6 +549,7 @@ int main(int argc, char *argv[])
         read_history_files(e, headless);
     }
 
+    e->status = EDITOR_RUNNING;
     e->err.print_to_stderr = headless;
     View *dview = open_initial_buffers(e, std_buffer, argv + optind, argc - optind);
     e->err.print_to_stderr = true;
@@ -556,8 +557,6 @@ int main(int argc, char *argv[])
     if (!headless) {
         update_screen_size(term, e->root_frame);
     }
-
-    e->status = EDITOR_RUNNING;
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);
