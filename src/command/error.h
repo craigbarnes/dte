@@ -12,6 +12,7 @@ typedef struct ErrorBuffer {
     unsigned int nr_errors;
     bool is_error;
     bool print_to_stderr;
+    bool stderr_errors_printed;
 } ErrorBuffer;
 
 bool error_msg(ErrorBuffer *eb, const char *format, ...) COLD PRINTF(2) NONNULL_ARGS;

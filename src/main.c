@@ -367,14 +367,8 @@ static View *open_initial_buffers (
     EditorState *e,
     Buffer *std_buffer,
     char *args[],
-    size_t len,
-    bool headless
+    size_t len
 ) {
-    // Don't print error messages to `stderr`, unless in headless mode
-    const unsigned int nerrs_save = e->err.nr_errors;
-    const bool ptse_save = e->err.print_to_stderr;
-    e->err.print_to_stderr = headless;
-
     // Open files specified as command-line arguments
     Window *window = e->window;
     for (size_t i = 0, line = 0, col = 0; i < len; i++) {
@@ -398,14 +392,8 @@ static View *open_initial_buffers (
 
     // Open default buffer, if none were opened above
     View *dview = window->views.count ? NULL : window_open_empty_buffer(window);
-    set_view(dview ? dview : window_get_first_view(window));
 
-    // Restore `nr_errors` from the value saved above, so that any
-    // errors not printed to stderr are also excluded from the
-    // `any_key()` condition in `main()`.
-    e->err.nr_errors = nerrs_save;
-    e->err.print_to_stderr = ptse_save;
-
+    set_view(window_get_first_view(window));
     return dview;
 }
 
@@ -535,12 +523,11 @@ int main(int argc, char *argv[])
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
 
     Terminal *term = &e->terminal;
-    e->err.print_to_stderr = true;
-
     if (!headless) {
         term_init(term, getenv("TERM"), getenv("COLORTERM"));
     }
 
+    e->err.print_to_stderr = true;
     Buffer *std_buffer = init_std_buffer(e, std_fds);
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
@@ -562,14 +549,15 @@ int main(int argc, char *argv[])
         read_history_files(e, headless);
     }
 
-    e->status = EDITOR_RUNNING;
-    char **files = argv + optind;
-    size_t nfiles = argc - optind;
-    View *dview = open_initial_buffers(e, std_buffer, files, nfiles, headless);
+    e->err.print_to_stderr = headless;
+    View *dview = open_initial_buffers(e, std_buffer, argv + optind, argc - optind);
+    e->err.print_to_stderr = true;
 
     if (!headless) {
         update_screen_size(term, e->root_frame);
     }
+
+    e->status = EDITOR_RUNNING;
 
     for (size_t i = 0; i < nr_commands; i++) {
         handle_normal_command(e, commands[i], false);
@@ -588,6 +576,7 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
+    e->err.print_to_stderr = headless;
     lookup_tags(e, tags, nr_tags, nr_commands ? NULL : dview);
 
     set_fatal_error_cleanup_handler(cleanup_handler, e);
@@ -600,13 +589,12 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    if (e->err.nr_errors) {
+    if (e->err.stderr_errors_printed) {
         // Display "press any key to continue" prompt for stderr errors
         any_key(term, e->options.esc_timeout);
         clear_error(&e->err);
     }
 
-    e->err.print_to_stderr = false;
     e->flags &= ~EFLAG_HEADLESS; // See comment for init_editor_state() call above
     ui_first_start(e, terminal_query_level);
     main_loop(e);

@@ -39,6 +39,7 @@ static void error_msgv(ErrorBuffer *eb, const char *format, va_list ap)
     if (eb->print_to_stderr) {
         xfputs(eb->buf, stderr);
         xfputc('\n', stderr);
+        eb->stderr_errors_printed = true;
     }
 
     eb->is_error = true;

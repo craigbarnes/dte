@@ -201,6 +201,8 @@ static void test_deinit(TestContext *ctx)
     EXPECT_NULL(e->buffer->abs_filename);
     EXPECT_PTREQ(e->buffer, e->buffers.ptrs[0]);
     EXPECT_FALSE(e->child_controls_terminal);
+    EXPECT_FALSE(e->err.print_to_stderr);
+    EXPECT_FALSE(e->err.stderr_errors_printed);
     EXPECT_EQ(e->flags, EFLAG_HEADLESS);
     EXPECT_EQ(e->include_recursion_count, 0);
     EXPECT_FALSE(e->options.lock_files);
