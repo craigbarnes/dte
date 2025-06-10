@@ -555,6 +555,8 @@ int main(int argc, char *argv[])
     e->err.print_to_stderr = true;
 
     if (!headless) {
+        // This is done before executing `-c` commands, so that the
+        // `exec` command can set $LINES and $COLUMNS appropriately
         update_screen_size(term, e->root_frame);
     }
 

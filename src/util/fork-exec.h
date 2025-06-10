@@ -5,7 +5,15 @@
 #include <sys/types.h>
 #include "macros.h"
 
-pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty) NONNULL_ARG(1) WARN_UNUSED_RESULT;
+WARN_UNUSED_RESULT NONNULL_ARGS
+pid_t fork_exec (
+    const char **argv,
+    int fd[3],
+    unsigned int lines,
+    unsigned int columns,
+    bool drop_ctty
+);
+
 int wait_child(pid_t pid) WARN_UNUSED_RESULT;
 
 #endif

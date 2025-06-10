@@ -3612,7 +3612,7 @@ static void test_fork_exec(TestContext *ctx)
     fd[2] = fd[0];
 
     const char *argv[] = {"sh", "-c", "exit 95", NULL};
-    pid_t pid = fork_exec(argv, NULL, fd, true);
+    pid_t pid = fork_exec(argv, fd, 0, 0, true);
     ASSERT_NE(pid, -1);
     int r = wait_child(pid);
     EXPECT_EQ(r, 95);
@@ -3620,7 +3620,7 @@ static void test_fork_exec(TestContext *ctx)
     argv[0] = "sleep";
     argv[1] = "5";
     argv[2] = NULL;
-    pid = fork_exec(argv, NULL, fd, true);
+    pid = fork_exec(argv, fd, 0, 0, true);
     ASSERT_NE(pid, -1);
     EXPECT_EQ(kill(pid, SIGINT), 0);
     r = wait_child(pid);

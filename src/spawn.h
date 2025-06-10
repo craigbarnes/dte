@@ -16,11 +16,12 @@ typedef enum {
 
 typedef struct {
     const char **argv;
-    const char **env;
     StringView input;
     String outputs[2]; // For stdout/stderr
     SpawnAction actions[3];
     ErrorBuffer *ebuf;
+    unsigned int lines;
+    unsigned int columns;
     bool quiet;
 } SpawnContext;
 

@@ -211,21 +211,6 @@ static void insert_to_selection (
     view->sel_eo = SEL_EO_RECALC;
 }
 
-static const char **lines_and_columns_env(const Window *window)
-{
-    static char lines[DECIMAL_STR_MAX(window->edit_h)];
-    static char columns[DECIMAL_STR_MAX(window->edit_w)];
-    static const char *vars[] = {
-        "LINES", lines,
-        "COLUMNS", columns,
-        NULL,
-    };
-
-    buf_uint_to_str(window->edit_h, lines);
-    buf_uint_to_str(window->edit_w, columns);
-    return vars;
-}
-
 static void show_spawn_error_msg(ErrorBuffer *ebuf, const String *errstr, int err)
 {
     if (err <= 0) {
@@ -289,7 +274,8 @@ ssize_t handle_exec (
         .outputs = {STRING_INIT, STRING_INIT},
         .quiet = quiet,
         .ebuf = &e->err,
-        .env = output_to_buffer ? lines_and_columns_env(e->window) : NULL,
+        .lines = output_to_buffer ? view->window->edit_h : 0,
+        .columns = output_to_buffer ? view->window->edit_w : 0,
         .actions = {
             spawn_action_from_exec_action(actions[0]),
             spawn_action_from_exec_action(actions[1]),

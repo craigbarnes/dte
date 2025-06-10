@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "log.h"
+#include "numtostr.h"
 #include "terminal/ioctl.h"
 #include "xreadwrite.h"
 
@@ -39,9 +40,10 @@ static bool reset_ignored_signals(void)
 
 static noreturn void child_process_exec (
     const char **argv,
-    const char **env,
     int fd[3],
     int error_fd,
+    unsigned int lines,
+    unsigned int columns,
     bool drop_ctty
 ) {
     int error;
@@ -95,15 +97,11 @@ static noreturn void child_process_exec (
         }
     }
 
-    if (env) {
-        for (size_t i = 0; env[i]; i += 2) {
-            const char *name = env[i];
-            const char *value = env[i + 1];
-            int r = value ? setenv(name, value, 1) : unsetenv(name);
-            if (unlikely(r != 0)) {
-                goto error;
-            }
-        }
+    if (lines) {
+        setenv("LINES", uint_to_str(lines), 1);
+    }
+    if (columns) {
+        setenv("COLUMNS", uint_to_str(columns), 1);
     }
 
     if (!reset_ignored_signals()) {
@@ -127,8 +125,13 @@ static pid_t xwaitpid(pid_t pid, int *status, int options)
     return ret;
 }
 
-pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
-{
+pid_t fork_exec (
+    const char **argv,
+    int fd[3],
+    unsigned int lines,
+    unsigned int columns,
+    bool drop_ctty
+) {
     int ep[2];
     if (xpipe2(ep, O_CLOEXEC) != 0) {
         return -1;
@@ -145,7 +148,7 @@ pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
 
     if (pid == 0) {
         // Child
-        child_process_exec(argv, env, fd, ep[1], drop_ctty);
+        child_process_exec(argv, fd, ep[1], lines, columns, drop_ctty);
         BUG("child_process_exec() should never return");
         return -1;
     }
