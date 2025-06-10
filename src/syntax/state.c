@@ -22,22 +22,22 @@
 #include "util/xsnprintf.h"
 #include "util/xstring.h"
 
-static bool in_syntax(EditorState *e)
+static bool in_syntax(const SyntaxLoader *syn, ErrorBuffer *ebuf)
 {
-    return likely(e->syn.current_syntax) || error_msg(&e->err, "No syntax started");
+    return likely(syn->current_syntax) || error_msg(ebuf, "No syntax started");
 }
 
-static bool in_state(EditorState *e)
+static bool in_state(const SyntaxLoader *syn, ErrorBuffer *ebuf)
 {
-    if (unlikely(!in_syntax(e))) {
+    if (unlikely(!in_syntax(syn, ebuf))) {
         return false;
     }
-    return likely(e->syn.current_state) || error_msg(&e->err, "No state started");
+    return likely(syn->current_state) || error_msg(ebuf, "No state started");
 }
 
-static void close_state(EditorState *e)
+static void close_state(SyntaxLoader *syn, ErrorBuffer *ebuf)
 {
-    const State *state = e->syn.current_state;
+    const State *state = syn->current_state;
     if (!state) {
         return;
     }
@@ -46,15 +46,15 @@ static void close_state(EditorState *e)
         // This error applies to the state itself rather than the last
         // command, so it doesn't make sense to include the command name
         // in the error message
-        error_msg_for_cmd(&e->err, NULL, "No default action in state '%s'", state->name);
+        error_msg_for_cmd(ebuf, NULL, "No default action in state '%s'", state->name);
     }
 
-    e->syn.current_state = NULL;
+    syn->current_state = NULL;
 }
 
-static State *find_or_add_state(EditorState *e, const char *name)
+static State *find_or_add_state(const SyntaxLoader *syn, const char *name)
 {
-    State *state = find_state(e->syn.current_syntax, name);
+    State *state = find_state(syn->current_syntax, name);
     if (state) {
         return state;
     }
@@ -64,55 +64,65 @@ static State *find_or_add_state(EditorState *e, const char *name)
     state->defined = false;
     state->type = STATE_INVALID;
 
-    if (e->syn.current_syntax->states.count == 0) {
-        e->syn.current_syntax->start_state = state;
+    if (syn->current_syntax->states.count == 0) {
+        syn->current_syntax->start_state = state;
     }
 
-    return hashmap_insert(&e->syn.current_syntax->states, state->name, state);
+    return hashmap_insert(&syn->current_syntax->states, state->name, state);
 }
 
-static State *reference_state(EditorState *e, const char *name)
-{
+static State *reference_state (
+    const SyntaxLoader *syn,
+    ErrorBuffer *ebuf,
+    const char *name
+) {
     if (streq(name, "this")) {
-        return e->syn.current_state;
+        return syn->current_state;
     }
 
-    State *state = find_or_add_state(e, name);
-    if (unlikely((e->syn.flags & SYN_LINT) && state == e->syn.current_state)) {
+    State *state = find_or_add_state(syn, name);
+    if (unlikely((syn->flags & SYN_LINT) && state == syn->current_state)) {
         error_msg (
-            &e->err,
+            ebuf,
             "destination '%s' can be optimized to 'this' in '%s' syntax",
             name,
-            e->syn.current_syntax->name
+            syn->current_syntax->name
         );
     }
 
     return state;
 }
 
-static bool in_subsyntax(EditorState *e)
+static bool in_subsyntax(const SyntaxLoader *syn, ErrorBuffer *ebuf)
 {
-    bool ss = likely(is_subsyntax(e->syn.current_syntax));
-    return ss || error_msg(&e->err, "Destination state 'END' only allowed in a subsyntax");
+    bool ss = likely(is_subsyntax(syn->current_syntax));
+    return ss || error_msg(ebuf, "Destination state 'END' only allowed in a subsyntax");
 }
 
-static Syntax *must_find_subsyntax(EditorState *e, const char *name)
-{
-    Syntax *syntax = find_any_syntax(&e->syntaxes, name);
+static Syntax *must_find_subsyntax (
+    const HashMap *syntaxes,
+    ErrorBuffer *ebuf,
+    const char *name
+) {
+    Syntax *syntax = find_any_syntax(syntaxes, name);
     if (unlikely(!syntax)) {
-        error_msg(&e->err, "No such syntax '%s'", name);
+        error_msg(ebuf, "No such syntax '%s'", name);
         return NULL;
     }
     if (unlikely(!is_subsyntax(syntax))) {
-        error_msg(&e->err, "Syntax '%s' is not a subsyntax", name);
+        error_msg(ebuf, "Syntax '%s' is not a subsyntax", name);
         return NULL;
     }
     return syntax;
 }
 
-static bool subsyntax_call(EditorState *e, const char *name, const char *ret, State **dest)
-{
-    Syntax *subsyn = must_find_subsyntax(e, name);
+static bool subsyntax_call (
+    EditorState *e,
+    const char *name,
+    const char *ret,
+    State **dest
+) {
+    Syntax *subsyn = must_find_subsyntax(&e->syntaxes, &e->err, name);
 
     SyntaxMerge m = {
         .subsyn = subsyn,
@@ -122,11 +132,11 @@ static bool subsyntax_call(EditorState *e, const char *name, const char *ret, St
     };
 
     if (streq(ret, "END")) {
-        if (!in_subsyntax(e)) {
+        if (!in_subsyntax(&e->syn, &e->err)) {
             return false;
         }
     } else if (subsyn) {
-        m.return_state = reference_state(e, ret);
+        m.return_state = reference_state(&e->syn, &e->err, ret);
     }
 
     if (subsyn) {
@@ -149,28 +159,32 @@ static bool destination_state(EditorState *e, const char *name, State **dest)
     }
 
     if (streq(name, "END")) {
-        if (!in_subsyntax(e)) {
+        if (!in_subsyntax(&e->syn, &e->err)) {
             return false;
         }
         *dest = NULL;
         return true;
     }
 
-    *dest = reference_state(e, name);
+    *dest = reference_state(&e->syn, &e->err, name);
     return true;
 }
 
-static void lint_emit_name(EditorState *e, const char *ename, const State *dest)
-{
+static void lint_emit_name (
+    ErrorBuffer *ebuf,
+    SyntaxLoadFlags flags,
+    const char *ename,
+    const State *dest
+) {
     if (
-        (e->syn.flags & SYN_LINT)
+        (flags & SYN_LINT)
         && ename
         && dest
         && dest->emit_name
         && interned_strings_equal(ename, dest->emit_name)
     ) {
         error_msg (
-            &e->err,
+            ebuf,
             "emit-name '%s' not needed (destination state uses same emit-name)",
             ename
         );
@@ -184,7 +198,7 @@ static Condition *add_condition (
     const char *emit
 ) {
     BUG_ON(!dest && cond_type_has_destination(type));
-    if (!in_state(e)) {
+    if (!in_state(&e->syn, &e->err)) {
         return NULL;
     }
 
@@ -200,7 +214,7 @@ static Condition *add_condition (
         && type != COND_INLIST
         && type != COND_INLIST_BUFFER
     ) {
-        lint_emit_name(e, emit, d);
+        lint_emit_name(&e->err, e->syn.flags, emit, d);
     }
 
     Condition *c = xcalloc1(sizeof(*c));
@@ -272,18 +286,20 @@ static bool cmd_char(EditorState *e, const CommandArgs *a)
 
 static bool cmd_default(EditorState *e, const CommandArgs *a)
 {
-    close_state(e);
-    if (!in_syntax(e)) {
+    SyntaxLoader *syn = &e->syn;
+    ErrorBuffer *ebuf = &e->err;
+    close_state(syn, ebuf);
+    if (!in_syntax(syn, ebuf)) {
         return false;
     }
 
     const char *value = str_intern(a->args[0]);
-    HashMap *map = &e->syn.current_syntax->default_styles;
+    HashMap *map = &syn->current_syntax->default_styles;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
         const char *name = a->args[i];
         const void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
         if (unlikely(oldval)) {
-            error_msg(&e->err, "'%s' argument specified multiple times", name);
+            error_msg(ebuf, "'%s' argument specified multiple times", name);
         }
     }
 
@@ -292,45 +308,47 @@ static bool cmd_default(EditorState *e, const CommandArgs *a)
 
 static bool cmd_eat(EditorState *e, const CommandArgs *a)
 {
-    if (!in_state(e)) {
+    SyntaxLoader *syn = &e->syn;
+    if (!in_state(syn, &e->err)) {
         return false;
     }
 
     const char *dest = a->args[0];
-    if (!destination_state(e, dest, &e->syn.current_state->default_action.destination)) {
+    State *curstate = syn->current_state;
+    if (!destination_state(e, dest, &curstate->default_action.destination)) {
         return false;
     }
 
     const char *emit = a->args[1] ? str_intern(a->args[1]) : NULL;
-    State *curstate = e->syn.current_state;
-    lint_emit_name(e, emit, curstate->default_action.destination);
+    lint_emit_name(&e->err, syn->flags, emit, curstate->default_action.destination);
     curstate->default_action.emit_name = emit;
     curstate->type = STATE_EAT;
-    e->syn.current_state = NULL;
+    syn->current_state = NULL;
     return true;
 }
 
 static bool cmd_heredocbegin(EditorState *e, const CommandArgs *a)
 {
-    if (!in_state(e)) {
+    SyntaxLoader *syn = &e->syn;
+    if (!in_state(syn, &e->err)) {
         return false;
     }
 
-    Syntax *subsyn = must_find_subsyntax(e, a->args[0]);
+    Syntax *subsyn = must_find_subsyntax(&e->syntaxes, &e->err, a->args[0]);
     if (!subsyn) {
         return false;
     }
 
     // default_action.destination is used as the return state
     const char *ret = a->args[1];
-    if (!destination_state(e, ret, &e->syn.current_state->default_action.destination)) {
+    if (!destination_state(e, ret, &syn->current_state->default_action.destination)) {
         return false;
     }
 
-    e->syn.current_state->default_action.emit_name = NULL;
-    e->syn.current_state->type = STATE_HEREDOCBEGIN;
-    e->syn.current_state->heredoc.subsyntax = subsyn;
-    e->syn.current_state = NULL;
+    syn->current_state->default_action.emit_name = NULL;
+    syn->current_state->type = STATE_HEREDOCBEGIN;
+    syn->current_state->heredoc.subsyntax = subsyn;
+    syn->current_state = NULL;
 
     // Normally merge() marks subsyntax used but in case of heredocs merge()
     // is not called when syntax file is loaded
@@ -344,8 +362,10 @@ static bool cmd_heredocend(EditorState *e, const CommandArgs *a)
     if (unlikely(!c)) {
         return false;
     }
-    BUG_ON(!e->syn.current_syntax);
-    e->syn.current_syntax->heredoc = true;
+
+    Syntax *current_syntax = e->syn.current_syntax;
+    BUG_ON(!current_syntax);
+    current_syntax->heredoc = true;
     return true;
 }
 
@@ -364,19 +384,21 @@ static bool cmd_include(EditorState *e, const CommandArgs *a)
 
 static bool cmd_list(EditorState *e, const CommandArgs *a)
 {
-    close_state(e);
-    if (!in_syntax(e)) {
+    SyntaxLoader *syn = &e->syn;
+    ErrorBuffer *ebuf = &e->err;
+    close_state(syn, ebuf);
+    if (!in_syntax(syn, ebuf)) {
         return false;
     }
 
     char **args = a->args;
     const char *name = args[0];
-    StringList *list = find_string_list(e->syn.current_syntax, name);
+    StringList *list = find_string_list(syn->current_syntax, name);
     if (!list) {
         list = xcalloc1(sizeof(*list));
-        hashmap_insert(&e->syn.current_syntax->string_lists, xstrdup(name), list);
+        hashmap_insert(&syn->current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
-        return error_msg(&e->err, "List '%s' already exists", name);
+        return error_msg(ebuf, "List '%s' already exists", name);
     }
     list->defined = true;
 
@@ -415,19 +437,23 @@ static bool cmd_inlist(EditorState *e, const CommandArgs *a)
 
 static bool cmd_noeat(EditorState *e, const CommandArgs *a)
 {
+    SyntaxLoader *syn = &e->syn;
     State *dest;
-    if (unlikely(!in_state(e) || !destination_state(e, a->args[0], &dest))) {
+    if (unlikely(!in_state(syn, &e->err) || !destination_state(e, a->args[0], &dest))) {
         return false;
     }
 
-    if (unlikely(dest == e->syn.current_state)) {
+    State *curstate = syn->current_state;
+    if (unlikely(dest == curstate)) {
         return error_msg(&e->err, "using noeat to jump to same state causes infinite loop");
     }
 
-    e->syn.current_state->default_action.destination = dest;
-    e->syn.current_state->default_action.emit_name = NULL;
-    e->syn.current_state->type = a->flags[0] == 'b' ? STATE_NOEAT_BUFFER : STATE_NOEAT;
-    e->syn.current_state = NULL;
+    Action *defaction = &curstate->default_action;
+    bool bflag = cmdargs_has_flag(a, 'b');
+    defaction->destination = dest;
+    defaction->emit_name = NULL;
+    curstate->type = bflag ? STATE_NOEAT_BUFFER : STATE_NOEAT;
+    syn->current_state = NULL;
     return true;
 }
 
@@ -483,10 +509,11 @@ static bool cmd_require(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    const SyntaxLoadFlags save = e->syn.flags;
-    e->syn.flags &= ~SYN_WARN_ON_UNUSED_SUBSYN;
+    SyntaxLoader *syn = &e->syn;
+    const SyntaxLoadFlags save = syn->flags;
+    syn->flags &= ~SYN_WARN_ON_UNUSED_SUBSYN;
     int r = read_syntax(e, path, flags);
-    e->syn.flags = save;
+    syn->flags = save;
     if (r != 0) {
         return false;
     }
@@ -497,29 +524,31 @@ static bool cmd_require(EditorState *e, const CommandArgs *a)
 
 static bool cmd_state(EditorState *e, const CommandArgs *a)
 {
-    close_state(e);
-    if (!in_syntax(e)) {
+    SyntaxLoader *syn = &e->syn;
+    ErrorBuffer *ebuf = &e->err;
+    close_state(syn, ebuf);
+    if (!in_syntax(syn, ebuf)) {
         return false;
     }
 
     const char *name = a->args[0];
     if (unlikely(streq(name, "END") || streq(name, "this"))) {
-        return error_msg(&e->err, "'%s' is reserved state name", name);
+        return error_msg(ebuf, "'%s' is reserved state name", name);
     }
 
-    State *state = find_or_add_state(e, name);
+    State *state = find_or_add_state(syn, name);
     if (unlikely(state->defined)) {
-        return error_msg(&e->err, "State '%s' already exists", name);
+        return error_msg(ebuf, "State '%s' already exists", name);
     }
 
     const char *emit_name = a->args[1];
-    if ((e->syn.flags & SYN_LINT) && emit_name && streq(emit_name, name)) {
-        return error_msg(&e->err, "Redundant emit-name '%s'", emit_name);
+    if ((syn->flags & SYN_LINT) && emit_name && streq(emit_name, name)) {
+        return error_msg(ebuf, "Redundant emit-name '%s'", emit_name);
     }
 
     state->defined = true;
     state->emit_name = str_intern(emit_name ? emit_name : name);
-    e->syn.current_state = state;
+    syn->current_state = state;
     return true;
 }
 
@@ -554,29 +583,30 @@ static bool cmd_str(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static void finish_syntax(EditorState *e)
+static void finish_syntax(SyntaxLoader *syn, ErrorBuffer *ebuf, HashMap *syntaxes)
 {
-    BUG_ON(!e->syn.current_syntax);
-    close_state(e);
-    finalize_syntax(&e->syntaxes, e->syn.current_syntax, &e->err, e->syn.saved_nr_errors);
-    e->syn.current_syntax = NULL;
+    BUG_ON(!syn->current_syntax);
+    close_state(syn, ebuf);
+    finalize_syntax(syntaxes, syn->current_syntax, ebuf, syn->saved_nr_errors);
+    syn->current_syntax = NULL;
 }
 
 static bool cmd_syntax(EditorState *e, const CommandArgs *a)
 {
-    if (e->syn.current_syntax) {
-        finish_syntax(e);
+    SyntaxLoader *syn = &e->syn;
+    if (syn->current_syntax) {
+        finish_syntax(syn, &e->err, &e->syntaxes);
     }
 
     Syntax *syntax = xcalloc1(sizeof(*syntax));
     syntax->name = xstrdup(a->args[0]);
-    if (is_subsyntax(syntax) && !(e->syn.flags & SYN_WARN_ON_UNUSED_SUBSYN)) {
+    if (is_subsyntax(syntax) && !(syn->flags & SYN_WARN_ON_UNUSED_SUBSYN)) {
         syntax->warned_unused_subsyntax = true;
     }
 
-    e->syn.current_syntax = syntax;
-    e->syn.current_state = NULL;
-    e->syn.saved_nr_errors = e->err.nr_errors;
+    syn->current_syntax = syntax;
+    syn->current_state = NULL;
+    syn->saved_nr_errors = e->err.nr_errors;
     return true;
 }
 
@@ -658,7 +688,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags f
     *err = do_read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
 
     if (!*err && e->syn.current_syntax) {
-        finish_syntax(e);
+        finish_syntax(&e->syn, &e->err, &e->syntaxes);
         find_unused_subsyntaxes(&e->syntaxes, &e->err);
     }
 
