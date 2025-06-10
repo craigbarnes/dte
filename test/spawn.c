@@ -15,6 +15,8 @@ static void test_spawn(TestContext *ctx)
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
         .ebuf = &ebuf,
+        .lines = 32,
+        .columns = 120,
         .quiet = true,
         .actions = {
             [STDIN_FILENO] = SPAWN_PIPE,
@@ -45,12 +47,12 @@ static void test_spawn(TestContext *ctx)
     EXPECT_EQ(string_clear(out), 4);
     EXPECT_EQ(string_clear(err), 0);
 
-    args[2] = "printf 'xyz 123'; exit 37";
+    args[2] = "printf \"xyz $LINES $COLUMNS\"; exit 37";
     EXPECT_EQ(spawn(&sc), 37);
-    EXPECT_EQ(out->len, 7);
+    EXPECT_EQ(out->len, 10);
     EXPECT_EQ(err->len, 0);
-    EXPECT_STREQ(string_borrow_cstring(out), "xyz 123");
-    EXPECT_EQ(string_clear(out), 7);
+    EXPECT_STREQ(string_borrow_cstring(out), "xyz 32 120");
+    EXPECT_EQ(string_clear(out), 10);
     EXPECT_EQ(string_clear(err), 0);
 
     // Make sure zero-length input with one SPAWN_PIPE action
