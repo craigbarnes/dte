@@ -367,11 +367,11 @@ static View *open_initial_buffers (
     EditorState *e,
     Buffer *std_buffer,
     char *args[],
-    size_t len
+    size_t nr_args
 ) {
     // Open files specified as command-line arguments
     Window *window = e->window;
-    for (size_t i = 0, line = 0, col = 0; i < len; i++) {
+    for (size_t i = 0, line = 0, col = 0; i < nr_args; i++) {
         const char *str = args[i];
         if (line == 0 && *str == '+' && str_to_filepos(str + 1, &line, &col)) {
             continue;
@@ -481,7 +481,7 @@ int main(int argc, char *argv[])
     int std_fds[2] = {-1, -1};
     ExitCode r = headless ? init_std_fds_headless(std_fds) : init_std_fds(std_fds);
     r = r ? r : init_logging();
-    if (unlikely(r != EC_OK)) {
+    if (unlikely(r)) {
         return r;
     }
 
@@ -511,9 +511,6 @@ int main(int argc, char *argv[])
     if (headless) {
         set_signal_dispositions_headless();
     } else {
-        if (!term_mode_init()) {
-            return ec_error("tcgetattr", EC_IO_ERROR);
-        }
         set_basic_signal_dispositions();
     }
 
@@ -577,15 +574,16 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    e->err.print_to_stderr = headless;
+    e->err.print_to_stderr = false;
     lookup_tags(e, tags, nr_tags, nr_commands ? NULL : dview);
 
     set_fatal_error_cleanup_handler(cleanup_handler, e);
     set_fatal_signal_handlers();
     set_sigwinch_handler();
 
-    if (unlikely(!term_raw())) {
-        e->status = ec_error("tcsetattr", EC_IO_ERROR);
+    bool init = term_mode_init();
+    if (unlikely(!init || !term_raw())) {
+        e->status = ec_error(init ? "tcsetattr" : "tcgetattr", EC_IO_ERROR);
         fast_exit = true;
         goto exit;
     }
