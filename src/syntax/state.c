@@ -512,8 +512,13 @@ static bool cmd_state(EditorState *e, const CommandArgs *a)
         return error_msg(&e->err, "State '%s' already exists", name);
     }
 
+    const char *emit_name = a->args[1];
+    if ((e->syn.flags & SYN_LINT) && emit_name && streq(emit_name, name)) {
+        return error_msg(&e->err, "Redundant emit-name '%s'", emit_name);
+    }
+
     state->defined = true;
-    state->emit_name = str_intern(a->args[1] ? a->args[1] : name);
+    state->emit_name = str_intern(emit_name ? emit_name : name);
     e->syn.current_state = state;
     return true;
 }
