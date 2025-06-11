@@ -108,7 +108,7 @@ typedef struct EditorState {
     PointerArray filetypes;
     PointerArray file_options;
     PointerArray bookmarks;
-    MessageArray messages[3];
+    MessageList messages[3];
     FileHistory file_history;
     History search_history;
     History command_history;

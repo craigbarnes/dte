@@ -92,7 +92,7 @@ static void open_temporary_buffer (
         block_iter_eof(&view->cursor);
         block_iter_prev_line(&view->cursor);
     } else if (flags & MSGLINE) {
-        const MessageArray *msgs = &e->messages[0];
+        const MessageList *msgs = &e->messages[0];
         if (msgs->array.count > 0) {
             block_iter_goto_line(&view->cursor, msgs->pos);
         }
@@ -322,7 +322,7 @@ static bool show_msg(EditorState *e, const char *name, bool cflag)
         return info_msg(&e->err, "no message list '%s'", name);
     }
 
-    const MessageArray *msgs = &e->messages[idx];
+    const MessageList *msgs = &e->messages[idx];
     String str = dump_messages(msgs);
 
     if (cflag) {

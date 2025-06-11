@@ -259,7 +259,7 @@ static void tag_file_find_tags (
 
 // Note: this moves ownership of tag->pattern to the generated Message
 // and assigns NULL to the old pointer
-void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir)
+void add_message_for_tag(MessageList *messages, Tag *tag, const StringView *dir)
 {
     BUG_ON(dir->length == 0);
     BUG_ON(dir->data[0] != '/');
@@ -288,7 +288,7 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
 
 size_t tag_lookup (
     TagFile *tf,
-    MessageArray *messages,
+    MessageList *messages,
     ErrorBuffer *ebuf,
     const StringView *name,
     const char *filename

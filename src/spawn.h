@@ -26,6 +26,6 @@ typedef struct {
 } SpawnContext;
 
 int spawn(SpawnContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bool read_stdout) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, bool read_stdout) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

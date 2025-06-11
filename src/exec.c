@@ -119,7 +119,7 @@ static void parse_and_activate_message(EditorState *e, const String *str, ExecAc
 
     size_t msgs_idx = (action == EXEC_MSG) ? 0 : action - EXEC_MSG_A;
     BUG_ON(msgs_idx >= ARRAYLEN(e->messages));
-    MessageArray *msgs = &e->messages[msgs_idx];
+    MessageList *msgs = &e->messages[msgs_idx];
     size_t count = msgs->array.count;
     size_t x;
 
@@ -152,7 +152,7 @@ static void parse_and_activate_tags(EditorState *e, const String *str, ExecActio
 
     size_t msgs_idx = (action == EXEC_TAG) ? e->options.msg_tag : action - EXEC_TAG_A;
     BUG_ON(msgs_idx >= ARRAYLEN(e->messages));
-    MessageArray *msgs = &e->messages[msgs_idx];
+    MessageList *msgs = &e->messages[msgs_idx];
     clear_messages(msgs);
 
     for (size_t pos = 0, len = str->len; pos < len; ) {

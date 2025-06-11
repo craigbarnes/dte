@@ -17,7 +17,7 @@
 #include "util/xreadwrite.h"
 #include "util/xstdio.h"
 
-static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
+static void handle_error_msg(const Compiler *c, MessageList *msgs, char *str)
 {
     if (str[0] == '\0' || str[0] == '\n') {
         return;
@@ -78,7 +78,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
     add_message(msgs, new_message(str, str_len));
 }
 
-static void read_errors(const Compiler *c, MessageArray *msgs, int fd, bool quiet)
+static void read_errors(const Compiler *c, MessageList *msgs, int fd, bool quiet)
 {
     FILE *f = fdopen(fd, "r");
     if (unlikely(!f)) {
@@ -214,7 +214,7 @@ static void exec_error(SpawnContext *ctx)
     error_msg(ctx->ebuf, "Unable to exec '%s': %s", ctx->argv[0], strerror(errno));
 }
 
-bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs, bool read_stdout)
+bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, bool read_stdout)
 {
     BUG_ON(!ctx->argv);
     BUG_ON(!ctx->argv[0]);

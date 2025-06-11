@@ -28,13 +28,13 @@ Message *new_message(const char *msg, size_t len)
     return m;
 }
 
-void add_message(MessageArray *msgs, Message *m)
+void add_message(MessageList *msgs, Message *m)
 {
     ptr_array_append(&msgs->array, m);
 }
 
 // Jump to the FileLocation of the current Message
-bool activate_current_message(const MessageArray *msgs, Window *window)
+bool activate_current_message(const MessageList *msgs, Window *window)
 {
     size_t count = msgs->array.count;
     if (count == 0) {
@@ -61,7 +61,7 @@ bool activate_current_message(const MessageArray *msgs, Window *window)
 // Like activate_current_message(), but also pushing the previous
 // FileLocation on the bookmark stack if the cursor moves
 void activate_current_message_save (
-    const MessageArray *msgs,
+    const MessageList *msgs,
     PointerArray *bookmarks,
     const View *view
 ) {
@@ -91,13 +91,13 @@ void activate_current_message_save (
     bookmark_push(bookmarks, new_file_location(filename, b->id, line, col));
 }
 
-void clear_messages(MessageArray *msgs)
+void clear_messages(MessageList *msgs)
 {
     msgs->pos = 0;
     ptr_array_free_cb(&msgs->array, FREE_FUNC(free_message));
 }
 
-String dump_messages(const MessageArray *messages)
+String dump_messages(const MessageList *messages)
 {
     size_t count = messages->array.count;
     char cwd[8192];

@@ -382,7 +382,7 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
 
     char abc = cmdargs_pick_winning_flag(a, "ABC");
     size_t idx = abc ? abc - 'A' : e->options.msg_compile;
-    MessageArray *messages = &e->messages[idx];
+    MessageList *messages = &e->messages[idx];
     clear_messages(messages);
 
     yield_terminal(e, quiet);
@@ -1088,7 +1088,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
 
     char abc = cmdargs_pick_winning_flag(a, "ABC");
     size_t idx = abc ? abc - 'A' : 0;
-    MessageArray *msgs = &e->messages[idx];
+    MessageList *msgs = &e->messages[idx];
     size_t count = msgs->array.count;
     if (count == 0) {
         return true;
@@ -2242,7 +2242,7 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
 
     char abc = cmdargs_pick_winning_flag(a, "ABC");
     size_t idx = abc ? abc - 'A' : e->options.msg_tag;
-    MessageArray *msgs = &e->messages[idx];
+    MessageList *msgs = &e->messages[idx];
     clear_messages(msgs);
     if (!load_tag_file(&e->tagfile, &e->err)) {
         return false;

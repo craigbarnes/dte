@@ -344,7 +344,7 @@ static void lookup_tags (
         return;
     }
 
-    MessageArray *msgs = &e->messages[e->options.msg_tag];
+    MessageList *msgs = &e->messages[e->options.msg_tag];
     clear_messages(msgs);
 
     for (size_t i = 0; i < nr_tags; i++) {
