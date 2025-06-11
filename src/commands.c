@@ -1078,33 +1078,35 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
 static bool cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
-    if (str && cmdargs_has_any_flag(a, "npNP")) {
+    if (str && cmdargs_has_any_flag(a, "np")) {
         return error_msg (
             &e->err,
-            "flags [-n|-p|-N|-P] can't be used with [number] argument"
+            "flags [-n|-p] can't be used with [number] argument"
         );
     }
 
     char abc = cmdargs_pick_winning_flag(a, "ABC");
-    size_t idx = abc ? abc - 'A' : 0;
-    MessageList *msgs = &e->messages[idx];
-    size_t count = msgs->array.count;
-    if (count == 0) {
+    MessageList *msgs = &e->messages[abc ? abc - 'A' : 0];
+    size_t n = msgs->array.count;
+    if (n == 0) {
         return true;
     }
 
+    bool wrap = has_flag(a, 'w');
     size_t p = msgs->pos;
-    switch (cmdargs_pick_winning_flag(a, "npNP")) {
-    case 'n': p = saturating_increment(p, count - 1); break;
-    case 'p': p = saturating_decrement(p); break;
-    case 'N': p = wrapping_increment(p, count); break;
-    case 'P': p = wrapping_decrement(p, count); break;
+    switch (cmdargs_pick_winning_flag(a, "np")) {
+    case 'n':
+        p = wrap ? wrapping_increment(p, n) : saturating_increment(p, n - 1);
+        break;
+    case 'p':
+        p = wrap ? wrapping_decrement(p, n) : saturating_decrement(p);
+        break;
     case 0:
         if (str) {
             if (!str_to_size(str, &p) || p == 0) {
                 return error_msg(&e->err, "invalid message index: %s", str);
             }
-            p = MIN(p - 1, count - 1);
+            p = MIN(p - 1, n - 1);
         }
     }
 
@@ -2605,7 +2607,7 @@ static const Command cmds[] = {
     {"match-bracket", "cl", NA, 0, 0, cmd_match_bracket},
     {"mode", "", RC, 1, 1, cmd_mode},
     {"move-tab", "", NA, 1, 1, cmd_move_tab},
-    {"msg", "ABCNPnp", NA, 0, 1, cmd_msg},
+    {"msg", "ABCnpw", NA, 0, 1, cmd_msg},
     {"new-line", "Iai", NA, 0, 0, cmd_new_line},
     {"next", "", NA, 0, 0, cmd_next},
     {"open", "e=gt", NA, 0, -1, cmd_open},
