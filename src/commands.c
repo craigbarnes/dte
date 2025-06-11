@@ -1078,8 +1078,7 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
 static bool cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
-    CommandFlagSet npflags = cmdargs_flagset_from_str("npNP");
-    if (str && (a->flag_set & npflags)) {
+    if (str && cmdargs_has_any_flag(a, "npNP")) {
         return error_msg (
             &e->err,
             "flags [-n|-p|-N|-P] can't be used with [number] argument"
@@ -2666,8 +2665,7 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         CommandArgs a = cmdargs_new(args_copy);
         bool ret = true;
         if (do_parse_args(cmd, &a) == ARGERR_NONE) {
-            CommandFlagSet npw = cmdargs_flagset_from_str("npw");
-            if (a.nr_args == 0 && !(a.flag_set & npw)) {
+            if (a.nr_args == 0 && !cmdargs_has_any_flag(&a, "npw")) {
                 // If command is "search" with no [pattern] argument or
                 // [-n|-p|-w] flags, the command would put the editor into
                 // search mode, which shouldn't be recorded.

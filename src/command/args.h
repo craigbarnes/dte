@@ -60,9 +60,12 @@ static inline CommandFlagSet cmdargs_flagset_from_str(const char *flags)
 
 static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
 {
-    CommandFlagSet bitmask = cmdargs_flagset_bit(flag);
-    static_assert_compatible_types(bitmask, a->flag_set);
-    return (a->flag_set & bitmask) != 0;
+    return (a->flag_set & cmdargs_flagset_bit(flag));
+}
+
+static inline bool cmdargs_has_any_flag(const CommandArgs *a, const char *flags)
+{
+    return (a->flag_set & cmdargs_flagset_from_str(flags));
 }
 
 // Return the rightmost flag in CommandArgs::flags[] that is also a member of
