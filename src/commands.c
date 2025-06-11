@@ -71,17 +71,6 @@
 #include "window.h"
 #include "wrap.h"
 
-static char last_flag_or_default(const CommandArgs *a, char def)
-{
-    size_t n = a->nr_flags;
-    return n ? a->flags[n - 1] : def;
-}
-
-static char last_flag(const CommandArgs *a)
-{
-    return last_flag_or_default(a, 0);
-}
-
 static bool has_flag(const CommandArgs *a, unsigned char flag)
 {
     return cmdargs_has_flag(a, flag);
@@ -249,7 +238,8 @@ static bool cmd_bookmark(EditorState *e, const CommandArgs *a)
 
 static bool cmd_case(EditorState *e, const CommandArgs *a)
 {
-    change_case(e->view, last_flag_or_default(a, 't'));
+    char mode = cmdargs_pick_winning_flag(a, "lu");
+    change_case(e->view, mode ? mode : 't');
     return true;
 }
 
@@ -813,7 +803,7 @@ static bool cmd_ft(EditorState *e, const CommandArgs *a)
     }
 
     FileDetectionType dt = FT_EXTENSION;
-    switch (last_flag(a)) {
+    switch (cmdargs_pick_winning_flag(a, "bcfi")) {
         case 'b': dt = FT_BASENAME; break;
         case 'c': dt = FT_CONTENT; break;
         case 'f': dt = FT_FILENAME; break;
@@ -2455,7 +2445,7 @@ static bool cmd_wresize(EditorState *e, const CommandArgs *a)
     }
 
     ResizeDirection dir = RESIZE_DIRECTION_AUTO;
-    switch (last_flag(a)) {
+    switch (cmdargs_pick_winning_flag(a, "hv")) {
     case 'h':
         dir = RESIZE_DIRECTION_HORIZONTAL;
         break;
