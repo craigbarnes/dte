@@ -55,10 +55,10 @@ typedef struct {
     const CommandSet *cmds;
     const char* (*lookup_alias)(const struct EditorState *e, const char *name);
     char* (*expand_variable)(const struct EditorState *e, const char *name);
-    const StringView *home_dir;
-    struct EditorState *e;
-    ErrorBuffer *ebuf;
-    unsigned int recursion_count;
+    const StringView *home_dir; // Used by parse_command_arg(); for expanding ~/
+    struct EditorState *e; // Passed to the above function pointers
+    ErrorBuffer *ebuf; // Used by parse_args(), handle_command(), exec_config()
+    unsigned int recursion_count; // Used by run_commands(); to limit alias recursion
     CommandRunnerFlags flags;
 } CommandRunner;
 
