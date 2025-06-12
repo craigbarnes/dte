@@ -156,7 +156,6 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
 
 int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
-    // Recursive
     ErrorBuffer *ebuf = runner->ebuf;
     const char *saved_file = ebuf->config_filename;
     const unsigned int saved_line = ebuf->config_line;
@@ -183,28 +182,6 @@ void exec_builtin_color_reset(EditorState *e)
     clear_hl_styles(&e->styles);
     StringView reset = string_view(builtin_color_reset, sizeof(builtin_color_reset) - 1);
     exec_builtin_config(e, reset, "color/reset");
-}
-
-static void exec_builtin_rc(EditorState *e)
-{
-    exec_builtin_color_reset(e);
-    StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
-    exec_builtin_config(e, rc, "rc");
-}
-
-static void exec_user_rc(EditorState *e, const char *filename)
-{
-    ConfigFlags flags = CFG_NOFLAGS;
-    char buf[8192];
-    if (filename) {
-        flags |= CFG_MUST_EXIST;
-    } else {
-        xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
-        filename = buf;
-    }
-
-    LOG_INFO("loading configuration from %s", filename);
-    read_normal_config(e, filename, flags);
 }
 
 static void log_config_counts(const EditorState *e)
@@ -244,12 +221,23 @@ static void log_config_counts(const EditorState *e)
     );
 }
 
-void exec_rc_files(EditorState *e, const char *user_rc, bool read_rc)
+void exec_rc_files(EditorState *e, const char *filename, bool read_user_rc)
 {
-    exec_builtin_rc(e);
+    StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
+    exec_builtin_color_reset(e);
+    exec_builtin_config(e, rc, "rc");
 
-    if (read_rc) {
-        exec_user_rc(e, user_rc);
+    if (read_user_rc) {
+        ConfigFlags flags = CFG_NOFLAGS;
+        char buf[8192];
+        if (filename) {
+            flags |= CFG_MUST_EXIST;
+        } else {
+            xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
+            filename = buf;
+        }
+        LOG_INFO("loading configuration from %s", filename);
+        read_normal_config(e, filename, flags);
     }
 
     log_config_counts(e);
