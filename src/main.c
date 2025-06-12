@@ -86,14 +86,14 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
     e->err.print_to_stderr = true;
     BUG_ON(e->status != EDITOR_INITIALIZING);
 
-    int err;
+    SyntaxLoadError err;
     const Syntax *s = load_syntax_file(e, filename, flags | SYN_MUST_EXIST, &err);
 
     if (s) {
         const size_t n = s->states.count;
         const char *plural = (n == 1) ? "" : "s";
         printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, plural);
-    } else if (err == EINVAL) {
+    } else if (err == SYNERR_NO_MAIN_SYNTAX) {
         error_msg(&e->err, "%s: no default syntax found", filename);
     }
 

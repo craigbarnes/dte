@@ -15,7 +15,6 @@
 #include "util/hashset.h"
 #include "util/intern.h"
 #include "util/log.h"
-#include "util/macros.h"
 #include "util/path.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -673,8 +672,12 @@ static int read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags fla
     return read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
 }
 
-Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags flags, int *err)
-{
+Syntax *load_syntax_file (
+    EditorState *e,
+    const char *filename,
+    SyntaxLoadFlags flags,
+    SyntaxLoadError *err // Out param
+) {
     e->syn = (SyntaxLoader) {
         .current_syntax = NULL,
         .current_state = NULL,
@@ -682,26 +685,28 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags f
         .saved_nr_errors = 0,
     };
 
-    const char *saved_file = e->err.config_filename;
-    const unsigned int saved_line = e->err.config_line;
+    ErrorBuffer *ebuf = &e->err;
+    const char *saved_file = ebuf->config_filename;
+    const unsigned int saved_line = ebuf->config_line;
     CommandRunner runner = cmdrunner_for_syntaxes(e);
-    *err = do_read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
+    int r = do_read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
 
-    if (!*err && e->syn.current_syntax) {
-        finish_syntax(&e->syn, &e->err, &e->syntaxes);
-        find_unused_subsyntaxes(&e->syntaxes, &e->err);
+    if (!r && e->syn.current_syntax) {
+        finish_syntax(&e->syn, ebuf, &e->syntaxes);
+        find_unused_subsyntaxes(&e->syntaxes, ebuf);
     }
 
-    e->err.config_filename = saved_file;
-    e->err.config_line = saved_line;
+    ebuf->config_filename = saved_file;
+    ebuf->config_line = saved_line;
 
-    if (*err) {
+    if (r) {
+        *err = (r == ENOENT) ? SYNERR_NONEXISTENT : SYNERR_READ_FAILED;
         return NULL;
     }
 
     Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
     if (!syn) {
-        *err = EINVAL;
+        *err = SYNERR_NO_MAIN_SYNTAX;
         return NULL;
     }
 
@@ -722,9 +727,9 @@ Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
     char filename[8192];
     xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
 
-    int err;
+    SyntaxLoadError err;
     Syntax *syn = load_syntax_file(e, filename, 0, &err);
-    if (syn || err != ENOENT) {
+    if (syn || err != SYNERR_NONEXISTENT) {
         return syn;
     }
 

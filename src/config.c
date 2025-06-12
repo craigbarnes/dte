@@ -130,11 +130,10 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
             exec_config(runner, cfg->text);
             return 0;
         }
-        if (!must_exist) {
-            return 0;
+        if (must_exist) {
+            error_msg(ebuf, "no built-in config with name '%s'", filename);
         }
-        error_msg(ebuf, "no built-in config with name '%s'", filename);
-        return 1;
+        return ENOENT;
     }
 
     char *buf;
