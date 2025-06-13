@@ -7,11 +7,10 @@
 #include "util/log.h"
 #include "util/xstdio.h"
 
-VPRINTF(2)
-static void error_msgv(ErrorBuffer *eb, const char *format, va_list ap)
+VPRINTF(3)
+static void error_msgv(ErrorBuffer *eb, const char *cmd, const char *format, va_list ap)
 {
     const size_t size = sizeof(eb->buf);
-    const char *cmd = eb->command_name;
     const char *file = eb->config_filename;
     unsigned int line  = eb->config_line;
     int pos = 0;
@@ -51,22 +50,17 @@ bool error_msg(ErrorBuffer *eb, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    error_msgv(eb, format, ap);
+    error_msgv(eb, eb->command_name, format, ap);
     va_end(ap);
     return false; // To allow tail-calling from command handlers
 }
 
 bool error_msg_for_cmd(ErrorBuffer *eb, const char *cmd, const char *format, ...)
 {
-    const char *saved_cmd = eb->command_name;
-    eb->command_name = cmd;
-
     va_list ap;
     va_start(ap, format);
-    error_msgv(eb, format, ap);
+    error_msgv(eb, cmd, format, ap);
     va_end(ap);
-
-    eb->command_name = saved_cmd;
     return false;
 }
 
