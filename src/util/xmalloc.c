@@ -54,7 +54,7 @@ static char *xvasprintf(const char *format, va_list ap)
     int n = vsnprintf(NULL, 0, format, ap2);
     va_end(ap2);
 
-    if (unlikely(n < 0 || n == INT_MAX)) {
+    if (unlikely(n < 0 || n == INT_MAX || n >= SIZE_MAX)) {
         fatal_error(__func__, n < 0 ? errno : EOVERFLOW);
     }
 

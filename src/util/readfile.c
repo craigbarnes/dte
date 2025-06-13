@@ -5,6 +5,7 @@
 #include "readfile.h"
 #include "xreadwrite.h"
 
+// Read the contents of a file into memory, if smaller than `size_limit`
 ssize_t read_file(const char *filename, char **bufp, size_t size_limit)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
