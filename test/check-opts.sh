@@ -96,7 +96,7 @@ check_exit 64
 # Linting invalid syntax file
 err="$($dte -s /dev/null 2>&1)"
 check_exit 65
-check_str "$err" '/dev/null: no default syntax found'
+check_str "$err" "/dev/null: no main syntax found (i.e. with name 'null')"
 
 # Dumping non-existent builtin config
 err="$($dte -b non-existent 2>&1)"

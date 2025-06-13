@@ -94,7 +94,8 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
         const char *plural = (n == 1) ? "" : "s";
         printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, plural);
     } else if (err == SYNERR_NO_MAIN_SYNTAX) {
-        error_msg(&e->err, "%s: no default syntax found", filename);
+        const char *base = path_basename(filename);
+        error_msg(&e->err, "%s: no main syntax found (i.e. with name '%s')", filename, base);
     }
 
     unsigned int nr_errs = e->err.nr_errors;
