@@ -28,7 +28,9 @@ The following points should be observed when adding new feature tests:
 
 * Source files under [`src/`] that use constructs like e.g. `#if HAVE_EXAMPLE`
   should use `#include "feature.h"` before any other includes and should be
-  given an explicit dependency on `src/feature.h` in [`mk/build.mk`].
+  given an explicit dependency on `src/feature.h` in [`mk/build.mk`]. The
+  `tools/hdrcheck.awk` script (and `make check-headers` target) will issue
+  a warning, if this `#include` ordering isn't respected.
 
 * Pre-processor `#if` or `#ifdef` guard blocks should be kept as small as
   is reasonably possible; ideally to just the single line where an extended

@@ -167,7 +167,7 @@ Documentation
   * **Bold**: Type exactly as shown
   * _Italic_ (or underline, in `roff(7)`): Replace with appropriate argument
   * `[-abc]`: Any or all arguments within `[ ]` are optional
-  * `-a|-b`: Options delimited by `|` cannot be used together
+  * `-a|-b`: Options delimited by `|` are mutually exclusive
   * `argument ...`: Argument is repeatable
   * `[expression] ...`: Entire expression within `[ ]` is repeatable
 
@@ -183,7 +183,8 @@ Documentation
   and also describe how precedence/ordering works (see also: [#180])
 
 * Document the fact that `exec -o tag` tries to parse the first line of
-  output as a [`tags(5)`] file entry, before falling back to a simple tag name
+  output as a [`tags(5)`] file entry, before falling back to a simple tag
+  name and mention `contrib/xtag.sh` as an example use case
 
 * Document the fact that [`exec`] sets `$LINES` and `$COLUMNS` and use e.g.
   `wsplit -t; pipe-from man ls` as an example of why
@@ -286,6 +287,12 @@ Code Quality/Efficiency Improvements
 * Detect whether linking with `-liconv` is needed (i.e. because it's not
   a core part of the platform's libc) by using a [feature test], instead
   of matching a known set of compiler targets
+
+* Use a sparse array instead of a uint32-keyed hash map (`IntMap`) for
+  storing key bindings (`ModeHandler::key_bindings`). The most commonly
+  bound keys are quite densely clustered, so the space wastage should be
+  minimal. A sparse/segmented array is also quite a bit simpler and more
+  efficient for a use case like this.
 
 Testing/Debugging
 -----------------
