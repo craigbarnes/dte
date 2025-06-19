@@ -1,4 +1,4 @@
-[attr]generated is-generated linguist-generated
+[attr]generated is-generated linguist-generated gitlab-generated
 [attr]4space text whitespace=tab-in-indent,tabwidth=4 space-indent
 [attr]2space text whitespace=tab-in-indent,tabwidth=2 space-indent
 [attr]c 4space linguist-language=C
