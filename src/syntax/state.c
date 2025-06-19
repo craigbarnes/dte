@@ -730,7 +730,7 @@ Syntax *load_syntax (
     return syntax;
 }
 
-Syntax *load_syntax_builtin(EditorState *e, const char *name, SyntaxLoadFlags flags)
+static Syntax *load_syntax_builtin(EditorState *e, const char *name, SyntaxLoadFlags flags)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {

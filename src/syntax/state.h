@@ -22,7 +22,6 @@ struct EditorState;
 
 Syntax *load_syntax(struct EditorState *e, StringView config_text, const char *config_filename, SyntaxLoadFlags flags) NONNULL_ARGS;
 Syntax *load_syntax_file(struct EditorState *e, const char *filename, SyntaxLoadFlags flags) NONNULL_ARGS;
-Syntax *load_syntax_builtin(struct EditorState *e, const char *name, SyntaxLoadFlags flags) NONNULL_ARGS;
 Syntax *load_syntax_by_filetype(struct EditorState *e, const char *filetype) NONNULL_ARGS;
 
 #endif
