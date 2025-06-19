@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script filters output from "nm" to show the sizes of symbols
+# This script filters output from nm(1), to show the sizes of symbols
 # (in KiB) in an object file, sorted from largest to smallest.
 
 if test ! -t 1; then
