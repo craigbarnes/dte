@@ -609,7 +609,7 @@ command. If there are no _filename_ arguments, the contents of the new
 window will be an additional view of the current buffer.
 
 `-b`
-:   Add new window before current instead of after
+:   Insert the new window before (instead of after) the current window
 
 `-g`
 :   Perform [`glob`] expansion on _filename_
@@ -621,7 +621,7 @@ window will be an additional view of the current buffer.
 :   Create a new, empty buffer
 
 `-r`
-:   Split root instead of current window
+:   Split the root window, instead of the current window
 
 `-t`
 :   Create a new, empty buffer and mark it as "temporary" (always
@@ -639,15 +639,17 @@ Close window.
 
 ### **wnext**
 
-Next window.
+Focus next window.
 
 ### **wprev**
 
-Previous window.
+Focus previous window.
 
 ### **wresize** [**-h**|**-v**] [_N_|+_N_|-- -_N_]
 
-If no parameter given, equalize window sizes in current frame.
+Resize the current window, in accordance with the arguments described
+below. If no arguments are given, window sizes in the current frame are
+equalized.
 
 `-h`
 :   Resize horizontally
@@ -656,29 +658,29 @@ If no parameter given, equalize window sizes in current frame.
 :   Resize vertically
 
 _N_
-:   Set size of current window to _N_ columns/rows
+:   Set the size of the current window to _N_ columns/rows
 
 `+`_N_
-:   Increase size of current window by _N_ columns/rows
+:   Increase the size of the current window by _N_ columns/rows
 
 `-`_N_
-:   Decrease size of current window by _N_ columns/rows (use `--` to
-    prevent the minus symbol being parsed as an option flag, e.g.
-    `wresize -- -5`)
+:   Decrease the size of the current window by _N_ columns/rows
+    (use `--` to prevent the minus symbol being parsed as an option,
+    e.g. `wresize -- -5`)
 
 ### **wflip**
 
-Change from vertical layout to horizontal and vice versa.
+Change from vertical to horizontal layout and vice versa.
 
 ### **wswap**
 
-Swap positions of this and next frame.
+Swap positions of the current and next frame.
 
 ## Movement Commands
 
 Movement commands are used to move the cursor position.
 
-Several of these commands also have `-c` and `-l` flags to allow
+Several of these commands also have `-c` and `-l` flags, to allow
 creating character/line selections. These 2 flags are noted in the
 command summaries below, but are only described once, as follows:
 

@@ -1071,7 +1071,7 @@ window will be an additional view of the current buffer.
 .P
 .TP
 \fB\-b\fR
-Add new window before current instead of after
+Insert the new window before (instead of after) the current window
 .PP
 .TP
 \fB\-g\fR
@@ -1087,7 +1087,7 @@ Create a new, empty buffer
 .PP
 .TP
 \fB\-r\fR
-Split root instead of current window
+Split the root window, instead of the current window
 .PP
 .TP
 \fB\-t\fR
@@ -1110,17 +1110,19 @@ Prompt for confirmation if there are unsaved files in the window
 .RE
 \fBwnext\fR
 .RS
-Next window.
+Focus next window.
 .P
 .RE
 \fBwprev\fR
 .RS
-Previous window.
+Focus previous window.
 .P
 .RE
 \fBwresize\fR [\fB\-h\fR|\fB\-v\fR] [\fIN\fR|+\fIN\fR|\-\- \-\fIN\fR]
 .RS
-If no parameter given, equalize window sizes in current frame.
+Resize the current window, in accordance with the arguments described
+below. If no arguments are given, window sizes in the current frame are
+equalized.
 .P
 .TP
 \fB\-h\fR
@@ -1132,33 +1134,33 @@ Resize vertically
 .PP
 .TP
 \fIN\fR
-Set size of current window to \fIN\fR columns/rows
+Set the size of the current window to \fIN\fR columns/rows
 .PP
 .TP
 \fB+\fR\fIN\fR
-Increase size of current window by \fIN\fR columns/rows
+Increase the size of the current window by \fIN\fR columns/rows
 .PP
 .TP
 \fB\-\fR\fIN\fR
-Decrease size of current window by \fIN\fR columns/rows (use \fB\-\-\fR to
-prevent the minus symbol being parsed as an option flag, e.g.
-\fBwresize \-\- \-5\fR)
+Decrease the size of the current window by \fIN\fR columns/rows
+(use \fB\-\-\fR to prevent the minus symbol being parsed as an option,
+e.g. \fBwresize \-\- \-5\fR)
 .PP
 .RE
 \fBwflip\fR
 .RS
-Change from vertical layout to horizontal and vice versa.
+Change from vertical to horizontal layout and vice versa.
 .P
 .RE
 \fBwswap\fR
 .RS
-Swap positions of this and next frame.
+Swap positions of the current and next frame.
 .P
 .RE
 .SS Movement Commands
 Movement commands are used to move the cursor position.
 .P
-Several of these commands also have \fB\-c\fR and \fB\-l\fR flags to allow
+Several of these commands also have \fB\-c\fR and \fB\-l\fR flags, to allow
 creating character/line selections. These 2 flags are noted in the
 command summaries below, but are only described once, as follows:
 .P
