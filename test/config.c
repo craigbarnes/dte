@@ -45,10 +45,8 @@ static void test_builtin_configs(TestContext *ctx)
             }
             // Check that built-in syntax files load without errors
             EXPECT_NULL(find_syntax(syntaxes, path_basename(cfg.name)));
-            SyntaxLoadError err;
-            SyntaxLoadFlags flags = SYN_BUILTIN | SYN_MUST_EXIST;
             unsigned int saved_nr_errs = e->err.nr_errors;
-            EXPECT_NONNULL(load_syntax_file(e, cfg.name, flags, &err));
+            EXPECT_NONNULL(load_syntax(e, cfg.text, cfg.name, 0));
             EXPECT_EQ(e->err.nr_errors, saved_nr_errs);
             EXPECT_NONNULL(find_syntax(syntaxes, path_basename(cfg.name)));
         } else {

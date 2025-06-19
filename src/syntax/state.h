@@ -3,6 +3,7 @@
 
 #include "syntax/syntax.h"
 #include "util/macros.h"
+#include "util/string-view.h"
 
 typedef enum {
     SYN_MUST_EXIST = 1 << 0, // See CFG_MUST_EXIST and syn_flags_to_cfg_flags()
@@ -11,22 +12,17 @@ typedef enum {
     SYN_LINT = 1 << 3, // Perform extra linting (see: lint_emit_name())
 } SyntaxLoadFlags;
 
-typedef enum {
-    SYNERR_NO_MAIN_SYNTAX, // File contains no main syntax (with name matching filename)
-    SYNERR_NONEXISTENT, // Requested syntax doesn't exist
-    SYNERR_READ_FAILED, // Reading file failed for reasons other than SYNERR_NONEXISTENT
-} SyntaxLoadError;
-
 typedef struct {
     Syntax *current_syntax;
     State *current_state;
     SyntaxLoadFlags flags;
-    unsigned int saved_nr_errors; // Used to check if nr_errors changed
 } SyntaxLoader;
 
 struct EditorState;
 
-Syntax *load_syntax_file(struct EditorState *e, const char *filename, SyntaxLoadFlags flags, SyntaxLoadError *err) NONNULL_ARGS WRITEONLY(4);
+Syntax *load_syntax(struct EditorState *e, StringView config_text, const char *config_filename, SyntaxLoadFlags flags) NONNULL_ARGS;
+Syntax *load_syntax_file(struct EditorState *e, const char *filename, SyntaxLoadFlags flags) NONNULL_ARGS;
+Syntax *load_syntax_builtin(struct EditorState *e, const char *name, SyntaxLoadFlags flags) NONNULL_ARGS;
 Syntax *load_syntax_by_filetype(struct EditorState *e, const char *filetype) NONNULL_ARGS;
 
 #endif

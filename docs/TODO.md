@@ -244,10 +244,6 @@ Code Quality/Efficiency Improvements
   and don't need to support deletions, re-implement as a collection of
   interned strings (sharing the interned string allocation)
 
-* Add a flag to `CommandRunner` that makes `run_commands()` return early
-  (without executing more commands) if `run_command()` returns `false`.
-  This may be useful for `macro play`, `load_syntax_file()`, etc.
-
 * Use [`writev(3)`][] (when available) in `write_buffer()`, for
   writing `Block::data` segments to files saved as UTF-8/LF (with less
   overhead from syscalls; see also: [#86])

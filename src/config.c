@@ -53,15 +53,16 @@ UNITTEST {
     // NOLINTEND(bugprone-assert-side-effect)
 }
 
-void exec_config(CommandRunner *runner, StringView config)
+bool exec_config(CommandRunner *runner, StringView config)
 {
     EditorState *e = runner->e;
     ErrorBuffer *ebuf = runner->ebuf;
     if (unlikely(e->include_recursion_count > 64)) {
-        error_msg_for_cmd(ebuf, NULL, "config recursion limit reached");
-        return;
+        return error_msg_for_cmd(ebuf, NULL, "config recursion limit reached");
     }
 
+    bool stop_at_first_err = (runner->flags & CMDRUNNER_STOP_AT_FIRST_ERROR);
+    size_t nfailed = 0;
     String buf = string_new(1024);
     e->include_recursion_count++;
 
@@ -77,18 +78,25 @@ void exec_config(CommandRunner *runner, StringView config)
             string_append_strview(&buf, &line);
         } else {
             string_append_strview(&buf, &line);
-            handle_command(runner, string_borrow_cstring(&buf));
+            bool r = handle_command(runner, string_borrow_cstring(&buf));
             string_clear(&buf);
+            nfailed += !r;
+            if (unlikely(!r && stop_at_first_err)) {
+                goto out;
+            }
         }
     }
 
     if (unlikely(buf.len)) {
         // This can only happen if the last line had a line continuation
-        handle_command(runner, string_borrow_cstring(&buf));
+        bool r = handle_command(runner, string_borrow_cstring(&buf));
+        nfailed += !r;
     }
 
+out:
     e->include_recursion_count--;
     string_free(&buf);
+    return (nfailed == 0);
 }
 
 String dump_builtin_configs(void)
@@ -117,18 +125,19 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
     return &builtin_configs[0];
 }
 
-int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
+static int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
     ErrorBuffer *ebuf = runner->ebuf;
     bool must_exist = flags & CFG_MUST_EXIST;
+    bool stop_at_first_err = runner->flags & CMDRUNNER_STOP_AT_FIRST_ERROR;
 
     if (flags & CFG_BUILTIN) {
         const BuiltinConfig *cfg = get_builtin_config(filename);
         if (cfg) {
             ebuf->config_filename = filename;
             ebuf->config_line = 1;
-            exec_config(runner, cfg->text);
-            return 0;
+            bool r = exec_config(runner, cfg->text);
+            return (r || !stop_at_first_err) ? 0 : EINVAL;
         }
         if (must_exist) {
             error_msg(ebuf, "no built-in config with name '%s'", filename);
@@ -148,9 +157,9 @@ int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flag
 
     ebuf->config_filename = filename;
     ebuf->config_line = 1;
-    exec_config(runner, string_view(buf, size));
+    bool r = exec_config(runner, string_view(buf, size));
     free(buf);
-    return 0;
+    return (r || !stop_at_first_err) ? 0 : EINVAL;
 }
 
 int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)

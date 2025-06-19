@@ -80,27 +80,25 @@ static ExitCode dump_builtin_config(const char *name)
     return ec_write_stdout(cfg->text.data, cfg->text.length);
 }
 
-static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
+static ExitCode lint_syntax(const char *filename, bool extra_lint)
 {
     EditorState *e = init_editor_state(EFLAG_HEADLESS);
     e->err.print_to_stderr = true;
     BUG_ON(e->status != EDITOR_INITIALIZING);
 
-    SyntaxLoadError err;
-    const Syntax *s = load_syntax_file(e, filename, flags | SYN_MUST_EXIST, &err);
+    SyntaxLoadFlags flags = SYN_MUST_EXIST | (extra_lint ? SYN_LINT : 0);
+    const Syntax *syntax = load_syntax_file(e, filename, flags);
+    bool ok = syntax && e->err.nr_errors == 0;
 
-    if (s) {
-        const size_t n = s->states.count;
+    if (ok) {
+        const size_t n = syntax->states.count;
         const char *plural = (n == 1) ? "" : "s";
-        printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, plural);
-    } else if (err == SYNERR_NO_MAIN_SYNTAX) {
-        const char *base = path_basename(filename);
-        error_msg(&e->err, "%s: no main syntax found (i.e. with name '%s')", filename, base);
+        const char *name = syntax->name;
+        printf("OK: loaded syntax '%s' with %zu state%s\n", name, n, plural);
     }
 
-    unsigned int nr_errs = e->err.nr_errors;
     free_editor_state(e);
-    return nr_errs ? EC_DATA_ERROR : EC_OK;
+    return ok ? EC_OK : EC_DATA_ERROR;
 }
 
 static ExitCode init_std_fds(int std_fds[2])
@@ -468,8 +466,8 @@ int main(int argc, char *argv[])
         case 'h': return ec_printf_ok(usage, progname(argc, argv, "dte"));
         case 'K': return showkey_loop(terminal_query_level);
         case 'P': return print_256_color_palette();
-        case 's': return lint_syntax(optarg, 0);
-        case 'S': return lint_syntax(optarg, SYN_LINT);
+        case 's': return lint_syntax(optarg, false);
+        case 'S': return lint_syntax(optarg, true);
         case 'V': return ec_write_stdout(copyright, sizeof(copyright));
         case 'Z': return ec_printf_ok("features:%s\n", buildvar_string);
         default: return EC_USAGE_ERROR;

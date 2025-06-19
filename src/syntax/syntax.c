@@ -71,7 +71,7 @@ static void free_syntax_contents(Syntax *syn)
     hashmap_free(&syn->default_styles, NULL);
 }
 
-static void free_syntax(Syntax *syn)
+void free_syntax(Syntax *syn)
 {
     free_syntax_contents(syn);
     free(syn->name);
@@ -89,60 +89,54 @@ void free_syntaxes(HashMap *syntaxes)
     hashmap_free(syntaxes, FREE_FUNC(free_syntax_cb));
 }
 
-void finalize_syntax (
-    HashMap *syntaxes,
-    Syntax *syn,
-    ErrorBuffer *ebuf,
-    unsigned int saved_nr_errors
-) {
+bool finalize_syntax(HashMap *syntaxes, Syntax *syn, ErrorBuffer *ebuf)
+{
     if (syn->states.count == 0) {
-        error_msg(ebuf, "Empty syntax");
+        return error_msg(ebuf, "Empty syntax");
     }
 
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;
         if (!s->defined) {
             // This state has been referenced but not defined
-            error_msg(ebuf, "No such state %s", it.entry->key);
+            return error_msg(ebuf, "No such state '%s'", it.entry->key);
         }
     }
     for (HashMapIter it = hashmap_iter(&syn->string_lists); hashmap_next(&it); ) {
         const StringList *list = it.entry->value;
         if (!list->defined) {
-            error_msg(ebuf, "No such list %s", it.entry->key);
+            return error_msg(ebuf, "No such list '%s'", it.entry->key);
         }
     }
 
     if (syn->heredoc && !is_subsyntax(syn)) {
-        error_msg(ebuf, "heredocend can be used only in subsyntaxes");
+        return error_msg(ebuf, "heredocend can be used only in subsyntaxes");
     }
 
     if (find_any_syntax(syntaxes, syn->name)) {
-        error_msg(ebuf, "Syntax %s already exists", syn->name);
-    }
-
-    if (ebuf->nr_errors != saved_nr_errors) {
-        free_syntax(syn);
-        return;
+        return error_msg(ebuf, "Syntax '%s' already exists", syn->name);
     }
 
     // Unused states and lists cause warnings only (to make loading WIP
     // syntax files less annoying)
+
     visit(syn->start_state);
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;
         if (!s->visited && !s->copied) {
-            error_msg(ebuf, "State %s is unreachable", it.entry->key);
+            error_msg(ebuf, "State '%s' is unreachable", it.entry->key);
         }
     }
+
     for (HashMapIter it = hashmap_iter(&syn->string_lists); hashmap_next(&it); ) {
         const StringList *list = it.entry->value;
         if (!list->used) {
-            error_msg(ebuf, "List %s never used", it.entry->key);
+            error_msg(ebuf, "List '%s' never used", it.entry->key);
         }
     }
 
     hashmap_insert(syntaxes, syn->name, syn);
+    return true;
 }
 
 Syntax *find_syntax(const HashMap *syntaxes, const char *name)
@@ -215,7 +209,7 @@ void find_unused_subsyntaxes(const HashMap *syntaxes, ErrorBuffer *ebuf)
     for (HashMapIter it = hashmap_iter(syntaxes); hashmap_next(&it); ) {
         Syntax *s = it.entry->value;
         if (!s->used && !s->warned_unused_subsyntax && is_subsyntax(s)) {
-            error_msg(ebuf, "Subsyntax %s is unused", s->name);
+            error_msg(ebuf, "Subsyntax '%s' is unused", s->name);
             // Don't complain multiple times about the same unused subsyntaxes
             s->warned_unused_subsyntax = true;
         }

@@ -82,6 +82,7 @@ static bool run_commands(CommandRunner *runner, const PointerArray *array)
         return error_msg_for_cmd(runner->ebuf, NULL, "alias recursion limit reached");
     }
 
+    bool stop_at_first_err = (runner->flags & CMDRUNNER_STOP_AT_FIRST_ERROR);
     void **ptrs = array->ptrs;
     size_t len = array->count;
     size_t nfailed = 0;
@@ -101,6 +102,9 @@ static bool run_commands(CommandRunner *runner, const PointerArray *array)
         if (e != s) {
             if (!run_command(runner, (char**)ptrs + s)) {
                 nfailed++;
+                if (stop_at_first_err) {
+                    goto out;
+                }
             }
         }
 
@@ -108,6 +112,7 @@ static bool run_commands(CommandRunner *runner, const PointerArray *array)
         s = ++e;
     }
 
+out:
     runner->recursion_count--;
     return (nfailed == 0);
 }

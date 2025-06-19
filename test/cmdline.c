@@ -103,6 +103,11 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_TRUE(handle_command(r, "eol"));
     EXPECT_EQ(c->pos, 3);
 
+    r->flags |= CMDRUNNER_STOP_AT_FIRST_ERROR;
+    EXPECT_FALSE(handle_command(r, "left; invalid-cmd; bol"));
+    EXPECT_EQ(c->pos, 2);
+    r->flags &= ~CMDRUNNER_STOP_AT_FIRST_ERROR;
+
     EXPECT_TRUE(handle_command(r, "cancel"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_NULL(c->search_pos);

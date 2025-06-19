@@ -49,6 +49,7 @@ typedef struct {
 typedef enum {
     CMDRUNNER_ALLOW_RECORDING = 1u << 0,
     CMDRUNNER_EXPAND_TILDE_SLASH = 1u << 1,
+    CMDRUNNER_STOP_AT_FIRST_ERROR = 1u << 2,
 } CommandRunnerFlags;
 
 typedef struct {

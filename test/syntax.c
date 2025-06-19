@@ -119,6 +119,105 @@ static void test_bitset(TestContext *ctx)
     }
 }
 
+static void test_load_syntax_errors(TestContext *ctx)
+{
+    EditorState *e = ctx->userdata;
+    ErrorBuffer *ebuf = &e->err;
+    SyntaxLoadFlags flags = SYN_MUST_EXIST | SYN_WARN_ON_UNUSED_SUBSYN | SYN_LINT;
+
+    clear_error(ebuf);
+    StringView text = strview_from_cstring("syntax dup; state a; eat this; syntax dup; state b; eat this");
+    EXPECT_NULL(load_syntax(e, text, "dup", flags));
+    EXPECT_STREQ(ebuf->buf, "dup:2: Syntax 'dup' already exists");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax empty");
+    EXPECT_NULL(load_syntax(e, text, "empty", flags));
+    EXPECT_STREQ(ebuf->buf, "empty:2: Empty syntax");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax hde; state a; heredocend b; eat this; state b; eat this");
+    EXPECT_NULL(load_syntax(e, text, "hde", flags));
+    EXPECT_STREQ(ebuf->buf, "hde:2: heredocend can be used only in subsyntaxes");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax loop; state ident; noeat this");
+    EXPECT_NULL(load_syntax(e, text, "loop", flags));
+    EXPECT_STREQ(ebuf->buf, "loop:1: noeat: using noeat to jump to same state causes infinite loop");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax ml; state a; inlist X this; eat this");
+    EXPECT_NULL(load_syntax(e, text, "ml", flags));
+    EXPECT_STREQ(ebuf->buf, "ml:2: No such list 'X'");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax mst; state a; noeat X");
+    EXPECT_NULL(load_syntax(e, text, "mst", flags));
+    EXPECT_STREQ(ebuf->buf, "mst:2: No such state 'X'");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax nda; state a; char a this");
+    EXPECT_NULL(load_syntax(e, text, "nda", flags));
+    EXPECT_STREQ(ebuf->buf, "nda:2: No default action in state 'a'");
+
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax not-known; state a; eat this");
+    EXPECT_NULL(load_syntax(e, text, "known", flags));
+    EXPECT_STREQ(ebuf->buf, "known: no main syntax found (i.e. with name 'known')");
+
+    // Non-fatal errors:
+
+    // Unreachable state
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax ust; state a; eat this; state U; eat a");
+    const Syntax *syntax = load_syntax(e, text, "ust", flags);
+    ASSERT_NONNULL(syntax);
+    EXPECT_STREQ(syntax->name, "ust");
+    EXPECT_EQ(syntax->states.count, 2);
+    EXPECT_STREQ(syntax->start_state->name, "a");
+    EXPECT_STREQ(ebuf->buf, "ust:2: State 'U' is unreachable");
+
+    // Unused list
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax ul; state a; eat this; list unused a");
+    syntax = load_syntax(e, text, "ul", flags);
+    ASSERT_NONNULL(syntax);
+    EXPECT_STREQ(syntax->name, "ul");
+    EXPECT_EQ(syntax->states.count, 1);
+    EXPECT_STREQ(syntax->start_state->name, "a");
+    EXPECT_STREQ(ebuf->buf, "ul:2: List 'unused' never used");
+
+    // Unused sub-syntax
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax .uss-x; state a; eat this; syntax uss; state a; eat this");
+    syntax = load_syntax(e, text, "uss", flags);
+    ASSERT_NONNULL(syntax);
+    EXPECT_STREQ(syntax->name, "uss");
+    EXPECT_EQ(syntax->states.count, 1);
+    EXPECT_STREQ(syntax->start_state->name, "a");
+    EXPECT_STREQ(ebuf->buf, "uss:2: Subsyntax '.uss-x' is unused");
+
+    // Use of named destination, instead of "this"
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax td; state a; eat a");
+    syntax = load_syntax(e, text, "td", flags);
+    ASSERT_NONNULL(syntax);
+    EXPECT_STREQ(syntax->name, "td");
+    EXPECT_EQ(syntax->states.count, 1);
+    EXPECT_STREQ(syntax->start_state->name, "a");
+    EXPECT_STREQ(ebuf->buf, "td:1: eat: destination 'a' can be optimized to 'this' in 'td' syntax");
+
+    // Redundant emit-name
+    clear_error(ebuf);
+    text = strview_from_cstring("syntax ren; state a; eat this a");
+    syntax = load_syntax(e, text, "ren", flags);
+    ASSERT_NONNULL(syntax);
+    EXPECT_STREQ(syntax->name, "ren");
+    EXPECT_EQ(syntax->states.count, 1);
+    EXPECT_STREQ(syntax->start_state->name, "a");
+    EXPECT_STREQ(ebuf->buf, "ren:1: eat: emit-name 'a' not needed (destination state uses same emit-name)");
+}
+
 static void test_hl_line(TestContext *ctx)
 {
     if (!get_builtin_config("syntax/c")) {
@@ -202,6 +301,7 @@ static void test_hl_line(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_bitset),
+    TEST(test_load_syntax_errors),
     TEST(test_hl_line),
 };
 

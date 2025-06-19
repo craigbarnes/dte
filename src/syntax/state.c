@@ -16,6 +16,7 @@
 #include "util/intern.h"
 #include "util/log.h"
 #include "util/path.h"
+#include "util/readfile.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -34,21 +35,22 @@ static bool in_state(const SyntaxLoader *syn, ErrorBuffer *ebuf)
     return likely(syn->current_state) || error_msg(ebuf, "No state started");
 }
 
-static void close_state(SyntaxLoader *syn, ErrorBuffer *ebuf)
+static bool close_state(SyntaxLoader *syn, ErrorBuffer *ebuf)
 {
     const State *state = syn->current_state;
     if (!state) {
-        return;
-    }
-
-    if (unlikely(state->type == STATE_INVALID)) {
-        // This error applies to the state itself rather than the last
-        // command, so it doesn't make sense to include the command name
-        // in the error message
-        error_msg_for_cmd(ebuf, NULL, "No default action in state '%s'", state->name);
+        return true;
     }
 
     syn->current_state = NULL;
+    if (likely(state->type != STATE_INVALID)) {
+        return true;
+    }
+
+    // This error applies to the state itself rather than the last command, so
+    // it doesn't make sense to include the command name in the error message
+    const char *name = state->name;
+    return error_msg_for_cmd(ebuf, NULL, "No default action in state '%s'", name);
 }
 
 static State *find_or_add_state(const SyntaxLoader *syn, const char *name)
@@ -287,8 +289,7 @@ static bool cmd_default(EditorState *e, const CommandArgs *a)
 {
     SyntaxLoader *syn = &e->syn;
     ErrorBuffer *ebuf = &e->err;
-    close_state(syn, ebuf);
-    if (!in_syntax(syn, ebuf)) {
+    if (!close_state(syn, ebuf) || !in_syntax(syn, ebuf)) {
         return false;
     }
 
@@ -385,8 +386,7 @@ static bool cmd_list(EditorState *e, const CommandArgs *a)
 {
     SyntaxLoader *syn = &e->syn;
     ErrorBuffer *ebuf = &e->err;
-    close_state(syn, ebuf);
-    if (!in_syntax(syn, ebuf)) {
+    if (!close_state(syn, ebuf) || !in_syntax(syn, ebuf)) {
         return false;
     }
 
@@ -525,8 +525,7 @@ static bool cmd_state(EditorState *e, const CommandArgs *a)
 {
     SyntaxLoader *syn = &e->syn;
     ErrorBuffer *ebuf = &e->err;
-    close_state(syn, ebuf);
-    if (!in_syntax(syn, ebuf)) {
+    if (!close_state(syn, ebuf) || !in_syntax(syn, ebuf)) {
         return false;
     }
 
@@ -542,7 +541,7 @@ static bool cmd_state(EditorState *e, const CommandArgs *a)
 
     const char *emit_name = a->args[1];
     if ((syn->flags & SYN_LINT) && emit_name && streq(emit_name, name)) {
-        return error_msg(ebuf, "Redundant emit-name '%s'", emit_name);
+        error_msg(ebuf, "Redundant emit-name '%s'", emit_name);
     }
 
     state->defined = true;
@@ -582,19 +581,23 @@ static bool cmd_str(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static void finish_syntax(SyntaxLoader *syn, ErrorBuffer *ebuf, HashMap *syntaxes)
+static bool finish_syntax(SyntaxLoader *syn, ErrorBuffer *ebuf, HashMap *syntaxes)
 {
-    BUG_ON(!syn->current_syntax);
-    close_state(syn, ebuf);
-    finalize_syntax(syntaxes, syn->current_syntax, ebuf, syn->saved_nr_errors);
+    Syntax *syntax = syn->current_syntax;
+    BUG_ON(!syntax);
+    bool r = close_state(syn, ebuf) && finalize_syntax(syntaxes, syntax, ebuf);
+    if (!r) {
+        free_syntax(syntax);
+    }
     syn->current_syntax = NULL;
+    return r;
 }
 
 static bool cmd_syntax(EditorState *e, const CommandArgs *a)
 {
     SyntaxLoader *syn = &e->syn;
-    if (syn->current_syntax) {
-        finish_syntax(syn, &e->err, &e->syntaxes);
+    if (syn->current_syntax && !finish_syntax(syn, &e->err, &e->syntaxes)) {
+        return false;
     }
 
     Syntax *syntax = xcalloc1(sizeof(*syntax));
@@ -605,7 +608,6 @@ static bool cmd_syntax(EditorState *e, const CommandArgs *a)
 
     syn->current_syntax = syntax;
     syn->current_state = NULL;
-    syn->saved_nr_errors = e->err.nr_errors;
     return true;
 }
 
@@ -655,6 +657,7 @@ static CommandRunner cmdrunner_for_syntaxes(EditorState *e)
 {
     CommandRunner runner = cmdrunner(e, &syntax_commands);
     runner.expand_variable = expand_syntax_var;
+    runner.flags |= CMDRUNNER_STOP_AT_FIRST_ERROR;
     return runner;
 }
 
@@ -672,49 +675,95 @@ static int read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags fla
     return read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
 }
 
-Syntax *load_syntax_file (
+Syntax *load_syntax (
     EditorState *e,
-    const char *filename,
-    SyntaxLoadFlags flags,
-    SyntaxLoadError *err // Out param
+    StringView config_text,
+    const char *config_filename,
+    SyntaxLoadFlags flags
 ) {
-    e->syn = (SyntaxLoader) {
+    SyntaxLoader *syn = &e->syn;
+    *syn = (SyntaxLoader) {
         .current_syntax = NULL,
         .current_state = NULL,
         .flags = flags | SYN_WARN_ON_UNUSED_SUBSYN,
-        .saved_nr_errors = 0,
     };
 
     ErrorBuffer *ebuf = &e->err;
     const char *saved_file = ebuf->config_filename;
     const unsigned int saved_line = ebuf->config_line;
     CommandRunner runner = cmdrunner_for_syntaxes(e);
-    int r = do_read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
 
-    if (!r && e->syn.current_syntax) {
-        finish_syntax(&e->syn, ebuf, &e->syntaxes);
-        find_unused_subsyntaxes(&e->syntaxes, ebuf);
+    ebuf->config_filename = config_filename;
+    ebuf->config_line = 1;
+    bool r = exec_config(&runner, config_text);
+
+    if (syn->current_syntax) {
+        if (r) {
+            r = finish_syntax(syn, ebuf, &e->syntaxes);
+            if (r) {
+                find_unused_subsyntaxes(&e->syntaxes, ebuf);
+            }
+        } else {
+            free_syntax(syn->current_syntax);
+            syn->current_syntax = NULL;
+        }
     }
 
     ebuf->config_filename = saved_file;
     ebuf->config_line = saved_line;
 
-    if (r) {
-        *err = (r == ENOENT) ? SYNERR_NONEXISTENT : SYNERR_READ_FAILED;
+    if (!r) {
         return NULL;
     }
 
-    Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
-    if (!syn) {
-        *err = SYNERR_NO_MAIN_SYNTAX;
+    const char *base = path_basename(config_filename);
+    Syntax *syntax = find_syntax(&e->syntaxes, base);
+    if (!syntax) {
+        error_msg(&e->err, "%s: no main syntax found (i.e. with name '%s')", config_filename, base);
         return NULL;
     }
 
     if (e->status != EDITOR_INITIALIZING) {
-        update_syntax_styles(syn, &e->styles);
+        update_syntax_styles(syntax, &e->styles);
     }
 
-    return syn;
+    return syntax;
+}
+
+Syntax *load_syntax_builtin(EditorState *e, const char *name, SyntaxLoadFlags flags)
+{
+    const BuiltinConfig *cfg = get_builtin_config(name);
+    if (!cfg) {
+        if (flags & SYN_MUST_EXIST) {
+            error_msg(&e->err, "no built-in config with name '%s'", name);
+        }
+        return NULL;
+    }
+    return load_syntax(e, cfg->text, name, flags | SYN_BUILTIN);
+}
+
+Syntax *load_syntax_file(EditorState *e, const char *filename, SyntaxLoadFlags flags)
+{
+    char *alloc;
+    ssize_t size = read_file(filename, &alloc, 0);
+    if (size < 0) {
+        int err = errno;
+        if (err != ENOENT || (flags & SYN_MUST_EXIST)) {
+            error_msg(&e->err, "Error reading %s: %s", filename, strerror(err));
+            errno = err;
+        }
+        return NULL;
+    }
+
+    StringView config = string_view(alloc, size);
+    Syntax *syntax = load_syntax(e, config, filename, flags);
+    free(alloc);
+
+    if (unlikely(!syntax)) {
+        errno = EINVAL;
+    }
+
+    return syntax;
 }
 
 Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
@@ -727,14 +776,13 @@ Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
     char filename[8192];
     xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
 
-    SyntaxLoadError err;
-    Syntax *syn = load_syntax_file(e, filename, 0, &err);
-    if (syn || err != SYNERR_NONEXISTENT) {
+    Syntax *syn = load_syntax_file(e, filename, 0);
+    if (syn || errno != ENOENT) {
         return syn;
     }
 
     // Skip past "%s/" (cfgdir) part of formatted string from above and
     // try to load a built-in syntax named `syntax/<filetype>`
     const char *builtin_name = filename + strlen(cfgdir) + STRLEN("/");
-    return load_syntax_file(e, builtin_name, SYN_BUILTIN, &err);
+    return load_syntax_builtin(e, builtin_name, 0);
 }

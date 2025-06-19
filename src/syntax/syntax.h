@@ -119,7 +119,8 @@ static inline bool cond_type_has_destination(ConditionType type)
 
 StringList *find_string_list(const Syntax *syn, const char *name);
 State *find_state(const Syntax *syn, const char *name);
-void finalize_syntax(HashMap *syntaxes, Syntax *syn, ErrorBuffer *ebuf, unsigned int saved_nr_errors);
+bool finalize_syntax(HashMap *syntaxes, Syntax *syn, ErrorBuffer *ebuf);
+void free_syntax(Syntax *syn);
 
 Syntax *find_any_syntax(const HashMap *syntaxes, const char *name);
 Syntax *find_syntax(const HashMap *syntaxes, const char *name);
