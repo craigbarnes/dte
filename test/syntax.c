@@ -123,7 +123,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     ErrorBuffer *ebuf = &e->err;
-    SyntaxLoadFlags flags = SYN_MUST_EXIST | SYN_WARN_ON_UNUSED_SUBSYN | SYN_LINT;
+    SyntaxLoadFlags flags = SYN_LINT;
 
     clear_error(ebuf);
     StringView text = strview_from_cstring("syntax dup; state a; eat this; syntax dup; state b; eat this");
