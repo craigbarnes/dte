@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include "bit.h"
+#include "container.h"
 #include "debug.h"
 #include "macros.h"
 #include "xmalloc.h"
@@ -20,8 +21,6 @@ typedef struct {
 }
 
 typedef int (*CompareFunction)(const void *, const void *);
-typedef void (*FreeFunction)(void *ptr);
-#define FREE_FUNC(f) (FreeFunction)f
 
 void ptr_array_grow_and_append(PointerArray *array, void *ptr) NONNULL_ARG(1) NOINLINE;
 void ptr_array_insert(PointerArray *array, void *ptr, size_t idx) NONNULL_ARG(1);

@@ -51,18 +51,10 @@ void ptr_array_insert(PointerArray *array, void *ptr, size_t idx)
     ptr_array_move(array, last, idx);
 }
 
-// Call a FreeFunction declared with an arbitrary pointer parameter type
-// without -fsanitize=function pedantry
-NO_SANITIZE("undefined")
-static void do_free_ptr(FreeFunction free_ptr, void *ptr)
-{
-    free_ptr(ptr);
-}
-
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)
 {
     for (size_t i = 0, n = array->count; i < n; i++) {
-        do_free_ptr(free_ptr, array->ptrs[i]);
+        do_free_value(free_ptr, array->ptrs[i]);
         array->ptrs[i] = NULL;
     }
     ptr_array_free_array(array);

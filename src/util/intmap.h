@@ -4,11 +4,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "container.h"
 #include "macros.h"
 
 extern const char tombstone[16];
-
-typedef void (*FreeFunction)(void *ptr);
 
 typedef struct {
     uint32_t key;

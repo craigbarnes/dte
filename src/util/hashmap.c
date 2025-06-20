@@ -226,14 +226,6 @@ void *hashmap_insert_or_replace(HashMap *map, char *key, void *value)
     return replaced_value;
 }
 
-// Call a FreeFunction declared with an arbitrary pointer parameter type
-// without -fsanitize=function pedantry
-NO_SANITIZE("undefined")
-static void do_free_value(FreeFunction free_value, void *value)
-{
-    free_value(value);
-}
-
 // Remove all entries without freeing the table
 void hashmap_clear(HashMap *map, FreeFunction free_value)
 {

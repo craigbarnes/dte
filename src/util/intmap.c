@@ -204,14 +204,6 @@ void *intmap_insert_or_replace(IntMap *map, uint32_t key, void *value)
     return replaced_value;
 }
 
-// Call a FreeFunction declared with an arbitrary pointer parameter type
-// without -fsanitize=function pedantry
-NO_SANITIZE("undefined")
-static void do_free_value(FreeFunction free_value, void *value)
-{
-    free_value(value);
-}
-
 // Remove all entries without freeing the table
 static void intmap_clear(IntMap *map, FreeFunction free_value)
 {

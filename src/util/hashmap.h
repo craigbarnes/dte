@@ -3,9 +3,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "container.h"
 #include "macros.h"
-
-typedef void (*FreeFunction)(void *ptr);
 
 typedef enum {
     HMAP_NO_FLAGS = 0, // For self-documentation purposes only
