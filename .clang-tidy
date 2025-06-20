@@ -95,6 +95,7 @@ CheckOptions:
         is_root_frame;
         is_valid_filetype_name;
         list_empty;
+        log_level_enabled;
         mem_equal;
         obuf_avail;
         path_is_absolute;
