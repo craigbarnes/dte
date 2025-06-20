@@ -35,8 +35,8 @@ static void string_append_dquoted_arg(String *s, StringView arg)
             ch = escmap[ch];
         } else if (unlikely(ascii_iscntrl(ch))) {
             pos += copyliteral(buf + pos, "\\x");
-            buf[pos++] = hextab_upper[(ch >> 4) & 0xF];
-            ch = hextab_upper[ch & 0xF];
+            buf[pos++] = hextable[(ch >> 4) & 0xF];
+            ch = hextable[ch & 0xF];
         }
         buf[pos++] = ch;
         s->len += pos;

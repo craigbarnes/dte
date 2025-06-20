@@ -9,9 +9,11 @@
 #include "bit.h"
 #include "debug.h"
 
+const char hextable[32] =
+    "0123456789ABCDEF"
+    "0123456789abcdef";
+
 static const char filesize_unit_prefixes[8] = "KMGTPEZY";
-const char hextab_lower[16] = "0123456789abcdef";
-const char hextab_upper[16] = "0123456789ABCDEF";
 
 static size_t umax_count_base10_digits(uintmax_t x)
 {
@@ -50,7 +52,7 @@ size_t buf_umax_to_hex_str(uintmax_t x, char *buf, size_t min_digits)
     buf[i--] = '\0';
     do {
         unsigned int nibble = x & 0xF;
-        buf[i] = hextab_upper[nibble];
+        buf[i] = hextable[nibble];
         x >>= 4;
     } while (i--);
     return ndigits;

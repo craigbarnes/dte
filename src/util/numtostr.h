@@ -12,12 +12,12 @@ enum {
     PRECISE_FILESIZE_STR_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN("GiB"),
 };
 
-extern const char hextab_lower[16];
-extern const char hextab_upper[16];
+extern const char hextable[32];
 
 // Encodes a byte of data as 2 hexadecimal digits
 static inline size_t hex_encode_byte(char out[2], uint8_t byte)
 {
+    const char *hextab_lower = hextable + 16;
     out[0] = hextab_lower[byte >> 4];
     out[1] = hextab_lower[byte & 0xF];
     return 2;
