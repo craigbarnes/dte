@@ -165,7 +165,7 @@ EditorState *init_editor_state(EditorFlags flags) RETURNS_NONNULL;
 void free_editor_state(EditorState *e) NONNULL_ARGS;
 void clear_all_messages(EditorState *e) NONNULL_ARGS;
 void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
-int main_loop(EditorState *e) NONNULL_ARGS;
+int main_loop(EditorState *e, bool timing) NONNULL_ARGS;
 void ui_first_start(EditorState *e, unsigned int terminal_query_level) NONNULL_ARGS;
 void ui_start(EditorState *e) NONNULL_ARGS;
 void ui_end(EditorState *e, bool final) NONNULL_ARGS;

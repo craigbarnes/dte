@@ -25,6 +25,7 @@
 #include "util/intern.h"
 #include "util/intmap.h"
 #include "util/log.h"
+#include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xstdio.h"
 #include "version.h"
@@ -338,7 +339,18 @@ void ui_end(EditorState *e, bool final)
     term_output_flush(obuf);
 }
 
-int main_loop(EditorState *e)
+static void log_timing_info(const struct timespec *start, bool enabled)
+{
+    struct timespec end;
+    if (likely(!enabled) || !xgettime(&end)) {
+        return;
+    }
+
+    double ms = timespec_to_fp_milliseconds(timespec_subtract(&end, start));
+    LOG_INFO("main loop time: %.3f ms", ms);
+}
+
+int main_loop(EditorState *e, bool timing)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
 
@@ -353,11 +365,16 @@ int main_loop(EditorState *e)
             continue;
         }
 
+        struct timespec start;
+        timing = unlikely(timing) && xgettime(&start);
+
         const ScreenState s = get_screen_state(e->view);
         clear_error(&e->err);
         handle_input(e, key);
         sanity_check(e->view);
         update_screen(e, &s);
+
+        log_timing_info(&start, timing);
     }
 
     BUG_ON(e->status < 0 || e->status > EDITOR_EXIT_MAX);

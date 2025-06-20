@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include "debug.h"
+#include "log.h"
 #include "macros.h"
 
 #define TIME_STR_BUFSIZE (64) // sizeof("292271025015-12-01 23:59:00.999999999 +0400")
@@ -40,9 +41,26 @@ static inline struct timespec timespec_subtract (
     };
 }
 
+static inline double timespec_to_fp_milliseconds(struct timespec ts)
+{
+    const double ms_per_s = MS_PER_SECOND;
+    const double ns_per_ms = NS_PER_MS;
+    return ((double)ts.tv_sec * ms_per_s) + ((double)ts.tv_nsec / ns_per_ms);
+}
+
 static inline bool timespecs_equal(const struct timespec *a, const struct timespec *b)
 {
     return a->tv_sec == b->tv_sec && a->tv_nsec == b->tv_nsec;
+}
+
+// Convenience wrapper for clock_gettime(), with bool return and error logging
+static inline bool xgettime(struct timespec *ts)
+{
+    bool r = (clock_gettime(CLOCK_MONOTONIC, ts) == 0);
+    if (unlikely(!r)) {
+        LOG_ERRNO("clock_gettime");
+    }
+    return r;
 }
 
 char *timespec_to_str(const struct timespec *ts, char buf[TIME_STR_BUFSIZE]) NONNULL_ARGS WARN_UNUSED_RESULT;

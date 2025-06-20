@@ -593,9 +593,15 @@ int main(int argc, char *argv[])
         clear_error(&e->err);
     }
 
+    // Enable main_loop() iteration timing if $DTE_LOG_TIMING is set
+    // and logging is enabled. In theory, this could be controlled by
+    // `TraceLoggingFlags`, but trace logging is only enabled in debug
+    // builds, whereas latency timing is most useful in release builds.
+    bool timing = log_level_enabled(LOG_LEVEL_INFO) && xgetenv("DTE_LOG_TIMING");
+
     e->flags &= ~EFLAG_HEADLESS; // See comment for init_editor_state() call above
     ui_first_start(e, terminal_query_level);
-    main_loop(e);
+    main_loop(e, timing);
     term_restore_title(term);
 
     /*
