@@ -74,14 +74,25 @@ static KeyCode tflag(TermFeatureFlags flags)
     return KEYCODE_QUERY_REPLY_BIT | flags;
 }
 
-// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=features%20the%20terminal%20supports
 static TermFeatureFlags da1_params_to_features(const TermControlParams *csi)
 {
     TermFeatureFlags flags = 0;
     for (size_t i = 1, n = csi->nparams; i < n; i++) {
-        unsigned int p = csi->params[i][0];
-        if (p == 22) {
+        switch (csi->params[i][0]) {
+        case 22:
+            // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=2%202%20%20%E2%87%92%C2%A0%20ANSI%20color
             flags |= TFLAG_8_COLOR;
+            break;
+        case 52:
+            // https://github.com/contour-terminal/contour/issues/1761#issuecomment-2944492097
+            // https://github.com/contour-terminal/vt-extensions/blob/master/clipboard-extension.md#feature-detection
+            // https://codeberg.org/dnkl/foot/pulls/2130
+            // https://github.com/wezterm/wezterm/pull/7046/files
+            // https://github.com/microsoft/terminal/pull/19034
+            // https://github.com/tmux/tmux/issues/4532
+            // https://github.com/tmux/tmux/pull/4539
+            flags |= TFLAG_OSC52_COPY;
+            break;
         }
     }
     return flags;
