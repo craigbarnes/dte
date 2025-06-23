@@ -236,9 +236,10 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
             return tflag(TFLAG_ECMA48_REPEAT);
         }
         if (strview_equal_cstring(&cap, "Ms") && val.length >= 6) {
-            // All 65 entries with this cap in the ncurses terminfo database
+            // All 71 entries with this cap in the ncurses terminfo database
             // use OSC 52, with only slight differences (BEL vs. ST), so
-            // there's really no reason to check the value
+            // there's really no reason to check the value.
+            // Source: https://gitlab.com/craigbarnes/lua-terminfo-parser/-/blob/master/examples/output/cap-values-Ms.txt#:~:text=Totals,-%2D
             return tflag(TFLAG_OSC52_COPY);
         }
     }
