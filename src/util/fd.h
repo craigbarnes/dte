@@ -70,5 +70,6 @@ int xdup3(int oldfd, int newfd, int flags) WARN_UNUSED_RESULT;
 int xfchown(int fd, uid_t owner, gid_t group) WARN_UNUSED_RESULT;
 int xfchmod(int fd, mode_t mode) WARN_UNUSED_RESULT;
 int xftruncate(int fd, off_t length) WARN_UNUSED_RESULT;
+int xfsync(int fd) WARN_UNUSED_RESULT;
 
 #endif

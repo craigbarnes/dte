@@ -109,3 +109,29 @@ int xftruncate(int fd, off_t length)
     } while (unlikely(r != 0 && errno == EINTR));
     return r;
 }
+
+int xfsync(int fd)
+{
+#if HAVE_FSYNC
+    retry:
+    if (fsync(fd) == 0) {
+        return 0;
+    }
+
+    switch (errno) {
+    // EINVAL is ignored because it just means "operation not possible
+    // on this descriptor" rather than indicating an actual error
+    case EINVAL:
+    case ENOTSUP:
+    case ENOSYS:
+        return 0;
+    case EINTR:
+        goto retry;
+    }
+
+    return -1;
+#else
+    (void)fd;
+    return 0;
+#endif
+}
