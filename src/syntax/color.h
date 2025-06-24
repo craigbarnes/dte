@@ -28,8 +28,8 @@ typedef enum {
 } BuiltinStyleEnum;
 
 typedef struct {
-    TermStyle builtin[NR_BSE];
-    HashMap other;
+    TermStyle builtin[NR_BSE]; // Built-in styles (directly indexed)
+    HashMap other; // All other styles (i.e. for syntax highlighting)
 } StyleMap;
 
 void set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style) NONNULL_ARGS;

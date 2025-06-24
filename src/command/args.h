@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include "error.h"
 #include "run.h"
 #include "util/base64.h"
@@ -45,7 +44,7 @@ static inline unsigned int cmdargs_flagset_idx(unsigned char c)
 
 static inline CommandFlagSet cmdargs_flagset_bit(unsigned char flag)
 {
-    return UINT64_C(1) << cmdargs_flagset_idx(flag);
+    return 1ULL << cmdargs_flagset_idx(flag);
 }
 
 static inline CommandFlagSet cmdargs_flagset_from_str(const char *flags)
