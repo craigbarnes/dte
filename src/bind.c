@@ -25,7 +25,7 @@ const CachedCommand *lookup_binding(const IntMap *bindings, KeyCode key)
 
 void free_bindings(IntMap *bindings)
 {
-    intmap_free(bindings, (FreeFunction)cached_command_free);
+    intmap_free(bindings, FREE_FUNC(cached_command_free));
 }
 
 bool handle_binding(EditorState *e, const ModeHandler *handler, KeyCode key)

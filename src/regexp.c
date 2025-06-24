@@ -160,5 +160,5 @@ static void free_interned_regexp(InternedRegexp *ir)
 void free_interned_regexps(void)
 {
     BUG_ON(!(interned_regexps.flags & HMAP_BORROWED_KEYS));
-    hashmap_free(&interned_regexps, (FreeFunction)free_interned_regexp);
+    hashmap_free(&interned_regexps, FREE_FUNC(free_interned_regexp));
 }
