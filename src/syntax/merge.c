@@ -101,8 +101,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
         const State *subsyn_state = it.entry->value;
         BUG_ON(!subsyn_state);
         const char *new_name = fix_name(buf, prefix, subsyn_state->name);
-        State *new_state = hashmap_get(states, new_name);
-        BUG_ON(!new_state);
+        State *new_state = hashmap_xget(states, new_name);
         fix_conditions(syn, new_state, merge, prefix, buf);
         if (merge->delim) {
             update_state_styles(syn, new_state, styles);
@@ -110,8 +109,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
     }
 
     const char *name = fix_name(buf, prefix, merge->subsyn->start_state->name);
-    State *start_state = hashmap_get(states, name);
-    BUG_ON(!start_state);
+    State *start_state = hashmap_xget(states, name);
     merge->subsyn->used = true;
     return start_state;
 }

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "hashmap.h"
 #include "bit.h"
-#include "debug.h"
 #include "hash.h"
 #include "xstring.h"
 

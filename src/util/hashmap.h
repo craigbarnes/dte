@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "container.h"
+#include "debug.h"
 #include "macros.h"
 
 typedef enum {
@@ -67,16 +68,25 @@ static inline bool hashmap_next(HashMapIter *iter)
 
 void hashmap_init(HashMap *map, size_t capacity, HashMapFlags flags) NONNULL_ARGS;
 void *hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS_AND_RETURN;
-void *hashmap_insert_or_replace(HashMap *map, char *key, void *value) NONNULL_ARGS;
-void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
+void *hashmap_insert_or_replace(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUSED_RESULT;
+void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
 void hashmap_clear(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
 void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
 HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
 
+NONNULL_ARGS WARN_UNUSED_RESULT
 static inline void *hashmap_get(const HashMap *map, const char *key)
 {
-    HashMapEntry *e = hashmap_find(map, key);
-    return e ? e->value : NULL;
+    HashMapEntry *entry = hashmap_find(map, key);
+    return entry ? entry->value : NULL;
+}
+
+NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT
+static inline void *hashmap_xget(const HashMap *map, const char *key)
+{
+    void *val = hashmap_get(map, key);
+    BUG_ON(!val);
+    return val;
 }
 
 #endif
