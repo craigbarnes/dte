@@ -19,6 +19,7 @@
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/time-util.h"
+#include "util/xadvise.h"
 #include "util/xreadwrite.h"
 
 static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size_t size, bool utf8_bom)
@@ -73,21 +74,6 @@ static void fixup_blocks(Buffer *buffer)
         lastblk->nl++;
         buffer->nl++;
     }
-}
-
-static int advise_sequential(void *addr, size_t len)
-{
-    BUG_ON(!addr);
-    BUG_ON(len == 0);
-
-#if HAVE_POSIX_MADVISE
-    return posix_madvise(addr, len, POSIX_MADV_SEQUENTIAL);
-#endif
-
-    // "The posix_madvise() function shall have no effect on the semantics
-    // of access to memory in the specified range, although it may affect
-    // the performance of access". Ergo, doing nothing is a valid fallback.
-    return 0;
 }
 
 static bool update_file_info(FileInfo *info, const struct stat *st)

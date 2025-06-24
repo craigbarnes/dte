@@ -31,8 +31,8 @@ CC_VERSION = $(or \
 util_objects := $(call prefix-obj, build/util/, \
     arith array ascii base64 debug exitcode fd fork-exec hashmap hashset \
     intern intmap log numtostr path ptr-array readfile string strtonum \
-    time-util unicode utf8 xmalloc xmemmem xmemrchr xreadwrite xsnprintf \
-    xstdio )
+    time-util unicode utf8 xadvise xmalloc xmemmem xmemrchr xreadwrite \
+    xsnprintf xstdio )
 
 command_objects := $(call prefix-obj, build/command/, \
     alias args cache error macro parse run serialize )
@@ -155,6 +155,7 @@ build/signals.o: build/gen/feature.h
 build/tag.o: build/gen/feature.h
 build/terminal/ioctl.o: build/gen/feature.h
 build/util/fd.o: build/gen/feature.h
+build/util/xadvise.o: build/gen/feature.h
 build/util/xmemmem.o: build/gen/feature.h
 build/util/xmemrchr.o: build/gen/feature.h
 
