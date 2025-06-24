@@ -39,6 +39,7 @@ static const struct {
     {"macro", 0},
     {"msg", ALLOW_EMPTY},
     {"open", 0},
+    {"paste", 0},
     {"option", CHECK_PARSE},
     {"search", ALLOW_EMPTY},
     {"set", CHECK_NAME | CHECK_PARSE},

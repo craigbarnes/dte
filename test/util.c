@@ -815,6 +815,12 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(s.alloc, 0);
     string_free(&s);
+
+    s = string_new_from_buf(STRN("1234567"));
+    EXPECT_EQ(s.len, 7);
+    EXPECT_EQ(s.alloc, 16);
+    EXPECT_STREQ(string_borrow_cstring(&s), "1234567");
+    string_free(&s);
 }
 
 static void test_string_view(TestContext *ctx)

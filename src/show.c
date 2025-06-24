@@ -575,6 +575,12 @@ static String dump_options_and_fileopts(EditorState *e)
     return str;
 }
 
+static String dump_paste(EditorState *e)
+{
+    const Clipboard *clip = &e->clipboard;
+    return string_new_from_buf(clip->buf, clip->len);
+}
+
 static String do_dump_options(EditorState *e) {return dump_options(&e->options, &e->buffer->options);}
 static String do_dump_builtin_configs(EditorState* UNUSED_ARG(e)) {return dump_builtin_configs();}
 static String do_dump_hl_styles(EditorState *e) {return dump_hl_styles(&e->styles);}
@@ -606,6 +612,7 @@ static const ShowHandler show_handlers[] = {
     {"msg", MSGLINE, do_dump_messages_a, show_msg, collect_show_msg_args},
     {"open", LASTLINE, dump_file_history, NULL, NULL},
     {"option", DTERC, dump_options_and_fileopts, show_option, collect_all_options},
+    {"paste", 0, dump_paste, NULL, NULL},
     {"search", LASTLINE, dump_search_history, NULL, NULL},
     {"set", DTERC, do_dump_options, show_option, collect_all_options},
     {"setenv", DTERC, dump_setenv, show_env, collect_env},

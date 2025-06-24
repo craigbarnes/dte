@@ -36,6 +36,16 @@ static inline String string_new(size_t size)
     };
 }
 
+static inline String string_new_from_buf(const char *buf, size_t len)
+{
+    size_t alloc = next_multiple(len, 16);
+    return (String) {
+        .buffer = len ? memcpy(xmalloc(alloc), buf, len) : NULL,
+        .alloc = alloc,
+        .len = len,
+    };
+}
+
 static inline void string_append_string(String *s1, const String *s2)
 {
     string_append_buf(s1, s2->buffer, s2->len);
