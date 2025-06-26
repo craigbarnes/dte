@@ -37,6 +37,33 @@ static inline bool mem_equal(const void *s1, const void *s2, size_t n)
     return n == 0 || memcmp(s1, s2, n) == 0;
 }
 
+// Portable version of glibc/FreeBSD mempcpy(3)
+NONNULL_ARGS_AND_RETURN
+static inline void *xmempcpy(void *restrict dest, const void *restrict src, size_t n)
+{
+    memcpy(dest, src, n);
+    return (char*)dest + n;
+}
+
+NONNULL_ARGS_AND_RETURN
+static inline void *xmempcpy2 (
+    void *dest,
+    const void *p1, size_t n1,
+    const void *p2, size_t n2
+) {
+    return xmempcpy(xmempcpy(dest, p1, n1), p2, n2);
+}
+
+NONNULL_ARGS_AND_RETURN
+static inline void *xmempcpy3 (
+    void *dest,
+    const void *p1, size_t n1,
+    const void *p2, size_t n2,
+    const void *p3, size_t n3
+) {
+    return xmempcpy(xmempcpy2(dest, p1, n1, p2, n2), p3, n3);
+}
+
 static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
 {
     if (n == 0) {

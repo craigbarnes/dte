@@ -4,6 +4,7 @@
 #include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "command/error.h"
 #include "util/macros.h"
 
@@ -33,6 +34,7 @@ typedef struct {
 typedef struct {
     char start[8];
     char end[8];
+    uint8_t len;
 } RegexpWordBoundaryTokens;
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags) NONNULL_ARGS;

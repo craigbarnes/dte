@@ -69,19 +69,18 @@ bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
     static const char text[] = "SSfooEE SSfoo fooEE foo SSfooEE";
     const regoff_t match_start = 20, match_end = 23;
     static const RegexpWordBoundaryTokens pairs[] = {
-        {"\\<", "\\>"},
-        {"[[:<:]]", "[[:>:]]"},
-        {"\\b", "\\b"},
+        {"\\<", "\\>", 2},
+        {"[[:<:]]", "[[:>:]]", 7},
+        {"\\b", "\\b", 2},
     };
 
     BUG_ON(ARRAYLEN(text) <= match_end);
     BUG_ON(!mem_equal(text + match_start - 1, " foo ", 5));
 
     for (size_t i = 0; i < ARRAYLEN(pairs); i++) {
-        const char *start = pairs[i].start;
-        const char *end = pairs[i].end;
+        const RegexpWordBoundaryTokens *p = &pairs[i];
         char patt[32];
-        xsnprintf(patt, sizeof(patt), "%s(foo)%s", start, end);
+        xmempcpy3(patt, p->start, p->len, STRN("(foo)"), p->end, p->len + 1);
         regex_t re;
         if (regcomp(&re, patt, DEFAULT_REGEX_FLAGS) != 0) {
             continue;

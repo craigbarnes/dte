@@ -265,13 +265,10 @@ void add_message_for_tag(MessageList *messages, Tag *tag, const StringView *dir)
     BUG_ON(dir->data[0] != '/');
 
     static const char prefix[] = "Tag ";
+    const StringView *name = &tag->name;
     size_t prefix_len = sizeof(prefix) - 1;
-    size_t msg_len = prefix_len + tag->name.length;
-    Message *m = xmalloc(sizeof(*m) + msg_len + 1);
-
-    memcpy(m->msg, prefix, prefix_len);
-    memcpy(m->msg + prefix_len, tag->name.data, tag->name.length);
-    m->msg[msg_len] = '\0';
+    Message *m = xmalloc(sizeof(*m) + prefix_len + name->length + 1);
+    xmempcpy3(m->msg, prefix, prefix_len, name->data, name->length, "", 1);
 
     char *filename = path_join_sv(dir, &tag->filename, false);
     m->loc = new_file_location(filename, 0, 0, 0);

@@ -31,8 +31,7 @@ static inline StringView path_slice_dirname(const char *filename)
         return string_view(".", 1);
     }
     bool slash_is_root_dir = (slash == filename);
-    size_t dirname_length = slash_is_root_dir ? 1 : slash - filename;
-    return string_view(filename, dirname_length);
+    return string_view(filename, slash_is_root_dir ? 1 : slash - filename);
 }
 
 XSTRDUP

@@ -226,8 +226,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         }
 
         dir_len = slash - pathname;
-        memcpy(buf, pathname, dir_len);
-        memcpy(buf + dir_len, ecfilename, sizeof ecfilename);
+        xmempcpy2(buf, pathname, dir_len, ecfilename, sizeof ecfilename);
         ptr = slash + 1;
     }
 

@@ -67,6 +67,7 @@
 #include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "util/xstring.h"
 #include "view.h"
 #include "window.h"
 #include "wrap.h"
@@ -2031,14 +2032,11 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
             return false; // Error message wouldn't be very useful here
         }
         const RegexpWordBoundaryTokens *rwbt = &e->regexp_word_tokens;
-        const size_t bmax = sizeof(rwbt->start);
-        static_assert_compatible_types(rwbt->start, char[8]);
-        if (unlikely(word.length >= sizeof(pattbuf) - (bmax * 2))) {
+        const size_t n = rwbt->len;
+        if (unlikely(word.length >= sizeof(pattbuf) - (n * 2))) {
             return error_msg(&e->err, "word under cursor too long");
         }
-        char *ptr = stpncpy(pattbuf, rwbt->start, bmax);
-        memcpy(ptr, word.data, word.length);
-        memcpy(ptr + word.length, rwbt->end, bmax);
+        xmempcpy3(pattbuf, rwbt->start, n, word.data, word.length, rwbt->end, n + 1);
         pattern = pattbuf;
     }
 

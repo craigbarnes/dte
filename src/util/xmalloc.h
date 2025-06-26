@@ -5,6 +5,7 @@
 #include <string.h>
 #include "arith.h"
 #include "macros.h"
+#include "xstring.h"
 
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
 #define xrenew(mem, n) xreallocarray(mem, (n), sizeof(*mem))
@@ -39,19 +40,11 @@ static inline void *xmemdup(const void *ptr, size_t size)
     return memcpy(xmalloc(size), ptr, size);
 }
 
-// Portable version of glibc/FreeBSD mempcpy(3)
-NONNULL_ARGS_AND_RETURN
-static inline void *xmempcpy(void *restrict dest, const void *restrict src, size_t n)
-{
-    memcpy(dest, src, n);
-    return (char*)dest + n;
-}
-
 NONNULL_ARGS_AND_RETURN
 static inline void *xmemjoin(const void *p1, size_t n1, const void *p2, size_t n2)
 {
     char *joined = xmalloc(xadd(n1, n2));
-    memcpy(xmempcpy(joined, p1, n1), p2, n2);
+    xmempcpy2(joined, p1, n1, p2, n2);
     return joined;
 }
 
@@ -62,7 +55,7 @@ static inline void *xmemjoin3 (
     const void *p3, size_t n3
 ) {
     char *joined = xmalloc(xadd3(n1, n2, n3));
-    memcpy(xmempcpy(xmempcpy(joined, p1, n1), p2, n2), p3, n3);
+    xmempcpy3(joined, p1, n1, p2, n2, p3, n3);
     return joined;
 }
 
