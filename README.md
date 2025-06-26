@@ -86,9 +86,9 @@ In addition to the build dependencies mentioned above, the following are
 also needed for a correctly/fully functioning editor:
 
 * [POSIX] 2008 conforming operating system
-* Properly configured [UTF-8][] [locale]
-* [ECMA-48] compatible terminal (supporting at least the `CUP` and `EL`
+* [ECMA-48] compatible terminal (supporting at least the [`CUP`] and [`EL`]
   control functions)
+* [UTF-8][] [locale]
 
 Documentation
 -------------
@@ -170,6 +170,8 @@ Public License version 2 for more details.
 [UTF-8]: https://datatracker.ietf.org/doc/html/rfc3629
 [locale]: https://man7.org/linux/man-pages/man7/locale.7.html
 [ECMA-48]: https://ecma-international.org/publications-and-standards/standards/ecma-48/
+[`CUP`]: https://vt100.net/docs/vt510-rm/CUP.html
+[`EL`]: https://vt100.net/docs/vt510-rm/EL.html
 
 [Debian]: https://packages.debian.org/source/dte
 [Ubuntu]: https://launchpad.net/ubuntu/+source/dte
