@@ -29,8 +29,22 @@ Features
   on exit and restoring it at startup (see also: `read_history_files()` →
   `search_set_regexp()`)
 
-* Retain the last 10 or so recorded macros and allow them to be viewed
-  (with e.g. `show macro 7`) and executed (with e.g. `macro play 7`)
+* Retain a configurable number of previously copied strings and allow
+  them to be:
+  * Pasted (`paste 7`)
+  * Viewed (`show paste 7`)
+  * Moved to a different index (`paste -m 1 7`)
+  * Removed (`paste -r 7`)
+  * Piped to external commands (`exec -i paste -o paste fzf`; implemented
+    in a similar way to `exec -i msg -o msg`)
+  * Automatically saved to a history file?
+
+* Retain a configurable number of previously recorded macros and allow
+  them to be:
+  * Played (`macro play 7`)
+  * Viewed (`show macro 7`)
+  * Saved/Loaded/Renamed/etc.
+  * Automatically saved to a history file?
 
 * Add option to [`wrap-paragraph`] to allow finding and removing a common
   prefix string from every line and then re-inserting it afterwards
@@ -293,6 +307,12 @@ Code Quality/Efficiency Improvements
   bound keys are quite densely clustered, so the space wastage should be
   minimal. A sparse/segmented array is also quite a bit simpler and more
   efficient for a use case like this.
+
+* Only append new entries when writing history files and truncate just
+  enough lines to adhere to the size limit. This is for the sake of
+  retaining all history entries (within the limit) from all concurrent
+  dte processes, instead of the most recent one replacing the file from
+  memory.
 
 Testing/Debugging
 -----------------
