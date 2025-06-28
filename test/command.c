@@ -177,8 +177,8 @@ static void test_parse_command_arg(TestContext *ctx)
     free(arg);
 
     // Built-in $MSGPOS var (expands to "1" by default)
-    arg = parse_command_arg(&runner, STRN("$MSGPOS"));
-    EXPECT_STREQ(arg, "1");
+    arg = parse_command_arg(&runner, STRN("$MSGPOS\\ $MSGPOS_A\\ $MSGPOS_B\\ $MSGPOS_C"));
+    EXPECT_STREQ(arg, "1 1 1 1");
     free(arg);
 
     // Environment var (via getenv(3))
