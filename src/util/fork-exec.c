@@ -41,59 +41,20 @@ static bool reset_ignored_signals(void)
 static noreturn void child_process_exec (
     const char **argv,
     int fd[3],
-    int error_fd,
+    int error_fd, // Pipe to parent, for communicating pre-exec errors
     unsigned int lines,
     unsigned int columns,
     bool drop_ctty
 ) {
-    int error;
-    int nr_fds = 3;
-    bool move = error_fd < nr_fds;
-    int max = error_fd;
-
     if (drop_ctty) {
         term_drop_controlling_tty(STDIN_FILENO);
     }
 
-    // Find if we must move fds out of the way
-    for (int i = 0; i < nr_fds; i++) {
-        if (fd[i] > max) {
-            max = fd[i];
-        }
-        if (fd[i] < i) {
-            move = true;
-        }
-    }
-
-    if (move) {
-        int next_free = max + 1;
-        if (error_fd < nr_fds) {
-            error_fd = xdup3(error_fd, next_free++, O_CLOEXEC);
-            if (error_fd < 0) {
-                goto error;
-            }
-        }
-        for (int i = 0; i < nr_fds; i++) {
-            if (fd[i] < i) {
-                fd[i] = xdup3(fd[i], next_free++, O_CLOEXEC);
-                if (fd[i] < 0) {
-                    goto error;
-                }
-            }
-        }
-    }
-
-    // Now it is safe to duplicate fds in this order
-    for (int i = 0; i < nr_fds; i++) {
-        if (i == fd[i]) {
-            // Clear FD_CLOEXEC flag
-            if (!fd_set_cloexec(fd[i], false)) {
-                goto error;
-            }
-        } else {
-            if (xdup3(fd[i], i, 0) < 0) {
-                goto error;
-            }
+    for (int i = STDIN_FILENO; i <= STDERR_FILENO; i++) {
+        int f = fd[i];
+        bool ok = (i == f) ? fd_set_cloexec(f, false) : xdup3(f, i, 0) >= 0;
+        if (unlikely(!ok)) {
+            goto error;
         }
     }
 
@@ -104,14 +65,14 @@ static noreturn void child_process_exec (
         setenv("COLUMNS", uint_to_str(columns), 1);
     }
 
-    if (!reset_ignored_signals()) {
+    if (unlikely(!reset_ignored_signals())) {
         goto error;
     }
 
     execvp(argv[0], (char**)argv);
 
-error:
-    error = errno;
+error:;
+    int error = errno;
     error = xwrite(error_fd, &error, sizeof(error));
     exit(42);
 }
@@ -132,17 +93,24 @@ pid_t fork_exec (
     unsigned int columns,
     bool drop_ctty
 ) {
+    // Create an "error pipe" before forking, so that child_process_exec()
+    // can signal pre-exec errors and allow the parent differentiate them
+    // from a successful exec(3) with a non-zero exit status
     int ep[2];
     if (xpipe2(ep, O_CLOEXEC) != 0) {
         return -1;
     }
 
+    BUG_ON(ep[0] <= STDERR_FILENO);
+    BUG_ON(ep[1] <= STDERR_FILENO);
+    BUG_ON(fd[0] <= STDERR_FILENO && fd[0] != 0);
+    BUG_ON(fd[1] <= STDERR_FILENO && fd[1] != 1);
+    BUG_ON(fd[2] <= STDERR_FILENO && fd[2] != 2);
+
     const pid_t pid = fork();
     if (unlikely(pid == -1)) {
-        int saved_errno = errno;
         xclose(ep[0]);
         xclose(ep[1]);
-        errno = saved_errno;
         return -1;
     }
 

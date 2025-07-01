@@ -191,7 +191,24 @@ static int open_dev_null(ErrorBuffer *ebuf, int flags)
     if (unlikely(fd < 0)) {
         error_msg_errno(ebuf, "Error opening /dev/null");
     }
+
+    // Prevented by init_std_fds() and relied upon by fork_exec()
+    BUG_ON(fd <= STDERR_FILENO);
+
     return fd;
+}
+
+static bool open_pipe(ErrorBuffer *ebuf, int fds[2])
+{
+    if (unlikely(xpipe2(fds, O_CLOEXEC) != 0)) {
+        return error_msg_errno(ebuf, "xpipe2");
+    }
+
+    // Prevented by init_std_fds() and relied upon by fork_exec()
+    BUG_ON(fds[0] <= STDERR_FILENO);
+    BUG_ON(fds[1] <= STDERR_FILENO);
+
+    return true;
 }
 
 static int handle_child_error(ErrorBuffer *ebuf, pid_t pid)
@@ -233,8 +250,7 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, boo
     }
 
     int p[2];
-    if (xpipe2(p, O_CLOEXEC) != 0) {
-        error_msg_errno(ctx->ebuf, "pipe");
+    if (!open_pipe(ctx->ebuf, p)) {
         xclose(dev_null);
         xclose(fd[0]);
         return false;
@@ -318,12 +334,9 @@ int spawn(SpawnContext *ctx)
             break;
         case SPAWN_PIPE: {
             int p[2];
-            if (xpipe2(p, O_CLOEXEC) != 0) {
-                error_msg_errno(ctx->ebuf, "pipe");
+            if (!open_pipe(ctx->ebuf, p)) {
                 goto error;
             }
-            BUG_ON(p[0] <= STDERR_FILENO);
-            BUG_ON(p[1] <= STDERR_FILENO);
             child_fds[i] = i ? p[1] : p[0];
             parent_fds[i] = i ? p[0] : p[1];
             if (!fd_set_nonblock(parent_fds[i], true)) {
