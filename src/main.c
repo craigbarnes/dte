@@ -82,7 +82,7 @@ static ExitCode dump_builtin_config(const char *name)
 
 static ExitCode lint_syntax(const char *filename, bool extra_lint)
 {
-    EditorState *e = init_editor_state(EFLAG_HEADLESS);
+    EditorState *e = init_editor_state(getenv("HOME"), getenv("DTE_HOME"));
     e->err.print_to_stderr = true;
     BUG_ON(e->status != EDITOR_INITIALIZING);
 
@@ -513,10 +513,11 @@ int main(int argc, char *argv[])
         set_basic_signal_dispositions();
     }
 
-    // Note that we set EFLAG_HEADLESS here, regardless of whether -C was used,
-    // because the terminal isn't properly initialized until later and we don't
-    // want commands running via -c or -C interacting with it
-    EditorState *e = init_editor_state(EFLAG_HEADLESS);
+    // Note that we don't unset EFLAG_HEADLESS in e->flags until later
+    // (regardless of whether -C was used), because the terminal isn't
+    // properly initialized yet and we don't want commands running via
+    // -c or -C -interacting with it
+    EditorState *e = init_editor_state(getenv("HOME"), getenv("DTE_HOME"));
 
     Terminal *term = &e->terminal;
     if (!headless) {

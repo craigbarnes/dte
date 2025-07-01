@@ -102,10 +102,6 @@ static void test_init(TestContext *ctx)
     ASSERT_EQ(setenv("DTE_HOME", dte_home, 1), 0);
     ASSERT_EQ(setenv("XDG_RUNTIME_DIR", dte_home, 1), 0);
     ASSERT_EQ(setenv("TZ", "UTC", 1), 0);
-
-    free(home);
-    free(dte_home);
-
     ASSERT_EQ(unsetenv("TERM"), 0);
     ASSERT_EQ(unsetenv("COLORTERM"), 0);
 
@@ -149,10 +145,14 @@ static void test_init(TestContext *ctx)
     TRACE_INPUT("%s: testing TRACE_INPUT()", __func__);
     TRACE_OUTPUT("%s: testing TRACE_OUTPUT()", __func__);
 
-    EditorState *e = init_editor_state(EFLAG_HEADLESS);
+    EditorState *e = init_editor_state(home, dte_home);
     ASSERT_NONNULL(e);
     ASSERT_NONNULL(e->user_config_dir);
     ASSERT_NONNULL(e->home_dir.data);
+    EXPECT_STREQ(e->user_config_dir, dte_home);
+    EXPECT_STRVIEW_EQ_CSTRING(&e->home_dir, home);
+    free(home);
+    free(dte_home);
     e->options.lock_files = false;
     ctx->userdata = e;
 

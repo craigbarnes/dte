@@ -161,7 +161,7 @@ static inline CommandRunner normal_mode_cmdrunner(EditorState *e)
     return cmdrunner(e, &normal_commands);
 }
 
-EditorState *init_editor_state(EditorFlags flags) RETURNS_NONNULL;
+EditorState *init_editor_state(const char *home, const char *dte_home) RETURNS_NONNULL;
 void free_editor_state(EditorState *e) NONNULL_ARGS;
 void clear_all_messages(EditorState *e) NONNULL_ARGS;
 void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;

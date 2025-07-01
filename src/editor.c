@@ -66,12 +66,17 @@ static mode_t get_umask(void)
     return old;
 }
 
-EditorState *init_editor_state(EditorFlags flags)
+EditorState *init_editor_state(const char *home, const char *dte_home)
 {
+    set_and_check_locale();
+    home = home ? home : "";
     EditorState *e = xmalloc(sizeof(*e));
+
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
-        .flags = flags,
+        .home_dir = strview_intern(home),
+        .user_config_dir = dte_home ? xstrdup(dte_home) : xstrjoin(home, "/.dte"),
+        .flags = EFLAG_HEADLESS,
         .command_history = {
             .max_entries = 512,
         },
@@ -126,16 +131,6 @@ EditorState *init_editor_state(EditorFlags flags)
 
     sanity_check_global_options(&e->err, &e->options);
 
-    const char *home = getenv("HOME");
-    const char *dte_home = getenv("DTE_HOME");
-    home = home ? home : "";
-    e->home_dir = strview_intern(home);
-    if (dte_home) {
-        e->user_config_dir = xstrdup(dte_home);
-    } else {
-        e->user_config_dir = xstrjoin(home, "/.dte");
-    }
-
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
     e->session_leader = leader;
@@ -150,11 +145,11 @@ EditorState *init_editor_state(EditorFlags flags)
     e->new_file_mode = 0666 & ~mask;
     LOG_INFO("umask: %04o", 0777u & (unsigned int)mask);
 
-    set_and_check_locale();
     init_file_locks_context(&e->locks_ctx, e->user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
     if (unlikely(setenv("DTE_VERSION", VERSION, 1) != 0)) {
+        // errno is almost certainly ENOMEM, if setenv() failed here
         fatal_error("setenv", errno);
     }
 
@@ -165,18 +160,21 @@ EditorState *init_editor_state(EditorFlags flags)
         LOG_WARNING("no regex word boundary tokens detected");
     }
 
-    hashmap_init(&e->aliases, 32, HMAP_NO_FLAGS);
-    hashset_init(&e->required_syntax_files, 0, false);
-    hashset_init(&e->required_syntax_builtins, 0, false);
-
     HashMap *modes = &e->modes;
     e->normal_mode = new_mode(modes, xstrdup("normal"), &normal_commands);
     e->command_mode = new_mode(modes, xstrdup("command"), &cmd_mode_commands);
     e->search_mode = new_mode(modes, xstrdup("search"), &search_mode_commands);
     e->mode = e->normal_mode;
+
+    // Pre-allocate space for key bindings and aliases, so that no
+    // predictable (and thus unnecessary) reallocs are needed when
+    // loading built-in configs
+    hashmap_init(&e->aliases, 32, HMAP_NO_FLAGS);
     intmap_init(&e->normal_mode->key_bindings, 150);
     intmap_init(&e->command_mode->key_bindings, 40);
     intmap_init(&e->search_mode->key_bindings, 40);
+    hashset_init(&e->required_syntax_files, 0, false);
+    hashset_init(&e->required_syntax_builtins, 0, false);
 
     return e;
 }
