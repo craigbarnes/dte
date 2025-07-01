@@ -60,6 +60,7 @@ static void open_temporary_buffer (
     size_t text_len,
     const char *cmd,
     const char *cmd_arg,
+    const char *filetype,
     ShowHandlerFlags flags
 ) {
     const char *sp = cmd_arg[0] ? " " : "";
@@ -68,8 +69,9 @@ static void open_temporary_buffer (
     buffer_set_display_filename(buffer, xasprintf("(%s%s%s)", cmd, sp, cmd_arg));
     buffer->temporary = true;
 
-    if (flags & DTERC) {
-        buffer->options.filetype = str_intern("dte");
+    filetype = filetype ? filetype : ((flags & DTERC) ? "dte" : NULL);
+    if (filetype) {
+        buffer->options.filetype = str_intern(filetype);
         set_file_options(e, buffer);
         buffer_update_syntax(e, buffer);
     }
@@ -272,7 +274,7 @@ static bool show_mode(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(e, str.buffer, str.len, "def-mode", name, DTERC);
+        open_temporary_buffer(e, str.buffer, str.len, "def-mode", name, NULL, DTERC);
     }
 
     string_free(&str);
@@ -290,7 +292,9 @@ static bool show_builtin(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, sv.data, sv.length);
     } else {
-        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, DTERC);
+        bool script = str_has_prefix(name, "script/");
+        const char *ft = script ? filetype_str_from_extension(name) : "dte";
+        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, ft, 0);
     }
 
     return true;
@@ -308,7 +312,7 @@ static bool show_compiler(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, DTERC);
+        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, NULL, DTERC);
     }
 
     string_free(&str);
@@ -328,7 +332,7 @@ static bool show_msg(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(e, str.buffer, str.len, "msg", name, 0);
+        open_temporary_buffer(e, str.buffer, str.len, "msg", name, NULL, 0);
         if (msgs->array.count > 0) {
             block_iter_goto_line(&e->view->cursor, msgs->pos);
         }
@@ -687,7 +691,7 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag)
     }
 
     String str = handler->dump(e);
-    open_temporary_buffer(e, str.buffer, str.len, "show", type, handler->flags);
+    open_temporary_buffer(e, str.buffer, str.len, "show", type, NULL, handler->flags);
     string_free(&str);
     return true;
 }

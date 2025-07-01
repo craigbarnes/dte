@@ -40,8 +40,6 @@ check-awk: src/msg.c src/msg.h
 	$(Q) $(AWKLINT) -f tools/wscheck.awk $^
 	$(E) AWKLINT tools/mkcheck.awk
 	$(Q) $(AWKLINT) -f tools/mkcheck.awk $^
-	$(E) AWKLINT contrib/longest-line.awk
-	$(Q) $(AWKLINT) -f contrib/longest-line.awk $<
 	$(E) AWKLINT tools/git-hooks/commit-msg
 	$(Q) printf 'L1\n\nL3.\n' | $(AWKLINT) -f tools/git-hooks/commit-msg
 	$(E) AWKLINT tools/gcovr-txt.awk

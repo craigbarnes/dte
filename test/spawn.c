@@ -12,6 +12,7 @@ static void test_spawn(TestContext *ctx)
     ErrorBuffer ebuf = {.print_to_stderr = false};
     SpawnContext sc = {
         .argv = args,
+        .prog_fd = -1,
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
         .ebuf = &ebuf,

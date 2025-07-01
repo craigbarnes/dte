@@ -1276,7 +1276,7 @@ Note that _command_ is executed directly using [`execvp`]. To use shell
 features like pipes or redirection, use a shell interpreter as the
 _command_ (see second example above). If complex commands become
 difficult to read (e.g. due to nested/escaped quotes), it's recommended
-to create [external scripts] and execute those instead.
+to create external scripts and execute those instead.
 
 ### **compile** [**-1ps**] _errorfmt_ _command_ [_argument_]...
 
@@ -1709,7 +1709,6 @@ errors should be highlighted. Set to `""` to disable.
 [`compiler/go`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/compiler/go
 [`ascii(7)`]: https://www.man7.org/linux/man-pages/man7/ascii.7.html#DESCRIPTION
 [standard streams]: https://man7.org/linux/man-pages/man3/stdin.3.html#DESCRIPTION
-[external scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/contrib
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04

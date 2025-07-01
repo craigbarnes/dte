@@ -271,6 +271,24 @@ void collect_builtin_includes(PointerArray *a, const char *prefix)
         if (
             str_has_strn_prefix(name, prefix, prefix_len)
             && !str_has_prefix(name, "syntax/")
+            && !str_has_prefix(name, "script/")
+        ) {
+            ptr_array_append(a, xstrdup(name));
+        }
+    }
+}
+
+void collect_builtin_scripts(PointerArray *a, const char *prefix)
+{
+    static const char script[] = "script/";
+    size_t script_len = sizeof(script) - 1;
+    size_t prefix_len = strlen(prefix);
+
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
+        const char *name = builtin_configs[i].name;
+        if (
+            str_has_strn_prefix(name, script, script_len)
+            && str_has_strn_prefix(name, prefix, prefix_len)
         ) {
             ptr_array_append(a, xstrdup(name));
         }

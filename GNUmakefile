@@ -48,10 +48,6 @@ define POSTINSTALL_ICONS
 ) || :
 endef
 
-CONTRIB_SCRIPTS = \
-    fzf.sh git-changes.sh help.sh lf-wrapper.sh longest-line.awk \
-    open-c-header.sh ranger-wrapper.sh xtag.sh
-
 INSTALL_TARGETS_BASIC := bin man bash-completion fish-completion zsh-completion
 INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) icons desktop-file appstream
 
@@ -151,18 +147,6 @@ install-appstream:
 uninstall-appstream:
 	$(RM) '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
 
-install-contrib:
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(datadir)/dte'
-	$(Q) $(foreach f, $(CONTRIB_SCRIPTS), \
-	  $(LOG) INSTALL '$(DESTDIR)$(datadir)/dte/$(f)'; \
-	  $(INSTALL_PROGRAM) 'contrib/$(f)' '$(DESTDIR)$(datadir)/dte'; \
-	)
-	$(E) INSTALL '$(DESTDIR)$(datadir)/dte/README.md'
-	$(Q) $(INSTALL_DATA) contrib/README.md '$(DESTDIR)$(datadir)/dte'
-
-uninstall-contrib:
-	$(RM) -r '$(DESTDIR)$(datadir)/dte'
-
 check-tests: $(test) all
 	$(E) EXEC '$(test)'
 	$(Q) ./$(test) $(TESTFLAGS)
@@ -184,7 +168,7 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic contrib
+INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic
 .DEFAULT_GOAL = all
 .PHONY: all clean install uninstall
 .PHONY: check check-tests check-opts installcheck bench

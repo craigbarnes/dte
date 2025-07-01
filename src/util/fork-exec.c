@@ -11,6 +11,9 @@
 #include "terminal/ioctl.h"
 #include "xreadwrite.h"
 
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
+extern char **environ;
+
 // Reset ignored signal dispositions (i.e. as originally set up by
 // set_basic_signal_dispositions()) to SIG_DFL
 static bool reset_ignored_signals(void)
@@ -41,6 +44,7 @@ static bool reset_ignored_signals(void)
 static noreturn void child_process_exec (
     const char **argv,
     int fd[3],
+    int prog_fd,
     int error_fd, // Pipe to parent, for communicating pre-exec errors
     unsigned int lines,
     unsigned int columns,
@@ -69,7 +73,11 @@ static noreturn void child_process_exec (
         goto error;
     }
 
-    execvp(argv[0], (char**)argv);
+    if (prog_fd >= 0) {
+        fexecve(prog_fd, (char**)argv, environ);
+    } else {
+        execvp(argv[0], (char**)argv);
+    }
 
 error:;
     int error = errno;
@@ -89,6 +97,7 @@ static pid_t xwaitpid(pid_t pid, int *status, int options)
 pid_t fork_exec (
     const char **argv,
     int fd[3],
+    int prog_fd,
     unsigned int lines,
     unsigned int columns,
     bool drop_ctty
@@ -106,6 +115,7 @@ pid_t fork_exec (
     BUG_ON(fd[0] <= STDERR_FILENO && fd[0] != 0);
     BUG_ON(fd[1] <= STDERR_FILENO && fd[1] != 1);
     BUG_ON(fd[2] <= STDERR_FILENO && fd[2] != 2);
+    BUG_ON(prog_fd >= STDIN_FILENO && prog_fd <= STDERR_FILENO);
 
     const pid_t pid = fork();
     if (unlikely(pid == -1)) {
@@ -116,7 +126,7 @@ pid_t fork_exec (
 
     if (pid == 0) {
         // Child
-        child_process_exec(argv, fd, ep[1], lines, columns, drop_ctty);
+        child_process_exec(argv, fd, prog_fd, ep[1], lines, columns, drop_ctty);
         BUG("child_process_exec() should never return");
         return -1;
     }

@@ -18,6 +18,7 @@ typedef struct {
     const char **argv;
     StringView input;
     String outputs[2]; // For stdout/stderr
+    int prog_fd; // File descriptor to pass to fexecve(3), or -1 if using execvp(3)
     SpawnAction actions[3];
     ErrorBuffer *ebuf;
     unsigned int lines;

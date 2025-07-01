@@ -1,14 +1,17 @@
+#include "feature.h"
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <unistd.h>
 #include "exec.h"
 #include "block-iter.h"
 #include "buffer.h"
 #include "change.h"
-#include "command/error.h"
 #include "command/macro.h"
 #include "commands.h"
+#include "config.h"
 #include "ctags.h"
 #include "move.h"
 #include "msg.h"
@@ -17,12 +20,13 @@
 #include "terminal/mode.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/numtostr.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/string.h"
 #include "util/strtonum.h"
+#include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
@@ -252,6 +256,52 @@ static SpawnAction spawn_action_from_exec_action(ExecAction action)
     }
 }
 
+int open_builtin_script(ErrorBuffer *ebuf, const char *name)
+{
+    const BuiltinConfig *cfg = get_builtin_config(name);
+    if (unlikely(!cfg)) {
+        error_msg(ebuf, "no built-in script with name '%s'", name);
+        return -1;
+    }
+    if (unlikely(!str_has_prefix(name, "script/"))) {
+        error_msg(ebuf, "built-in config '%s' not an executable script", name);
+        return -1;
+    }
+
+#if HAVE_MEMFD_CREATE
+    // MFD_CLOEXEC isn't used here, due to a bug in the way fexecve(3)
+    // is implemented on Linux. See also:
+    // • https://man7.org/linux/man-pages/man3/fexecve.3.html#BUGS
+    // • https://man7.org/linux/man-pages/man2/execveat.2.html#BUGS
+    int prog_fd = memfd_create(name, MFD_ALLOW_SEALING);
+    if (prog_fd < 0) {
+        error_msg_errno(ebuf, "memfd_create");
+        return -1;
+    }
+
+    if (xwrite_all(prog_fd, cfg->text.data, cfg->text.length) < 0) {
+        error_msg_errno(ebuf, "xwrite_all");
+        xclose(prog_fd);
+        return -1;
+    }
+
+    int seals = F_SEAL_SEAL | F_SEAL_SHRINK | F_SEAL_GROW | F_SEAL_WRITE;
+    if (fcntl(prog_fd, F_ADD_SEALS, seals)) {
+        // Not a hard error, since sealing isn't strictly needed
+        LOG_ERRNO("setting file seals failed");
+    }
+
+    return prog_fd;
+#endif
+
+    // TODO: Use shm_open() as a fallback implementation. That API is
+    // inferior for this use case, but it's part of the POSIX [SHM]
+    // option and is also more portable in practice (e.g. to OpenBSD,
+    // macOS, etc.).
+    error_msg(ebuf, "executing built-in scripts not yet supported on this platform");
+    return -1;
+}
+
 // NOLINTNEXTLINE(readability-function-size)
 ssize_t handle_exec (
     EditorState *e,
@@ -268,9 +318,18 @@ ssize_t handle_exec (
     bool input_from_buffer = false;
     bool replace_unselected_input = false;
     bool quiet = (exec_flags & EXECFLAG_QUIET);
+    int prog_fd = -1;
+
+    if (exec_flags & EXECFLAG_BUILTIN) {
+        prog_fd = open_builtin_script(&e->err, argv[0]);
+        if (prog_fd < 0) {
+            return -1;
+        }
+    }
 
     SpawnContext ctx = {
         .argv = argv,
+        .prog_fd = prog_fd,
         .outputs = {STRING_INIT, STRING_INIT},
         .quiet = quiet,
         .ebuf = &e->err,
@@ -397,6 +456,7 @@ ssize_t handle_exec (
 
     yield_terminal(e, quiet);
     int err = spawn(&ctx);
+    xclose(prog_fd);
     bool prompt = (err >= 0) && (exec_flags & EXECFLAG_PROMPT);
     resume_terminal(e, quiet, prompt);
     free(alloc);

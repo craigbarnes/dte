@@ -22,6 +22,9 @@ const char buildvar_string[] =
 #if HAVE_FSYNC
     " fsync"
 #endif
+#if HAVE_MEMFD_CREATE
+    " memfd_create"
+#endif
 #if HAVE_MEMMEM
     " memmem"
 #endif

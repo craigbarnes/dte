@@ -50,7 +50,8 @@ static void test_builtin_configs(TestContext *ctx)
             EXPECT_EQ(e->err.nr_errors, saved_nr_errs);
             EXPECT_NONNULL(find_syntax(syntaxes, path_basename(cfg.name)));
         } else {
-            // Check that built-in configs are identical to their source files
+            // Check that built-in configs and scripts are identical to
+            // their source files
             char path[4096];
             xsnprintf(path, sizeof path, "config/%s", cfg.name);
             char *src;

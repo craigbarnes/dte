@@ -32,6 +32,7 @@ static inline bool is_valid_filetype_name(const char *name)
 
 bool is_ft(const PointerArray *filetypes, const char *name);
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line);
+const char *filetype_str_from_extension(const char *path) NONNULL_ARGS;
 void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *prefix);
 String dump_filetypes(const PointerArray *filetypes);
 void free_filetypes(PointerArray *filetypes);

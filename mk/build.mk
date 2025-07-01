@@ -15,9 +15,14 @@ BUILTIN_SYNTAX_FILES ?= \
     sed sh sql tex texmfcnf tmux vala weechatlog xml xresources zig \
     inc/c-comment inc/c-uchar inc/diff inc/json-num
 
+BUILTIN_SCRIPTS ?= \
+    fzf.sh git-changes.sh help.sh lf-wrapper.sh longest-line.awk \
+    open-c-header.sh paste.sh ranger-wrapper.sh xtag.sh
+
 BUILTIN_CONFIGS = $(addprefix config/, \
-    rc binding/default compiler/gcc compiler/go \
+    rc extra binding/default compiler/gcc compiler/go \
     $(addprefix color/, reset default darkgray) \
+    $(addprefix script/, $(BUILTIN_SCRIPTS)) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
@@ -69,8 +74,9 @@ test_objects := $(call prefix-obj, build/test/, \
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
-    dup3 embed pipe2 fsync memmem memrchr mkostemp sigisemptyset TIOCGWINSZ \
-    TIOCNOTTY tcgetwinsize posix_madvise qsort_r ))
+    dup3 embed pipe2 fsync memfd_create memmem memrchr mkostemp \
+    sigisemptyset TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise \
+    qsort_r ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/ build/gen/
@@ -150,6 +156,7 @@ build/editor.o: build/gen/version.h
 build/test/command.o: build/gen/version.h
 build/test/init.o: build/gen/version.h
 build/compat.o: build/gen/feature.h build/gen/buildvar-iconv.h
+build/exec.o: build/gen/feature.h
 build/load-save.o: build/gen/feature.h
 build/signals.o: build/gen/feature.h
 build/tag.o: build/gen/feature.h

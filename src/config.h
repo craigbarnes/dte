@@ -39,5 +39,6 @@ void exec_builtin_color_reset(struct EditorState *e);
 void exec_rc_files(struct EditorState *e, const char *filename, bool read_user_rc) NONNULL_ARG(1);
 void collect_builtin_configs(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_builtin_includes(PointerArray *a, const char *prefix) NONNULL_ARGS;
+void collect_builtin_scripts(PointerArray *a, const char *prefix) NONNULL_ARGS;
 
 #endif

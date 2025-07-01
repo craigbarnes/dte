@@ -198,7 +198,7 @@ Documentation
 
 * Document the fact that `exec -o tag` tries to parse the first line of
   output as a [`tags(5)`] file entry, before falling back to a simple tag
-  name and mention `contrib/xtag.sh` as an example use case
+  name and mention `config/script/xtag.sh` as an example use case
 
 * Document the fact that [`exec`] sets `$LINES` and `$COLUMNS` and use e.g.
   `wsplit -t; pipe-from man ls` as an example of why

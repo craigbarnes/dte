@@ -372,3 +372,11 @@ bool is_valid_filetype_name_sv(const StringView *name)
 
     return true;
 }
+
+const char *filetype_str_from_extension(const char *path)
+{
+    StringView base = strview_from_cstring(path_basename(path));
+    StringView ext = get_filename_extension(base);
+    FileTypeEnum ft = filetype_from_extension(ext);
+    return (ft == NONE) ? NULL : builtin_filetype_names[ft];
+}

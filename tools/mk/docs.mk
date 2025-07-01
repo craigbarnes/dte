@@ -1,7 +1,7 @@
 manpage-names = $(basename $(notdir $(man)))
 manpage-date-targets = $(addprefix manpage-date-, $(manpage-names))
 last-commit-date = git log -1 --format='%ad' --date='format:%B %Y'
-html-aux-basenames = contributing packaging releasing TODO contrib-scripts
+html-aux-basenames = contributing packaging releasing TODO
 html-aux = $(foreach f, $(html-aux-basenames), public/$(f).html)
 
 # These are miscellaneous Markdown files dotted around the repo and
@@ -12,7 +12,6 @@ public/contributing.html: docs/contributing.md
 public/TODO.html: docs/TODO.md
 public/releasing.html: docs/releasing.md
 public/packaging.html: docs/packaging.md
-public/contrib-scripts.html: contrib/README.md
 
 html-aux: $(html-aux)
 htmlgz-aux: $(patsubst %, %.gz, $(html-aux))

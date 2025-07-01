@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#include "command/error.h"
 #include "editor.h"
 #include "spawn.h"
 #include "util/macros.h"
@@ -11,7 +12,7 @@
 // NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
 typedef enum {
     EXEC_INVALID = -1,
-    // Note: items below here need to be kept sorted
+    // Note: items below here need to be kept sorted (for exec_map[])
     EXEC_BUFFER = 0,
     EXEC_COMMAND,
     EXEC_ECHO,
@@ -38,6 +39,7 @@ typedef enum {
     EXECFLAG_QUIET = 1u << 0, // Interpret SPAWN_TTY as SPAWN_NULL and don't yield terminal to child
     EXECFLAG_PROMPT = 1u << 1, // Show "press any key to continue" prompt
     EXECFLAG_STRIP_NL = 1u << 2, // Strip newline from end of inserted text (if any)
+    EXECFLAG_BUILTIN = 1u << 3, // Look up argv[0] as a built-in script, instead of in the filesystem
 } ExecFlags;
 
 ssize_t handle_exec (
@@ -48,6 +50,7 @@ ssize_t handle_exec (
 ) NONNULL_ARGS;
 
 ExecAction lookup_exec_action(const char *name, int fd) NONNULL_ARGS;
+int open_builtin_script(ErrorBuffer *ebuf, const char *name) NONNULL_ARGS WARN_UNUSED_RESULT;
 void yield_terminal(EditorState *e, bool quiet) NONNULL_ARGS;
 void resume_terminal(EditorState *e, bool quiet, bool prompt) NONNULL_ARGS;
 void collect_exec_actions(PointerArray *a, const char *prefix, int fd) NONNULL_ARGS;
