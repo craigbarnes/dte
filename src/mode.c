@@ -47,8 +47,9 @@ static bool handle_input_single (
     KeyCode key,
     ModeHandlerFlags inherited_flags
 ) {
-    if (key == KEYCODE_DETECTED_PASTE || key == KEYCODE_BRACKETED_PASTE) {
-        return insert_paste(e, handler, key == KEYCODE_BRACKETED_PASTE);
+    bool bracketed_paste = (key == KEYCODE_BRACKETED_PASTE);
+    if (bracketed_paste || key == KEYCODE_DETECTED_PASTE) {
+        return insert_paste(e, handler, bracketed_paste);
     }
 
     ModeHandlerFlags noinsert_flags = MHF_NO_TEXT_INSERTION | MHF_NO_TEXT_INSERTION_RECURSIVE;
