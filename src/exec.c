@@ -268,7 +268,7 @@ int open_builtin_script(ErrorBuffer *ebuf, const char *name)
         return -1;
     }
 
-#if HAVE_MEMFD_CREATE
+#if HAVE_MEMFD_CREATE && HAVE_FEXECVE
     // MFD_CLOEXEC isn't used here, due to a bug in the way fexecve(3)
     // is implemented on Linux. See also:
     // • https://man7.org/linux/man-pages/man3/fexecve.3.html#BUGS

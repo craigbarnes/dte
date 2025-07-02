@@ -74,7 +74,7 @@ test_objects := $(call prefix-obj, build/test/, \
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
-    dup3 embed pipe2 fsync memfd_create memmem memrchr mkostemp \
+    dup3 embed pipe2 fexecve fsync memfd_create memmem memrchr mkostemp \
     sigisemptyset TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise \
     qsort_r ))
 
@@ -162,6 +162,7 @@ build/signals.o: build/gen/feature.h
 build/tag.o: build/gen/feature.h
 build/terminal/ioctl.o: build/gen/feature.h
 build/util/fd.o: build/gen/feature.h
+build/util/fork-exec.o: build/gen/feature.h
 build/util/xadvise.o: build/gen/feature.h
 build/util/xmemmem.o: build/gen/feature.h
 build/util/xmemrchr.o: build/gen/feature.h

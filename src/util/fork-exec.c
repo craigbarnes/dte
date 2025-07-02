@@ -1,3 +1,4 @@
+#include "feature.h"
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -11,8 +12,12 @@
 #include "terminal/ioctl.h"
 #include "xreadwrite.h"
 
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-extern char **environ;
+// glibc headers conditionally declare `environ`, if _GNU_SOURCE is
+// defined (which is the case here due to the "feature.h" include).
+// TODO: Move this to a separate header
+IGNORE_WARNING("-Wredundant-decls")
+extern char **environ; // NOLINT(*-avoid-non-const-global-variables)
+UNIGNORE_WARNINGS
 
 // Reset ignored signal dispositions (i.e. as originally set up by
 // set_basic_signal_dispositions()) to SIG_DFL
@@ -74,10 +79,18 @@ static noreturn void child_process_exec (
     }
 
     if (prog_fd >= 0) {
-        fexecve(prog_fd, (char**)argv, environ);
-    } else {
-        execvp(argv[0], (char**)argv);
+        #if HAVE_FEXECVE
+            fexecve(prog_fd, (char**)argv, environ);
+        #else
+            // This set of conditions can't actually occur in this codebase,
+            // since the only caller that passes a positive `prog_fd` does
+            // so only when HAVE_FEXECVE is non-zero
+            errno = ENOSYS;
+        #endif
+        goto error;
     }
+
+    execvp(argv[0], (char**)argv);
 
 error:;
     int error = errno;

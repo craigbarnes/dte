@@ -19,6 +19,9 @@ const char buildvar_string[] =
 #if HAVE_PIPE2
     " pipe2"
 #endif
+#if HAVE_FEXECVE
+    " fexecve"
+#endif
 #if HAVE_FSYNC
     " fsync"
 #endif
