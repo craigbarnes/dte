@@ -6,18 +6,12 @@
 #include <unistd.h>
 #include "fork-exec.h"
 #include "debug.h"
+#include "environ.h"
 #include "fd.h"
 #include "log.h"
 #include "numtostr.h"
 #include "terminal/ioctl.h"
 #include "xreadwrite.h"
-
-// glibc headers conditionally declare `environ`, if _GNU_SOURCE is
-// defined (which is the case here due to the "feature.h" include).
-// TODO: Move this to a separate header
-IGNORE_WARNING("-Wredundant-decls")
-extern char **environ; // NOLINT(*-avoid-non-const-global-variables)
-UNIGNORE_WARNINGS
 
 // Reset ignored signal dispositions (i.e. as originally set up by
 // set_basic_signal_dispositions()) to SIG_DFL

@@ -28,6 +28,7 @@
 #include "util/array.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/environ.h"
 #include "util/intern.h"
 #include "util/log.h"
 #include "util/unicode.h"
@@ -36,9 +37,6 @@
 #include "util/xstring.h"
 #include "view.h"
 #include "window.h"
-
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-extern char **environ;
 
 typedef enum {
     DTERC = 1 << 0, // Use "dte" filetype (and syntax highlighter)

@@ -388,6 +388,8 @@
     // https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3469.htm#:~:text=_Countof
     // https://github.com/llvm/llvm-project/commit/00c43ae23524d72707701620da89ad248393a8e4
     // https://github.com/llvm/llvm-project/issues/102836#issuecomment-2681819243
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117025#c6
+    // https://gcc.gnu.org/cgit/gcc/commit/?id=517c9487f8fdc4e4e90252a9365e5823259dc783
     // TODO: Enable this if/when _Countof() becomes more certain and/or available
     // in a Clang release:
     //#define ARRAYLEN(a) _Countof(a)

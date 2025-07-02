@@ -30,6 +30,7 @@
 #include "util/bit.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/environ.h"
 #include "util/intmap.h"
 #include "util/log.h"
 #include "util/numtostr.h"
@@ -41,9 +42,6 @@
 #include "util/xdirent.h"
 #include "util/xmalloc.h"
 #include "vars.h"
-
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-extern char **environ;
 
 typedef enum {
     COLLECT_ALL, // (directories and files)

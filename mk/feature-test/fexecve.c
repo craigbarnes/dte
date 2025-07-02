@@ -13,11 +13,9 @@
  • https://man.netbsd.org/fexecve.2#:~:text=int-,fexecve
 */
 
-extern char **environ;
-
 int main(void)
 {
     static const char *const argv[] = {"argv0", "1", "2", NULL};
-    int r = (fexecve)(3, (char**)argv, environ);
-    return !r;
+    static const char *const envp[] = {"VAR=xyz", NULL};
+    return (fexecve)(3, (char**)argv, (char**)envp);
 }
