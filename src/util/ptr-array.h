@@ -25,6 +25,7 @@ typedef int (*CompareFunction)(const void *, const void *);
 void ptr_array_grow_and_append(PointerArray *array, void *ptr) NONNULL_ARG(1) NOINLINE;
 void ptr_array_insert(PointerArray *array, void *ptr, size_t idx) NONNULL_ARG(1);
 void ptr_array_move(PointerArray *array, size_t from, size_t to) NONNULL_ARGS;
+void ptr_array_clear(PointerArray *array, FreeFunction free_ptr) NONNULL_ARGS;
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr) NONNULL_ARGS;
 size_t ptr_array_remove(PointerArray *array, void *ptr) NONNULL_ARG(1);
 void *ptr_array_remove_index(PointerArray *array, size_t idx) NONNULL_ARGS;

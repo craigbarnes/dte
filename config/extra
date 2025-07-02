@@ -14,8 +14,7 @@ alias header 'exec -sb -o open script/open-c-header.sh $FILE'
 
 # Jump to the locations of unstaged changes made to the git(1) working
 # tree
-errorfmt gitdiff
-errorfmt gitdiff '^([^:]+): [+-]([0-9]+).*' file line
+errorfmt -c gitdiff '^([^:]+): [+-]([0-9]+).*' file line
 alias git-changes 'compile -1sb gitdiff script/git-changes.sh'
 
 # Jump to the longest line in the current buffer

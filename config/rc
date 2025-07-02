@@ -14,8 +14,7 @@ alias trim-lines 'replace "[ \t]+$" ""'
 alias color hi
 alias exit quit
 
-errorfmt basic
-errorfmt basic '^([^:]+):([0-9]+):([0-9]+): *(.*)$' file line column message
+errorfmt basic -c '^([^:]+):([0-9]+):([0-9]+): *(.*)$' file line column message
 errorfmt basic '^([^:]+):([0-9]+): *(.*)$' file line message
 alias git-grep 'compile -1s basic git grep -En'
 

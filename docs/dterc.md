@@ -442,7 +442,7 @@ Note: "built-in files" are config files bundled into the program binary.
 See the `-B` and `-b` flags in the [`dte`] man page and the [`show include`]
 command for more information.
 
-### **errorfmt** [**-i**] _compiler_ [_regexp_] [file|line|column|message|_]...
+### **errorfmt** [**-ci**] _compiler_ [_regexp_] [file|line|column|message|_]...
 
 Register a [`regex`] pattern, for later use with the [`compile`] command.
 
@@ -465,6 +465,11 @@ added for that compiler name will be removed.
 
 For a basic example of usage, see the [output][`compiler/go`] of
 `dte -b compiler/go`.
+
+`-c`
+:   Clear existing _regexp_ patterns for _compiler_, before appending
+    a new one (equivalent to `errorfmt c; errorfmt c regexp ...`, if
+    a _regexp_ argument is provided)
 
 `-i`
 :   Ignore this error

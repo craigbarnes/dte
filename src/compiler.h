@@ -40,6 +40,7 @@ static inline Compiler *find_compiler(const HashMap *compilers, const char *name
 
 void remove_compiler(HashMap *compilers, const char *name) NONNULL_ARGS;
 void free_compiler(Compiler *c) NONNULL_ARGS;
+void free_error_format(ErrorFormat *f) NONNULL_ARGS;
 ssize_t errorfmt_capture_name_to_index(const char *name) NONNULL_ARGS WARN_UNUSED_RESULT;
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void dump_compiler(const Compiler *c, const char *name, String *s) NONNULL_ARGS;

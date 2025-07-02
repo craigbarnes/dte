@@ -54,7 +54,7 @@ void add_error_fmt (
     ptr_array_append(&compiler->error_formats, f);
 }
 
-static void free_error_format(ErrorFormat *f)
+void free_error_format(ErrorFormat *f)
 {
     regfree(&f->re);
     free(f);

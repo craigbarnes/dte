@@ -27,7 +27,7 @@ Configuration Commands:
 .br
    \fBinclude\fR [\fB\-bq\fR] \fIfile\fR
 .br
-   \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
+   \fBerrorfmt\fR [\fB\-ci\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
 .br
 .P
 Editor Commands:
@@ -868,7 +868,7 @@ See the \fB\-B\fR and \fB\-b\fR flags in the \fBdte\fR(1) man page and the \fBsh
 command for more information.
 .P
 .RE
-\fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
+\fBerrorfmt\fR [\fB\-ci\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
 .RS
 Register a \fBregex\fR(7) pattern, for later use with the \fBcompile\fR command.
 .P
@@ -892,6 +892,12 @@ added for that compiler name will be removed.
 For a basic example of usage, see the output of
 \fBdte \-b compiler/go\fR.
 .P
+.TP
+\fB\-c\fR
+Clear existing \fIregexp\fR patterns for \fIcompiler\fR, before appending
+a new one (equivalent to \fBerrorfmt c; errorfmt c regexp ...\fR, if
+a \fIregexp\fR argument is provided)
+.PP
 .TP
 \fB\-i\fR
 Ignore this error

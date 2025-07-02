@@ -709,11 +709,20 @@ static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
 
 static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
 {
-    BUG_ON(a->nr_args == 0 || a->nr_args > 2 + ERRORFMT_CAPTURE_MAX);
+    const size_t nr_args = a->nr_args;
+    BUG_ON(nr_args == 0 || nr_args > 2 + ERRORFMT_CAPTURE_MAX);
     const char *name = a->args[0];
-    if (a->nr_args == 1) {
+
+    if (nr_args == 1) {
         remove_compiler(&e->compilers, name);
         return true;
+    }
+
+    if (has_flag(a, 'c')) {
+        Compiler *c = find_compiler(&e->compilers, name);
+        if (c) {
+            ptr_array_clear(&c->error_formats, FREE_FUNC(free_error_format));
+        }
     }
 
     static_assert(NR_ERRFMT_INDICES == 4);
@@ -725,7 +734,7 @@ static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
         [ERRFMT_MESSAGE] = 0,
     };
 
-    for (size_t i = 0, n = a->nr_args - 2; i < n; i++) {
+    for (size_t i = 0, n = nr_args - 2; i < n; i++) {
         char *cap_name = a->args[i + 2];
         if (streq(cap_name, "_")) {
             continue;
@@ -2604,7 +2613,7 @@ static const Command cmds[] = {
     {"erase", "", NA, 0, 0, cmd_erase},
     {"erase-bol", "", NA, 0, 0, cmd_erase_bol},
     {"erase-word", "s", NA, 0, 0, cmd_erase_word},
-    {"errorfmt", "i", RC, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
+    {"errorfmt", "ci", RC, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
     {"exec", "e=i=o=blmnpst", NFAA, 1, -1, cmd_exec},
     {"ft", "bcfi", RC | NFAA, 2, -1, cmd_ft},
     {"hi", "c", RC | NFAA, 0, -1, cmd_hi},
