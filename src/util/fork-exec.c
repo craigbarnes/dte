@@ -40,9 +40,10 @@ static bool reset_ignored_signals(void)
     return true;
 }
 
+// NOLINTNEXTLINE(readability-function-size)
 static noreturn void child_process_exec (
     const char **argv,
-    int fd[3],
+    const int fd[3],
     int prog_fd,
     int error_fd, // Pipe to parent, for communicating pre-exec errors
     unsigned int lines,

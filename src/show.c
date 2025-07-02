@@ -52,6 +52,7 @@ typedef struct {
     void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
 } ShowHandler;
 
+// NOLINTNEXTLINE(readability-function-size)
 static void open_temporary_buffer (
     EditorState *e,
     const char *text,

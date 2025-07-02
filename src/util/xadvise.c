@@ -9,6 +9,8 @@ int advise_sequential(void *addr, size_t len)
 
 #if HAVE_POSIX_MADVISE
     return posix_madvise(addr, len, POSIX_MADV_SEQUENTIAL);
+#else
+    (void)addr;
 #endif
 
     // "The posix_madvise() function shall have no effect on the semantics

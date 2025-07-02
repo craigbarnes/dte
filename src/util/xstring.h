@@ -55,7 +55,7 @@ static inline void *xmempcpy2 (
 }
 
 NONNULL_ARGS_AND_RETURN
-static inline void *xmempcpy3 (
+static inline void *xmempcpy3 ( // NOLINT(readability-function-size)
     void *dest,
     const void *p1, size_t n1,
     const void *p2, size_t n2,
