@@ -29,7 +29,6 @@ Checks: >
     -bugprone-multi-level-implicit-pointer-conversion,
     -bugprone-narrowing-conversions,
     -bugprone-not-null-terminated-result,
-    -bugprone-sizeof-expression,
     -bugprone-switch-missing-default-case,
     -readability-avoid-nested-conditional-operator,
     -readability-else-after-return,
@@ -51,6 +50,8 @@ CheckOptions:
     readability-function-size.NestingThreshold: '6'
     readability-function-size.ParameterThreshold: '6'
     readability-function-size.VariableThreshold: '32'
+    bugprone-sizeof-expression.WarnOnSizeOfIntegerExpression: true
+    bugprone-sizeof-expression.WarnOnSizeOfPointer: true
 
     readability-identifier-naming.ConstantCase: lower_case
     readability-identifier-naming.EnumCase: CamelCase

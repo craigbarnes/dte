@@ -24,7 +24,7 @@ alias longest-line 'unselect; exec -sb -i buffer -o eval awk -f script/longest-l
 # (see the comments in the script for additional details)
 alias fzf-open 'exec -b -o eval script/fzf.sh'
 
-# Jump to the tag under the cursor, or opens an fzf(1) menu if there
+# Jump to the tag under the cursor, or open an fzf(1) menu if there
 # are multiple matching tags
 alias xtag 'exec -sb -o eval -e errmsg script/xtag.sh $WORD'
 

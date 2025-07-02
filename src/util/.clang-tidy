@@ -1,7 +1,6 @@
 InheritParentConfig: true
 Checks: >
     bugprone-implicit-widening-of-multiplication-result,
-    bugprone-sizeof-expression,
     cert-err33-c,
     clang-analyzer-core.NonNullParamChecker,
     clang-analyzer-unix.Malloc,
