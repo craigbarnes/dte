@@ -16,7 +16,7 @@ extern char **environ;
 
 int main(void)
 {
-    char *const argv[] = {"argv0", "1", "2", NULL};
-    int r = (fexecve)(3, argv, environ);
+    static const char *const argv[] = {"argv0", "1", "2", NULL};
+    int r = (fexecve)(3, (char**)argv, environ);
     return !r;
 }
