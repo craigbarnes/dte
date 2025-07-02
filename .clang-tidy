@@ -58,11 +58,10 @@ CheckOptions:
     readability-identifier-naming.EnumConstantCase: UPPER_CASE
     readability-identifier-naming.EnumConstantIgnoredRegexp: '[a-z]'
     readability-identifier-naming.FunctionCase: lower_case
-    readability-identifier-naming.FunctionIgnoredRegexp: '^(xmul|string_array_concat)_$'
+    readability-identifier-naming.FunctionIgnoredRegexp: '^[a-z][a-z_]+[a-z]_$'
     readability-identifier-naming.LocalVariableCase: lower_case
     readability-identifier-naming.LocalVariableIgnoredRegexp: '[A-Z]'
     readability-identifier-naming.MacroDefinitionCase: aNy_CasE
-    readability-identifier-naming.MacroDefinitionIgnoredRegexp: '^error_msg(_errno)?_$'
     readability-identifier-naming.MemberCase: lower_case
     readability-identifier-naming.ParameterCase: lower_case
     readability-identifier-naming.ParameterIgnoredRegexp: '[A-Z]'
