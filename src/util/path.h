@@ -44,19 +44,14 @@ static inline char *path_dirname(const char *filename)
 XSTRDUP
 static inline char *path_join_sv(const StringView *s1, const StringView *s2, bool trailing_slash)
 {
+    BUG_ON(!s1->data || !s2->data); // ISO C11 memcpy(3) never allows NULL pointer arguments
+    const char slash[2] = "/";
     size_t n1 = s1->length;
     size_t n2 = s2->length;
-    char *path = xmalloc(n1 + n2 + (trailing_slash ? 3 : 2));
-    memcpy(path, s1->data, n1);
-    char *ptr = path + n1;
-    if (n1 && n2 && s1->data[n1 - 1] != '/') {
-        *ptr++ = '/';
-    }
-    memcpy(ptr, s2->data, n2);
-    if (trailing_slash && n2 && s2->data[n2 - 1] != '/') {
-        ptr[n2++] = '/';
-    }
-    ptr[n2] = '\0';
+    size_t sep = n1 && n2 && s1->data[n1 - 1] != '/'; // Separating slash length (1 or 0)
+    size_t ts = trailing_slash && n2 && s2->data[n2 - 1] != '/'; // Trailing slash length (1 or 0)
+    char *path = xmalloc(xadd3(n1, n2, sep + ts + 1));
+    xmempcpy4(path, s1->data, n1, slash, sep, s2->data, n2, slash + !ts, 2 - !ts);
     return path;
 }
 

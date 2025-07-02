@@ -64,6 +64,17 @@ static inline void *xmempcpy3 ( // NOLINT(readability-function-size)
     return xmempcpy(xmempcpy2(dest, p1, n1, p2, n2), p3, n3);
 }
 
+NONNULL_ARGS_AND_RETURN
+static inline void *xmempcpy4 ( // NOLINT(readability-function-size)
+    void *dest,
+    const void *p1, size_t n1,
+    const void *p2, size_t n2,
+    const void *p3, size_t n3,
+    const void *p4, size_t n4
+) {
+    return xmempcpy(xmempcpy3(dest, p1, n1, p2, n2, p3, n3), p4, n4);
+}
+
 static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
 {
     if (n == 0) {
