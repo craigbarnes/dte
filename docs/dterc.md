@@ -810,7 +810,7 @@ Center view to cursor.
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of `{}[]()<>`.
 
-### **search** [**-Her**] [**-a**|**-i**|**-s**] [**-n**|**-p**|**-w**|_pattern_]
+### **search** [**-c**|**-l**] [**-Her**] [**-a**|**-i**|**-s**] [**-n**|**-p**|**-w**|_pattern_]
 
 Perform a [`regex`] search in the current buffer and move the cursor to
 the next match (if any).
@@ -818,7 +818,7 @@ the next match (if any).
 If no **-npw** flag or _pattern_ argument is provided, the editor will
 instead switch to [search mode], where a pattern can be entered and some
 other conveniences (e.g. history navigation with up/down arrow keys) can
-be used. In this case, **-Heais** flags are ignored (but see the [`bind`]
+be used. In this case, **-clHeais** flags are ignored (but see the [`bind`]
 command, the [`case-sensitive-search`] option and the [search mode] section
 in the [`dte`] man page for equivalents).
 
