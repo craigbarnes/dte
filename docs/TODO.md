@@ -111,6 +111,10 @@ Features
   in `cmd_match_bracket()` (see also: [EU's list of quotation marks] and
   Unicode's [`BidiBrackets.txt`])
 
+* Add support for arbitrary bracket pairings to the `match-bracket`
+  command, by allowing the characters (or perhaps even arbitrary
+  start/end strings?) to be specified as arguments
+
 * Add an option to convert U+2103 (℃ ) into U+00B0 U+0043 (°C) when
   rendering to the terminal and perhaps do likewise for some other
   "ambiguous" width characters (see also: [foot#1665] and the related
