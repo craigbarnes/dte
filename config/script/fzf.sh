@@ -7,11 +7,11 @@
 # that the current window is included in the split.
 
 fzf \
-    --reverse \
     --multi \
     --expect=ctrl-v,ctrl-h,alt-v,alt-h,enter \
     --bind='f1:change-prompt(find .>)+reload(find . -type f -not -path "*/\.git/*")' \
     --bind='f2:change-prompt(git ls-files>)+reload(git ls-files)' \
+    "$@" \
 | awk '
     BEGIN {
         cmds["ctrl-v"] = "wsplit -h"
