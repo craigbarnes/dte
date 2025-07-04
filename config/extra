@@ -21,8 +21,12 @@ alias git-changes 'compile -1sb gitdiff script/git-changes.sh'
 alias longest-line 'unselect; exec -sb -i buffer -o eval awk -f script/longest-line.awk'
 
 # Run a customized fzf(1) file picker and open the selected files
-# (see the comments in the script for additional details)
+# (see the comments in the script for additional features)
 alias fzf-open 'exec -b -o eval script/fzf.sh'
+
+# Run an fzf(1) message picker, with an `fzf --preview` window for the
+# selected item (example usage: `git-grep xyz; msgs`)
+alias msgs "exec -b -i msg -o msg -e errmsg script/msgs.sh $MSGPOS --reverse"
 
 # Jump to the tag under the cursor, or open an fzf(1) menu if there
 # are multiple matching tags

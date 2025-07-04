@@ -17,7 +17,7 @@ BUILTIN_SYNTAX_FILES ?= \
 
 BUILTIN_SCRIPTS ?= \
     fzf.sh git-changes.sh help.sh lf-wrapper.sh longest-line.awk \
-    open-c-header.sh paste.sh ranger-wrapper.sh xtag.sh
+    msgs.sh open-c-header.sh paste.sh ranger-wrapper.sh xtag.sh
 
 BUILTIN_CONFIGS = $(addprefix config/, \
     rc extra binding/default compiler/gcc compiler/go \
