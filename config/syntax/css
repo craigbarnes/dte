@@ -412,44 +412,47 @@ list -i property -- \
     break-inside caption-side caret caret-color caret-shape clear clip \
     clip-path clip-rule color color-adjust color-interpolation-filters \
     color-scheme column-count column-fill column-gap column-rule \
-    column-rule-color column-rule-style column-rule-width column-span \
-    column-width columns contain contain-intrinsic-block-size \
+    column-rule-break column-rule-color column-rule-outset \
+    column-rule-style column-rule-width column-span column-width \
+    columns contain contain-intrinsic-block-size \
     contain-intrinsic-height contain-intrinsic-inline-size \
     contain-intrinsic-size contain-intrinsic-width container \
     container-name container-type content content-visibility continue \
     counter-increment counter-reset counter-set cue cue-after \
-    cue-before cursor direction display dominant-baseline elevation \
-    empty-cells fill fill-break fill-color fill-image fill-opacity \
-    fill-origin fill-position fill-repeat fill-rule fill-size filter \
-    flex flex-basis flex-direction flex-flow flex-grow flex-shrink \
-    flex-wrap float float-defer float-offset float-reference \
-    flood-color flood-opacity flow-from flow-into font font-family \
-    font-feature-settings font-kerning font-language-override \
-    font-optical-sizing font-palette font-size font-size-adjust \
-    font-stretch font-style font-synthesis font-synthesis-position \
-    font-synthesis-small-caps font-synthesis-style \
-    font-synthesis-weight font-variant font-variant-alternates \
-    font-variant-caps font-variant-east-asian font-variant-emoji \
-    font-variant-ligatures font-variant-numeric font-variant-position \
-    font-variation-settings font-weight font-width footnote-display \
-    footnote-policy forced-color-adjust gap glyph-orientation-vertical \
-    grid grid-area grid-auto-columns grid-auto-flow grid-auto-rows \
-    grid-column grid-column-end grid-column-start grid-row grid-row-end \
-    grid-row-start grid-template grid-template-areas \
-    grid-template-columns grid-template-rows hanging-punctuation height \
-    hyphenate-character hyphenate-limit-chars hyphenate-limit-last \
-    hyphenate-limit-lines hyphenate-limit-zone hyphens \
-    image-orientation image-rendering image-resolution initial-letter \
-    initial-letter-align initial-letter-wrap inline-size inline-sizing \
-    inset inset-area inset-block inset-block-end inset-block-start \
-    inset-inline inset-inline-end inset-inline-start isolation \
+    cue-before cursor direction display dominant-baseline \
+    dynamic-range-limit elevation empty-cells fill fill-break \
+    fill-color fill-image fill-opacity fill-origin fill-position \
+    fill-repeat fill-rule fill-size filter flex flex-basis \
+    flex-direction flex-flow flex-grow flex-shrink flex-wrap float \
+    float-defer float-offset float-reference flood-color flood-opacity \
+    flow-from flow-into font font-family font-feature-settings \
+    font-kerning font-language-override font-optical-sizing \
+    font-palette font-size font-size-adjust font-stretch font-style \
+    font-synthesis font-synthesis-position font-synthesis-small-caps \
+    font-synthesis-style font-synthesis-weight font-variant \
+    font-variant-alternates font-variant-caps font-variant-east-asian \
+    font-variant-emoji font-variant-ligatures font-variant-numeric \
+    font-variant-position font-variation-settings font-weight \
+    font-width footnote-display footnote-policy forced-color-adjust gap \
+    glyph-orientation-vertical grid grid-area grid-auto-columns \
+    grid-auto-flow grid-auto-rows grid-column grid-column-end \
+    grid-column-start grid-row grid-row-end grid-row-start \
+    grid-template grid-template-areas grid-template-columns \
+    grid-template-rows hanging-punctuation height hyphenate-character \
+    hyphenate-limit-chars hyphenate-limit-last hyphenate-limit-lines \
+    hyphenate-limit-zone hyphens image-orientation image-rendering \
+    image-resolution initial-letter initial-letter-align \
+    initial-letter-wrap inline-size inline-sizing inset inset-block \
+    inset-block-end inset-block-start inset-inline inset-inline-end \
+    inset-inline-start interpolate-size isolation item-cross \
+    item-direction item-flow item-pack item-slack item-track item-wrap \
     justify-content justify-items justify-self left letter-spacing \
-    lighting-color line-break line-clamp line-grid line-height \
-    line-height-step line-padding line-snap list-style list-style-image \
-    list-style-position list-style-type margin margin-block \
-    margin-block-end margin-block-start margin-bottom margin-break \
-    margin-inline margin-inline-end margin-inline-start margin-left \
-    margin-right margin-top margin-trim marker marker-end \
+    lighting-color line-break line-clamp line-fit-edge line-grid \
+    line-height line-height-step line-padding line-snap list-style \
+    list-style-image list-style-position list-style-type margin \
+    margin-block margin-block-end margin-block-start margin-bottom \
+    margin-break margin-inline margin-inline-end margin-inline-start \
+    margin-left margin-right margin-top margin-trim marker marker-end \
     marker-knockout-left marker-knockout-right marker-mid \
     marker-pattern marker-segment marker-side marker-start mask \
     mask-border mask-border-mode mask-border-outset mask-border-repeat \
@@ -476,23 +479,29 @@ list -i property -- \
     padding-top page page-break-after page-break-before \
     page-break-inside pause pause-after pause-before perspective \
     perspective-origin pitch pitch-range place-content place-items \
-    place-self play-during position position-anchor position-try \
-    position-try-options position-try-order print-color-adjust quotes \
+    place-self play-during position position-anchor position-area \
+    position-try position-try-fallbacks position-try-order \
+    position-visibility print-color-adjust quotes reading-flow \
     region-fragment resize rest rest-after rest-before richness right \
-    rotate row-gap ruby-align ruby-merge ruby-overhang ruby-position \
-    running scale scroll-behavior scroll-margin scroll-margin-block \
+    rotate row-gap row-rule row-rule-break row-rule-color \
+    row-rule-outset row-rule-style row-rule-width ruby-align ruby-merge \
+    ruby-overhang ruby-position rule rule-break rule-color rule-outset \
+    rule-paint-order rule-style rule-width running scale \
+    scroll-behavior scroll-margin scroll-margin-block \
     scroll-margin-block-end scroll-margin-block-start \
     scroll-margin-bottom scroll-margin-inline scroll-margin-inline-end \
     scroll-margin-inline-start scroll-margin-left scroll-margin-right \
-    scroll-margin-top scroll-padding scroll-padding-block \
-    scroll-padding-block-end scroll-padding-block-start \
-    scroll-padding-bottom scroll-padding-inline \
-    scroll-padding-inline-end scroll-padding-inline-start \
-    scroll-padding-left scroll-padding-right scroll-padding-top \
-    scroll-snap-align scroll-snap-stop scroll-snap-type scroll-timeline \
-    scroll-timeline-axis scroll-timeline-name scrollbar-color \
-    scrollbar-gutter scrollbar-width shape-image-threshold shape-inside \
-    shape-margin shape-outside spatial-navigation-action \
+    scroll-margin-top scroll-marker-group scroll-padding \
+    scroll-padding-block scroll-padding-block-end \
+    scroll-padding-block-start scroll-padding-bottom \
+    scroll-padding-inline scroll-padding-inline-end \
+    scroll-padding-inline-start scroll-padding-left \
+    scroll-padding-right scroll-padding-top scroll-snap-align \
+    scroll-snap-stop scroll-snap-type scroll-start-target \
+    scroll-timeline scroll-timeline-axis scroll-timeline-name \
+    scrollbar-color scrollbar-gutter scrollbar-width \
+    shape-image-threshold shape-inside shape-margin shape-outside \
+    slider-orientation spatial-navigation-action \
     spatial-navigation-contain spatial-navigation-function speak \
     speak-as speak-header speak-numeral speak-punctuation speech-rate \
     stress string-set stroke stroke-align stroke-alignment stroke-break \
@@ -501,7 +510,7 @@ list -i property -- \
     stroke-dashoffset stroke-image stroke-linecap stroke-linejoin \
     stroke-miterlimit stroke-opacity stroke-origin stroke-position \
     stroke-repeat stroke-size stroke-width tab-size table-layout \
-    text-align text-align-all text-align-last text-autospace \
+    text-align text-align-all text-align-last text-autospace text-box \
     text-box-edge text-box-trim text-combine-upright text-decoration \
     text-decoration-color text-decoration-line text-decoration-skip \
     text-decoration-skip-box text-decoration-skip-ink \
@@ -518,12 +527,12 @@ list -i property -- \
     transition-property transition-timing-function translate \
     unicode-bidi user-select vertical-align view-timeline \
     view-timeline-axis view-timeline-inset view-timeline-name \
-    view-transition-name visibility voice-balance voice-duration \
-    voice-family voice-pitch voice-range voice-rate voice-stress \
-    voice-volume volume white-space white-space-collapse \
-    white-space-trim widows width will-change word-break \
-    word-space-transform word-spacing word-wrap wrap-after wrap-before \
-    wrap-flow wrap-inside wrap-through writing-mode z-index
+    view-transition-class view-transition-group view-transition-name \
+    visibility voice-balance voice-duration voice-family voice-pitch \
+    voice-range voice-rate voice-stress voice-volume volume white-space \
+    white-space-collapse white-space-trim widows width will-change \
+    word-break word-space-transform word-spacing word-wrap wrap-after \
+    wrap-before wrap-flow wrap-inside wrap-through writing-mode z-index
 
 list -i value -- \
     absolute always armenian auto avoid baseline bidi-override blink \
