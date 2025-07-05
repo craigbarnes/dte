@@ -9,7 +9,6 @@ WARN_UNUSED_RESULT NONNULL_ARGS
 pid_t fork_exec (
     const char **argv,
     int fd[3],
-    int progfd,
     unsigned int lines,
     unsigned int columns,
     bool drop_ctty

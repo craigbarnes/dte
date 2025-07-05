@@ -74,9 +74,8 @@ test_objects := $(call prefix-obj, build/test/, \
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
-    dup3 embed pipe2 fexecve fsync memfd_create memmem memrchr mkostemp \
-    sigisemptyset TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise \
-    qsort_r ))
+    dup3 embed pipe2 fsync memmem memrchr mkostemp sigisemptyset \
+    TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise qsort_r ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/ build/gen/

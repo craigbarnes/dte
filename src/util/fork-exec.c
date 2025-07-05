@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include "fork-exec.h"
 #include "debug.h"
-#include "environ.h"
 #include "fd.h"
 #include "log.h"
 #include "numtostr.h"
@@ -44,7 +43,6 @@ static bool reset_ignored_signals(void)
 static noreturn void child_process_exec (
     const char **argv,
     const int fd[3],
-    int prog_fd,
     int error_fd, // Pipe to parent, for communicating pre-exec errors
     unsigned int lines,
     unsigned int columns,
@@ -73,18 +71,6 @@ static noreturn void child_process_exec (
         goto error;
     }
 
-    if (prog_fd >= 0) {
-        #if HAVE_FEXECVE
-            fexecve(prog_fd, (char**)argv, environ);
-        #else
-            // This set of conditions can't actually occur in this codebase,
-            // since the only caller that passes a positive `prog_fd` does
-            // so only when HAVE_FEXECVE is non-zero
-            errno = ENOSYS;
-        #endif
-        goto error;
-    }
-
     execvp(argv[0], (char**)argv);
 
 error:;
@@ -105,7 +91,6 @@ static pid_t xwaitpid(pid_t pid, int *status, int options)
 pid_t fork_exec (
     const char **argv,
     int fd[3],
-    int prog_fd,
     unsigned int lines,
     unsigned int columns,
     bool drop_ctty
@@ -123,7 +108,6 @@ pid_t fork_exec (
     BUG_ON(fd[0] <= STDERR_FILENO && fd[0] != 0);
     BUG_ON(fd[1] <= STDERR_FILENO && fd[1] != 1);
     BUG_ON(fd[2] <= STDERR_FILENO && fd[2] != 2);
-    BUG_ON(prog_fd >= STDIN_FILENO && prog_fd <= STDERR_FILENO);
 
     const pid_t pid = fork();
     if (unlikely(pid == -1)) {
@@ -134,7 +118,7 @@ pid_t fork_exec (
 
     if (pid == 0) {
         // Child
-        child_process_exec(argv, fd, prog_fd, ep[1], lines, columns, drop_ctty);
+        child_process_exec(argv, fd, ep[1], lines, columns, drop_ctty);
         BUG("child_process_exec() should never return");
         return -1;
     }

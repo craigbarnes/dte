@@ -4,9 +4,7 @@
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # NOTE: built-in scripts are currently undocumented and thus may be
-# changed in backwards incompatible ways at any time. They're also
-# only usable (via `exec -b`, at least) on platforms that implement
-# memfd_create(2), which is currently just Linux and FreeBSD.
+# changed in backwards incompatible ways at any time.
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # Open the *.h file matching the current *.c file (or vice versa)

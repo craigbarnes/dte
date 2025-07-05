@@ -322,11 +322,7 @@ static void complete_exec(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     size_t n = a->nr_args;
-    if (n == 0 && cmdargs_has_flag(a, 'b')) {
-        collect_builtin_scripts(&cs->completions, cs->parsed);
-    } else {
-        collect_files(e, cs, n == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
-    }
+    collect_files(e, cs, n == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
 }
 
 static void complete_compile(EditorState *e, const CommandArgs *a)
@@ -335,8 +331,6 @@ static void complete_compile(EditorState *e, const CommandArgs *a)
     size_t n = a->nr_args;
     if (n == 0) {
         collect_compilers(e, &cs->completions, cs->parsed);
-    } else if (n == 1 && cmdargs_has_flag(a, 'b')) {
-        collect_builtin_scripts(&cs->completions, cs->parsed);
     } else {
         collect_files(e, cs, n == 1 ? COLLECT_EXECUTABLES : COLLECT_ALL);
     }

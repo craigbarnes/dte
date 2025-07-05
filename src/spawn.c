@@ -265,7 +265,7 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, boo
         fd[2] = p[1];
     }
 
-    pid_t pid = fork_exec(ctx->argv, fd, ctx->prog_fd, ctx->lines, ctx->columns, quiet);
+    pid_t pid = fork_exec(ctx->argv, fd, ctx->lines, ctx->columns, quiet);
     if (pid == -1) {
         exec_error(ctx);
         xclose(p[1]);
@@ -352,7 +352,7 @@ int spawn(SpawnContext *ctx)
         }
     }
 
-    pid_t pid = fork_exec(ctx->argv, child_fds, ctx->prog_fd, ctx->lines, ctx->columns, quiet);
+    pid_t pid = fork_exec(ctx->argv, child_fds, ctx->lines, ctx->columns, quiet);
     if (pid == -1) {
         exec_error(ctx);
         goto error;

@@ -66,7 +66,6 @@
 #include "util/strtonum.h"
 #include "util/time-util.h"
 #include "util/xmalloc.h"
-#include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 #include "util/xstring.h"
 #include "view.h"
@@ -370,14 +369,6 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
         return error_msg(&e->err, "No such error parser %s", a->args[0]);
     }
 
-    int prog_fd = -1;
-    if (has_flag(a, 'b')) {
-        prog_fd = open_builtin_script(&e->err, a->args[1]);
-        if (prog_fd < 0) {
-            return false;
-        }
-    }
-
     bool quiet = has_flag(a, 's');
     if ((e->flags & EFLAG_HEADLESS) && !quiet) {
         LOG_INFO("automatically added -s flag to compile command (headless mode)");
@@ -386,7 +377,6 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
 
     SpawnContext ctx = {
         .argv = (const char **)a->args + 1,
-        .prog_fd = prog_fd,
         .ebuf = &e->err,
         .quiet = quiet,
     };
@@ -400,7 +390,6 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
     bool prompt = has_flag(a, 'p');
     bool read_stdout = has_flag(a, '1');
     bool spawned = spawn_compiler(&ctx, compiler, messages, read_stdout);
-    xclose(prog_fd);
     resume_terminal(e, quiet, spawned && prompt);
 
     activate_current_message_save(messages, &e->bookmarks, e->view);
@@ -776,7 +765,6 @@ static bool cmd_exec(EditorState *e, const CommandArgs *a)
             case 'e': fd = STDERR_FILENO; break;
             case 'i': fd = STDIN_FILENO; break;
             case 'o': fd = STDOUT_FILENO; break;
-            case 'b': exec_flags |= EXECFLAG_BUILTIN; continue;
             case 'p': exec_flags |= EXECFLAG_PROMPT; continue;
             case 's': exec_flags |= EXECFLAG_QUIET; continue;
             case 't': exec_flags &= ~EXECFLAG_QUIET; continue;
@@ -2597,7 +2585,7 @@ static const Command cmds[] = {
     {"clear", "Ii", NA, 0, 0, cmd_clear},
     {"close", "fpqw", NA, 0, 0, cmd_close},
     {"command", "", NFAA, 0, 1, cmd_command},
-    {"compile", "1ABCbps", NFAA, 2, -1, cmd_compile},
+    {"compile", "1ABCps", NFAA, 2, -1, cmd_compile},
     {"copy", "bikp", NA, 0, 1, cmd_copy},
     {"cursor", "", RC, 0, 3, cmd_cursor},
     {"cut", "", NA, 0, 0, cmd_cut},
@@ -2614,7 +2602,7 @@ static const Command cmds[] = {
     {"erase-bol", "", NA, 0, 0, cmd_erase_bol},
     {"erase-word", "s", NA, 0, 0, cmd_erase_word},
     {"errorfmt", "ci", RC, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
-    {"exec", "e=i=o=blmnpst", NFAA, 1, -1, cmd_exec},
+    {"exec", "e=i=o=lmnpst", NFAA, 1, -1, cmd_exec},
     {"ft", "bcfi", RC | NFAA, 2, -1, cmd_ft},
     {"hi", "c", RC | NFAA, 0, -1, cmd_hi},
     {"include", "bq", RC, 1, 1, cmd_include},
