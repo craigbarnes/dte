@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "parse.h"
+#include "trace.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/string.h"
@@ -83,28 +84,61 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
     return pos;
 }
 
-static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len, String *buf)
-{
-    if (len == 0 || !is_alpha_or_underscore(cmd[0])) {
-        return 0;
+static size_t expand_var (
+    const CommandRunner *runner,
+    const char *cmd,
+    size_t len,
+    String *buf
+) {
+    if (!runner->expand_variable || len == 0) {
+        return len;
     }
 
-    size_t n = 1;
-    while (n < len && is_alnum_or_underscore(cmd[n])) {
-        n++;
+    char *name = xstrcut(cmd, len);
+    char *value = runner->expand_variable(runner->e, name);
+    free(name);
+    if (value) {
+        string_append_cstring(buf, value);
+        free(value);
     }
 
-    if (runner->expand_variable) {
-        char *name = xstrcut(cmd, n);
-        char *value = runner->expand_variable(runner->e, name);
-        free(name);
-        if (value) {
-            string_append_cstring(buf, value);
-            free(value);
-        }
+    return len;
+}
+
+// Handles bracketed variables, e.g. ${varname}
+static size_t parse_bracketed_var (
+    const CommandRunner *runner,
+    const char *cmd,
+    size_t len,
+    String *buf
+) {
+    const char *end = memchr(cmd + 1, '}', len - 1);
+    if (!end) {
+        LOG_WARNING("no end delimiter for bracketed variable: $%.*s", (int)len, cmd);
+        return len; // Consume without appending
     }
 
-    return n;
+    size_t var_len = (size_t)(end - cmd) - 1;
+    TRACE_CMD("expanding variable: ${%.*s}", (int)var_len, cmd + 1);
+    return expand_var(runner, cmd + 1, var_len, buf) + STRLEN("{}");
+}
+
+static size_t parse_var (
+    const CommandRunner *runner,
+    const char *cmd,
+    size_t len,
+    String *buf
+) {
+    char ch = len ? cmd[0] : 0;
+    if (!is_alpha_or_underscore(ch)) {
+        bool bracketed = (ch == '{');
+        return bracketed ? parse_bracketed_var(runner, cmd, len, buf) : 0;
+    }
+
+    AsciiCharType type_mask = ASCII_ALNUM | ASCII_UNDERSCORE;
+    size_t var_len = ascii_type_prefix_length(cmd, len, type_mask);
+    TRACE_CMD("expanding variable: $%.*s", (int)var_len, cmd);
+    return expand_var(runner, cmd, var_len, buf);
 }
 
 // Parse a single dterc(5) argument from `cmd`, stopping when an unquoted
@@ -217,8 +251,11 @@ size_t find_end(const char *cmd, size_t pos, CommandParseError *err)
 }
 
 // Note: `array` must be freed, regardless of the return value
-CommandParseError parse_commands(const CommandRunner *runner, PointerArray *array, const char *cmd)
-{
+CommandParseError parse_commands (
+    const CommandRunner *runner,
+    PointerArray *array,
+    const char *cmd
+) {
     for (size_t pos = 0; true; ) {
         while (ascii_isspace(cmd[pos])) {
             pos++;

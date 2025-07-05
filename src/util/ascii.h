@@ -95,6 +95,18 @@ static inline bool ascii_streq_icase(const char *s1, const char *s2)
     return ascii_strcmp_icase(s1, s2) == 0;
 }
 
+static inline size_t ascii_type_prefix_length (
+    const char *str,
+    size_t len,
+    AsciiCharType mask
+) {
+    size_t i = 0;
+    while (i < len && ascii_test(str[i], mask)) {
+        i++;
+    }
+    return i;
+}
+
 static inline size_t ascii_blank_prefix_length(const char *str, size_t len)
 {
     size_t i = 0;

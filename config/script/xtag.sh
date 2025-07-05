@@ -5,17 +5,19 @@ error() {
     exit 1
 }
 
-if test "$#" -eq 0; then
-    error "Usage: $0 TAGNAME"
-fi
-
 if ! command -v readtags >/dev/null; then
     error 'Required command "readtags" not found'
 fi
 
-tags=$(readtags "$1")
+if test "$#" -lt 1; then
+    error "Usage: xtag.sh TAGNAME"
+fi
+
+TAGNAME="$1"
+tags=$(readtags "$TAGNAME")
+
 if test -z "$tags"; then
-    error 'No tags found'
+    error "No tags found with name '$TAGNAME'"
 fi
 
 count=$(echo "$tags" | wc -l)
@@ -25,4 +27,4 @@ if test "$count" -eq 1; then
     exit 0
 fi
 
-echo "exec -o tag sh -c \"readtags '$1' | fzf --reverse\""
+echo "exec -o tag sh -c \"readtags '$TAGNAME' | fzf --reverse\""

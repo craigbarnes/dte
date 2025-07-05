@@ -12,6 +12,8 @@
 #include "util/xmalloc.h"
 #include "view.h"
 
+// TODO: Make expand() functions return a StringVariant type and
+// only do dynamic allocations when necessary
 typedef struct {
     char name[12];
     char *(*expand)(const EditorState *e);
@@ -137,12 +139,46 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(normal_vars, name);
 }
 
+// Handles variables like e.g. ${builtin:color/reset} and ${script:file.sh}
+static char *expand_prefixed_var(const char *name, size_t name_len, StringView prefix)
+{
+    char buf[64];
+    bool name_fits_buf = (name_len < sizeof(buf));
+
+    if (strview_equal_cstring(&prefix, "builtin")) {
+        // Skip past "builtin:"
+        name += prefix.length + 1;
+    } else if (strview_equal_cstring(&prefix, "script") && name_fits_buf) {
+        // Copy `name` into `buf` and replace ':' with '/'
+        memcpy(buf, name, name_len + 1);
+        buf[prefix.length] = '/';
+        name = buf;
+    } else {
+        return NULL;
+    }
+
+    const BuiltinConfig *cfg = get_builtin_config(name);
+    return cfg ? xmemdup(cfg->text.data, cfg->text.length + 1) : NULL;
+}
+
 char *expand_normal_var(const EditorState *e, const char *name)
 {
+    size_t name_len = strlen(name);
+    if (unlikely(name_len == 0)) {
+        return NULL;
+    }
+
+    size_t pos = 0;
+    StringView prefix = get_delim(name, &pos, name_len, ':');
+    if (prefix.length < name_len) {
+        return expand_prefixed_var(name, name_len, prefix);
+    }
+
     const BuiltinVar *var = BSEARCH(name, normal_vars, vstrcmp);
     if (var) {
         return var->expand(e);
     }
+
     const char *str = xgetenv(name);
     return str ? xstrdup(str) : NULL;
 }

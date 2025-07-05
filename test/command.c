@@ -176,6 +176,22 @@ static void test_parse_command_arg(TestContext *ctx)
     EXPECT_TRUE(str_has_suffix(arg, "/test/DTE_HOME"));
     free(arg);
 
+    // Built-in ${DTE_HOME} var in ${bracketed} form
+    arg = parse_command_arg(&runner, STRN("${DTE_HOME}"));
+    EXPECT_TRUE(path_is_absolute(arg));
+    EXPECT_TRUE(str_has_suffix(arg, "/test/DTE_HOME"));
+    free(arg);
+
+    // Bracketed var with missing end delimiter
+    arg = parse_command_arg(&runner, STRN("${DTE_HOME"));
+    EXPECT_STREQ(arg, "");
+    free(arg);
+
+    // Empty bracketed var
+    arg = parse_command_arg(&runner, STRN("aa${}zz"));
+    EXPECT_STREQ(arg, "aazz");
+    free(arg);
+
     // Built-in $MSGPOS var (expands to "1" by default)
     arg = parse_command_arg(&runner, STRN("$MSGPOS\\ $MSGPOS_A\\ $MSGPOS_B\\ $MSGPOS_C"));
     EXPECT_STREQ(arg, "1 1 1 1");
