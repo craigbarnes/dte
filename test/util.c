@@ -144,7 +144,7 @@ static void test_is_power_of_2(TestContext *ctx)
     EXPECT_FALSE(IS_POWER_OF_2(-2));
     EXPECT_FALSE(IS_POWER_OF_2(-10));
 
-    const uintmax_t max_pow2 = UINTMAX_MAX & ~(UINTMAX_MAX >> 1);
+    const uintmax_t max_pow2 = ~(UINTMAX_MAX >> 1);
     EXPECT_TRUE(max_pow2 >= 1ULL << 63);
     EXPECT_TRUE(IS_POWER_OF_2(max_pow2));
     EXPECT_UINT_EQ(max_pow2 << 1, 0);
@@ -3041,10 +3041,39 @@ static void test_lsbit(TestContext *ctx)
     EXPECT_EQ(u32_lsbit(UINT32_MAX), 1);
     EXPECT_EQ(u32_lsbit(UINT32_MAX << 25), 1u << 25);
 
-    for (uint32_t x = 1; x < 70; x++) {
-        uint32_t lsb = u32_lsbit(x);
-        EXPECT_TRUE(IS_POWER_OF_2(lsb));
-        EXPECT_TRUE(lsb & x);
+    for (uint32_t i = 1; i < 70; i++) {
+        uint32_t lsb = u32_lsbit(i);
+        IEXPECT_TRUE(IS_POWER_OF_2(lsb));
+        IEXPECT_TRUE(lsb & i);
+    }
+}
+
+static void test_msbit(TestContext *ctx)
+{
+    EXPECT_EQ(size_msbit(0), 0);
+    EXPECT_EQ(size_msbit(1), 1);
+    EXPECT_EQ(size_msbit(2), 2);
+    EXPECT_EQ(size_msbit(3), 2);
+    EXPECT_EQ(size_msbit(4), 4);
+    EXPECT_EQ(size_msbit(7), 4);
+    EXPECT_EQ(size_msbit(8), 8);
+    EXPECT_EQ(size_msbit(255), 128);
+    EXPECT_EQ(size_msbit(256), 256);
+    EXPECT_UINT_EQ(size_msbit(0x1FFFu), 0x1000u);
+    EXPECT_UINT_EQ(size_msbit(0xFFFFu), 0x8000u);
+
+    const size_t max = SIZE_MAX;
+    const size_t max_pow2 = ~(max >> 1);
+    EXPECT_UINT_EQ(size_msbit(max), max_pow2);
+    EXPECT_UINT_EQ(size_msbit(max - 1), max_pow2);
+    EXPECT_UINT_EQ(size_msbit(max_pow2), max_pow2);
+    EXPECT_UINT_EQ(size_msbit(max_pow2 - 1), max_pow2 >> 1);
+    EXPECT_UINT_EQ(size_msbit(max_pow2 + 1), max_pow2);
+
+    for (size_t i = 1; i < 70; i++) {
+        size_t msb = size_msbit(i);
+        IEXPECT_TRUE(IS_POWER_OF_2(msb));
+        IEXPECT_TRUE(msb & i);
     }
 }
 
@@ -3852,6 +3881,7 @@ static const TestEntry tests[] = {
     TEST(test_ctz),
     TEST(test_ffs),
     TEST(test_lsbit),
+    TEST(test_msbit),
     TEST(test_clz),
     TEST(test_umax_bitwidth),
     TEST(test_umax_count_base16_digits),

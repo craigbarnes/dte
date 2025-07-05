@@ -104,19 +104,33 @@ static inline uint32_t u32_lsbit(uint32_t x)
     return x & -x;
 }
 
-// Return the power of 2 greater than or equal to `x`, or 0 if `x` is
-// greater than the largest size_t power of 2
+// Extract (isolate) most significant set bit (log₂ x)
+static inline size_t size_msbit(size_t x)
+{
+    const size_t nbits = BITSIZE(x);
+    size_t i = 1;
+
+#if HAS_BUILTIN(__builtin_clzg)
+    return x ? i << ((nbits - __builtin_clzg(x)) - 1) : 0;
+#endif
+
+    UNROLL_LOOP(8)
+    while (i < nbits) {
+        x |= x >> i;
+        i <<= 1;
+    }
+
+    return x ^ (x >> 1);
+}
+
+// Return the smallest power of 2 greater than or equal to `x`, or 0 if `x`
+// is greater than the largest size_t power of 2. This is mostly the same
+// as C23 stdc_bit_ceil(), except for the `x > max_pow2` case noted above.
 static inline size_t next_pow2(size_t x)
 {
-    if (unlikely(x == 0)) {
-        return 1;
-    }
-    x--;
-    UNROLL_LOOP(8)
-    for (size_t i = 1, n = BITSIZE(x); i < n; i <<= 1) {
-        x |= x >> i;
-    }
-    return x + 1;
+    size_t msbit = size_msbit(x);
+    size_t shift = !IS_POWER_OF_2(x);
+    return (msbit << shift) + !x;
 }
 
 // Count leading zeros
