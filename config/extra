@@ -34,7 +34,7 @@ alias xtag 'exec -s -o eval -e errmsg sh -c ${script:xtag.sh} $WORD'
 
 # Run `man dterc` and jump directly to the part describing the specified
 # command (e.g. `help insert`, `help exec`, etc.)
-alias help 'exec sh -c ${script:help.sh}'
+alias help 'exec sh -c ${script:help.sh} --'
 
 # Insert the contents of the system clipboard into the buffer (using
 # wl-paste(1), xclip(1), pbpaste(1), etc., so no SSH support)
