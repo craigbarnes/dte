@@ -26,6 +26,12 @@ alias fzf-open 'exec -o eval sh -c ${script:fzf.sh} -- --reverse'
 # selected item (example usage: `git-grep xyz; msgs`)
 alias msgs 'exec -i msg -o msg -e errmsg sh -c ${script:msgs.sh} -- $MSGPOS --reverse'
 
+# Open files with `ranger --choosefile` (see: https://ranger.fm/)
+alias ranger-open 'exec -o open sh -c ${script:ranger-wrapper.sh}'
+
+# Open files with `lf -selection-path` (see https://github.com/gokcehan/lf)
+alias lf-open 'exec -o open sh -c ${script:lf-wrapper.sh}'
+
 # Jump to the tag under the cursor, or open an fzf(1) menu if there
 # are multiple matching tags
 alias xtag 'exec -s -o eval -e errmsg sh -c ${script:xtag.sh} $WORD'
