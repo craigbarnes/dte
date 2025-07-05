@@ -29,7 +29,6 @@
 #include "util/ascii.h"
 #include "util/bit.h"
 #include "util/bsearch.h"
-#include "util/debug.h"
 #include "util/environ.h"
 #include "util/intmap.h"
 #include "util/log.h"

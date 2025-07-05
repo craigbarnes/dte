@@ -69,7 +69,7 @@ void new_line(View *view, bool auto_indent, bool above_cursor)
 
 // Go to beginning of whitespace (tabs and spaces) under cursor and
 // return number of whitespace bytes surrounding cursor
-static inline size_t goto_beginning_of_whitespace(BlockIter *cursor)
+static size_t goto_beginning_of_whitespace(BlockIter *cursor)
 {
     BlockIter tmp = *cursor;
     return block_iter_skip_blanks_fwd(&tmp) + block_iter_skip_blanks_bwd(cursor);

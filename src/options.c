@@ -539,7 +539,7 @@ static char *get_option_ptr(EditorState *e, const OptionDesc *d, bool global)
     return global ? global_ptr(d, &e->options) : local_ptr(d, &e->buffer->options);
 }
 
-static inline size_t count_enum_values(const OptionDesc *desc)
+static size_t count_enum_values(const OptionDesc *desc)
 {
     OptionType type = desc->type;
     BUG_ON(type != OPT_ENUM && type != OPT_FLAG && type != OPT_BOOL);

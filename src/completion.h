@@ -3,6 +3,7 @@
 
 #include "cmdline.h"
 #include "editor.h"
+#include "util/debug.h"
 #include "util/hashmap.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
