@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "test.h"
 #include "editor.h"
+#include "exec.h"
 #include "terminal/color.h"
 #include "terminal/terminal.h"
 #include "trace.h"
@@ -200,7 +201,6 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(e->buffers.count, 1);
     EXPECT_NULL(e->buffer->abs_filename);
     EXPECT_PTREQ(e->buffer, e->buffers.ptrs[0]);
-    EXPECT_FALSE(e->child_controls_terminal);
     EXPECT_FALSE(e->err.print_to_stderr);
     EXPECT_FALSE(e->err.stderr_errors_printed);
     EXPECT_EQ(e->flags, EFLAG_HEADLESS);
@@ -213,6 +213,7 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(e->buffers.count, 0);
 
     free_editor_state(e);
+    EXPECT_EQ(child_controls_terminal, 0);
     EXPECT_TRUE(log_close());
 }
 

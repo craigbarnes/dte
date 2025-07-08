@@ -85,7 +85,6 @@ typedef struct EditorState {
     EditorFlags flags;
     ScreenUpdateFlags screen_update;
     uint8_t include_recursion_count;
-    bool child_controls_terminal;
     bool session_leader;
     Clipboard clipboard;
     TagFile tagfile;

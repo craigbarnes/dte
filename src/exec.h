@@ -1,6 +1,7 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <signal.h>
 #include <stdbool.h>
 #include <sys/types.h>
 #include "command/error.h"
@@ -8,6 +9,8 @@
 #include "spawn.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+
+extern volatile sig_atomic_t child_controls_terminal;
 
 // NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
 typedef enum {

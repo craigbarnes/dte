@@ -16,6 +16,7 @@
 #include "config.h"
 #include "editor.h"
 #include "encoding.h"
+#include "exec.h"
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
@@ -57,6 +58,10 @@
 // as a sanitizer callback
 static void cleanup_handler(void)
 {
+    if (child_controls_terminal) {
+        return;
+    }
+
     static const char reset[] = "\033c"; // ECMA-48 RIS (reset to initial state)
     (void)!xwrite_all(STDOUT_FILENO, reset, sizeof(reset) - 1);
     term_cooked();

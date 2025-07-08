@@ -25,6 +25,8 @@
 #include "view.h"
 #include "window.h"
 
+volatile sig_atomic_t child_controls_terminal = 0;
+
 enum {
     IN = 1 << 0,
     OUT = 1 << 1,
@@ -494,7 +496,7 @@ void yield_terminal(EditorState *e, bool quiet)
     if (quiet) {
         term_raw_isig();
     } else {
-        e->child_controls_terminal = true;
+        child_controls_terminal = 1;
         ui_end(&e->terminal, false);
         term_cooked();
     }
@@ -507,11 +509,11 @@ void resume_terminal(EditorState *e, bool quiet, bool prompt)
     }
 
     term_raw();
-    if (!quiet && e->child_controls_terminal) {
+    if (!quiet && child_controls_terminal) {
         if (prompt) {
             any_key(&e->terminal, e->options.esc_timeout);
         }
         ui_start(e);
-        e->child_controls_terminal = false;
+        child_controls_terminal = 0;
     }
 }
