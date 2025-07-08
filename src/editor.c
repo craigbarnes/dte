@@ -315,18 +315,15 @@ void ui_first_start(EditorState *e, unsigned int terminal_query_level)
     ui_resize(e);
 }
 
-void ui_end(EditorState *e, bool final)
+void ui_end(Terminal *term, bool final)
 {
-    BUG_ON(e->flags & EFLAG_HEADLESS);
-    Terminal *term = &e->terminal;
-    TermOutputBuffer *obuf = &term->obuf;
-
     if (final) {
         term_restore_title(term);
     } else {
         term_restore_and_save_title(term);
     }
 
+    TermOutputBuffer *obuf = &term->obuf;
     term_clear_screen(obuf);
     term_move_cursor(obuf, 0, term->height - 1);
     term_restore_cursor_style(term);

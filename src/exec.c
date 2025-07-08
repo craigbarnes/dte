@@ -495,7 +495,7 @@ void yield_terminal(EditorState *e, bool quiet)
         term_raw_isig();
     } else {
         e->child_controls_terminal = true;
-        ui_end(e, false);
+        ui_end(&e->terminal, false);
         term_cooked();
     }
 }

@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
      * to be echoed to the terminal (before the shell takes over again
      * and prints its prompt).
      */
-    ui_end(e, true);
+    ui_end(&e->terminal, true);
 
 exit:
     e->err.print_to_stderr = true;
