@@ -52,14 +52,14 @@
 #include "view.h"
 #include "window.h"
 
-static void cleanup_handler(void *userdata)
+// This serves a similar purpose to ui_end(), but using only minimal program
+// state, so as to be more suitable for use in handle_fatal_signal() and/or
+// as a sanitizer callback
+static void cleanup_handler(void)
 {
-    EditorState *e = userdata;
-    set_fatal_error_cleanup_handler(NULL, NULL);
-    if (!e->child_controls_terminal) {
-        ui_end(e, true);
-        term_cooked();
-    }
+    static const char reset[] = "\033c"; // ECMA-48 RIS (reset to initial state)
+    (void)!xwrite_all(STDOUT_FILENO, reset, sizeof(reset) - 1);
+    term_cooked();
 }
 
 static ExitCode list_builtin_configs(void)
@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
     e->err.print_to_stderr = false;
     lookup_tags(e, tags, nr_tags, nr_commands ? NULL : dview);
 
-    set_fatal_error_cleanup_handler(cleanup_handler, e);
+    set_fatal_error_cleanup_handler(cleanup_handler);
     set_fatal_signal_handlers();
     set_sigwinch_handler();
 

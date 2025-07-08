@@ -61,10 +61,10 @@ static inline const char *ld_preload_env_var(void)
 #endif
 }
 
-typedef void (*CleanupHandler)(void *userdata);
+typedef void (*CleanupHandler)(void);
 
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
-void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata);
+void set_fatal_error_cleanup_handler(CleanupHandler handler);
 void fatal_error_cleanup(void);
 
 #endif

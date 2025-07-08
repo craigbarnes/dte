@@ -7,21 +7,18 @@
 #include "debug.h"
 #include "log.h"
 
-// NOLINTBEGIN(*-avoid-non-const-global-variables)
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
 static CleanupHandler cleanup_handler = NULL;
-static void *cleanup_userdata = NULL;
-// NOLINTEND(*-avoid-non-const-global-variables)
 
-void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata)
+void set_fatal_error_cleanup_handler(CleanupHandler handler)
 {
     cleanup_handler = handler;
-    cleanup_userdata = userdata;
 }
 
 void fatal_error_cleanup(void)
 {
     if (cleanup_handler) {
-        cleanup_handler(cleanup_userdata);
+        cleanup_handler();
     }
 }
 
