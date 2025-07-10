@@ -35,7 +35,6 @@ default:
 .manual-test:
     extends: .test
     when: manual
-    allow_failure: false
 
 alpine:
     extends: .test
@@ -100,7 +99,6 @@ debian:
 
 android:
     when: manual
-    allow_failure: false
     stage: test
     needs: []
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
