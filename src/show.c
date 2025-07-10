@@ -382,6 +382,11 @@ static void do_collect_modes(EditorState *e, PointerArray *a, const char *prefix
     collect_modes(&e->modes, a, prefix);
 }
 
+static void do_collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
+{
+    collect_env(a, strview_from_cstring(prefix), "");
+}
+
 static void collect_show_msg_args(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
     static const char args[][2] = {"A", "B", "C"};
@@ -606,7 +611,7 @@ static const ShowHandler show_handlers[] = {
     {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
     {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
     {"def-mode", DTERC, dump_modes, show_mode, do_collect_modes},
-    {"env", 0, dump_env, show_env, collect_env},
+    {"env", 0, dump_env, show_env, do_collect_env},
     {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
     {"ft", DTERC, do_dump_filetypes, NULL, NULL},
     {"hi", DTERC, do_dump_hl_styles, show_color, collect_hl_styles},
@@ -618,7 +623,7 @@ static const ShowHandler show_handlers[] = {
     {"paste", 0, dump_paste, NULL, NULL},
     {"search", LASTLINE, dump_search_history, NULL, NULL},
     {"set", DTERC, do_dump_options, show_option, collect_all_options},
-    {"setenv", DTERC, dump_setenv, show_env, collect_env},
+    {"setenv", DTERC, dump_setenv, show_env, do_collect_env},
     {"show", DTERC, dump_show_subcmds, NULL, NULL},
     {"tag", 0, do_dump_tags, NULL, NULL},
     {"wsplit", 0, dump_frames, show_wsplit, NULL},

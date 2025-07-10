@@ -263,6 +263,27 @@ void collect_builtin_configs(PointerArray *a, const char *prefix)
     }
 }
 
+// Collect ${builtin:path/name} style variables (minus the leading "${")
+// TODO: Support ${script:name} variables
+void collect_builtin_config_variables(PointerArray *a, StringView prefix)
+{
+    static const char builtin[] = "builtin:";
+    const size_t blen = sizeof(builtin) - 1;
+    const size_t cmplen = MIN(prefix.length, blen);
+
+    if (!strview_remove_matching_strn_prefix(&prefix, builtin, cmplen)) {
+        return;
+    }
+
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
+        const char *name = builtin_configs[i].name;
+        size_t namelen = strlen(name);
+        if (strn_has_strview_prefix(name, namelen, &prefix)) {
+            ptr_array_append(a, xmemjoin3(builtin, blen, name, namelen, "}", 2));
+        }
+    }
+}
+
 void collect_builtin_includes(PointerArray *a, const char *prefix)
 {
     size_t prefix_len = strlen(prefix);

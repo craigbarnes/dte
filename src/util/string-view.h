@@ -180,14 +180,21 @@ static inline void strview_remove_suffix(StringView *sv, size_t len)
     sv->length -= len;
 }
 
-static inline bool strview_remove_matching_prefix(StringView *sv, const char *prefix)
-{
-    size_t prefix_len = strlen(prefix);
+static inline bool strview_remove_matching_strn_prefix (
+    StringView *sv,
+    const char *prefix,
+    size_t prefix_len
+) {
     if (!strview_has_strn_prefix(sv, prefix, prefix_len)) {
         return false;
     }
     strview_remove_prefix(sv, prefix_len);
     return true;
+}
+
+static inline bool strview_remove_matching_prefix(StringView *sv, const char *prefix)
+{
+    return strview_remove_matching_strn_prefix(sv, prefix, strlen(prefix));
 }
 
 static inline bool strview_remove_matching_suffix(StringView *sv, const char *suffix)

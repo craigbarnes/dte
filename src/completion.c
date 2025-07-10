@@ -221,19 +221,23 @@ void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)
     collect_hashmap_keys(&e->compilers, a, prefix);
 }
 
-void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
-{
-    size_t prefix_len = strlen(prefix);
-    if (memchr(prefix, '=', prefix_len)) {
+void collect_env (
+    PointerArray *a,
+    StringView prefix, // Prefix to match against
+    const char *suffix // Suffix to append to collected strings
+) {
+    if (strview_memchr(&prefix, '=')) {
         return;
     }
 
+    size_t sfxlen = strlen(suffix) + 1;
     for (size_t i = 0; environ[i]; i++) {
         const char *var = environ[i];
-        if (str_has_strn_prefix(var, prefix, prefix_len)) {
-            const char *delim = strchr(var, '=');
+        size_t varlen = strlen(var);
+        if (strn_has_strview_prefix(var, varlen, &prefix)) {
+            const char *delim = memchr(var, '=', varlen);
             if (likely(delim && delim != var)) {
-                ptr_array_append(a, xstrcut(var, delim - var));
+                ptr_array_append(a, xmemjoin(var, delim - var, suffix, sfxlen));
             }
         }
     }
@@ -525,7 +529,7 @@ static void complete_setenv(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_env(e, &cs->completions, cs->parsed);
+        collect_env(&cs->completions, strview_from_cstring(cs->parsed), "");
     } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
         BUG_ON(!a->args[0]);
         const char *value = getenv(a->args[0]);
@@ -771,42 +775,14 @@ out:
     free_string_array(args_copy);
 }
 
-static bool is_var(const char *str, size_t len)
+static bool is_valid_nonbracketed_var_name(StringView name)
 {
-    if (len == 0 || str[0] != '$') {
-        return false;
-    }
-    if (len == 1) {
-        return true;
-    }
-    if (!is_alpha_or_underscore(str[1])) {
-        return false;
-    }
-    for (size_t i = 2; i < len; i++) {
-        if (!is_alnum_or_underscore(str[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-UNITTEST {
-    // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(!is_var(STRN("$VAR")));
-    BUG_ON(!is_var(STRN("$xy_190")));
-    BUG_ON(!is_var(STRN("$__x_y_z")));
-    BUG_ON(!is_var(STRN("$x")));
-    BUG_ON(!is_var(STRN("$A")));
-    BUG_ON(!is_var(STRN("$_0")));
-    BUG_ON(!is_var(STRN("$")));
-    BUG_ON(is_var(STRN("")));
-    BUG_ON(is_var(STRN("A")));
-    BUG_ON(is_var(STRN("$.a")));
-    BUG_ON(is_var(STRN("$xyz!")));
-    BUG_ON(is_var(STRN("$1")));
-    BUG_ON(is_var(STRN("$09")));
-    BUG_ON(is_var(STRN("$1a")));
-    // NOLINTEND(bugprone-assert-side-effect)
+    AsciiCharType mask = ASCII_ALNUM | ASCII_UNDERSCORE;
+    size_t len = name.length;
+    return len == 0 || (
+        is_alpha_or_underscore(name.data[0])
+        && ascii_type_prefix_length(name.data, len, mask) == len
+    );
 }
 
 static int strptrcmp(const void *v1, const void *v2)
@@ -814,6 +790,28 @@ static int strptrcmp(const void *v1, const void *v2)
     const char *const *s1 = v1;
     const char *const *s2 = v2;
     return strcmp(*s1, *s2);
+}
+
+static size_t collect_vars(PointerArray *a, StringView name)
+{
+    const char *suffix = "";
+    size_t pos = STRLEN("$");
+    strview_remove_prefix(&name, pos);
+
+    if (strview_remove_matching_prefix(&name, "{")) {
+        if (strview_memchr(&name, '}')) {
+            return 0;
+        }
+        collect_builtin_config_variables(a, name);
+        pos += STRLEN("{");
+        suffix = "}";
+    } else if (!is_valid_nonbracketed_var_name(name)) {
+        return 0;
+    }
+
+    collect_normal_vars(a, name, suffix);
+    collect_env(a, name, suffix);
+    return pos;
 }
 
 static void init_completion(EditorState *e, const CommandLine *cmdline)
@@ -884,17 +882,14 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
         pos = end;
     }
 
-    const char *str = cmd + completion_pos;
-    size_t len = cmdline_pos - completion_pos;
-    if (is_var(str, len)) {
-        char *name = xstrslice(str, 1, len);
-        completion_pos++;
-        collect_env(e, &cs->completions, name);
-        collect_normal_vars(&cs->completions, name);
-        free(name);
+    StringView text = string_view(cmd, cmdline_pos); // Text to be completed
+    strview_remove_prefix(&text, completion_pos);
+
+    if (strview_has_prefix(&text, "$")) {
+        completion_pos += collect_vars(&cs->completions, text);
     } else {
-        cs->escaped = string_view(str, len);
-        cs->parsed = parse_command_arg(&runner, str, len);
+        cs->escaped = text;
+        cs->parsed = parse_command_arg(&runner, text.data, text.length);
         cs->add_space_after_single_match = true;
         size_t count = array.count;
         char **args = count ? (char**)array.ptrs + 1 + semicolon : NULL;

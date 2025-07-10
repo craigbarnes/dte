@@ -183,7 +183,17 @@ char *expand_normal_var(const EditorState *e, const char *name)
     return str ? xstrdup(str) : NULL;
 }
 
-void collect_normal_vars(PointerArray *a, const char *prefix)
-{
-    COLLECT_STRING_FIELDS(normal_vars, name, a, prefix);
+void collect_normal_vars (
+    PointerArray *a,
+    StringView prefix, // Prefix to match against
+    const char *suffix // Suffix to append to collected strings
+) {
+    size_t suffix_len = strlen(suffix) + 1;
+    for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
+        const char *var = normal_vars[i].name;
+        size_t var_len = strlen(var);
+        if (strn_has_strview_prefix(var, var_len, &prefix)) {
+            ptr_array_append(a, xmemjoin(var, var_len, suffix, suffix_len));
+        }
+    }
 }

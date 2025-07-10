@@ -218,6 +218,16 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ_CSTRING(&c->buf, "set case-sensitive-search auto ");
     reset_completion(c);
 
+    cmdline_set_text(c, "insert ${builtin:");
+    complete_command_next(e);
+    EXPECT_STRING_EQ_CSTRING(&c->buf, "insert ${builtin:binding/default}");
+    reset_completion(c);
+
+    cmdline_set_text(c, "insert ${builtin:c");
+    complete_command_next(e);
+    EXPECT_STRING_EQ_CSTRING(&c->buf, "insert ${builtin:color/darkgray}");
+    reset_completion(c);
+
     ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", 1), 0);
 
     cmdline_set_text(c, "insert $" ENV_VAR_PREFIX);
