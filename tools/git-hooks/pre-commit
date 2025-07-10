@@ -80,9 +80,12 @@ if test "$changed_shell_files"; then
     shellcheck -fgcc $changed_shell_files
 fi
 
-# Check for header-related errors in changed C files
+# Check for header and clang-tidy errors in changed C files
 if test "$changed_c_files"; then
     tools/hdrcheck.awk $changed_c_files
+
+    echo "    TIDY  ..."
+    tools/clang-tidy.sh -quiet --checks='-clang-analyzer-*' $changed_c_files
 fi
 
 # Check for lint in changed makefiles
