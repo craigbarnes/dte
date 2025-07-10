@@ -26,6 +26,7 @@
 /docs/logo-inkscape.svg export-ignore
 /tools export-ignore
 /tools/** export-ignore
+.clang-tidy export-ignore
 
 *.[ch] c
 *.lua lua

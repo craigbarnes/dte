@@ -1,3 +1,4 @@
+// NOLINTBEGIN(modernize-macro-to-enum)
 #define HAVE_DUP3 0
 #define HAVE_EMBED 0
 #define HAVE_PIPE2 0
@@ -11,3 +12,4 @@
 #define HAVE_TCGETWINSIZE 0
 #define HAVE_POSIX_MADVISE 0
 #define HAVE_QSORT_R 0
+// NOLINTEND(modernize-macro-to-enum)

@@ -3,6 +3,8 @@
 # whereas CheckOptions settings override parent config settings of the
 # same name.
 
+HeaderFilterRegex: .*
+
 Checks: >
     clang-diagnostic-*,
     clang-analyzer-*,
@@ -99,6 +101,8 @@ CheckOptions:
         mem_equal;
         obuf_avail;
         path_is_absolute;
+        strview_has_prefix;
+        strview_has_suffix;
 
     portability-restrict-system-includes.Includes: >
         -*,

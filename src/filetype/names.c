@@ -1,3 +1,4 @@
+// NOLINTNEXTLINE(cert-int09-c,readability-enum-initial-value)
 typedef enum {
     ADA,
     ASCIIDOC,
