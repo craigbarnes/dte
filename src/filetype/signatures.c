@@ -90,9 +90,7 @@ static FileTypeEnum filetype_from_signature(const StringView line)
     case '<':
         if (strview_has_prefix_icase(&line, "<!DOCTYPE HTML")) {
             return HTML;
-        } else if (strview_has_prefix(&line, "<!DOCTYPE")) {
-            return XML;
-        } else if (strview_has_prefix(&line, "<?xml")) {
+        } else if (strview_has_either_prefix(&line, "<!DOCTYPE", "<?xml")) {
             return XML;
         }
         break;
@@ -102,9 +100,7 @@ static FileTypeEnum filetype_from_signature(const StringView line)
         }
         break;
     case '#':
-        if (strview_has_prefix(&line, "#compdef ")) {
-            return SH;
-        } else if (strview_has_prefix(&line, "#autoload")) {
+        if (strview_has_either_prefix(&line, "#compdef ", "#autoload")) {
             return SH;
         }
         break;

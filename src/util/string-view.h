@@ -119,6 +119,16 @@ static inline bool strview_has_prefix_icase(const StringView *sv, const char *p)
 }
 
 NONNULL_ARGS
+static inline bool strview_has_either_prefix (
+    const StringView *sv,
+    const char *pfx1,
+    const char *pfx2
+) {
+    return strview_has_strn_prefix(sv, pfx1, strlen(pfx1))
+        || strview_has_strn_prefix(sv, pfx2, strlen(pfx2));
+}
+
+NONNULL_ARGS
 static inline bool strview_has_suffix(const StringView *sv, const char *suffix)
 {
     return strview_has_strn_suffix(sv, suffix, strlen(suffix));

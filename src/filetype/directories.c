@@ -1,20 +1,21 @@
-static const struct {
-    const char dir[16];
+static const struct DirPrefixMap {
+    const char NONSTRING dir[15];
+    uint8_t dir_len;
     FileTypeEnum filetype;
 } prefixes[] = {
-    {"/etc/default/", SH},
-    {"/etc/nginx/", NGINX},
-    {"/etc/pam.d/", CONFIG},
-    {"/etc/sudoers.d/", CONFIG},
+    {STRN("/etc/default/"), SH},
+    {STRN("/etc/nginx/"), NGINX},
+    {STRN("/etc/pam.d/"), CONFIG},
+    {STRN("/etc/sudoers.d/"), CONFIG},
 };
 
 UNITTEST {
     for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
-        const char *dir = prefixes[i].dir;
-        BUG_ON(dir[0] != '/');
-        BUG_ON(dir[ARRAYLEN(prefixes[0].dir) - 1] != '\0');
-        BUG_ON(dir[strlen(dir) - 1] != '/');
-        BUG_ON(prefixes[i].filetype >= NR_BUILTIN_FILETYPES);
+        const struct DirPrefixMap *p = &prefixes[i];
+        BUG_ON(p->dir_len > sizeof(prefixes[0].dir));
+        BUG_ON(p->dir[0] != '/');
+        BUG_ON(p->dir[p->dir_len - 1] != '/');
+        BUG_ON(p->filetype >= NR_BUILTIN_FILETYPES);
     }
 }
 
@@ -24,8 +25,9 @@ static FileTypeEnum filetype_from_dir_prefix(StringView path)
         return NONE;
     }
     for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
-        if (strview_has_prefix(&path, prefixes[i].dir)) {
-            return prefixes[i].filetype;
+        const struct DirPrefixMap *p = &prefixes[i];
+        if (strview_has_strn_prefix(&path, p->dir, p->dir_len)) {
+            return p->filetype;
         }
     }
     return NONE;
