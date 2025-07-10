@@ -10,7 +10,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
-extern volatile sig_atomic_t child_controls_terminal;
+extern volatile sig_atomic_t child_controls_terminal; // NOLINT(*non-const-global*)
 
 // NOLINTNEXTLINE(readability-enum-initial-value,cert-int09-c)
 typedef enum {

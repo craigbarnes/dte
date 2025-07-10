@@ -25,7 +25,7 @@
 #include "view.h"
 #include "window.h"
 
-volatile sig_atomic_t child_controls_terminal = 0;
+volatile sig_atomic_t child_controls_terminal = 0; // NOLINT(*non-const-global*)
 
 enum {
     IN = 1 << 0,
