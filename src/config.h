@@ -9,9 +9,10 @@
 #include "util/string-view.h"
 #include "util/string.h"
 
+// Used in generated headers included by `{src,test}/config.c`
+#define CFG(n, t) {.name = n, .text = {.data = t, .length = sizeof(t) - 1}}
+
 #ifdef __linux__
-    // Used in generated headers (`build/gen/{test-data,builtin-config}*.h`)
-    // included by `src/config.c` and `test/config.c`
     #define CONFIG_SECTION SECTION(".dte.config") MAXALIGN
 #else
     #define CONFIG_SECTION

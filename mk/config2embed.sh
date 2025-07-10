@@ -15,17 +15,12 @@ for file in "$@"; do
     printf "$template\n" "$ident" "$file"
 done
 
-echo '#define cfg(n, t) { \
-    .name = n, \
-    .text = {.data = t, .length = sizeof(t)} \
-}
-
-CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {'
+echo 'CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {'
 
 for file in "$@"; do
     name="${file#config/}"
     ident=$(filename_to_ident "$file")
-    echo "    cfg(\"$name\", $ident),"
+    echo "    CFG(\"$name\", $ident),"
 done
 
 echo '};'

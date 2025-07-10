@@ -57,14 +57,10 @@ name ~ /syntax\// {
 END {
     print \
         ";\n\nUNIGNORE_WARNINGS\n\n" \
-        "#define cfg(n, t) { \\\n" \
-        "    .name = n, \\\n" \
-        "    .text = {.data = t, .length = sizeof(t) - 1} \\\n" \
-        "}\n\n" \
         "CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {"
 
     for (i = 1; i <= nfiles; i++) {
-        print "    cfg(\"" names[i] "\", " idents[i] "),"
+        print "    CFG(\"" names[i] "\", " idents[i] "),"
     }
 
     print "};"
