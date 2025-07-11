@@ -209,50 +209,56 @@ static bool is_notice(const char *word, size_t len)
 }
 
 // Highlight certain words inside comments
-static void hl_words(Terminal *term, const StyleMap *styles, const LineInfo *info)
-{
-    const TermStyle *cc = find_style(styles, "comment");
-    const TermStyle *nc = find_style(styles, "notice");
-
-    if (!info->styles || !cc || !nc) {
+static void hl_words (
+    const LineInfo *info,
+    const TermStyle *comment_style,
+    const TermStyle *notice_style,
+    unsigned int term_width
+) {
+    const TermStyle **styles = info->styles;
+    if (!styles || !comment_style || !notice_style) {
         return;
     }
 
+    const size_t size = info->size;
     size_t i = info->pos;
-    if (i >= info->size) {
+    if (i >= size) {
         return;
     }
 
     // Go to beginning of partially visible word inside comment
-    while (i > 0 && info->styles[i] == cc && is_word_byte(info->line[i])) {
+    const unsigned char *line = info->line;
+    while (i > 0 && styles[i] == comment_style && is_word_byte(line[i])) {
         i--;
     }
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
-    const size_t max = info->pos + (term->width * 4) + 8;
+    const size_t max = info->pos + (term_width * 4) + 8;
 
-    size_t si;
-    while (i < info->size) {
-        if (info->styles[i] != cc || !is_word_byte(info->line[i])) {
+    while (i < size) {
+        if (styles[i] != comment_style || !is_word_byte(line[i])) {
             if (i > max) {
                 break;
             }
             i++;
-        } else {
-            // Beginning of a word inside comment
-            si = i++;
-            while (
-                i < info->size && info->styles[i] == cc
-                && is_word_byte(info->line[i])
-            ) {
-                i++;
+            continue;
+        }
+
+        // Beginning of a word inside a comment
+        size_t word_start = i++;
+
+        // Move to the end of the word
+        while (i < size) {
+            if (styles[i] != comment_style || !is_word_byte(line[i])) {
+                break;
             }
-            if (is_notice(info->line + si, i - si)) {
-                for (size_t j = si; j < i; j++) {
-                    info->styles[j] = nc;
-                }
-            }
+            i++;
+        }
+
+        // ...and highlight it, if applicable
+        if (is_notice(line + word_start, i - word_start)) {
+            set_style_range(styles, notice_style, word_start, i);
         }
     }
 }
@@ -343,7 +349,9 @@ static void print_line (
         screen_skip_char(obuf, info);
     }
 
-    hl_words(term, styles, info);
+    const TermStyle *comment = find_style(styles, "comment");
+    const TermStyle *notice = find_style(styles, "notice");
+    hl_words(info, comment, notice, term->width);
 
     while (info->pos < info->size) {
         BUG_ON(obuf->x > obuf->scroll_x + obuf->width);

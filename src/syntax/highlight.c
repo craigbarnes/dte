@@ -5,7 +5,6 @@
 #include "syntax/merge.h"
 #include "util/arith.h"
 #include "util/bit.h"
-#include "util/debug.h"
 #include "util/intern.h"
 #include "util/xmalloc.h"
 #include "util/xstring.h"
@@ -71,20 +70,6 @@ static State *handle_heredoc (
 
     ptr_array_append(&state->heredoc.states, s);
     return s->state;
-}
-
-// Set styles in range [start,end] and return number of styles set
-static size_t set_style_range (
-    const TermStyle **styles,
-    const TermStyle *emit_style,
-    size_t start,
-    size_t end
-) {
-    BUG_ON(start > end);
-    for (size_t i = start; i < end; i++) {
-        styles[i] = emit_style;
-    }
-    return end - start;
 }
 
 // Line should be terminated with \n unless it's the last line

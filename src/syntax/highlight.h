@@ -6,8 +6,24 @@
 #include "block-iter.h"
 #include "syntax/color.h"
 #include "syntax/syntax.h"
+#include "terminal/style.h"
+#include "util/debug.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
+
+// Set styles in range [start,end] and return number of styles set
+static inline size_t set_style_range (
+    const TermStyle **styles,
+    const TermStyle *emit_style,
+    size_t start,
+    size_t end
+) {
+    BUG_ON(start > end);
+    for (size_t i = start; i < end; i++) {
+        styles[i] = emit_style;
+    }
+    return end - start;
+}
 
 const TermStyle **hl_line (
     Syntax *syn,
