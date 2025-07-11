@@ -18,7 +18,7 @@ AWK_PREVIEW_GENERATOR='
     }
 
     NR == target_lineno {
-        print "\033[1;48;5;24m" $0 "\033[0m"
+        print "\033[1;48;5;24m" $0 "\033[K\033[0m"
         next
     }
 
