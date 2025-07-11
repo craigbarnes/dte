@@ -78,6 +78,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     const View *view = info->view;
     WhitespaceErrorFlags flags = info->wse_flags;
     WhitespaceErrorFlags trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
+
     if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
         if (
@@ -95,7 +96,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     bool in_indent = (i < info->indent_size);
     if (u == '\t') {
         WhitespaceErrorFlags mask = in_indent ? WSE_TAB_INDENT : WSE_TAB_AFTER_INDENT;
-        return (flags & mask) != 0;
+        return !!(flags & mask);
     }
 
     if (!in_indent || !(flags & (WSE_SPACE_INDENT | WSE_SPACE_ALIGN))) {
@@ -118,15 +119,12 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 
     bool space_instead_of_tab = (count >= view->buffer->options.tab_width);
     bool space_before_tab = (pos < size && line[pos] == '\t');
-    WhitespaceErrorFlags mask;
     if (space_instead_of_tab || space_before_tab) {
-        mask = WSE_SPACE_INDENT;
-    } else {
-        // Less than tab width spaces at end of indentation
-        mask = WSE_SPACE_ALIGN;
+        return !!(flags & WSE_SPACE_INDENT);
     }
 
-    return (flags & mask) != 0;
+    // Less than tab width spaces at end of indentation
+    return !!(flags & WSE_SPACE_ALIGN);
 }
 
 static CodePoint screen_next_char (
@@ -189,21 +187,22 @@ static void screen_skip_char(TermOutputBuffer *obuf, LineInfo *info)
             // Control
             obuf->x += 2;
         }
-    } else {
-        size_t pos = info->pos;
-        info->pos--;
-        u = u_get_nonascii(info->line, info->size, &info->pos);
-        obuf->x += u_char_width(u);
-        info->offset += info->pos - pos;
+        return;
     }
+
+    size_t pos = info->pos;
+    info->pos--;
+    u = u_get_nonascii(info->line, info->size, &info->pos);
+    obuf->x += u_char_width(u);
+    info->offset += info->pos - pos;
 }
 
 static bool is_notice(const char *word, size_t len)
 {
     switch (len) {
-    case 3: return mem_equal(word, "XXX", 3);
-    case 4: return mem_equal(word, "TODO", 4);
-    case 5: return mem_equal(word, "FIXME", 5);
+        case 3: return mem_equal(word, STRN("XXX"));
+        case 4: return mem_equal(word, STRN("TODO"));
+        case 5: return mem_equal(word, STRN("FIXME"));
     }
     return false;
 }
@@ -278,20 +277,21 @@ static LineInfo line_info_init(const View *view, const BlockIter *bi, size_t lin
         .line_nr = line_nr,
         .offset = block_iter_get_offset(bi),
         .wse_flags = get_wse_flags(&view->buffer->options),
+        .sel_so = -1,
+        .sel_eo = -1,
     };
 
-    if (!view->selection) {
-        info.sel_so = -1;
-        info.sel_eo = -1;
-    } else if (view->sel_eo != SEL_EO_RECALC) {
-        // Already calculated
-        info.sel_so = view->sel_so;
-        info.sel_eo = view->sel_eo;
-        BUG_ON(info.sel_so > info.sel_eo);
-    } else {
-        SelectionInfo sel = init_selection(view);
-        info.sel_so = sel.so;
-        info.sel_eo = sel.eo;
+    if (view->selection) {
+        if (view->sel_eo == SEL_EO_RECALC) {
+            SelectionInfo sel = init_selection(view);
+            info.sel_so = sel.so;
+            info.sel_eo = sel.eo;
+        } else {
+            // Already calculated
+            info.sel_so = view->sel_so;
+            info.sel_eo = view->sel_eo;
+            BUG_ON(info.sel_so > info.sel_eo);
+        }
     }
 
     return info;
@@ -454,6 +454,7 @@ void update_range (
     if (i < y2) {
         set_builtin_style(term, styles, BSE_NOLINE);
     }
+
     for (; i < y2; i++) {
         obuf->x = 0;
         term_move_cursor(obuf, edit_x, edit_y + i);

@@ -75,7 +75,7 @@ static inline size_t saturating_decrement(size_t x)
 
 static inline size_t saturating_subtract(size_t a, size_t b)
 {
-    return (a > b) ? a - b : 0;
+    return a - MIN(a, b);
 }
 
 size_t xmul_(size_t a, size_t b);
