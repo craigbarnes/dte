@@ -83,7 +83,7 @@ static State *reference_state (
 
     State *state = find_or_add_state(syn, name);
     if (unlikely((syn->flags & SYN_LINT) && state == syn->current_state)) {
-        error_msg (
+        error_msg ( // Soft error
             ebuf,
             "destination '%s' can be optimized to 'this' in '%s' syntax",
             name,
@@ -184,7 +184,7 @@ static void lint_emit_name (
         && dest->emit_name
         && interned_strings_equal(ename, dest->emit_name)
     ) {
-        error_msg (
+        error_msg ( // Soft error
             ebuf,
             "emit-name '%s' not needed (destination state uses same emit-name)",
             ename
@@ -299,6 +299,7 @@ static bool cmd_default(EditorState *e, const CommandArgs *a)
         const char *name = a->args[i];
         const void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
         if (unlikely(oldval)) {
+            // Soft error
             error_msg(ebuf, "'%s' argument specified multiple times", name);
         }
     }
@@ -541,6 +542,7 @@ static bool cmd_state(EditorState *e, const CommandArgs *a)
 
     const char *emit_name = a->args[1];
     if ((syn->flags & SYN_LINT) && emit_name && streq(emit_name, name)) {
+        // Soft error
         error_msg(ebuf, "Redundant emit-name '%s'", emit_name);
     }
 
@@ -555,7 +557,10 @@ static bool cmd_str(EditorState *e, const CommandArgs *a)
     const char *str = a->args[0];
     size_t len = strlen(str);
     if (unlikely(len < 2)) {
-        return error_msg(&e->err, "string should be at least 2 bytes; use 'char' for single bytes");
+        error_msg ( // Soft error
+            &e->err,
+            "string should be at least 2 bytes; use 'char' for single bytes"
+        );
     }
 
     Condition *c;
@@ -719,7 +724,12 @@ Syntax *load_syntax (
     const char *base = path_basename(config_filename);
     Syntax *syntax = find_syntax(&e->syntaxes, base);
     if (!syntax) {
-        error_msg(&e->err, "%s: no main syntax found (i.e. with name '%s')", config_filename, base);
+        error_msg (
+            &e->err,
+            "%s: no main syntax found (i.e. with name '%s')",
+            config_filename,
+            base
+        );
         return NULL;
     }
 
