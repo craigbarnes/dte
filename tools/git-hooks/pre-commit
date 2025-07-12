@@ -1,4 +1,5 @@
 #!/bin/sh
+set -u
 
 # This pre-commit hook creates a fresh, temporary checkout of the index
 # (i.e. not including unstaged/dirty changes from the working tree)
@@ -6,12 +7,14 @@
 
 export POSIXLY_CORRECT=1
 TMPDIR='.pre-commit-test'
-PROGNAME="$0"
+PROGNAME="${0:-pre-commit}"
 
 error() {
     echo "$PROGNAME:$1: Error: $2" >&2
     exit 1
 }
+
+alias abort='error "${LINENO:-1}"'
 
 changed_files() {
     git diff-index --cached --name-only --diff-filter=ACMR HEAD -- "$@"
@@ -21,26 +24,40 @@ git_ls() {
     git ls-files --error-unmatch "$@"
 }
 
-alias abort='error "${LINENO:-1}"'
-set -u
+require_commands() {
+    for cmd_ in "$@"; do
+        if ! command -v "$cmd_" >/dev/null; then
+            abort "Required command '$cmd_' not found"
+        fi
+    done
+}
 
-for cmd in git gcc clang ccache awk pandoc mkdir cp basename diff; do
-    if ! command -v "$cmd" >/dev/null; then
-        abort "'$cmd' is required but couldn't be found"
-    fi
-done
-
+require_commands git awk sed
 test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists"
 
-MAKE="$(command -v gmake || command -v make)"
+CCACHE=$(command -v "${CCACHE:-ccache}")
+ANY_CC=$(command -v "${CC:-cc}" || command -v gcc || command -v clang)
+MAKE=$(command -v gmake || command -v make)
 test -x "$MAKE" || abort 'unable to find GNU Make command'
 MAKE="$MAKE --no-print-directory -C $TMPDIR -j$(mk/nproc.sh)"
-
 set -e
-git checkout-index --prefix="$TMPDIR/" -a
-trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
 changed_doc_regen_files=$(changed_files ':(attr:change-triggers-doc-regen-check)')
+changed_indented_files=$(changed_files ':(attr:space-indent)')
+changed_shell_files=$(changed_files ':(attr:shell)')
+changed_c_files=$(changed_files '**.[ch]')
+changed_make_files=$(changed_files ':(attr:make)')
+changed_full_check_files=$(changed_files ':(attr:change-triggers-full-check)')
+changed_basic_check_files=$(changed_files ':(attr:change-triggers-basic-check)')
+
+test -z "$changed_doc_regen_files" || require_commands pandoc mkdir cp basename diff
+test -z "$changed_shell_files" || require_commands shellcheck
+test -z "$changed_c_files" || require_commands clang-tidy
+test -z "$changed_full_check_files" || require_commands gcc clang ccache
+test -z "$changed_basic_check_files" || require_commands "${ANY_CC:-c99}"
+
+git checkout-index --prefix="$TMPDIR/" -a
+trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
 if test "$changed_doc_regen_files"; then
     # Snapshot and re-generate man pages, if any Markdown sources
@@ -63,13 +80,6 @@ if test "$changed_doc_regen_files"; then
     done
 fi
 
-changed_indented_files=$(changed_files ':(attr:space-indent)')
-changed_shell_files=$(changed_files ':(attr:shell)')
-changed_c_files=$(changed_files '**.[ch]')
-changed_make_files=$(changed_files ':(attr:make)')
-changed_full_check_files=$(changed_files ':(attr:change-triggers-full-check)')
-changed_basic_check_files=$(changed_files ':(attr:change-triggers-basic-check)')
-
 # Check for whitespace errors in changed files (if applicable)
 if test "$changed_indented_files"; then
     tools/wscheck.awk $changed_indented_files
@@ -77,6 +87,7 @@ fi
 
 # Run shellcheck(1) on changed shell scripts
 if test "$changed_shell_files"; then
+    echo ' SHCHECK ' $changed_shell_files
     shellcheck -fgcc $changed_shell_files
 fi
 
@@ -84,7 +95,7 @@ fi
 if test "$changed_c_files"; then
     tools/hdrcheck.awk $changed_c_files
 
-    echo "    TIDY " $changed_c_files
+    echo '    TIDY ' $changed_c_files
     tools/clang-tidy.sh -quiet --checks='-clang-analyzer-*' $changed_c_files
 fi
 
@@ -106,5 +117,5 @@ if test "$changed_full_check_files"; then
 elif test "$changed_basic_check_files"; then
     # If the code and build system weren't changed but syntax files were,
     # run a single `make check` to ensure test_builtin_configs() passes
-    $MAKE check CC='ccache gcc' CFLAGS='-g -Og -pipe -Werror' DEBUG=3
+    $MAKE check CC="$CCACHE ${ANY_CC:-c99}" CFLAGS='-g -Og -pipe -Werror' DEBUG=3
 fi
