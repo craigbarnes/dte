@@ -9,18 +9,19 @@
 
 void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style)
 {
-    TermStyle tmp = *style;
-    // NOTE: -2 (keep) is treated as -1 (default)
-    if (tmp.fg < 0) {
-        tmp.fg = styles->builtin[BSE_DEFAULT].fg;
+    // COLOR_KEEP (-2) is treated the same as COLOR_DEFAULT (-1)
+    static_assert(COLOR_KEEP < COLOR_DEFAULT);
+    const TermStyle *default_style = &styles->builtin[BSE_DEFAULT];
+
+    TermStyle effective_style = {
+        .fg = (style->fg <= COLOR_DEFAULT) ? default_style->fg : style->fg,
+        .bg = (style->bg <= COLOR_DEFAULT) ? default_style->bg : style->bg,
+        .attr = style->attr,
+    };
+
+    if (!same_style(&effective_style, &term->obuf.style)) {
+        term_set_style(term, effective_style);
     }
-    if (tmp.bg < 0) {
-        tmp.bg = styles->builtin[BSE_DEFAULT].bg;
-    }
-    if (same_style(&tmp, &term->obuf.style)) {
-        return;
-    }
-    term_set_style(term, tmp);
 }
 
 void set_builtin_style(Terminal *term, const StyleMap *styles, BuiltinStyleEnum s)
