@@ -13,12 +13,16 @@ DOCFILES = $(call GITATTRS, xml markdown)
 SHELLSCRIPTS = $(call GITATTRS, shell)
 SPACE_INDENTED_FILES = $(call GITATTRS, space-indent)
 MK_FILES = $(call GITATTRS, make)
-AWK_FILES = $(call GITATTRS, awk)
 # TODO: Re-enable `wrap`, after diagnosing/fixing the extreme slowness
 SPATCH_NAMES = arraylen minmax tailcall perf pitfalls stat-mtime staticbuf
-
 check_coccinelle_targets = $(addprefix check-coccinelle-, $(SPATCH_NAMES))
 check_awk_targets = $(addprefix check-awk-, $(AWK_FILES))
+
+AWK_FILES = \
+    config/script/longest-line.awk \
+    mk/config2c.awk \
+    tools/git-hooks/commit-msg \
+    $(foreach f, cat gcovr-txt hdrcheck mkcheck wscheck, tools/$(f).awk)
 
 check-awk-config/script/longest-line.awk: src/msg.c
 check-awk-mk/config2c.awk: config/rc
