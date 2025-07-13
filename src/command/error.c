@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "error.h"
-#include "command/run.h"
 #include "util/log.h"
 #include "util/xstdio.h"
 

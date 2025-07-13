@@ -14,7 +14,6 @@
 
 #include <limits.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "output.h"
@@ -27,7 +26,6 @@
 #include "util/numtostr.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
-#include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
 char *term_output_reserve_space(TermOutputBuffer *obuf, size_t count)

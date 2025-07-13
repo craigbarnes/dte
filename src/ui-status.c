@@ -1,7 +1,6 @@
 #include "ui.h"
 #include "status.h"
 #include "trace.h"
-#include "util/log.h"
 
 void update_status_line(const Window *window)
 {

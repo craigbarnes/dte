@@ -6,7 +6,6 @@
 #include <sys/types.h>
 #include "command/error.h"
 #include "editor.h"
-#include "spawn.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 

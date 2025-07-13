@@ -8,7 +8,6 @@
 #include "encoding.h"
 #include "util/arith.h"
 #include "util/debug.h"
-#include "util/intern.h"
 #include "util/list.h"
 #include "util/log.h"
 #include "util/str-util.h"

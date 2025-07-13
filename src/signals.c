@@ -1,7 +1,6 @@
 #include "feature.h"
 #include <errno.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include "signals.h"
@@ -10,7 +9,6 @@
 #include "util/exitcode.h"
 #include "util/log.h"
 #include "util/macros.h"
-#include "util/xstring.h"
 
 volatile sig_atomic_t resized = 0; // NOLINT(*-avoid-non-const-global-variables)
 

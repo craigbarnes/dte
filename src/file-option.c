@@ -1,12 +1,11 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "file-option.h"
-#include "command/error.h"
 #include "command/serialize.h"
 #include "editor.h"
 #include "editorconfig/editorconfig.h"
-#include "filetype.h"
 #include "options.h"
 #include "regexp.h"
 #include "util/debug.h"

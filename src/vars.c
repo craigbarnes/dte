@@ -4,7 +4,6 @@
 #include "vars.h"
 #include "editor.h"
 #include "selection.h"
-#include "util/array.h"
 #include "util/bsearch.h"
 #include "util/numtostr.h"
 #include "util/path.h"

@@ -13,7 +13,6 @@
 #include "util/time-util.h"
 #include "util/unicode.h"
 #include "util/utf8.h"
-#include "util/xmalloc.h"
 
 static void consume_input(TermInputBuffer *input, size_t len)
 {

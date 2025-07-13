@@ -5,7 +5,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "numtostr.h"
-#include "arith.h"
 #include "bit.h"
 #include "debug.h"
 

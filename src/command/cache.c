@@ -4,7 +4,6 @@
 #include "args.h"
 #include "parse.h"
 #include "trace.h"
-#include "util/log.h"
 #include "util/ptr-array.h"
 #include "util/str-array.h"
 #include "util/xmalloc.h"

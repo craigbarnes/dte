@@ -6,7 +6,6 @@
 #include "paste.h"
 #include "util/debug.h"
 #include "util/log.h"
-#include "util/string-view.h"
 #include "util/utf8.h"
 #include "util/xmemmem.h"
 #include "util/xreadwrite.h"

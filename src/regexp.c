@@ -7,7 +7,6 @@
 #include "util/hashmap.h"
 #include "util/intern.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
 #include "util/xstring.h"
 
 // NOLINTNEXTLINE(*-avoid-non-const-global-variables)

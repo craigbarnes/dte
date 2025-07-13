@@ -1,4 +1,3 @@
-#include <string.h>
 #include "view.h"
 #include "block.h"
 #include "buffer.h"

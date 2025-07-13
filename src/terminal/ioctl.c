@@ -1,6 +1,5 @@
 #include "feature.h"
 #include <errno.h>
-#include <string.h>
 #include <termios.h>
 #include <unistd.h>
 #include "ioctl.h"

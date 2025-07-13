@@ -4,7 +4,6 @@
 #include "intmap.h"
 #include "bit.h"
 #include "debug.h"
-#include "hash.h"
 
 const char tombstone[16] = "TOMBSTONE";
 

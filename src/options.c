@@ -8,8 +8,6 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "status.h"
-#include "terminal/output.h"
-#include "ui.h"
 #include "util/arith.h"
 #include "util/bsearch.h"
 #include "util/intern.h"

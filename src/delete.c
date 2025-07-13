@@ -6,10 +6,7 @@
 #include "indent.h"
 #include "options.h"
 #include "selection.h"
-#include "util/debug.h"
-#include "util/string.h"
 #include "util/string-view.h"
-#include "util/utf8.h"
 
 void delete_ch(View *view)
 {

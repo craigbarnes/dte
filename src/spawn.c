@@ -7,7 +7,6 @@
 #include "spawn.h"
 #include "command/error.h"
 #include "regexp.h"
-#include "terminal/mode.h"
 #include "util/debug.h"
 #include "util/fd.h"
 #include "util/fork-exec.h"

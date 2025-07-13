@@ -1,4 +1,3 @@
-#include <string.h>
 #include "trace.h"
 #include "util/array.h"
 #include "util/str-util.h"

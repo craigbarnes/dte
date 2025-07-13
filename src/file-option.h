@@ -1,11 +1,9 @@
 #ifndef FILE_OPTION_H
 #define FILE_OPTION_H
 
-#include <stdbool.h>
 #include "buffer.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
-#include "util/string-view.h"
 #include "util/string.h"
 
 typedef enum {
