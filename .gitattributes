@@ -53,6 +53,7 @@ LICENSE text
 /config/README.md -dterc
 /tools/git-hooks/commit-msg awk
 /tools/git-hooks/pre-commit shell
+/tools/test/COMMIT_EDITMSG whitespace=-blank-at-eol
 /test/data/crlf.txt -text diff
 /test/data/insert.txt whitespace=-blank-at-eol
 /test/data/syntax-lint.dterc -space-indent -whitespace

@@ -13,16 +13,33 @@ DOCFILES = $(call GITATTRS, xml markdown)
 SHELLSCRIPTS = $(call GITATTRS, shell)
 SPACE_INDENTED_FILES = $(call GITATTRS, space-indent)
 MK_FILES = $(call GITATTRS, make)
+AWK_FILES = $(call GITATTRS, awk)
 # TODO: Re-enable `wrap`, after diagnosing/fixing the extreme slowness
-SPATCHNAMES = arraylen minmax tailcall perf pitfalls stat-mtime staticbuf
-SPATCHTARGETS = $(addprefix check-coccinelle-, $(SPATCHNAMES))
+SPATCH_NAMES = arraylen minmax tailcall perf pitfalls stat-mtime staticbuf
+
+check_coccinelle_targets = $(addprefix check-coccinelle-, $(SPATCH_NAMES))
+check_awk_targets = $(addprefix check-awk-, $(AWK_FILES))
+
+check-awk-config/script/longest-line.awk: src/msg.c
+check-awk-mk/config2c.awk: config/rc
+check-awk-tools/cat.awk: src/msg.c src/msg.h
+check-awk-tools/gcovr-txt.awk: tools/test/gcovr-report.txt
+check-awk-tools/git-hooks/commit-msg: tools/test/COMMIT_EDITMSG
+check-awk-tools/hdrcheck.awk: src/msg.c src/msg.h
+check-awk-tools/mkcheck.awk: mk/build.mk
+check-awk-tools/wscheck.awk: src/msg.c src/msg.h
 
 check-all: check-source check-aux check distcheck check-clang-tidy
 check-source: $(addprefix check-, whitespace headers makefiles codespell shell awk)
 check-aux: check-desktop-file check-appstream
-check-coccinelle: $(SPATCHTARGETS)
+check-awk: $(check_awk_targets)
+check-coccinelle: $(check_coccinelle_targets)
 
-$(SPATCHTARGETS): check-coccinelle-%:
+$(check_awk_targets): check-awk-%:
+	$(E) AWKLINT '$*'
+	$(Q) $(AWKLINT) -f '$*' $^
+
+$(check_coccinelle_targets): check-coccinelle-%:
 	$(E) SPATCH 'tools/coccinelle/$*.cocci'
 	$(Q) $(SPATCH) $(SPATCHFLAGS) --sp-file 'tools/coccinelle/$*.cocci' \
 	     $(all_sources) 2>&1 | sed '/egrep is obsolescent/d'
@@ -30,20 +47,6 @@ $(SPATCHTARGETS): check-coccinelle-%:
 check-shell:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(SHELLSCRIPTS))'
 	$(Q) $(SHELLCHECK) -fgcc $(SHELLSCRIPTS) >&2
-
-check-awk: src/msg.c src/msg.h
-	$(E) AWKLINT mk/config2c.awk
-	$(Q) $(AWKLINT) -f mk/config2c.awk $(BUILTIN_CONFIGS)
-	$(E) AWKLINT tools/hdrcheck.awk
-	$(Q) $(AWKLINT) -f tools/hdrcheck.awk $^
-	$(E) AWKLINT tools/wscheck.awk
-	$(Q) $(AWKLINT) -f tools/wscheck.awk $^
-	$(E) AWKLINT tools/mkcheck.awk
-	$(Q) $(AWKLINT) -f tools/mkcheck.awk $^
-	$(E) AWKLINT tools/git-hooks/commit-msg
-	$(Q) printf 'L1\n\nL3.\n' | $(AWKLINT) -f tools/git-hooks/commit-msg
-	$(E) AWKLINT tools/gcovr-txt.awk
-	$(Q) printf '.\n.\n.\n1 2 3 4 5\n' | $(AWKLINT) -f tools/gcovr-txt.awk
 
 check-whitespace:
 	$(Q) $(WSCHECK) $(SPACE_INDENTED_FILES) >&2
@@ -74,7 +77,7 @@ check-appstream:
 
 
 .PHONY: \
-    $(SPATCHTARGETS) \
+    $(check_awk_targets) $(check_coccinelle_targets) \
     $(addprefix check-, all source aux coccinelle shell awk whitespace) \
     $(addprefix check-, headers makefiles codespell typos desktop-file) \
     $(addprefix check-, appstream)

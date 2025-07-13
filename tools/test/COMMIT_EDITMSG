@@ -1,0 +1,30 @@
+This file serves as test input for the git `commit-msg` hook
+
+See also:
+
+* `tools/git-hooks/commit-msg`
+* `tools/mk/lint.mk`
+* `make check-awk`
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Changes to be committed:
+#	modified:   tools/git-hooks/pre-commit
+#
+# ------------------------ >8 ------------------------
+# Do not modify or remove the line above.
+# Everything below it will be ignored.
+diff --git a/tools/git-hooks/pre-commit b/tools/git-hooks/pre-commit
+index be2330a6..45e28c95 100755
+--- a/tools/git-hooks/pre-commit
++++ b/tools/git-hooks/pre-commit
+@@ -84,7 +84,7 @@ fi
+ if test "$changed_c_files"; then
+     tools/hdrcheck.awk $changed_c_files
+ 
+-    echo "    TIDY  ..."
++    echo "    TIDY " $changed_c_files
+     tools/clang-tidy.sh -quiet --checks='-clang-analyzer-*' $changed_c_files
+ fi
+ 
