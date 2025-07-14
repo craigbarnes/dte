@@ -1,0 +1,31 @@
+src/cmdline.h should add these lines:
+#include <stddef.h>            // for size_t
+
+src/cmdline.h should remove these lines:
+- #include <sys/types.h>  // lines 5-5
+
+The full include-list for src/cmdline.h:
+#include <stdbool.h>           // for bool
+#include <stddef.h>            // for size_t
+#include "command/run.h"       // for CommandSet
+#include "history.h"           // for HistoryEntry
+#include "util/macros.h"       // for NONNULL_ARGS
+#include "util/ptr-array.h"    // for PointerArray
+#include "util/string-view.h"  // for StringView
+#include "util/string.h"       // for String
+---
+
+src/cmdline.c should add these lines:
+#include "terminal/terminal.h"  // for TFLAG_OSC52_COPY, Terminal
+#include "util/str-util.h"      // for strn_replace_byte
+
+src/cmdline.c should remove these lines:
+
+(src/compiler.h has correct #includes/fwd-decls)
+
+src/compiler.c should add these lines:
+#include "util/container.h"     // for FREE_FUNC
+#include "util/xstring.h"       // for streq
+
+src/compiler.c should remove these lines:
+- #include "regexp.h"  // lines 5-5
