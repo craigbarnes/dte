@@ -1,10 +1,6 @@
-#include <sys/stat.h>
 #include "test.h"
 #include "ctags.h"
-#include "util/ptr-array.h"
 #include "util/readfile.h"
-#include "util/xmalloc.h"
-#include "util/xreadwrite.h"
 
 static void test_parse_ctags_line(TestContext *ctx)
 {

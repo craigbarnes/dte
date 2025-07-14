@@ -3,7 +3,6 @@
 #include "filetype.h"
 #include "command/serialize.h"
 #include "regexp.h"
-#include "util/array.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"

@@ -14,7 +14,6 @@
 #include "util/arith.h"
 #include "util/macros.h"
 #include "util/numtostr.h"
-#include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/time-util.h"
 #include "util/utf8.h"

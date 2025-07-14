@@ -2,7 +2,7 @@
 #define CMDLINE_H
 
 #include <stdbool.h>
-#include <sys/types.h>
+#include <stddef.h>
 #include "command/run.h"
 #include "history.h"
 #include "util/macros.h"

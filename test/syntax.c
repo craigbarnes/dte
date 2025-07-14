@@ -2,7 +2,6 @@
 #include "block-iter.h"
 #include "config.h"
 #include "editor.h"
-#include "encoding.h"
 #include "syntax/bitset.h"
 #include "syntax/highlight.h"
 #include "util/log.h"

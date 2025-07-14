@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test.h"
-#include "util/debug.h"
-#include "util/str-util.h"
 #include "util/utf8.h"
 
 #define expect(cond, ctx, ...) if (cond) test_pass(ctx); else test_fail(ctx, __VA_ARGS__)

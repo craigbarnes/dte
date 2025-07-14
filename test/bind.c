@@ -1,12 +1,10 @@
 #include "test.h"
 #include "bind.h"
 #include "block.h"
-#include "buffer.h"
 #include "change.h"
 #include "command/args.h"
 #include "commands.h"
 #include "editor.h"
-#include "util/str-util.h"
 
 static void test_add_binding(TestContext *ctx)
 {

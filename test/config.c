@@ -3,9 +3,7 @@
 #include <unistd.h>
 #include "test.h"
 #include "config.h"
-#include "command/error.h"
 #include "command/macro.h"
-#include "command/run.h"
 #include "commands.h"
 #include "convert.h"
 #include "editor.h"
@@ -14,8 +12,6 @@
 #include "mode.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"
-#include "terminal/terminal.h"
-#include "util/debug.h"
 #include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"

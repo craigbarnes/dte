@@ -15,7 +15,6 @@
 #include "util/bit.h"
 #include "util/fd.h"
 #include "util/fork-exec.h"
-#include "util/hash.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/intern.h"

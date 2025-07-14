@@ -2,7 +2,6 @@
 #include <string.h>
 #include "compiler.h"
 #include "command/serialize.h"
-#include "regexp.h"
 #include "util/array.h"
 #include "util/debug.h"
 #include "util/intern.h"

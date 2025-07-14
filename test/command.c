@@ -1,4 +1,3 @@
-#include <limits.h>
 #include "test.h"
 #include "command/alias.h"
 #include "command/args.h"
@@ -9,9 +8,7 @@
 #include "commands.h"
 #include "editor.h"
 #include "replace.h"
-#include "search.h"
 #include "util/ascii.h"
-#include "util/debug.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "version.h"

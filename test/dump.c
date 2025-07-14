@@ -1,16 +1,8 @@
 #include "test.h"
-#include "bind.h"
 #include "command/args.h"
 #include "command/parse.h"
-#include "commands.h"
-#include "compiler.h"
-#include "config.h"
 #include "editor.h"
-#include "filetype.h"
-#include "frame.h"
-#include "options.h"
 #include "show.h"
-#include "syntax/color.h"
 #include "util/str-util.h"
 
 typedef enum {
