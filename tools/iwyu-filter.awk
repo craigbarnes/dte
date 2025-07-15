@@ -13,5 +13,5 @@
     start = index($0, ref) + length(ref)
     end = index(substr($0, start), "-") - 1
     lineno = substr($0, start, end)
-    print file ":" lineno ": " $3 " include should be removed"
+    print file ":" lineno ": unused " $3 " include"
 }
