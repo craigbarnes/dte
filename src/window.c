@@ -130,22 +130,27 @@ View *window_find_view(Window *window, Buffer *buffer)
     return NULL;
 }
 
-View *window_find_unclosable_view(Window *window)
+size_t window_count_uncloseable_views(const Window *window, View **first_uncloseable)
 {
-    // Check active view first
-    if (window->view && !view_can_close(window->view)) {
-        return window->view;
-    }
-
+    const View *current_view = window->view;
+    View *first = NULL;
     void **ptrs = window->views.ptrs;
+    size_t nr_uncloseable = 0;
+
     for (size_t i = 0, n = window->views.count; i < n; i++) {
         View *view = ptrs[i];
-        if (!view_can_close(view)) {
-            return view;
+        if (view_can_close(view)) {
+            continue;
+        }
+        nr_uncloseable++;
+        // Always use the current view as the out-param, if uncloseable
+        if (!first || view == current_view) {
+            first = view;
         }
     }
 
-    return NULL;
+    *first_uncloseable = first;
+    return nr_uncloseable;
 }
 
 // Remove the View found at `window->views.ptrs[view_idx]`, then update

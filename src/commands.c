@@ -1465,7 +1465,7 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
     }
 
     BUG_ON(!first_modified);
-    const char *plural = (n > 1) ? "s" : "";
+    const char *plural = (n != 1) ? "s" : "";
     if (has_flag(a, 'f')) {
         LOG_INFO("force quitting with %zu modified buffer%s", n, plural);
         goto exit;
@@ -2350,14 +2350,15 @@ static bool cmd_view(EditorState *e, const CommandArgs *a)
 
 static bool cmd_wclose(EditorState *e, const CommandArgs *a)
 {
-    View *view = window_find_unclosable_view(e->window);
+    View *first_uncloseable;
+    size_t n = window_count_uncloseable_views(e->window, &first_uncloseable);
     bool force = has_flag(a, 'f');
-    if (!view || force) {
+    if (n == 0 || force) {
         goto close;
     }
 
     bool prompt = has_flag(a, 'p');
-    set_view(view);
+    set_view(first_uncloseable);
     if (!prompt) {
         return error_msg (
             &e->err,
@@ -2370,7 +2371,16 @@ static bool cmd_wclose(EditorState *e, const CommandArgs *a)
         return error_msg(&e->err, "-p flag unavailable in headless mode");
     }
 
-    if (dialog_prompt(e, "Close window without saving? [y/N]", "ny") != 'y') {
+    const char *plural = (n != 1) ? "s" : "";
+    char question[128];
+
+    xsnprintf (
+        question, sizeof question,
+        "Close window without saving %zu modified buffer%s? [y/N]",
+        n, plural
+    );
+
+    if (dialog_prompt(e, question, "ny") != 'y') {
         return false;
     }
 
