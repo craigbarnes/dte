@@ -9,7 +9,7 @@
 #include "view.h"
 
 typedef struct {
-    char *buf;
+    char NONSTRING *buf;
     size_t len;
     bool is_lines;
 } Clipboard;
@@ -29,6 +29,6 @@ static inline void record_copy(Clipboard *clip, char *buf, size_t len, bool is_l
     clip->is_lines = is_lines;
 }
 
-void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after);
+void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after) NONNULL_ARGS;
 
 #endif

@@ -95,23 +95,26 @@ static bool cmd_clear(EditorState *e, const CommandArgs *a)
 
 static bool cmd_copy(EditorState *e, const CommandArgs *a)
 {
-    bool internal = cmdargs_has_flag(a, 'i') || a->flag_set == 0;
-    bool clipboard = cmdargs_has_flag(a, 'b');
-    bool primary = cmdargs_has_flag(a, 'p');
+    static const FlagMapping map[] = {
+        {'b', TCOPY_CLIPBOARD},
+        {'p', TCOPY_PRIMARY},
+    };
 
+    Terminal *term = &e->terminal;
+    TermCopyFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
+    bool internal = cmdargs_has_flag(a, 'i') || flags == 0;
+    bool osc52 = flags && (term->features & TFLAG_OSC52_COPY);
     String *buf = &e->cmdline.buf;
     size_t len = buf->len;
+
     if (internal) {
         char *str = string_clone_cstring(buf);
         record_copy(&e->clipboard, str, len, false);
     }
 
-    Terminal *term = &e->terminal;
-    if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
-        const char *str = string_borrow_cstring(buf);
-        if (!term_osc52_copy(&term->obuf, str, len, clipboard, primary)) {
+    if (osc52) {
+        if (!term_osc52_copy(&term->obuf, strview_from_string(buf), flags)) {
             LOG_ERRNO("term_osc52_copy");
-            // TODO: return false ?
         }
     }
 

@@ -1566,17 +1566,20 @@ static void test_term_set_style(TestContext *ctx)
 static void test_term_osc52_copy(TestContext *ctx)
 {
     TermOutputBuffer obuf = TERM_OUTPUT_INIT;
-    EXPECT_TRUE(term_osc52_copy(&obuf, STRN("foobar"), true, true));
+    StringView text = strview_from_cstring("foobar");
+    EXPECT_TRUE(term_osc52_copy(&obuf, text, TCOPY_CLIPBOARD | TCOPY_PRIMARY));
     EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;pc;Zm9vYmFy\033\\", 18);
     EXPECT_EQ(obuf.x, 0);
     ASSERT_TRUE(clear_obuf(&obuf));
 
-    EXPECT_TRUE(term_osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
+    text = strview_from_cstring("\xF0\x9F\xA5\xA3");
+    EXPECT_TRUE(term_osc52_copy(&obuf, text, TCOPY_PRIMARY));
     EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;p;8J+low==\033\\", 17);
     EXPECT_EQ(obuf.x, 0);
     ASSERT_TRUE(clear_obuf(&obuf));
 
-    EXPECT_TRUE(term_osc52_copy(&obuf, STRN(""), true, false));
+    text = strview_from_cstring("");
+    EXPECT_TRUE(term_osc52_copy(&obuf, text, TCOPY_CLIPBOARD));
     EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;c;\033\\", 9);
     EXPECT_EQ(obuf.x, 0);
     ASSERT_TRUE(clear_obuf(&obuf));

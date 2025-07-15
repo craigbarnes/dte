@@ -397,12 +397,16 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
 
 static bool cmd_copy(EditorState *e, const CommandArgs *a)
 {
-    const char *text = a->args[0];
+    static const FlagMapping map[] = {
+        {'b', TCOPY_CLIPBOARD},
+        {'p', TCOPY_PRIMARY},
+    };
+
     Terminal *term = &e->terminal;
-    bool clipboard = has_flag(a, 'b');
-    bool primary = has_flag(a, 'p');
-    bool internal = has_flag(a, 'i') || !(clipboard || primary);
-    bool osc52 = (clipboard || primary) && term->features & TFLAG_OSC52_COPY;
+    TermCopyFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
+    bool internal = has_flag(a, 'i') || flags == 0;
+    bool osc52 = flags && (term->features & TFLAG_OSC52_COPY);
+    const char *text = a->args[0];
 
     if (text) {
         size_t len = strlen(text);
@@ -410,7 +414,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
             record_copy(&e->clipboard, xstrdup(text), len, false);
         }
         if (osc52) {
-            if (!term_osc52_copy(&term->obuf, text, len, clipboard, primary)) {
+            if (!term_osc52_copy(&term->obuf, string_view(text, len), flags)) {
                 error_msg_errno(&e->err, "OSC 52 copy failed");
             }
         }
@@ -440,7 +444,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
 
     char *buf = block_iter_get_bytes(&bi, size);
     if (osc52) {
-        if (!term_osc52_copy(&term->obuf, buf, size, clipboard, primary)) {
+        if (!term_osc52_copy(&term->obuf, string_view(buf, size), flags)) {
             error_msg_errno(&e->err, "OSC 52 copy failed");
         }
     }
@@ -452,7 +456,6 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         free(buf);
     }
 
-    // TODO: return false if term_osc52_copy() failed?
     return has_flag(a, 'k') || unselect(e->view);
 }
 
