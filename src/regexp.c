@@ -37,28 +37,32 @@ void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags)
 
 bool regexp_exec (
     const regex_t *re,
-    const char *buf,
-    size_t size,
+    const char *text,
+    size_t text_len,
     size_t nmatch,
     regmatch_t *pmatch,
     int flags
 ) {
+    BUG_ON(nmatch && !pmatch);
+
 // ASan's __interceptor_regexec() doesn't support REG_STARTEND
 #if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
     // "If REG_STARTEND is specified, pmatch must point to at least
     // one regmatch_t (even if nmatch is 0 or REG_NOSUB was specified),
     // to hold the input offsets for REG_STARTEND."
     // -- https://man.openbsd.org/regex.3
+    regmatch_t tmp_startend;
+    pmatch = nmatch ? pmatch : &tmp_startend;
     pmatch[0].rm_so = 0;
-    pmatch[0].rm_eo = size;
-    return !regexec(re, buf, nmatch, pmatch, flags | REG_STARTEND);
-#else
-    // Buffer must be null-terminated if REG_STARTEND isn't supported
-    char *tmp = xstrcut(buf, size);
-    int ret = !regexec(re, tmp, nmatch, pmatch, flags);
-    free(tmp);
-    return ret;
+    pmatch[0].rm_eo = text_len;
+    return !regexec(re, text, nmatch, pmatch, flags | REG_STARTEND);
 #endif
+
+    // Buffer must be null-terminated if REG_STARTEND isn't supported
+    char *cstr = xstrcut(text, text_len);
+    int ret = !regexec(re, cstr, nmatch, pmatch, flags);
+    free(cstr);
+    return ret;
 }
 
 // Check which word boundary tokens are supported by regcomp(3)

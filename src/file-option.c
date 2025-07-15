@@ -98,8 +98,7 @@ void set_file_options(EditorState *e, Buffer *buffer)
         }
 
         const regex_t *re = &opt->u.filename->re;
-        regmatch_t m;
-        if (regexp_exec(re, filename, strlen(filename), 0, &m, 0)) {
+        if (regexp_exec(re, filename, strlen(filename), 0, NULL, 0)) {
             set_options(e, opt->strs);
         }
     }

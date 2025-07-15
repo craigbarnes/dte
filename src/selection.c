@@ -104,8 +104,7 @@ bool line_has_opening_brace(StringView line)
         compiled = true;
     }
 
-    regmatch_t m;
-    return regexp_exec(&re, line.data, line.length, 0, &m, 0);
+    return regexp_exec(&re, line.data, line.length, 0, NULL, 0);
 }
 
 bool line_has_closing_brace(StringView line)
