@@ -148,28 +148,11 @@ View *window_find_unclosable_view(Window *window)
     return NULL;
 }
 
-static void window_remove_views(Window *window)
+// Remove the View found at `window->views.ptrs[view_idx]`, then update
+// history/locks/etc. (if applicable) and free the allocation
+static void window_remove_view_at_index(Window *window, size_t view_idx)
 {
-    while (window->views.count > 0) {
-        View *view = window->views.ptrs[window->views.count - 1];
-        remove_view(view);
-    }
-}
-
-// NOTE: window->frame isn't removed
-void window_free(Window *window)
-{
-    window_remove_views(window);
-    ptr_array_free_array(&window->views);
-    window->frame = NULL;
-    free(window);
-}
-
-// Remove view from view->window and view->buffer->views and free it
-size_t remove_view(View *view)
-{
-    Window *window = view->window;
-    window->update_tabbar = true;
+    View *view = ptr_array_remove_index(&window->views, view_idx);
     if (view == window->prev_view) {
         window->prev_view = NULL;
     }
@@ -180,20 +163,47 @@ size_t remove_view(View *view)
         e->buffer = NULL;
     }
 
-    size_t idx = ptr_array_remove(&window->views, view);
     Buffer *buffer = view->buffer;
     ptr_array_remove(&buffer->views, view);
 
     if (buffer->views.count == 0) {
         if (buffer->options.file_history && buffer->abs_filename) {
+            const char *path = buffer->abs_filename;
             FileHistory *hist = &e->file_history;
-            file_history_append(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
+            file_history_append(hist, view->cy + 1, view->cx_char + 1, path);
         }
         buffer_remove_unlock_and_free(&e->buffers, buffer, &e->err, &e->locks_ctx);
     }
 
+    window->update_tabbar = true;
     free(view);
-    return idx;
+}
+
+// Like window_remove_view(), but searching for the index of `view` in
+// `view->window->views` by pointer
+size_t remove_view(View *view)
+{
+    Window *window = view->window;
+    size_t view_idx = ptr_array_index(&window->views, view);
+    window_remove_view_at_index(window, view_idx);
+    return view_idx;
+}
+
+static void window_remove_views(Window *window)
+{
+    // This loop terminates when `0--` wraps around to SIZE_MAX
+    for (size_t n = window->views.count, i = n - 1; i < n; i--) {
+        window_remove_view_at_index(window, i);
+    }
+}
+
+// NOTE: window->frame isn't removed
+void window_free(Window *window)
+{
+    window_remove_views(window);
+    ptr_array_free_array(&window->views);
+    window->frame = NULL;
+    free(window);
 }
 
 void window_close_current_view(Window *window)
