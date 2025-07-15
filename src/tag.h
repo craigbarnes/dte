@@ -12,7 +12,7 @@
 
 // Metadata and contents of a tags(5) file, as loaded by load_tag_file()
 typedef struct {
-    char *filename; // The absolute path of the tags file
+    char *filename; // The absolute path of the tags(5) file
     size_t dirname_len; // The length of the directory part of `filename` (including the last slash)
     char *buf; // The contents of the tags file
     size_t size; // The length of `buf`

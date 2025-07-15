@@ -37,6 +37,14 @@ extern const TestGroup syntax_tests;
 extern const TestGroup terminal_tests;
 extern const TestGroup util_tests;
 
+static void get_time(TestContext *ctx, struct timespec *ts)
+{
+    if (unlikely(ctx->timing && clock_gettime(CLOCK_MONOTONIC, ts) != 0)) {
+        perror("clock_gettime");
+        ctx->timing = false;
+    }
+}
+
 static void print_timing(const TestContext *ctx, const struct timespec ts[2])
 {
     double ms = timespec_to_fp_milliseconds(timespec_subtract(&ts[1], &ts[0]));
@@ -54,7 +62,7 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
     }
 
     struct timespec times[2];
-    bool timing = ctx->timing && !clock_gettime(CLOCK_MONOTONIC, &times[0]);
+    get_time(ctx, &times[0]);
 
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
         if (unlikely(!t->name || !t->func)) {
@@ -65,17 +73,21 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
         unsigned int prev_passed = ctx->passed;
         unsigned int prev_failed = ctx->failed;
         t->func(ctx);
-        timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[1]);
-
+        get_time(ctx, &times[1]);
         unsigned int passed = ctx->passed - prev_passed;
         unsigned int failed = ctx->failed - prev_failed;
+
+        if (ctx->quiet && failed == 0) {
+            continue;
+        }
+
         fprintf(stderr, "   CHECK  %-30s  %5u passed", t->name, passed);
 
         if (unlikely(failed > 0)) {
             fprintf(stderr, " %s%4u FAILED%s", ctx->boldred, failed, ctx->sgr0);
         }
 
-        if (timing) {
+        if (ctx->timing) {
             print_timing(ctx, times);
             times[0] = times[1];
         }
@@ -128,7 +140,7 @@ error:
 
 static ExitCode usage(const char *prog, bool err)
 {
-    fprintf(err ? stderr : stdout, "Usage: %s [-cCtTh]\n", prog);
+    fprintf(err ? stderr : stdout, "Usage: %s [-cCtTqQh]\n", prog);
     return err ? EC_USAGE_ERROR : EC_OK;
 }
 
@@ -143,15 +155,16 @@ int main(int argc, char *argv[])
 
     bool color = isatty(STDERR_FILENO) && !xgetenv("NO_COLOR");
 
-    for (int ch; (ch = getopt(argc, argv, "cCtTh")) != -1; ) {
+    for (int ch; (ch = getopt(argc, argv, "cCtTqQh")) != -1; ) {
         switch (ch) {
-        case 'c':
-        case 'C':
+        case 'c': case 'C':
             color = (ch == 'c');
             break;
-        case 't':
-        case 'T':
+        case 't': case 'T':
             ctx.timing = (ch == 't');
+            break;
+        case 'q': case 'Q':
+            ctx.quiet = (ch == 'q');
             break;
         case 'h':
         default:
@@ -159,6 +172,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    ctx.timing = !ctx.quiet && ctx.timing;
     setvbuf(stderr, NULL, _IOLBF, 0);
     init_working_directory(argc, argv);
 
@@ -169,7 +183,7 @@ int main(int argc, char *argv[])
     }
 
     struct timespec times[2];
-    bool timing = ctx.timing && !clock_gettime(CLOCK_MONOTONIC, &times[0]);
+    get_time(&ctx, &times[0]);
 
     run_tests(&ctx, &init_tests);
     run_tests(&ctx, &util_tests);
@@ -200,7 +214,11 @@ int main(int argc, char *argv[])
     run_tests(&ctx, &error_tests);
     run_tests(&ctx, &deinit_tests);
 
-    timing = timing && !clock_gettime(CLOCK_MONOTONIC, &times[1]);
+    get_time(&ctx, &times[1]);
+
+    if (ctx.quiet && ctx.failed == 0) {
+        return 0;
+    }
 
     const char *red = ctx.failed ? ctx.boldred : "";
     const char *sgr0 = ctx.failed ? ctx.sgr0 : "";
@@ -210,7 +228,7 @@ int main(int argc, char *argv[])
         ctx.passed, red, ctx.failed, sgr0
     );
 
-    if (timing) {
+    if (ctx.timing) {
         fprintf(stderr, " (%u functions, %u groups)", ctx.nfuncs, ctx.ngroups);
         print_timing(&ctx, times);
     }

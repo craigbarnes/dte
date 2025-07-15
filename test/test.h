@@ -19,7 +19,8 @@ typedef struct {
     char boldred[8];
     char dim[5];
     char sgr0[5];
-    bool timing;
+    bool timing; // Print the time taken to run each TestGroup
+    bool quiet; // Print output only for test failures
 } TestContext;
 
 typedef struct {
