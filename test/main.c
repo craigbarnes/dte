@@ -138,14 +138,24 @@ error:
     exit(1);
 }
 
-static ExitCode usage(const char *prog, bool err)
-{
-    fprintf(err ? stderr : stdout, "Usage: %s [-cCtTqQh]\n", prog);
-    return err ? EC_USAGE_ERROR : EC_OK;
-}
+static const char usage[] =
+    "Usage: %s [-%s]\n\n"
+    "Options:\n"
+    "   -c  Enable colored output (on by default, if stderr is a tty and $NO_COLOR is unset)\n"
+    "   -C  Disable colored output\n"
+    "   -q  Disable all output, except for failing tests\n"
+    "   -Q  Reverse the effects of -q\n"
+    "   -t  Show timing information in output\n"
+    "   -T  Reverse the effects of -t\n"
+    "   -h  Display help summary and exit\n"
+    "\n";
 
 int main(int argc, char *argv[])
 {
+    static const char optstring[] = "cCqQtTh";
+    const char *prog = progname(argc, argv, "test");
+    bool color = isatty(STDERR_FILENO) && !xgetenv("NO_COLOR");
+
     TestContext ctx = {
         .timing = false,
         .boldred = "\033[1;31m",
@@ -153,9 +163,7 @@ int main(int argc, char *argv[])
         .sgr0 = "\033[0m",
     };
 
-    bool color = isatty(STDERR_FILENO) && !xgetenv("NO_COLOR");
-
-    for (int ch; (ch = getopt(argc, argv, "cCtTqQh")) != -1; ) {
+    for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
         case 'c': case 'C':
             color = (ch == 'c');
@@ -168,7 +176,8 @@ int main(int argc, char *argv[])
             break;
         case 'h':
         default:
-            return usage(progname(argc, argv, NULL), ch != 'h');
+            fprintf(ch == 'h' ? stdout : stderr, usage, prog, optstring);
+            return ch == 'h' ? EC_OK : EC_USAGE_ERROR;
         }
     }
 
