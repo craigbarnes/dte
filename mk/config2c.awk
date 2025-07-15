@@ -18,15 +18,20 @@ function escape_syntax(s) {
     return s
 }
 
-BEGIN {
-    if (escape_syntax("abc\\xyz") != "abc\\134xyz") {
-        # A bug in BusyBox 1.37.0 AWK breaks the above functions; show
-        # a clear error message instead of producing broken output
-        ref = "       See: https://gitlab.com/craigbarnes/dte/-/issues/226"
-        print "ERROR: AWK interpreter doesn't conform to POSIX\n" ref > "/dev/stderr"
-        exit(1)
+function check_busybox_bug() {
+    if (escape_syntax("abc\\xyz") == "abc\\134xyz") {
+        return
     }
+    # A bug in BusyBox 1.37.0 AWK breaks the escape_*() functions above,
+    # so we explicitly detect it and show a clear error message, instead
+    # of producing broken output
+    ref = "       See: https://gitlab.com/craigbarnes/dte/-/issues/226"
+    print "ERROR: AWK interpreter doesn't conform to POSIX\n" ref > "/dev/stderr"
+    exit(1)
+}
 
+BEGIN {
+    check_busybox_bug()
     print "IGNORE_WARNING(\"-Woverlength-strings\")\n"
     nfiles = 0
 }
@@ -55,9 +60,8 @@ name ~ /syntax\// {
 }
 
 END {
-    print \
-        ";\n\nUNIGNORE_WARNINGS\n\n" \
-        "CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {"
+    print ";\n\nUNIGNORE_WARNINGS\n"
+    print "CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {"
 
     for (i = 1; i <= nfiles; i++) {
         print "    CFG(\"" names[i] "\", " idents[i] "),"

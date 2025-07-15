@@ -9,7 +9,7 @@
 #include "util/string-view.h"
 #include "util/string.h"
 
-// Used in generated headers included by `{src,test}/config.c`
+// Used in the generated headers included by `{src,test}/config.c`
 #define CFG(n, t) {.name = n, .text = {.data = t, .length = sizeof(t) - 1}}
 
 #ifdef __linux__
