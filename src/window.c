@@ -155,7 +155,7 @@ size_t window_count_uncloseable_views(const Window *window, View **first_unclose
 
 // Remove the View found at `window->views.ptrs[view_idx]`, then update
 // history/locks/etc. (if applicable) and free the allocation
-static void window_remove_view_at_index(Window *window, size_t view_idx)
+void window_remove_view_at_index(Window *window, size_t view_idx)
 {
     View *view = ptr_array_remove_index(&window->views, view_idx);
     if (view == window->prev_view) {
@@ -184,16 +184,6 @@ static void window_remove_view_at_index(Window *window, size_t view_idx)
     free(view);
 }
 
-// Like window_remove_view(), but searching for the index of `view` in
-// `view->window->views` by pointer
-size_t remove_view(View *view)
-{
-    Window *window = view->window;
-    size_t view_idx = ptr_array_index(&window->views, view);
-    window_remove_view_at_index(window, view_idx);
-    return view_idx;
-}
-
 static void window_remove_views(Window *window)
 {
     // This loop terminates when `0--` wraps around to SIZE_MAX
@@ -213,7 +203,7 @@ void window_free(Window *window)
 
 void window_close_current_view(Window *window)
 {
-    size_t idx = remove_view(window->view);
+    size_t idx = view_remove(window->view);
     if (window->prev_view) {
         window->view = window->prev_view;
         window->prev_view = NULL;
@@ -312,7 +302,7 @@ static View *maybe_set_view(Window *window, View *view, View *prev, bool set_pre
             // after opening another view. This is done because closing the
             // last view (with window_close_current_view()) causes an empty
             // view to be opened (windows must contain at least one buffer).
-            remove_view(prev);
+            view_remove(prev);
         } else if (set_prev) {
             window->prev_view = prev;
         }

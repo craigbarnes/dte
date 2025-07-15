@@ -361,7 +361,7 @@ static void lookup_tags (
     ) {
         // Close the default/empty buffer, if another buffer is opened
         // for a tag (and no commands were executed via `-c` or `-C`)
-        remove_view(closeable_default_view);
+        view_remove(closeable_default_view);
     }
 }
 

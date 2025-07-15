@@ -138,6 +138,16 @@ bool view_can_close(const View *view)
     return !buffer_modified(buffer) || buffer->views.count > 1;
 }
 
+// Like window_remove_view(), but searching for the index of `view` in
+// `view->window->views` by pointer
+size_t view_remove(View *view)
+{
+    Window *window = view->window;
+    size_t view_idx = ptr_array_index(&window->views, view);
+    window_remove_view_at_index(window, view_idx);
+    return view_idx;
+}
+
 size_t get_bounds_for_word_under_cursor(StringView line, size_t *cursor_offset)
 {
     // Move right, until over a word char (if not already)
