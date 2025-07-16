@@ -21,6 +21,7 @@
 #include "util/time-util.h"
 #include "util/xadvise.h"
 #include "util/xreadwrite.h"
+#include "util/xstring.h"
 
 static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size_t size, bool utf8_bom)
 {
@@ -355,18 +356,29 @@ static int tmp_file (
         return -1;
     }
 
-    const char *base = path_basename(filename);
     const StringView dir = path_slice_dirname(filename);
-    const int dlen = (int)dir.length;
-    int n = snprintf(buf, buflen, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
-    if (unlikely(n <= 0 || n >= buflen)) {
+    const StringView base = strview_from_cstring(path_basename(filename));
+    size_t required_buflen = dir.length + base.length + sizeof("/.tmp..XXXXXX");
+
+    if (unlikely(buflen < required_buflen)) {
+        LOG_ERROR("%s() buffer of size %zu insufficient", __func__, buflen);
         buf[0] = '\0';
         return -1;
     }
 
+    // "<dir>/.tmp.<base>.XXXXXX"
+    xmempcpy4 (
+        buf,
+        dir.data, dir.length,
+        STRN("/.tmp."),
+        base.data, base.length,
+        STRN(".XXXXXX") + 1
+    );
+
     int fd = xmkstemp_cloexec(buf);
     if (fd == -1) {
         // No write permission to the directory?
+        LOG_ERRNO("xmkstemp_cloexec() failed");
         buf[0] = '\0';
         return -1;
     }
