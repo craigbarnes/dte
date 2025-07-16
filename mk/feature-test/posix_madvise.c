@@ -3,7 +3,7 @@
 /*
  Testing for: posix_madvise()
  Supported by: Linux, OpenBSD, FreeBSD, NetBSD
- Standardized by: POSIX 2001 (Advisory Information option; "ADV")
+ Standardized by: POSIX 2001 (Advisory Information option; "[ADV]")
 
  See also:
  • https://pubs.opengroup.org/onlinepubs/9799919799/functions/posix_madvise.html

@@ -78,7 +78,7 @@ static void test_log_open_errors(TestContext *ctx)
         EXPECT_EQ(errno, ENOSPC);
     }
 
-    int tty = open("/dev/tty", O_WRONLY | O_CLOEXEC | O_NOCTTY);
+    int tty = xopen("/dev/tty", O_WRONLY | O_CLOEXEC | O_NOCTTY, 0);
     if (tty >= 0) {
         ASSERT_TRUE(tty > STDERR_FILENO);
         ASSERT_TRUE(is_controlling_tty(tty));

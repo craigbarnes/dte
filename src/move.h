@@ -9,8 +9,8 @@
 typedef enum {
     BOL_SIMPLE, // Move to BOL, regardless of cursor position
     BOL_INDENT, // Move to end of indent first, then BOL
-    BOL_TOGGLE_RL, // Like BOL_INDENT, but also toggles back and forth between the 2 positions
-    BOL_TOGGLE_LR, // Like BOL_TOGGLE_RL, but moving to BOL first and end of indent only when at BOL
+    BOL_TOGGLE_RL, // Like BOL_INDENT, but also toggle back and forth between the 2 positions
+    BOL_TOGGLE_LR, // Like BOL_TOGGLE_RL, but move to BOL first and end of indent only when at BOL
 } SmartBolType;
 
 void move_to_preferred_x(View *view, long preferred_x);

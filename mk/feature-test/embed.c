@@ -5,7 +5,7 @@
 
  See also:
  • https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3017.htm
- * https://gcc.gnu.org/gcc-15/changes.html#:~:text=embed,-preprocessing
+ • https://gcc.gnu.org/gcc-15/changes.html#:~:text=embed,-preprocessing
  • https://clang.llvm.org/c_status.html#:~:text=embed,-N3017
  • https://gcc.gnu.org/onlinedocs/cpp/Binary-Resource-Inclusion.html
  • https://gcc.gnu.org/onlinedocs/gcc-15.1.0/gcc/Directory-Options.html#index-embed-dir

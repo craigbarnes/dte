@@ -104,6 +104,42 @@ CheckOptions:
         strview_has_prefix;
         strview_has_suffix;
 
+    # https://clang.llvm.org/extra/clang-tidy/checks/bugprone/unsafe-functions.html#custom-functions
+    bugprone-unsafe-functions.ReportDefaultFunctions: false
+    bugprone-unsafe-functions.CustomFunctions: >
+        ^strn?(cpy|cat)$,memccpy,is flawed (see https://nullprogram.com/blog/2023/02/11/#strings:~:text=no%20legitimate%20uses);
+        ^strl(cpy|cat)$,memccpy,is flawed (see https://nullprogram.com/blog/2023/02/11/#strings:~:text=functions%20like%20strlcpy);
+        scanf$,src/util/strtonum.h,is flawed (see https://nullprogram.com/blog/2023/02/11/#stdio:~:text=don%E2%80%99t%20ever%20bother%20with%20scanf);
+        ^(atoi|atol|atoll)$,src/util/strtonum.h,is broken (see "BUGS" in atoi(3));
+        ^strto(u?ll?|[iu](max)?)$,src/util/strtonum.h,is locale-dependant;
+        ^(atof|strto(f|d|ld))$,integers,returns a floating-point type;
+        ^mktemp$,xmkstemp_cloexec,is broken (see "BUGS" in mktemp(3));
+        ^(tmpfile|tempnam|tmpnam)$,xmkstemp_cloexec,is flawed;
+        ^mkstemp$,xmkstemp_cloexec,doesn't set O_CLOEXEC flag and needs EINTR handling;
+        ^mkostemp$,xmkstemp_cloexec,needs EINTR handling and is non-portable (non-POSIX);
+        ^va_arg$,fixed parameters,is error prone and inefficient;
+        ^open$,xopen,needs EINTR handling;
+        ^read$,xread,needs EINTR handling;
+        ^write$,xwrite,needs EINTR handling;
+        ^close$,xclose,needs EINTR/EINPROGRESS handling and may clobber errno(3) on success;
+        ^opendir$,xopendir,needs EINTR handling;
+        ^readdir$,xreaddir,needs EINTR handling;
+        ^fopen$,xfopen,needs EINTR/O_CLOEXEC/umask handling;
+        ^calloc$,xcalloc,needs explicit ENOMEM and arithmetic overflow handling;
+        ^reallocarray$,xreallocarray,needs explicit ENOMEM handling and is a recent POSIX addition (issue 8, 2024);
+        ^asprintf$,xasprintf,needs explicit ENOMEM/EOVERFLOW/EILSEQ handling and isn't specified by POSIX;
+        ^vasprintf$,xvasprintf,needs explicit ENOMEM/EOVERFLOW/EILSEQ handling and isn't specified by POSIX;
+        ^strdup$,xstrdup,needs explicit ENOMEM handling;
+        ^strndup$,a different function,is a code smell;
+        ^mempcpy$,xmempcpy,is non-portable (non-POSIX);
+        ^memmem$,xmemmem,is a recent POSIX addition (issue 8, 2024);
+        ^dup3$,xdup3,is a recent POSIX addition (issue 8, 2024);
+        ^pipe2$,xpipe2,is a recent POSIX addition (issue 8, 2024);
+        ^signal$,sigaction,is obsolete;
+        ^tow?(lower|upper)$,,is locale-dependant;
+        ^isw?(alnum|alpha|blank|cntrl|x?digit|graph|lower|print|punct|space|upper)$,,is locale-dependant;
+
+    # https://clang.llvm.org/extra/clang-tidy/checks/llvmlibc/restrict-system-libc-headers.html#cmdoption-arg-Includes
     portability-restrict-system-includes.Includes: >
         -*,
         dirent.h,

@@ -325,7 +325,7 @@ static int xmkstemp_cloexec(char *path_template)
 #endif
 
     do {
-        fd = mkstemp(path_template);
+        fd = mkstemp(path_template); // NOLINT(*-unsafe-functions)
     } while (unlikely(fd == -1 && errno == EINTR));
 
     if (fd == -1) {

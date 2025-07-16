@@ -43,47 +43,18 @@ static inline bool u_is_ascii_upper(CodePoint u)
 
 #ifdef SANE_WCTYPE
     #include <wctype.h> // NOLINT(portability-restrict-system-includes)
-
-    static inline bool u_is_lower(CodePoint u)
-    {
-        return iswlower((wint_t)u);
-    }
-
-    static inline bool u_is_upper(CodePoint u)
-    {
-        return iswupper((wint_t)u);
-    }
-
-    static inline CodePoint u_to_lower(CodePoint u)
-    {
-        return towlower((wint_t)u);
-    }
-
-    static inline CodePoint u_to_upper(CodePoint u)
-    {
-        return towupper((wint_t)u);
-    }
+    // NOLINTBEGIN(*-unsafe-functions)
+    static inline bool u_is_lower(CodePoint u) {return iswlower((wint_t)u);}
+    static inline bool u_is_upper(CodePoint u) {return iswupper((wint_t)u);}
+    static inline CodePoint u_to_lower(CodePoint u) {return towlower((wint_t)u);}
+    static inline CodePoint u_to_upper(CodePoint u) {return towupper((wint_t)u);}
+    // NOLINTEND(*-unsafe-functions)
 #else
-    static inline bool u_is_lower(CodePoint u)
-    {
-        return (u - 'a') < 26;
-    }
-
-    static inline bool u_is_upper(CodePoint u)
-    {
-        return (u - 'A') < 26;
-    }
-
-    static inline CodePoint u_to_lower(CodePoint u)
-    {
-        return u_is_upper(u) ? u + 32 : u;
-    }
-
-    static inline CodePoint u_to_upper(CodePoint u)
-    {
-        return u_is_lower(u) ? u - 32 : u;
-    }
-#endif // SANE_WCTYPE
+    static inline bool u_is_lower(CodePoint u) {return (u - 'a') < 26;}
+    static inline bool u_is_upper(CodePoint u) {return (u - 'A') < 26;}
+    static inline CodePoint u_to_lower(CodePoint u) {return u_is_upper(u) ? u + 32 : u;}
+    static inline CodePoint u_to_upper(CodePoint u) {return u_is_lower(u) ? u - 32 : u;}
+#endif
 
 bool u_is_breakable_whitespace(CodePoint u) CONST_FN;
 bool u_is_word_char(CodePoint u) CONST_FN;

@@ -11,7 +11,7 @@ static inline DIR *xopendir(const char *path)
 {
     DIR *dir;
     do {
-        dir = opendir(path);
+        dir = opendir(path); // NOLINT(*-unsafe-functions)
     } while (!dir && errno == EINTR);
     return dir;
 }
@@ -22,7 +22,7 @@ static inline struct dirent *xreaddir(DIR *dir)
     struct dirent *ent;
     do {
         errno = 0;
-        ent = readdir(dir);
+        ent = readdir(dir); // NOLINT(*-unsafe-functions)
     } while (!ent && errno == EINTR);
     return ent;
 }

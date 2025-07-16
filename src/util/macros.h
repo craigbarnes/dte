@@ -5,8 +5,6 @@
 #error C99 compiler required
 #endif
 
-#define STRLEN(x) (sizeof("" x "") - 1)
-#define STRN(x) x,STRLEN(x)
 #define PASTE(a, b) a##b
 #define XPASTE(a, b) PASTE(a, b)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -23,6 +21,16 @@
 #define BITSIZE(T) (sizeof(T) * 8)
 #define DECIMAL_STR_MAX(T) ((sizeof(T) * 3) + 2)
 #define HEX_STR_MAX(T) ((sizeof(T) * 2) + 2)
+
+// Like strlen(3), but suitable for use in constant expressions
+// (and only for string literal arguments)
+#define STRLEN(x) (sizeof("" x "") - 1)
+
+// Automatically follow a string literal with a comma and its length,
+// to avoid the need to manually update both when a string constant
+// is changed. Note that this should never be used as an argument of
+// library functions (see tools/coccinelle/pitfalls.cocci).
+#define STRN(x) x,STRLEN(x)
 
 #define VERSION_GE(L, l, R, r) ((L > R) || ((L == R) && (l >= r)))
 

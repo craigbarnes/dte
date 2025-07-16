@@ -45,7 +45,7 @@ set -e
 changed_doc_regen_files=$(changed_files ':(attr:change-triggers-doc-regen-check)')
 changed_indented_files=$(changed_files ':(attr:space-indent)')
 changed_shell_files=$(changed_files ':(attr:shell)')
-changed_c_files=$(changed_files '**.[ch]')
+changed_c_files=$(changed_files 'src/**.[ch]' 'test/**.[ch]' 'tools/**.h')
 changed_make_files=$(changed_files ':(attr:make)')
 changed_full_check_files=$(changed_files ':(attr:change-triggers-full-check)')
 changed_basic_check_files=$(changed_files ':(attr:change-triggers-basic-check)')

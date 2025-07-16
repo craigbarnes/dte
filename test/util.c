@@ -3590,7 +3590,7 @@ static void test_xstdio(TestContext *ctx)
 
 static void test_fd_set_cloexec(TestContext *ctx)
 {
-    int fd = open("/dev/null", O_RDONLY);
+    int fd = xopen("/dev/null", O_RDONLY, 0);
     ASSERT_TRUE(fd >= 0);
     int flags = fcntl(fd, F_GETFD);
     EXPECT_TRUE(flags >= 0);
@@ -3611,12 +3611,12 @@ static void test_fd_set_cloexec(TestContext *ctx)
         IEXPECT_EQ(flags & FD_CLOEXEC, 0);
     }
 
-    close(fd);
+    xclose(fd);
 }
 
 static void test_fd_set_nonblock(TestContext *ctx)
 {
-    int fd = open("/dev/null", O_RDONLY);
+    int fd = xopen("/dev/null", O_RDONLY, 0);
     ASSERT_TRUE(fd >= 0);
     int flags = fcntl(fd, F_GETFL);
     EXPECT_TRUE(flags >= 0);
@@ -3634,13 +3634,13 @@ static void test_fd_set_nonblock(TestContext *ctx)
         IEXPECT_EQ(flags & O_NONBLOCK, 0);
     }
 
-    close(fd);
+    xclose(fd);
 }
 
 static void test_fork_exec(TestContext *ctx)
 {
     int fd[3];
-    fd[0] = open("/dev/null", O_RDWR | O_CLOEXEC);
+    fd[0] = xopen("/dev/null", O_RDWR | O_CLOEXEC, 0);
     ASSERT_TRUE(fd[0] > 0);
     fd[1] = fd[0];
     fd[2] = fd[0];

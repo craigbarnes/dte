@@ -32,7 +32,7 @@ static int intmap_resize(IntMap *map, size_t capacity)
         return EOVERFLOW;
     }
 
-    IntMapEntry *newtab = calloc(capacity, entrysize);
+    IntMapEntry *newtab = calloc(capacity, entrysize); // NOLINT(*-unsafe-functions)
     if (unlikely(!newtab)) {
         return ENOMEM;
     }

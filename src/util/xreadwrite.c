@@ -21,6 +21,13 @@
     #define MAX_RW_COUNT ((size_t)SSIZE_MAX)
 #endif
 
+static size_t rwsize(size_t count)
+{
+    return MIN(count, MAX_RW_COUNT);
+}
+
+// NOLINTBEGIN(*-unsafe-functions)
+
 ssize_t xread(int fd, void *buf, size_t count)
 {
     ssize_t r;
@@ -37,11 +44,6 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
         r = write(fd, buf, count);
     } while (unlikely(r < 0 && errno == EINTR));
     return r;
-}
-
-static size_t rwsize(size_t count)
-{
-    return MIN(count, MAX_RW_COUNT);
 }
 
 ssize_t xread_all(int fd, void *buf, size_t count)
@@ -127,3 +129,5 @@ out:
     }
     return r;
 }
+
+// NOLINTEND(*-unsafe-functions)

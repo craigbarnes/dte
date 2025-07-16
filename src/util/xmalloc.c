@@ -28,9 +28,8 @@ void *xcalloc(size_t nmemb, size_t size)
     if (unlikely(calloc_args_have_ub_overflow(nmemb, size))) {
         fatal_error(__func__, EOVERFLOW);
     }
-
     BUG_ON(nmemb == 0 || size == 0);
-    return check_alloc(calloc(nmemb, size));
+    return check_alloc(calloc(nmemb, size)); // NOLINT(*-unsafe-functions)
 }
 
 void *xrealloc(void *ptr, size_t size)
@@ -41,7 +40,7 @@ void *xrealloc(void *ptr, size_t size)
 
 char *xstrdup(const char *str)
 {
-    return check_alloc(strdup(str));
+    return check_alloc(strdup(str)); // NOLINT(*-unsafe-functions)
 }
 
 VPRINTF(1)
