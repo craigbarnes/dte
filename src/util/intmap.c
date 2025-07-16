@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "intmap.h"
+#include "arith.h"
 #include "bit.h"
 #include "debug.h"
 
 const char tombstone[16] = "TOMBSTONE";
 
 enum {
-    MIN_SIZE = 8,
+    MIN_CAPACITY = 8,
 };
 
 static size_t hash_key(uint32_t k)
@@ -20,13 +21,18 @@ static size_t hash_key(uint32_t k)
 }
 
 WARN_UNUSED_RESULT
-static int intmap_resize(IntMap *map, size_t size)
+static int intmap_resize(IntMap *map, size_t capacity)
 {
-    BUG_ON(size < MIN_SIZE);
-    BUG_ON(size <= map->count);
-    BUG_ON(!IS_POWER_OF_2(size));
+    BUG_ON(capacity < MIN_CAPACITY);
+    BUG_ON(capacity <= map->count);
+    BUG_ON(!IS_POWER_OF_2(capacity));
 
-    IntMapEntry *newtab = calloc(size, sizeof(*newtab));
+    const size_t entrysize = sizeof(map->entries[0]);
+    if (unlikely(calloc_args_have_ub_overflow(capacity, entrysize))) {
+        return EOVERFLOW;
+    }
+
+    IntMapEntry *newtab = calloc(capacity, entrysize);
     if (unlikely(!newtab)) {
         return ENOMEM;
     }
@@ -34,7 +40,7 @@ static int intmap_resize(IntMap *map, size_t size)
     IntMapEntry *oldtab = map->entries;
     size_t oldlen = map->mask + 1;
     map->entries = newtab;
-    map->mask = size - 1;
+    map->mask = capacity - 1;
     map->tombstones = 0;
 
     if (!oldtab) {
@@ -61,23 +67,23 @@ static int intmap_resize(IntMap *map, size_t size)
 }
 
 WARN_UNUSED_RESULT
-static int intmap_do_init(IntMap *map, size_t size)
+static int intmap_do_init(IntMap *map, size_t capacity)
 {
     // Accommodate the 75% load factor in the table size, to allow
     // filling to the requested size without needing to resize()
-    size += size / 3;
+    capacity += capacity / 3;
 
-    if (unlikely(size < MIN_SIZE)) {
-        size = MIN_SIZE;
+    if (unlikely(capacity < MIN_CAPACITY)) {
+        capacity = MIN_CAPACITY;
     }
 
-    size = next_pow2(size);
-    if (unlikely(size == 0)) {
+    capacity = next_pow2(capacity);
+    if (unlikely(capacity == 0)) {
         return EOVERFLOW;
     }
 
     *map = (IntMap)INTMAP_INIT;
-    return intmap_resize(map, size);
+    return intmap_resize(map, capacity);
 }
 
 void intmap_init(IntMap *map, size_t capacity)

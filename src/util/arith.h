@@ -45,6 +45,17 @@ static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
     CHECKED_ADD(a, b, result);
 }
 
+// Return true if `nmemb * size` overflows and the compiler indicates a
+// pre-C23 standards revision. The purpose of this is to check for integer
+// overflow in the product of calloc() arguments, but only when the standard
+// doesn't require the calloc() function itself to do so (see §7.24.3.2p3).
+static inline bool calloc_args_have_ub_overflow(size_t nmemb, size_t size)
+{
+    bool pre_c23 = (__STDC_VERSION__ < 202311L);
+    size_t tmp;
+    return pre_c23 && size_multiply_overflows(nmemb, size, &tmp);
+}
+
 // This is equivalent to `(x + 1) % modulus`, given the constraints
 // imposed by BUG_ON(), but avoids expensive divisions by a non-constant
 static inline size_t wrapping_increment(size_t x, size_t modulus)

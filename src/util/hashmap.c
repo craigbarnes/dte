@@ -2,23 +2,29 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashmap.h"
+#include "arith.h"
 #include "bit.h"
 #include "hash.h"
 #include "xstring.h"
 
 enum {
-    MIN_SIZE = 8,
+    MIN_CAPACITY = 8,
     TOMBSTONE = 0xdead,
 };
 
 WARN_UNUSED_RESULT
-static int hashmap_resize(HashMap *map, size_t size)
+static int hashmap_resize(HashMap *map, size_t capacity)
 {
-    BUG_ON(size < MIN_SIZE);
-    BUG_ON(size <= map->count);
-    BUG_ON(!IS_POWER_OF_2(size));
+    BUG_ON(capacity < MIN_CAPACITY);
+    BUG_ON(capacity <= map->count);
+    BUG_ON(!IS_POWER_OF_2(capacity));
 
-    HashMapEntry *newtab = calloc(size, sizeof(*newtab));
+    const size_t entrysize = sizeof(map->entries[0]);
+    if (unlikely(calloc_args_have_ub_overflow(capacity, entrysize))) {
+        return EOVERFLOW;
+    }
+
+    HashMapEntry *newtab = calloc(capacity, entrysize); // NOLINT(*-unsafe-functions)
     if (unlikely(!newtab)) {
         return ENOMEM;
     }
@@ -26,7 +32,7 @@ static int hashmap_resize(HashMap *map, size_t size)
     HashMapEntry *oldtab = map->entries;
     size_t oldlen = map->mask + 1;
     map->entries = newtab;
-    map->mask = size - 1;
+    map->mask = capacity - 1;
     map->tombstones = 0;
 
     if (!oldtab) {
@@ -53,26 +59,26 @@ static int hashmap_resize(HashMap *map, size_t size)
 }
 
 WARN_UNUSED_RESULT
-static int hashmap_do_init(HashMap *map, size_t size)
+static int hashmap_do_init(HashMap *map, size_t capacity)
 {
     // Accommodate the 75% load factor in the table size, to allow
     // filling to the requested size without needing to resize()
-    size += size / 3;
+    capacity += capacity / 3;
 
-    if (unlikely(size < MIN_SIZE)) {
-        size = MIN_SIZE;
+    if (unlikely(capacity < MIN_CAPACITY)) {
+        capacity = MIN_CAPACITY;
     }
 
     // Round up the size to the next power of 2, to allow using simple
     // bitwise ops (instead of modulo) to wrap the hash value and also
     // to allow quadratic probing with triangular numbers (`i += j++`
     // in the `for` loops below)
-    size = next_pow2(size);
-    if (unlikely(size == 0)) {
+    capacity = next_pow2(capacity);
+    if (unlikely(capacity == 0)) {
         return EOVERFLOW;
     }
 
-    return hashmap_resize(map, size);
+    return hashmap_resize(map, capacity);
 }
 
 void hashmap_init(HashMap *map, size_t capacity, HashMapFlags flags)

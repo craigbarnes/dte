@@ -25,10 +25,8 @@ void *xmalloc(size_t size)
 
 void *xcalloc(size_t nmemb, size_t size)
 {
-    if (__STDC_VERSION__ < 202311L) {
-        // ISO C23 (§7.24.3.2) requires calloc() to check for integer
-        // overflow in `nmemb * size`, but older C standards don't
-        xmul(nmemb, size);
+    if (unlikely(calloc_args_have_ub_overflow(nmemb, size))) {
+        fatal_error(__func__, EOVERFLOW);
     }
 
     BUG_ON(nmemb == 0 || size == 0);
