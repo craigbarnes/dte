@@ -3320,25 +3320,25 @@ static void test_path_join(TestContext *ctx)
     EXPECT_STREQ(p, "/home/user//.dte");
     free(p);
 
-    p = path_joinx("foo", "bar", true);
+    p = path_join_sv(strview("foo"), strview("bar"), true);
     EXPECT_STREQ(p, "foo/bar/");
     free(p);
-    p = path_joinx("foo", "bar", false);
+    p = path_join_sv(strview("foo"), strview("bar"), false);
     EXPECT_STREQ(p, "foo/bar");
     free(p);
-    p = path_joinx("", "", true);
+    p = path_join_sv(strview(""), strview(""), true);
     EXPECT_STREQ(p, "");
     free(p);
-    p = path_joinx("/", "", true);
+    p = path_join_sv(strview("/"), strview(""), true);
     EXPECT_STREQ(p, "/");
     free(p);
-    p = path_joinx("", "file", true);
+    p = path_join_sv(strview(""), strview("file"), true);
     EXPECT_STREQ(p, "file/");
     free(p);
-    p = path_joinx("", "file", false);
+    p = path_join_sv(strview(""), strview("file"), false);
     EXPECT_STREQ(p, "file");
     free(p);
-    p = path_joinx("", "file/", true);
+    p = path_join_sv(strview(""), strview("file/"), true);
     EXPECT_STREQ(p, "file/");
     free(p);
 }

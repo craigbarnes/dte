@@ -120,7 +120,8 @@ static bool do_collect_files (
             }
         }
 
-        ptr_array_append(array, path_joinx(dirprefix, name, is_dir));
+        char *path = path_join_sv(strview(dirprefix), strview(name), is_dir);
+        ptr_array_append(array, path);
     }
 
     xclosedir(dir);

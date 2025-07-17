@@ -259,10 +259,10 @@ static void tag_file_find_tags (
 
 // Note: this moves ownership of tag->pattern to the generated Message
 // and assigns NULL to the old pointer
-void add_message_for_tag(MessageList *messages, Tag *tag, const StringView *dir)
+void add_message_for_tag(MessageList *messages, Tag *tag, StringView dir)
 {
-    BUG_ON(dir->length == 0);
-    BUG_ON(dir->data[0] != '/');
+    BUG_ON(dir.length == 0);
+    BUG_ON(dir.data[0] != '/');
 
     static const char prefix[] = "Tag ";
     const StringView *name = &tag->name;
@@ -270,7 +270,7 @@ void add_message_for_tag(MessageList *messages, Tag *tag, const StringView *dir)
     Message *m = xmalloc(sizeof(*m) + prefix_len + name->length + 1);
     xmempcpy3(m->msg, prefix, prefix_len, name->data, name->length, "", 1);
 
-    char *filename = path_join_sv(dir, &tag->filename, false);
+    char *filename = path_join_sv(dir, tag->filename, false);
     m->loc = new_file_location(filename, 0, 0, 0);
 
     if (tag->pattern) {
@@ -309,7 +309,7 @@ size_t tag_lookup (
 
     for (size_t i = 0; i < ntags; i++) {
         Tag *tag = tags.ptrs[i];
-        add_message_for_tag(messages, tag, &tagfile_dir);
+        add_message_for_tag(messages, tag, tagfile_dir);
     }
 
     free_tags(&tags);

@@ -28,7 +28,7 @@ static inline StringView path_slice_dirname(const char *filename)
 {
     const char *slash = strrchr(filename, '/');
     if (!slash) {
-        return string_view(".", 1);
+        return strview(".");
     }
     bool slash_is_root_dir = (slash == filename);
     return string_view(filename, slash_is_root_dir ? 1 : slash - filename);
@@ -42,31 +42,23 @@ static inline char *path_dirname(const char *filename)
 }
 
 XSTRDUP
-static inline char *path_join_sv(const StringView *s1, const StringView *s2, bool trailing_slash)
+static inline char *path_join_sv(StringView s1, StringView s2, bool trailing_slash)
 {
-    BUG_ON(!s1->data || !s2->data); // ISO C11 memcpy(3) never allows NULL pointer arguments
+    BUG_ON(!s1.data || !s2.data); // ISO C11 memcpy(3) never allows NULL pointer arguments
     const char slash[2] = "/";
-    size_t n1 = s1->length;
-    size_t n2 = s2->length;
-    size_t sep = n1 && n2 && s1->data[n1 - 1] != '/'; // Separating slash length (1 or 0)
-    size_t ts = trailing_slash && n2 && s2->data[n2 - 1] != '/'; // Trailing slash length (1 or 0)
+    size_t n1 = s1.length;
+    size_t n2 = s2.length;
+    size_t sep = n1 && n2 && s1.data[n1 - 1] != '/'; // Separating slash length (1 or 0)
+    size_t ts = trailing_slash && n2 && s2.data[n2 - 1] != '/'; // Trailing slash length (1 or 0)
     char *path = xmalloc(xadd3(n1, n2, sep + ts + 1));
-    xmempcpy4(path, s1->data, n1, slash, sep, s2->data, n2, slash + !ts, 2 - !ts);
+    xmempcpy4(path, s1.data, n1, slash, sep, s2.data, n2, slash + !ts, 2 - !ts);
     return path;
-}
-
-XSTRDUP
-static inline char *path_joinx(const char *s1, const char *s2, bool trailing_slash)
-{
-    StringView sv1 = strview_from_cstring(s1);
-    StringView sv2 = strview_from_cstring(s2);
-    return path_join_sv(&sv1, &sv2, trailing_slash);
 }
 
 XSTRDUP
 static inline char *path_join(const char *s1, const char *s2)
 {
-    return path_joinx(s1, s2, false);
+    return path_join_sv(strview(s1), strview(s2), false);
 }
 
 // If path is the root directory, return false. Otherwise, mutate the

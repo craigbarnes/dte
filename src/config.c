@@ -45,11 +45,11 @@ static bool has_line_continuation(StringView line)
 UNITTEST {
     // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(has_line_continuation(string_view(NULL, 0)));
-    BUG_ON(has_line_continuation(strview_from_cstring("0")));
-    BUG_ON(!has_line_continuation(strview_from_cstring("1 \\")));
-    BUG_ON(has_line_continuation(strview_from_cstring("2 \\\\")));
-    BUG_ON(!has_line_continuation(strview_from_cstring("3 \\\\\\")));
-    BUG_ON(has_line_continuation(strview_from_cstring("4 \\\\\\\\")));
+    BUG_ON(has_line_continuation(strview("0")));
+    BUG_ON(!has_line_continuation(strview("1 \\")));
+    BUG_ON(has_line_continuation(strview("2 \\\\")));
+    BUG_ON(!has_line_continuation(strview("3 \\\\\\")));
+    BUG_ON(has_line_continuation(strview("4 \\\\\\\\")));
     // NOLINTEND(bugprone-assert-side-effect)
 }
 

@@ -165,7 +165,7 @@ static void parse_and_activate_tags(EditorState *e, const String *str, ExecActio
         bool parsed = parse_ctags_line(&tag, line.data, line.length);
         if (parsed) {
             // `line` is a valid tags(5) file entry; handle it directly
-            add_message_for_tag(msgs, &tag, &dir);
+            add_message_for_tag(msgs, &tag, dir);
             continue;
         }
 

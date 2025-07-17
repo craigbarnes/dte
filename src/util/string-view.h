@@ -43,6 +43,11 @@ static inline StringView strview_from_cstring(const char *str)
     return string_view(str, str ? strlen(str) : 0);
 }
 
+static inline StringView strview(const char *str)
+{
+    return strview_from_cstring(str);
+}
+
 NONNULL_ARGS
 static inline bool strview_equal(const StringView *a, const StringView *b)
 {
