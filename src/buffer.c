@@ -313,27 +313,27 @@ static int indent_len(StringView line, uint8_t indents_bitmask, bool *tab_indent
 
 UNITTEST {
     bool tab;
-    int len = indent_len(strview_from_cstring("    4 space"), 0, &tab);
+    int len = indent_len(strview("    4 space"), 0, &tab);
     BUG_ON(len != 4);
     BUG_ON(tab);
 
-    len = indent_len(strview_from_cstring("\t\t2 tab"), 0, &tab);
+    len = indent_len(strview("\t\t2 tab"), 0, &tab);
     BUG_ON(len != 16);
     BUG_ON(!tab);
 
-    len = indent_len(strview_from_cstring("no indent"), 0, &tab);
+    len = indent_len(strview("no indent"), 0, &tab);
     BUG_ON(len != 0);
 
-    len = indent_len(strview_from_cstring(" \t mixed"), 0, &tab);
+    len = indent_len(strview(" \t mixed"), 0, &tab);
     BUG_ON(len != -2);
 
-    len = indent_len(strview_from_cstring("\t  \t "), 0, &tab);
+    len = indent_len(strview("\t  \t "), 0, &tab);
     BUG_ON(len != -1); // whitespace only
 
-    len = indent_len(strview_from_cstring("     * 5 space"), 0, &tab);
+    len = indent_len(strview("     * 5 space"), 0, &tab);
     BUG_ON(len != 4);
 
-    StringView line = strview_from_cstring("    * 4 space");
+    StringView line = strview("    * 4 space");
     len = indent_len(line, 0, &tab);
     BUG_ON(len != 4);
     len = indent_len(line, 1 << 2, &tab);

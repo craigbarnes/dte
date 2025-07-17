@@ -22,12 +22,11 @@ enum {
     FILETYPE_NAME_MAX = 63,
 };
 
-bool is_valid_filetype_name_sv(const StringView *name) PURE NONNULL_ARGS;
+bool is_valid_filetype_name_sv(StringView name) PURE;
 
 static inline bool is_valid_filetype_name(const char *name)
 {
-    const StringView sv = strview_from_cstring(name);
-    return is_valid_filetype_name_sv(&sv);
+    return is_valid_filetype_name_sv(strview(name));
 }
 
 bool is_ft(const PointerArray *filetypes, const char *name);

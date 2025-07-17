@@ -10,7 +10,7 @@ void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde) 
 
 static inline void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
 {
-    string_append_escaped_arg_sv(s, strview_from_cstring(arg), escape_tilde);
+    string_append_escaped_arg_sv(s, strview(arg), escape_tilde);
 }
 
 #endif

@@ -28,11 +28,11 @@ static void test_is_valid_filetype_name(TestContext *ctx)
 
     StringView filetype = STRING_VIEW("zero\0\0");
     EXPECT_EQ(filetype.length, 6);
-    EXPECT_FALSE(is_valid_filetype_name_sv(&filetype));
-    filetype.length--;
-    EXPECT_FALSE(is_valid_filetype_name_sv(&filetype));
-    filetype.length--;
-    EXPECT_TRUE(is_valid_filetype_name_sv(&filetype));
+    EXPECT_FALSE(is_valid_filetype_name_sv(filetype));
+    strview_remove_suffix(&filetype, 1);
+    EXPECT_FALSE(is_valid_filetype_name_sv(filetype));
+    strview_remove_suffix(&filetype, 1);
+    EXPECT_TRUE(is_valid_filetype_name_sv(filetype));
 }
 
 static void test_find_ft_filename(TestContext *ctx)

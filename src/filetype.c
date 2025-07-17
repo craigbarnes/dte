@@ -352,10 +352,10 @@ void free_filetypes(PointerArray *filetypes)
     ptr_array_free_cb(filetypes, FREE_FUNC(free_filetype_entry));
 }
 
-bool is_valid_filetype_name_sv(const StringView *name)
+bool is_valid_filetype_name_sv(StringView name)
 {
-    const char *data = name->data;
-    const size_t len = name->length;
+    const char *data = name.data;
+    const size_t len = name.length;
     if (unlikely(len == 0 || len > FILETYPE_NAME_MAX || data[0] == '-')) {
         return false;
     }
@@ -373,7 +373,7 @@ bool is_valid_filetype_name_sv(const StringView *name)
 
 const char *filetype_str_from_extension(const char *path)
 {
-    StringView base = strview_from_cstring(path_basename(path));
+    StringView base = strview(path_basename(path));
     StringView ext = get_filename_extension(base);
     FileTypeEnum ft = filetype_from_extension(ext);
     return (ft == NONE) ? NULL : builtin_filetype_names[ft];

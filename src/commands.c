@@ -1261,7 +1261,7 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
     size_t errors = 0;
     for (size_t pos = 0, len = strlen(arg0); pos < len; ) {
         const StringView ft = get_delim(arg0, &pos, len, ',');
-        if (unlikely(!is_valid_filetype_name_sv(&ft))) {
+        if (unlikely(!is_valid_filetype_name_sv(ft))) {
             error_msg(&e->err, "invalid filetype name: '%.*s'", (int)ft.length, ft.data);
             errors++;
             continue;
