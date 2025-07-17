@@ -57,9 +57,7 @@ static inline bool timespecs_equal(const struct timespec *a, const struct timesp
 static inline bool xgettime(struct timespec *ts)
 {
     bool r = (clock_gettime(CLOCK_MONOTONIC, ts) == 0);
-    if (unlikely(!r)) {
-        LOG_ERRNO("clock_gettime");
-    }
+    LOG_ERRNO_ON(!r, "clock_gettime");
     return r;
 }
 

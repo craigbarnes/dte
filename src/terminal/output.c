@@ -52,12 +52,9 @@ void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scro
 // Write directly to the terminal, as done when e.g. flushing the output buffer
 static bool term_direct_write(const char *str, size_t count)
 {
-    ssize_t n = xwrite_all(STDOUT_FILENO, str, count);
-    if (unlikely(n != count)) {
-        LOG_ERRNO("write");
-        return false;
-    }
-    return true;
+    bool ok = (xwrite_all(STDOUT_FILENO, str, count) == count);
+    LOG_ERRNO_ON(!ok, "write");
+    return ok;
 }
 
 // NOTE: does not update `obuf.x`; see term_put_byte()

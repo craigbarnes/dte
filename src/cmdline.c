@@ -113,9 +113,8 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
     }
 
     if (osc52) {
-        if (!term_osc52_copy(&term->obuf, strview_from_string(buf), flags)) {
-            LOG_ERRNO("term_osc52_copy");
-        }
+        bool ok = term_osc52_copy(&term->obuf, strview_from_string(buf), flags);
+        LOG_ERRNO_ON(!ok, "term_osc52_copy");
     }
 
     return true;

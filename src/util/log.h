@@ -25,6 +25,7 @@ typedef enum {
 #define LOG_CRITICAL(...) LOG(LOG_LEVEL_CRITICAL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_ERRNO(prefix) LOG_ERROR("%s: %s", prefix, strerror(errno))
+#define LOG_ERRNO_ON(cond, prefix) if (unlikely(cond)) {LOG_ERRNO(prefix);}
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
 #define LOG_NOTICE(...) LOG(LOG_LEVEL_NOTICE, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)

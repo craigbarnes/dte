@@ -22,11 +22,8 @@ static void error_msgv(ErrorBuffer *eb, const char *cmd, const char *format, va_
         pos = snprintf(eb->buf, size, "%s: ", cmd);
     }
 
-    if (unlikely(pos < 0)) {
-        // Note: POSIX snprintf(3) *does* set errno on failure (unlike ISO C)
-        LOG_ERRNO("snprintf");
-        pos = 0;
-    }
+    LOG_ERRNO_ON(pos < 0, "snprintf");
+    pos = MAX(0, pos);
 
     if (likely(pos < (size - 3))) {
         vsnprintf(eb->buf + pos, size - pos, format, ap);

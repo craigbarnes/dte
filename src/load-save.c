@@ -119,6 +119,7 @@ bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
             mapped = true;
             goto decode;
         }
+        LOG_ERRNO("mmap() failed");
         buf = NULL;
     }
 
@@ -172,7 +173,8 @@ decode:
 
 error:
     if (mapped) {
-        munmap(buf, size);
+        int r = munmap(buf, size); // Can only fail due to usage error
+        LOG_ERRNO_ON(r, "munmap");
     } else {
         free(buf);
     }
