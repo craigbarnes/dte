@@ -40,10 +40,8 @@ int xpipe2(int fd[2], int flags)
     return 0;
 
 error:;
-    int e = errno;
     xclose(fd[0]);
     xclose(fd[1]);
-    errno = e;
     return -1;
 }
 

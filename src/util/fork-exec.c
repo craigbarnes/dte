@@ -111,10 +111,8 @@ pid_t fork_exec (
 
     const pid_t pid = fork();
     if (unlikely(pid == -1)) {
-        int saved_errno = errno;
         xclose(ep[0]);
         xclose(ep[1]);
-        errno = saved_errno;
         return -1;
     }
 
@@ -129,7 +127,6 @@ pid_t fork_exec (
     xclose(ep[1]);
     int error = 0;
     ssize_t rc = xread(ep[0], &error, sizeof(error));
-    int xread_errno = errno;
     xclose(ep[0]);
     BUG_ON(rc > sizeof(error));
 
@@ -139,7 +136,7 @@ pid_t fork_exec (
     }
 
     if (unlikely(rc != sizeof(error))) {
-        error = (rc < 0) ? xread_errno : EPIPE;
+        error = (rc < 0) ? errno : EPIPE;
     }
 
     int status;

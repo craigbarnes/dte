@@ -90,9 +90,8 @@ LogLevel log_open(const char *filename, LogLevel level, bool use_color)
 
     bool ctty = is_controlling_tty(fd);
     if (unlikely(ctty || xwrite_all(fd, "\n", 1) != 1)) {
-        int err = ctty ? EINVAL : errno;
+        errno = ctty ? EINVAL : errno;
         xclose(fd);
-        errno = err;
         return LOG_LEVEL_NONE;
     }
 

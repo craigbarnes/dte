@@ -336,9 +336,7 @@ static int xmkstemp_cloexec(char *path_template)
     }
 
     if (unlikely(!fd_set_cloexec(fd, true))) {
-        int e = errno;
         xclose(fd);
-        errno = e;
         return -1;
     }
 

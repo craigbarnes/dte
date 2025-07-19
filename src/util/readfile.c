@@ -13,7 +13,6 @@ ssize_t read_file(const char *filename, char **bufp, size_t size_limit)
         goto error_noclose;
     }
 
-    int saved_errno;
     struct stat st;
     if (unlikely(fstat(fd, &st) == -1)) {
         goto error;
@@ -47,9 +46,7 @@ ssize_t read_file(const char *filename, char **bufp, size_t size_limit)
     return r;
 
 error:
-    saved_errno = errno;
     xclose(fd);
-    errno = saved_errno;
 error_noclose:
     *bufp = NULL;
     return -1;

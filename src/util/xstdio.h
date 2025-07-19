@@ -41,10 +41,9 @@ static inline FILE *xfopen(const char *path, const char *mode, int flags, mode_t
 
     FILE *file = fdopen(fd, mode);
     if (unlikely(!file)) {
-        int e = errno;
         xclose(fd);
-        errno = e;
     }
+
     return file;
 }
 
