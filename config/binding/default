@@ -149,6 +149,10 @@ bind F1 'run man dterc'
 bind F3 'search -n'
 bind F4 'search -p'
 bind F5 refresh
+# In some terminals (e.g. the Linux console) Shift+F3 produces a sequence
+# corresponding to F15
+bind F15 'search -p'
+bind S-F3 'search -p'
 
 # Command/search mode bindings:
 bind -cs left left
