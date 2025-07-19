@@ -12,6 +12,7 @@
 #include "syntax/merge.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/errorcode.h"
 #include "util/hashset.h"
 #include "util/intern.h"
 #include "util/path.h"
@@ -370,7 +371,7 @@ static bool cmd_heredocend(EditorState *e, const CommandArgs *a)
 }
 
 // Forward declaration, used in cmd_include() and cmd_require()
-static int read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags flags);
+static SystemErrno read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags flags);
 
 static bool cmd_include(EditorState *e, const CommandArgs *a)
 {
@@ -378,8 +379,8 @@ static bool cmd_include(EditorState *e, const CommandArgs *a)
     if (a->flags[0] == 'b') {
         flags |= SYN_BUILTIN;
     }
-    int r = read_syntax(e, a->args[0], flags);
-    return r == 0;
+    SystemErrno err = read_syntax(e, a->args[0], flags);
+    return !err;
 }
 
 static bool cmd_list(EditorState *e, const CommandArgs *a)
@@ -511,9 +512,9 @@ static bool cmd_require(EditorState *e, const CommandArgs *a)
     SyntaxLoader *syn = &e->syn;
     const SyntaxLoadFlags save = syn->flags;
     syn->flags &= ~SYN_WARN_ON_UNUSED_SUBSYN;
-    int r = read_syntax(e, path, flags);
+    SystemErrno err = read_syntax(e, path, flags);
     syn->flags = save;
-    if (r != 0) {
+    if (err) {
         return false;
     }
 
@@ -673,8 +674,11 @@ static ConfigFlags syn_flags_to_cfg_flags(SyntaxLoadFlags flags)
     return (ConfigFlags)(flags & mask);
 }
 
-static int read_syntax(EditorState *e, const char *filename, SyntaxLoadFlags flags)
-{
+static SystemErrno read_syntax (
+    EditorState *e,
+    const char *filename,
+    SyntaxLoadFlags flags
+) {
     CommandRunner runner = cmdrunner_for_syntaxes(e);
     return read_config(&runner, filename, syn_flags_to_cfg_flags(flags));
 }

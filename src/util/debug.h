@@ -2,6 +2,7 @@
 #define UTIL_DEBUG_H
 
 #include <stddef.h> // unreachable()
+#include "errorcode.h"
 #include "macros.h"
 
 #ifndef DEBUG
@@ -63,7 +64,7 @@ static inline const char *ld_preload_env_var(void)
 
 typedef void (*CleanupHandler)(void);
 
-noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
+noreturn void fatal_error(const char *msg, SystemErrno err) COLD NONNULL_ARGS;
 void set_fatal_error_cleanup_handler(CleanupHandler handler);
 void fatal_error_cleanup(void);
 

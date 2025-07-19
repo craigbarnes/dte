@@ -5,6 +5,7 @@
 #include "arith.h"
 #include "bit.h"
 #include "debug.h"
+#include "errorcode.h"
 
 const char tombstone[16] = "TOMBSTONE";
 
@@ -21,7 +22,7 @@ static size_t hash_key(uint32_t k)
 }
 
 WARN_UNUSED_RESULT
-static int intmap_resize(IntMap *map, size_t capacity)
+static SystemErrno intmap_resize(IntMap *map, size_t capacity)
 {
     BUG_ON(capacity < MIN_CAPACITY);
     BUG_ON(capacity <= map->count);
@@ -67,7 +68,7 @@ static int intmap_resize(IntMap *map, size_t capacity)
 }
 
 WARN_UNUSED_RESULT
-static int intmap_do_init(IntMap *map, size_t capacity)
+static SystemErrno intmap_do_init(IntMap *map, size_t capacity)
 {
     // Accommodate the 75% load factor in the table size, to allow
     // filling to the requested size without needing to resize()
@@ -88,7 +89,7 @@ static int intmap_do_init(IntMap *map, size_t capacity)
 
 void intmap_init(IntMap *map, size_t capacity)
 {
-    int err = intmap_do_init(map, capacity);
+    SystemErrno err = intmap_do_init(map, capacity);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }
@@ -134,9 +135,9 @@ void *intmap_remove(IntMap *map, uint32_t key)
 }
 
 WARN_UNUSED_RESULT
-static int intmap_do_insert(IntMap *map, uint32_t key, void *value, void **old_value)
+static SystemErrno intmap_do_insert(IntMap *map, uint32_t key, void *value, void **old_value)
 {
-    int err = 0;
+    SystemErrno err = 0;
     if (unlikely(!map->entries)) {
         err = intmap_do_init(map, 0);
         if (unlikely(err)) {
@@ -202,7 +203,7 @@ error:
 void *intmap_insert_or_replace(IntMap *map, uint32_t key, void *value)
 {
     void *replaced_value = NULL;
-    int err = intmap_do_insert(map, key, value, &replaced_value);
+    SystemErrno err = intmap_do_insert(map, key, value, &replaced_value);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }

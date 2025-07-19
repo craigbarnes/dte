@@ -4,6 +4,7 @@
 #include "hashmap.h"
 #include "arith.h"
 #include "bit.h"
+#include "errorcode.h"
 #include "hash.h"
 #include "xstring.h"
 
@@ -13,7 +14,7 @@ enum {
 };
 
 WARN_UNUSED_RESULT
-static int hashmap_resize(HashMap *map, size_t capacity)
+static SystemErrno hashmap_resize(HashMap *map, size_t capacity)
 {
     BUG_ON(capacity < MIN_CAPACITY);
     BUG_ON(capacity <= map->count);
@@ -59,7 +60,7 @@ static int hashmap_resize(HashMap *map, size_t capacity)
 }
 
 WARN_UNUSED_RESULT
-static int hashmap_do_init(HashMap *map, size_t capacity)
+static SystemErrno hashmap_do_init(HashMap *map, size_t capacity)
 {
     // Accommodate the 75% load factor in the table size, to allow
     // filling to the requested size without needing to resize()
@@ -84,7 +85,7 @@ static int hashmap_do_init(HashMap *map, size_t capacity)
 void hashmap_init(HashMap *map, size_t capacity, HashMapFlags flags)
 {
     *map = (HashMap){.flags = flags};
-    int err = hashmap_do_init(map, capacity);
+    SystemErrno err = hashmap_do_init(map, capacity);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }
@@ -137,9 +138,9 @@ void *hashmap_remove(HashMap *map, const char *key)
 }
 
 WARN_UNUSED_RESULT
-static int hashmap_do_insert(HashMap *map, char *key, void *value, void **old_value)
+static SystemErrno hashmap_do_insert(HashMap *map, char *key, void *value, void **old_value)
 {
-    int err = 0;
+    SystemErrno err = 0;
     if (unlikely(!map->entries)) {
         err = hashmap_do_init(map, 0);
         if (unlikely(err)) {
@@ -214,7 +215,7 @@ error:
 
 void *hashmap_insert(HashMap *map, char *key, void *value)
 {
-    int err = hashmap_do_insert(map, key, value, NULL);
+    SystemErrno err = hashmap_do_insert(map, key, value, NULL);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }
@@ -224,7 +225,7 @@ void *hashmap_insert(HashMap *map, char *key, void *value)
 void *hashmap_insert_or_replace(HashMap *map, char *key, void *value)
 {
     void *replaced_value = NULL;
-    int err = hashmap_do_insert(map, key, value, &replaced_value);
+    SystemErrno err = hashmap_do_insert(map, key, value, &replaced_value);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }

@@ -86,7 +86,7 @@ noreturn void bug(const char *file, int line, const char *func, const char *fmt,
 #endif
 
 // Error handler for unrecoverable system errors during runtime
-noreturn void fatal_error(const char *msg, int err)
+noreturn void fatal_error(const char *msg, SystemErrno err)
 {
     LOG_CRITICAL("%s: %s", msg, strerror(err));
     cleanup();

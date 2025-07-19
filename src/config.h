@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include "command/run.h"
 #include "util/align.h"
+#include "util/errorcode.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -35,7 +36,7 @@ String dump_builtin_configs(void);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
 bool exec_config(CommandRunner *runner, StringView config);
-int read_config(CommandRunner *runner, const char *filename, ConfigFlags f);
+SystemErrno read_config(CommandRunner *runner, const char *filename, ConfigFlags f);
 void exec_builtin_color_reset(struct EditorState *e);
 void exec_rc_files(struct EditorState *e, const char *filename, bool read_user_rc) NONNULL_ARG(1);
 void collect_builtin_configs(PointerArray *a, const char *prefix) NONNULL_ARGS;

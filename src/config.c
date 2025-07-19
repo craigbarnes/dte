@@ -125,8 +125,11 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
     return &builtin_configs[0];
 }
 
-static int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
-{
+static SystemErrno do_read_config (
+    CommandRunner *runner,
+    const char *filename,
+    ConfigFlags flags
+) {
     ErrorBuffer *ebuf = runner->ebuf;
     bool must_exist = flags & CFG_MUST_EXIST;
     bool stop_at_first_err = runner->flags & CMDRUNNER_STOP_AT_FIRST_ERROR;
@@ -162,12 +165,12 @@ static int do_read_config(CommandRunner *runner, const char *filename, ConfigFla
     return (r || !stop_at_first_err) ? 0 : EINVAL;
 }
 
-int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
+SystemErrno read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
     ErrorBuffer *ebuf = runner->ebuf;
     const char *saved_file = ebuf->config_filename;
     const unsigned int saved_line = ebuf->config_line;
-    int ret = do_read_config(runner, filename, flags);
+    SystemErrno ret = do_read_config(runner, filename, flags);
     ebuf->config_filename = saved_file;
     ebuf->config_line = saved_line;
     return ret;

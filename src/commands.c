@@ -884,7 +884,7 @@ static bool cmd_include(EditorState *e, const CommandArgs *a)
         flags |= CFG_BUILTIN;
     }
 
-    int err = read_normal_config(e, a->args[0], flags);
+    SystemErrno err = read_normal_config(e, a->args[0], flags);
     // TODO: Clean up read_normal_config() so this can be simplified to `err == 0`
     return err == 0 || (err == ENOENT && !(flags & CFG_MUST_EXIST));
 }
@@ -2778,7 +2778,7 @@ void exec_normal_config(EditorState *e, StringView config)
     exec_config(&runner, config);
 }
 
-int read_normal_config(EditorState *e, const char *filename, ConfigFlags flags)
+SystemErrno read_normal_config(EditorState *e, const char *filename, ConfigFlags flags)
 {
     CommandRunner runner = normal_mode_cmdrunner(e);
     return read_config(&runner, filename, flags);
