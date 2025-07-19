@@ -83,14 +83,13 @@ static ExitCode dump_builtin_config(const char *name)
     return ec_write_stdout(cfg->text.data, cfg->text.length);
 }
 
-static ExitCode lint_syntax(const char *filename, bool extra_lint)
+static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
 {
     EditorState *e = init_editor_state(getenv("HOME"), getenv("DTE_HOME"));
     e->err.print_to_stderr = true;
     BUG_ON(e->status != EDITOR_INITIALIZING);
 
-    SyntaxLoadFlags flags = SYN_MUST_EXIST | (extra_lint ? SYN_LINT : 0);
-    const Syntax *syntax = load_syntax_file(e, filename, flags);
+    const Syntax *syntax = load_syntax_file(e, filename, flags | SYN_MUST_EXIST);
     bool ok = syntax && e->err.nr_errors == 0;
 
     if (ok) {
@@ -469,8 +468,8 @@ int main(int argc, char *argv[])
         case 'h': return ec_printf_ok(usage, progname(argc, argv, "dte"));
         case 'K': return showkey_loop(terminal_query_level);
         case 'P': return print_256_color_palette();
-        case 's': return lint_syntax(optarg, false);
-        case 'S': return lint_syntax(optarg, true);
+        case 's': return lint_syntax(optarg, 0);
+        case 'S': return lint_syntax(optarg, SYN_LINT);
         case 'V': return ec_write_stdout(copyright, sizeof(copyright));
         case 'Z': return ec_printf_ok("features:%s\n", buildvar_string);
         default: return EC_USAGE_ERROR;

@@ -49,6 +49,7 @@ cc_option() {
     $CC "$@" -Werror -c -o /dev/null mk/feature-test/basic.c
 }
 
+# Print all non-empty lines in "$2", each prefixed with "$1 += "
 fmt_var() {
     echo "$2" | sed -E "/^\$/d; s/^ */$1 += /"
 }

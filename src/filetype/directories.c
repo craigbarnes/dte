@@ -12,6 +12,7 @@ static const struct DirPrefixMap {
 UNITTEST {
     for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
         const struct DirPrefixMap *p = &prefixes[i];
+        BUG_ON(p->dir_len < STRLEN("/a/b/"));
         BUG_ON(p->dir_len > sizeof(prefixes[0].dir));
         BUG_ON(p->dir[0] != '/');
         BUG_ON(p->dir[p->dir_len - 1] != '/');

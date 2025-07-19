@@ -345,7 +345,7 @@ static void log_timing_info(const struct timespec *start, bool enabled)
     LOG_INFO("main loop time: %.3f ms", ms);
 }
 
-int main_loop(EditorState *e, bool timing)
+void main_loop(EditorState *e, bool timing)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
 
@@ -373,5 +373,4 @@ int main_loop(EditorState *e, bool timing)
     }
 
     BUG_ON(e->status < 0 || e->status > EDITOR_EXIT_MAX);
-    return e->status;
 }
