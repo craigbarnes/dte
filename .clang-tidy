@@ -104,6 +104,24 @@ CheckOptions:
         strview_has_prefix;
         strview_has_suffix;
 
+    # https://clang.llvm.org/extra/clang-tidy/checks/bugprone/unused-return-value.html
+    bugprone-unused-return-value.CheckedReturnTypes: ^(ExitCode|String|SystemErrno)$
+    bugprone-unused-return-value.AllowCastToVoid: true
+    bugprone-unused-return-value.CheckedFunctions: >
+        ^(fd)?opendir$;
+        ^(f|fd|fre)open$;
+        ^(m|c|re)alloc$;
+        ^clock_gettime$;
+        ^m(un)?map$;
+        ^mkdir(at)?$;
+        ^open(at)?$;
+        ^p?(read|write)v?$;
+        ^reg(comp|exec)$;
+        ^remove$;
+        ^rename$;
+        ^setlocale$;
+        ^strftime$;
+
     # https://clang.llvm.org/extra/clang-tidy/checks/bugprone/unsafe-functions.html#custom-functions
     bugprone-unsafe-functions.ReportDefaultFunctions: false
     bugprone-unsafe-functions.CustomFunctions: >
@@ -116,7 +134,7 @@ CheckOptions:
         ^mktemp$,xmkstemp_cloexec,is broken (see "BUGS" in mktemp(3));
         ^(tmpfile|tempnam|tmpnam)$,xmkstemp_cloexec,is flawed;
         ^mkstemp$,xmkstemp_cloexec,doesn't set O_CLOEXEC flag and needs EINTR handling;
-        ^mkostemp$,xmkstemp_cloexec,needs EINTR handling and is non-portable (non-POSIX);
+        ^mkostemp$,xmkstemp_cloexec,needs EINTR handling and is a recent POSIX addition (issue 8, 2024);
         ^va_arg$,fixed parameters,is error prone and inefficient;
         ^open$,xopen,needs EINTR handling;
         ^read$,xread,needs EINTR handling;
@@ -124,6 +142,8 @@ CheckOptions:
         ^close$,xclose,needs EINTR/EINPROGRESS handling and may clobber errno(3) on success;
         ^opendir$,xopendir,needs EINTR handling;
         ^readdir$,xreaddir,needs EINTR handling;
+        ^readdir_r$,xreaddir,is obsolete;
+        ^closedir$,xclosedir;
         ^fopen$,xfopen,needs EINTR/O_CLOEXEC/umask handling;
         ^calloc$,xcalloc,needs explicit ENOMEM and arithmetic overflow handling;
         ^reallocarray$,xreallocarray,needs explicit ENOMEM handling and is a recent POSIX addition (issue 8, 2024);
@@ -132,9 +152,12 @@ CheckOptions:
         ^strdup$,xstrdup,needs explicit ENOMEM handling;
         ^strndup$,a different function,is a code smell;
         ^mempcpy$,xmempcpy,is non-portable (non-POSIX);
+        ^memrchr$,xmemrchr,is non-portable (non-POSIX);
         ^memmem$,xmemmem,is a recent POSIX addition (issue 8, 2024);
         ^dup3$,xdup3,is a recent POSIX addition (issue 8, 2024);
         ^pipe2$,xpipe2,is a recent POSIX addition (issue 8, 2024);
+        ^fsync$,xfsync,is optional in POSIX;
+        ^posix_madvise$,advise_sequential,is optional in POSIX;
         ^signal$,sigaction,is obsolete;
         ^tow?(lower|upper)$,,is locale-dependant;
         ^isw?(alnum|alpha|blank|cntrl|x?digit|graph|lower|print|punct|space|upper)$,,is locale-dependant;
