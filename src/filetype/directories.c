@@ -4,6 +4,7 @@ static const struct DirPrefixMap {
     FileTypeEnum filetype;
 } prefixes[] = {
     {STRN("/etc/default/"), SH},
+    {STRN("/etc/firejail/"), CONFIG},
     {STRN("/etc/nginx/"), NGINX},
     {STRN("/etc/pam.d/"), CONFIG},
     {STRN("/etc/sudoers.d/"), CONFIG},
