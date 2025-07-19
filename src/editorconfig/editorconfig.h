@@ -11,19 +11,13 @@ typedef enum {
 } EditorConfigIndentStyle;
 
 typedef struct {
-    unsigned int indent_size;
-    unsigned int tab_width;
-    unsigned int max_line_length;
-    EditorConfigIndentStyle indent_style;
-    bool indent_size_is_tab;
+    unsigned int indent_size : 4;
+    unsigned int tab_width : 4;
+    unsigned int max_line_length : 10;
+    unsigned int indent_style : 2; // EditorConfigIndentStyle
+    unsigned int indent_size_is_tab : 1; // bool
 } EditorConfigOptions;
 
-static inline EditorConfigOptions editorconfig_options_init(void)
-{
-    return (EditorConfigOptions){.indent_style = INDENT_STYLE_UNSPECIFIED};
-}
-
-NONNULL_ARG(1) WARN_UNUSED_RESULT
-int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts);
+EditorConfigOptions get_editorconfig_options(const char *pathname) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

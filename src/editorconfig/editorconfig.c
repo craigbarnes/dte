@@ -4,6 +4,7 @@
 #include "editorconfig.h"
 #include "ini.h"
 #include "match.h"
+#include "options.h"
 #include "util/debug.h"
 #include "util/path.h"
 #include "util/readfile.h"
@@ -66,9 +67,10 @@ static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
 
 static unsigned int parse_indent_digit(const StringView *val)
 {
+    static_assert(INDENT_WIDTH_MAX == TAB_WIDTH_MAX);
     const unsigned char *data = val->data;
     unsigned int indent = (val->length == 1) ? data[0] - '0' : 0;
-    return (indent <= 8) ? indent : 0; // Valid indent widths are 1-8
+    return (indent <= INDENT_WIDTH_MAX) ? indent : 0;
 }
 
 static void parse_indent_size(EditorConfigOptions *options, const StringView *val)
@@ -82,7 +84,7 @@ static unsigned int parse_max_line_length(const StringView *val)
 {
     unsigned int maxlen = 0;
     size_t ndigits = buf_parse_uint(val->data, val->length, &maxlen);
-    return (ndigits == val->length) ? maxlen : 0;
+    return (ndigits == val->length) ? MIN(maxlen, TEXT_WIDTH_MAX) : 0;
 }
 
 static void editorconfig_option_set (
@@ -159,6 +161,11 @@ static bool is_root_key(const IniParser *ini)
         && strview_equal_cstring_icase(&ini->value, "true");
 }
 
+static EditorConfigOptions editorconfig_options_init(void)
+{
+    return (EditorConfigOptions){.indent_style = INDENT_STYLE_UNSPECIFIED};
+}
+
 static void editorconfig_parse(const char *buf, size_t size, UserData *data)
 {
     IniParser ini = {
@@ -194,13 +201,14 @@ static void editorconfig_parse(const char *buf, size_t size, UserData *data)
     }
 }
 
-int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
+EditorConfigOptions get_editorconfig_options(const char *pathname)
 {
     BUG_ON(!path_is_absolute(pathname));
     UserData data = {
         .pathname = pathname,
         .config_file_dir = STRING_VIEW_INIT,
-        .match = false
+        .options = editorconfig_options_init(),
+        .match = false,
     };
 
     static const char ecfilename[16] = "/.editorconfig";
@@ -249,6 +257,5 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         o->tab_width = o->indent_size;
     }
 
-    *opts = data.options;
-    return 0;
+    return data.options;
 }

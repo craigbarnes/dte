@@ -3,6 +3,8 @@
 #include "editorconfig/editorconfig.h"
 #include "editorconfig/ini.h"
 #include "editorconfig/match.h"
+#include "options.h"
+#include "util/bit.h"
 #include "util/path.h"
 
 static void test_ini_parse(TestContext *ctx)
@@ -134,12 +136,33 @@ static void test_ec_pattern_match(TestContext *ctx)
     #undef patmatch
 }
 
+static void test_editorconfig_options_struct(TestContext *ctx)
+{
+    const EditorConfigOptions opts = {
+        .indent_size = INDENT_WIDTH_MAX,
+        .tab_width = TAB_WIDTH_MAX,
+        .max_line_length = TEXT_WIDTH_MAX,
+        .indent_style = INDENT_STYLE_SPACE,
+        .indent_size_is_tab = true,
+    };
+
+    // Ensure bitfield widths are sufficient for maximum values
+    EXPECT_EQ(opts.indent_size, INDENT_WIDTH_MAX);
+    EXPECT_EQ(opts.tab_width, TAB_WIDTH_MAX);
+    EXPECT_EQ(opts.max_line_length, TEXT_WIDTH_MAX);
+    EXPECT_EQ(opts.indent_style, INDENT_STYLE_SPACE);
+    EXPECT_EQ(opts.indent_size_is_tab, true);
+    EXPECT_EQ(umax_bitwidth(INDENT_WIDTH_MAX), 4);
+    EXPECT_EQ(umax_bitwidth(TAB_WIDTH_MAX), 4);
+    EXPECT_EQ(umax_bitwidth(TEXT_WIDTH_MAX), 10);
+    EXPECT_EQ(umax_bitwidth(INDENT_STYLE_SPACE), 2);
+}
+
 static void test_get_editorconfig_options(TestContext *ctx)
 {
-    EditorConfigOptions opts = editorconfig_options_init();
     char *path = path_absolute("test/data/file.0foo.z");
     ASSERT_NONNULL(path);
-    EXPECT_EQ(get_editorconfig_options(path, &opts), 0);
+    EditorConfigOptions opts = get_editorconfig_options(path);
     free(path);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_SPACE);
     EXPECT_EQ(opts.indent_size, 3);
@@ -149,7 +172,7 @@ static void test_get_editorconfig_options(TestContext *ctx)
 
     path = path_absolute("test/data/file.foo");
     ASSERT_NONNULL(path);
-    EXPECT_EQ(get_editorconfig_options(path, &opts), 0);
+    opts = get_editorconfig_options(path);
     free(path);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_UNSPECIFIED);
     EXPECT_EQ(opts.indent_size, 0);
@@ -161,6 +184,7 @@ static void test_get_editorconfig_options(TestContext *ctx)
 static const TestEntry tests[] = {
     TEST(test_ini_parse),
     TEST(test_ec_pattern_match),
+    TEST(test_editorconfig_options_struct),
     TEST(test_get_editorconfig_options),
 };
 

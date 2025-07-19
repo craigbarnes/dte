@@ -48,31 +48,31 @@ void set_editorconfig_options(Buffer *buffer)
         path = cwd;
     }
 
-    EditorConfigOptions opts;
-    if (get_editorconfig_options(path, &opts) != 0) {
-        return;
-    }
-
+    EditorConfigOptions opts = get_editorconfig_options(path);
     EditorConfigIndentStyle style = opts.indent_style;
     if (style != INDENT_STYLE_UNSPECIFIED) {
+        BUG_ON(style != INDENT_STYLE_SPACE && style != INDENT_STYLE_TAB);
         options->expand_tab = (style == INDENT_STYLE_SPACE);
         options->emulate_tab = (style == INDENT_STYLE_SPACE);
         options->detect_indent = 0;
     }
 
     unsigned int iw = opts.indent_size;
-    if (iw && iw <= INDENT_WIDTH_MAX) {
+    if (iw) {
+        BUG_ON(iw > INDENT_WIDTH_MAX);
         options->indent_width = iw;
         options->detect_indent = 0;
     }
 
     unsigned int tw = opts.tab_width;
-    if (tw && tw <= TAB_WIDTH_MAX) {
+    if (tw) {
+        BUG_ON(tw > TAB_WIDTH_MAX);
         options->tab_width = tw;
     }
 
     unsigned int maxlen = opts.max_line_length;
-    if (maxlen && maxlen <= TEXT_WIDTH_MAX) {
+    if (maxlen) {
+        BUG_ON(maxlen > TEXT_WIDTH_MAX);
         options->text_width = maxlen;
     }
 }
