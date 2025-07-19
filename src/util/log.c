@@ -143,6 +143,7 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
 
     BUG_ON(logfd < 0);
     char buf[2048];
+    const int saved_errno = errno;
     const size_t buf_size = sizeof(buf) - 1;
     const char *prefix = log_level_map[level].prefix;
     const char *color = sgr0[0] ? log_level_map[level].color : "";
@@ -163,6 +164,7 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
     size_t n = MIN(len1 + MAX(len2, 0), buf_size);
     buf[n++] = '\n';
     (void)!xwrite_all(logfd, buf, n);
+    errno = saved_errno;
 }
 
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
@@ -171,4 +173,13 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
     va_start(ap, fmt);
     log_msgv(level, file, line, fmt, ap);
     va_end(ap);
+}
+
+SystemErrno log_errno(const char *file, int line, const char *prefix)
+{
+    SystemErrno err = errno;
+    if (log_level_enabled(LOG_LEVEL_ERROR)) {
+        log_msg(LOG_LEVEL_ERROR, file, line, "%s: %s", prefix, strerror(err));
+    }
+    return err;
 }

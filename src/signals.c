@@ -81,7 +81,7 @@ static const char *signum_to_str(int signum)
     return "unknown signal";
 }
 
-static bool xsigaction(int sig, const struct sigaction *action)
+static SystemErrno xsigaction(int sig, const struct sigaction *action)
 {
     struct sigaction old_action;
     if (likely(sigaction(sig, action, &old_action) == 0)) {
@@ -89,23 +89,27 @@ static bool xsigaction(int sig, const struct sigaction *action)
             const char *name = signum_to_str(sig);
             LOG_WARNING("ignored signal was inherited: %d (%s)", sig, name);
         }
-        return true;
+        return 0;
     }
 
-    const char *err = strerror(errno);
-    const char *name = signum_to_str(sig);
-    LOG_ERROR("failed to set disposition for signal %d (%s): %s", sig, name, err);
-    return false;
+    LOG_ERROR (
+        "failed to set disposition for signal %d (%s): %s",
+        sig, signum_to_str(sig), strerror(errno)
+    );
+
+    return errno;
 }
 
-void set_sigwinch_handler(void)
+SystemErrno set_sigwinch_handler(void)
 {
 #ifdef SIGWINCH
     struct sigaction action = {.sa_handler = handle_sigwinch};
     sigemptyset(&action.sa_mask);
     LOG_INFO("setting SIGWINCH handler");
-    xsigaction(SIGWINCH, &action);
+    return xsigaction(SIGWINCH, &action);
 #endif
+
+    return ENOSYS;
 }
 
 void set_basic_signal_dispositions(void)
@@ -183,7 +187,7 @@ static noreturn COLD void handle_fatal_signal(int signum)
  *
  * (https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html)
  */
-void set_fatal_signal_handlers(void)
+SystemErrno set_fatal_signal_handlers(void)
 {
     struct sigaction action = {.sa_handler = handle_fatal_signal};
     if (sigfillset(&action.sa_mask) != 0) {
@@ -192,8 +196,7 @@ void set_fatal_signal_handlers(void)
         // of registering signal handlers without a correct sa_mask.
         // Not having terminal cleanup for fatal signals is merely
         // inconvenient, whereas an incorrect mask could lead to UB.
-        LOG_ERRNO("sigfillset");
-        return;
+        return LOG_ERRNO("sigfillset");
     }
 
     xsigaction(SIGHUP, &action);
@@ -230,6 +233,8 @@ void set_fatal_signal_handlers(void)
         xsigaction(s, &action);
     }
 #endif
+
+    return 0;
 }
 
 // Set signals for headless (EFLAG_HEADLESS) mode

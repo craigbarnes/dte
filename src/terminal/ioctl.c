@@ -1,5 +1,4 @@
 #include "feature.h"
-#include <errno.h>
 #include <termios.h>
 #include <unistd.h>
 #include "ioctl.h"
@@ -9,19 +8,19 @@
 # include <sys/ioctl.h>
 #endif
 
-bool term_drop_controlling_tty(int fd)
+SystemErrno term_drop_controlling_tty(int fd)
 {
 #if HAVE_TIOCNOTTY
-    return ioctl(fd, TIOCNOTTY) != -1;
+    int r = ioctl(fd, TIOCNOTTY);
+    return (r == -1) ? errno : 0;
 #endif
 
     (void)fd;
-    errno = ENOSYS;
-    return false;
+    return ENOSYS;
 }
 
 // NOLINTNEXTLINE(*-non-const-parameter)
-bool term_get_size(unsigned int *w, unsigned int *h)
+SystemErrno term_get_size(unsigned int *w, unsigned int *h)
 {
 #if HAVE_TIOCGWINSZ || HAVE_TCGETWINSIZE
     struct winsize ws;
@@ -31,15 +30,14 @@ bool term_get_size(unsigned int *w, unsigned int *h)
         int r = tcgetwinsize(STDIN_FILENO, &ws);
     #endif
     if (unlikely(r == -1)) {
-        LOG_ERRNO("term_get_size");
-        return false;
+        return LOG_ERRNO("term_get_size");
     }
     *w = ws.ws_col;
     *h = ws.ws_row;
-    return true;
+    return 0;
 #endif
 
     (void)w;
     (void)h;
-    return false;
+    return ENOSYS;
 }

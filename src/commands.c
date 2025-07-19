@@ -57,6 +57,7 @@
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/errorcode.h"
 #include "util/intern.h"
 #include "util/log.h"
 #include "util/path.h"
@@ -1688,30 +1689,28 @@ static bool stat_changed(const FileInfo *file, const struct stat *st)
         || st->st_size != file->size;
 }
 
-static bool save_unmodified_buffer(Buffer *buffer, const char *filename)
+static SystemErrno save_unmodified_buffer(Buffer *buffer, const char *filename)
 {
     SaveUnmodifiedType type = buffer->options.save_unmodified;
     if (type == SAVE_NONE) {
         LOG_INFO("buffer unchanged; leaving file untouched");
-        return true;
+        return 0;
     }
 
     BUG_ON(type != SAVE_TOUCH);
     struct timespec times[2];
     if (unlikely(clock_gettime(CLOCK_REALTIME, &times[0]) != 0)) {
-        LOG_ERRNO("aborting partial save; clock_gettime() failed");
-        return false;
+        return LOG_ERRNO("aborting partial save; clock_gettime() failed");
     }
 
     times[1] = times[0];
     if (unlikely(utimensat(AT_FDCWD, filename, times, 0) != 0)) {
-        LOG_ERRNO("aborting partial save; utimensat() failed");
-        return false;
+        return LOG_ERRNO("aborting partial save; utimensat() failed");
     }
 
     buffer->file.mtime = times[0];
     LOG_INFO("buffer unchanged; mtime/atime updated");
-    return true;
+    return 0;
 }
 
 static bool cmd_save(EditorState *e, const CommandArgs *a)
@@ -1868,7 +1867,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         && encoding == buffer->encoding
         && crlf == buffer->crlf_newlines
         && bom == buffer->bom
-        && save_unmodified_buffer(buffer, absolute)
+        && save_unmodified_buffer(buffer, absolute) == 0
     ) {
         BUG_ON(new_locked);
         return true;

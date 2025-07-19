@@ -138,7 +138,7 @@ void update_screen_size(Terminal *term, Frame *root_frame)
 {
     BUG_ON(!is_root_frame(root_frame));
     unsigned int w, h;
-    if (!term_get_size(&w, &h) || (w == term->width && h == term->height)) {
+    if (term_get_size(&w, &h) != 0 || (w == term->width && h == term->height)) {
         return;
     }
 
