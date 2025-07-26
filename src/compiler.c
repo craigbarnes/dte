@@ -75,10 +75,9 @@ void remove_compiler(HashMap *compilers, const char *name)
 
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
 {
+    static const char underscore[][2] = {"_"};
+    COLLECT_STRINGS(underscore, a, prefix);
     COLLECT_STRINGS(capture_names, a, prefix);
-    if (str_has_prefix("_", prefix)) {
-        ptr_array_append(a, xstrdup("_"));
-    }
 }
 
 void dump_compiler(const Compiler *c, const char *name, String *s)

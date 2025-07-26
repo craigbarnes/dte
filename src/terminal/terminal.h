@@ -66,7 +66,7 @@ typedef enum {
 
 typedef struct {
     // Current x position (tab: 1-8, double-width: 2, invalid UTF-8 byte: 4)
-    // if smaller than scroll_x printed characters are not visible
+    // if smaller than scroll_x, printed characters are not visible
     size_t x;
     size_t scroll_x; // Number of characters scrolled (x direction)
     unsigned int count; // Number of buffered bytes (see term_output_flush())
