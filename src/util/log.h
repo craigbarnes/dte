@@ -25,11 +25,11 @@ typedef enum {
 #define LOG_CRITICAL(...) LOG(LOG_LEVEL_CRITICAL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_ERRNO(prefix) log_errno(__FILE__, __LINE__, prefix)
-#define LOG_ERRNO_ON(cond, prefix) if (unlikely(cond)) {LOG_ERRNO(prefix);}
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
 #define LOG_NOTICE(...) LOG(LOG_LEVEL_NOTICE, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
-#define WARN_ON(a) if (unlikely(a)) {LOG_WARNING("%s", #a);}
+#define WARN_ON(cond) if (unlikely(cond)) {LOG_WARNING("%s", #cond);}
+#define LOG_ERRNO_ON(cond, prefix) if (unlikely(cond)) {LOG_ERRNO(prefix);}
 
 bool log_level_enabled(LogLevel level);
 
@@ -44,6 +44,7 @@ bool log_level_enabled(LogLevel level);
 #endif
 
 #if DEBUG >= 3
+    // See also: src/trace.h
     #define TRACE_LOGGING_ENABLED 1
 #else
     #define TRACE_LOGGING_ENABLED 0

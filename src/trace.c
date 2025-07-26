@@ -14,27 +14,19 @@ static const char trace_names[][8] = {
     "output",
 };
 
+UNITTEST {
+    CHECK_STRING_ARRAY(trace_names);
+}
+
 // Example valid input: "command,status,input"
 TraceLoggingFlags trace_flags_from_str(const char *str)
 {
     if (!str || str[0] == '\0') {
         return 0;
     }
+
     bool all = streq(str, "all");
     return all ? TRACEFLAGS_ALL : STR_TO_BITFLAGS(str, trace_names, true);
-}
-
-UNITTEST {
-    CHECK_STRING_ARRAY(trace_names);
-    // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(trace_flags_from_str("output") != TRACEFLAG_OUTPUT);
-    BUG_ON(trace_flags_from_str(",x,, ,output,,") != TRACEFLAG_OUTPUT);
-    BUG_ON(trace_flags_from_str("command,input") != (TRACEFLAG_COMMAND | TRACEFLAG_INPUT));
-    BUG_ON(trace_flags_from_str("command,inpu") != TRACEFLAG_COMMAND);
-    BUG_ON(trace_flags_from_str("") != 0);
-    BUG_ON(trace_flags_from_str(",") != 0);
-    BUG_ON(trace_flags_from_str("a") != 0);
-    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 void set_trace_logging_flags(TraceLoggingFlags flags)
@@ -56,6 +48,7 @@ void log_trace(TraceLoggingFlags flags, const char *file, int line, const char *
     if (!log_trace_enabled(flags)) {
         return;
     }
+
     va_list ap;
     va_start(ap, fmt);
     log_msgv(LOG_LEVEL_TRACE, file, line, fmt, ap);

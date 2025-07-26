@@ -89,6 +89,21 @@ static void test_log_open_errors(TestContext *ctx)
     }
 }
 
+static void test_trace_flags_from_str(TestContext *ctx)
+{
+    if (!TRACE_LOGGING_ENABLED) {
+        return;
+    }
+
+    EXPECT_EQ(trace_flags_from_str("output"), TRACEFLAG_OUTPUT);
+    EXPECT_EQ(trace_flags_from_str(",x,, ,output,,"), TRACEFLAG_OUTPUT);
+    EXPECT_EQ(trace_flags_from_str("command,input"), TRACEFLAG_COMMAND | TRACEFLAG_INPUT);
+    EXPECT_EQ(trace_flags_from_str("command,inpu"), TRACEFLAG_COMMAND);
+    EXPECT_EQ(trace_flags_from_str(""), 0);
+    EXPECT_EQ(trace_flags_from_str(","), 0);
+    EXPECT_EQ(trace_flags_from_str("a"), 0);
+}
+
 static void test_init(TestContext *ctx)
 {
     char *home = path_absolute("build/test/HOME");
@@ -221,6 +236,7 @@ static const TestEntry itests[] = {
     TEST(test_process_sanity),
     TEST(test_posix_sanity),
     TEST(test_log_open_errors),
+    TEST(test_trace_flags_from_str),
     TEST(test_init),
 };
 
