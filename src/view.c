@@ -143,7 +143,7 @@ bool view_can_close(const View *view)
 size_t view_remove(View *view)
 {
     Window *window = view->window;
-    size_t view_idx = ptr_array_index(&window->views, view);
+    size_t view_idx = ptr_array_xindex(&window->views, view);
     window_remove_view_at_index(window, view_idx);
     return view_idx;
 }

@@ -69,8 +69,9 @@ void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)
 
 size_t ptr_array_remove(PointerArray *array, void *ptr)
 {
-    size_t idx = ptr_array_index(array, ptr);
-    ptr_array_remove_index(array, idx);
+    size_t idx = ptr_array_xindex(array, ptr);
+    void *removed = ptr_array_remove_index(array, idx);
+    BUG_ON(removed != ptr);
     return idx;
 }
 

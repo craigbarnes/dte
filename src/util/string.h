@@ -87,9 +87,9 @@ size_t string_insert_codepoint(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(3, 4);
 void string_append_memset(String *s, unsigned char byte, size_t len) NONNULL_ARGS;
 void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;
-char *string_steal_cstring(String *s) NONNULL_ARGS_AND_RETURN;
-char *string_clone_cstring(const String *s) XSTRDUP;
-const char *string_borrow_cstring(String *s) NONNULL_ARGS_AND_RETURN;
+char *string_steal_cstring(String *s) NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT;
+char *string_clone_cstring(const String *s) XSTRDUP WARN_UNUSED_RESULT;
+const char *string_borrow_cstring(String *s) NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT;
 void string_remove(String *s, size_t pos, size_t len) NONNULL_ARGS;
 void string_free(String *s) NONNULL_ARGS;
 

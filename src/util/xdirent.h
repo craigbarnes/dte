@@ -32,7 +32,7 @@ static inline int xclosedir(DIR *dir)
 {
     // We don't handle EINTR in a similar fashion to xclose() here, because
     // closedir() frees `dir` and it's typically unnecessary anyway.
-    return closedir(dir);
+    return closedir(dir); // NOLINT(*-unsafe-functions)
 }
 
 #endif
