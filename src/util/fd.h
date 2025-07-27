@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include "macros.h"
 
+#define IS_STD_FD(fd) ((fd) >= STDIN_FILENO && (fd) <= STDERR_FILENO)
+
 /*
  * "The arg values to F_GETFD, F_SETFD, F_GETFL, and F_SETFL all
  * represent flag values to allow for future growth. Applications

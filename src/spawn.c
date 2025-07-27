@@ -16,6 +16,12 @@
 #include "util/xreadwrite.h"
 #include "util/xstdio.h"
 
+enum {
+    IN = STDIN_FILENO,
+    OUT = STDOUT_FILENO,
+    ERR = STDERR_FILENO,
+};
+
 static void handle_error_msg(const Compiler *c, MessageList *msgs, char *str)
 {
     if (str[0] == '\0' || str[0] == '\n') {
@@ -95,23 +101,23 @@ static void read_errors(const Compiler *c, MessageList *msgs, int fd, bool quiet
 
 static void handle_piped_data(int f[3], SpawnContext *ctx)
 {
-    BUG_ON(f[0] < 0 && f[1] < 0 && f[2] < 0);
-    BUG_ON(f[0] >= 0 && f[0] <= 2);
-    BUG_ON(f[1] >= 0 && f[1] <= 2);
-    BUG_ON(f[2] >= 0 && f[2] <= 2);
+    BUG_ON(f[IN] < 0 && f[OUT] < 0 && f[ERR] < 0);
+    BUG_ON(IS_STD_FD(f[IN]));
+    BUG_ON(IS_STD_FD(f[OUT]));
+    BUG_ON(IS_STD_FD(f[ERR]));
 
     if (ctx->input.length == 0) {
-        xclose(f[0]);
-        f[0] = -1;
-        if (f[1] < 0 && f[2] < 0) {
+        xclose(f[IN]);
+        f[IN] = -1;
+        if (f[OUT] < 0 && f[ERR] < 0) {
             return;
         }
     }
 
     struct pollfd fds[] = {
-        {.fd = f[0], .events = POLLOUT},
-        {.fd = f[1], .events = POLLIN},
-        {.fd = f[2], .events = POLLIN},
+        {.fd = f[IN], .events = POLLOUT},
+        {.fd = f[OUT], .events = POLLIN},
+        {.fd = f[ERR], .events = POLLIN},
     };
 
     size_t wlen = 0;
@@ -146,19 +152,19 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             }
         }
 
-        if (fds[0].revents & POLLOUT) {
-            ssize_t rc = xwrite(fds[0].fd, ctx->input.data + wlen, ctx->input.length - wlen);
+        if (fds[IN].revents & POLLOUT) {
+            ssize_t rc = xwrite(fds[IN].fd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (unlikely(rc < 0)) {
                 error_msg_errno(ctx->ebuf, "write");
                 return;
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
-                if (xclose(fds[0].fd)) {
+                if (xclose(fds[IN].fd)) {
                     error_msg_errno(ctx->ebuf, "close");
                     return;
                 }
-                fds[0].fd = -1;
+                fds[IN].fd = -1;
             }
         }
 
@@ -237,48 +243,49 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, boo
     BUG_ON(!ctx->ebuf);
 
     int fd[3];
-    fd[0] = open_dev_null(ctx->ebuf, O_RDONLY);
-    if (fd[0] < 0) {
+    fd[IN] = open_dev_null(ctx->ebuf, O_RDONLY);
+    if (fd[IN] < 0) {
         return false;
     }
 
     int dev_null = open_dev_null(ctx->ebuf, O_WRONLY);
     if (dev_null < 0) {
-        xclose(fd[0]);
+        xclose(fd[IN]);
         return false;
     }
 
     int p[2];
     if (!open_pipe(ctx->ebuf, p)) {
         xclose(dev_null);
-        xclose(fd[0]);
+        xclose(fd[IN]);
         return false;
     }
 
     bool quiet = ctx->quiet;
     if (read_stdout) {
-        fd[1] = p[1];
-        fd[2] = quiet ? dev_null : 2;
+        fd[OUT] = p[1];
+        fd[ERR] = quiet ? dev_null : ERR;
     } else {
-        fd[1] = quiet ? dev_null : 1;
-        fd[2] = p[1];
+        fd[OUT] = quiet ? dev_null : OUT;
+        fd[ERR] = p[1];
     }
 
     pid_t pid = fork_exec(ctx->argv, fd, ctx->lines, ctx->columns, quiet);
+
+    // Note that the write end of the pipe must be closed before
+    // read_errors() is called, otherwise the read end never gets EOF
+    xclose(p[1]);
+
     if (pid == -1) {
         exec_error(ctx);
-        xclose(p[1]);
     } else {
-        // Must close write end of the pipe before read_errors() or
-        // the read end never gets EOF!
-        xclose(p[1]);
         read_errors(c, msgs, p[0], quiet);
         handle_child_error(ctx->ebuf, pid);
     }
 
     xclose(p[0]);
     xclose(dev_null);
-    xclose(fd[0]);
+    xclose(fd[IN]);
     return (pid != -1);
 }
 
