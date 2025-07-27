@@ -274,15 +274,14 @@ void collect_builtin_config_variables(PointerArray *a, StringView prefix)
     const size_t blen = sizeof(builtin) - 1;
     const size_t cmplen = MIN(prefix.length, blen);
 
-    if (!strview_remove_matching_strn_prefix(&prefix, builtin, cmplen)) {
+    if (!strview_remove_matching_sv_prefix(&prefix, string_view(builtin, cmplen))) {
         return;
     }
 
     for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
-        const char *name = builtin_configs[i].name;
-        size_t namelen = strlen(name);
-        if (strn_has_strview_prefix(name, namelen, &prefix)) {
-            ptr_array_append(a, xmemjoin3(builtin, blen, name, namelen, "}", 2));
+        StringView name = strview(builtin_configs[i].name);
+        if (strview_has_sv_prefix(name, prefix)) {
+            ptr_array_append(a, xmemjoin3(builtin, blen, name.data, name.length, "}", 2));
         }
     }
 }

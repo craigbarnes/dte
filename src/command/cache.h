@@ -4,6 +4,7 @@
 #include "command/run.h"
 #include "util/macros.h"
 
+// See comment above cached_command_new()
 typedef struct {
     const Command *cmd; // Cached command (or NULL if not cacheable)
     CommandArgs a; // Pre-parsed arguments (uninitialized if cmd is NULL)

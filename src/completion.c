@@ -223,6 +223,7 @@ void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)
 }
 
 void collect_env (
+    char **env, // Pointer to environ(3), or any array with the same format
     PointerArray *a,
     StringView prefix, // Prefix to match against
     const char *suffix // Suffix to append to collected strings
@@ -232,13 +233,13 @@ void collect_env (
     }
 
     size_t sfxlen = strlen(suffix) + 1;
-    for (size_t i = 0; environ[i]; i++) {
-        const char *var = environ[i];
-        size_t varlen = strlen(var);
-        if (strn_has_strview_prefix(var, varlen, &prefix)) {
-            const char *delim = memchr(var, '=', varlen);
-            if (likely(delim && delim != var)) {
-                ptr_array_append(a, xmemjoin(var, delim - var, suffix, sfxlen));
+    for (size_t i = 0; env[i]; i++) {
+        StringView var = strview(env[i]);
+        if (var.length && strview_has_sv_prefix(var, prefix)) {
+            size_t pos = 0;
+            StringView name = get_delim(var.data, &pos, var.length, '=');
+            if (likely(name.length)) {
+                ptr_array_append(a, xmemjoin(name.data, name.length, suffix, sfxlen));
             }
         }
     }
@@ -530,7 +531,7 @@ static void complete_setenv(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_env(&cs->completions, strview_from_cstring(cs->parsed), "");
+        collect_env(environ, &cs->completions, strview_from_cstring(cs->parsed), "");
     } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
         BUG_ON(!a->args[0]);
         const char *value = getenv(a->args[0]);
@@ -811,7 +812,7 @@ static size_t collect_vars(PointerArray *a, StringView name)
     }
 
     collect_normal_vars(a, name, suffix);
-    collect_env(a, name, suffix);
+    collect_env(environ, a, name, suffix);
     return pos;
 }
 

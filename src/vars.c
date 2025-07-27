@@ -189,10 +189,9 @@ void collect_normal_vars (
 ) {
     size_t suffix_len = strlen(suffix) + 1;
     for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
-        const char *var = normal_vars[i].name;
-        size_t var_len = strlen(var);
-        if (strn_has_strview_prefix(var, var_len, &prefix)) {
-            ptr_array_append(a, xmemjoin(var, var_len, suffix, suffix_len));
+        StringView var = strview(normal_vars[i].name);
+        if (strview_has_sv_prefix(var, prefix)) {
+            ptr_array_append(a, xmemjoin(var.data, var.length, suffix, suffix_len));
         }
     }
 }

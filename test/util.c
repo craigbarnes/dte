@@ -898,20 +898,24 @@ static void test_strview_has_suffix(TestContext *ctx)
     EXPECT_FALSE(strview_has_suffix(&sv, "foo"));
     EXPECT_FALSE(strview_has_suffix(&sv, "foobars"));
 
+    const StringView suffix = string_view(NULL, 0);
+    EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
+    EXPECT_TRUE(strview_has_sv_suffix(suffix, suffix));
+
     sv.length--;
     EXPECT_FALSE(strview_has_suffix(&sv, "bar"));
     EXPECT_TRUE(strview_has_suffix(&sv, "ba"));
-    EXPECT_TRUE(strview_has_strn_suffix(&sv, NULL, 0));
+    EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
 
     sv.length = 0;
     EXPECT_TRUE(strview_has_suffix(&sv, ""));
     EXPECT_FALSE(strview_has_suffix(&sv, "f"));
-    EXPECT_TRUE(strview_has_strn_suffix(&sv, NULL, 0));
+    EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
 
     sv.data = NULL;
     EXPECT_TRUE(strview_has_suffix(&sv, ""));
     EXPECT_FALSE(strview_has_suffix(&sv, "f"));
-    EXPECT_TRUE(strview_has_strn_suffix(&sv, NULL, 0));
+    EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
 }
 
 static void test_strview_remove_matching(TestContext *ctx)

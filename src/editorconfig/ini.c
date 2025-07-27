@@ -32,7 +32,7 @@ bool ini_parse(IniParser *ctx)
         strview_trim_right(&line);
         BUG_ON(line.length == 0);
 
-        if (strview_remove_matching_prefix_and_suffix(&line, "[", "]")) {
+        if (strview_remove_matching_affixes(&line, strview("["), strview("]"))) {
             // Keep track of (and skip past) section headings
             ctx->section = line;
             ctx->name_count = 0;

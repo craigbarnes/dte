@@ -28,7 +28,7 @@ static FileTypeEnum filetype_from_dir_prefix(StringView path)
     }
     for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
         const struct DirPrefixMap *p = &prefixes[i];
-        if (strview_has_strn_prefix(&path, p->dir, p->dir_len)) {
+        if (strview_has_sv_prefix(path, string_view(p->dir, p->dir_len))) {
             return p->filetype;
         }
     }

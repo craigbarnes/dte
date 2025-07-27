@@ -85,35 +85,23 @@ static inline bool strview_equal_cstring_icase(const StringView *sv, const char 
     return strview_equal_strn_icase(sv, str, strlen(str));
 }
 
-NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
-static inline bool strview_has_strn_prefix(const StringView *sv, const char *p, size_t n)
+static inline bool strview_has_sv_prefix(StringView sv, StringView prefix)
 {
-    return sv->length >= n && mem_equal(sv->data, p, n);
+    const size_t plen = prefix.length;
+    return sv.length >= plen && mem_equal(sv.data, prefix.data, plen);
 }
 
-NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
-static inline bool strview_has_strn_suffix(const StringView *sv, const char *suf, size_t suflen)
+static inline bool strview_has_sv_suffix(StringView sv, StringView suffix)
 {
-    // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
-    size_t len = sv->length;
-    return suflen == 0 || (len >= suflen && mem_equal(sv->data + len - suflen, suf, suflen));
-}
-
-NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3) NONNULL_ARG_IF_NONZERO_LENGTH(4, 5)
-static inline bool strview_has_strn_prefix_and_suffix (
-    const StringView *sv,
-    const char *prefix, size_t prefix_len,
-    const char *suffix, size_t suffix_len
-) {
-    return prefix_len + suffix_len <= sv->length
-        && strview_has_strn_prefix(sv, prefix, prefix_len)
-        && strview_has_strn_suffix(sv, suffix, suffix_len);
+    size_t len = sv.length;
+    size_t suflen = suffix.length;
+    return len >= suflen && mem_equal(sv.data + len - suflen, suffix.data, suflen);
 }
 
 NONNULL_ARGS
 static inline bool strview_has_prefix(const StringView *sv, const char *p)
 {
-    return strview_has_strn_prefix(sv, p, strlen(p));
+    return strview_has_sv_prefix(*sv, strview(p));
 }
 
 NONNULL_ARGS
@@ -129,14 +117,14 @@ static inline bool strview_has_either_prefix (
     const char *pfx1,
     const char *pfx2
 ) {
-    return strview_has_strn_prefix(sv, pfx1, strlen(pfx1))
-        || strview_has_strn_prefix(sv, pfx2, strlen(pfx2));
+    return strview_has_sv_prefix(*sv, strview(pfx1))
+        || strview_has_sv_prefix(*sv, strview(pfx2));
 }
 
 NONNULL_ARGS
 static inline bool strview_has_suffix(const StringView *sv, const char *suffix)
 {
-    return strview_has_strn_suffix(sv, suffix, strlen(suffix));
+    return strview_has_sv_suffix(*sv, strview(suffix));
 }
 
 NONNULL_ARGS
@@ -195,46 +183,50 @@ static inline void strview_remove_suffix(StringView *sv, size_t len)
     sv->length -= len;
 }
 
-static inline bool strview_remove_matching_strn_prefix (
+static inline bool strview_remove_matching_sv_prefix (
     StringView *sv,
-    const char *prefix,
-    size_t prefix_len
+    StringView prefix
 ) {
-    if (!strview_has_strn_prefix(sv, prefix, prefix_len)) {
-        return false;
-    }
-    strview_remove_prefix(sv, prefix_len);
-    return true;
+    bool match = strview_has_sv_prefix(*sv, prefix);
+    strview_remove_prefix(sv, match ? prefix.length : 0);
+    return match;
+}
+
+static inline bool strview_remove_matching_sv_suffix (
+    StringView *sv,
+    StringView suffix
+) {
+    bool match = strview_has_sv_suffix(*sv, suffix);
+    strview_remove_suffix(sv, match ? suffix.length : 0);
+    return match;
 }
 
 static inline bool strview_remove_matching_prefix(StringView *sv, const char *prefix)
 {
-    return strview_remove_matching_strn_prefix(sv, prefix, strlen(prefix));
+    return strview_remove_matching_sv_prefix(sv, strview(prefix));
 }
 
 static inline bool strview_remove_matching_suffix(StringView *sv, const char *suffix)
 {
-    size_t suffix_len = strlen(suffix);
-    if (!strview_has_strn_suffix(sv, suffix, suffix_len)) {
-        return false;
-    }
-    sv->length -= suffix_len;
-    return true;
+    return strview_remove_matching_sv_suffix(sv, strview(suffix));
 }
 
-static inline bool strview_remove_matching_prefix_and_suffix (
+static inline bool strview_remove_matching_affixes (
     StringView *sv,
-    const char *prefix,
-    const char *suffix
+    StringView prefix,
+    StringView suffix
 ) {
-    size_t plen = strlen(prefix);
-    size_t slen = strlen(suffix);
-    if (strview_has_strn_prefix_and_suffix(sv, prefix, plen, suffix, slen)) {
-        strview_remove_prefix(sv, plen);
-        strview_remove_suffix(sv, slen);
-        return true;
+    size_t total_affix_length = prefix.length + suffix.length;
+    bool pmatch = strview_has_sv_prefix(*sv, prefix);
+    bool smatch = strview_has_sv_suffix(*sv, suffix);
+    bool match = (total_affix_length <= sv->length) && pmatch && smatch;
+
+    if (match) {
+        sv->data += prefix.length;
+        sv->length -= total_affix_length;
     }
-    return false;
+
+    return match;
 }
 
 NONNULL_ARGS
