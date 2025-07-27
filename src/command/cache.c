@@ -68,10 +68,7 @@ nocache:
 
 void cached_command_free(CachedCommand *cc)
 {
-    if (!cc) {
-        return;
-    }
-    if (cc->cmd) {
+    if (cc && cc->cmd) {
         free_string_array(cc->a.args);
     }
     free(cc);
