@@ -54,31 +54,31 @@ static inline size_t obuf_avail(TermOutputBuffer *obuf)
     return TERM_OUTBUF_SIZE - obuf->count;
 }
 
-char *term_output_reserve_space(TermOutputBuffer *obuf, size_t count) NONNULL_ARGS_AND_RETURN;
-void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x);
-void term_put_byte(TermOutputBuffer *obuf, char ch);
-void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
-TermSetBytesMethod term_set_bytes(Terminal *term, char ch, size_t count);
-void term_put_str(TermOutputBuffer *obuf, const char *str);
-void term_put_initial_queries(Terminal *term, unsigned int level);
-void term_put_level_2_queries(Terminal *term, bool emit_all);
-void term_put_level_3_queries(Terminal *term, bool emit_all);
-void term_use_alt_screen_buffer(Terminal *term);
-void term_use_normal_screen_buffer(Terminal *term);
-void term_hide_cursor(Terminal *term);
-void term_show_cursor(Terminal *term);
-void term_begin_sync_update(Terminal *term);
-void term_end_sync_update(Terminal *term);
-void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y);
-void term_save_title(Terminal *term);
-void term_restore_title(Terminal *term);
-void term_restore_and_save_title(Terminal *term);
-bool term_can_clear_eol_with_el_sequence(const Terminal *term);
-int term_clear_eol(Terminal *term);
-void term_clear_screen(TermOutputBuffer *obuf);
-void term_output_flush(TermOutputBuffer *obuf) NOINLINE;
-bool term_put_char(TermOutputBuffer *obuf, CodePoint u);
-void term_set_style(Terminal *term, TermStyle style);
-void term_set_cursor_style(Terminal *term, TermCursorStyle style);
+char *term_output_reserve_space(TermOutputBuffer *obuf, size_t count) NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT;
+void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x) NONNULL_ARGS;
+void term_put_byte(TermOutputBuffer *obuf, char ch) NONNULL_ARGS;
+void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count) NONNULL_ARGS;
+TermSetBytesMethod term_set_bytes(Terminal *term, char ch, size_t count) NONNULL_ARGS;
+void term_put_str(TermOutputBuffer *obuf, const char *str) NONNULL_ARGS;
+void term_put_initial_queries(Terminal *term, unsigned int level) NONNULL_ARGS;
+void term_put_level_2_queries(Terminal *term, bool emit_all) NONNULL_ARGS;
+void term_put_level_3_queries(Terminal *term, bool emit_all) NONNULL_ARGS;
+void term_use_alt_screen_buffer(Terminal *term) NONNULL_ARGS;
+void term_use_normal_screen_buffer(Terminal *term) NONNULL_ARGS;
+void term_hide_cursor(Terminal *term) NONNULL_ARGS;
+void term_show_cursor(Terminal *term) NONNULL_ARGS;
+void term_begin_sync_update(Terminal *term) NONNULL_ARGS;
+void term_end_sync_update(Terminal *term) NONNULL_ARGS;
+void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y) NONNULL_ARGS;
+void term_save_title(Terminal *term) NONNULL_ARGS;
+void term_restore_title(Terminal *term) NONNULL_ARGS;
+void term_restore_and_save_title(Terminal *term) NONNULL_ARGS;
+bool term_can_clear_eol_with_el_sequence(const Terminal *term) NONNULL_ARGS;
+int term_clear_eol(Terminal *term) NONNULL_ARGS;
+void term_clear_screen(TermOutputBuffer *obuf) NONNULL_ARGS;
+void term_output_flush(TermOutputBuffer *obuf) NOINLINE NONNULL_ARGS;
+bool term_put_char(TermOutputBuffer *obuf, CodePoint u) NONNULL_ARGS;
+void term_set_style(Terminal *term, TermStyle style) NONNULL_ARGS;
+void term_set_cursor_style(Terminal *term, TermCursorStyle style) NONNULL_ARGS;
 
 #endif

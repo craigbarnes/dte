@@ -20,6 +20,7 @@
 #include "color.h"
 #include "cursor.h"
 #include "indent.h"
+#include "options.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/log.h"
@@ -514,45 +515,49 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         return false;
     }
 
-    term_output_reserve_space(obuf, 8);
+    static_assert(U_SET_CHAR_MAXLEN == 4);
+    static_assert(INDENT_WIDTH_MAX == 8);
+    const size_t nreserved = 8;
+    char *buf = term_output_reserve_space(obuf, nreserved);
+    size_t i = 0;
+
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
-            obuf->buf[obuf->count++] = u;
-            obuf->x++;
+            buf[i++] = u;
         } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
             size_t width = next_indent_width(obuf->x, obuf->tab_width) - obuf->x;
-            BUG_ON(width > 8);
-            width = MIN(width, space);
-            memcpy(obuf->buf + obuf->count, get_tab_str(obuf->tab_mode), 8);
-            obuf->count += width;
-            obuf->x += width;
+            // Fill all 8 reserved bytes and just set `i` as appropriate
+            memcpy(buf, get_tab_str(obuf->tab_mode), 8);
+            i += MIN(width, space);
         } else {
             // Use caret notation for control chars:
-            obuf->buf[obuf->count++] = '^';
-            obuf->x++;
+            buf[i++] = '^';
             if (likely(space > 1)) {
-                obuf->buf[obuf->count++] = (u + 64) & 0x7F;
-                obuf->x++;
+                buf[i++] = (u + 64) & 0x7F;
             }
         }
     } else {
         const size_t width = u_char_width(u);
         if (likely(width <= space)) {
+            // This is the only case where the additions to `x` and `count`
+            // aren't necessarily the same, so just set them here and return
             obuf->x += width;
-            obuf->count += u_set_char(obuf->buf + obuf->count, u);
+            obuf->count += u_set_char(buf, u);
+            return true;
         } else if (u_is_unprintable(u)) {
             // <xx> would not fit.
             // There's enough space in the buffer so render all 4 characters
             // but increment position less.
-            u_set_hex(obuf->buf + obuf->count, u);
-            obuf->count += space;
-            obuf->x += space;
+            u_set_hex(buf, u);
+            i += space;
         } else {
-            obuf->buf[obuf->count++] = '>';
-            obuf->x++;
+            buf[i++] = '>';
         }
     }
 
+    BUG_ON(i > nreserved);
+    obuf->count += i;
+    obuf->x += i;
     return true;
 }
 
