@@ -64,7 +64,6 @@ arch:
         - *vvars
         - make check-source check-clang-tidy
         - make check USE_SANITIZER=1
-        - (cd build/ && test/test)
         - *objsize_and_bench
 
 debian:

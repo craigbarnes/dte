@@ -99,45 +99,6 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
     ctx->ngroups += 1;
 }
 
-// Change to the expected working directory, in case the test binary
-// wasn't executed via `make check` (or `build/test/test`).
-static void init_working_directory(int argc, char *argv[])
-{
-    static const char testfile[] = "test/data/crlf.dterc";
-    if (likely(access(testfile, F_OK) == 0)) {
-        // Working directory already correct
-        return;
-    }
-
-    if (argc < 1 || !argv || !argv[0]) {
-        goto error;
-    }
-
-    char dir[8192];
-    StringView progdir = path_slice_dirname(argv[0]);
-    if (progdir.length >= sizeof(dir) - 8) {
-        goto error;
-    }
-
-    memcpy(dir, progdir.data, progdir.length);
-    copyliteral(dir + progdir.length, "/../..\0");
-
-    if (chdir(dir) != 0) {
-        perror("chdir");
-        goto error;
-    }
-
-    if (access(testfile, F_OK) != 0) {
-        goto error;
-    }
-
-    return;
-
-error:
-    fputs("test binary executed from incorrect working directory; exiting", stderr);
-    exit(1);
-}
-
 static const char usage[] =
     "Usage: %s [-%s]\n\n"
     "Options:\n"
@@ -183,12 +144,21 @@ int main(int argc, char *argv[])
 
     ctx.timing = !ctx.quiet && ctx.timing;
     setvbuf(stderr, NULL, _IOLBF, 0);
-    init_working_directory(argc, argv);
 
     if (!color) {
         ctx.boldred[0] = '\0';
         ctx.dim[0] = '\0';
         ctx.sgr0[0] = '\0';
+    }
+
+    // Several tests load data from the filesystem and depend on $PWD
+    // being the project root directory, so perform a sanity test and
+    // show a clear error message if not as expected
+    if (unlikely(access("test/data/crlf.dterc", F_OK) != 0)) {
+        return ec_usage_error (
+            "test runner ('%s') started with incorrect working directory",
+            prog
+        );
     }
 
     struct timespec times[2];
