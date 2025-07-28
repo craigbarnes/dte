@@ -60,10 +60,18 @@ arch:
     stage: test
     needs: []
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
+    artifacts:
+        expire_in: 30 days
+        name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: build/coverage.xml
     script:
         - *vvars
         - make check-source check-clang-tidy
         - make check USE_SANITIZER=1
+        - make coverage-xml
         - *objsize_and_bench
 
 debian:
@@ -107,21 +115,6 @@ android:
         - make CC="$CC_ARMV7A"
         - make CC="$CC_I686"
         - make CC="$CC_X86_64"
-
-coverage:
-    stage: test
-    needs: []
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
-    artifacts:
-        expire_in: 30 days
-        name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-        reports:
-            coverage_report:
-                coverage_format: cobertura
-                path: build/coverage.xml
-    script:
-        - make gcovr-xml
-        - awk -f tools/gcovr-txt.awk build/coverage.txt
 
 .pages:
     stage: dist

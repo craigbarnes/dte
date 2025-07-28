@@ -16,6 +16,9 @@ gcovr-xml: build/coverage.xml
 coverage: public/coverage/index.html
 	$(if $(BROWSER), $(BROWSER) $<, $(error $$BROWSER not set))
 
+coverage-xml: build/coverage.xml
+	$(AWK) -f tools/gcovr-txt.awk build/coverage.txt
+
 public/coverage/index.html: FORCE | public/coverage/
 	$(RM) public/coverage/*.html public/coverage/*.html.gz
 	$(COVERAGE_MAKE_CHECK)
@@ -31,7 +34,7 @@ public/coverage/: public/
 	$(Q) mkdir -p $@
 
 
-NON_PARALLEL_TARGETS += gcovr-html gcovr-xml coverage
+NON_PARALLEL_TARGETS += gcovr-html gcovr-xml coverage coverage-xml
 NON_PARALLEL_TARGETS += public/coverage/index.html build/coverage.xml
 
-.PHONY: gcovr-html gcovr-xml coverage
+.PHONY: gcovr-html gcovr-xml coverage coverage-xml
