@@ -41,7 +41,7 @@ alpine:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
 
 ubuntu:
-    extends: .test
+    extends: .manual-test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
 
 rocky-8:
@@ -75,6 +75,7 @@ arch:
         - *objsize_and_bench
 
 debian:
+    when: manual
     stage: test
     needs: []
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
