@@ -120,6 +120,8 @@ int main(int argc, char *argv[])
     TestContext ctx = {
         .timing = false,
         .boldred = "\033[1;31m",
+        .yellow = "\033[33m",
+        .cyan = "\033[36m",
         .dim = "\033[2m",
         .sgr0 = "\033[0m",
     };
@@ -147,6 +149,8 @@ int main(int argc, char *argv[])
 
     if (!color) {
         ctx.boldred[0] = '\0';
+        ctx.yellow[0] = '\0';
+        ctx.cyan[0] = '\0';
         ctx.dim[0] = '\0';
         ctx.sgr0[0] = '\0';
     }

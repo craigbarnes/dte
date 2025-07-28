@@ -62,11 +62,17 @@ void expect_memeq (
     char buf[2048];
     size_t m1 = u_make_printable(p1, n1, buf, sizeof(buf) - 64, 0);
     size_t m2 = u_make_printable(p2, n2, buf + m1, sizeof(buf) - m1, 0);
+    const char *color1 = ctx->cyan;
+    const char *color2 = ctx->yellow;
+    const char *sgr0 = ctx->sgr0;
 
     test_fail (
         ctx, file, line,
-        "Memory areas not equal: lengths: %zu, %zu; contents:  %.*s  %.*s",
-        n1, n2, (int)m1, buf, (int)m2, buf + m1
+        "Memory areas not equal: lengths: %s%zu%s, %s%zu%s; contents:  %s%.*s%s  %s%.*s%s",
+        color1, n1, sgr0,
+        color2, n2, sgr0,
+        color1, (int)m1, buf, sgr0,
+        color2, (int)m2, buf + m1, sgr0
     );
 }
 
