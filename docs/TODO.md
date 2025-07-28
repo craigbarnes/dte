@@ -176,6 +176,10 @@ Features
   file. The regression test for 7cf2b19320a4c2 in `test/check-opts.sh`
   is one existing use case for this.
 
+* Add commands for directional window navigation (e.g. `wleft`, `wdown`,
+  etc.), as an alternative to the existing `wnext` and `wprev` commands
+  (see also: [#141])
+
 Documentation
 -------------
 
@@ -237,6 +241,12 @@ Documentation
   "grid of cells" display model and/or multi-process division of
   responsibilities (e.g. ambiguous display width codepoints, the
   U+2103 [example][foot#1665] mentioned above, ZWJ sequences, etc.)
+
+* Generate HTML documentation for the most recent stable release (in
+  addition to the most recent commit) and place a notice somewhere
+  stating that installed man pages should be considered the most
+  appropriate source of documentation for older releases (see also
+  [#153])
 
 Code Quality/Efficiency Improvements
 ------------------------------------
@@ -388,10 +398,12 @@ Testing/Debugging
 [#105]: https://gitlab.com/craigbarnes/dte/-/issues/105
 [#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
 [#132]: https://gitlab.com/craigbarnes/dte/-/issues/132
+[#141]: https://gitlab.com/craigbarnes/dte/-/issues/141
 [#142]: https://gitlab.com/craigbarnes/dte/-/issues/142
 [#147]: https://gitlab.com/craigbarnes/dte/-/issues/147
 [#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
 [#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
+[#153]: https://gitlab.com/craigbarnes/dte/-/issues/153
 [#161]: https://gitlab.com/craigbarnes/dte/-/issues/161
 [#164]: https://gitlab.com/craigbarnes/dte/-/issues/164
 [#179]: https://gitlab.com/craigbarnes/dte/-/issues/179
