@@ -25,7 +25,7 @@ enum {
 typedef enum {
     // Replace C0 control characters with Unicode "control picture"
     // symbols, instead of using caret notation (which can become
-    // quite ambuguous when formatting terminal escape sequences)
+    // quite ambiguous when formatting terminal escape sequences)
     MPF_C0_SYMBOLS = 1 << 0,
 } MakePrintableFlags;
 
