@@ -289,16 +289,14 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, boo
     return (pid != -1);
 }
 
-// Close fd only if valid (positive) and not stdin/stdout/stderr
-static int safe_xclose(int fd)
-{
-    return (fd > STDERR_FILENO) ? xclose(fd) : 0;
-}
-
+// Close each fd only if valid (positive) and not stdin/stdout/stderr
 static void safe_xclose_all(int fds[], size_t nr_fds)
 {
     for (size_t i = 0; i < nr_fds; i++) {
-        safe_xclose(fds[i]);
+        if (fds[i] > STDERR_FILENO) {
+            xclose(fds[i]);
+        }
+        // Also prevent use-after-close errors
         fds[i] = -1;
     }
 }

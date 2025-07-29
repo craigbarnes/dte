@@ -39,7 +39,7 @@ int xpipe2(int fd[2], int flags)
 
     return 0;
 
-error:;
+error:
     xclose(fd[0]);
     xclose(fd[1]);
     return -1;
