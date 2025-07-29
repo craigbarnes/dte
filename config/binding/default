@@ -38,6 +38,8 @@ bind S-home 'bol -c'
 bind S-end 'eol -c'
 bind S-pgup 'pgup -c'
 bind S-pgdown 'pgdown -c'
+bind S-delete delete
+bind S-backspace erase
 
 bind C-S-left 'word-bwd -cs'
 bind C-S-right 'word-fwd -cs'
@@ -168,8 +170,10 @@ bind -cs M-left bol
 bind -cs M-right eol
 bind -cs C-delete delete-word
 bind -cs M-delete delete-word
+bind -cs S-delete delete
 bind -cs C-backspace erase-word
 bind -cs M-backspace erase-word
+bind -cs S-backspace erase
 bind -cs C-a bol
 bind -cs C-b left
 bind -cs C-c cancel
