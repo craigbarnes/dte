@@ -166,12 +166,14 @@ static EditorConfigOptions editorconfig_options_init(void)
     return (EditorConfigOptions){.indent_style = INDENT_STYLE_UNSPECIFIED};
 }
 
-static void editorconfig_parse(const char *buf, size_t size, UserData *data)
+static void editorconfig_parse(StringView input, UserData *data)
 {
+    static const StringView utf8_bom = STRING_VIEW("\xEF\xBB\xBF");
+    bool has_utf8_bom = strview_has_sv_prefix(input, utf8_bom);
+
     IniParser ini = {
-        .input = buf,
-        .input_len = size,
-        .pos = (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) ? 3 : 0, // Skip UTF-8 BOM
+        .input = input,
+        .pos = has_utf8_bom ? utf8_bom.length : 0,
     };
 
     while (ini_parse(&ini)) {
@@ -224,7 +226,7 @@ EditorConfigOptions get_editorconfig_options(const char *pathname)
         ssize_t len = read_file(buf, &text, MAX_FILESIZE);
         if (len >= 0) {
             data.config_file_dir = string_view(buf, dir_len);
-            editorconfig_parse(text, len, &data);
+            editorconfig_parse(string_view(text, len), &data);
             free(text);
         }
 

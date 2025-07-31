@@ -7,8 +7,7 @@
 #include "util/string-view.h"
 
 typedef struct {
-    const char *input;
-    size_t input_len;
+    StringView input;
     size_t pos;
     StringView section;
     StringView name;

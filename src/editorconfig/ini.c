@@ -16,11 +16,8 @@
  */
 bool ini_parse(IniParser *ctx)
 {
-    const char *input = ctx->input;
-    const size_t len = ctx->input_len;
-    size_t pos = ctx->pos;
-
-    while (pos < len) {
+    const char *input = ctx->input.data;
+    for (size_t pos = ctx->pos, len = ctx->input.length; pos < len; ) {
         StringView line = buf_slice_next_line(input, &pos, len);
         strview_trim_left(&line);
         if (line.length < 2 || line.data[0] == '#' || line.data[0] == ';') {

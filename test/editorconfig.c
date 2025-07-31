@@ -9,7 +9,7 @@
 
 static void test_ini_parse(TestContext *ctx)
 {
-    static const char input[] =
+    static const StringView input = STRING_VIEW (
         " \t  key = val   \n"
         "\n"
         " \t [section 1]  \n"
@@ -18,14 +18,12 @@ static void test_ini_parse(TestContext *ctx)
         "[section 2]\n"
         " x=0\n"
         "[]\n"
+        " \t # comm=ent\n"
+        "; comm=ent\n"
         "z=."
-    ;
+    );
 
-    IniParser ini = {
-        .input = input,
-        .input_len = sizeof(input) - 1,
-    };
-
+    IniParser ini = {.input = input};
     EXPECT_TRUE(ini_parse(&ini));
     EXPECT_EQ(ini.pos, 17);
     EXPECT_EQ(ini.name_count, 1);
@@ -55,7 +53,7 @@ static void test_ini_parse(TestContext *ctx)
     EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "0");
 
     EXPECT_TRUE(ini_parse(&ini));
-    EXPECT_EQ(ini.pos, 101);
+    EXPECT_EQ(ini.pos, 126);
     EXPECT_EQ(ini.name_count, 1);
     EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "");
     EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "z");
