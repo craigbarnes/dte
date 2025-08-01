@@ -40,6 +40,7 @@
 #include "util/string.h"
 #include "util/xdirent.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 #include "vars.h"
 
 typedef enum {
@@ -53,11 +54,18 @@ static bool is_executable(int dir_fd, const char *filename)
     return faccessat(dir_fd, filename, X_OK, 0) == 0;
 }
 
+static bool is_ignored_dir_entry(const StringView *name)
+{
+    return unlikely(name->length == 0)
+        || strview_equal_cstring(name, ".")
+        || strview_equal_cstring(name, "..");
+}
+
 static bool do_collect_files (
     PointerArray *array,
     const char *dirname,
-    const char *dirprefix,
-    const char *fileprefix,
+    StringView dirprefix,
+    StringView fileprefix,
     FileCollectionType type
 ) {
     DIR *const dir = xopendir(dirname);
@@ -72,19 +80,16 @@ static bool do_collect_files (
         return false;
     }
 
-    size_t dlen = strlen(dirprefix);
-    size_t flen = strlen(fileprefix);
-    const struct dirent *de;
+    if (type == COLLECT_EXECUTABLES && dirprefix.length == 0) {
+        dirprefix = strview("./");
+    }
 
-    while ((de = xreaddir(dir))) {
+    for (const struct dirent *de; (de = xreaddir(dir)); ) {
         const char *name = de->d_name;
-        if (streq(name, ".") || streq(name, "..") || unlikely(streq(name, ""))) {
-            continue;
-        }
-
-        // TODO: add a global option to allow dotfiles to be included
-        // even when there's no prefix
-        if (flen ? strncmp(name, fileprefix, flen) != 0 : name[0] == '.') {
+        const StringView name_sv = strview(name);
+        bool has_prefix = strview_has_sv_prefix(name_sv, fileprefix);
+        bool match = fileprefix.length ? has_prefix : name[0] != '.';
+        if (!match || is_ignored_dir_entry(&name_sv)) {
             continue;
         }
 
@@ -110,17 +115,13 @@ static bool do_collect_files (
                 if (!is_executable(dir_fd, name)) {
                     continue;
                 }
-                if (!dlen) {
-                    dirprefix = "./";
-                    dlen = 2;
-                }
                 break;
             default:
                 BUG("unhandled FileCollectionType value");
             }
         }
 
-        char *path = path_join_sv(strview(dirprefix), strview(name), is_dir);
+        char *path = path_join_sv(dirprefix, name_sv, is_dir);
         ptr_array_append(array, path);
     }
 
@@ -130,29 +131,41 @@ static bool do_collect_files (
 
 static void collect_files(EditorState *e, CompletionState *cs, FileCollectionType type)
 {
-    StringView esc = cs->escaped;
-    if (strview_has_prefix(&esc, "~/")) {
-        CommandRunner runner = normal_mode_cmdrunner(e);
-        runner.flags &= ~CMDRUNNER_EXPAND_TILDE_SLASH;
-        char *str = parse_command_arg(&runner, esc.data, esc.length);
-        const char *slash = xstrrchr(str, '/');
-        cs->tilde_expanded = true;
-        char *dir = path_dirname(cs->parsed);
-        char *dirprefix = path_dirname(str);
-        do_collect_files(&cs->completions, dir, dirprefix, slash + 1, type);
-        free(dirprefix);
-        free(dir);
-        free(str);
-    } else {
-        const char *slash = strrchr(cs->parsed, '/');
-        if (!slash) {
-            do_collect_files(&cs->completions, ".", "", cs->parsed, type);
-        } else {
-            char *dir = path_dirname(cs->parsed);
-            do_collect_files(&cs->completions, dir, dir, slash + 1, type);
-            free(dir);
+    char *dir = path_dirname(cs->parsed);
+    StringView dirprefix;
+    StringView fileprefix;
+    char buf[8192];
+
+    if (strview_has_prefix(&cs->escaped, "~/")) {
+        const StringView *home = &e->home_dir;
+        if (unlikely(!strview_has_prefix(home, "/"))) {
+            return;
         }
+
+        StringView parsed = strview(cs->parsed);
+        bool p = strview_remove_matching_sv_prefix(&parsed, *home);
+        p = p && strview_remove_matching_prefix(&parsed, "/");
+        if (unlikely(!p || sizeof(buf) < parsed.length + 3)) {
+            LOG_ERROR("%s", p ? "no buffer space" : "unexpected prefix");
+            return;
+        }
+
+        // Copy `cs->parsed` into `buf[]`, but with the $HOME/ prefix
+        // replaced with ~/
+        xmempcpy2(buf, STRN("~/"), parsed.data, parsed.length + 1);
+
+        dirprefix = path_slice_dirname(buf);
+        fileprefix = strview(buf + dirprefix.length + 1);
+        cs->tilde_expanded = true;
+    } else {
+        const char *base = path_basename(cs->parsed);
+        bool has_slash = (base != cs->parsed);
+        dirprefix = strview(has_slash ? dir : "");
+        fileprefix = strview(base);
     }
+
+    do_collect_files(&cs->completions, dir, dirprefix, fileprefix, type);
+    free(dir);
 
     if (cs->completions.count == 1) {
         // Add space if completed string is not a directory
