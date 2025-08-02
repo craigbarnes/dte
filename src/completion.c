@@ -139,15 +139,15 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
 
     if (strview_has_prefix(&cs->escaped, "~/")) {
         const StringView *home = &e->home_dir;
-        if (unlikely(!strview_has_prefix(home, "/"))) {
-            return;
-        }
-
         StringView parsed = strview(cs->parsed);
-        bool p = strview_remove_matching_sv_prefix(&parsed, *home);
-        p = p && strview_remove_matching_prefix(&parsed, "/");
-        if (unlikely(!p || sizeof(buf) < parsed.length + 3)) {
-            LOG_ERROR("%s", p ? "no buffer space" : "unexpected prefix");
+        BUG_ON(!strview_has_sv_prefix(parsed, *home));
+        strview_remove_prefix(&parsed, home->length + STRLEN("/"));
+        bool sufficient_buf = parsed.length <= sizeof(buf) - sizeof("~/");
+        bool sane_home = strview_has_prefix(home, "/");
+
+        if (unlikely(!sane_home || !sufficient_buf)) {
+            LOG_ERROR("%s", !sane_home ? "non-absolute $HOME" : "no buffer space");
+            free(dir);
             return;
         }
 

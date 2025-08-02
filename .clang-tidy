@@ -103,6 +103,7 @@ CheckOptions:
         path_is_absolute;
         strview_has_prefix;
         strview_has_suffix;
+        strview_has_sv_prefix;
 
     # https://clang.llvm.org/extra/clang-tidy/checks/bugprone/unused-return-value.html
     bugprone-unused-return-value.CheckedReturnTypes: ^(ExitCode|String|SystemErrno)$
