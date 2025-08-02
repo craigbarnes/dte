@@ -45,12 +45,15 @@ typedef enum {
     MSGLINE = 1 << 2, // Move cursor to line corresponding to `e->messages[0].pos`
 } ShowHandlerFlags;
 
+typedef bool (*ShowHandlerFunc)(EditorState *e, const char *name, bool cmdline);
+typedef void (*CompleteArgFunc)(EditorState *e, PointerArray *a, const char *prefix);
+
 typedef struct {
     const char name[10];
     uint8_t flags; // ShowHandlerFlags
     DumpFunc dump;
-    bool (*show)(EditorState *e, const char *name, bool cmdline);
-    void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
+    ShowHandlerFunc show;
+    CompleteArgFunc complete_arg;
 } ShowHandler;
 
 // NOLINTNEXTLINE(readability-function-size)
@@ -632,8 +635,8 @@ static const ShowHandler show_handlers[] = {
 
 static const char *arg_hint_for_subcmd(const ShowHandler *handler)
 {
-    const void *show = handler->show;
-    return (show == show_binding) ? " [key]" : (show ? " [name]" : "");
+    const ShowHandlerFunc func = handler->show;
+    return (func == show_binding) ? " [key]" : (func ? " [name]" : "");
 }
 
 static String dump_show_subcmds(EditorState* UNUSED_ARG(e))
