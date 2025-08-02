@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include "command/error.h"
-#include "editor.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
@@ -44,8 +43,10 @@ typedef enum {
     EXECFLAG_BUILTIN = 1u << 3, // Look up argv[0] as a built-in script, instead of in the filesystem
 } ExecFlags;
 
+struct EditorState;
+
 ssize_t handle_exec (
-    EditorState *e,
+    struct EditorState *e,
     const char **argv,
     ExecAction actions[3],
     ExecFlags flags
@@ -53,8 +54,8 @@ ssize_t handle_exec (
 
 ExecAction lookup_exec_action(const char *name, int fd) NONNULL_ARGS;
 int open_builtin_script(ErrorBuffer *ebuf, const char *name) NONNULL_ARGS WARN_UNUSED_RESULT;
-void yield_terminal(EditorState *e, bool quiet) NONNULL_ARGS;
-void resume_terminal(EditorState *e, bool quiet, bool prompt) NONNULL_ARGS;
+void yield_terminal(struct EditorState *e, bool quiet) NONNULL_ARGS;
+void resume_terminal(struct EditorState *e, bool quiet, bool prompt) NONNULL_ARGS;
 void collect_exec_actions(PointerArray *a, const char *prefix, int fd) NONNULL_ARGS;
 
 #endif

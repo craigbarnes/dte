@@ -9,6 +9,7 @@
 #include "command/macro.h"
 #include "commands.h"
 #include "ctags.h"
+#include "editor.h"
 #include "move.h"
 #include "msg.h"
 #include "selection.h"

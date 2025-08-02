@@ -5,6 +5,7 @@
 #include "command/macro.h"
 #include "command/run.h"
 #include "command/serialize.h"
+#include "editor.h"
 #include "util/debug.h"
 #include "util/xmalloc.h"
 

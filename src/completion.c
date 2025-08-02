@@ -14,6 +14,7 @@
 #include "commands.h"
 #include "compiler.h"
 #include "config.h"
+#include "editor.h"
 #include "exec.h"
 #include "filetype.h"
 #include "mode.h"

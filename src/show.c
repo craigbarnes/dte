@@ -14,6 +14,7 @@
 #include "completion.h"
 #include "config.h"
 #include "edit.h"
+#include "editor.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
