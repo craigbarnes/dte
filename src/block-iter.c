@@ -6,10 +6,17 @@
 #include "util/xmalloc.h"
 #include "util/xmemrchr.h"
 
-/*
- * Move after next newline (beginning of next line or end of file).
- * Returns number of bytes iterator advanced.
- */
+NONNULL_ARGS_AND_RETURN
+static const char *block_memchr_eol(const Block *blk, size_t offset)
+{
+    BUG_ON(offset > blk->size);
+    const char *eol = memchr(blk->data + offset, '\n', blk->size - offset);
+    BUG_ON(!eol);
+    return eol;
+}
+
+// Move after next newline (beginning of next line or end of file)
+// and return number of bytes moved
 size_t block_iter_eat_line(BlockIter *bi)
 {
     block_iter_normalize(bi);
@@ -22,20 +29,14 @@ size_t block_iter_eat_line(BlockIter *bi)
     if (bi->blk->nl == 1) {
         bi->offset = bi->blk->size;
     } else {
-        const char *start = bi->blk->data + offset;
-        const char *end = memchr(start, '\n', bi->blk->size - offset);
-        BUG_ON(!end);
+        const char *end = block_memchr_eol(bi->blk, offset);
         bi->offset = (size_t)(end + 1 - bi->blk->data);
     }
 
     return bi->offset - offset;
 }
 
-/*
- * Move to beginning of next line.
- * If there is no next line, iterator is not advanced.
- * Returns number of bytes iterator advanced.
- */
+// Move to beginning of next line (if any) and return number of bytes moved
 size_t block_iter_next_line(BlockIter *bi)
 {
     block_iter_normalize(bi);
@@ -49,11 +50,10 @@ size_t block_iter_next_line(BlockIter *bi)
     if (bi->blk->nl == 1) {
         new_offset = bi->blk->size;
     } else {
-        const char *start = bi->blk->data + offset;
-        const char *end = memchr(start, '\n', bi->blk->size - offset);
-        BUG_ON(!end);
+        const char *end = block_memchr_eol(bi->blk, offset);
         new_offset = (size_t)(end + 1 - bi->blk->data);
     }
+
     if (new_offset == bi->blk->size && bi->blk->node.next == bi->head) {
         return 0;
     }
@@ -62,10 +62,7 @@ size_t block_iter_next_line(BlockIter *bi)
     return bi->offset - offset;
 }
 
-/*
- * Move to beginning of previous line.
- * Returns number of bytes moved, which is zero if there's no previous line.
- */
+// Move to beginning of previous line (if any) and return number of bytes moved
 size_t block_iter_prev_line(BlockIter *bi)
 {
     Block *blk = bi->blk;
@@ -212,8 +209,7 @@ size_t block_iter_eol(BlockIter *bi)
         return bi->offset - offset;
     }
 
-    const char *end = memchr(blk->data + offset, '\n', blk->size - offset);
-    BUG_ON(!end);
+    const char *end = block_memchr_eol(blk, offset);
     bi->offset = (size_t)(end - blk->data);
     return bi->offset - offset;
 }
@@ -368,22 +364,24 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
 StringView block_iter_get_line_with_nl(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    StringView line = {.data = bi->blk->data + bi->offset};
-    const size_t max = bi->blk->size - bi->offset;
+    const char *start = bi->blk->data + bi->offset;
+    StringView line = {.data = start, .length = 0};
+    size_t max = bi->blk->size - bi->offset;
+
     if (unlikely(max == 0)) {
         // Cursor at end of last block
         return line;
     }
 
     if (bi->blk->nl == 1) {
+        // Block contains only 1 line; end-of-line is end-of-block
         BUG_ON(line.data[max - 1] != '\n');
         line.length = max;
         return line;
     }
 
-    const char *nl = memchr(line.data, '\n', max);
-    BUG_ON(!nl);
-    line.length = (size_t)(nl - line.data + 1);
+    const char *nl = block_memchr_eol(bi->blk, bi->offset);
+    line.length = (size_t)(nl - start + 1);
     BUG_ON(line.length == 0);
     return line;
 }
