@@ -172,7 +172,7 @@ static const char *lookup_other_key(KeyCode key)
 // Writes the string representation of `k` into `buf` (which must
 // have at least `KEYCODE_STR_BUFSIZE` bytes available) and returns
 // the length of the written string.
-size_t keycode_to_str(KeyCode k, char buf[KEYCODE_STR_BUFSIZE])
+size_t keycode_to_str(KeyCode k, char buf[static KEYCODE_STR_BUFSIZE])
 {
     static const struct {
         char prefix;

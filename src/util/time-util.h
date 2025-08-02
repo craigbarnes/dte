@@ -61,6 +61,6 @@ static inline bool xgettime(struct timespec *ts)
     return r;
 }
 
-char *timespec_to_str(const struct timespec *ts, char buf[TIME_STR_BUFSIZE]) NONNULL_ARGS WARN_UNUSED_RESULT;
+char *timespec_to_str(const struct timespec *ts, char buf[static TIME_STR_BUFSIZE]) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

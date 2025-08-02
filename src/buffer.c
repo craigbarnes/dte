@@ -421,7 +421,7 @@ void buffer_setup(EditorState *e, Buffer *buffer)
     sanity_check_local_options(&e->err, &buffer->options);
 }
 
-void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2])
+void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[static 2])
 {
     uintmax_t blocks = 0;
     uintmax_t bytes = 0;

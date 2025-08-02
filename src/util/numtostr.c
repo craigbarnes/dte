@@ -123,7 +123,7 @@ size_t buf_uint_to_str(unsigned int x, char *buf)
  * • https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10:~:text=three%20character%20positions
  * • https://gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html#index-long-ls-format
  */
-char *file_permissions_to_str(mode_t mode, char buf[10])
+char *file_permissions_to_str(mode_t mode, char buf[static 10])
 {
     static const char xmap[8] = "-xSs-xTt";
 
@@ -149,7 +149,7 @@ char *file_permissions_to_str(mode_t mode, char buf[10])
 // Write an approximate, human-readable representation of `bytes` into
 // `buf`, using IEC 80000-13 units (e.g. KiB, MiB, etc.) and (optionally)
 // a 2 digit decimal fraction
-char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
+char *human_readable_size(uintmax_t bytes, char buf[static HRSIZE_MAX])
 {
     unsigned int sigbits = umax_bitwidth(bytes);
     unsigned int nr_unit_shifts = (sigbits - !!sigbits) / 10;
@@ -186,7 +186,7 @@ char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX])
 
 // Like human_readable_size(), but also printing the exact number
 // of bytes in parentheses, e.g. 1024 → "1 KiB (1024)"
-char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX])
+char *filesize_to_str(uintmax_t bytes, char buf[static FILESIZE_STR_MAX])
 {
     human_readable_size(bytes, buf);
     if (bytes < 1024) {
@@ -208,7 +208,7 @@ char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX])
 // for uses cases that call for a single, trivially parseable integer and unit.
 // In practical terms this means that 1.5GiB (3 << 29) is printed as "1536MiB"
 // and `(3 << 29) + 1` is printed as "1610612737".
-char *filesize_to_str_precise(uintmax_t bytes, char buf[PRECISE_FILESIZE_STR_MAX])
+char *filesize_to_str_precise(uintmax_t bytes, char buf[static PRECISE_FILESIZE_STR_MAX])
 {
     unsigned int tzcount = bytes ? umax_ctz(bytes) : 0; // Special case zero
     unsigned int nr_unit_shifts = tzcount / 10;

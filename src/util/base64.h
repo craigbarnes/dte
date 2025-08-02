@@ -47,6 +47,6 @@ static inline unsigned int base64_decode_branchy(unsigned char c)
 }
 
 size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen) NONNULL_ARGS;
-void base64_encode_final(const char *in, size_t ilen, char out[4]) NONNULL_ARGS;
+void base64_encode_final(const char *in, size_t ilen, char out[static 4]) NONNULL_ARGS;
 
 #endif

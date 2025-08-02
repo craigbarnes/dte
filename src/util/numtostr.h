@@ -15,7 +15,7 @@ enum {
 extern const char hextable[32];
 
 // Encodes a byte of data as 2 hexadecimal digits
-static inline size_t hex_encode_byte(char out[2], uint8_t byte)
+static inline size_t hex_encode_byte(char out[static 2], uint8_t byte)
 {
     const char *hextab_lower = hextable + 16;
     out[0] = hextab_lower[byte >> 4];
@@ -30,9 +30,9 @@ size_t buf_u8_to_str(uint8_t x, char *buf) NONNULL_ARGS;
 const char *umax_to_str(uintmax_t x) RETURNS_NONNULL;
 const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
 const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;
-char *file_permissions_to_str(mode_t mode, char buf[10]) NONNULL_ARGS_AND_RETURN;
-char *human_readable_size(uintmax_t bytes, char buf[HRSIZE_MAX]) NONNULL_ARGS_AND_RETURN;
-char *filesize_to_str(uintmax_t bytes, char buf[FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
-char *filesize_to_str_precise(uintmax_t bytes, char buf[PRECISE_FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
+char *file_permissions_to_str(mode_t mode, char buf[static 10]) NONNULL_ARGS_AND_RETURN;
+char *human_readable_size(uintmax_t bytes, char buf[static HRSIZE_MAX]) NONNULL_ARGS_AND_RETURN;
+char *filesize_to_str(uintmax_t bytes, char buf[static FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
+char *filesize_to_str_precise(uintmax_t bytes, char buf[static PRECISE_FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
 
 #endif

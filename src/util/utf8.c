@@ -248,7 +248,7 @@ size_t u_set_char(char *buf, CodePoint u)
     return u_set_char_raw(buf, u);
 }
 
-size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u)
+size_t u_set_hex(char buf[static U_SET_HEX_LEN], CodePoint u)
 {
     buf[0] = '<';
     if (!u_is_unicode(u)) {

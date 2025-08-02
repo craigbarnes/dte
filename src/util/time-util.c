@@ -2,7 +2,7 @@
 #include "time-util.h"
 #include "numtostr.h"
 
-char *timespec_to_str(const struct timespec *ts, char buf[TIME_STR_BUFSIZE])
+char *timespec_to_str(const struct timespec *ts, char buf[static TIME_STR_BUFSIZE])
 {
     if (unlikely(ts->tv_nsec < 0 || ts->tv_nsec >= NS_PER_SECOND)) {
         errno = EINVAL;

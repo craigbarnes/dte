@@ -106,7 +106,7 @@ void buffer_update_short_filename(Buffer *buffer, const StringView *home) NONNUL
 bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes) NONNULL_ARGS;
 void buffer_update_syntax(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_setup(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
-void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[2]) NONNULL_ARGS;
+void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[static 2]) NONNULL_ARGS;
 void buffer_remove_unlock_and_free(PointerArray *buffers, Buffer *buffer, ErrorBuffer *ebuf, const FileLocksContext *locks_ctx) NONNULL_ARGS;
 void free_blocks(Buffer *buffer) NONNULL_ARGS;
 

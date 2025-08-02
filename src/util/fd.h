@@ -67,7 +67,7 @@ static inline bool is_controlling_tty(int fd)
     return isatty(fd) && tcgetpgrp(fd) != -1;
 }
 
-int xpipe2(int fd[2], int flags) WARN_UNUSED_RESULT;
+int xpipe2(int fd[static 2], int flags) WARN_UNUSED_RESULT;
 int xdup3(int oldfd, int newfd, int flags) WARN_UNUSED_RESULT;
 int xfchown(int fd, uid_t owner, gid_t group) WARN_UNUSED_RESULT;
 int xfchmod(int fd, mode_t mode) WARN_UNUSED_RESULT;

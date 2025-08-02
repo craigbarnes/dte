@@ -49,7 +49,7 @@ size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
     return o;
 }
 
-void base64_encode_final(const char *in, size_t ilen, char out[4])
+void base64_encode_final(const char *in, size_t ilen, char out[static 4])
 {
     BUG_ON(ilen - 1 > 1);
     uint32_t a = (unsigned char)in[0];

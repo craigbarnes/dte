@@ -166,7 +166,7 @@ void collect_colors_and_attributes(PointerArray *a, const char *prefix)
     }
 }
 
-size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
+size_t color_to_str(char buf[static COLOR_STR_BUFSIZE], int32_t color)
 {
     BUG_ON(!color_is_valid(color));
     if (color < 16) {
@@ -189,7 +189,7 @@ size_t color_to_str(char buf[COLOR_STR_BUFSIZE], int32_t color)
     return i;
 }
 
-const char *term_style_to_string(char buf[TERM_STYLE_BUFSIZE], const TermStyle *style)
+const char *term_style_to_string(char buf[static TERM_STYLE_BUFSIZE], const TermStyle *style)
 {
     size_t pos = color_to_str(buf, style->fg);
 

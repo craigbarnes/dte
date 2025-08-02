@@ -106,6 +106,6 @@ static inline KeyCode keycode_get_modifiers(KeyCode k)
 }
 
 KeyCode keycode_from_str(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;
-size_t keycode_to_str(KeyCode key, char buf[KEYCODE_STR_BUFSIZE]) NONNULL_ARGS;
+size_t keycode_to_str(KeyCode key, char buf[static KEYCODE_STR_BUFSIZE]) NONNULL_ARGS;
 
 #endif

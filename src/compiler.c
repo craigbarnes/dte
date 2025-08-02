@@ -40,7 +40,7 @@ void add_error_fmt (
     const char *name,
     const char *pattern,
     regex_t *re,
-    int8_t idx[NR_ERRFMT_INDICES],
+    int8_t idx[static NR_ERRFMT_INDICES],
     bool ignore
 ) {
     ErrorFormat *f = xmalloc(sizeof(*f));
