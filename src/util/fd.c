@@ -4,20 +4,21 @@
 #include "debug.h"
 #include "xreadwrite.h"
 
-int xpipe2(int fd[2], int flags)
+static bool cloexec(int fd) {return fd_set_cloexec(fd, true);}
+static bool nonblock(int fd) {return fd_set_nonblock(fd, true);}
+
+int xpipe2(int fd[static 2], int flags)
 {
     BUG_ON((flags & (O_CLOEXEC | O_NONBLOCK)) != flags);
 
 #if HAVE_PIPE2
-    if (likely(pipe2(fd, flags) == 0)) {
-        return 0;
-    }
     // If pipe2() fails with ENOSYS, it means the function is just a stub
     // and not actually supported. In that case, the pure POSIX fallback
     // implementation should be tried instead. In other cases, the failure
     // is probably caused by a normal error condition.
-    if (errno != ENOSYS) {
-        return -1;
+    int r = pipe2(fd, flags);
+    if (likely(r == 0 || errno != ENOSYS)) {
+        return r;
     }
 #endif
 
@@ -26,23 +27,15 @@ int xpipe2(int fd[2], int flags)
         return -1;
     }
 
-    if (flags & O_CLOEXEC) {
-        if (unlikely(!fd_set_cloexec(fd[0], true) || !fd_set_cloexec(fd[1], true))) {
-            goto error;
-        }
-    }
-    if (flags & O_NONBLOCK) {
-        if (unlikely(!fd_set_nonblock(fd[0], true) || !fd_set_nonblock(fd[1], true))) {
-            goto error;
-        }
+    bool ok = !(flags & O_CLOEXEC) || (cloexec(fd[0]) && cloexec(fd[1]));
+    ok = ok && (!(flags & O_NONBLOCK) || (nonblock(fd[0]) && nonblock(fd[1])));
+    if (unlikely(!ok)) {
+        xclose(fd[0]);
+        xclose(fd[1]);
+        return -1;
     }
 
     return 0;
-
-error:
-    xclose(fd[0]);
-    xclose(fd[1]);
-    return -1;
 }
 
 int xdup3(int oldfd, int newfd, int flags)
@@ -75,7 +68,7 @@ int xdup3(int oldfd, int newfd, int flags)
     } while (unlikely(fd < 0 && errno == EINTR));
 
     if (fd >= 0 && (flags & O_CLOEXEC)) {
-        (void)!fd_set_cloexec(fd, true);
+        cloexec(fd);
     }
 
     return fd;
