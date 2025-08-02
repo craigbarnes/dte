@@ -103,7 +103,7 @@ static unsigned int u_get_first_byte_mask(unsigned int seq_len)
     return (0x80 >> seq_len) - 1;
 }
 
-size_t u_str_width(const unsigned char *str)
+size_t u_str_width(const char *str)
 {
     size_t i = 0, w = 0;
     while (str[i]) {
@@ -112,7 +112,7 @@ size_t u_str_width(const unsigned char *str)
     return w;
 }
 
-CodePoint u_prev_char(const unsigned char *str, size_t *idx)
+CodePoint u_prev_char(const char *str, size_t *idx)
 {
     size_t i = *idx;
     unsigned char ch = str[--i];
@@ -152,14 +152,14 @@ CodePoint u_prev_char(const unsigned char *str, size_t *idx)
 
 invalid:
     *idx = *idx - 1;
-    u = str[*idx];
+    u = (unsigned char)str[*idx];
     return -u;
 }
 
-CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx)
+CodePoint u_get_char(const char *str, size_t size, size_t *idx)
 {
     size_t i = *idx;
-    CodePoint u = str[i];
+    CodePoint u = (unsigned char)str[i];
     if (likely(u < 0x80)) {
         *idx = i + 1;
         return u;
@@ -167,10 +167,10 @@ CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx)
     return u_get_nonascii(str, size, idx);
 }
 
-CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx)
+CodePoint u_get_nonascii(const char *str, size_t size, size_t *idx)
 {
     size_t i = *idx;
-    unsigned int first = str[i++];
+    unsigned int first = (unsigned char)str[i++];
     int seq_len = u_seq_len(first);
     if (unlikely(seq_len < 2 || seq_len > size - i + 1)) {
         goto invalid;
@@ -201,28 +201,29 @@ invalid:
 
 size_t u_set_char_raw(char *buf, CodePoint u)
 {
+    unsigned char *ubuf = (unsigned char*)buf;
     unsigned int prefix = 0;
     size_t len = u_char_size(u);
     BUG_ON(len == 0 || len > UTF8_MAX_SEQ_LEN);
 
     switch (len) {
     case 4:
-        buf[3] = (u & 0x3F) | 0x80;
+        ubuf[3] = (u & 0x3F) | 0x80;
         u >>= 6;
         prefix |= 0xF0;
         // Fallthrough
     case 3:
-        buf[2] = (u & 0x3F) | 0x80;
+        ubuf[2] = (u & 0x3F) | 0x80;
         u >>= 6;
         prefix |= 0xE0;
         // Fallthrough
     case 2:
-        buf[1] = (u & 0x3F) | 0x80;
+        ubuf[1] = (u & 0x3F) | 0x80;
         u >>= 6;
         prefix |= 0xC0;
     }
 
-    buf[0] = (u & 0xFF) | prefix;
+    ubuf[0] = (u & 0xFF) | prefix;
     return len;
 }
 

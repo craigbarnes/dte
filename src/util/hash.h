@@ -19,18 +19,18 @@ static inline size_t fnv_1a_prime(void)
 }
 
 // https://datatracker.ietf.org/doc/html/draft-eastlake-fnv-31#name-fnv-basics
-static inline size_t fnv_1a_hash(const unsigned char *str, size_t n)
+static inline size_t fnv_1a_hash(const char *str, size_t n)
 {
     const size_t prime = fnv_1a_prime();
     size_t hash = fnv_1a_init();
     while (n--) {
-        hash ^= *str++;
+        hash ^= (unsigned char)*str++;
         hash *= prime;
     }
     return hash;
 }
 
-static inline size_t fnv_1a_hash_icase(const unsigned char *str, size_t n)
+static inline size_t fnv_1a_hash_icase(const char *str, size_t n)
 {
     const size_t prime = fnv_1a_prime();
     size_t hash = fnv_1a_init();

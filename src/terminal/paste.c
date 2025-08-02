@@ -103,7 +103,7 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
         // slightly overlaps into the previous read(), so as to handle
         // boundary-straddling delimiters in a minimal amount of code
         size_t overlap = MIN(dlen, str.len);
-        unsigned char *end = xmemmem(start - overlap, read_len + overlap, delim, dlen);
+        char *end = xmemmem(start - overlap, read_len + overlap, delim, dlen);
         if (!end) {
             str.len += read_len;
             continue;

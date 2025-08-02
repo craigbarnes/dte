@@ -82,7 +82,7 @@ static const TermStyle **highlight_line (
 ) {
     static const TermStyle **styles; // NOLINT(*-avoid-non-const-global-variables)
     static size_t alloc; // NOLINT(*-avoid-non-const-global-variables)
-    const unsigned char *const line = line_sv->data;
+    const char *const line = line_sv->data;
     const size_t len = line_sv->length;
     size_t i = 0;
     ssize_t sidx = -1;

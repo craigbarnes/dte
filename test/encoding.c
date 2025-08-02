@@ -5,7 +5,7 @@ static void test_detect_encoding_from_bom(TestContext *ctx)
 {
     static const struct bom_test {
         EncodingType encoding;
-        const unsigned char *text;
+        const char *text;
         size_t size;
     } tests[] = {
         {UTF8, STRN("\xef\xbb\xbfHello")},

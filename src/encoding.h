@@ -33,7 +33,7 @@ static inline bool encoding_type_has_bom(EncodingType type)
 
 const char *encoding_normalize(const char *name) NONNULL_ARGS_AND_RETURN;
 const char *encoding_from_type(EncodingType type) RETURNS_NONNULL;
-EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size);
+EncodingType detect_encoding_from_bom(const char *buf, size_t size);
 const ByteOrderMark *get_bom_for_encoding(EncodingType type);
 
 #endif

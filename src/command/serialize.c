@@ -45,7 +45,7 @@ static void string_append_dquoted_arg(String *s, StringView arg)
     string_append_byte(s, '"');
 }
 
-static SerializeType get_serialize_type(const unsigned char *arg, size_t n)
+static SerializeType get_serialize_type(const char *arg, size_t n)
 {
     SerializeType type = NO_QUOTE;
     for (size_t i = 0; i < n; i++) {

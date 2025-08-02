@@ -23,7 +23,7 @@
 #include "util/xreadwrite.h"
 #include "util/xstring.h"
 
-static bool decode_and_add_blocks(Buffer *buffer, const unsigned char *buf, size_t size, bool utf8_bom)
+static bool decode_and_add_blocks(Buffer *buffer, const char *buf, size_t size, bool utf8_bom)
 {
     EncodingType bom_type = detect_encoding_from_bom(buf, size);
     if (!buffer->encoding && bom_type != UNKNOWN_ENCODING) {
@@ -107,7 +107,7 @@ bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
 {
     const size_t map_size = 64 * 1024;
     size_t size = buffer->file.size;
-    unsigned char *buf = NULL;
+    char *buf = NULL;
     bool mapped = false;
     bool ret = false;
 

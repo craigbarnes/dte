@@ -81,8 +81,8 @@ static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
         return true;
     }
 
-    const unsigned char *s1 = p1;
-    const unsigned char *s2 = p2;
+    const char *s1 = p1;
+    const char *s2 = p2;
     BUG_ON(!s1 || !s2);
 
     while (n--) {

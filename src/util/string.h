@@ -11,7 +11,7 @@
 #include "xmalloc.h"
 
 typedef struct {
-    unsigned char NONSTRING *buffer;
+    char NONSTRING *buffer;
     size_t alloc;
     size_t len;
 } String;

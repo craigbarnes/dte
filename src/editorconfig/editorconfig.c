@@ -68,7 +68,7 @@ static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
 static unsigned int parse_indent_digit(const StringView *val)
 {
     static_assert(INDENT_WIDTH_MAX == TAB_WIDTH_MAX);
-    const unsigned char *data = val->data;
+    const char *data = val->data;
     unsigned int indent = (val->length == 1) ? data[0] - '0' : 0;
     return (indent <= INDENT_WIDTH_MAX) ? indent : 0;
 }

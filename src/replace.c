@@ -62,8 +62,8 @@ static unsigned int replace_on_line (
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
-    const unsigned char *buf = line->data;
-    unsigned char *alloc = NULL;
+    const char *buf = line->data;
+    char *alloc = NULL;
     EditorState *e = view->window->editor;
     ReplaceFlags flags = *flagsp;
     regmatch_t matches[32];

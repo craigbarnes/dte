@@ -58,11 +58,11 @@ typedef union {
     BitSetWord bitset[BITSET_NR_WORDS(256)];
     StringView heredocend;
     const StringList *str_list;
-    unsigned char ch;
+    char ch;
     size_t recolor_len;
     struct {
         uint8_t len;
-        unsigned char buf[31];
+        char buf[31];
     } str;
 } ConditionData;
 

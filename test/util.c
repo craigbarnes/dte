@@ -1936,7 +1936,7 @@ static void test_u_str_width(TestContext *ctx)
 
 static void test_u_set_char_raw(TestContext *ctx)
 {
-    unsigned char buf[UTF8_MAX_SEQ_LEN] = "";
+    char buf[UTF8_MAX_SEQ_LEN] = "";
     EXPECT_EQ(sizeof(buf), 4);
     EXPECT_EQ(u_set_char_raw(buf, 'a'), 1);
     EXPECT_EQ(buf[0], 'a');
@@ -1945,58 +1945,58 @@ static void test_u_set_char_raw(TestContext *ctx)
     EXPECT_EQ(buf[0], '\0');
 
     EXPECT_EQ(u_set_char_raw(buf, 0x1F), 1);
-    EXPECT_EQ(buf[0], 0x1F);
+    EXPECT_EQ(buf[0], '\x1F');
 
     EXPECT_EQ(u_set_char_raw(buf, 0x7F), 1);
-    EXPECT_EQ(buf[0], 0x7F);
+    EXPECT_EQ(buf[0], '\x7F');
 
     EXPECT_EQ(u_set_char_raw(buf, 0x7FF), 2);
-    EXPECT_EQ(buf[0], 0xDF);
-    EXPECT_EQ(buf[1], 0xBF);
+    EXPECT_EQ(buf[0], '\xDF');
+    EXPECT_EQ(buf[1], '\xBF');
 
     EXPECT_EQ(u_set_char_raw(buf, 0xFF45), 3);
-    EXPECT_EQ(buf[0], 0xEF);
-    EXPECT_EQ(buf[1], 0xBD);
-    EXPECT_EQ(buf[2], 0x85);
+    EXPECT_EQ(buf[0], '\xEF');
+    EXPECT_EQ(buf[1], '\xBD');
+    EXPECT_EQ(buf[2], '\x85');
 
     EXPECT_EQ(u_set_char_raw(buf, 0x1F311), 4);
-    EXPECT_EQ(buf[0], 0xF0);
-    EXPECT_EQ(buf[1], 0x9F);
-    EXPECT_EQ(buf[2], 0x8C);
-    EXPECT_EQ(buf[3], 0x91);
+    EXPECT_EQ(buf[0], '\xF0');
+    EXPECT_EQ(buf[1], '\x9F');
+    EXPECT_EQ(buf[2], '\x8C');
+    EXPECT_EQ(buf[3], '\x91');
 
     buf[1] = 0x88;
     EXPECT_EQ(u_set_char_raw(buf, 0x110000), 1);
-    EXPECT_EQ(buf[0], 0);
-    EXPECT_EQ(buf[1], 0x88);
+    EXPECT_EQ(buf[0], '\0');
+    EXPECT_EQ(buf[1], '\x88');
 
     EXPECT_EQ(u_set_char_raw(buf, 0x110042), 1);
-    EXPECT_EQ(buf[0], 0x42);
-    EXPECT_EQ(buf[1], 0x88);
+    EXPECT_EQ(buf[0], '\x42');
+    EXPECT_EQ(buf[1], '\x88');
 }
 
 static void test_u_set_char(TestContext *ctx)
 {
-    unsigned char buf[U_SET_CHAR_MAXLEN] = "";
+    char buf[U_SET_CHAR_MAXLEN] = "";
     EXPECT_EQ(sizeof(buf), 4);
     EXPECT_EQ(u_set_char(buf, 'a'), 1);
     EXPECT_EQ(buf[0], 'a');
 
     EXPECT_EQ(u_set_char(buf, 0x00DF), 2);
-    EXPECT_EQ(buf[0], 0xC3);
-    EXPECT_EQ(buf[1], 0x9F);
+    EXPECT_EQ(buf[0], '\xC3');
+    EXPECT_EQ(buf[1], '\x9F');
 
     EXPECT_EQ(u_set_char(buf, 0x0E01), 3);
-    EXPECT_EQ(buf[0], 0xE0);
-    EXPECT_EQ(buf[1], 0xB8);
-    EXPECT_EQ(buf[2], 0x81);
+    EXPECT_EQ(buf[0], '\xE0');
+    EXPECT_EQ(buf[1], '\xB8');
+    EXPECT_EQ(buf[2], '\x81');
 
     EXPECT_EQ(UTF8_MAX_SEQ_LEN, 4);
     EXPECT_EQ(u_set_char(buf, 0x1F914), 4);
-    EXPECT_EQ(buf[0], 0xF0);
-    EXPECT_EQ(buf[1], 0x9F);
-    EXPECT_EQ(buf[2], 0xA4);
-    EXPECT_EQ(buf[3], 0x94);
+    EXPECT_EQ(buf[0], '\xF0');
+    EXPECT_EQ(buf[1], '\x9F');
+    EXPECT_EQ(buf[2], '\xA4');
+    EXPECT_EQ(buf[3], '\x94');
 
     EXPECT_EQ(U_SET_HEX_LEN, 4);
     EXPECT_EQ(u_set_char(buf, 0x10FFFF), 4);
@@ -2320,7 +2320,7 @@ static void test_u_get_char(TestContext *ctx)
 
 static void test_u_prev_char(TestContext *ctx)
 {
-    const unsigned char *buf = "\xE6\xB7\xB1\xE5\x9C\xB3\xE5\xB8\x82"; // 深圳市
+    const char *buf = "\xE6\xB7\xB1\xE5\x9C\xB3\xE5\xB8\x82"; // 深圳市
     size_t idx = 9;
     CodePoint c = u_prev_char(buf, &idx);
     EXPECT_UINT_EQ(c, 0x5E02);
@@ -2358,19 +2358,19 @@ static void test_u_prev_char(TestContext *ctx)
     buf = "\xF0\xF5";
     idx = 2;
     c = u_prev_char(buf, &idx);
-    EXPECT_UINT_EQ(-c, buf[1]);
+    EXPECT_UINT_EQ(-c, 0xF5);
     EXPECT_EQ(idx, 1);
     c = u_prev_char(buf, &idx);
-    EXPECT_UINT_EQ(-c, buf[0]);
+    EXPECT_UINT_EQ(-c, 0xF0);
     EXPECT_EQ(idx, 0);
 
     buf = "\xF5\xF0";
     idx = 2;
     c = u_prev_char(buf, &idx);
-    EXPECT_UINT_EQ(-c, buf[1]);
+    EXPECT_UINT_EQ(-c, 0xF0);
     EXPECT_EQ(idx, 1);
     c = u_prev_char(buf, &idx);
-    EXPECT_UINT_EQ(-c, buf[0]);
+    EXPECT_UINT_EQ(-c, 0xF5);
     EXPECT_EQ(idx, 0);
 }
 
@@ -2741,9 +2741,9 @@ static void test_hashset(TestContext *ctx)
         "foo", "Foo", "bar", "quux", "etc",
         "\t\xff\x80\b", "\t\t\t", "\x01\x02\x03\xfe\xff",
 #if __STDC_VERSION__ >= 201112L
-        u8"ภาษาไทย",
-        u8"中文",
-        u8"日本語",
+        (const char*)u8"ภาษาไทย",
+        (const char*)u8"中文",
+        (const char*)u8"日本語",
 #endif
     };
 

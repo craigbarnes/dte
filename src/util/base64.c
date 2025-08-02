@@ -33,13 +33,12 @@ size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
     BUG_ON(ilen == 0);
     BUG_ON(ilen % 3 != 0);
     BUG_ON(ilen / 3 * 4 > olen);
-    const unsigned char *u_in = in;
     size_t o = 0;
 
     for (size_t i = 0; i < ilen; ) {
-        uint32_t a = u_in[i++];
-        uint32_t b = u_in[i++];
-        uint32_t c = u_in[i++];
+        uint32_t a = (unsigned char)in[i++];
+        uint32_t b = (unsigned char)in[i++];
+        uint32_t c = (unsigned char)in[i++];
         uint32_t v = a << 16 | b << 8 | c;
         out[o++] = base64_encode_table[(v >> 18) & 63];
         out[o++] = base64_encode_table[(v >> 12) & 63];
@@ -53,9 +52,8 @@ size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
 void base64_encode_final(const char *in, size_t ilen, char out[4])
 {
     BUG_ON(ilen - 1 > 1);
-    const unsigned char *u_in = in;
-    uint32_t a = u_in[0];
-    uint32_t b = (ilen == 2) ? u_in[1] : 0;
+    uint32_t a = (unsigned char)in[0];
+    uint32_t b = (ilen == 2) ? (unsigned char)in[1] : 0;
     uint32_t v = a << 16 | b << 8;
     char x = (ilen == 2) ? base64_encode_table[(v >> 6) & 63] : '=';
     out[0] = base64_encode_table[(v >> 18) & 63];

@@ -22,7 +22,7 @@ enum {
 };
 
 typedef struct {
-    const unsigned char *ibuf;
+    const char *ibuf;
     ssize_t ipos;
     ssize_t isize;
     struct cconv *cconv;
@@ -37,7 +37,7 @@ static void add_block(Buffer *buffer, Block *blk)
 static Block *add_utf8_line (
     Buffer *buffer,
     Block *blk,
-    const unsigned char *line,
+    const char *line,
     size_t len
 ) {
     size_t size = len + 1;
@@ -91,7 +91,7 @@ static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
     return true;
 }
 
-static bool file_decoder_read_utf8(Buffer *buffer, const unsigned char *buf, size_t size)
+static bool file_decoder_read_utf8(Buffer *buffer, const char *buf, size_t size)
 {
     if (unlikely(!encoding_is_utf8(buffer->encoding))) {
         errno = EINVAL;
@@ -139,7 +139,7 @@ static bool file_decoder_read_utf8(Buffer *buffer, const unsigned char *buf, siz
 
 static size_t unix_to_dos (
     FileEncoder *enc,
-    const unsigned char *buf,
+    const char *buf,
     size_t size
 ) {
     // TODO: Pass in Buffer::nl and make this size adjustment more conservative
@@ -190,7 +190,7 @@ void file_encoder_free(FileEncoder *enc)
     free(enc->nbuf);
 }
 
-ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t n)
+ssize_t file_encoder_write(FileEncoder *enc, const char *buf, size_t n)
 {
     if (unlikely(enc->crlf)) {
         n = unix_to_dos(enc, buf, n);
@@ -204,7 +204,7 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
     return 0;
 }
 
-bool file_decoder_read(Buffer *buffer, const unsigned char *buf, size_t size)
+bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
 {
     return file_decoder_read_utf8(buffer, buf, size);
 }
@@ -423,7 +423,7 @@ static struct cconv *cconv_to_utf8(const char *encoding)
 
 static void encode_replacement(struct cconv *c)
 {
-    static const unsigned char rep[] = REPLACEMENT;
+    static const char rep[] = REPLACEMENT;
     const char *ib = rep;
     char *ob = c->rbuf;
     size_t ic = STRLEN(REPLACEMENT);
@@ -534,7 +534,7 @@ void file_encoder_free(FileEncoder *enc)
 // NOTE: buf must contain whole characters!
 ssize_t file_encoder_write (
     FileEncoder *enc,
-    const unsigned char *buf,
+    const char *buf,
     size_t size
 ) {
     if (unlikely(enc->crlf)) {
@@ -599,7 +599,7 @@ static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *l
     return true;
 }
 
-bool file_decoder_read(Buffer *buffer, const unsigned char *buf, size_t size)
+bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
 {
     if (encoding_is_utf8(buffer->encoding)) {
         return file_decoder_read_utf8(buffer, buf, size);

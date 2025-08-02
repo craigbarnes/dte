@@ -19,7 +19,7 @@ GCC_4_8_WARNINGS='
     -Wvla -Wold-style-definition -Wframe-larger-than=32768
     -Wpointer-arith -Wnested-externs -Winit-self -Wbad-function-cast
     -Werror=div-by-zero -Werror=implicit-function-declaration
-    -Wno-sign-compare -Wno-pointer-sign
+    -Wno-sign-compare
 '
 
 # https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Warning-Options.html

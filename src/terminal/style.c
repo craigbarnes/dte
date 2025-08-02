@@ -86,10 +86,9 @@ static int32_t parse_color(const char *str)
 
     // Parse r/g/b
     if (len == 5 && str[1] == '/') {
-        const unsigned char *u_str = str;
-        uint8_t r = u_str[0] - '0';
-        uint8_t g = u_str[2] - '0';
-        uint8_t b = u_str[4] - '0';
+        uint8_t r = (unsigned char)str[0] - '0';
+        uint8_t g = (unsigned char)str[2] - '0';
+        uint8_t b = (unsigned char)str[4] - '0';
         if (unlikely(r > 5 || g > 5 || b > 5 || str[3] != '/')) {
             return COLOR_INVALID;
         }

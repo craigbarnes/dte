@@ -15,7 +15,7 @@ typedef struct {
     ssize_t sel_eo;
     WhitespaceErrorFlags wse_flags;
 
-    const unsigned char *line;
+    const char *line;
     size_t size;
     size_t pos;
     size_t indent_size;
@@ -137,7 +137,7 @@ static CodePoint screen_next_char (
     bool ws_error;
     size_t count;
     size_t pos = info->pos;
-    CodePoint u = info->line[pos];
+    CodePoint u = (unsigned char)info->line[pos];
 
     if (likely(u < 0x80)) {
         info->pos++;
@@ -169,7 +169,7 @@ static CodePoint screen_next_char (
 
 static void screen_skip_char(TermOutputBuffer *obuf, LineInfo *info)
 {
-    CodePoint u = info->line[info->pos++];
+    CodePoint u = (unsigned char)info->line[info->pos++];
     info->offset++;
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
@@ -219,7 +219,7 @@ static void hl_words (
     }
 
     // Go to beginning of partially visible word inside comment
-    const unsigned char *line = info->line;
+    const char *line = info->line;
     while (i > 0 && styles[i] == comment_style && is_word_byte(line[i])) {
         i--;
     }

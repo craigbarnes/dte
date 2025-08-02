@@ -10,7 +10,7 @@
 // Otherwise zero-sized blocks are forbidden.
 typedef struct {
     ListHead node;
-    unsigned char NONSTRING *data;
+    char NONSTRING *data;
     size_t size;
     size_t alloc;
     size_t nl;

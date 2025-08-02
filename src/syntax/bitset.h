@@ -61,10 +61,10 @@ static inline BitSetWord bitset_end_mask(unsigned char ch)
     return bit | (bit - 1);
 }
 
-static inline void bitset_add_char_range(BitSetWord *set, const unsigned char *r)
+static inline void bitset_add_char_range(BitSetWord *set, const char *r)
 {
     for (size_t i = 0; r[i]; i++) {
-        unsigned int first_char = r[i];
+        unsigned int first_char = (unsigned char)r[i];
         if (r[i + 1] != '-' || r[i + 2] == '\0') {
             // Not a range; set bit for a single character
             bitset_add(set, first_char);
@@ -72,7 +72,7 @@ static inline void bitset_add_char_range(BitSetWord *set, const unsigned char *r
         }
 
         i += 2;
-        unsigned int last_char = r[i];
+        unsigned int last_char = (unsigned char)r[i];
         if (unlikely(first_char > last_char)) {
             continue;
         }

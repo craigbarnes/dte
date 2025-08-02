@@ -16,7 +16,7 @@
 // The .data member will usually *not* be null-terminated and the
 // underlying string *must* outlive the view.
 typedef struct {
-    const unsigned char NONSTRING *data;
+    const char NONSTRING *data;
     size_t length;
 } StringView;
 
@@ -150,13 +150,13 @@ static inline bool strview_contains_char_type(const StringView *sv, AsciiCharTyp
 }
 
 NONNULL_ARGS
-static inline const unsigned char *strview_memchr(const StringView *sv, int c)
+static inline const char *strview_memchr(const StringView *sv, int c)
 {
     return sv->length ? memchr(sv->data, c, sv->length) : NULL;
 }
 
 NONNULL_ARGS
-static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
+static inline const char *strview_memrchr(const StringView *sv, int c)
 {
     return sv->length ? xmemrchr(sv->data, c, sv->length) : NULL;
 }
@@ -164,7 +164,7 @@ static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
 NONNULL_ARGS
 static inline ssize_t strview_memrchr_idx(const StringView *sv, int c)
 {
-    const unsigned char *ptr = strview_memrchr(sv, c);
+    const char *ptr = strview_memrchr(sv, c);
     return ptr ? (ssize_t)(ptr - sv->data) : -1;
 }
 
@@ -240,7 +240,7 @@ static inline size_t strview_trim_left(StringView *sv)
 NONNULL_ARGS
 static inline void strview_trim_right(StringView *sv)
 {
-    const unsigned char *data = sv->data;
+    const char *data = sv->data;
     size_t n = sv->length;
     while (n && ascii_isblank(data[n - 1])) {
         n--;

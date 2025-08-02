@@ -140,7 +140,7 @@ static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
-    const unsigned char *buf = c->buf.buffer;
+    const char *buf = c->buf.buffer;
     const size_t len = c->buf.len;
     size_t i = c->pos;
 
@@ -342,7 +342,7 @@ static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
         return cmdline_soft_reset(c);
     }
 
-    const unsigned char *const buf = c->buf.buffer;
+    const char *const buf = c->buf.buffer;
     size_t i = c->pos - 1;
 
     while (i > 0 && !is_word_byte(buf[i])) {
@@ -365,7 +365,7 @@ static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
-    const unsigned char *buf = c->buf.buffer;
+    const char *buf = c->buf.buffer;
     const size_t len = c->buf.len;
     size_t i = c->pos;
 

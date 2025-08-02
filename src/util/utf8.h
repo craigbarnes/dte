@@ -29,16 +29,16 @@ typedef enum {
     MPF_C0_SYMBOLS = 1 << 0,
 } MakePrintableFlags;
 
-size_t u_str_width(const unsigned char *str) NONNULL_ARGS;
+size_t u_str_width(const char *str) NONNULL_ARGS;
 size_t u_skip_chars(const char *str, unsigned int skip_width) NONNULL_ARGS;
-CodePoint u_prev_char(const unsigned char *str, size_t *idx) NONNULL_ARGS READWRITE(2);
-CodePoint u_get_char(const unsigned char *str, size_t size, size_t *idx) NONNULL_ARGS READWRITE(3);
-CodePoint u_get_nonascii(const unsigned char *str, size_t size, size_t *idx) NONNULL_ARGS READWRITE(3);
+CodePoint u_prev_char(const char *str, size_t *idx) NONNULL_ARGS READWRITE(2);
+CodePoint u_get_char(const char *str, size_t size, size_t *idx) NONNULL_ARGS READWRITE(3);
+CodePoint u_get_nonascii(const char *str, size_t size, size_t *idx) NONNULL_ARGS READWRITE(3);
 size_t u_set_char_raw(char *buf, CodePoint u) NONNULL_ARGS;
 size_t u_set_char(char *buf, CodePoint u) NONNULL_ARGS;
 size_t u_set_hex(char buf[U_SET_HEX_LEN], CodePoint u) NONNULL_ARGS;
 
-static inline CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
+static inline CodePoint u_str_get_char(const char *str, size_t *idx)
 {
     // We can use a dummy size here, since the null terminator in `str`
     // guarantees u_get_char() won't read past the end
