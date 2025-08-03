@@ -134,7 +134,7 @@ static void test_ec_pattern_match(TestContext *ctx)
     #undef patmatch
 }
 
-static void test_editorconfig_options_struct(TestContext *ctx)
+static void test_ec_options_struct(TestContext *ctx)
 {
     const EditorConfigOptions opts = {
         .indent_size = INDENT_WIDTH_MAX,
@@ -149,7 +149,7 @@ static void test_editorconfig_options_struct(TestContext *ctx)
     EXPECT_EQ(opts.tab_width, TAB_WIDTH_MAX);
     EXPECT_EQ(opts.max_line_length, TEXT_WIDTH_MAX);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_SPACE);
-    EXPECT_EQ(opts.indent_size_is_tab, true);
+    EXPECT_TRUE(opts.indent_size_is_tab);
     EXPECT_EQ(umax_bitwidth(INDENT_WIDTH_MAX), 4);
     EXPECT_EQ(umax_bitwidth(TAB_WIDTH_MAX), 4);
     EXPECT_EQ(umax_bitwidth(TEXT_WIDTH_MAX), 10);
@@ -182,7 +182,7 @@ static void test_get_editorconfig_options(TestContext *ctx)
 static const TestEntry tests[] = {
     TEST(test_ini_parse),
     TEST(test_ec_pattern_match),
-    TEST(test_editorconfig_options_struct),
+    TEST(test_ec_options_struct),
     TEST(test_get_editorconfig_options),
 };
 
