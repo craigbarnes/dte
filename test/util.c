@@ -862,7 +862,7 @@ static void test_string_view(TestContext *ctx)
     EXPECT_NULL(strview_memrchr(&sv, '.'));
     EXPECT_NULL(strview_memchr(&sv, '.'));
     EXPECT_TRUE(strview_equal(&sv, &sv));
-    EXPECT_FALSE(strview_contains_char_type(&sv, ASCII_DIGIT));
+    EXPECT_FALSE(strview_contains_char_type(sv, ASCII_DIGIT));
     EXPECT_TRUE(strview_isblank(&sv));
     EXPECT_EQ(strview_trim_left(&sv), 0);
     EXPECT_TRUE(strview_equal_cstring(&sv, ""));

@@ -143,10 +143,9 @@ static inline bool strview_isblank(const StringView *sv)
     return len == ascii_blank_prefix_length(sv->data, len);
 }
 
-NONNULL_ARGS
-static inline bool strview_contains_char_type(const StringView *sv, AsciiCharType mask)
+static inline bool strview_contains_char_type(StringView sv, AsciiCharType mask)
 {
-    return strn_contains_ascii_char_type(sv->data, sv->length, mask);
+    return strn_contains_ascii_char_type(sv.data, sv.length, mask);
 }
 
 NONNULL_ARGS

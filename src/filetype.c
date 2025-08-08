@@ -230,16 +230,16 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
         }
     }
 
-    // Use "ini" filetype if first line looks like an ini [section]
     strview_trim_right(&line);
-    if (line.length >= 4) {
-        const char *s = line.data;
-        const size_t n = line.length;
-        if (s[0] == '[' && s[n - 1] == ']' && is_word_byte(s[1])) {
-            if (!strview_contains_char_type(&line, ASCII_CNTRL)) {
-                return builtin_filetype_names[INI];
-            }
-        }
+    if (
+        line.length >= 4
+        && strview_has_prefix(&line, "[")
+        && strview_has_suffix(&line, "]")
+        && is_word_byte(line.data[1])
+        && !strview_contains_char_type(line, ASCII_CNTRL)
+    ) {
+        // Use "ini" filetype, if first line looks like an INI [section]
+        return builtin_filetype_names[INI];
     }
 
     if (strview_equal_cstring(&ext, "conf")) {
