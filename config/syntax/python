@@ -29,6 +29,8 @@ state hex1 special
 
 syntax python
 
+# TODO: Numeric literal separators (1_000_000)
+# TODO: Decorators (@staticmethod)
 state start code
     char # comment
     str '"""' longdq
@@ -110,8 +112,6 @@ state hex numeric
     noeat int-suffix
 
 state int-suffix code
-    # TODO: Remove long int suffixes? (removed in Python 3)
-    char lL int-end numeric
     char jJ float-end numeric
     noeat int-end
 
