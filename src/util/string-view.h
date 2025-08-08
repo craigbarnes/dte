@@ -145,7 +145,12 @@ static inline bool strview_isblank(const StringView *sv)
 
 static inline bool strview_contains_char_type(StringView sv, AsciiCharType mask)
 {
-    return strn_contains_ascii_char_type(sv.data, sv.length, mask);
+    for (size_t i = 0, n = sv.length; i < n; i++) {
+        if (ascii_test(sv.data[i], mask)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 NONNULL_ARGS

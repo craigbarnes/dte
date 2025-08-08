@@ -134,7 +134,7 @@ bool search_tag(View *view, const char *pattern)
 
 static bool has_upper(const char *str)
 {
-    return strn_contains_ascii_char_type(str, strlen(str), ASCII_UPPER);
+    return strview_contains_char_type(strview(str), ASCII_UPPER);
 }
 
 static bool update_regex(SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs)

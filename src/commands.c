@@ -1660,9 +1660,9 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
 
     char *alloc = NULL;
     if (has_flag(a, 'e')) {
-        size_t len = strlen(pattern);
-        if (strn_contains_ascii_char_type(pattern, len, ASCII_REGEX)) {
-            pattern = alloc = regexp_escape(pattern, len);
+        StringView pat = strview(pattern);
+        if (strview_contains_char_type(pat, ASCII_REGEX)) {
+            pattern = alloc = regexp_escape(pattern, pat.length);
         }
         flags &= ~REPLACE_BASIC;
     }
@@ -2079,9 +2079,9 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     char *alloc = NULL;
 
     if (!use_word_under_cursor && has_flag(a, 'e')) {
-        size_t len = strlen(pattern);
-        if (strn_contains_ascii_char_type(pattern, len, ASCII_REGEX)) {
-            pattern = alloc = regexp_escape(pattern, len);
+        StringView pat = strview(pattern);
+        if (strview_contains_char_type(pat, ASCII_REGEX)) {
+            pattern = alloc = regexp_escape(pattern, pat.length);
         }
     }
 
