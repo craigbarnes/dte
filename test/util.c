@@ -1297,6 +1297,61 @@ static void test_str_to_filepos(TestContext *ctx)
     EXPECT_EQ(col, 2222);
 }
 
+static void test_parse_file_line_col(TestContext *ctx)
+{
+    size_t line = 44;
+    size_t col = 77;
+    StringView path = parse_file_line_col("dir/file.ext:12:45", &line, &col);
+    EXPECT_STRVIEW_EQ_CSTRING(&path, "dir/file.ext");
+    EXPECT_EQ(line, 12);
+    EXPECT_EQ(col, 45);
+
+    path = parse_file_line_col("/x/y/z/file:901", &line, &col);
+    EXPECT_STRVIEW_EQ_CSTRING(&path, "/x/y/z/file");
+    EXPECT_EQ(line, 901);
+    EXPECT_EQ(col, 1);
+
+    // Colons are searched from the end of the string, so the filename may
+    // contain colons
+    path = parse_file_line_col("/x/:y:/z/file:99:32", &line, &col);
+    EXPECT_STRVIEW_EQ_CSTRING(&path, "/x/:y:/z/file");
+    EXPECT_EQ(line, 99);
+    EXPECT_EQ(col, 32);
+
+    path = parse_file_line_col("a:5", &line, &col);
+    EXPECT_STRVIEW_EQ_CSTRING(&path, "a");
+    EXPECT_EQ(line, 5);
+    EXPECT_EQ(col, 1);
+
+    static const char invalid[][8] = {
+        "a", // Invalid because line number is mandatory
+        "",
+        ":",
+        "::",
+        "a:",
+        "a::",
+        ":1:1",
+        "a:2:",
+        "a::2",
+        "a:1:0",
+        "a:0:1",
+        "a:0:0",
+        "a:1:1:",
+        "a:_:1",
+        "a:1:_",
+        "a:1:1_",
+    };
+
+    for (size_t i = 0; i < ARRAYLEN(invalid); i++) {
+        line = 7;
+        col = 8;
+        path = parse_file_line_col(invalid[i], &line, &col);
+        EXPECT_STRVIEW_EQ_CSTRING(&path, "");
+        IEXPECT_EQ(line, 7);
+        IEXPECT_EQ(col, 8);
+    }
+}
+
 static void test_buf_umax_to_hex_str(TestContext *ctx)
 {
     char buf[HEX_STR_MAX(uintmax_t)];
@@ -3840,6 +3895,7 @@ static const TestEntry tests[] = {
     TEST(test_str_to_int),
     TEST(test_str_to_size),
     TEST(test_str_to_filepos),
+    TEST(test_parse_file_line_col),
     TEST(test_buf_umax_to_hex_str),
     TEST(test_parse_filesize),
     TEST(test_umax_to_str),

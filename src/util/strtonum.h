@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "macros.h"
+#include "string-view.h"
 
 extern const uint8_t hex_decode_table[64];
 
@@ -65,6 +66,7 @@ bool str_to_size(const char *str, size_t *valp) NONNULL_ARGS WARN_UNUSED_RESULT 
 bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2);
 bool str_to_filepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2) WRITEONLY(3);
 bool str_to_xfilepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2) WRITEONLY(3);
+StringView parse_file_line_col(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS WARN_UNUSED_RESULT WRITEONLY(2) WRITEONLY(3);
 intmax_t parse_filesize(const char *str) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

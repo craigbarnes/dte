@@ -373,17 +373,28 @@ static View *open_initial_buffers (
     // Open files specified as command-line arguments
     Window *window = e->window;
     for (size_t i = 0, line = 0, col = 0; i < nr_args; i++) {
-        const char *str = args[i];
-        if (line == 0 && *str == '+' && str_to_filepos(str + 1, &line, &col)) {
+        const char *arg = args[i];
+        if (line == 0 && *arg == '+' && str_to_filepos(arg + 1, &line, &col)) {
+            // +line[:col] argument parsed (affects next argument)
             continue;
         }
-        View *view = window_open_buffer(window, str, false, NULL);
+
+        char *alloc = NULL;
         if (line == 0) {
-            continue;
+            StringView path = parse_file_line_col(arg, &line, &col);
+            if (path.length) {
+                // file:line[:col] argument parsed; extract `file` and use below
+                arg = alloc = xstrcut(path.data, path.length);
+            }
         }
-        set_view(view);
-        move_to_filepos(view, line, col);
-        line = 0;
+
+        View *view = window_open_buffer(window, arg, false, NULL);
+        free(alloc);
+        if (line) {
+            set_view(view);
+            move_to_filepos(view, line, col);
+            line = 0;
+        }
     }
 
     if (std_buffer) {
