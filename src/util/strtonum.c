@@ -224,17 +224,11 @@ bool str_to_filepos(const char *str, size_t *linep, size_t *colp)
 // Note that `:line` isn't optional.
 StringView parse_file_line_col(const char *str, size_t *linep, size_t *colp)
 {
-    size_t len = strlen(str);
-    const char *c1 = xmemrchr(str, ':', len);
-    if (!c1 || c1 == str) {
-        return strview(NULL);
-    }
-
-    const char *c2 = xmemrchr(str, ':', c1 - str);
-    BUG_ON(c2 >= c1);
-    const char *colon = c2 ? c2 : c1;
-    bool ok = (colon != str && str_to_filepos(colon + 1, linep, colp));
-    return string_view(str, ok ? colon - str : 0);
+    const char *a = strrchr(str, ':');
+    const char *b = a ? xmemrchr(str, ':', a - str) : NULL;
+    const char *c = b ? b : a;
+    bool ok = (c && c != str && str_to_filepos(c + 1, linep, colp));
+    return string_view(str, ok ? c - str : 0);
 }
 
 // Return the number of decimal digits in `x`
