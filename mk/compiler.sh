@@ -3,7 +3,8 @@
 # shellcheck disable=SC2086,SC2116,SC2310
 
 set -eu
-CC="$1"
+LOGFILE="$1"
+CC="$2"
 
 # The following compiler options are divided into "sets", which are
 # tested all at once, in order to keep process spawning overhead to
@@ -46,7 +47,7 @@ SANITIZER_FLAGS='
 '
 
 cc_option() {
-    $CC "$@" -Werror -c -o /dev/null mk/feature-test/basic.c
+    $CC "$@" -Werror -c -o /dev/null mk/feature-test/basic.c 2>>"$LOGFILE"
 }
 
 # Print all non-empty lines in "$2", each prefixed with "$1 += "
@@ -82,8 +83,11 @@ detect_cflags_for_var() {
     fi
 }
 
+# Truncate log file, before appending to it
+printf '' >"$LOGFILE"
+
 if ! cc_option; then
-    echo "$0:$LINENO: ERROR: Basic sanity test for \$CC ($CC) failed" >&2
+    echo "$0:$LINENO: ERROR: Basic sanity test for \$CC ($CC) failed" | tee -a "$LOGFILE" >&2
     exit 1
 fi
 
@@ -142,13 +146,13 @@ fi
 
 # https://stackoverflow.com/questions/22017484/detect-if-a-compiler-is-using-ccache/61282413#61282413
 # https://ccache.dev/manual/latest.html#_extra_options
-if $CC -c -o /dev/null --ccache-skip -Dxyz=1 mk/feature-test/basic.c; then
+if cc_option --ccache-skip -Dxyz=1; then
     echo 'CC_IS_CCACHE = 1'
 else
     echo 'CC_IS_CCACHE = 0'
 fi
 
-TARGET="$($CC -dumpmachine)"
+TARGET=$($CC -dumpmachine 2>>"$LOGFILE" || :)
 echo "CC_TARGET = $TARGET"
 
 if test -z "$TARGET"; then

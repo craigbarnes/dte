@@ -229,11 +229,11 @@ build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 
 build/gen/platform.mk: mk/platform.sh mk/nproc.sh | build/gen/
 	$(E) GEN $@
-	$(Q) mk/platform.sh >$@ 2>$(logfile)
+	$(Q) mk/platform.sh '$(logfile)' >$@
 
 build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
 	$(E) GEN $@
-	$(Q) mk/compiler.sh '$(CC)' >$@ 2>$(logfile) || $(dumplog_and_exit1)
+	$(Q) mk/compiler.sh '$(logfile)' '$(CC)' >$@
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/feature/
 	$(E) DETECT $@
