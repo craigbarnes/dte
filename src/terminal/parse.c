@@ -139,6 +139,11 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
         case 57381: return KEY_F18;
         case 57382: return KEY_F19;
         case 57383: return KEY_F20;
+        case 57384: return KEY_F21;
+        case 57385: return KEY_F22;
+        case 57386: return KEY_F23;
+        case 57387: return KEY_F24;
+        // Keypad:
         case 57399: return '0';
         case 57400: return '1';
         case 57401: return '2';
@@ -156,6 +161,7 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
         case 57413: return '+';
         case 57414: return KEY_ENTER;
         case 57415: return '=';
+        case 57416: return KEY_IGNORE; // KP_SEPARATOR
         case 57417: return KEY_LEFT;
         case 57418: return KEY_RIGHT;
         case 57419: return KEY_UP;

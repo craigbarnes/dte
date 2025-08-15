@@ -48,6 +48,10 @@ static const char special_names[][10] = {
     KEY(F18) = "F18",
     KEY(F19) = "F19",
     KEY(F20) = "F20",
+    KEY(F21) = "F21",
+    KEY(F22) = "F22",
+    KEY(F23) = "F23",
+    KEY(F24) = "F24",
 };
 
 static const struct {

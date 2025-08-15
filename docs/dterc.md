@@ -160,7 +160,7 @@ Special keys:
 * `scrlock`
 * `pause`
 * `begin` (keypad "5" with Num Lock off)
-* `F1`..`F20`
+* `F1`..`F24`
 
 Modifiers:
 

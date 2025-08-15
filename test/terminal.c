@@ -728,6 +728,21 @@ static void test_term_parse_sequence(TestContext *ctx)
     EXPECT_PARSE_SEQ("\033[57381u", KEY_F18);
     EXPECT_PARSE_SEQ("\033[57382u", KEY_F19);
     EXPECT_PARSE_SEQ("\033[57383u", KEY_F20);
+    EXPECT_PARSE_SEQ("\033[57384u", KEY_F21);
+    EXPECT_PARSE_SEQ("\033[57385u", KEY_F22);
+    EXPECT_PARSE_SEQ("\033[57386u", KEY_F23);
+    EXPECT_PARSE_SEQ("\033[57387u", KEY_F24);
+    EXPECT_PARSE_SEQ("\033[57388u", KEY_IGNORE); // F25
+    EXPECT_PARSE_SEQ("\033[57389u", KEY_IGNORE); // F26
+    EXPECT_PARSE_SEQ("\033[57390u", KEY_IGNORE); // F27
+    EXPECT_PARSE_SEQ("\033[57391u", KEY_IGNORE); // F28
+    EXPECT_PARSE_SEQ("\033[57392u", KEY_IGNORE); // F29
+    EXPECT_PARSE_SEQ("\033[57393u", KEY_IGNORE); // F30
+    EXPECT_PARSE_SEQ("\033[57394u", KEY_IGNORE); // F31
+    EXPECT_PARSE_SEQ("\033[57395u", KEY_IGNORE); // F32
+    EXPECT_PARSE_SEQ("\033[57396u", KEY_IGNORE); // F33
+    EXPECT_PARSE_SEQ("\033[57397u", KEY_IGNORE); // F34
+    EXPECT_PARSE_SEQ("\033[57398u", KEY_IGNORE); // F35
     EXPECT_PARSE_SEQ("\033[57399u", '0');
     EXPECT_PARSE_SEQ("\033[57400u", '1');
     EXPECT_PARSE_SEQ("\033[57401u", '2');
@@ -745,6 +760,7 @@ static void test_term_parse_sequence(TestContext *ctx)
     EXPECT_PARSE_SEQ("\033[57413u", '+');
     EXPECT_PARSE_SEQ("\033[57414u", KEY_ENTER);
     EXPECT_PARSE_SEQ("\033[57415u", '=');
+    EXPECT_PARSE_SEQ("\033[57416u", KEY_IGNORE); // KP_SEPARATOR
     EXPECT_PARSE_SEQ("\033[57417u", KEY_LEFT);
     EXPECT_PARSE_SEQ("\033[57418u", KEY_RIGHT);
     EXPECT_PARSE_SEQ("\033[57419u", KEY_UP);
@@ -1144,12 +1160,14 @@ static void test_keycode_to_string(TestContext *ctx)
         {"F13", KEY_F13},
         {"F16", KEY_F16},
         {"F20", KEY_F20},
+        {"F24", KEY_F24},
         {"M-enter", MOD_META | KEY_ENTER},
         {"M-space", MOD_META | KEY_SPACE},
         {"S-tab", MOD_SHIFT | KEY_TAB},
         {"C-M-S-F12", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F12},
         {"C-M-F16", MOD_CTRL | MOD_META | KEY_F16},
         {"C-S-F20", MOD_CTRL | MOD_SHIFT | KEY_F20},
+        {"C-S-F24", MOD_CTRL | MOD_SHIFT | KEY_F24},
         {"C-M-S-up", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
         {"C-M-delete", MOD_CTRL | MOD_META | KEY_DELETE},
         {"C-home", MOD_CTRL | KEY_HOME},
@@ -1177,11 +1195,11 @@ static void test_keycode_to_string(TestContext *ctx)
     }
 
     EXPECT_EQ(keycode_to_str(KEYCODE_DETECTED_PASTE, buf), 19);
-    EXPECT_STREQ(buf, "INVALID; 0x00110025");
+    EXPECT_STREQ(buf, "INVALID; 0x00110029");
     EXPECT_EQ(keycode_to_str(KEYCODE_BRACKETED_PASTE, buf), 19);
-    EXPECT_STREQ(buf, "INVALID; 0x00110026");
+    EXPECT_STREQ(buf, "INVALID; 0x0011002A");
     EXPECT_EQ(keycode_to_str(KEY_IGNORE, buf), 19);
-    EXPECT_STREQ(buf, "INVALID; 0x00110027");
+    EXPECT_STREQ(buf, "INVALID; 0x0011002B");
     EXPECT_EQ(keycode_to_str(UINT32_MAX, buf), 23);
     EXPECT_STREQ(buf, "QUERY REPLY; 0xFFFFFFFF");
 
@@ -1205,6 +1223,7 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(keycode_from_str("C-M"), MOD_CTRL | 'm');
     EXPECT_EQ(keycode_from_str("C-F1"), MOD_CTRL | KEY_F1);
     EXPECT_EQ(keycode_from_str("C-M-S-F20"), MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F20);
+    EXPECT_EQ(keycode_from_str("C-M-S-F24"), MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F24);
     EXPECT_EQ(keycode_from_str("s-m"), MOD_SUPER | 'm');
     EXPECT_EQ(keycode_from_str("H-y"), MOD_HYPER | 'y');
     EXPECT_EQ(keycode_from_str("H-y"), MOD_HYPER | 'y');
@@ -1252,13 +1271,17 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(keycode_from_str("f18"), KEY_F18);
     EXPECT_EQ(keycode_from_str("f19"), KEY_F19);
     EXPECT_EQ(keycode_from_str("f20"), KEY_F20);
+    EXPECT_EQ(keycode_from_str("f21"), KEY_F21);
+    EXPECT_EQ(keycode_from_str("f22"), KEY_F22);
+    EXPECT_EQ(keycode_from_str("f23"), KEY_F23);
+    EXPECT_EQ(keycode_from_str("f24"), KEY_F24);
 
     EXPECT_EQ(keycode_from_str("C-"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("C-M-"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("paste"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("???"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("F0"), KEY_NONE);
-    EXPECT_EQ(keycode_from_str("F21"), KEY_NONE);
+    EXPECT_EQ(keycode_from_str("F25"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("F01"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("\t"), KEY_NONE);
     EXPECT_EQ(keycode_from_str("\n"), KEY_NONE);
