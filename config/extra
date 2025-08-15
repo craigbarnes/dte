@@ -13,7 +13,7 @@ alias header 'exec -s -o open sh -c ${script:open-c-header.sh} -- $FILE'
 # Jump to the locations of unstaged changes made to the git(1) working
 # tree
 errorfmt -c gitdiff '^([^:]+): [+-]([0-9]+).*' file line
-alias git-changes 'compile -1s gitdiff sh -c ${script:git-changes.sh}'
+alias git-changes 'compile -1s gitdiff sh -c ${script:git-changes.sh} --'
 
 # Jump to the longest line in the current buffer
 alias longest-line 'unselect; exec -s -i buffer -o eval awk ${script:longest-line.awk}'
@@ -34,7 +34,7 @@ alias lf-open 'exec -o open sh -c ${script:lf-wrapper.sh}'
 
 # Jump to the tag under the cursor, or open an fzf(1) menu if there
 # are multiple matching tags
-alias xtag 'exec -s -o eval -e errmsg sh -c ${script:xtag.sh} $WORD'
+alias xtag 'exec -s -o eval -e errmsg sh -c ${script:xtag.sh} -- $WORD'
 
 # Run `man dterc` and jump directly to the part describing the specified
 # command (e.g. `help insert`, `help exec`, etc.)
