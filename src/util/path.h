@@ -41,10 +41,8 @@ static inline char *path_dirname(const char *filename)
     return xstrcut(dir.data, dir.length);
 }
 
-XSTRDUP
 static inline char *path_join_sv(StringView s1, StringView s2, bool trailing_slash)
 {
-    BUG_ON(!s1.data || !s2.data); // ISO C11 memcpy(3) never allows NULL pointer arguments
     const char slash[2] = "/";
     size_t n1 = s1.length;
     size_t n2 = s2.length;
@@ -55,7 +53,6 @@ static inline char *path_join_sv(StringView s1, StringView s2, bool trailing_sla
     return path;
 }
 
-XSTRDUP
 static inline char *path_join(const char *s1, const char *s2)
 {
     return path_join_sv(strview(s1), strview(s2), false);

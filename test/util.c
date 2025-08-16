@@ -229,6 +229,16 @@ static void test_xstrrchr(TestContext *ctx)
     EXPECT_PTREQ(xstrrchr(str, '\0'), str + sizeof(str) - 1);
 }
 
+static void test_xmempcpy(TestContext *ctx)
+{
+    char buf[16] = "12345678";
+    EXPECT_PTREQ(xmempcpy4(buf, NULL, 0, NULL, 0, NULL, 0, NULL, 0), buf);
+    EXPECT_STREQ(buf, "12345678");
+
+    EXPECT_PTREQ(xmempcpy4(buf, "a", 1, "b", 1, "c", 1, "d", 2), buf + 5);
+    EXPECT_STREQ(buf, "abcd");
+}
+
 static void test_str_has_strn_prefix(TestContext *ctx)
 {
     EXPECT_TRUE(str_has_strn_prefix("xyz", STRN("xyz")));
@@ -3378,6 +3388,9 @@ static void test_path_join(TestContext *ctx)
     p = path_join("/home/user//", ".dte");
     EXPECT_STREQ(p, "/home/user//.dte");
     free(p);
+    p = path_join(NULL, NULL);
+    EXPECT_STREQ(p, "");
+    free(p);
 
     p = path_join_sv(strview("foo"), strview("bar"), true);
     EXPECT_STREQ(p, "foo/bar/");
@@ -3399,6 +3412,9 @@ static void test_path_join(TestContext *ctx)
     free(p);
     p = path_join_sv(strview(""), strview("file/"), true);
     EXPECT_STREQ(p, "file/");
+    free(p);
+    p = path_join_sv(strview(NULL), strview(NULL), false);
+    EXPECT_STREQ(p, "");
     free(p);
 }
 
@@ -3867,6 +3883,7 @@ static const TestEntry tests[] = {
     TEST(test_xmalloc),
     TEST(test_xstreq),
     TEST(test_xstrrchr),
+    TEST(test_xmempcpy),
     TEST(test_str_has_strn_prefix),
     TEST(test_str_has_prefix),
     TEST(test_str_has_suffix),

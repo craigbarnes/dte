@@ -1,6 +1,14 @@
 #ifndef UTIL_XSTRING_H
 #define UTIL_XSTRING_H
 
+// Several of the *mem*() wrapper functions below explicitly allow NULL
+// pointer arguments when the corresponding length bound is 0. This is
+// unlike the equivalent/underlying library functions (where it would
+// ordinarily be undefined behavior) and is done in the spirit of the
+// WG14 N3322 proposal.
+// See also:
+// • https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
+
 #include <stdbool.h>
 #include <string.h>
 #include "ascii.h"
@@ -30,22 +38,22 @@ static inline const char *xstrrchr(const char *str, int ch)
     return ptr;
 }
 
-// See: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
+NONNULL_ARG_IF_NONZERO_LENGTH(1, 3) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
 static inline bool mem_equal(const void *s1, const void *s2, size_t n)
 {
-    BUG_ON(n && (!s1 || !s2));
+    BUG_ON(n && (!s1 || !s2)); // See N3322 reference above
     return n == 0 || memcmp(s1, s2, n) == 0;
 }
 
 // Portable version of glibc/FreeBSD mempcpy(3)
-NONNULL_ARGS_AND_RETURN
+NONNULL_ARG(1) RETURNS_NONNULL NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
 static inline void *xmempcpy(void *restrict dest, const void *restrict src, size_t n)
 {
-    memcpy(dest, src, n);
-    return (char*)dest + n;
+    BUG_ON(n && !src); // See N3322 reference above
+    return likely(n) ? (char*)memcpy(dest, src, n) + n : dest;
 }
 
-NONNULL_ARGS_AND_RETURN
+NONNULL_ARG(1) RETURNS_NONNULL
 static inline void *xmempcpy2 (
     void *dest,
     const void *p1, size_t n1,
@@ -54,7 +62,7 @@ static inline void *xmempcpy2 (
     return xmempcpy(xmempcpy(dest, p1, n1), p2, n2);
 }
 
-NONNULL_ARGS_AND_RETURN
+NONNULL_ARG(1) RETURNS_NONNULL
 static inline void *xmempcpy3 ( // NOLINT(readability-function-size)
     void *dest,
     const void *p1, size_t n1,
@@ -64,7 +72,7 @@ static inline void *xmempcpy3 ( // NOLINT(readability-function-size)
     return xmempcpy(xmempcpy2(dest, p1, n1, p2, n2), p3, n3);
 }
 
-NONNULL_ARGS_AND_RETURN
+NONNULL_ARG(1) RETURNS_NONNULL
 static inline void *xmempcpy4 ( // NOLINT(readability-function-size)
     void *dest,
     const void *p1, size_t n1,
@@ -78,7 +86,7 @@ static inline void *xmempcpy4 ( // NOLINT(readability-function-size)
 static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
 {
     if (n == 0) {
-        return true;
+        return true; // See N3322 reference above
     }
 
     const char *s1 = p1;
