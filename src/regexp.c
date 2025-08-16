@@ -22,17 +22,13 @@ bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern,
     return error_msg(ebuf, "%s: %s", msg, pattern);
 }
 
-void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags)
+const regex_t *regexp_compile_or_fatal_error(const char *pattern)
 {
-    // Note: DEFAULT_REGEX_FLAGS isn't used here because this function
-    // is only used for compiling built-in patterns, where we explicitly
-    // avoid using "enhanced" features
-    int err = regcomp(re, pattern, flags | REG_EXTENDED);
-    if (unlikely(err)) {
-        char msg[1024];
-        regerror(err, re, msg, sizeof(msg));
-        fatal_error(msg, EINVAL);
+    const InternedRegexp *ir = regexp_intern(NULL, pattern);
+    if (unlikely(!ir)) {
+        fatal_error("regexp_intern", EINVAL);
     }
+    return &ir->re;
 }
 
 bool regexp_exec (

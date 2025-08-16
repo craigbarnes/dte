@@ -32,22 +32,18 @@ static bool line_contents_increases_indent (
     const LocalOptions *options,
     const StringView *line
 ) {
-    static regex_t re1, re2;
-    static bool compiled;
-    if (!compiled) {
+    static const regex_t *re1, *re2;
+    if (!re1) {
         // TODO: Make these patterns configurable via a local option
-        static const char pat1[] = "\\{[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
-        static const char pat2[] = "\\}[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
-        regexp_compile_or_fatal_error(&re1, pat1, REG_NEWLINE | REG_NOSUB);
-        regexp_compile_or_fatal_error(&re2, pat2, REG_NEWLINE | REG_NOSUB);
-        compiled = true;
+        re1 = regexp_compile_or_fatal_error("\\{[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$");
+        re2 = regexp_compile_or_fatal_error("\\}[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$");
     }
 
     if (options->brace_indent) {
-        if (regexp_exec(&re1, line->data, line->length, 0, NULL, 0)) {
+        if (regexp_exec(re1, line->data, line->length, 0, NULL, 0)) {
             return true;
         }
-        if (regexp_exec(&re2, line->data, line->length, 0, NULL, 0)) {
+        if (regexp_exec(re2, line->data, line->length, 0, NULL, 0)) {
             return false;
         }
     }

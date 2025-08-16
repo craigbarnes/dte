@@ -8,12 +8,3 @@
    fun:highlight_line*
    ...
 }
-
-{
-   static regex_t compiled with regexp_compile_or_fatal_error()
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   ...
-   fun:regexp_compile_or_fatal_error
-   ...
-}

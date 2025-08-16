@@ -95,16 +95,13 @@ size_t get_nr_selected_chars(const SelectionInfo *info)
 
 bool line_has_opening_brace(StringView line)
 {
-    static regex_t re;
-    static bool compiled;
-    if (!compiled) {
-        // TODO: Reimplement without using regex
-        static const char pat[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
-        regexp_compile_or_fatal_error(&re, pat, REG_NEWLINE | REG_NOSUB);
-        compiled = true;
+    // TODO: Reimplement without using regex
+    static const regex_t *re;
+    if (!re) {
+        re = regexp_compile_or_fatal_error("\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$");
     }
 
-    return regexp_exec(&re, line.data, line.length, 0, NULL, 0);
+    return regexp_exec(re, line.data, line.length, 0, NULL, 0);
 }
 
 bool line_has_closing_brace(StringView line)

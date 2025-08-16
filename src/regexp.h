@@ -37,7 +37,7 @@ typedef struct {
     uint8_t len;
 } RegexpWordBoundaryTokens;
 
-void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags) NONNULL_ARGS;
+const regex_t *regexp_compile_or_fatal_error(const char *pattern) NONNULL_ARGS_AND_RETURN;
 bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt) NONNULL_ARGS;
 bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern, int err) NONNULL_ARG(2, 3);
 char *regexp_escape(const char *pattern, size_t len) NONNULL_ARGS WARN_UNUSED_RESULT;
