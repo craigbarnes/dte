@@ -25,9 +25,7 @@ bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern,
 const regex_t *regexp_compile_or_fatal_error(const char *pattern)
 {
     const InternedRegexp *ir = regexp_intern(NULL, pattern);
-    if (unlikely(!ir)) {
-        fatal_error("regexp_intern", EINVAL);
-    }
+    FATAL_ERROR_ON(!ir, EINVAL);
     return &ir->re;
 }
 

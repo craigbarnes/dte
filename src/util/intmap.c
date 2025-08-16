@@ -90,9 +90,7 @@ static SystemErrno intmap_do_init(IntMap *map, size_t capacity)
 void intmap_init(IntMap *map, size_t capacity)
 {
     SystemErrno err = intmap_do_init(map, capacity);
-    if (unlikely(err)) {
-        fatal_error(__func__, err);
-    }
+    FATAL_ERROR_ON(err, err);
 }
 
 IntMapEntry *intmap_find(const IntMap *map, uint32_t key)
@@ -204,9 +202,7 @@ void *intmap_insert_or_replace(IntMap *map, uint32_t key, void *value)
 {
     void *replaced_value = NULL;
     SystemErrno err = intmap_do_insert(map, key, value, &replaced_value);
-    if (unlikely(err)) {
-        fatal_error(__func__, err);
-    }
+    FATAL_ERROR_ON(err, err);
     return replaced_value;
 }
 

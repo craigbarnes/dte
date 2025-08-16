@@ -34,9 +34,7 @@
 size_t xvsnprintf(char *restrict buf, size_t n, const char *restrict fmt, va_list v)
 {
     int r = vsnprintf(buf, n, fmt, v);
-    if (unlikely(r < 0 || r >= (int)n)) {
-        fatal_error(__func__, (r < 0) ? errno : ENOBUFS);
-    }
+    FATAL_ERROR_ON(r < 0 || r >= (int)n, r < 0 ? errno : ENOBUFS);
     return (size_t)r;
 }
 

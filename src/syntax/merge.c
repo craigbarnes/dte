@@ -18,9 +18,7 @@ static const char *fix_name(char *buf, StringView prefix, const char *name)
     BUG_ON(plen >= FIXBUF_SIZE);
     memcpy(buf, prefix.data, plen);
     char *end = memccpy(buf + plen, name, '\0', FIXBUF_SIZE - plen);
-    if (unlikely(!end)) {
-        fatal_error(__func__, ENOBUFS);
-    }
+    FATAL_ERROR_ON(!end, ENOBUFS);
     return buf;
 }
 

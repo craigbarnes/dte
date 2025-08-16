@@ -86,9 +86,7 @@ void hashmap_init(HashMap *map, size_t capacity, HashMapFlags flags)
 {
     *map = (HashMap){.flags = flags};
     SystemErrno err = hashmap_do_init(map, capacity);
-    if (unlikely(err)) {
-        fatal_error(__func__, err);
-    }
+    FATAL_ERROR_ON(err, err);
 }
 
 HashMapEntry *hashmap_find(const HashMap *map, const char *key)
@@ -216,9 +214,7 @@ error:
 void *hashmap_insert(HashMap *map, char *key, void *value)
 {
     SystemErrno err = hashmap_do_insert(map, key, value, NULL);
-    if (unlikely(err)) {
-        fatal_error(__func__, err);
-    }
+    FATAL_ERROR_ON(err, err);
     return value;
 }
 
@@ -226,9 +222,7 @@ void *hashmap_insert_or_replace(HashMap *map, char *key, void *value)
 {
     void *replaced_value = NULL;
     SystemErrno err = hashmap_do_insert(map, key, value, &replaced_value);
-    if (unlikely(err)) {
-        fatal_error(__func__, err);
-    }
+    FATAL_ERROR_ON(err, err);
     return replaced_value;
 }
 

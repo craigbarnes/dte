@@ -9,9 +9,7 @@
 
 static void *check_alloc(void *alloc)
 {
-    if (unlikely(alloc == NULL)) {
-        fatal_error(__func__, ENOMEM);
-    }
+    FATAL_ERROR_ON(alloc == NULL, ENOMEM);
     return alloc;
 }
 
@@ -25,9 +23,8 @@ void *xmalloc(size_t size)
 
 void *xcalloc(size_t nmemb, size_t size)
 {
-    if (unlikely(calloc_args_have_ub_overflow(nmemb, size))) {
-        fatal_error(__func__, EOVERFLOW);
-    }
+    bool overflow = calloc_args_have_ub_overflow(nmemb, size);
+    FATAL_ERROR_ON(overflow, EOVERFLOW);
     BUG_ON(nmemb == 0 || size == 0);
     return check_alloc(calloc(nmemb, size)); // NOLINT(*-unsafe-functions)
 }

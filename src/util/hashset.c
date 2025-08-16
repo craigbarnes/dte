@@ -28,9 +28,7 @@ void hashset_init(HashSet *set, size_t size, bool icase)
     // Round up the allocation to the next power of 2, to allow using
     // simple bitwise ops (instead of modulo) in get_slot()
     size = next_pow2(size);
-    if (unlikely(size == 0)) {
-        fatal_error(__func__, EOVERFLOW);
-    }
+    FATAL_ERROR_ON(size == 0, EOVERFLOW);
 
     alloc_table(set, size);
     set->nr_entries = 0;
@@ -111,9 +109,7 @@ HashSetEntry *hashset_insert(HashSet *set, const char *str, size_t str_len)
 
     if (++set->nr_entries > set->grow_at) {
         size_t new_size = set->table_size << 1;
-        if (unlikely(new_size == 0)) {
-            fatal_error(__func__, EOVERFLOW);
-        }
+        FATAL_ERROR_ON(new_size == 0, EOVERFLOW);
         rehash(set, new_size);
     }
 

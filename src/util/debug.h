@@ -11,10 +11,14 @@
 
 // This is similar to the Linux kernel macro of the same name, or to the
 // ISO C assert() macro with the condition inverted
-#define BUG_ON(a) \
+#define BUG_ON(cond) \
     IGNORE_WARNING("-Wtautological-compare") \
-    if (unlikely(a)) {BUG("%s", #a);} \
+    if (unlikely(cond)) {BUG("%s", #cond);} \
     UNIGNORE_WARNINGS
+
+// Like BUG_ON(), but still enabled even in non-debug builds
+#define FATAL_ERROR_ON(cond, err) \
+    if (unlikely(cond)) {fatal_error(__func__, err);}
 
 #if GNUC_AT_LEAST(4, 5) || HAS_BUILTIN(__builtin_unreachable)
     // https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#index-_005f_005fbuiltin_005funreachable
