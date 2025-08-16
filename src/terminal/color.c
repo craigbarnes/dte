@@ -33,18 +33,6 @@ static unsigned int color_distance (
     return ((R - r) * (R - r)) + ((G - g) * (G - g)) + ((B - b) * (B - b));
 }
 
-UNITTEST {
-    // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(color_distance(0,0,0, 0,0,0) != 0);
-    BUG_ON(color_distance(1,1,1, 1,0,1) != 1);
-    BUG_ON(color_distance(100,0,0, 80,0,0) != 400);
-    BUG_ON(color_distance(0,5,10, 5,0,2) != 25 + 25 + 64);
-    BUG_ON(color_distance(0,0,0, 255,0,0) != 255 * 255);
-    BUG_ON(color_distance(255,255,255, 0,0,0) != 255 * 255 * 3);
-    BUG_ON(color_distance(0,0,0, 255,255,255) != 255 * 255 * 3);
-    // NOLINTEND(bugprone-assert-side-effect)
-}
-
 // Convert an RGB color component (0-255) to the index (0-5) of the
 // nearest XTerm palette color stop (0, 95, 135, 175, 215, 255)
 static unsigned int quantize_rgb(uint8_t c)
@@ -55,6 +43,13 @@ static unsigned int quantize_rgb(uint8_t c)
 
 UNITTEST {
     // NOLINTBEGIN(bugprone-assert-side-effect)
+    BUG_ON(color_distance(0,0,0, 0,0,0) != 0);
+    BUG_ON(color_distance(1,1,1, 1,0,1) != 1);
+    BUG_ON(color_distance(100,0,0, 80,0,0) != 400);
+    BUG_ON(color_distance(0,5,10, 5,0,2) != 25 + 25 + 64);
+    BUG_ON(color_distance(0,0,0, 255,0,0) != 255 * 255);
+    BUG_ON(color_distance(255,255,255, 0,0,0) != 255 * 255 * 3);
+    BUG_ON(color_distance(0,0,0, 255,255,255) != 255 * 255 * 3);
     BUG_ON(quantize_rgb(0) != 0);
     BUG_ON(quantize_rgb(46) != 0);
     BUG_ON(quantize_rgb(47) != 1);
