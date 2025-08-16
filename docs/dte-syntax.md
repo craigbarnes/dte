@@ -2,7 +2,7 @@
 NOTE: See https://craigbarnes.gitlab.io/dte/dte-syntax.html for a fully rendered version of this document
 title: dte-syntax
 section: 5
-date: October 2024
+date: May 2025
 description: Format of syntax highlighting files used by dte
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dterc`"]

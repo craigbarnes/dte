@@ -411,7 +411,7 @@ static View *open_initial_buffers (
 
 static const char copyright[] =
     "dte " VERSION "\n"
-    "(C) 2013-2024 Craig Barnes\n"
+    "(C) 2013-2025 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
     "This program is free software; you can redistribute and/or modify\n"
     "it under the terms of the GNU General Public License version 2\n"

@@ -126,7 +126,7 @@ appreciated and allows me to spend more time working on dte.
 License
 -------
 
-Copyright © 2013-2024 Craig Barnes.\
+Copyright © 2013-2025 Craig Barnes.\
 Copyright © 2010-2015 Timo Hirvonen.
 
 This program is free software; you can redistribute it and/or modify it

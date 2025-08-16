@@ -2,7 +2,7 @@
 NOTE: See https://craigbarnes.gitlab.io/dte/dte.html for a fully rendered version of this document
 title: dte
 section: 1
-date: January 2025
+date: May 2025
 description: A small, configurable text editor
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dterc`", "`dte-syntax`"]
