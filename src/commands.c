@@ -60,6 +60,7 @@
 #include "util/errorcode.h"
 #include "util/intern.h"
 #include "util/log.h"
+#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-array.h"
 #include "util/str-util.h"
@@ -228,13 +229,32 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
 static bool cmd_bookmark(EditorState *e, const CommandArgs *a)
 {
     PointerArray *bookmarks = &e->bookmarks;
+    ErrorBuffer *ebuf = &e->err;
+    bool verbose = has_flag(a, 'v');
+
     if (has_flag(a, 'r')) {
-        bookmark_pop(bookmarks, e->window);
+        size_t popped = bookmark_pop(bookmarks, e->window);
+        if (!verbose || popped == 0) {
+            return verbose ? info_msg(ebuf, "no bookmarks to pop") : true;
+        }
+        return info_msg (
+            ebuf, "popped %zu bookmark%s (%zu remaining)",
+            popped, (popped == 1) ? "" : "s", bookmarks->count
+        );
+    }
+
+    FileLocation *loc = get_current_file_location(e->view);
+    size_t idx = bookmark_push(bookmarks, loc);
+    if (!verbose) {
         return true;
     }
 
-    bookmark_push(bookmarks, get_current_file_location(e->view));
-    return true;
+    return info_msg (
+        ebuf, "pushed bookmark #%zu at position %lu,%lu (%s%s)",
+        idx, loc->line, loc->column,
+        loc->filename ? "" : "unsaved buffer #",
+        loc->filename ? loc->filename : ulong_to_str(loc->buffer_id)
+    );
 }
 
 static bool cmd_case(EditorState *e, const CommandArgs *a)
@@ -2589,7 +2609,7 @@ static const Command cmds[] = {
     {"bof", "cl", NA, 0, 0, cmd_bof},
     {"bol", "clrst", NA, 0, 0, cmd_bol},
     {"bolsf", "cl", NA, 0, 0, cmd_bolsf},
-    {"bookmark", "r", NA, 0, 0, cmd_bookmark},
+    {"bookmark", "rv", NA, 0, 0, cmd_bookmark},
     {"case", "lu", NA, 0, 0, cmd_case},
     {"cd", "v", RC, 1, 1, cmd_cd},
     {"center-view", "", NA, 0, 0, cmd_center_view},

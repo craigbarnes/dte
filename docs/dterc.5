@@ -127,7 +127,7 @@ Movement Commands:
 .br
    \fBline\fR [\fB\-c\fR|\fB\-l\fR] \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .br
-   \fBbookmark\fR [\fB\-r\fR]
+   \fBbookmark\fR [\fB\-rv\fR]
 .br
    \fBtag\fR [\fB\-r\fR|\fItag\fR...]
 .br
@@ -1389,13 +1389,17 @@ line\ 20:15
 .fi
 .PP
 .RE
-\fBbookmark\fR [\fB\-r\fR]
+\fBbookmark\fR [\fB\-rv\fR]
 .RS
 Save the current file/cursor location to a stack.
 .P
 .TP
 \fB\-r\fR
 Jump back to the previous location (and pop it off the stack)
+.PP
+.TP
+\fB\-v\fR
+Verbose mode (show information about pushed/popped bookmarks)
 .PP
 .RE
 \fBtag\fR [\fB\-r\fR|\fItag\fR...]

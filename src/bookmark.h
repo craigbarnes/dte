@@ -2,6 +2,7 @@
 #define BOOKMARK_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
@@ -35,7 +36,7 @@ FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETUR
 bool file_location_go(Window *window, const FileLocation *loc) NONNULL_ARGS WARN_UNUSED_RESULT;
 void file_location_free(FileLocation *loc) NONNULL_ARGS;
 
-void bookmark_push(PointerArray *bookmarks, FileLocation *loc) NONNULL_ARGS;
-void bookmark_pop(PointerArray *bookmarks, Window *window) NONNULL_ARGS;
+size_t bookmark_push(PointerArray *bookmarks, FileLocation *loc) NONNULL_ARGS;
+size_t bookmark_pop(PointerArray *bookmarks, Window *window) NONNULL_ARGS;
 
 #endif

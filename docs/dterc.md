@@ -862,12 +862,15 @@ Examples:
     line 20,15
     line 20:15
 
-### **bookmark** [**-r**]
+### **bookmark** [**-rv**]
 
 Save the current file/cursor location to a stack.
 
 `-r`
 :   Jump back to the previous location (and pop it off the stack)
+
+`-v`
+:   Verbose mode (show information about pushed/popped bookmarks)
 
 ### **tag** [**-r**|_tag_...]
 
