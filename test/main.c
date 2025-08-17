@@ -128,19 +128,14 @@ int main(int argc, char *argv[])
 
     for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
-        case 'c': case 'C':
-            color = (ch == 'c');
-            break;
-        case 't': case 'T':
-            ctx.timing = (ch == 't');
-            break;
-        case 'q': case 'Q':
-            ctx.quiet = (ch == 'q');
-            break;
-        case 'h':
-        default:
-            fprintf(ch == 'h' ? stdout : stderr, usage, prog, optstring);
-            return ch == 'h' ? EC_OK : EC_USAGE_ERROR;
+            case 'c': color = true; break;
+            case 'C': color = false; break;
+            case 't': ctx.timing = true; break;
+            case 'T': ctx.timing = false; break;
+            case 'q': ctx.quiet = true; break;
+            case 'Q': ctx.quiet = false; break;
+            case 'h': return ec_printf_ok(usage, prog, optstring);
+            default: return EC_USAGE_ERROR;
         }
     }
 
