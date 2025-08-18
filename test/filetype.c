@@ -318,7 +318,7 @@ static void test_find_ft_firstline(TestContext *ctx)
     };
     const PointerArray arr = PTR_ARRAY_INIT;
     FOR_EACH_I(i, tests) {
-        const char *ft = find_ft(&arr, NULL, strview_from_cstring(tests[i].line));
+        const char *ft = find_ft(&arr, NULL, strview(tests[i].line));
         IEXPECT_STREQ(ft, tests[i].expected_filetype);
     }
 }
@@ -344,12 +344,12 @@ static void test_find_ft_dynamic(TestContext *ctx)
     EXPECT_STREQ(find_ft(&a, "/tmp/._filename", line), NULL);
 
     ft = "test4";
-    line = strview_from_cstring("!!42");
+    line = strview("!!42");
     EXPECT_TRUE(add_filetype(&a, ft, "^!+42$", FT_CONTENT, NULL));
     EXPECT_STREQ(find_ft(&a, NULL, line), ft);
 
     ft = "test5";
-    line = strview_from_cstring("#!/usr/bin/xyzlang4.2");
+    line = strview("#!/usr/bin/xyzlang4.2");
     EXPECT_TRUE(add_filetype(&a, ft, "xyzlang", FT_INTERPRETER, NULL));
     EXPECT_STREQ(find_ft(&a, NULL, line), ft);
 

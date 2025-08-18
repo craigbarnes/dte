@@ -388,7 +388,7 @@ static void do_collect_modes(EditorState *e, PointerArray *a, const char *prefix
 
 static void do_collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
-    collect_env(environ, a, strview_from_cstring(prefix), "");
+    collect_env(environ, a, strview(prefix), "");
 }
 
 static void collect_show_msg_args(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)

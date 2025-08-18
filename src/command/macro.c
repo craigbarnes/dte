@@ -86,7 +86,7 @@ void macro_search_hook (
 
     char *cmd;
     if (pattern) {
-        StringView pat = strview_from_cstring(pattern);
+        StringView pat = strview(pattern);
         String buf = string_new(pat.length + sizeof("search -r -H -- ") + 8);
         string_append_cstring(&buf, "search ");
         string_append_cstring(&buf, reverse ? "-r " : "");

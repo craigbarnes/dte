@@ -125,42 +125,42 @@ static void test_load_syntax_errors(TestContext *ctx)
     SyntaxLoadFlags flags = SYN_LINT;
 
     clear_error(ebuf);
-    StringView text = strview_from_cstring("syntax dup; state a; eat this; syntax dup; state b; eat this");
+    StringView text = strview("syntax dup; state a; eat this; syntax dup; state b; eat this");
     EXPECT_NULL(load_syntax(e, text, "dup", flags));
     EXPECT_STREQ(ebuf->buf, "dup:2: Syntax 'dup' already exists");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax empty");
+    text = strview("syntax empty");
     EXPECT_NULL(load_syntax(e, text, "empty", flags));
     EXPECT_STREQ(ebuf->buf, "empty:2: Empty syntax");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax hde; state a; heredocend b; eat this; state b; eat this");
+    text = strview("syntax hde; state a; heredocend b; eat this; state b; eat this");
     EXPECT_NULL(load_syntax(e, text, "hde", flags));
     EXPECT_STREQ(ebuf->buf, "hde:2: heredocend can be used only in subsyntaxes");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax loop; state ident; noeat this");
+    text = strview("syntax loop; state ident; noeat this");
     EXPECT_NULL(load_syntax(e, text, "loop", flags));
     EXPECT_STREQ(ebuf->buf, "loop:1: noeat: using noeat to jump to same state causes infinite loop");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax ml; state a; inlist X this; eat this");
+    text = strview("syntax ml; state a; inlist X this; eat this");
     EXPECT_NULL(load_syntax(e, text, "ml", flags));
     EXPECT_STREQ(ebuf->buf, "ml:2: No such list 'X'");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax mst; state a; noeat X");
+    text = strview("syntax mst; state a; noeat X");
     EXPECT_NULL(load_syntax(e, text, "mst", flags));
     EXPECT_STREQ(ebuf->buf, "mst:2: No such state 'X'");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax nda; state a; char a this");
+    text = strview("syntax nda; state a; char a this");
     EXPECT_NULL(load_syntax(e, text, "nda", flags));
     EXPECT_STREQ(ebuf->buf, "nda:2: No default action in state 'a'");
 
     clear_error(ebuf);
-    text = strview_from_cstring("syntax not-known; state a; eat this");
+    text = strview("syntax not-known; state a; eat this");
     EXPECT_NULL(load_syntax(e, text, "known", flags));
     EXPECT_STREQ(ebuf->buf, "known: no main syntax found (i.e. with name 'known')");
 
@@ -168,7 +168,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 
     // Unreachable state
     clear_error(ebuf);
-    text = strview_from_cstring("syntax ust; state a; eat this; state U; eat a");
+    text = strview("syntax ust; state a; eat this; state U; eat a");
     const Syntax *syntax = load_syntax(e, text, "ust", flags);
     ASSERT_NONNULL(syntax);
     EXPECT_STREQ(syntax->name, "ust");
@@ -178,7 +178,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 
     // Unused list
     clear_error(ebuf);
-    text = strview_from_cstring("syntax ul; state a; eat this; list unused a");
+    text = strview("syntax ul; state a; eat this; list unused a");
     syntax = load_syntax(e, text, "ul", flags);
     ASSERT_NONNULL(syntax);
     EXPECT_STREQ(syntax->name, "ul");
@@ -188,7 +188,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 
     // Unused sub-syntax
     clear_error(ebuf);
-    text = strview_from_cstring("syntax .uss-x; state a; eat this; syntax uss; state a; eat this");
+    text = strview("syntax .uss-x; state a; eat this; syntax uss; state a; eat this");
     syntax = load_syntax(e, text, "uss", flags);
     ASSERT_NONNULL(syntax);
     EXPECT_STREQ(syntax->name, "uss");
@@ -198,7 +198,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 
     // Use of named destination, instead of "this"
     clear_error(ebuf);
-    text = strview_from_cstring("syntax td; state a; eat a");
+    text = strview("syntax td; state a; eat a");
     syntax = load_syntax(e, text, "td", flags);
     ASSERT_NONNULL(syntax);
     EXPECT_STREQ(syntax->name, "td");
@@ -208,7 +208,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 
     // Redundant emit-name
     clear_error(ebuf);
-    text = strview_from_cstring("syntax ren; state a; eat this a");
+    text = strview("syntax ren; state a; eat this a");
     syntax = load_syntax(e, text, "ren", flags);
     ASSERT_NONNULL(syntax);
     EXPECT_STREQ(syntax->name, "ren");

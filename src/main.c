@@ -349,7 +349,7 @@ static void lookup_tags (
     clear_messages(msgs);
 
     for (size_t i = 0; i < nr_tags; i++) {
-        StringView tagname = strview_from_cstring(tags[i]);
+        StringView tagname = strview(tags[i]);
         tag_lookup(&e->tagfile, msgs, &e->err, &tagname, NULL);
     }
 

@@ -186,9 +186,9 @@ typedef FileTypeEnum (*FileTypeLookupFunc)(const StringView sv);
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line)
 {
     const char *b = filename ? path_basename(filename) : NULL;
-    const StringView base = strview_from_cstring(b);
+    const StringView base = strview(b);
     const StringView ext = get_filename_extension(base);
-    const StringView path = strview_from_cstring(filename);
+    const StringView path = strview(filename);
     const StringView interpreter = get_interpreter(line);
     BUG_ON(path.length == 0 && (base.length != 0 || ext.length != 0));
     BUG_ON(line.length == 0 && interpreter.length != 0);

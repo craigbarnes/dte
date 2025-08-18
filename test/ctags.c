@@ -94,8 +94,8 @@ static void test_next_tag(TestContext *ctx)
     }
 
     size_t pos = 0;
-    t.name = string_view(NULL, 0);
-    prefix = strview_from_cstring("hashmap_res");
+    t.name = strview(NULL);
+    prefix = strview("hashmap_res");
     EXPECT_TRUE(next_tag(buf, len, &pos, &prefix, false, &t));
     EXPECT_STRVIEW_EQ_CSTRING(&t.name, "hashmap_resize");
     free_tag(&t);

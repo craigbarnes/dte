@@ -2283,7 +2283,7 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
     }
 
     for (size_t i = 0; i < nargs; i++) {
-        StringView tagname = strview_from_cstring(a->args[i]);
+        StringView tagname = strview(a->args[i]);
         tag_lookup(&e->tagfile, msgs, &e->err, &tagname, filename);
     }
 

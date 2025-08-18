@@ -476,7 +476,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_FALSE(csi.unhandled_bytes);
 
     csi = (TermControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[123;09;56:78:99m");
+    s = strview("\033[123;09;56:78:99m");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
     EXPECT_EQ(csi.nparams, 3);
@@ -498,7 +498,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_FALSE(csi.unhandled_bytes);
 
     csi = (TermControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[1:2:3;44:55;;6~");
+    s = strview("\033[1:2:3;44:55;;6~");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
     EXPECT_EQ(csi.nparams, 4);
@@ -518,7 +518,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_FALSE(csi.unhandled_bytes);
 
     csi = (TermControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[+2p");
+    s = strview("\033[+2p");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
     EXPECT_EQ(csi.nparams, 1);
@@ -531,7 +531,7 @@ static void test_term_parse_csi_params(TestContext *ctx)
     EXPECT_FALSE(csi.unhandled_bytes);
 
     csi = (TermControlParams){.nparams = 0};
-    s = strview_from_cstring("\033[?47;1$y");
+    s = strview("\033[?47;1$y");
     n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length);
     EXPECT_EQ(csi.nparams, 2);
@@ -1589,19 +1589,19 @@ static void test_term_set_style(TestContext *ctx)
 static void test_term_osc52_copy(TestContext *ctx)
 {
     TermOutputBuffer obuf = TERM_OUTPUT_INIT;
-    StringView text = strview_from_cstring("foobar");
+    StringView text = strview("foobar");
     EXPECT_TRUE(term_osc52_copy(&obuf, text, TCOPY_CLIPBOARD | TCOPY_PRIMARY));
     EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;pc;Zm9vYmFy\033\\", 18);
     EXPECT_EQ(obuf.x, 0);
     ASSERT_TRUE(clear_obuf(&obuf));
 
-    text = strview_from_cstring("\xF0\x9F\xA5\xA3");
+    text = strview("\xF0\x9F\xA5\xA3");
     EXPECT_TRUE(term_osc52_copy(&obuf, text, TCOPY_PRIMARY));
     EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;p;8J+low==\033\\", 17);
     EXPECT_EQ(obuf.x, 0);
     ASSERT_TRUE(clear_obuf(&obuf));
 
-    text = strview_from_cstring("");
+    text = strview("");
     EXPECT_TRUE(term_osc52_copy(&obuf, text, TCOPY_CLIPBOARD));
     EXPECT_MEMEQ(obuf.buf, obuf.count, "\033]52;c;\033\\", 9);
     EXPECT_EQ(obuf.x, 0);

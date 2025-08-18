@@ -545,7 +545,7 @@ static void complete_setenv(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_env(environ, &cs->completions, strview_from_cstring(cs->parsed), "");
+        collect_env(environ, &cs->completions, strview(cs->parsed), "");
     } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
         BUG_ON(!a->args[0]);
         const char *value = getenv(a->args[0]);
@@ -571,7 +571,7 @@ static void complete_tag(EditorState *e, const CommandArgs *a)
     CompletionState *cs = &e->cmdline.completion;
     if (!cmdargs_has_flag(a, 'r')) {
         BUG_ON(!cs->parsed);
-        StringView prefix = strview_from_cstring(cs->parsed);
+        StringView prefix = strview(cs->parsed);
         collect_tags(&e->tagfile, &cs->completions, &prefix);
     }
 }
@@ -916,7 +916,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
     ptr_array_free(&array);
     ptr_array_sort(&cs->completions, strptrcmp);
     cs->orig = cmd; // (takes ownership)
-    cs->tail = strview_from_cstring(cmd + cmdline_pos);
+    cs->tail = strview(cmd + cmdline_pos);
     cs->head_len = completion_pos;
 }
 
@@ -924,7 +924,7 @@ static void do_complete_command(CommandLine *cmdline)
 {
     const CompletionState *cs = &cmdline->completion;
     const PointerArray *arr = &cs->completions;
-    const StringView middle = strview_from_cstring(arr->ptrs[cs->idx]);
+    const StringView middle = strview(arr->ptrs[cs->idx]);
     const StringView tail = cs->tail;
     const size_t head_length = cs->head_len;
 

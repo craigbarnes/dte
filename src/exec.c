@@ -146,7 +146,7 @@ static void parse_and_activate_tags(EditorState *e, const String *str, ExecActio
         return;
     }
 
-    const StringView dir = strview_from_cstring(cwd);
+    const StringView dir = strview(cwd);
     const char *buffer_filename = e->buffer->abs_filename;
     TagFile *tf = &e->tagfile;
     enum {NOT_LOADED, LOADED, FAILED} tf_status = NOT_LOADED;

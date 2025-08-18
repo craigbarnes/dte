@@ -357,7 +357,7 @@ static int tmp_file (
     }
 
     const StringView dir = path_slice_dirname(filename);
-    const StringView base = strview_from_cstring(path_basename(filename));
+    const StringView base = strview(path_basename(filename));
     size_t required_buflen = dir.length + base.length + sizeof("/.tmp..XXXXXX");
 
     if (unlikely(buflen < required_buflen)) {
