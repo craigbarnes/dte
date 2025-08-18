@@ -4,9 +4,10 @@
 #include "merge.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
+#include "util/numtostr.h"
 #include "util/string-view.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
+#include "util/xstring.h"
 
 enum {
     FIXBUF_SIZE = 512
@@ -16,8 +17,8 @@ static const char *fix_name(char *buf, StringView prefix, const char *name)
 {
     size_t plen = prefix.length;
     BUG_ON(plen >= FIXBUF_SIZE);
-    memcpy(buf, prefix.data, plen);
-    char *end = memccpy(buf + plen, name, '\0', FIXBUF_SIZE - plen);
+    size_t avail = FIXBUF_SIZE - plen;
+    char *end = memccpy(xmempcpy(buf, prefix.data, plen), name, '\0', avail);
     FATAL_ERROR_ON(!end, ENOBUFS);
     return buf;
 }
@@ -54,25 +55,32 @@ static void fix_conditions (
     }
 }
 
+// Generate a prefix for merged state names, to avoid clashes
+static StringView make_prefix_str(char *buf)
+{
+    static unsigned int counter;
+    size_t n = 0;
+    buf[n++] = 'm';
+    n += buf_uint_to_str(counter++, buf + n);
+    buf[n++] = '-';
+    return string_view(buf, n);
+}
+
 // Merge a sub-syntax into another syntax, copying or updating
 // pointers and strings as appropriate.
 // NOTE: string_lists is owned by Syntax, so there's no need to
 // copy it. Freeing Condition does not free any string lists.
 State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const StyleMap *styles)
 {
-    // Generate a prefix for merged state names, to avoid clashes
-    static unsigned int counter;
-    char prefix_buf[DECIMAL_STR_MAX(counter) + 2];
-    size_t prefix_len = xsnprintf(prefix_buf, sizeof prefix_buf, "m%u-", counter++);
-    StringView prefix = string_view(prefix_buf, prefix_len);
-
     const HashMap *subsyn_states = &merge->subsyn->states;
     HashMap *states = &syn->states;
+    char prefix_buf[64];
+    StringView prefix = make_prefix_str(prefix_buf);
     char buf[FIXBUF_SIZE];
 
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         State *s = xmemdup(it.entry->value, sizeof(State));
-        s->name = xstrjoin(prefix_buf, s->name);
+        s->name = xmemjoin(prefix.data, prefix.length, s->name, strlen(s->name) + 1);
         hashmap_insert(states, s->name, s);
 
         if (s->conds.count > 0) {
