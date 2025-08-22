@@ -170,7 +170,7 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
  */
 void term_put_initial_queries(Terminal *term, unsigned int level)
 {
-    if (level < 1) {
+    if (level < 1 || (term->features & TFLAG_NO_QUERY_L1)) {
         return;
     }
 

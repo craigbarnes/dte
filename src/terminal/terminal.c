@@ -29,6 +29,7 @@ enum {
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
     MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
     SYNC = TFLAG_SYNC,
+    NOQUERY1 = TFLAG_NO_QUERY_L1,
     NOQUERY3 = TFLAG_NO_QUERY_L3,
     BSCTRL = TFLAG_BS_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
     DELCTRL = TFLAG_DEL_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
@@ -95,6 +96,7 @@ static const TermEntry terms[] = {
     t("terminator", C256 | BCE | TITLE | BSCTRL),
     t("termite", C8 | TITLE),
     t("tmux", C8 | TITLE | OSC52 | NOQUERY3 | BSCTRL), // See also: parse_dcs_query_reply()
+    t("vt220", NOQUERY1), // Used by cu(1) and picocom(1), which wrongly handle queries
     t("wezterm", TC | BCE | REP | TITLE | OSC52 | SYNC | BSCTRL),
     t("xfce", C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too

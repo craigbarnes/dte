@@ -215,6 +215,7 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_SYNC: return "SYNC";
     case TFLAG_QUERY_L2: return "QUERY2";
     case TFLAG_QUERY_L3: return "QUERY3";
+    case TFLAG_NO_QUERY_L1: return "NOQUERY1";
     case TFLAG_NO_QUERY_L3: return "NOQUERY3";
     case TFLAG_8_COLOR: return "C8";
     case TFLAG_16_COLOR: return "C16";
