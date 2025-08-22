@@ -214,7 +214,8 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
     handle_selection_flags(view, a);
 
     if (!block_iter_bol(&view->cursor)) {
-        long top = view->vy + window_get_scroll_margin(e->window);
+        long margin = window_get_scroll_margin(e->window);
+        long top = view->vy + margin;
         if (view->cy > top) {
             move_up(view, view->cy - top);
         } else {
@@ -1962,7 +1963,7 @@ static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
         return true; // Don't move cursor, even at scroll margin
     }
 
-    unsigned int margin = window_get_scroll_margin(e->window);
+    long margin = window_get_scroll_margin(e->window);
     if (view->cy < view->vy + margin) {
         move_down(view, 1);
     }
@@ -2032,7 +2033,7 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
     }
 
     const Window *window = e->window;
-    unsigned int margin = window_get_scroll_margin(window);
+    long margin = window_get_scroll_margin(window);
     if (view->vy + (window->edit_h - margin) <= view->cy) {
         move_up(view, 1);
     }
