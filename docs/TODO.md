@@ -180,6 +180,15 @@ Features
   etc.), as an alternative to the existing `wnext` and `wprev` commands
   (see also: [#141])
 
+* Add support for top-level tabs that contain 1 or more windows (AKA
+  "workspaces" or, implementation-wise, multiple root frames). This
+  should work in a similar fashion to e.g. tiling window managers, tmux,
+  etc. In theory, the current "windows contain tabs" model could probably
+  be entirely replaced by this, but to minimize disruptive changes, both
+  should be supported initially. If workspaces are presented in the UI
+  as another tab bar, an option for auto-hiding when there's only 1 tab
+  would also be a useful thing to implement.
+
 Documentation
 -------------
 
