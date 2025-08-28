@@ -219,11 +219,11 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 
 // Write the contents of the special `stdout` Buffer (as created by
 // init_std_buffer()) to `stdout` and free its remaining allocations
-static int buffer_write_blocks_and_free(Buffer *buffer, int fd)
+static SystemErrno buffer_write_blocks_and_free(Buffer *buffer, int fd)
 {
     BUG_ON(!buffer->stdout_buffer);
     const Block *blk;
-    int err = 0;
+    SystemErrno err = 0;
 
     block_for_each(blk, &buffer->blocks) {
         if (xwrite_all(fd, blk->data, blk->size) < 0) {
@@ -646,7 +646,7 @@ exit:
     }
 
     if (have_stdout_buffer) {
-        int err = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
+        SystemErrno err = buffer_write_blocks_and_free(std_buffer, std_fds[STDOUT_FILENO]);
         if (err != 0) {
             error_msg(&e->err, "failed to write (stdout) buffer: %s", strerror(err));
             if (exit_code == EDITOR_EXIT_OK) {

@@ -171,16 +171,16 @@ static bool lock_or_unlock(const FileLocksContext *ctx, ErrorBuffer *ebuf, const
         goto error;
     }
 
-    int r = xclose(wfd);
+    SystemErrno err = xclose(wfd);
     wfd = -1;
-    if (r != 0) {
-        error_msg(ebuf, "Error closing %s: %s", file_locks_lock, strerror(errno));
+    if (err != 0) {
+        error_msg(ebuf, "Error closing %s: %s", file_locks_lock, strerror(err));
         goto error;
     }
 
     if (rename(file_locks_lock, file_locks)) {
-        const char *err = strerror(errno);
-        error_msg(ebuf, "Renaming %s to %s: %s", file_locks_lock, file_locks, err);
+        const char *desc = strerror(errno);
+        error_msg(ebuf, "Renaming %s to %s: %s", file_locks_lock, file_locks, desc);
         goto error;
     }
 

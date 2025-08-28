@@ -441,10 +441,10 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
         goto error;
     }
 
-    int r = xclose(fd);
+    SystemErrno err = xclose(fd);
     fd = -1;
-    if (r != 0) {
-        error_msg_errno(ebuf, "close");
+    if (err != 0) {
+        error_msg(ebuf, "close: %s", strerror(err));
         goto error;
     }
 
