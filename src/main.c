@@ -304,20 +304,33 @@ static ExitCode init_logging(void)
 
 static void read_history_files(EditorState *e, bool headless)
 {
+    const size_t size_limit = 64u << 20; // 64 MiB
     const char *dir = e->user_config_dir;
-    size_t size_limit = 64u << 20; // 64 MiB
-    file_history_load(&e->file_history, &e->err, path_join(dir, "file-history"), size_limit);
-    history_load(&e->command_history, &e->err, path_join(dir, "command-history"), size_limit);
-    history_load(&e->search_history, &e->err, path_join(dir, "search-history"), size_limit);
+    ErrorBuffer *ebuf = &e->err;
 
-    // There's not much sense in saving history for headless sessions, but we
-    // do still load it (above), to make it available to e.g. `exec -i command`
-    if (!headless) {
-        e->flags |= EFLAG_ALL_HIST;
+    if (e->flags & EFLAG_FILE_HIST) {
+        char *path = path_join(dir, "file-history");
+        file_history_load(&e->file_history, ebuf, path, size_limit);
     }
 
-    if (e->search_history.last) {
-        search_set_regexp(&e->search, e->search_history.last->text);
+    if (e->flags & EFLAG_CMD_HIST) {
+        char *path = path_join(dir, "command-history");
+        history_load(&e->command_history, ebuf, path, size_limit);
+    }
+
+    if (e->flags & EFLAG_SEARCH_HIST) {
+        char *path = path_join(dir, "search-history");
+        history_load(&e->search_history, ebuf, path, size_limit);
+        if (e->search_history.last) {
+            search_set_regexp(&e->search, e->search_history.last->text);
+        }
+    }
+
+    // There's not much sense in saving history for headless sessions, but
+    // we do still load it (above, if applicable), to make it available to
+    // e.g. `exec -i command`
+    if (headless) {
+        e->flags &= ~EFLAG_ALL_HIST;
     }
 }
 
@@ -442,9 +455,9 @@ int main(int argc, char *argv[])
     const char *tags[8];
     size_t nr_commands = 0;
     size_t nr_tags = 0;
+    EditorFlags histflags = EFLAG_ALL_HIST;
     bool headless = false;
     bool read_rc = true;
-    bool load_and_save_history = true;
     bool explicit_term_query_level = false;
     unsigned int terminal_query_level = 1;
 
@@ -471,7 +484,7 @@ int main(int argc, char *argv[])
             }
             explicit_term_query_level = true;
             break;
-        case 'H': load_and_save_history = false; break;
+        case 'H': histflags = 0; break;
         case 'r': rc = optarg; break;
         case 'R': read_rc = false; break;
         case 'b': return dump_builtin_config(optarg);
@@ -546,19 +559,16 @@ int main(int argc, char *argv[])
     BUG_ON(!cfgdir);
     if (mkdir(cfgdir, 0755) != 0 && errno != EEXIST) {
         error_msg(&e->err, "Error creating %s: %s", cfgdir, strerror(errno));
-        load_and_save_history = false;
+        histflags = 0;
         e->options.lock_files = false;
     }
 
+    e->flags |= histflags;
     exec_rc_files(e, rc, read_rc);
+    read_history_files(e, headless);
 
     e->window = new_window(e);
     e->root_frame = new_root_frame(e->window);
-
-    if (load_and_save_history) {
-        read_history_files(e, headless);
-    }
-
     e->status = EDITOR_RUNNING;
     e->err.print_to_stderr = headless;
     View *dview = open_initial_buffers(e, std_buffer, argv + optind, argc - optind);
