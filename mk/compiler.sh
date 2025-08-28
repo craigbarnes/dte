@@ -127,6 +127,7 @@ detect_cflags '--embed-dir=.'
 detect_cflags_any '-fstrict-flex-arrays -Wstrict-flex-arrays' '-fstrict-flex-arrays'
 
 detect_cflags_for_var CC_SANITIZER_FLAGS "$SANITIZER_FLAGS"
+detect_cflags_for_var CC_AUTOVAR_PATTERN "-ftrivial-auto-var-init=pattern"
 
 # https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fasynchronous-unwind-tables
 # https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-fasynchronous-unwind-tables

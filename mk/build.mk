@@ -115,6 +115,7 @@ ifeq "$(strip $(DEBUG))" "0"
   BASIC_CFLAGS += $(CC_NO_UNWIND_TABLES)
 else
   BASIC_CPPFLAGS += -DDEBUG='$(strip $(DEBUG))'
+  BASIC_CFLAGS += $(CC_AUTOVAR_PATTERN)
 endif
 
 ifeq "$(WERROR)" "1"
