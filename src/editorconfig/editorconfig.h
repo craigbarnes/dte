@@ -11,9 +11,9 @@ typedef enum {
 } EditorConfigIndentStyle;
 
 typedef struct {
-    unsigned int indent_size : 4;
-    unsigned int tab_width : 4;
-    unsigned int max_line_length : 10;
+    unsigned int indent_size : 4; // 0..INDENT_WIDTH_MAX
+    unsigned int tab_width : 4; // 0..TAB_WIDTH_MAX
+    unsigned int max_line_length : 10; // 0..TEXT_WIDTH_MAX
     unsigned int indent_style : 2; // EditorConfigIndentStyle
     unsigned int indent_size_is_tab : 1; // bool
 } EditorConfigOptions;

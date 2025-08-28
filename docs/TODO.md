@@ -187,7 +187,7 @@ Features
   be entirely replaced by this, but to minimize disruptive changes, both
   should be supported initially. If workspaces are presented in the UI
   as another tab bar, an option for auto-hiding when there's only 1 tab
-  would also be a useful thing to implement.
+  would also be useful.
 
 Documentation
 -------------
