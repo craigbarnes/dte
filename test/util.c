@@ -1541,21 +1541,17 @@ static void test_buf_uint_to_str(TestContext *ctx)
 
 static void test_buf_u8_to_str(TestContext *ctx)
 {
-    // Note: EXPECT_STREQ() only works here if the tests are done in ascending
-    // order, since buf_u8_to_str() doesn't null-terminate the buffer
-    char buf[4] = {0};
-    EXPECT_EQ(buf_u8_to_str(0, buf), 1);
-    EXPECT_STREQ(buf, "0");
-    EXPECT_EQ(buf_u8_to_str(1, buf), 1);
-    EXPECT_STREQ(buf, "1");
-    EXPECT_EQ(buf_u8_to_str(9, buf), 1);
-    EXPECT_STREQ(buf, "9");
-    EXPECT_EQ(buf_u8_to_str(99, buf), 2);
-    EXPECT_STREQ(buf, "99");
-    EXPECT_EQ(buf_u8_to_str(100, buf), 3);
-    EXPECT_STREQ(buf, "100");
-    EXPECT_EQ(buf_u8_to_str(255, buf), 3);
-    EXPECT_STREQ(buf, "255");
+    // Note that buf_u8_to_str() doesn't null-terminate the buffer
+    char buf[4] = "";
+    EXPECT_MEMEQ(buf, buf_u8_to_str(0, buf), "0", 1);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(1, buf), "1", 1);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(9, buf), "9", 1);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(10, buf), "10", 2);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(99, buf), "99", 2);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(100, buf), "100", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(101, buf), "101", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(123, buf), "123", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(255, buf), "255", 3);
 }
 
 static void test_file_permissions_to_str(TestContext *ctx)
