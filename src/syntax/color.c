@@ -44,14 +44,17 @@ static const TermStyle *find_real_style_const(const StyleMap *styles, const char
     return find_real_style((StyleMap*)styles, name);
 }
 
-void set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style)
+bool set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style)
 {
     TermStyle *existing = find_real_style(styles, name);
     if (existing) {
+        bool different = !same_style(style, existing);
         *existing = *style;
-    } else {
-        hashmap_insert(&styles->other, xstrdup(name), XMEMDUP(style));
+        return different;
     }
+
+    hashmap_insert(&styles->other, xstrdup(name), XMEMDUP(style));
+    return true;
 }
 
 const TermStyle *find_style(const StyleMap *styles, const char *name)

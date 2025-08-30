@@ -859,7 +859,7 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
 {
     if (unlikely(a->nr_args == 0)) {
         exec_builtin_color_reset(e);
-        goto update;
+        return true;
     }
 
     char **strs = a->args + 1;
@@ -885,16 +885,8 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
 
     style.fg = fg;
     style.bg = bg;
-    set_highlight_style(&e->styles, a->args[0], &style);
-
-update:
-    // Don't call update_all_syntax_styles() needlessly; it's called
-    // right after config has been loaded
-    if (e->status != EDITOR_INITIALIZING) {
-        update_all_syntax_styles(&e->syntaxes, &e->styles);
-        e->screen_update |= UPDATE_ALL_WINDOWS;
-    }
-
+    bool changed = set_highlight_style(&e->styles, a->args[0], &style);
+    e->screen_update |= changed ? (UPDATE_SYNTAX_STYLES | UPDATE_ALL_WINDOWS) : 0;
     return true;
 }
 

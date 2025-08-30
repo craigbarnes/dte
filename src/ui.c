@@ -1,6 +1,7 @@
 #include <string.h>
 #include "ui.h"
 #include "frame.h"
+#include "syntax/syntax.h"
 #include "terminal/cursor.h"
 #include "terminal/ioctl.h"
 #include "util/log.h"
@@ -161,6 +162,11 @@ void update_screen(EditorState *e, const ScreenState *s)
     Buffer *buffer = e->buffer;
     Terminal *term = &e->terminal;
     ScreenUpdateFlags flags = e->screen_update;
+
+    if (unlikely(flags & UPDATE_SYNTAX_STYLES)) {
+        update_all_syntax_styles(&e->syntaxes, styles);
+    }
+
     start_update(term);
 
     if (flags & UPDATE_ALL_WINDOWS) {

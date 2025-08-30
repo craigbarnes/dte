@@ -1,6 +1,7 @@
 #ifndef SYNTAX_COLOR_H
 #define SYNTAX_COLOR_H
 
+#include <stdbool.h>
 #include "terminal/style.h"
 #include "util/hashmap.h"
 #include "util/macros.h"
@@ -32,7 +33,7 @@ typedef struct {
     HashMap other; // All other styles (i.e. for syntax highlighting)
 } StyleMap;
 
-void set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style) NONNULL_ARGS;
+bool set_highlight_style(StyleMap *styles, const char *name, const TermStyle *style) NONNULL_ARGS;
 const TermStyle *find_style(const StyleMap *styles, const char *name) NONNULL_ARGS;
 void clear_hl_styles(StyleMap *styles) NONNULL_ARGS;
 void collect_builtin_styles(PointerArray *a, const char *prefix) NONNULL_ARGS;

@@ -190,9 +190,10 @@ static void exec_builtin_config(EditorState *e, StringView cfg, const char *name
 
 void exec_builtin_color_reset(EditorState *e)
 {
-    clear_hl_styles(&e->styles);
     StringView reset = string_view(builtin_color_reset, sizeof(builtin_color_reset) - 1);
+    clear_hl_styles(&e->styles);
     exec_builtin_config(e, reset, "color/reset");
+    e->screen_update |= UPDATE_SYNTAX_STYLES | UPDATE_ALL_WINDOWS;
 }
 
 static void log_config_counts(const EditorState *e)
@@ -252,7 +253,6 @@ void exec_rc_files(EditorState *e, const char *filename, bool read_user_rc)
     }
 
     log_config_counts(e);
-    update_all_syntax_styles(&e->syntaxes, &e->styles);
 }
 
 void collect_builtin_configs(PointerArray *a, const char *prefix)
