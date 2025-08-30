@@ -224,7 +224,6 @@ String dump_buffer(const View *view)
         "   Blocks:", counts[0],
         "    Lines:", buffer->nl,
         "     Size:", filesize_to_str(counts[1], sizestr)
-
     );
 
     if (

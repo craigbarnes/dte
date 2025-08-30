@@ -14,7 +14,7 @@ enum {
 
 extern const char hextable[32];
 
-// Encodes a byte of data as 2 hexadecimal digits
+// Encode a uint8_t as a string of 2 hexadecimal digits
 static inline size_t hex_encode_byte(char out[static 2], uint8_t byte)
 {
     const char *hextab_lower = hextable + 16;
@@ -23,10 +23,22 @@ static inline size_t hex_encode_byte(char out[static 2], uint8_t byte)
     return 2;
 }
 
+// Encode a uint8_t as a string of 1-3 decimal digits
+static inline size_t buf_u8_to_str(uint8_t x, char *buf)
+{
+    // Write 3 digits unconditionally, but adjust the indices to produce
+    // the correct string (x=1 writes to `buf[0]` 3 times)
+    size_t i = (x >= 100);
+    size_t j = (x >= 10) + i;
+    buf[0] = '0' + ((x / 100) % 10);
+    buf[i] = '0' + ((x / 10) % 10);
+    buf[j] = '0' + (x % 10);
+    return j + 1;
+}
+
 size_t buf_umax_to_str(uintmax_t x, char *buf) NONNULL_ARGS;
 size_t buf_umax_to_hex_str(uintmax_t x, char *buf, size_t min_digits) NONNULL_ARGS;
 size_t buf_uint_to_str(unsigned int x, char *buf) NONNULL_ARGS;
-size_t buf_u8_to_str(uint8_t x, char *buf) NONNULL_ARGS;
 const char *umax_to_str(uintmax_t x) RETURNS_NONNULL;
 const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
 const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;

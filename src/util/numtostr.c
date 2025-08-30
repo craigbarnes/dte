@@ -72,26 +72,6 @@ const char *umax_to_str(uintmax_t x)
     return &buf[i + 1];
 }
 
-// Like buf_umax_to_str() but for uint8_t values (1-3 digits)
-size_t buf_u8_to_str(uint8_t x, char *buf)
-{
-    size_t ndigits = 1;
-    if (x >= 100) {
-        buf[2] = (x % 10) + '0';
-        x /= 10;
-        ndigits++;
-    }
-
-    if (x >= 10) {
-        buf[1] = (x % 10) + '0';
-        x /= 10;
-        ndigits++;
-    }
-
-    buf[0] = (x % 10) + '0';
-    return ndigits;
-}
-
 const char *uint_to_str(unsigned int x)
 {
     return umax_to_str(x);
