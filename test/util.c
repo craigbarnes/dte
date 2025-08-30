@@ -320,21 +320,14 @@ static void test_hex_decode(TestContext *ctx)
 
 static void test_hex_encode_byte(TestContext *ctx)
 {
-    char buf[4] = {0};
-    EXPECT_EQ(hex_encode_byte(buf, 0x00), 2);
-    EXPECT_STREQ(buf, "00");
-    EXPECT_EQ(hex_encode_byte(buf, 0x05), 2);
-    EXPECT_STREQ(buf, "05");
-    EXPECT_EQ(hex_encode_byte(buf, 0x10), 2);
-    EXPECT_STREQ(buf, "10");
-    EXPECT_EQ(hex_encode_byte(buf, 0x1b), 2);
-    EXPECT_STREQ(buf, "1b");
-    EXPECT_EQ(hex_encode_byte(buf, 0xee), 2);
-    EXPECT_STREQ(buf, "ee");
-    EXPECT_EQ(hex_encode_byte(buf, 0xfe), 2);
-    EXPECT_STREQ(buf, "fe");
-    EXPECT_EQ(hex_encode_byte(buf, 0xff), 2);
-    EXPECT_STREQ(buf, "ff");
+    char buf[4] = "";
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0x00), "00", 2);
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0x05), "05", 2);
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0x10), "10", 2);
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0x1b), "1b", 2);
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0xee), "ee", 2);
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0xfe), "fe", 2);
+    EXPECT_MEMEQ(buf, hex_encode_byte(buf, 0xff), "ff", 2);
 }
 
 static void test_ascii(TestContext *ctx)
@@ -1547,10 +1540,16 @@ static void test_buf_u8_to_str(TestContext *ctx)
     EXPECT_MEMEQ(buf, buf_u8_to_str(1, buf), "1", 1);
     EXPECT_MEMEQ(buf, buf_u8_to_str(9, buf), "9", 1);
     EXPECT_MEMEQ(buf, buf_u8_to_str(10, buf), "10", 2);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(72, buf), "72", 2);
     EXPECT_MEMEQ(buf, buf_u8_to_str(99, buf), "99", 2);
     EXPECT_MEMEQ(buf, buf_u8_to_str(100, buf), "100", 3);
     EXPECT_MEMEQ(buf, buf_u8_to_str(101, buf), "101", 3);
     EXPECT_MEMEQ(buf, buf_u8_to_str(123, buf), "123", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(205, buf), "205", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(215, buf), "215", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(225, buf), "225", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(250, buf), "250", 3);
+    EXPECT_MEMEQ(buf, buf_u8_to_str(251, buf), "251", 3);
     EXPECT_MEMEQ(buf, buf_u8_to_str(255, buf), "255", 3);
 }
 
