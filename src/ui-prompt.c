@@ -85,48 +85,40 @@ void show_dialog(Terminal *term, const StyleMap *styles, const char *question)
     }
 }
 
-char dialog_prompt(EditorState *e, const char *question, const char *choices)
-{
-    BUG_ON(e->flags & EFLAG_HEADLESS);
-
+static char prompt (
+    EditorState *e,
+    const char *question,
+    const char *choices,
+    ScreenUpdateFlags uflags
+) {
     const ScreenState dummyval = {.id = 0};
+    BUG_ON(e->flags & EFLAG_HEADLESS);
     info_msg(&e->err, "%s", question);
-    e->screen_update |= UPDATE_ALL | UPDATE_DIALOG;
+    e->screen_update |= uflags;
     update_screen(e, &dummyval);
 
     Terminal *term = &e->terminal;
     unsigned int esc_timeout = e->options.esc_timeout;
     char choice;
+
     while ((choice = get_choice(term, choices, esc_timeout)) == 0) {
         if (resized) {
-            e->screen_update |= UPDATE_DIALOG;
+            e->screen_update |= uflags & UPDATE_DIALOG;
             ui_resize(e);
         }
     }
 
     clear_error(&e->err);
-    e->screen_update |= UPDATE_ALL;
+    e->screen_update |= uflags & UPDATE_ALL;
     return (choice >= 'a') ? choice : 0;
+}
+
+char dialog_prompt(EditorState *e, const char *question, const char *choices)
+{
+    return prompt(e, question, choices, UPDATE_DIALOG | UPDATE_ALL);
 }
 
 char status_prompt(EditorState *e, const char *question, const char *choices)
 {
-    BUG_ON(e->flags & EFLAG_HEADLESS);
-
-    const ScreenState dummyval = {.id = 0};
-    info_msg(&e->err, "%s", question);
-    update_screen(e, &dummyval);
-
-    Terminal *term = &e->terminal;
-    unsigned int esc_timeout = e->options.esc_timeout;
-    char choice;
-
-    while ((choice = get_choice(term, choices, esc_timeout)) == 0) {
-        if (resized) {
-            ui_resize(e);
-        }
-    }
-
-    clear_error(&e->err);
-    return (choice >= 'a') ? choice : 0;
+    return prompt(e, question, choices, 0);
 }
