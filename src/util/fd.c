@@ -1,4 +1,4 @@
-#include "feature.h"
+#include "build-defs.h"
 #include <sys/stat.h>
 #include "fd.h"
 #include "debug.h"

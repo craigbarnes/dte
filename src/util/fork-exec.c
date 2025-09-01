@@ -1,4 +1,4 @@
-#include "feature.h"
+#include "build-defs.h"
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>

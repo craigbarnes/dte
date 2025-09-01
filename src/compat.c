@@ -1,4 +1,4 @@
-#include "feature.h" // HAVE_*
+#include "build-defs.h" // HAVE_*
 #include <regex.h> // REG_STARTEND, REG_ENHANCED (macOS)
 #include <sys/stat.h> // S_ISVTX
 #include "buildvar-iconv.h" // ICONV_DISABLE

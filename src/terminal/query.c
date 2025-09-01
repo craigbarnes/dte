@@ -1,6 +1,6 @@
 #include "query.h"
 #include "cursor.h"
-#include "terminal.h"
+#include "feature.h"
 #include "util/log.h"
 #include "util/str-util.h"
 #include "util/string-view.h"

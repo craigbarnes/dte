@@ -49,8 +49,8 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight merge state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color cursor input ioctl key linux mode osc52 output parse paste \
-    query rxvt style terminal )
+    color cursor feature input ioctl key linux mode osc52 output parse \
+    paste query rxvt style terminal )
 
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter bookmark buffer case change cmdline commands \
@@ -149,23 +149,23 @@ $(feature_tests): mk/feature-test/defs.h build/gen/all.cflags
 build/convert.o: build/gen/buildvar-iconv.h
 build/gen/builtin-config.h build/gen/builtin-config-embed.h: build/gen/builtin-config.mk
 build/gen/test-data.h build/gen/test-data-embed.h: build/gen/test-data.mk
-build/config.o: build/gen/feature.h build/gen/builtin-config.h build/gen/builtin-config-embed.h
-build/test/config.o: build/gen/feature.h build/gen/test-data.h build/gen/test-data-embed.h
+build/config.o: build/gen/build-defs.h build/gen/builtin-config.h build/gen/builtin-config-embed.h
+build/test/config.o: build/gen/build-defs.h build/gen/test-data.h build/gen/test-data-embed.h
 build/main.o: build/gen/version.h
 build/editor.o: build/gen/version.h
 build/test/command.o: build/gen/version.h
 build/test/init.o: build/gen/version.h
-build/compat.o: build/gen/feature.h build/gen/buildvar-iconv.h
-build/exec.o: build/gen/feature.h
-build/load-save.o: build/gen/feature.h
-build/signals.o: build/gen/feature.h
-build/tag.o: build/gen/feature.h
-build/terminal/ioctl.o: build/gen/feature.h
-build/util/fd.o: build/gen/feature.h
-build/util/fork-exec.o: build/gen/feature.h
-build/util/xadvise.o: build/gen/feature.h
-build/util/xmemmem.o: build/gen/feature.h
-build/util/xmemrchr.o: build/gen/feature.h
+build/compat.o: build/gen/build-defs.h build/gen/buildvar-iconv.h
+build/exec.o: build/gen/build-defs.h
+build/load-save.o: build/gen/build-defs.h
+build/signals.o: build/gen/build-defs.h
+build/tag.o: build/gen/build-defs.h
+build/terminal/ioctl.o: build/gen/build-defs.h
+build/util/fd.o: build/gen/build-defs.h
+build/util/fork-exec.o: build/gen/build-defs.h
+build/util/xadvise.o: build/gen/build-defs.h
+build/util/xmemmem.o: build/gen/build-defs.h
+build/util/xmemrchr.o: build/gen/build-defs.h
 
 # `-fexceptions` is in some distro's packaging CFLAGS by default, but all it
 # does here is add ~60KiB of useless binary bloat (see commit ba36a8333de9e2)
@@ -224,7 +224,7 @@ build/gen/test-data-embed.h: $(TEST_CONFIGS) mk/config2embed.sh | build/gen/
 	$(E) GEN $@
 	$(Q) mk/config2embed.sh $(TEST_CONFIGS) > $@
 
-build/gen/feature.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
+build/gen/build-defs.h: mk/feature-test/defs.h $(feature_tests) | build/gen/
 	$(E) GEN $@
 	$(Q) cat $^ > $@
 

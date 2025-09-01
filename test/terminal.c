@@ -1,6 +1,7 @@
 #include "test.h"
 #include "terminal/color.h"
 #include "terminal/cursor.h"
+#include "terminal/feature.h"
 #include "terminal/input.h"
 #include "terminal/key.h"
 #include "terminal/linux.h"

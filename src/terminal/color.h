@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "terminal.h"
+#include "feature.h"
 #include "util/macros.h"
 
 #define COLOR_RGB(x) (COLOR_FLAG_RGB | (x))

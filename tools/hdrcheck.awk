@@ -23,9 +23,9 @@ FNR == 1 {
     print "  HCHECK  " FILENAME
 }
 
-FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"feature.h"/ {
+FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"build-defs.h"/ {
     h++
-    warn("\"feature.h\" include not on line 1")
+    warn("\"build-defs.h\" include not on line 1")
 }
 
 /^#ifndef / && FILENAME ~ /\.h$/ && ifndef_line == -1 {
@@ -47,7 +47,7 @@ FILENAME ~ /\.[ch]$/ && FNR != 1 && /^[ \t]*#include[ \t]+"feature.h"/ {
 
 END {
     if (h) {
-        print "Error: " h " misplaced \"feature.h\" include" plural(h)
+        print "Error: " h " misplaced \"build-defs.h\" include" plural(h)
     }
     if (H) {
         print "Error: " H " unexpected header guard" plural(H)

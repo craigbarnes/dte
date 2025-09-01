@@ -13,8 +13,8 @@ jobs:
             - run: ln -s tools/Config-CI.mk Config.mk
             - run: brew install make
             - run: gmake vvars
-            - run: gmake build/gen/feature.h
-            - run: cat build/gen/feature.h build/feature/*.log
+            - run: gmake build/gen/build-defs.h
+            - run: cat build/gen/build-defs.h build/feature/*.log
             - run: gmake check
             - run: gmake bench CFLAGS=-O3 DEBUG=0
 
@@ -28,7 +28,7 @@ jobs:
               with: {filter: "tree:0", fetch-depth: 0}
             - run: ln -s tools/Config-CI.mk Config.mk
             - run: make vvars
-            - run: make build/gen/feature.h
-            - run: cat build/gen/feature.h build/feature/*.log
+            - run: make build/gen/build-defs.h
+            - run: cat build/gen/build-defs.h build/feature/*.log
             - run: make check
             - run: make bench CFLAGS=-O3 DEBUG=0

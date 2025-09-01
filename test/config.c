@@ -1,4 +1,4 @@
-#include "feature.h"
+#include "build-defs.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include "test.h"

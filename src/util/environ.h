@@ -6,7 +6,7 @@
 // The glibc <unistd.h> header declares `environ` in some cases (if
 // _GNU_SOURCE is defined before inclusion), whereas it needs to be
 // declared explicitly in others. The former can happen in some parts
-// of this codebase, due to the generated build/gen/feature.h header
+// of this codebase, due to the generated build/gen/build-defs.h header
 // being included. Since identical re-declarations are well defined
 // in C, we simply silence any -Wredundant-decls warnings and declare
 // it unconditionally.

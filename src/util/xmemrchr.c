@@ -1,4 +1,4 @@
-#include "feature.h"
+#include "build-defs.h"
 #include <string.h>
 #include "xmemrchr.h"
 

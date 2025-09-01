@@ -19,7 +19,7 @@ The following points should be observed when adding new feature tests:
 
 *  If the feature being detected depends on `_GNU_SOURCE` being defined,
   `#include "defs.h"` should be added at the top of the `*.c` file. The
-  contents of [`defs.h`] is concatenated into `build/gen/feature.h` by the
+  contents of [`defs.h`] is concatenated into `build/gen/build-defs.h` by the
   build system, along with the generated headers from `build/feature/*.h`,
   to ensure the code under [`src/`] sees the same macro definitions as the
   feature tests. Most other platform-specific [`feature_test_macros(7)`]
@@ -27,9 +27,9 @@ The following points should be observed when adding new feature tests:
   explicitly define them (see commits [`a91a15760`] and [`38d9e95da`]).
 
 * Source files under [`src/`] that use constructs like e.g. `#if HAVE_EXAMPLE`
-  should use `#include "feature.h"` before any other includes and should be
-  given an explicit dependency on `src/feature.h` in [`mk/build.mk`]. The
-  `tools/hdrcheck.awk` script (and `make check-headers` target) will issue
+  should use `#include "build-defs.h"` before any other includes and should be
+  given an explicit dependency on `build/gen/build-defs.h` in [`mk/build.mk`].
+  The `tools/hdrcheck.awk` script (and `make check-headers` target) will issue
   a warning, if this `#include` ordering isn't respected.
 
 * Pre-processor `#if` or `#ifdef` guard blocks should be kept as small as

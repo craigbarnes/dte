@@ -1,4 +1,4 @@
-#include "feature.h"
+#include "build-defs.h"
 #include <sys/mman.h>
 #include "xadvise.h"
 #include "debug.h"

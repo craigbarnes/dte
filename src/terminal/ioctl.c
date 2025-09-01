@@ -1,4 +1,4 @@
-#include "feature.h"
+#include "build-defs.h"
 #include <termios.h>
 #include <unistd.h>
 #include "ioctl.h"
