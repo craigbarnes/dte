@@ -23,6 +23,7 @@
 typedef enum {
     OPT_STR,
     OPT_UINT,
+    OPT_UINT8,
     OPT_ENUM,
     OPT_BOOL,
     OPT_FLAG,
@@ -32,13 +33,13 @@ typedef enum {
 
 typedef union {
     const char *str_val; // OPT_STR, OPT_REGEX
-    unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG, OPT_FILESIZE
+    unsigned int uint_val; // OPT_UINT, OPT_UINT8, OPT_ENUM, OPT_FLAG, OPT_FILESIZE
     bool bool_val; // OPT_BOOL
 } OptionValue;
 
 typedef union {
     struct {bool (*validate)(ErrorBuffer *ebuf, const char *value);} str_opt; // OPT_STR (optional)
-    struct {unsigned int min, max;} uint_opt; // OPT_UINT
+    struct {unsigned int min, max;} uint_opt; // OPT_UINT, OPT_UINT8
     struct {const char *const *values;} enum_opt; // OPT_ENUM, OPT_FLAG, OPT_BOOL
 } OptionConstraint;
 
@@ -64,10 +65,15 @@ typedef struct {
     OLG \
     .name = _name, \
     .type = OPT_UINT, \
-    .u = {.uint_opt = { \
-        .min = _min, \
-        .max = _max, \
-    }}, \
+    .u = {.uint_opt = {.min = _min, .max = _max}}, \
+    .on_change = _on_change, \
+}
+
+#define UINT8_OPT(_name, OLG, _min, _max, _on_change) { \
+    OLG \
+    .name = _name, \
+    .type = OPT_UINT8, \
+    .u = {.uint_opt = {.min = _min, .max = _max}}, \
     .on_change = _on_change, \
 }
 
@@ -103,9 +109,9 @@ typedef struct {
 }
 
 #define FSIZE_OPT(_name, OLG, _on_change) { \
+    OLG \
     .name = _name, \
     .type = OPT_FILESIZE, \
-    OLG \
     .on_change = _on_change, \
 }
 
@@ -291,6 +297,24 @@ static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionVal
     return *valp == value.uint_val;
 }
 
+static OptionValue uint8_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
+{
+    const uint8_t *valp = ptr;
+    return (OptionValue){.uint_val = (unsigned int)(*valp)};
+}
+
+static void uint8_set(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
+{
+    uint8_t *valp = ptr;
+    *valp = (uint8_t)value.uint_val;
+}
+
+static bool uint8_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
+{
+    const uint8_t *valp = ptr;
+    return (unsigned int)(*valp) == value.uint_val;
+}
+
 static OptionValue bool_get(const OptionDesc* UNUSED_ARG(d), void *ptr)
 {
     const bool *valp = ptr;
@@ -450,7 +474,8 @@ static const struct {
 } option_ops[] = {
     [OPT_STR] = {str_get, str_set, str_parse, str_string, str_equals},
     [OPT_UINT] = {uint_get, uint_set, uint_parse, uint_string, uint_equals},
-    [OPT_ENUM] = {uint_get, uint_set, enum_parse, enum_string, uint_equals},
+    [OPT_UINT8] = {uint8_get, uint8_set, uint_parse, uint_string, uint8_equals},
+    [OPT_ENUM] = {uint8_get, uint8_set, enum_parse, enum_string, uint8_equals},
     [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals},
     [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals},
     [OPT_REGEX] = {re_get, re_set, re_parse, str_string, re_equals},
@@ -497,7 +522,7 @@ static const OptionDesc option_desc[] = {
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
     BOOL_OPT("fsync", C(fsync), NULL),
     REGEX_OPT("indent-regex", L(indent_regex), NULL),
-    UINT_OPT("indent-width", C(indent_width), 1, INDENT_WIDTH_MAX, NULL),
+    UINT8_OPT("indent-width", C(indent_width), 1, INDENT_WIDTH_MAX, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("msg-compile", G(msg_compile), msg_enum, NULL),
     ENUM_OPT("msg-tag", G(msg_tag), msg_enum, NULL),
@@ -505,7 +530,7 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("optimize-true-color", G(optimize_true_color), redraw_screen),
     BOOL_OPT("overwrite", C(overwrite), overwrite_changed),
     ENUM_OPT("save-unmodified", C(save_unmodified), save_unmodified_enum, NULL),
-    UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, redraw_screen),
+    UINT8_OPT("scroll-margin", G(scroll_margin), 0, 100, redraw_screen),
     BOOL_OPT("select-cursor-char", G(select_cursor_char), redraw_screen),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),
     BOOL_OPT("show-line-numbers", G(show_line_numbers), redraw_screen),
@@ -513,7 +538,7 @@ static const OptionDesc option_desc[] = {
     STR_OPT("statusline-right", G(statusline_right), validate_statusline_format, NULL),
     BOOL_OPT("syntax", C(syntax), syntax_changed),
     BOOL_OPT("tab-bar", G(tab_bar), redraw_screen),
-    UINT_OPT("tab-width", C(tab_width), 1, TAB_WIDTH_MAX, redraw_buffer),
+    UINT8_OPT("tab-width", C(tab_width), 1, TAB_WIDTH_MAX, redraw_buffer),
     UINT_OPT("text-width", C(text_width), 1, TEXT_WIDTH_MAX, NULL),
     BOOL_OPT("utf8-bom", G(utf8_bom), NULL),
     ENUM_OPT("window-separator", G(window_separator), window_separator_enum, window_separator_changed),
@@ -553,7 +578,8 @@ UNITTEST {
     } map[] = {
         [OPT_STR] = {ALIGNOF(const char*), sizeof(const char*)},
         [OPT_UINT] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
-        [OPT_ENUM] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
+        [OPT_UINT8] = {ALIGNOF(uint8_t), sizeof(uint8_t)},
+        [OPT_ENUM] = {ALIGNOF(uint8_t), sizeof(uint8_t)},
         [OPT_BOOL] = {ALIGNOF(bool), sizeof(bool)},
         [OPT_FLAG] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
         [OPT_REGEX] = {ALIGNOF(const InternedRegexp*), sizeof(const InternedRegexp*)},
@@ -573,29 +599,39 @@ UNITTEST {
         BUG_ON(type >= ARRAYLEN(map));
         size_t alignment = map[type].alignment;
         size_t end = desc->offset + map[type].size;
+
         if (desc->global) {
             const char *ptr = global_ptr(desc, &gopts);
             uintptr_t ptr_val = (uintptr_t)ptr;
             BUG_ON(ptr_val % alignment != 0);
             BUG_ON(end > sizeof(GlobalOptions));
         }
+
         if (desc->local) {
             const char *ptr = local_ptr(desc, &lopts);
             uintptr_t ptr_val = (uintptr_t)ptr;
             BUG_ON(ptr_val % alignment != 0);
             BUG_ON(end > sizeof(LocalOptions));
         }
+
         if (desc->global && desc->local) {
             BUG_ON(end > sizeof(CommonOptions));
         }
-        if (type == OPT_UINT) {
-            BUG_ON(desc->u.uint_opt.max <= desc->u.uint_opt.min);
-        } else if (type == OPT_BOOL) {
+
+        switch (type) {
+        case OPT_UINT8:
+            BUG_ON(desc->u.uint_opt.max > UINT8_MAX);
+            // Fallthrough
+        case OPT_UINT:
+            BUG_ON(desc->u.uint_opt.min >= desc->u.uint_opt.max);
+            break;
+        case OPT_BOOL:
             BUG_ON(desc->u.enum_opt.values != bool_enum);
-        } else if (type == OPT_ENUM) {
-            // NOLINTNEXTLINE(bugprone-assert-side-effect)
-            BUG_ON(count_enum_values(desc) < 2);
-        } else if (type == OPT_FLAG) {
+            break;
+        case OPT_ENUM:
+            BUG_ON(count_enum_values(desc) < 2); // NOLINT(*-assert-side-effect)
+            break;
+        case OPT_FLAG: {
             size_t nvals = count_enum_values(desc);
             OptionValue val = {.uint_val = -1};
             BUG_ON(nvals < 2);
@@ -610,6 +646,11 @@ UNITTEST {
             if (val.uint_val != mask) {
                 BUG("values not equal: %u, %u", val.uint_val, mask);
             }
+            } break;
+        case OPT_REGEX:
+        case OPT_STR:
+        case OPT_FILESIZE:
+            break;
         }
     }
 
@@ -864,6 +905,7 @@ static void sanity_check_option_value(const OptionDesc *desc, ErrorBuffer *ebuf,
         }
         return;
     case OPT_UINT:
+    case OPT_UINT8:
         BUG_ON(val.uint_val < desc->u.uint_opt.min);
         BUG_ON(val.uint_val > desc->u.uint_opt.max);
         return;
@@ -959,8 +1001,44 @@ void collect_toggleable_options(PointerArray *a, const char *prefix, bool global
     }
 }
 
-void collect_option_values(EditorState *e, PointerArray *a, const char *option, const char *prefix)
-{
+static void collect_enum_option_values (
+    const char *const *values,
+    PointerArray *a,
+    const char *prefix,
+    size_t prefix_len
+) {
+    for (size_t i = 0; values[i]; i++) {
+        if (str_has_strn_prefix(values[i], prefix, prefix_len)) {
+            ptr_array_append(a, xstrdup(values[i]));
+        }
+    }
+}
+
+static void collect_flag_option_values (
+    const char *const *values,
+    PointerArray *a,
+    const char *prefix,
+    size_t prefix_len
+) {
+    const char *comma = xmemrchr(prefix, ',', prefix_len);
+    const size_t tail_idx = comma ? ++comma - prefix : 0;
+    const char *tail = prefix + tail_idx;
+    const size_t tail_len = prefix_len - tail_idx;
+
+    for (size_t i = 0; values[i]; i++) {
+        const char *str = values[i];
+        if (str_has_strn_prefix(str, tail, tail_len)) {
+            ptr_array_append(a, xmemjoin(prefix, tail_idx, str, strlen(str) + 1));
+        }
+    }
+}
+
+void collect_option_values (
+    EditorState *e,
+    PointerArray *a,
+    const char *option,
+    const char *prefix
+) {
     const OptionDesc *desc = find_option(option);
     if (!desc) {
         return;
@@ -974,33 +1052,24 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
         return;
     }
 
-    OptionType type = desc->type;
-    if (type == OPT_STR || type == OPT_UINT || type == OPT_REGEX || type == OPT_FILESIZE) {
+    switch (desc->type) {
+    case OPT_STR:
+    case OPT_UINT:
+    case OPT_UINT8:
+    case OPT_REGEX:
+    case OPT_FILESIZE:
+        // Not enumerated; nothing to collect
+        return;
+    case OPT_ENUM:
+    case OPT_BOOL:
+        collect_enum_option_values(desc->u.enum_opt.values, a, prefix, prefix_len);
+        return;
+    case OPT_FLAG:
+        collect_flag_option_values(desc->u.enum_opt.values, a, prefix, prefix_len);
         return;
     }
 
-    const char *const *values = desc->u.enum_opt.values;
-    if (type == OPT_ENUM || type == OPT_BOOL) {
-        for (size_t i = 0; values[i]; i++) {
-            if (str_has_strn_prefix(values[i], prefix, prefix_len)) {
-                ptr_array_append(a, xstrdup(values[i]));
-            }
-        }
-        return;
-    }
-
-    BUG_ON(type != OPT_FLAG);
-    const char *comma = xmemrchr(prefix, ',', prefix_len);
-    const size_t tail_idx = comma ? ++comma - prefix : 0;
-    const char *tail = prefix + tail_idx;
-    const size_t tail_len = prefix_len - tail_idx;
-
-    for (size_t i = 0; values[i]; i++) {
-        const char *str = values[i];
-        if (str_has_strn_prefix(str, tail, tail_len)) {
-            ptr_array_append(a, xmemjoin(prefix, tail_idx, str, strlen(str) + 1));
-        }
-    }
+    BUG("unhandled OptionType value");
 }
 
 static void append_option(String *s, const OptionDesc *desc, void *ptr)

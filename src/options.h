@@ -37,11 +37,11 @@ typedef enum {
 
 #define COMMON_OPTIONS \
     unsigned int detect_indent; \
-    unsigned int indent_width; \
-    unsigned int save_unmodified; \
-    unsigned int tab_width; \
     unsigned int text_width; \
     unsigned int ws_error; \
+    uint8_t indent_width; \
+    uint8_t save_unmodified; \
+    uint8_t tab_width; \
     bool auto_indent; \
     bool editorconfig; \
     bool emulate_tab; \
@@ -75,14 +75,14 @@ typedef struct {
     bool show_line_numbers;
     bool tab_bar;
     bool utf8_bom; // Default value for new files
+    uint8_t scroll_margin;
+    uint8_t crlf_newlines; // Default value for new files
+    uint8_t case_sensitive_search; // SearchCaseSensitivity
+    uint8_t window_separator; // WindowSeparatorType
+    uint8_t msg_compile; // Default EditorState::messages[] index for `compile`
+    uint8_t msg_tag; // Default EditorState::messages[] index for `tag`
     unsigned int esc_timeout;
     unsigned int filesize_limit;
-    unsigned int scroll_margin;
-    unsigned int crlf_newlines; // Default value for new files
-    unsigned int case_sensitive_search; // SearchCaseSensitivity
-    unsigned int window_separator; // WindowSeparatorType
-    unsigned int msg_compile; // Default EditorState::messages[] index for `compile`
-    unsigned int msg_tag; // Default EditorState::messages[] index for `tag`
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;
