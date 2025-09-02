@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "editor.h"
 
 static void print_separator(Window *window, void* UNUSED_ARG(ud))
 {

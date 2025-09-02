@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "editor.h"
 #include "status.h"
 #include "trace.h"
 

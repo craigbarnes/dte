@@ -1,5 +1,6 @@
 #include <string.h>
 #include "ui.h"
+#include "editor.h"
 #include "frame.h"
 #include "syntax/syntax.h"
 #include "terminal/cursor.h"

@@ -334,6 +334,19 @@ void ui_end(Terminal *term, bool final)
     term_output_flush(obuf);
 }
 
+static ScreenState get_screen_state(const EditorState *e)
+{
+    const View *view = e->view;
+    return (ScreenState) {
+        .is_modified = buffer_modified(view->buffer),
+        .set_window_title = e->options.set_window_title,
+        .id = view->buffer->id,
+        .cy = view->cy,
+        .vx = view->vx,
+        .vy = view->vy
+    };
+}
+
 static void log_timing_info(const struct timespec *start, bool enabled)
 {
     struct timespec end;
@@ -363,7 +376,7 @@ void main_loop(EditorState *e, bool timing)
         struct timespec start;
         timing = unlikely(timing) && xgettime(&start);
 
-        const ScreenState s = get_screen_state(e->view);
+        const ScreenState s = get_screen_state(e);
         clear_error(&e->err);
         handle_input(e, key);
         sanity_check(e->view);

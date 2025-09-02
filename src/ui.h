@@ -4,8 +4,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "buffer.h"
+#include "cmdline.h"
+#include "command/error.h"
 #include "command/run.h"
-#include "editor.h"
+#include "frame.h"
+#include "options.h"
+#include "search.h"
 #include "syntax/color.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
@@ -27,20 +31,10 @@ typedef struct {
     long vy;
 } ScreenState;
 
-static inline ScreenState get_screen_state(const View *view)
-{
-    return (ScreenState) {
-        .is_modified = buffer_modified(view->buffer),
-        .set_window_title = view->window->editor->options.set_window_title,
-        .id = view->buffer->id,
-        .cy = view->cy,
-        .vx = view->vx,
-        .vy = view->vy
-    };
-}
+struct EditorState;
 
 // ui.c
-void update_screen(EditorState *e, const ScreenState *s);
+void update_screen(struct EditorState *e, const ScreenState *s);
 void update_term_title(TermOutputBuffer *obuf, const char *filename, bool is_modified);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
@@ -84,8 +78,8 @@ void update_buffer_windows(Terminal *term, const View *view, const StyleMap *sty
 void update_window_separators(Terminal *term, Frame *root_frame, const StyleMap *styles);
 
 // ui-prompt.c
-char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
-char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
+char status_prompt(struct EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
+char dialog_prompt(struct EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 void show_dialog(Terminal *term, const StyleMap *styles, const char *question) NONNULL_ARGS;
 
 #endif
