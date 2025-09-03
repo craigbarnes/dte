@@ -43,7 +43,6 @@ $dte -s config/syntax/dte >>"$logfile"
 $dte -h >/dev/null
 $dte -P >/dev/null
 
-
 # Check headless mode ------------------------------------------------------
 
 set +e

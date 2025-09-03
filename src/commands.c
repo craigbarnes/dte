@@ -760,7 +760,6 @@ static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
         indices[cap_idx] = max_idx;
     }
 
-
     const char *pattern = a->args[1];
     regex_t re;
     if (unlikely(!regexp_compile(&e->err, &re, pattern, 0))) {

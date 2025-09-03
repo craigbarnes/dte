@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 
 BEGIN {
-    t = w = n = 0
+    t = w = n = b = 0
 }
 
 FNR == 1 && NR > 1 && NR - 1 == lastblank {
@@ -10,10 +10,15 @@ FNR == 1 && NR > 1 && NR - 1 == lastblank {
 }
 
 FNR == 1 {
+    lastblankfnr = 0
     print " WSCHECK  " FILENAME
 }
 
 /^[ \t]*$/ {
+    if (lastblankfnr > 0 && lastblankfnr == FNR - 1 && FILENAME !~ /\.md$/) {
+        b++
+        print FILENAME ":" FNR ": excess blank line"
+    }
     lastblank = NR
     lastblankfnr = FNR
     lastname = FILENAME
@@ -47,7 +52,10 @@ END {
     if (n) {
         print "Error: blank line at EOF in " n " file" plural(n)
     }
-    if (t + w + n != 0) {
+    if (b) {
+        print "Error: " b " excess blank line" plural(b)
+    }
+    if (t + w + n + b != 0) {
         exit 1
     }
 }
