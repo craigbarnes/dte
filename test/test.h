@@ -101,9 +101,9 @@ void assert_nonnull(TestContext *ctx, const char *file, int line, const void *pt
 
 static inline void expect_strview_eq_cstring (
     TestContext *ctx, const char *file, int line,
-    const StringView *sv, const char *cstr
+    StringView sv, const char *cstr
 ) {
-    expect_memeq(ctx, file, line, sv->data, sv->length, cstr, strlen(cstr));
+    expect_memeq(ctx, file, line, sv.data, sv.length, cstr, strlen(cstr));
 }
 
 static inline void expect_string_eq_cstring (

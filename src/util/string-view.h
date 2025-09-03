@@ -55,19 +55,9 @@ static inline bool strview_equal_icase(StringView a, StringView b)
     return n == b.length && mem_equal_icase(a.data, b.data, n);
 }
 
-NONNULL_ARGS
-static inline bool strview_equal_strn (
-    const StringView *sv,
-    const char *str,
-    size_t len
-) {
-    return len == sv->length && mem_equal(sv->data, str, len);
-}
-
-NONNULL_ARGS
-static inline bool strview_equal_cstring(const StringView *sv, const char *str)
+static inline bool strview_equal_cstring(StringView sv, const char *str)
 {
-    return strview_equal(*sv, strview(str));
+    return strview_equal(sv, strview(str));
 }
 
 static inline bool strview_has_sv_prefix(StringView sv, StringView prefix)
@@ -83,49 +73,42 @@ static inline bool strview_has_sv_suffix(StringView sv, StringView suffix)
     return len >= suflen && mem_equal(sv.data + len - suflen, suffix.data, suflen);
 }
 
-NONNULL_ARGS
-static inline bool strview_has_prefix(const StringView *sv, const char *p)
+static inline bool strview_has_prefix(StringView sv, const char *prefix)
 {
-    return strview_has_sv_prefix(*sv, strview(p));
+    return strview_has_sv_prefix(sv, strview(prefix));
 }
 
-NONNULL_ARGS
-static inline bool strview_has_prefix_icase(const StringView *sv, const char *p)
+static inline bool strview_has_prefix_icase(StringView sv, const char *prefix)
 {
-    size_t length = strlen(p);
-    return sv->length >= length && mem_equal_icase(sv->data, p, length);
+    size_t length = strlen(prefix);
+    return sv.length >= length && mem_equal_icase(sv.data, prefix, length);
 }
 
-NONNULL_ARGS
 static inline bool strview_has_either_prefix (
-    const StringView *sv,
+    StringView sv,
     const char *pfx1,
     const char *pfx2
 ) {
-    return strview_has_sv_prefix(*sv, strview(pfx1))
-        || strview_has_sv_prefix(*sv, strview(pfx2));
+    return strview_has_sv_prefix(sv, strview(pfx1))
+        || strview_has_sv_prefix(sv, strview(pfx2));
 }
 
-NONNULL_ARGS
-static inline bool strview_has_suffix(const StringView *sv, const char *suffix)
+static inline bool strview_has_suffix(StringView sv, const char *suffix)
 {
-    return strview_has_sv_suffix(*sv, strview(suffix));
+    return strview_has_sv_suffix(sv, strview(suffix));
 }
 
-NONNULL_ARGS
 static inline bool strview_has_prefix_and_suffix (
-    const StringView *sv,
+    StringView sv,
     const char *prefix,
     const char *suffix
 ) {
     return strview_has_prefix(sv, prefix) && strview_has_suffix(sv, suffix);
 }
 
-NONNULL_ARGS
-static inline bool strview_isblank(const StringView *sv)
+static inline bool strview_isblank(StringView sv)
 {
-    size_t len = sv->length;
-    return len == ascii_blank_prefix_length(sv->data, len);
+    return ascii_blank_prefix_length(sv.data, sv.length) == sv.length;
 }
 
 static inline bool strview_contains_char_type(StringView sv, AsciiCharType mask)
@@ -138,23 +121,20 @@ static inline bool strview_contains_char_type(StringView sv, AsciiCharType mask)
     return false;
 }
 
-NONNULL_ARGS
-static inline const char *strview_memchr(const StringView *sv, int c)
+static inline const char *strview_memchr(StringView sv, int c)
 {
-    return sv->length ? memchr(sv->data, c, sv->length) : NULL;
+    return sv.length ? memchr(sv.data, c, sv.length) : NULL;
 }
 
-NONNULL_ARGS
-static inline const char *strview_memrchr(const StringView *sv, int c)
+static inline const char *strview_memrchr(StringView sv, int c)
 {
-    return sv->length ? xmemrchr(sv->data, c, sv->length) : NULL;
+    return sv.length ? xmemrchr(sv.data, c, sv.length) : NULL;
 }
 
-NONNULL_ARGS
-static inline ssize_t strview_memrchr_idx(const StringView *sv, int c)
+static inline ssize_t strview_memrchr_idx(StringView sv, int c)
 {
     const char *ptr = strview_memrchr(sv, c);
-    return ptr ? (ssize_t)(ptr - sv->data) : -1;
+    return ptr ? (ssize_t)(ptr - sv.data) : -1;
 }
 
 static inline void strview_remove_prefix(StringView *sv, size_t len)

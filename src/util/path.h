@@ -63,18 +63,18 @@ static inline char *path_join(const char *s1, const char *s2)
 // that path *must* be canonical (i.e. as returned by path_absolute()).
 static inline bool path_parent(StringView *path)
 {
-    BUG_ON(!strview_has_prefix(path, "/"));
+    BUG_ON(!strview_has_prefix(*path, "/"));
     if (unlikely(path->length == 1)) {
         return false; // Root dir
     }
 
     // Remove up to 1 trailing slash
     if (unlikely(strview_remove_matching_suffix(path, "/"))) {
-        BUG_ON(strview_has_suffix(path, "/"));
+        BUG_ON(strview_has_suffix(*path, "/"));
     }
 
     // Adjust the length, to exclude the last path component
-    ssize_t slash_idx = strview_memrchr_idx(path, '/');
+    ssize_t slash_idx = strview_memrchr_idx(*path, '/');
     BUG_ON(slash_idx < 0);
     path->length = MAX(slash_idx, 1); // Shortest valid path is "/"
     return true;

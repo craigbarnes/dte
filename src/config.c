@@ -69,7 +69,7 @@ bool exec_config(CommandRunner *runner, StringView config)
     for (size_t i = 0, n = config.length; i < n; ebuf->config_line++) {
         StringView line = buf_slice_next_line(config.data, &i, n);
         strview_trim_left(&line);
-        if (buf.len == 0 && strview_has_prefix(&line, "#")) {
+        if (buf.len == 0 && strview_has_prefix(line, "#")) {
             // Comment line
             continue;
         }

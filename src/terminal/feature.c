@@ -160,7 +160,7 @@ UNITTEST {
 static StringView term_extract_name(const char *name, size_t len, size_t *pos)
 {
     StringView root = get_delim(name, pos, len, '-');
-    if (*pos >= len || !strview_equal_cstring(&root, "xterm")) {
+    if (*pos >= len || !strview_equal_cstring(root, "xterm")) {
         return root;
     }
 
@@ -168,9 +168,9 @@ static StringView term_extract_name(const char *name, size_t len, size_t *pos)
     size_t tmp = *pos;
     StringView word2 = get_delim(name, &tmp, len, '-');
     if (
-        strview_equal_cstring(&word2, "kitty")
-        || strview_equal_cstring(&word2, "termite")
-        || strview_equal_cstring(&word2, "ghostty")
+        strview_equal_cstring(word2, "kitty")
+        || strview_equal_cstring(word2, "termite")
+        || strview_equal_cstring(word2, "ghostty")
     ) {
         *pos = tmp;
         return word2;
@@ -218,7 +218,7 @@ TermFeatureFlags term_get_features(const char *name, const char *colorterm)
         for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
             const char *suffix = color_suffixes[i].suffix;
             size_t suffix_len = color_suffixes[i].suffix_len;
-            if (strview_equal_strn(&str, suffix, suffix_len)) {
+            if (strview_equal(str, string_view(suffix, suffix_len))) {
                 TermFeatureFlags color_features = color_suffixes[i].flags;
                 if (color_features == 0) {
                     features &= ~(TC | C256 | C16 | C8 | NCVUL | NCVREV | NCVDIM);

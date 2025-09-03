@@ -73,7 +73,7 @@ void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde)
         return;
     }
 
-    bool has_tilde_slash_prefix = strview_has_prefix(&arg, "~/");
+    bool has_tilde_slash_prefix = strview_has_prefix(arg, "~/");
     if (has_tilde_slash_prefix && !escape_tilde) {
         // Print "~/" and skip past it, so it doesn't get quoted
         size_t skip = copyliteral(buf, "~/");

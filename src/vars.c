@@ -144,10 +144,10 @@ static char *expand_prefixed_var(const char *name, size_t name_len, StringView p
     char buf[64];
     bool name_fits_buf = (name_len < sizeof(buf));
 
-    if (strview_equal_cstring(&prefix, "builtin")) {
+    if (strview_equal_cstring(prefix, "builtin")) {
         // Skip past "builtin:"
         name += prefix.length + 1;
-    } else if (strview_equal_cstring(&prefix, "script") && name_fits_buf) {
+    } else if (strview_equal_cstring(prefix, "script") && name_fits_buf) {
         // Copy `name` into `buf` and replace ':' with '/'
         memcpy(buf, name, name_len + 1);
         buf[prefix.length] = '/';

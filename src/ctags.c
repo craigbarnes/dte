@@ -113,7 +113,7 @@ bool parse_ctags_line(Tag *tag, const char *line, size_t line_len)
         StringView field = get_delim(line, &pos, line_len, '\t');
         if (field.length == 1 && ascii_isalpha(field.data[0])) {
             tag->kind = field.data[0];
-        } else if (strview_equal_cstring(&field, "file:")) {
+        } else if (strview_equal_cstring(field, "file:")) {
             tag->local = true;
         }
         // TODO: struct/union/typeref

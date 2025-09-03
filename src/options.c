@@ -384,7 +384,7 @@ static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
         const StringView flag = get_delim(str, &pos, len, ',');
         size_t n;
         for (n = 0; values[n]; n++) {
-            if (strview_equal_cstring(&flag, values[n])) {
+            if (strview_equal_cstring(flag, values[n])) {
                 flags |= 1u << n;
                 break;
             }

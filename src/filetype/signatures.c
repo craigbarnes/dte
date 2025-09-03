@@ -77,7 +77,7 @@ static bool is_gitlog_commit_line(StringView line)
     }
 
     strview_remove_prefix(&line, ndigits);
-    return line.length == 0 || strview_has_prefix_and_suffix(&line, " (", ")");
+    return line.length == 0 || strview_has_prefix_and_suffix(line, " (", ")");
 }
 
 static FileTypeEnum filetype_from_signature(const StringView line)
@@ -88,30 +88,30 @@ static FileTypeEnum filetype_from_signature(const StringView line)
 
     switch (line.data[0]) {
     case '<':
-        if (strview_has_prefix_icase(&line, "<!DOCTYPE HTML")) {
+        if (strview_has_prefix_icase(line, "<!DOCTYPE HTML")) {
             return HTML;
-        } else if (strview_has_either_prefix(&line, "<!DOCTYPE", "<?xml")) {
+        } else if (strview_has_either_prefix(line, "<!DOCTYPE", "<?xml")) {
             return XML;
         }
         break;
     case '%':
-        if (strview_has_prefix(&line, "%YAML")) {
+        if (strview_has_prefix(line, "%YAML")) {
             return YAML;
         }
         break;
     case '#':
-        if (strview_has_either_prefix(&line, "#compdef ", "#autoload")) {
+        if (strview_has_either_prefix(line, "#compdef ", "#autoload")) {
             return SH;
         }
         break;
     case 'I':
-        return strview_has_prefix(&line, "ISO-10303-21;") ? STEP : NONE;
+        return strview_has_prefix(line, "ISO-10303-21;") ? STEP : NONE;
     case 'c':
         return is_gitlog_commit_line(line) ? GITLOG : NONE;
     case 'd':
-        return strview_has_prefix(&line, "diff --git") ? DIFF : NONE;
+        return strview_has_prefix(line, "diff --git") ? DIFF : NONE;
     case 's':
-        return strview_has_prefix(&line, "stash@{") ? GITSTASH : NONE;
+        return strview_has_prefix(line, "stash@{") ? GITSTASH : NONE;
     case '/':
     case '.':
     case ';':

@@ -80,11 +80,11 @@ static FileTypeEnum filetype_from_interpreter(const StringView name)
     }
 
     if (name.length >= ARRAYLEN(interpreters[0].key)) {
-        if (strview_equal_cstring(&name, "openrc-run")) {
+        if (strview_equal_cstring(name, "openrc-run")) {
             return SH;
-        } else if (strview_equal_cstring(&name, "runhaskell")) {
+        } else if (strview_equal_cstring(name, "runhaskell")) {
             return HASKELL;
-        } else if (strview_equal_cstring(&name, "rust-script")) {
+        } else if (strview_equal_cstring(name, "rust-script")) {
             return RUST;
         }
         return NONE;

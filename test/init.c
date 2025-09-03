@@ -166,7 +166,7 @@ static void test_init(TestContext *ctx)
     ASSERT_NONNULL(e->user_config_dir);
     ASSERT_NONNULL(e->home_dir.data);
     EXPECT_STREQ(e->user_config_dir, dte_home);
-    EXPECT_STRVIEW_EQ_CSTRING(&e->home_dir, home);
+    EXPECT_STRVIEW_EQ_CSTRING(e->home_dir, home);
     free(home);
     free(dte_home);
     e->options.lock_files = false;

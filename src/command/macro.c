@@ -13,7 +13,7 @@ static void merge_insert_buffer(MacroRecorder *m)
     StringView ibuf = strview_from_string(&m->insert_buffer);
     string_append_literal(&s, "insert -k ");
 
-    if (unlikely(strview_has_prefix(&ibuf, "-"))) {
+    if (unlikely(strview_has_prefix(ibuf, "-"))) {
         string_append_literal(&s, "-- ");
     }
 
@@ -119,7 +119,7 @@ void macro_insert_text_hook(MacroRecorder *m, const char *text, size_t size)
     StringView sv = string_view(text, size);
     string_append_literal(&buf, "insert -m ");
 
-    if (unlikely(strview_has_prefix(&sv, "-"))) {
+    if (unlikely(strview_has_prefix(sv, "-"))) {
         string_append_literal(&buf, "-- ");
     }
 

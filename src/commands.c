@@ -1294,10 +1294,10 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 
     // If current line is blank, skip past consecutive blank lines
     StringView line = get_current_line(&view->cursor);
-    if (strview_isblank(&line)) {
+    if (strview_isblank(line)) {
         while (block_iter_next_line(&view->cursor)) {
             line = block_iter_get_line(&view->cursor);
-            if (!strview_isblank(&line)) {
+            if (!strview_isblank(line)) {
                 break;
             }
         }
@@ -1306,7 +1306,7 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
     // Skip past non-blank lines
     while (block_iter_next_line(&view->cursor)) {
         line = block_iter_get_line(&view->cursor);
-        if (strview_isblank(&line)) {
+        if (strview_isblank(line)) {
             break;
         }
     }
@@ -1335,10 +1335,10 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 
     // If current line is blank, skip past consecutive blank lines
     StringView line = get_current_line(&view->cursor);
-    if (strview_isblank(&line)) {
+    if (strview_isblank(line)) {
         while (block_iter_prev_line(&view->cursor)) {
             line = block_iter_get_line(&view->cursor);
-            if (!strview_isblank(&line)) {
+            if (!strview_isblank(line)) {
                 break;
             }
         }
@@ -1347,7 +1347,7 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
     // Skip past non-blank lines
     while (block_iter_prev_line(&view->cursor)) {
         line = block_iter_get_line(&view->cursor);
-        if (strview_isblank(&line)) {
+        if (strview_isblank(line)) {
             break;
         }
     }

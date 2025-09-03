@@ -58,8 +58,8 @@ static bool is_executable(int dir_fd, const char *filename)
 static bool is_ignored_dir_entry(StringView name)
 {
     return unlikely(name.length == 0)
-        || strview_equal_cstring(&name, ".")
-        || strview_equal_cstring(&name, "..");
+        || strview_equal_cstring(name, ".")
+        || strview_equal_cstring(name, "..");
 }
 
 static bool do_collect_files (
@@ -137,13 +137,13 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
     StringView fileprefix;
     char buf[8192];
 
-    if (strview_has_prefix(&cs->escaped, "~/")) {
+    if (strview_has_prefix(cs->escaped, "~/")) {
         const StringView home = e->home_dir;
         StringView parsed = strview(cs->parsed);
         BUG_ON(!strview_has_sv_prefix(parsed, home));
         strview_remove_prefix(&parsed, home.length + STRLEN("/"));
         bool sufficient_buf = parsed.length <= sizeof(buf) - sizeof("~/");
-        bool sane_home = strview_has_prefix(&home, "/");
+        bool sane_home = strview_has_prefix(home, "/");
 
         if (unlikely(!sane_home || !sufficient_buf)) {
             LOG_ERROR("%s", !sane_home ? "non-absolute $HOME" : "no buffer space");
@@ -242,7 +242,7 @@ void collect_env (
     StringView prefix, // Prefix to match against
     const char *suffix // Suffix to append to collected strings
 ) {
-    if (strview_memchr(&prefix, '=')) {
+    if (strview_memchr(prefix, '=')) {
         return;
     }
 
@@ -815,7 +815,7 @@ static size_t collect_vars(PointerArray *a, StringView name)
     strview_remove_prefix(&name, pos);
 
     if (strview_remove_matching_prefix(&name, "{")) {
-        if (strview_memchr(&name, '}')) {
+        if (strview_memchr(name, '}')) {
             return 0;
         }
         collect_builtin_config_variables(a, name);
@@ -901,7 +901,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
     StringView text = string_view(cmd, cmdline_pos); // Text to be completed
     strview_remove_prefix(&text, completion_pos);
 
-    if (strview_has_prefix(&text, "$")) {
+    if (strview_has_prefix(text, "$")) {
         completion_pos += collect_vars(&cs->completions, text);
     } else {
         cs->escaped = text;

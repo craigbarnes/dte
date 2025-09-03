@@ -17,7 +17,7 @@
 
 static bool tag_is_local_to_file(const Tag *tag, const char *path)
 {
-    return tag->local && !!path && strview_equal_cstring(&tag->filename, path);
+    return tag->local && !!path && strview_equal_cstring(tag->filename, path);
 }
 
 static int visibility_cmp(const Tag *a, const Tag *b, const char *filename)

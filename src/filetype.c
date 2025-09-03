@@ -112,7 +112,7 @@ bool add_filetype (
 static StringView path_extension(StringView filename)
 {
     StringView ext = filename;
-    ssize_t pos = strview_memrchr_idx(&ext, '.');
+    ssize_t pos = strview_memrchr_idx(ext, '.');
     strview_remove_prefix(&ext, pos > 0 ? pos + 1 : ext.length);
     return ext;
 }
@@ -144,14 +144,14 @@ static StringView get_interpreter(StringView line)
 
     size_t pos = 0;
     sv = get_delim(line.data, &pos, line.length, ' ');
-    if (pos < line.length && strview_equal_cstring(&sv, "/usr/bin/env")) {
+    if (pos < line.length && strview_equal_cstring(sv, "/usr/bin/env")) {
         while (pos + 1 < line.length && line.data[pos] == ' ') {
             pos++;
         }
         sv = get_delim(line.data, &pos, line.length, ' ');
     }
 
-    ssize_t last_slash_idx = strview_memrchr_idx(&sv, '/');
+    ssize_t last_slash_idx = strview_memrchr_idx(sv, '/');
     if (last_slash_idx >= 0) {
         strview_remove_prefix(&sv, last_slash_idx + 1);
     }
@@ -163,10 +163,10 @@ static StringView get_interpreter(StringView line)
     return sv;
 }
 
-static bool ft_str_match(const UserFileTypeEntry *ft, const StringView sv)
+static bool ft_str_match(const UserFileTypeEntry *ft, StringView sv)
 {
     const FlexArrayStr *s = ft->u.str;
-    return sv.length > 0 && strview_equal_strn(&sv, s->str, s->str_len);
+    return sv.length && strview_equal(sv, string_view(s->str, s->str_len));
 }
 
 static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
@@ -233,8 +233,8 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
     strview_trim_right(&line);
     if (
         line.length >= 4
-        && strview_has_prefix(&line, "[")
-        && strview_has_suffix(&line, "]")
+        && strview_has_prefix(line, "[")
+        && strview_has_suffix(line, "]")
         && is_word_byte(line.data[1])
         && !strview_contains_char_type(line, ASCII_CNTRL)
     ) {
@@ -242,17 +242,17 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
         return builtin_filetype_names[INI];
     }
 
-    if (strview_equal_cstring(&ext, "conf")) {
-        if (strview_has_prefix(&path, "/etc/systemd/")) {
+    if (strview_equal_cstring(ext, "conf")) {
+        if (strview_has_prefix(path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
         }
         BUG_ON(!filename);
         const StringView dir = path_slice_dirname(filename);
         if (
-            strview_has_prefix(&path, "/etc/")
-            || strview_has_prefix(&path, "/usr/share/")
-            || strview_has_prefix(&path, "/usr/local/share/")
-            || strview_has_suffix(&dir, "/tmpfiles.d")
+            strview_has_prefix(path, "/etc/")
+            || strview_has_prefix(path, "/usr/share/")
+            || strview_has_prefix(path, "/usr/local/share/")
+            || strview_has_suffix(dir, "/tmpfiles.d")
         ) {
             return builtin_filetype_names[CONFIG];
         }

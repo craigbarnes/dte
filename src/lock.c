@@ -61,9 +61,8 @@ static bool process_exists(pid_t pid)
     return !kill(pid, 0);
 }
 
-static pid_t rewrite_lock_file(const FileLocksContext *ctx, char *buf, size_t *sizep, const char *filename)
+static pid_t rewrite_lock_file(const FileLocksContext *ctx, char *buf, size_t *sizep, StringView filename)
 {
-    const size_t filename_len = strlen(filename);
     size_t size = *sizep;
     pid_t other_pid = 0;
 
@@ -76,12 +75,12 @@ static pid_t rewrite_lock_file(const FileLocksContext *ctx, char *buf, size_t *s
         }
 
         strview_remove_prefix(&line, numlen);
-        if (unlikely(!strview_has_prefix(&line, " /"))) {
+        if (unlikely(!strview_has_prefix(line, " /"))) {
             goto remove_line;
         }
         strview_remove_prefix(&line, 1);
 
-        bool same = strview_equal_strn(&line, filename, filename_len);
+        bool same = strview_equal(line, filename);
         pid_t pid = (pid_t)num;
         if (pid == ctx->editor_pid) {
             if (same) {
@@ -153,7 +152,7 @@ static bool lock_or_unlock(const FileLocksContext *ctx, ErrorBuffer *ebuf, const
     }
 
     size_t size = (size_t)ssize;
-    pid_t pid = rewrite_lock_file(ctx, buf, &size, filename);
+    pid_t pid = rewrite_lock_file(ctx, buf, &size, strview(filename));
     if (lock) {
         if (pid == 0) {
             intmax_t p = (intmax_t)ctx->editor_pid;

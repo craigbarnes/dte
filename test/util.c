@@ -828,52 +828,50 @@ static void test_string(TestContext *ctx)
 static void test_string_view(TestContext *ctx)
 {
     StringView sv = STRING_VIEW("testing");
-    EXPECT_TRUE(strview_equal_cstring(&sv, "testing"));
-    EXPECT_FALSE(strview_equal_cstring(&sv, "testin"));
-    EXPECT_FALSE(strview_equal_cstring(&sv, "TESTING"));
-    EXPECT_TRUE(strview_has_prefix(&sv, "test"));
-    EXPECT_TRUE(strview_has_prefix_icase(&sv, "TEst"));
-    EXPECT_FALSE(strview_has_prefix(&sv, "TEst"));
-    EXPECT_FALSE(strview_has_prefix_icase(&sv, "TEst_"));
+    EXPECT_TRUE(strview_equal_cstring(sv, "testing"));
+    EXPECT_FALSE(strview_equal_cstring(sv, "testin"));
+    EXPECT_FALSE(strview_equal_cstring(sv, "TESTING"));
+    EXPECT_TRUE(strview_has_prefix(sv, "test"));
+    EXPECT_TRUE(strview_has_prefix_icase(sv, "TEst"));
+    EXPECT_FALSE(strview_has_prefix(sv, "TEst"));
+    EXPECT_FALSE(strview_has_prefix_icase(sv, "TEst_"));
 
     sv = string_view(sv.data, sv.length);
     EXPECT_TRUE(strview_equal(sv, sv));
-    sv = string_view(STRN("\0test\0 ..."));
-    EXPECT_TRUE(strview_equal_strn(&sv, "\0test\0 ...", 10));
 
     sv = strview("foobar");
-    EXPECT_TRUE(strview_equal_cstring(&sv, "foobar"));
-    EXPECT_TRUE(strview_has_prefix(&sv, "foo"));
-    EXPECT_FALSE(strview_equal_cstring(&sv, "foo"));
+    EXPECT_TRUE(strview_equal_cstring(sv, "foobar"));
+    EXPECT_TRUE(strview_has_prefix(sv, "foo"));
+    EXPECT_FALSE(strview_equal_cstring(sv, "foo"));
 
     sv = strview("\t  \t\t ");
-    EXPECT_TRUE(strview_isblank(&sv));
+    EXPECT_TRUE(strview_isblank(sv));
     sv.length = 0;
-    EXPECT_TRUE(strview_isblank(&sv));
+    EXPECT_TRUE(strview_isblank(sv));
     sv = strview("    \t .  ");
-    EXPECT_FALSE(strview_isblank(&sv));
+    EXPECT_FALSE(strview_isblank(sv));
     sv = strview("\n");
-    EXPECT_FALSE(strview_isblank(&sv));
+    EXPECT_FALSE(strview_isblank(sv));
     sv = strview("  \r ");
-    EXPECT_FALSE(strview_isblank(&sv));
+    EXPECT_FALSE(strview_isblank(sv));
 
     sv = strview("  \t\t \ttrim test \t\t");
     strview_trim(&sv);
-    EXPECT_TRUE(strview_equal_cstring(&sv, "trim test"));
+    EXPECT_TRUE(strview_equal_cstring(sv, "trim test"));
 
     sv = strview(NULL);
-    EXPECT_NULL(strview_memrchr(&sv, '.'));
-    EXPECT_NULL(strview_memchr(&sv, '.'));
+    EXPECT_NULL(strview_memrchr(sv, '.'));
+    EXPECT_NULL(strview_memchr(sv, '.'));
     EXPECT_TRUE(strview_equal(sv, sv));
     EXPECT_TRUE(strview_equal_icase(sv, sv));
     EXPECT_FALSE(strview_contains_char_type(sv, ASCII_DIGIT));
-    EXPECT_TRUE(strview_isblank(&sv));
+    EXPECT_TRUE(strview_isblank(sv));
     EXPECT_EQ(strview_trim_left(&sv), 0);
-    EXPECT_TRUE(strview_equal_cstring(&sv, ""));
+    EXPECT_TRUE(strview_equal_cstring(sv, ""));
     EXPECT_TRUE(strview_equal_icase(sv, strview("")));
-    EXPECT_TRUE(strview_has_prefix(&sv, ""));
-    EXPECT_TRUE(strview_has_suffix(&sv, ""));
-    EXPECT_TRUE(strview_has_prefix_icase(&sv, ""));
+    EXPECT_TRUE(strview_has_prefix(sv, ""));
+    EXPECT_TRUE(strview_has_suffix(sv, ""));
+    EXPECT_TRUE(strview_has_prefix_icase(sv, ""));
 
     // Call these 3 for ASan/UBSan coverage:
     strview_trim_right(&sv);
@@ -883,42 +881,42 @@ static void test_string_view(TestContext *ctx)
     EXPECT_EQ(sv.length, 0);
 
     sv = strview("prefix - suffix");
-    EXPECT_PTREQ(strview_memchr(&sv, '-'), strview_memrchr(&sv, '-'));
-    EXPECT_PTREQ(strview_memchr(&sv, 'x'), sv.data + 5);
-    EXPECT_PTREQ(strview_memrchr(&sv, 'x'), sv.data + 14);
-    EXPECT_PTREQ(strview_memrchr(&sv, '@'), NULL);
-    EXPECT_EQ(strview_memrchr_idx(&sv, 'p'), 0);
-    EXPECT_EQ(strview_memrchr_idx(&sv, 'x'), 14);
-    EXPECT_EQ(strview_memrchr_idx(&sv, '@'), -1);
+    EXPECT_PTREQ(strview_memchr(sv, '-'), strview_memrchr(sv, '-'));
+    EXPECT_PTREQ(strview_memchr(sv, 'x'), sv.data + 5);
+    EXPECT_PTREQ(strview_memrchr(sv, 'x'), sv.data + 14);
+    EXPECT_PTREQ(strview_memrchr(sv, '@'), NULL);
+    EXPECT_EQ(strview_memrchr_idx(sv, 'p'), 0);
+    EXPECT_EQ(strview_memrchr_idx(sv, 'x'), 14);
+    EXPECT_EQ(strview_memrchr_idx(sv, '@'), -1);
 }
 
 static void test_strview_has_suffix(TestContext *ctx)
 {
     StringView sv = strview("foobar");
-    EXPECT_TRUE(strview_has_suffix(&sv, "foobar"));
-    EXPECT_TRUE(strview_has_suffix(&sv, "bar"));
-    EXPECT_TRUE(strview_has_suffix(&sv, "r"));
-    EXPECT_TRUE(strview_has_suffix(&sv, ""));
-    EXPECT_FALSE(strview_has_suffix(&sv, "foo"));
-    EXPECT_FALSE(strview_has_suffix(&sv, "foobars"));
+    EXPECT_TRUE(strview_has_suffix(sv, "foobar"));
+    EXPECT_TRUE(strview_has_suffix(sv, "bar"));
+    EXPECT_TRUE(strview_has_suffix(sv, "r"));
+    EXPECT_TRUE(strview_has_suffix(sv, ""));
+    EXPECT_FALSE(strview_has_suffix(sv, "foo"));
+    EXPECT_FALSE(strview_has_suffix(sv, "foobars"));
 
     const StringView suffix = strview(NULL);
     EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
     EXPECT_TRUE(strview_has_sv_suffix(suffix, suffix));
 
     sv.length--;
-    EXPECT_FALSE(strview_has_suffix(&sv, "bar"));
-    EXPECT_TRUE(strview_has_suffix(&sv, "ba"));
+    EXPECT_FALSE(strview_has_suffix(sv, "bar"));
+    EXPECT_TRUE(strview_has_suffix(sv, "ba"));
     EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
 
     sv.length = 0;
-    EXPECT_TRUE(strview_has_suffix(&sv, ""));
-    EXPECT_FALSE(strview_has_suffix(&sv, "f"));
+    EXPECT_TRUE(strview_has_suffix(sv, ""));
+    EXPECT_FALSE(strview_has_suffix(sv, "f"));
     EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
 
     sv.data = NULL;
-    EXPECT_TRUE(strview_has_suffix(&sv, ""));
-    EXPECT_FALSE(strview_has_suffix(&sv, "f"));
+    EXPECT_TRUE(strview_has_suffix(sv, ""));
+    EXPECT_FALSE(strview_has_suffix(sv, "f"));
     EXPECT_TRUE(strview_has_sv_suffix(sv, suffix));
 }
 
@@ -926,20 +924,20 @@ static void test_strview_remove_matching(TestContext *ctx)
 {
     StringView sv = STRING_VIEW("ABCDEFGHIJKLMN");
     EXPECT_TRUE(strview_remove_matching_prefix(&sv, "ABC"));
-    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJKLMN");
+    EXPECT_STRVIEW_EQ_CSTRING(sv, "DEFGHIJKLMN");
 
     EXPECT_TRUE(strview_remove_matching_suffix(&sv, "KLMN"));
-    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
+    EXPECT_STRVIEW_EQ_CSTRING(sv, "DEFGHIJ");
 
     EXPECT_FALSE(strview_remove_matching_prefix(&sv, "A"));
     EXPECT_FALSE(strview_remove_matching_suffix(&sv, "K"));
-    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
+    EXPECT_STRVIEW_EQ_CSTRING(sv, "DEFGHIJ");
 
     EXPECT_TRUE(strview_remove_matching_prefix(&sv, ""));
-    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
+    EXPECT_STRVIEW_EQ_CSTRING(sv, "DEFGHIJ");
 
     EXPECT_TRUE(strview_remove_matching_suffix(&sv, ""));
-    EXPECT_STRVIEW_EQ_CSTRING(&sv, "DEFGHIJ");
+    EXPECT_STRVIEW_EQ_CSTRING(sv, "DEFGHIJ");
 
     sv.length = 0;
     sv.data = NULL;
@@ -949,7 +947,7 @@ static void test_strview_remove_matching(TestContext *ctx)
     EXPECT_FALSE(strview_remove_matching_suffix(&sv, "suf"));
     EXPECT_EQ(sv.length, 0);
     EXPECT_NULL(sv.data);
-    EXPECT_STRVIEW_EQ_CSTRING(&sv, "");
+    EXPECT_STRVIEW_EQ_CSTRING(sv, "");
 }
 
 static void test_get_delim(TestContext *ctx)
@@ -964,7 +962,7 @@ static void test_get_delim(TestContext *ctx)
         const StringView sv = get_delim(input, &pos, len, '-');
         ASSERT_TRUE(idx < nparts);
         ASSERT_EQ(parts[idx][part_size - 1], '\0');
-        EXPECT_STRVIEW_EQ_CSTRING(&sv, parts[idx]);
+        EXPECT_STRVIEW_EQ_CSTRING(sv, parts[idx]);
     }
 
     EXPECT_EQ(idx, nparts - 1);
@@ -1306,24 +1304,24 @@ static void test_parse_file_line_col(TestContext *ctx)
     size_t line = 44;
     size_t col = 77;
     StringView path = parse_file_line_col("dir/file.ext:12:45", &line, &col);
-    EXPECT_STRVIEW_EQ_CSTRING(&path, "dir/file.ext");
+    EXPECT_STRVIEW_EQ_CSTRING(path, "dir/file.ext");
     EXPECT_EQ(line, 12);
     EXPECT_EQ(col, 45);
 
     path = parse_file_line_col("/x/y/z/file:901", &line, &col);
-    EXPECT_STRVIEW_EQ_CSTRING(&path, "/x/y/z/file");
+    EXPECT_STRVIEW_EQ_CSTRING(path, "/x/y/z/file");
     EXPECT_EQ(line, 901);
     EXPECT_EQ(col, 1);
 
     // Colons are searched from the end of the string, so the filename may
     // contain colons
     path = parse_file_line_col("/x/:y:/z/file:99:32", &line, &col);
-    EXPECT_STRVIEW_EQ_CSTRING(&path, "/x/:y:/z/file");
+    EXPECT_STRVIEW_EQ_CSTRING(path, "/x/:y:/z/file");
     EXPECT_EQ(line, 99);
     EXPECT_EQ(col, 32);
 
     path = parse_file_line_col("a:5", &line, &col);
-    EXPECT_STRVIEW_EQ_CSTRING(&path, "a");
+    EXPECT_STRVIEW_EQ_CSTRING(path, "a");
     EXPECT_EQ(line, 5);
     EXPECT_EQ(col, 1);
 
@@ -1350,7 +1348,7 @@ static void test_parse_file_line_col(TestContext *ctx)
         line = 7;
         col = 8;
         path = parse_file_line_col(invalid[i], &line, &col);
-        EXPECT_STRVIEW_EQ_CSTRING(&path, "");
+        EXPECT_STRVIEW_EQ_CSTRING(path, "");
         IEXPECT_EQ(line, 7);
         IEXPECT_EQ(col, 8);
     }

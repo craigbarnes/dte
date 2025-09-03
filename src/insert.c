@@ -94,7 +94,7 @@ static void insert_nl(View *view)
         size_t len = block_iter_bol(&bi);
         line = block_iter_get_line(&bi);
         line.length = len; // Current line will be split at cursor position
-        if (strview_isblank(&line)) {
+        if (strview_isblank(line)) {
             // This line is (or will become) whitespace only; find previous,
             // non-whitespace line
             if (block_iter_prev_line(&bi) && block_iter_find_non_empty_line_bwd(&bi)) {
@@ -157,7 +157,7 @@ void insert_ch(View *view, CodePoint ch)
         del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
     } else if (ch == '}' && options->auto_indent && options->brace_indent) {
         StringView line = get_current_line(&view->cursor);
-        if (strview_isblank(&line)) {
+        if (strview_isblank(line)) {
             int width = get_indent_of_matching_brace(view);
             if (width >= 0) {
                 // Replace current (ws only) line with some indent + '}'

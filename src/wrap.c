@@ -49,7 +49,7 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
 static bool is_long_comment_delim(StringView sv)
 {
     // TODO: make this configurable
-    return strview_equal_cstring(&sv, "/*") || strview_equal_cstring(&sv, "*/");
+    return strview_equal_cstring(sv, "/*") || strview_equal_cstring(sv, "*/");
 }
 
 static bool is_paragraph_separator(StringView line)

@@ -225,16 +225,16 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     StringView val = hex_decode_str(val_hex, vbuf, sizeof(vbuf));
 
     if (data[0] == '1' && cap.length >= 2) {
-        if (strview_equal_cstring(&cap, "bce") && val.length == 0) {
+        if (strview_equal_cstring(cap, "bce") && val.length == 0) {
             return tflag(TFLAG_BACK_COLOR_ERASE);
         }
-        if (strview_equal_cstring(&cap, "tsl") && strview_equal_cstring(&val, "\033]2;")) {
+        if (strview_equal_cstring(cap, "tsl") && strview_equal_cstring(val, "\033]2;")) {
             return tflag(TFLAG_SET_WINDOW_TITLE);
         }
-        if (strview_equal_cstring(&cap, "rep") && strview_has_suffix(&val, "b")) {
+        if (strview_equal_cstring(cap, "rep") && strview_has_suffix(val, "b")) {
             return tflag(TFLAG_ECMA48_REPEAT);
         }
-        if (strview_equal_cstring(&cap, "Ms") && val.length >= 6) {
+        if (strview_equal_cstring(cap, "Ms") && val.length >= 6) {
             // All 71 entries with this cap in the ncurses terminfo database
             // use OSC 52, with only slight differences (BEL vs. ST), so
             // there's really no reason to check the value.
@@ -272,20 +272,20 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
     for (size_t pos = 0; pos < len; ) {
         // These SGR params correspond to the ones in term_put_level_3_queries()
         StringView s = get_delim(data, &pos, len, ';');
-        if (strview_equal_cstring(&s, "48:5:255")) {
+        if (strview_equal_cstring(s, "48:5:255")) {
             flags |= TFLAG_256_COLOR;
             continue;
         }
 
         if (
-            strview_equal_cstring(&s, "38:2::60:70:80") // xterm, foot
-            || strview_equal_cstring(&s, "38:2:60:70:80") // kitty
+            strview_equal_cstring(s, "38:2::60:70:80") // xterm, foot
+            || strview_equal_cstring(s, "38:2:60:70:80") // kitty
         ) {
             flags |= TFLAG_TRUE_COLOR;
             continue;
         }
 
-        if (strview_equal_cstring(&s, "0") && pos <= 2) {
+        if (strview_equal_cstring(s, "0") && pos <= 2) {
             continue;
         }
 
@@ -302,13 +302,13 @@ static KeyCode parse_xtversion_reply(StringView reply)
 {
     LOG_INFO("XTVERSION reply: %.*s", (int)reply.length, reply.data);
 
-    if (strview_has_prefix(&reply, "XTerm(")) {
+    if (strview_has_prefix(reply, "XTerm(")) {
         return tflag (
             TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
         );
     }
 
-    if (strview_has_prefix(&reply, "tmux ")) {
+    if (strview_has_prefix(reply, "tmux ")) {
         // tmux gained support for XTVERSION in release 3.2, so any response
         // starting with "tmux " implies support for all tmux 3.2 features.
         // It also has bugs related to DECRQSS queries, including crashing
@@ -354,12 +354,12 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
         return tflag(TFLAG_QUERY_L3);
     }
 
-    if (strview_has_prefix(&seq, "1+r") || strview_has_prefix(&seq, "0+r")) {
+    if (strview_has_prefix(seq, "1+r") || strview_has_prefix(seq, "0+r")) {
         return parse_xtgettcap_reply(data, len);
     }
 
     if (strview_remove_matching_prefix(&seq, "1$r")) {
-        if (strview_has_suffix(&seq, " q")) {
+        if (strview_has_suffix(seq, " q")) {
             size_t n = seq.length - 2;
             unsigned int x;
             if (n >= 1 && n == buf_parse_uint(seq.data, n, &x)) {
@@ -377,7 +377,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
         return KEY_IGNORE;
     }
 
-    if (strview_equal_cstring(&seq, "0$r")) {
+    if (strview_equal_cstring(seq, "0$r")) {
         note = " (DECRQSS; invalid request)";
         goto unhandled;
     }

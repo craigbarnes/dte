@@ -27,37 +27,37 @@ static void test_ini_parse(TestContext *ctx)
     EXPECT_TRUE(ini_parse(&ini));
     EXPECT_EQ(ini.pos, 17);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "key");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "val");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.section, "");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.name, "key");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.value, "val");
 
     EXPECT_TRUE(ini_parse(&ini));
     EXPECT_EQ(ini.pos, 45);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "section 1");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "xyz");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "123");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.section, "section 1");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.name, "xyz");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.value, "123");
 
     EXPECT_TRUE(ini_parse(&ini));
     EXPECT_EQ(ini.pos, 78);
     EXPECT_EQ(ini.name_count, 2);
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "section 1");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "foo bar");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "this;is#not#a;comment");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.section, "section 1");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.name, "foo bar");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.value, "this;is#not#a;comment");
 
     EXPECT_TRUE(ini_parse(&ini));
     EXPECT_EQ(ini.pos, 95);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "section 2");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "x");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, "0");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.section, "section 2");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.name, "x");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.value, "0");
 
     EXPECT_TRUE(ini_parse(&ini));
     EXPECT_EQ(ini.pos, 126);
     EXPECT_EQ(ini.name_count, 1);
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.section, "");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.name, "z");
-    EXPECT_STRVIEW_EQ_CSTRING(&ini.value, ".");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.section, "");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.name, "z");
+    EXPECT_STRVIEW_EQ_CSTRING(ini.value, ".");
 
     EXPECT_FALSE(ini_parse(&ini));
 }

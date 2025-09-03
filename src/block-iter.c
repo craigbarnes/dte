@@ -261,7 +261,7 @@ bool block_iter_find_non_empty_line_bwd(BlockIter *bi)
     block_iter_bol(bi);
     do {
         StringView line = block_iter_get_line(bi);
-        if (!strview_isblank(&line)) {
+        if (!strview_isblank(line)) {
             return true;
         }
     } while (block_iter_prev_line(bi));

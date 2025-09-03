@@ -136,7 +136,7 @@ static bool section_matches_path(StringView section, StringView dir, const char 
         string_append_byte(&pattern, c);
     }
 
-    if (!strview_memchr(&section, '/')) {
+    if (!strview_memchr(section, '/')) {
         // Section contains no slashes; insert "**/" between `dir` and `section`
         string_append_literal(&pattern, "**/");
     } else if (section.data[0] != '/') {

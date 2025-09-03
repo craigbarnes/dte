@@ -139,9 +139,9 @@ static const struct FileBasenameMap {
 static FileTypeEnum filetype_from_basename(StringView name)
 {
     size_t dotprefix = 0;
-    if (strview_has_prefix(&name, ".")) {
+    if (strview_has_prefix(name, ".")) {
         dotprefix = 1;
-    } else if (strview_has_prefix(&name, "dot_")) {
+    } else if (strview_has_prefix(name, "dot_")) {
         dotprefix = 4;
     }
 
@@ -151,9 +151,9 @@ static FileTypeEnum filetype_from_basename(StringView name)
     }
 
     if (name.length >= ARRAYLEN(basenames[0].name)) {
-        if (strview_equal_cstring(&name, "meson_options.txt")) {
+        if (strview_equal_cstring(name, "meson_options.txt")) {
             return dotprefix ? NONE : MESON;
-        } else if (strview_equal_cstring(&name, "git-blame-ignore-revs")) {
+        } else if (strview_equal_cstring(name, "git-blame-ignore-revs")) {
             return dotprefix ? CONFIG : NONE;
         }
         return NONE;
