@@ -83,27 +83,27 @@ void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
 void dump_compiler(const Compiler *c, const char *name, String *s)
 {
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
-        ErrorFormat *e = c->error_formats.ptrs[i];
+        const ErrorFormat *errfmt = c->error_formats.ptrs[i];
         string_append_literal(s, "errorfmt ");
-        if (e->ignore) {
+        if (errfmt->ignore) {
             string_append_literal(s, "-i ");
         }
-        if (unlikely(name[0] == '-' || e->pattern[0] == '-')) {
+        if (unlikely(name[0] == '-' || errfmt->pattern[0] == '-')) {
             string_append_literal(s, "-- ");
         }
         string_append_escaped_arg(s, name, true);
         string_append_byte(s, ' ');
-        string_append_escaped_arg(s, e->pattern, true);
+        string_append_escaped_arg(s, errfmt->pattern, true);
 
-        static_assert(ARRAYLEN(e->capture_index) == 4);
-        const int8_t *a = e->capture_index;
-        int max_idx = MAX4(a[0], a[1], a[2], a[3]);
+        static_assert(ARRAYLEN(errfmt->capture_index) == 4);
+        const int8_t *capidx = errfmt->capture_index;
+        int max_idx = MAX4(capidx[0], capidx[1], capidx[2], capidx[3]);
         BUG_ON(max_idx > ERRORFMT_CAPTURE_MAX);
 
         for (int j = 1; j <= max_idx; j++) {
             const char *capname = "_";
             for (size_t k = 0; k < ARRAYLEN(capture_names); k++) {
-                if (j == a[k]) {
+                if (j == capidx[k]) {
                     capname = capture_names[k];
                     break;
                 }

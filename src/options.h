@@ -37,11 +37,11 @@ typedef enum {
 
 #define COMMON_OPTIONS \
     unsigned int detect_indent; \
-    unsigned int text_width; \
     unsigned int ws_error; \
+    unsigned int text_width; \
     uint8_t indent_width; \
-    uint8_t save_unmodified; \
     uint8_t tab_width; \
+    uint8_t save_unmodified; \
     bool auto_indent; \
     bool editorconfig; \
     bool emulate_tab; \
