@@ -44,7 +44,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"def-mode xz search", "unable to use 'search' as fall-through mode"},
         {"def-mode _m; def-mode _m", "mode '_m' already exists"},
         {"errorfmt x (re) zz", "unknown substring name"},
-        {"errorfmt x (re) file line", "invalid substring count"},
+        {"errorfmt x (re) file line", "expected 2 subexpressions in regex, but found 1: '(re)'"},
         {"exec -s sh -c 'kill -s USR1 $$'", "child received signal"},
         {"exec -s sh -c 'exit 44'", "child returned 44"},
         {"exec -s _z9kjdf_2dmm_92:j-a3d_xzkw::", "unable to exec"},

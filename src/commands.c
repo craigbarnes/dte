@@ -769,7 +769,10 @@ static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
 
     if (unlikely(max_idx > re.re_nsub)) {
         regfree(&re);
-        return error_msg(&e->err, "invalid substring count");
+        return error_msg (
+            &e->err, "expected %zu subexpressions in regex, but found %zu: '%s'",
+            max_idx, re.re_nsub, pattern
+        );
     }
 
     bool ignore = has_flag(a, 'i');
