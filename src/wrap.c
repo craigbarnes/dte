@@ -46,21 +46,20 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     pf->cur_width += word_width;
 }
 
-static bool is_long_comment_delim(const StringView *sv)
+static bool is_long_comment_delim(StringView sv)
 {
     // TODO: make this configurable
-    return strview_equal_cstring(sv, "/*") || strview_equal_cstring(sv, "*/");
+    return strview_equal_cstring(&sv, "/*") || strview_equal_cstring(&sv, "*/");
 }
 
-static bool is_paragraph_separator(const StringView *line)
+static bool is_paragraph_separator(StringView line)
 {
-    StringView trimmed = *line;
-    strview_trim(&trimmed);
-    return (trimmed.length == 0) || is_long_comment_delim(&trimmed);
+    strview_trim(&line);
+    return (line.length == 0) || is_long_comment_delim(line);
 }
 
 static bool in_paragraph (
-    const StringView *line,
+    StringView line,
     size_t para_indent_width,
     unsigned int tab_width
 ) {
@@ -73,18 +72,18 @@ static size_t paragraph_size(View *view)
     BlockIter bi = view->cursor;
     block_iter_bol(&bi);
     StringView line = block_iter_get_line(&bi);
-    if (is_paragraph_separator(&line)) {
+    if (is_paragraph_separator(line)) {
         // Not in paragraph
         return 0;
     }
 
     unsigned int tab_width = view->buffer->options.tab_width;
-    size_t para_indent_width = get_indent_width(&line, tab_width);
+    size_t para_indent_width = get_indent_width(line, tab_width);
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
         line = block_iter_get_line(&bi);
-        if (!in_paragraph(&line, para_indent_width, tab_width)) {
+        if (!in_paragraph(line, para_indent_width, tab_width)) {
             block_iter_eat_line(&bi);
             break;
         }
@@ -100,7 +99,7 @@ static size_t paragraph_size(View *view)
         }
         size += bytes;
         line = block_iter_get_line(&bi);
-    } while (in_paragraph(&line, para_indent_width, tab_width));
+    } while (in_paragraph(line, para_indent_width, tab_width));
     return size;
 }
 
@@ -120,7 +119,7 @@ void wrap_paragraph(View *view, size_t text_width)
     const LocalOptions *options = &view->buffer->options;
     char *sel = block_iter_get_bytes(&view->cursor, len);
     StringView sv = string_view(sel, len);
-    size_t indent_width = get_indent_width(&sv, options->tab_width);
+    size_t indent_width = get_indent_width(sv, options->tab_width);
     char *indent = make_indent(options, indent_width);
 
     ParagraphFormatter pf = {

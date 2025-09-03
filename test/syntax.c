@@ -253,7 +253,7 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_EQ(line.length, 65);
 
     bool next_changed;
-    const TermStyle **hl = hl_line(syn, lss, styles, &line, line_nr, &next_changed);
+    const TermStyle **hl = hl_line(syn, lss, styles, line, line_nr, &next_changed);
     ASSERT_NONNULL(hl);
     EXPECT_TRUE(next_changed);
 

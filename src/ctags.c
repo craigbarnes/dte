@@ -126,7 +126,7 @@ bool next_tag (
     const char *buf,
     size_t buf_len,
     size_t *posp, // in-out param
-    const StringView *prefix,
+    StringView prefix,
     bool exact,
     Tag *tag // out param
 ) {
@@ -135,8 +135,8 @@ bool next_tag (
         if (
             line.length > 0 // Line is non-empty
             && line.data[0] != '!' // and not a comment
-            && strview_has_sv_prefix(line, *prefix) // and starts with `prefix`
-            && (!exact || line.data[prefix->length] == '\t') // and matches `prefix` exactly, if applicable
+            && strview_has_sv_prefix(line, prefix) // and starts with `prefix`
+            && (!exact || line.data[prefix.length] == '\t') // and matches `prefix` exactly, if applicable
             && parse_ctags_line(tag, line.data, line.length) // and is a valid tags(5) entry
         ) {
             // Advance the position; `tag` has been filled by parse_ctags_line()

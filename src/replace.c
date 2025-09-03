@@ -56,13 +56,13 @@ static void build_replacement (
  */
 static unsigned int replace_on_line (
     View *view,
-    StringView *line,
+    StringView line,
     regex_t *re,
     const char *format,
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
-    const char *buf = line->data;
+    const char *buf = line.data;
     char *alloc = NULL;
     EditorState *e = view->window->editor;
     ReplaceFlags flags = *flagsp;
@@ -74,7 +74,7 @@ static unsigned int replace_on_line (
     while (regexp_exec (
         re,
         buf + pos,
-        line->length - pos,
+        line.length - pos,
         ARRAYLEN(matches),
         matches,
         eflags
@@ -116,9 +116,9 @@ static unsigned int replace_on_line (
             build_replacement(&b, buf + pos, format, matches);
 
             // line ref is invalidated by modification
-            if (buf == line->data && line->length != 0) {
+            if (buf == line.data && line.length != 0) {
                 BUG_ON(alloc);
-                alloc = xmemdup(buf, line->length);
+                alloc = xmemdup(buf, line.length);
                 buf = alloc;
             }
 
@@ -210,7 +210,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
             line.length = nr_bytes;
         }
 
-        unsigned int nr = replace_on_line(view, &line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(view, line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;

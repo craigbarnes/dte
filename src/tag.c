@@ -218,7 +218,7 @@ static int tag_cmp(const void *t1, const void *t2)
 static void tag_file_find_tags (
     const TagFile *tf,
     const char *filename,
-    const StringView *name,
+    StringView name,
     PointerArray *tags
 ) {
     Tag *tag = xmalloc(sizeof(*tag));
@@ -265,10 +265,10 @@ void add_message_for_tag(MessageList *messages, Tag *tag, StringView dir)
     BUG_ON(dir.data[0] != '/');
 
     static const char prefix[] = "Tag ";
-    const StringView *name = &tag->name;
+    StringView name = tag->name;
     size_t prefix_len = sizeof(prefix) - 1;
-    Message *m = xmalloc(sizeof(*m) + prefix_len + name->length + 1);
-    xmempcpy3(m->msg, prefix, prefix_len, name->data, name->length, "", 1);
+    Message *m = xmalloc(sizeof(*m) + prefix_len + name.length + 1);
+    xmempcpy3(m->msg, prefix, prefix_len, name.data, name.length, "", 1);
 
     char *filename = path_join_sv(dir, tag->filename, false);
     m->loc = new_file_location(filename, 0, 0, 0);
@@ -287,7 +287,7 @@ size_t tag_lookup (
     TagFile *tf,
     MessageList *messages,
     ErrorBuffer *ebuf,
-    const StringView *name,
+    StringView name,
     const char *filename
 ) {
     BUG_ON(!tf->filename);
@@ -298,7 +298,7 @@ size_t tag_lookup (
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg(ebuf, "Tag '%.*s' not found", (int)name->length, name->data);
+        error_msg(ebuf, "Tag '%.*s' not found", (int)name.length, name.data);
         return 0;
     }
 
@@ -316,7 +316,7 @@ size_t tag_lookup (
     return ntags;
 }
 
-void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
+void collect_tags(TagFile *tf, PointerArray *a, StringView prefix)
 {
     ErrorBuffer ebuf;
     ebuf.print_to_stderr = false;
@@ -329,7 +329,7 @@ void collect_tags(TagFile *tf, PointerArray *a, const StringView *prefix)
     StringView prev = STRING_VIEW_INIT;
     while (next_tag(tf->buf, tf->size, &pos, prefix, false, &tag)) {
         BUG_ON(tag.name.length == 0);
-        if (prev.length == 0 || !strview_equal(&tag.name, &prev)) {
+        if (prev.length == 0 || !strview_equal(tag.name, prev)) {
             ptr_array_append(a, xstrcut(tag.name.data, tag.name.length));
             prev = tag.name;
         }
@@ -362,7 +362,7 @@ String dump_tags(TagFile *tf, ErrorBuffer *ebuf)
     size_t pos = 0;
     Tag tag;
 
-    while (next_tag(tf->buf, tf->size, &pos, &prefix, false, &tag)) {
+    while (next_tag(tf->buf, tf->size, &pos, prefix, false, &tag)) {
         string_append_buf(&buf, tag.name.data, tag.name.length);
         string_append_cstring(&buf, "   ");
         string_append_buf(&buf, tag.filename.data, tag.filename.length);

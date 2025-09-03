@@ -20,7 +20,7 @@ bool next_tag (
     const char *buf,
     size_t buf_len,
     size_t *posp,
-    const StringView *prefix,
+    StringView prefix,
     bool exact,
     Tag *tag
 );

@@ -44,9 +44,9 @@ static inline size_t next_indent_width(size_t x, size_t m)
 }
 
 char *make_indent(const LocalOptions *options, size_t width);
-char *get_indent_for_next_line(const LocalOptions *options, const StringView *line);
-IndentInfo get_indent_info(const LocalOptions *options, const StringView *line);
-size_t get_indent_width(const StringView *line, unsigned int tab_width);
+char *get_indent_for_next_line(const LocalOptions *options, StringView line);
+IndentInfo get_indent_info(const LocalOptions *options, StringView line);
+size_t get_indent_width(StringView line, unsigned int tab_width);
 size_t get_indent_level_bytes_left(const LocalOptions *options, const BlockIter *cursor);
 size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter *cursor);
 

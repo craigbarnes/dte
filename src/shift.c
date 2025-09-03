@@ -30,7 +30,7 @@ static void shift_right(View *view, size_t nr_lines, size_t count)
 
     for (size_t i = 0; true; ) {
         StringView line = block_iter_get_line(&view->cursor);
-        IndentInfo info = get_indent_info(options, &line);
+        IndentInfo info = get_indent_info(options, line);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation
@@ -64,7 +64,7 @@ static void shift_left(View *view, size_t nr_lines, size_t count)
 
     for (size_t i = 0; true; ) {
         StringView line = block_iter_get_line(&view->cursor);
-        IndentInfo info = get_indent_info(options, &line);
+        IndentInfo info = get_indent_info(options, line);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation

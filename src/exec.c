@@ -179,7 +179,7 @@ static void parse_and_activate_tags(EditorState *e, const String *str, ExecActio
             }
             // Fallthrough
         case LOADED:
-            tag_lookup(tf, msgs, ebuf, &line, buffer_filename);
+            tag_lookup(tf, msgs, ebuf, line, buffer_filename);
             continue;
         case FAILED:
             continue;

@@ -30,7 +30,7 @@ char *make_indent(const LocalOptions *options, size_t width)
 // of auto-indent on the next line
 static bool line_contents_increases_indent (
     const LocalOptions *options,
-    const StringView *line
+    StringView line
 ) {
     static const regex_t *re1, *re2;
     if (!re1) {
@@ -40,10 +40,10 @@ static bool line_contents_increases_indent (
     }
 
     if (options->brace_indent) {
-        if (regexp_exec(re1, line->data, line->length, 0, NULL, 0)) {
+        if (regexp_exec(re1, line.data, line.length, 0, NULL, 0)) {
             return true;
         }
-        if (regexp_exec(re2, line->data, line->length, 0, NULL, 0)) {
+        if (regexp_exec(re2, line.data, line.length, 0, NULL, 0)) {
             return false;
         }
     }
@@ -54,10 +54,10 @@ static bool line_contents_increases_indent (
     }
 
     BUG_ON(ir->str[0] == '\0');
-    return regexp_exec(&ir->re, line->data, line->length, 0, NULL, 0);
+    return regexp_exec(&ir->re, line.data, line.length, 0, NULL, 0);
 }
 
-char *get_indent_for_next_line(const LocalOptions *options, const StringView *line)
+char *get_indent_for_next_line(const LocalOptions *options, StringView line)
 {
     size_t curr_width = get_indent_width(line, options->tab_width);
     size_t next_width = next_indent_width(curr_width, options->indent_width);
@@ -65,10 +65,10 @@ char *get_indent_for_next_line(const LocalOptions *options, const StringView *li
     return make_indent(options, increase ? next_width : curr_width);
 }
 
-IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
+IndentInfo get_indent_info(const LocalOptions *options, StringView line)
 {
-    const char *buf = line->data;
-    const size_t len = line->length;
+    const char *buf = line.data;
+    const size_t len = line.length;
     const size_t tw = options->tab_width;
     const size_t iw = options->indent_width;
     const bool space_indent = use_spaces_for_indent(options);
@@ -98,11 +98,11 @@ IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
     return info;
 }
 
-size_t get_indent_width(const StringView *line, unsigned int tab_width)
+size_t get_indent_width(StringView line, unsigned int tab_width)
 {
-    const char *buf = line->data;
+    const char *buf = line.data;
     size_t width = 0;
-    for (size_t i = 0, n = line->length; i < n; i++) {
+    for (size_t i = 0, n = line.length; i < n; i++) {
         if (buf[i] == ' ') {
             width++;
         } else if (buf[i] == '\t') {

@@ -56,7 +56,7 @@ void clear_lines(View *view, bool auto_indent)
         BlockIter bi = view->cursor;
         if (block_iter_prev_line(&bi) && block_iter_find_non_empty_line_bwd(&bi)) {
             StringView line = block_iter_get_line(&bi);
-            indent = get_indent_for_next_line(&view->buffer->options, &line);
+            indent = get_indent_for_next_line(&view->buffer->options, line);
         }
     }
 

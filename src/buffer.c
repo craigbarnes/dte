@@ -214,7 +214,7 @@ bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes)
     return false;
 }
 
-void buffer_update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd)
+void buffer_update_short_filename_cwd(Buffer *buffer, StringView home, const char *cwd)
 {
     const char *abs = buffer->abs_filename;
     if (!abs) {
@@ -224,7 +224,7 @@ void buffer_update_short_filename_cwd(Buffer *buffer, const StringView *home, co
     buffer_set_display_filename(buffer, name);
 }
 
-void buffer_update_short_filename(Buffer *buffer, const StringView *home)
+void buffer_update_short_filename(Buffer *buffer, StringView home)
 {
     const char *abs = buffer->abs_filename;
     BUG_ON(!abs);

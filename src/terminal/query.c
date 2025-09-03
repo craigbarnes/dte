@@ -207,10 +207,10 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
     return string_view(outbuf, n / 2);
 }
 
-static size_t make_printable_ctlseq(const StringView *seq, char *buf, size_t buflen)
+static size_t make_printable_ctlseq(StringView seq, char *buf, size_t buflen)
 {
     MakePrintableFlags flags = MPF_C0_SYMBOLS;
-    return u_make_printable(seq->data, seq->length, buf, buflen, flags);
+    return u_make_printable(seq.data, seq.length, buf, buflen, flags);
 }
 
 static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
@@ -247,10 +247,10 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     size_t i = 0;
     if (cap.length) {
         i += copyliteral(ebuf + i, " (");
-        i += make_printable_ctlseq(&cap, ebuf + i, sizeof(ebuf) - i);
+        i += make_printable_ctlseq(cap, ebuf + i, sizeof(ebuf) - i);
         if (val.length) {
             ebuf[i++] = '=';
-            i += make_printable_ctlseq(&val, ebuf + i, sizeof(ebuf) - i);
+            i += make_printable_ctlseq(val, ebuf + i, sizeof(ebuf) - i);
         }
         ebuf[i++] = ')';
     }
@@ -298,17 +298,17 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
     return flags ? tflag(flags) : KEY_IGNORE;
 }
 
-static KeyCode parse_xtversion_reply(const StringView *reply)
+static KeyCode parse_xtversion_reply(StringView reply)
 {
-    LOG_INFO("XTVERSION reply: %.*s", (int)reply->length, reply->data);
+    LOG_INFO("XTVERSION reply: %.*s", (int)reply.length, reply.data);
 
-    if (strview_has_prefix(reply, "XTerm(")) {
+    if (strview_has_prefix(&reply, "XTerm(")) {
         return tflag (
             TFLAG_QUERY_L3 | TFLAG_ECMA48_REPEAT | TFLAG_MODIFY_OTHER_KEYS
         );
     }
 
-    if (strview_has_prefix(reply, "tmux ")) {
+    if (strview_has_prefix(&reply, "tmux ")) {
         // tmux gained support for XTVERSION in release 3.2, so any response
         // starting with "tmux " implies support for all tmux 3.2 features.
         // It also has bugs related to DECRQSS queries, including crashing
@@ -339,7 +339,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
 
     StringView seq = string_view(data, len);
     if (strview_remove_matching_prefix(&seq, ">|")) {
-        return parse_xtversion_reply(&seq);
+        return parse_xtversion_reply(seq);
     }
 
     // https://vt100.net/docs/vt510-rm/DA3.html

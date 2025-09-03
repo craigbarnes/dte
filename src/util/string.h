@@ -56,9 +56,9 @@ static inline void string_append_cstring(String *s, const char *cstr)
     string_append_buf(s, cstr, strlen(cstr));
 }
 
-static inline void string_append_strview(String *s, const StringView *sv)
+static inline void string_append_strview(String *s, StringView sv)
 {
-    string_append_buf(s, sv->data, sv->length);
+    string_append_buf(s, sv.data, sv.length);
 }
 
 static inline void string_replace_byte(String *s, char byte, char rep)

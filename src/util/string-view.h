@@ -43,11 +43,16 @@ static inline StringView strview(const char *str)
     return string_view(str, str ? strlen(str) : 0);
 }
 
-NONNULL_ARGS
-static inline bool strview_equal(const StringView *a, const StringView *b)
+static inline bool strview_equal(StringView a, StringView b)
 {
-    size_t n = a->length;
-    return n == b->length && mem_equal(a->data, b->data, n);
+    size_t n = a.length;
+    return n == b.length && mem_equal(a.data, b.data, n);
+}
+
+static inline bool strview_equal_icase(StringView a, StringView b)
+{
+    size_t n = a.length;
+    return n == b.length && mem_equal_icase(a.data, b.data, n);
 }
 
 NONNULL_ARGS
@@ -60,24 +65,9 @@ static inline bool strview_equal_strn (
 }
 
 NONNULL_ARGS
-static inline bool strview_equal_strn_icase (
-    const StringView *sv,
-    const char *str,
-    size_t len
-) {
-    return len == sv->length && mem_equal_icase(sv->data, str, len);
-}
-
-NONNULL_ARGS
 static inline bool strview_equal_cstring(const StringView *sv, const char *str)
 {
-    return strview_equal_strn(sv, str, strlen(str));
-}
-
-NONNULL_ARGS
-static inline bool strview_equal_cstring_icase(const StringView *sv, const char *str)
-{
-    return strview_equal_strn_icase(sv, str, strlen(str));
+    return strview_equal(*sv, strview(str));
 }
 
 static inline bool strview_has_sv_prefix(StringView sv, StringView prefix)

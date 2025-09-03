@@ -71,7 +71,7 @@ View *window_open_buffer (
         // File already open in editor
         if (!streq(absolute, buffer->abs_filename)) {
             const char *bufname = buffer_filename(buffer);
-            char *s = short_filename(absolute, &e->home_dir);
+            char *s = short_filename(absolute, e->home_dir);
             info_msg(ebuf, "%s and %s are the same file", s, bufname); // Hard links
             free(s);
         }
@@ -89,7 +89,7 @@ View *window_open_buffer (
     BUG_ON(!absolute);
     BUG_ON(!path_is_absolute(absolute));
     buffer->abs_filename = absolute;
-    buffer_update_short_filename(buffer, &e->home_dir);
+    buffer_update_short_filename(buffer, e->home_dir);
 
     if (e->options.lock_files) {
         if (!lock_file(&e->locks_ctx, ebuf, buffer->abs_filename)) {

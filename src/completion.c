@@ -55,11 +55,11 @@ static bool is_executable(int dir_fd, const char *filename)
     return faccessat(dir_fd, filename, X_OK, 0) == 0;
 }
 
-static bool is_ignored_dir_entry(const StringView *name)
+static bool is_ignored_dir_entry(StringView name)
 {
-    return unlikely(name->length == 0)
-        || strview_equal_cstring(name, ".")
-        || strview_equal_cstring(name, "..");
+    return unlikely(name.length == 0)
+        || strview_equal_cstring(&name, ".")
+        || strview_equal_cstring(&name, "..");
 }
 
 static bool do_collect_files (
@@ -90,7 +90,7 @@ static bool do_collect_files (
         const StringView name_sv = strview(name);
         bool has_prefix = strview_has_sv_prefix(name_sv, fileprefix);
         bool match = fileprefix.length ? has_prefix : name[0] != '.';
-        if (!match || is_ignored_dir_entry(&name_sv)) {
+        if (!match || is_ignored_dir_entry(name_sv)) {
             continue;
         }
 
@@ -138,12 +138,12 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
     char buf[8192];
 
     if (strview_has_prefix(&cs->escaped, "~/")) {
-        const StringView *home = &e->home_dir;
+        const StringView home = e->home_dir;
         StringView parsed = strview(cs->parsed);
-        BUG_ON(!strview_has_sv_prefix(parsed, *home));
-        strview_remove_prefix(&parsed, home->length + STRLEN("/"));
+        BUG_ON(!strview_has_sv_prefix(parsed, home));
+        strview_remove_prefix(&parsed, home.length + STRLEN("/"));
         bool sufficient_buf = parsed.length <= sizeof(buf) - sizeof("~/");
-        bool sane_home = strview_has_prefix(home, "/");
+        bool sane_home = strview_has_prefix(&home, "/");
 
         if (unlikely(!sane_home || !sufficient_buf)) {
             LOG_ERROR("%s", !sane_home ? "non-absolute $HOME" : "no buffer space");
@@ -572,7 +572,7 @@ static void complete_tag(EditorState *e, const CommandArgs *a)
     if (!cmdargs_has_flag(a, 'r')) {
         BUG_ON(!cs->parsed);
         StringView prefix = strview(cs->parsed);
-        collect_tags(&e->tagfile, &cs->completions, &prefix);
+        collect_tags(&e->tagfile, &cs->completions, prefix);
     }
 }
 
@@ -938,7 +938,7 @@ static void do_complete_command(CommandLine *cmdline)
     }
 
     size_t pos = buf.len;
-    string_append_strview(&buf, &tail);
+    string_append_strview(&buf, tail);
     cmdline_set_text(cmdline, string_borrow_cstring(&buf));
     cmdline->pos = pos;
     string_free(&buf);

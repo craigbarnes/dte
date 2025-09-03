@@ -75,9 +75,9 @@ bool exec_config(CommandRunner *runner, StringView config)
         }
         if (has_line_continuation(line)) {
             line.length--;
-            string_append_strview(&buf, &line);
+            string_append_strview(&buf, line);
         } else {
-            string_append_strview(&buf, &line);
+            string_append_strview(&buf, line);
             bool r = handle_command(runner, string_borrow_cstring(&buf));
             string_clear(&buf);
             nfailed += !r;

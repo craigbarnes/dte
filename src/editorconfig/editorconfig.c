@@ -36,11 +36,11 @@ typedef enum {
     ECONF_UNKNOWN_PROPERTY,
 } PropertyType;
 
-#define CMP(s, val) if (mem_equal(name->data, s, STRLEN(s))) return val;
+#define CMP(s, val) if (mem_equal(name.data, s, STRLEN(s))) return val;
 
-static PropertyType lookup_property(const StringView *name)
+static PropertyType lookup_property(StringView name)
 {
-    switch (name->length) {
+    switch (name.length) {
     case  7: CMP("charset", ECONF_CHARSET); break;
     case  9: CMP("tab_width", ECONF_TAB_WIDTH); break;
     case 11:
@@ -55,42 +55,41 @@ static PropertyType lookup_property(const StringView *name)
     return ECONF_UNKNOWN_PROPERTY;
 }
 
-static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
+static EditorConfigIndentStyle lookup_indent_style(StringView val)
 {
-    if (strview_equal_cstring_icase(val, "space")) {
+    if (strview_equal_icase(val, strview("space"))) {
         return INDENT_STYLE_SPACE;
-    } else if (strview_equal_cstring_icase(val, "tab")) {
+    } else if (strview_equal_icase(val, strview("tab"))) {
         return INDENT_STYLE_TAB;
     }
     return INDENT_STYLE_UNSPECIFIED;
 }
 
-static unsigned int parse_indent_digit(const StringView *val)
+static unsigned int parse_indent_digit(StringView val)
 {
     static_assert(INDENT_WIDTH_MAX == TAB_WIDTH_MAX);
-    const char *data = val->data;
-    unsigned int indent = (val->length == 1) ? data[0] - '0' : 0;
+    unsigned int indent = (val.length == 1) ? val.data[0] - '0' : 0;
     return (indent <= INDENT_WIDTH_MAX) ? indent : 0;
 }
 
-static void parse_indent_size(EditorConfigOptions *options, const StringView *val)
+static void parse_indent_size(EditorConfigOptions *options, StringView val)
 {
-    bool tab = strview_equal_cstring_icase(val, "tab");
+    bool tab = strview_equal_icase(val, strview("tab"));
     options->indent_size_is_tab = tab;
     options->indent_size = tab ? 0 : parse_indent_digit(val);
 }
 
-static unsigned int parse_max_line_length(const StringView *val)
+static unsigned int parse_max_line_length(StringView val)
 {
     unsigned int maxlen = 0;
-    size_t ndigits = buf_parse_uint(val->data, val->length, &maxlen);
-    return (ndigits == val->length) ? MIN(maxlen, TEXT_WIDTH_MAX) : 0;
+    size_t ndigits = buf_parse_uint(val.data, val.length, &maxlen);
+    return (ndigits == val.length) ? MIN(maxlen, TEXT_WIDTH_MAX) : 0;
 }
 
 static void editorconfig_option_set (
     EditorConfigOptions *options,
-    const StringView *name,
-    const StringView *val
+    StringView name,
+    StringView val
 ) {
     switch (lookup_property(name)) {
     case ECONF_INDENT_STYLE:
@@ -149,7 +148,7 @@ static bool section_matches_path(StringView section, StringView dir, const char 
     // Append the section heading (from the .editorconfig file) to the
     // prefix constructed above and test whether the resulting `pattern`
     // matches against `path`
-    string_append_strview(&pattern, &section);
+    string_append_strview(&pattern, section);
     bool r = ec_pattern_match(pattern.buffer, pattern.len, path);
     string_free(&pattern);
     return r;
@@ -157,8 +156,8 @@ static bool section_matches_path(StringView section, StringView dir, const char 
 
 static bool is_root_key(const IniParser *ini)
 {
-    return strview_equal_cstring_icase(&ini->name, "root")
-        && strview_equal_cstring_icase(&ini->value, "true");
+    return strview_equal_icase(ini->name, strview("root"))
+        && strview_equal_icase(ini->value, strview("true"));
 }
 
 static EditorConfigOptions editorconfig_options_init(void)
@@ -198,7 +197,7 @@ static void editorconfig_parse(StringView input, UserData *data)
         }
 
         if (data->match) {
-            editorconfig_option_set(&data->options, &ini.name, &ini.value);
+            editorconfig_option_set(&data->options, ini.name, ini.value);
         }
     }
 }

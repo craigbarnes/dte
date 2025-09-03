@@ -10,7 +10,7 @@ static void test_get_indent_info(TestContext *ctx)
     };
 
     StringView line = strview("            ");
-    IndentInfo info = get_indent_info(&options, &line);
+    IndentInfo info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 12);
     EXPECT_EQ(info.width, 12);
     EXPECT_EQ(info.level, 3);
@@ -18,7 +18,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_TRUE(info.sane);
 
     line = strview("\t\t");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 2);
     EXPECT_EQ(info.width, 8);
     EXPECT_EQ(info.level, 2);
@@ -26,7 +26,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_FALSE(info.sane);
 
     line = strview("    xyz");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 4);
     EXPECT_EQ(info.width, 4);
     EXPECT_EQ(info.level, 1);
@@ -35,7 +35,7 @@ static void test_get_indent_info(TestContext *ctx)
 
     options.expand_tab = false;
     line = strview("\t\t");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 2);
     EXPECT_EQ(info.width, 8);
     EXPECT_EQ(info.level, 2);
@@ -43,7 +43,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_TRUE(info.sane);
 
     line = strview("    test");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 4);
     EXPECT_EQ(info.width, 4);
     EXPECT_EQ(info.level, 1);
@@ -53,7 +53,7 @@ static void test_get_indent_info(TestContext *ctx)
     options.indent_width = 8;
     options.tab_width = 8;
     line = strview("\t\t  ");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 4);
     EXPECT_EQ(info.width, 18);
     EXPECT_EQ(info.level, 2);
@@ -61,7 +61,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_TRUE(info.sane);
 
     line = strview("\t \t ");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 4);
     EXPECT_EQ(info.width, 17);
     EXPECT_EQ(info.level, 2);
@@ -69,7 +69,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_FALSE(info.sane);
 
     line = strview("    test");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 4);
     EXPECT_EQ(info.width, 4);
     EXPECT_EQ(info.level, 0);
@@ -77,7 +77,7 @@ static void test_get_indent_info(TestContext *ctx)
     EXPECT_TRUE(info.sane);
 
     line = strview("        test");
-    info = get_indent_info(&options, &line);
+    info = get_indent_info(&options, line);
     EXPECT_EQ(info.bytes, 8);
     EXPECT_EQ(info.width, 8);
     EXPECT_EQ(info.level, 1);

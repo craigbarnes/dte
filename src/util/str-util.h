@@ -50,12 +50,6 @@ static inline bool str_has_suffix(const char *str, const char *suffix)
 }
 
 NONNULL_ARGS
-static inline bool strn_has_strview_prefix(const char *s, size_t n, const StringView *p)
-{
-    return n >= p->length && mem_equal(s, p->data, p->length);
-}
-
-NONNULL_ARGS
 static inline size_t str_common_prefix_length(const char *a, const char *b)
 {
     size_t n = 0;

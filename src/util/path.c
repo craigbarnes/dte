@@ -111,23 +111,24 @@ char *path_relative(const char *abs, const char *cwd)
     return xmemjoin("../../", 3 * dotdot, tail, strlen(tail) + 1);
 }
 
-static bool path_has_dir_prefix(const char *path, size_t pathlen, const StringView *dir)
+static bool path_has_dir_prefix(StringView path, StringView dir)
 {
-    return strn_has_strview_prefix(path, pathlen, dir) && path[dir->length] == '/';
+    return strview_has_sv_prefix(path, dir) && path.data[dir.length] == '/';
 }
 
-char *short_filename_cwd(const char *abs, const char *cwd, const StringView *home)
+char *short_filename_cwd(const char *abs, const char *cwd, StringView home)
 {
+    StringView abs_sv = strview(abs);
     char *rel = path_relative(abs, cwd);
-    size_t abs_len = strlen(abs);
+    size_t abs_len = abs_sv.length;
     size_t rel_len = strlen(rel);
-    size_t suffix_len = (abs_len - home->length) + 1;
+    size_t suffix_len = (abs_len - home.length) + 1;
 
-    if (path_has_dir_prefix(abs, abs_len, home) && suffix_len < rel_len) {
+    if (path_has_dir_prefix(abs_sv, home) && suffix_len < rel_len) {
         // Prefer absolute in tilde notation (e.g. "~/abs/path"), if applicable
         // and shorter than relative
         rel[0] = '~';
-        memcpy(rel + 1, abs + home->length, suffix_len);
+        memcpy(rel + 1, abs + home.length, suffix_len);
     } else if (abs_len < rel_len) {
         // Prefer absolute, if shorter than relative
         memcpy(rel, abs, abs_len + 1);
@@ -136,7 +137,7 @@ char *short_filename_cwd(const char *abs, const char *cwd, const StringView *hom
     return rel;
 }
 
-char *short_filename(const char *abs, const StringView *home)
+char *short_filename(const char *abs, StringView home)
 {
     char buf[8192];
     const char *cwd = getcwd(buf, sizeof buf);

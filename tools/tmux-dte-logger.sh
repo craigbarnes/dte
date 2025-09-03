@@ -18,12 +18,12 @@ test "$TMUX"
 
 killpane=1
 while getopts 'Kth' flag; do
-   case "$flag" in
-   K) killpane= ;;
-   t) export DTE_LOG_LEVEL=trace ;;
-   h) usage; exit 0 ;;
-   *) usage >&2; exit 64 ;;
-   esac
+    case "$flag" in
+        K) killpane= ;;
+        t) export DTE_LOG_LEVEL=trace ;;
+        h) usage; exit 0 ;;
+        *) usage >&2; exit 64 ;;
+    esac
 done
 
 shift $((OPTIND - 1))

@@ -106,12 +106,12 @@ static void test_get_indent_for_next_line(TestContext *ctx)
     };
 
     const StringView line1 = STRING_VIEW("foo {");
-    char *indent = get_indent_for_next_line(&options, &line1);
+    char *indent = get_indent_for_next_line(&options, line1);
     EXPECT_STREQ(indent, "    ");
     free(indent);
 
     const StringView line2 = STRING_VIEW("foo");
-    indent = get_indent_for_next_line(&options, &line2);
+    indent = get_indent_for_next_line(&options, line2);
     EXPECT_STREQ(indent, NULL);
     free(indent);
 }

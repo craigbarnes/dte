@@ -308,7 +308,7 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
 
     for (size_t i = 0, n = e->buffers.count; i < n; i++) {
         Buffer *buffer = e->buffers.ptrs[i];
-        buffer_update_short_filename_cwd(buffer, &e->home_dir, cwd);
+        buffer_update_short_filename_cwd(buffer, e->home_dir, cwd);
     }
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
@@ -1917,7 +1917,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
 
         free(buffer->abs_filename);
         buffer->abs_filename = absolute;
-        buffer_update_short_filename(buffer, &e->home_dir);
+        buffer_update_short_filename(buffer, e->home_dir);
         e->screen_update |= UPDATE_TERM_TITLE;
 
         // Filename change is not detected (only buffer_modified() change)
@@ -2272,12 +2272,12 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
 
     const char *filename = e->buffer->abs_filename;
     if (nargs == 0) {
-        tag_lookup(&e->tagfile, msgs, &e->err, &word_under_cursor, filename);
+        tag_lookup(&e->tagfile, msgs, &e->err, word_under_cursor, filename);
     }
 
     for (size_t i = 0; i < nargs; i++) {
         StringView tagname = strview(a->args[i]);
-        tag_lookup(&e->tagfile, msgs, &e->err, &tagname, filename);
+        tag_lookup(&e->tagfile, msgs, &e->err, tagname, filename);
     }
 
     activate_current_message_save(msgs, &e->bookmarks, e->view);

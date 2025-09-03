@@ -837,7 +837,7 @@ static void test_string_view(TestContext *ctx)
     EXPECT_FALSE(strview_has_prefix_icase(&sv, "TEst_"));
 
     sv = string_view(sv.data, sv.length);
-    EXPECT_TRUE(strview_equal(&sv, &sv));
+    EXPECT_TRUE(strview_equal(sv, sv));
     sv = string_view(STRN("\0test\0 ..."));
     EXPECT_TRUE(strview_equal_strn(&sv, "\0test\0 ...", 10));
 
@@ -864,12 +864,13 @@ static void test_string_view(TestContext *ctx)
     sv = strview(NULL);
     EXPECT_NULL(strview_memrchr(&sv, '.'));
     EXPECT_NULL(strview_memchr(&sv, '.'));
-    EXPECT_TRUE(strview_equal(&sv, &sv));
+    EXPECT_TRUE(strview_equal(sv, sv));
+    EXPECT_TRUE(strview_equal_icase(sv, sv));
     EXPECT_FALSE(strview_contains_char_type(sv, ASCII_DIGIT));
     EXPECT_TRUE(strview_isblank(&sv));
     EXPECT_EQ(strview_trim_left(&sv), 0);
     EXPECT_TRUE(strview_equal_cstring(&sv, ""));
-    EXPECT_TRUE(strview_equal_cstring_icase(&sv, ""));
+    EXPECT_TRUE(strview_equal_icase(sv, strview("")));
     EXPECT_TRUE(strview_has_prefix(&sv, ""));
     EXPECT_TRUE(strview_has_suffix(&sv, ""));
     EXPECT_TRUE(strview_has_prefix_icase(&sv, ""));
@@ -3258,19 +3259,19 @@ static void test_path_slice_relative(TestContext *ctx)
 static void test_short_filename_cwd(TestContext *ctx)
 {
     const StringView home = STRING_VIEW("/home/user");
-    char *s = short_filename_cwd("/home/user", "/home/user", &home);
+    char *s = short_filename_cwd("/home/user", "/home/user", home);
     EXPECT_STREQ(s, ".");
     free(s);
 
-    s = short_filename_cwd("/home/use", "/home/user", &home);
+    s = short_filename_cwd("/home/use", "/home/user", home);
     EXPECT_STREQ(s, "../use");
     free(s);
 
-    s = short_filename_cwd("/a/b/c/d", "/a/x/y/file", &home);
+    s = short_filename_cwd("/a/b/c/d", "/a/x/y/file", home);
     EXPECT_STREQ(s, "/a/b/c/d");
     free(s);
 
-    s = short_filename_cwd("/home/user/file", "/home/user/cwd", &home);
+    s = short_filename_cwd("/home/user/file", "/home/user/cwd", home);
     EXPECT_STREQ(s, "~/file");
     free(s);
 
@@ -3280,7 +3281,7 @@ static void test_short_filename_cwd(TestContext *ctx)
     EXPECT_TRUE(strlen(abs) < strlen(rel));
     EXPECT_STREQ(rel, "../../b");
     free(rel);
-    s = short_filename_cwd(abs, cwd, &home);
+    s = short_filename_cwd(abs, cwd, home);
     EXPECT_STREQ(s, "/a/b");
     free(s);
 }
@@ -3291,16 +3292,16 @@ static void test_short_filename(TestContext *ctx)
     static const char rel[] = "test/main.c";
     char *abs = path_absolute(rel);
     ASSERT_NONNULL(abs);
-    char *s = short_filename(abs, &home);
+    char *s = short_filename(abs, home);
     EXPECT_STREQ(s, rel);
     free(abs);
     free(s);
 
-    s = short_filename("/home/user/subdir/file.txt", &home);
+    s = short_filename("/home/user/subdir/file.txt", home);
     EXPECT_STREQ(s, "~/subdir/file.txt");
     free(s);
 
-    s = short_filename("/x/y/z", &home);
+    s = short_filename("/x/y/z", home);
     EXPECT_STREQ(s, "/x/y/z");
     free(s);
 }

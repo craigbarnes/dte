@@ -292,14 +292,14 @@ static LineInfo line_info_init(const View *view, const BlockIter *bi, size_t lin
 
 static void line_info_set_line (
     LineInfo *info,
-    const StringView *line,
+    StringView line,
     const TermStyle **styles
 ) {
-    BUG_ON(line->length == 0);
-    BUG_ON(line->data[line->length - 1] != '\n');
+    BUG_ON(line.length == 0);
+    BUG_ON(line.data[line.length - 1] != '\n');
 
-    info->line = line->data;
-    info->size = line->length - 1;
+    info->line = line.data;
+    info->size = line.length - 1;
     info->pos = 0;
     info->styles = styles;
 
@@ -418,8 +418,8 @@ void update_range (
 
         StringView line = block_iter_get_line_with_nl(&bi);
         bool next_changed;
-        const TermStyle **hlstyles = hl_line(syn, lss, styles, &line, info.line_nr, &next_changed);
-        line_info_set_line(&info, &line, hlstyles);
+        const TermStyle **hlstyles = hl_line(syn, lss, styles, line, info.line_nr, &next_changed);
+        line_info_set_line(&info, line, hlstyles);
         print_line(term, &info, styles, display_special);
 
         got_line = !!block_iter_next_line(&bi);

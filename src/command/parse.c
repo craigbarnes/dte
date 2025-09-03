@@ -155,7 +155,7 @@ char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len
     size_t pos = 0;
 
     if (tilde_slash) {
-        string_append_strview(&buf, home);
+        string_append_strview(&buf, *home);
         pos += 1; // Skip past '~' and leave '/' to be handled below
     }
 

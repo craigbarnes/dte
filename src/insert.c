@@ -24,14 +24,14 @@ void insert_text(View *view, const char *text, size_t size, bool move_after)
 
 static size_t insert_nl_and_autoindent (
     View *view,
-    const StringView *prev_line,
+    StringView prev_line,
     size_t del_count
 ) {
     const char *ins = "\n";
     size_t ins_count = 1;
     char *indent = NULL;
 
-    if (prev_line->length) {
+    if (prev_line.length) {
         indent = get_indent_for_next_line(&view->buffer->options, prev_line);
         if (indent) {
             ins_count = strlen(indent);
@@ -63,7 +63,7 @@ void new_line(View *view, bool auto_indent, bool above_cursor)
         line = block_iter_get_line(&tmp);
     }
 
-    size_t ins_count = insert_nl_and_autoindent(view, &line, 0);
+    size_t ins_count = insert_nl_and_autoindent(view, line, 0);
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
@@ -106,7 +106,7 @@ static void insert_nl(View *view)
     }
 
     begin_change(CHANGE_MERGE_NONE);
-    size_t ins_count = insert_nl_and_autoindent(view, &line, del_count);
+    size_t ins_count = insert_nl_and_autoindent(view, line, del_count);
     end_change();
     block_iter_skip_bytes(&view->cursor, ins_count); // Move after inserted text
 }
@@ -121,7 +121,7 @@ static int get_indent_of_matching_brace(const View *view)
         StringView line = block_iter_get_line(&bi);
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
-                return get_indent_width(&line, tab_width);
+                return get_indent_width(line, tab_width);
             }
         }
         if (line_has_closing_brace(line)) {

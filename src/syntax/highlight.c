@@ -77,13 +77,13 @@ static const TermStyle **highlight_line (
     Syntax *syn,
     State *state,
     const StyleMap *sm,
-    const StringView *line_sv,
+    StringView line_sv,
     State **ret
 ) {
     static const TermStyle **styles; // NOLINT(*-avoid-non-const-global-variables)
     static size_t alloc; // NOLINT(*-avoid-non-const-global-variables)
-    const char *const line = line_sv->data;
-    const size_t len = line_sv->length;
+    const char *const line = line_sv.data;
+    const size_t len = line_sv.length;
     size_t i = 0;
     ssize_t sidx = -1;
 
@@ -277,7 +277,7 @@ static ssize_t fill_hole (
         State *st;
         StringView line = block_iter_get_line_with_nl(bi);
         block_iter_eat_line(bi);
-        highlight_line(syn, ptrs[idx++], sm, &line, &st);
+        highlight_line(syn, ptrs[idx++], sm, line, &st);
 
         if (ptrs[idx] == st) {
             // Was not invalidated and didn't change
@@ -349,7 +349,7 @@ void hl_fill_start_states (
             syn,
             states[s->count - 1],
             sm,
-            &line,
+            line,
             &states[s->count]
         );
         s->count++;
@@ -361,7 +361,7 @@ const TermStyle **hl_line (
     Syntax *syn,
     PointerArray *line_start_states,
     const StyleMap *sm,
-    const StringView *line,
+    StringView line,
     size_t line_nr,
     bool *next_changed
 ) {

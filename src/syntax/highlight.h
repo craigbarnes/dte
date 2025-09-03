@@ -29,7 +29,7 @@ const TermStyle **hl_line (
     Syntax *syn,
     PointerArray *line_start_states,
     const StyleMap *sm,
-    const StringView *line,
+    StringView line,
     size_t line_nr,
     bool *next_changed
 );

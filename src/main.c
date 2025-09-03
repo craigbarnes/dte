@@ -363,7 +363,7 @@ static void lookup_tags (
 
     for (size_t i = 0; i < nr_tags; i++) {
         StringView tagname = strview(tags[i]);
-        tag_lookup(&e->tagfile, msgs, &e->err, &tagname, NULL);
+        tag_lookup(&e->tagfile, msgs, &e->err, tagname, NULL);
     }
 
     if (
