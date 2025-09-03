@@ -328,10 +328,8 @@ static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 {
     CompletionState *cs = &e->cmdline.completion;
     collect_files(e, cs, COLLECT_DIRS_ONLY);
-    if (str_has_prefix("-", cs->parsed)) {
-        if (likely(xgetenv("OLDPWD"))) {
-            ptr_array_append(&cs->completions, xstrdup("-"));
-        }
+    if (str_has_prefix("-", cs->parsed) && xgetenv("OLDPWD")) {
+        ptr_array_append(&cs->completions, xstrdup("-"));
     }
 }
 
@@ -364,12 +362,9 @@ static void complete_cursor(EditorState *e, const CommandArgs *a)
     } else if (n == 1) {
         collect_cursor_types(&cs->completions, cs->parsed);
     } else if (n == 2) {
+        static const char example_colors[][8] = {"#22AABB"}; // For discoverability
         collect_cursor_colors(&cs->completions, cs->parsed);
-        // Add an example #rrggbb color, to make things more discoverable
-        static const char rgb_example[] = "#22AABB";
-        if (str_has_prefix(rgb_example, cs->parsed)) {
-            ptr_array_append(&cs->completions, xstrdup(rgb_example));
-        }
+        COLLECT_STRINGS(example_colors, &cs->completions, cs->parsed);
     }
 }
 
@@ -511,13 +506,9 @@ static void complete_save(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 
 static void complete_quit(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 {
+    static const char exit_codes[][2] = {"0", "1"};
     CompletionState *cs = &e->cmdline.completion;
-    if (str_has_prefix("0", cs->parsed)) {
-        ptr_array_append(&cs->completions, xstrdup("0"));
-    }
-    if (str_has_prefix("1", cs->parsed)) {
-        ptr_array_append(&cs->completions, xstrdup("1"));
-    }
+    COLLECT_STRINGS(exit_codes, &cs->completions, cs->parsed);
 }
 
 static void complete_redo(EditorState *e, const CommandArgs* UNUSED_ARG(a))
