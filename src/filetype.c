@@ -55,7 +55,7 @@ UNITTEST {
 
 typedef struct {
     unsigned int str_len;
-    char str[] COUNTED_BY(str_len);
+    char str[];
 } FlexArrayStr;
 
 // Filetypes dynamically added via the `ft` command.

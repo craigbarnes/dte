@@ -301,6 +301,11 @@
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
 // https://clang.llvm.org/docs/AttributeReference.html#counted-by
 #if HAS_ATTRIBUTE(counted_by)
+    // NOTE: DO NOT use this unless the array it's attached to is STRICTLY
+    // bounded by the length `member`. A common counter-example of this
+    // would be a null-terminated char array, where an extra byte is
+    // always appended (and accounted for in allocations) but not included
+    // in the length.
     #define COUNTED_BY(member) __attribute__((counted_by(member)))
 #else
     #define COUNTED_BY(member)
