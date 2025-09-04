@@ -305,7 +305,7 @@
     // bounded by the length `member`. A common counter-example of this
     // would be a null-terminated char array, where an extra byte is
     // always appended (and accounted for in allocations) but not included
-    // in the length.
+    // in the length. See commit f0dbfc236381aa1e for more details.
     #define COUNTED_BY(member) __attribute__((counted_by(member)))
 #else
     #define COUNTED_BY(member)
