@@ -4,21 +4,24 @@ Packaging
 Installation targets
 --------------------
 
-Running `make install` is equivalent to running the following `make`
-targets:
+The build system provides 2 general installation targets:
+
+* `make install`: Install `dte` binary, man pages and shell completion
+  scripts for [bash]/[zsh]/[fish]
+* `make install-full`: As above, but with some additional conveniences for
+  desktop systems ([desktop entry] file, icons and [AppStream] metadata)
+
+The `install` and `install-full` targets are simply aliases for a
+subset of the following (fine grained) targets:
 
 * `install-bin`: Install `dte` binary
 * `install-man`: Install man pages
 * `install-bash-completion`: Install [bash] auto-completion script
 * `install-fish-completion`: Install [fish] auto-completion script
 * `install-zsh-completion`: Install [zsh] auto-completion script
-* `install-desktop-file`: Install [desktop entry] file (excluded on macOS/Android)
-* `install-icons`: Install SVG/PNG icon files (excluded on macOS/Android)
-* `install-appstream`: Install [AppStream] metadata (excluded on macOS/Android)
-
-The last 3 targets are excluded on macOS/Android because they'd typically
-just be unused clutter on those platforms. However, `make install-full`
-can be used to run *all* of the above targets, regardless of platform.
+* `install-desktop-file`: Install [desktop entry] file
+* `install-icons`: Install SVG/PNG icon files
+* `install-appstream`: Install [AppStream] metadata
 
 For more information about available `make` targets, run `make help`.
 

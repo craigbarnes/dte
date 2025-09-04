@@ -72,6 +72,11 @@ installed:
 
     make && sudo make install
 
+The `make install` command installs the `dte` binary, man pages and
+shell completion scripts for bash/zsh/fish. If you're installing to
+a desktop machine and would also like a [desktop entry] launcher,
+[`make install-full`] can be used instead.
+
 If you're using macOS, it may be necessary to install a more recent version
 of GNU Make (e.g. with [`brew`]) and then use `gmake` in place of `make`.
 For example:
@@ -188,6 +193,8 @@ Public License version 2 for more details.
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [release]: https://craigbarnes.gitlab.io/dte/releases.html
+[desktop entry]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
+[`make install-full`]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/packaging.md#installation-targets
 [`brew`]: https://brew.sh/
 [Contributor guidelines]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md
 [Packaging information]: https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md

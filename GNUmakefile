@@ -51,21 +51,12 @@ endef
 INSTALL_TARGETS_BASIC := bin man bash-completion fish-completion zsh-completion
 INSTALL_TARGETS_FULL := $(INSTALL_TARGETS_BASIC) icons desktop-file appstream
 
-# See "installation targets" in docs/packaging.md
-ifeq "$(NO_INSTALL_XDG_CLUTTER)" "1"
- INSTALL_TARGETS := $(INSTALL_TARGETS_BASIC)
-else
- INSTALL_TARGETS := $(INSTALL_TARGETS_FULL)
-endif
-
 all: $(dte)
 check: check-tests check-opts
-install: $(addprefix install-, $(INSTALL_TARGETS))
-uninstall: $(addprefix uninstall-, $(INSTALL_TARGETS))
+install: $(addprefix install-, $(INSTALL_TARGETS_BASIC))
+uninstall: $(addprefix uninstall-, $(INSTALL_TARGETS_BASIC))
 install-full: $(addprefix install-, $(INSTALL_TARGETS_FULL))
-install-basic: $(addprefix install-, $(INSTALL_TARGETS_BASIC))
 uninstall-full: $(addprefix uninstall-, $(INSTALL_TARGETS_FULL))
-uninstall-basic: $(addprefix uninstall-, $(INSTALL_TARGETS_BASIC))
 
 install-bin: all
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
@@ -168,11 +159,10 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
-INSTALL_TARGETS_ALL := $(INSTALL_TARGETS_FULL) full basic
 .DEFAULT_GOAL = all
 .PHONY: all clean install uninstall
 .PHONY: check check-tests check-opts installcheck bench
-.PHONY: $(foreach T, $(INSTALL_TARGETS_ALL), install-$(T) uninstall-$(T))
+.PHONY: $(foreach T, $(INSTALL_TARGETS_FULL) full, install-$(T) uninstall-$(T))
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean install% uninstall%

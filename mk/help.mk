@@ -47,7 +47,8 @@ help:
 	$P vvars 'Verbose version of "make vars"'
 	$P tags 'Create tags(5) file using ctags(1)'
 	$P clean 'Remove generated files'
-	$P install 'Equivalent to the first 8 (5 on macOS/Android) install-* targets below'
+	$P install 'Equivalent to: make install-{bin,man,{bash,fish,zsh}-completion}'
+	$P install-full 'Equivalent to: make install install-{desktop-file,icons,appstream}'
 	$P install-bin 'Install dte binary'
 	$P install-man 'Install man pages'
 	$P install-bash-completion 'Install bash auto-completion script'
@@ -62,7 +63,6 @@ help:
 	$P check 'Equivalent to "make check-tests check-opts"'
 	$P check-tests 'Compile and run unit tests'
 	$P check-opts 'Test dte(1) command-line options and error handling'
-	$P install-full 'Same as "make install", but without exclusions for macOS/Android'
 	@echo
 ifeq "$(DEVMK)" "loaded"
 	@printf ' Dev targets:\n\n'

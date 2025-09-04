@@ -174,15 +174,13 @@ case "$TARGET" in
 *-linux-android2[89]|*-linux-android[3-9][0-9]*)
     # The compiler in the Android NDK for API 28 produces the following error
     # if `-liconv` is used: "ld.lld: error: unable to find library -liconv"
-    echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
+    : ;;
 *-linux-android*)
     # ...whereas the compiler targeting API level 24 complains about undefined
     # `libiconv_*` symbols if `-liconv` is NOT used
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
+    echo 'LDLIBS_ICONV = -liconv' ;;
 *-darwin*)
-    echo 'LDLIBS_ICONV = -liconv'
-    echo 'NO_INSTALL_XDG_CLUTTER = 1' ;;
+    echo 'LDLIBS_ICONV = -liconv' ;;
 *-openbsd*)
     echo 'LDLIBS_ICONV = -liconv'
     echo 'BASIC_CPPFLAGS += -I/usr/local/include'
