@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "test.h"
+#include "sizes.h"
 #include "util/exitcode.h"
 #include "util/path.h"
 #include "util/progname.h"
@@ -108,12 +109,13 @@ static const char usage[] =
     "   -Q  Reverse the effects of -q\n"
     "   -t  Show timing information in output\n"
     "   -T  Reverse the effects of -t\n"
+    "   -s  Show sizes of various structs and exit\n"
     "   -h  Display help summary and exit\n"
     "\n";
 
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "cCqQtTh";
+    static const char optstring[] = "cCqQtTsh";
     const char *prog = progname(argc, argv, "test");
     bool color = isatty(STDERR_FILENO) && !xgetenv("NO_COLOR");
 
@@ -134,6 +136,7 @@ int main(int argc, char *argv[])
             case 'T': ctx.timing = false; break;
             case 'q': ctx.quiet = true; break;
             case 'Q': ctx.quiet = false; break;
+            case 's': return print_struct_sizes();
             case 'h': return ec_printf_ok(usage, prog, optstring);
             default: return EC_USAGE_ERROR;
         }

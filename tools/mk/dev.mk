@@ -20,6 +20,10 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
 	$(Q) cp $< $@
 
+print-struct-sizes: $(test)
+	$(E) EXEC '$(test) -s'
+	$(Q) $(test) -s
+
 tags:
 	$(CTAGS) src/*.[ch] src/*/*.[ch] test/*.[ch]
 
@@ -30,4 +34,4 @@ dump-generated-makefiles: $(GEN_MKFILES)
 
 
 DEVMK := loaded
-.PHONY: git-hooks tags dump-generated-makefiles
+.PHONY: print-struct-sizes git-hooks tags dump-generated-makefiles
