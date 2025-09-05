@@ -39,34 +39,18 @@ static inline bool same_style(const TermStyle *a, const TermStyle *b)
     return a->fg == b->fg && a->bg == b->bg && a->attr == b->attr;
 }
 
-static inline int32_t mask_color(int32_t color, int32_t over)
+static inline void mask_style2(TermStyle *style, const TermStyle *over, bool mask_bg)
 {
-    return (over == COLOR_KEEP) ? color : over;
-}
-
-static inline unsigned int mask_attr(unsigned int attr, unsigned int over)
-{
-    return (over & ATTR_KEEP) ? attr : over;
+    *style = (TermStyle) {
+        .fg = (over->fg == COLOR_KEEP) ? style->fg : over->fg,
+        .bg = (over->bg == COLOR_KEEP || !mask_bg) ? style->bg : over->bg,
+        .attr = (over->attr & ATTR_KEEP) ? style->attr : over->attr,
+    };
 }
 
 static inline void mask_style(TermStyle *style, const TermStyle *over)
 {
-    *style = (TermStyle) {
-        .fg = mask_color(style->fg, over->fg),
-        .bg = mask_color(style->bg, over->bg),
-        .attr = mask_attr(style->attr, over->attr),
-    };
-}
-
-// Like mask_style() but can change bg color only if it has not been changed yet
-static inline void mask_style2(TermStyle *style, const TermStyle *over, int32_t default_bg)
-{
-    bool has_default_bg = (style->bg == default_bg || style->bg <= COLOR_DEFAULT);
-    *style = (TermStyle) {
-        .fg = mask_color(style->fg, over->fg),
-        .bg = has_default_bg ? mask_color(style->bg, over->bg) : style->bg,
-        .attr = mask_attr(style->attr, over->attr),
-    };
+    return mask_style2(style, over, true);
 }
 
 ssize_t parse_term_style(TermStyle *style, char **strs, size_t nstrs) NONNULL_ARGS WARN_UNUSED_RESULT;

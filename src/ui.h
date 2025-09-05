@@ -33,6 +33,11 @@ typedef struct {
 
 struct EditorState;
 
+static inline bool term_style_has_default_bg(const TermStyle *s, const StyleMap *map)
+{
+    return s->bg == map->builtin[BSE_DEFAULT].bg || s->bg <= COLOR_DEFAULT;
+}
+
 // ui.c
 void update_screen(struct EditorState *e, const ScreenState *s);
 void update_term_title(TermOutputBuffer *obuf, const char *filename, bool is_modified);

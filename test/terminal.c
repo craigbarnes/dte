@@ -467,6 +467,7 @@ static void test_mask_style(TestContext *ctx)
     const TermStyle keep_fg = term_style(COLOR_KEEP, 93, ATTR_STRIKETHROUGH);
     const TermStyle keep_bg = term_style(241, COLOR_KEEP, ATTR_REVERSE);
     const TermStyle a = term_style(COLOR_BLUE, COLOR_CYAN, ATTR_BOLD);
+    const TermStyle b = term_style(100, 105, ATTR_DIM);
 
     TermStyle style = a;
     mask_style(&style, &keep_all);
@@ -488,17 +489,20 @@ static void test_mask_style(TestContext *ctx)
     EXPECT_EQ(style.attr, keep_fg.attr);
 
     style = a;
-    mask_style2(&style, &keep_fg, style.bg);
-    EXPECT_EQ(style.bg, keep_fg.bg);
-
-    style = a;
-    mask_style2(&style, &keep_fg, style.bg + 1);
+    mask_style2(&style, &b, false);
     EXPECT_EQ(style.bg, a.bg);
 
     style = a;
-    style.bg = COLOR_DEFAULT;
-    mask_style2(&style, &keep_fg, style.bg + 1);
-    EXPECT_EQ(style.bg, keep_fg.bg);
+    mask_style2(&style, &b, true);
+    EXPECT_EQ(style.bg, b.bg);
+
+    style = a;
+    mask_style2(&style, &keep_bg, true);
+    EXPECT_EQ(style.bg, a.bg);
+
+    style = a;
+    mask_style2(&style, &keep_bg, false);
+    EXPECT_EQ(style.bg, a.bg);
 }
 
 static void test_term_parse_csi_params(TestContext *ctx)

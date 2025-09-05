@@ -31,8 +31,9 @@ static void mask_selection_and_current_line (
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
         mask_style(style, &styles->builtin[BSE_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
-        int32_t default_bg = styles->builtin[BSE_DEFAULT].bg;
-        mask_style2(style, &styles->builtin[BSE_CURRENTLINE], default_bg);
+        // Only change `bg` if it hasn't been changed from the default
+        bool allow_change_bg = term_style_has_default_bg(style, styles);
+        mask_style2(style, &styles->builtin[BSE_CURRENTLINE], allow_change_bg);
     }
 }
 
@@ -405,7 +406,7 @@ void update_range (
     if (i < y2 && info.line_nr == view->cy) {
         // Dummy empty line is shown only if cursor is on it
         TermStyle style = styles->builtin[BSE_DEFAULT];
-        mask_style2(&style, &styles->builtin[BSE_CURRENTLINE], style.bg);
+        mask_style(&style, &styles->builtin[BSE_CURRENTLINE]);
         obuf->x = 0;
         set_style(term, styles, &style);
         term_move_cursor(obuf, edit_x, edit_y + i++);
