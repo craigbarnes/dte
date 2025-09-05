@@ -461,6 +461,46 @@ static void test_same_cursor(TestContext *ctx)
     EXPECT_TRUE(same_cursor(&a, &b));
 }
 
+static void test_mask_style(TestContext *ctx)
+{
+    const TermStyle keep_all = term_style(COLOR_KEEP, COLOR_KEEP, ATTR_KEEP);
+    const TermStyle keep_fg = term_style(COLOR_KEEP, 93, ATTR_STRIKETHROUGH);
+    const TermStyle keep_bg = term_style(241, COLOR_KEEP, ATTR_REVERSE);
+    const TermStyle a = term_style(COLOR_BLUE, COLOR_CYAN, ATTR_BOLD);
+
+    TermStyle style = a;
+    mask_style(&style, &keep_all);
+    EXPECT_EQ(style.fg, a.fg);
+    EXPECT_EQ(style.bg, a.bg);
+    EXPECT_EQ(style.attr, a.attr);
+    EXPECT_TRUE(same_style(&style, &a));
+
+    style = a;
+    mask_style(&style, &keep_bg);
+    EXPECT_EQ(style.fg, keep_bg.fg);
+    EXPECT_EQ(style.bg, a.bg);
+    EXPECT_EQ(style.attr, keep_bg.attr);
+
+    style = a;
+    mask_style(&style, &keep_fg);
+    EXPECT_EQ(style.fg, a.fg);
+    EXPECT_EQ(style.bg, keep_fg.bg);
+    EXPECT_EQ(style.attr, keep_fg.attr);
+
+    style = a;
+    mask_style2(&style, &keep_fg, style.bg);
+    EXPECT_EQ(style.bg, keep_fg.bg);
+
+    style = a;
+    mask_style2(&style, &keep_fg, style.bg + 1);
+    EXPECT_EQ(style.bg, a.bg);
+
+    style = a;
+    style.bg = COLOR_DEFAULT;
+    mask_style2(&style, &keep_fg, style.bg + 1);
+    EXPECT_EQ(style.bg, keep_fg.bg);
+}
+
 static void test_term_parse_csi_params(TestContext *ctx)
 {
     TermControlParams csi = {.nparams = 0};
@@ -1809,6 +1849,7 @@ static const TestEntry tests[] = {
     TEST(test_cursor_color_from_str),
     TEST(test_cursor_color_to_str),
     TEST(test_same_cursor),
+    TEST(test_mask_style),
     TEST(test_term_parse_csi_params),
     TEST(test_term_parse_sequence),
     TEST(test_term_parse_sequence2),

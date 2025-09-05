@@ -23,36 +23,6 @@ typedef struct {
     const TermStyle **styles;
 } LineInfo;
 
-static int32_t mask_color(int32_t color, int32_t over)
-{
-    return (over == COLOR_KEEP) ? color : over;
-}
-
-static unsigned int mask_attr(unsigned int attr, unsigned int over)
-{
-    return (over & ATTR_KEEP) ? attr : over;
-}
-
-static void mask_style(TermStyle *style, const TermStyle *over)
-{
-    *style = (TermStyle) {
-        .fg = mask_color(style->fg, over->fg),
-        .bg = mask_color(style->bg, over->bg),
-        .attr = mask_attr(style->attr, over->attr),
-    };
-}
-
-// Like mask_style() but can change bg color only if it has not been changed yet
-static void mask_style2(TermStyle *style, const TermStyle *over, int32_t default_bg)
-{
-    bool has_default_bg = (style->bg == default_bg || style->bg <= COLOR_DEFAULT);
-    *style = (TermStyle) {
-        .fg = mask_color(style->fg, over->fg),
-        .bg = has_default_bg ? mask_color(style->bg, over->bg) : style->bg,
-        .attr = mask_attr(style->attr, over->attr),
-    };
-}
-
 static void mask_selection_and_current_line (
     const StyleMap *styles,
     const LineInfo *info,
