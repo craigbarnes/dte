@@ -32,11 +32,9 @@ typedef struct Window {
     int edit_w, edit_h; // Width and height of editable area
     size_t first_tab_idx;
     bool update_tabbar;
-    struct {
-        int width;
-        long first;
-        long last;
-    } line_numbers;
+    unsigned int lineno_width; // Width of line numbers bar (including padding)
+    long lineno_first; // First visible line number, in previous screen update
+    long lineno_last; // Last visible line number, in previous screen update
 } Window;
 
 static inline View *window_get_first_view(const Window *window)

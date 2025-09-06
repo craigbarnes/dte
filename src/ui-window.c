@@ -30,37 +30,38 @@ void update_window_separators(Terminal *term, Frame *root_frame, const StyleMap 
     frame_for_each_window(root_frame, print_separator, NULL);
 }
 
-static void update_line_numbers(Terminal *term, const StyleMap *styles, Window *window, bool force)
-{
+static void update_line_numbers (
+    Terminal *term,
+    const StyleMap *styles,
+    Window *window,
+    bool force
+) {
     const View *view = window->view;
     size_t lines = view->buffer->nl;
     int x = window->x;
 
     window_calculate_line_numbers(window);
-    long first = view->vy + 1;
-    long last = MIN(view->vy + window->edit_h, lines);
+    long vy = view->vy;
+    long first = vy + 1;
+    long last = MIN(vy + window->edit_h, lines);
 
-    if (
-        !force
-        && window->line_numbers.first == first
-        && window->line_numbers.last == last
-    ) {
+    if (!force && window->lineno_first == first && window->lineno_last == last) {
         return;
     }
 
-    window->line_numbers.first = first;
-    window->line_numbers.last = last;
+    window->lineno_first = first;
+    window->lineno_last = last;
 
     TermOutputBuffer *obuf = &term->obuf;
-    char buf[DECIMAL_STR_MAX(unsigned long) + 1];
-    size_t width = window->line_numbers.width;
+    char buf[DECIMAL_STR_MAX(vy) + 1];
+    size_t width = window->lineno_width;
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
     term_output_reset(term, window->x, window->w, 0);
     set_builtin_style(term, styles, BSE_LINENUMBER);
 
     for (int y = 0, h = window->edit_h, edit_y = window->edit_y; y < h; y++) {
-        unsigned long line = view->vy + y + 1;
+        unsigned long line = vy + y + 1;
         memset(buf, ' ', width);
         if (line <= lines) {
             size_t i = width - 2;

@@ -344,21 +344,21 @@ void buffer_mark_tabbars_changed(Buffer *buffer)
     }
 }
 
-static int line_numbers_width(const GlobalOptions *options, const View *view)
+static unsigned int line_numbers_width(const GlobalOptions *options, const View *view)
 {
     if (!options->show_line_numbers || !view) {
         return 0;
     }
-    size_t width = size_str_width(view->buffer->nl) + 1;
+    unsigned int width = size_str_width(view->buffer->nl) + 1;
     return MAX(width, LINE_NUMBERS_MIN_WIDTH);
 }
 
-static int edit_x_offset(const GlobalOptions *options, const View *view)
+static unsigned int edit_x_offset(const GlobalOptions *options, const View *view)
 {
     return line_numbers_width(options, view);
 }
 
-static int edit_y_offset(const GlobalOptions *options)
+static unsigned int edit_y_offset(const GlobalOptions *options)
 {
     return options->tab_bar ? 1 : 0;
 }
@@ -375,11 +375,11 @@ static void set_edit_size(Window *window, const GlobalOptions *options)
 void window_calculate_line_numbers(Window *window)
 {
     const GlobalOptions *options = &window->editor->options;
-    int w = line_numbers_width(options, window->view);
-    if (w != window->line_numbers.width) {
-        window->line_numbers.width = w;
-        window->line_numbers.first = 0;
-        window->line_numbers.last = 0;
+    unsigned int w = line_numbers_width(options, window->view);
+    if (w != window->lineno_width) {
+        window->lineno_width = w;
+        window->lineno_first = 0;
+        window->lineno_last = 0;
         mark_all_lines_changed(window->view->buffer);
     }
     set_edit_size(window, options);
