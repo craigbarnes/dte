@@ -403,11 +403,12 @@ static View *open_initial_buffers (
 
         View *view = window_open_buffer(window, arg, false, NULL);
         free(alloc);
-        if (line) {
+        if (view && line) {
             set_view(view);
             move_to_filepos(view, line, col);
-            line = 0;
         }
+
+        line = 0;
     }
 
     if (std_buffer) {
