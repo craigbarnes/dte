@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "block-iter.h"
+#include "util/macros.h"
 #include "view.h"
 
 typedef enum {
@@ -13,20 +14,20 @@ typedef enum {
     BOL_TOGGLE_LR, // Like BOL_TOGGLE_RL, but move to BOL first and end of indent only when at BOL
 } SmartBolType;
 
-void move_to_preferred_x(View *view, long preferred_x);
-void move_cursor_left(View *view);
-void move_cursor_right(View *view);
-void move_bol(View *view, SmartBolType type);
-void move_eol(View *view);
-void move_up(View *view, long count);
-void move_down(View *view, long count);
-void move_bof(View *view);
-void move_eof(View *view);
-void move_to_line(View *view, size_t line);
-void move_to_column(View *view, size_t column);
-void move_to_filepos(View *view, size_t line, size_t column);
+void move_to_preferred_x(View *view, long preferred_x) NONNULL_ARGS;
+void move_cursor_left(View *view) NONNULL_ARGS;
+void move_cursor_right(View *view) NONNULL_ARGS;
+void move_bol(View *view, SmartBolType type) NONNULL_ARGS;
+void move_eol(View *view) NONNULL_ARGS;
+void move_up(View *view, long count) NONNULL_ARGS;
+void move_down(View *view, long count) NONNULL_ARGS;
+void move_bof(View *view) NONNULL_ARGS;
+void move_eof(View *view) NONNULL_ARGS;
+void move_to_line(View *view, size_t line) NONNULL_ARGS;
+void move_to_column(View *view, size_t column) NONNULL_ARGS;
+void move_to_filepos(View *view, size_t line, size_t column) NONNULL_ARGS;
 
-size_t word_fwd(BlockIter *bi, bool skip_non_word);
-size_t word_bwd(BlockIter *bi, bool skip_non_word);
+size_t word_fwd(BlockIter *bi, bool skip_non_word) NONNULL_ARGS;
+size_t word_bwd(BlockIter *bi, bool skip_non_word) NONNULL_ARGS;
 
 #endif
