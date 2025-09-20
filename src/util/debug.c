@@ -33,10 +33,15 @@ static void cleanup(void)
     // and then get interrupted in the middle of a sequence of instructions
     // that aren't async-signal-safe (see: signal-safety(7)).
     sigset_t mask, oldmask;
-    sigfillset(&mask);
-    sigprocmask(SIG_SETMASK, &mask, &oldmask);
-    fatal_error_cleanup();
-    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+    if (
+        cleanup_handler
+        && sigfillset(&mask) == 0
+        && sigprocmask(SIG_SETMASK, &mask, &oldmask) == 0
+    ) {
+        cleanup_handler();
+        set_fatal_error_cleanup_handler(NULL);
+        (void)!sigprocmask(SIG_SETMASK, &oldmask, NULL);
+    }
 }
 
 #if ASAN_ENABLED == 1
