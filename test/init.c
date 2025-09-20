@@ -130,8 +130,7 @@ static void test_init(TestContext *ctx)
     EXPECT_FALSE(log_level_enabled(LOG_LEVEL_TRACE));
     EXPECT_FALSE(log_level_debug_enabled());
 
-    const LogLevel def_lvl = log_level_default();
-    const LogLevel max_lvl = TRACE_LOGGING_ENABLED ? LOG_LEVEL_TRACE : def_lvl;
+    const LogLevel max_lvl = log_level_max();
     const LogLevel req_lvl = LOG_LEVEL_TRACE;
     ASSERT_EQ(log_open("build/test/log.txt", req_lvl, false), max_lvl);
     EXPECT_TRUE(log_level_enabled(LOG_LEVEL_CRITICAL));

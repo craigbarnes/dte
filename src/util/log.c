@@ -40,16 +40,6 @@ UNITTEST {
     }
 }
 
-LogLevel log_level_default(void)
-{
-    return DEBUG_LOGGING_ENABLED ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
-}
-
-static LogLevel log_level_max(void)
-{
-    return TRACE_LOGGING_ENABLED ? LOG_LEVEL_TRACE : log_level_default();
-}
-
 LogLevel log_level_from_str(const char *str)
 {
     if (!str || str[0] == '\0') {

@@ -30,6 +30,7 @@ typedef enum {
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
 #define WARN_ON(cond) if (unlikely(cond)) {LOG_WARNING("%s", #cond);}
 #define LOG_ERRNO_ON(cond, prefix) if (unlikely(cond)) {LOG_ERRNO(prefix);}
+#define TRACE_LOGGING_ENABLED (DEBUG >= 3) // See also: src/trace.h
 
 bool log_level_enabled(LogLevel level);
 
@@ -43,12 +44,15 @@ bool log_level_enabled(LogLevel level);
     static inline bool log_level_debug_enabled(void) {return false;}
 #endif
 
-#if DEBUG >= 3
-    // See also: src/trace.h
-    #define TRACE_LOGGING_ENABLED 1
-#else
-    #define TRACE_LOGGING_ENABLED 0
-#endif
+static inline LogLevel log_level_default(void)
+{
+    return DEBUG_LOGGING_ENABLED ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
+}
+
+static inline LogLevel log_level_max(void)
+{
+    return TRACE_LOGGING_ENABLED ? LOG_LEVEL_TRACE : log_level_default();
+}
 
 LogLevel log_open(const char *filename, LogLevel level, bool use_color);
 bool log_close(void);
@@ -56,7 +60,6 @@ void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...) P
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap) VPRINTF(4);
 void log_write(LogLevel level, const char *str, size_t len);
 SystemErrno log_errno(const char *file, int line, const char *prefix) COLD NONNULL_ARGS;
-LogLevel log_level_default(void);
 LogLevel log_level_from_str(const char *str);
 const char *log_level_to_str(LogLevel level);
 
