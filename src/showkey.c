@@ -11,6 +11,16 @@
 #include "util/str-util.h"
 #include "util/xreadwrite.h"
 
+static bool is_ignored_key(KeyCode key, TermInputBuffer *ibuf)
+{
+    bool bpaste = (key == KEYCODE_BRACKETED_PASTE);
+    if (bpaste || key == KEYCODE_DETECTED_PASTE) {
+        term_discard_paste(ibuf, bpaste);
+        return true;
+    }
+    return key == KEY_NONE || key == KEY_IGNORE;
+}
+
 ExitCode showkey_loop(unsigned int terminal_query_level)
 {
     if (!term_mode_init()) {
@@ -30,20 +40,15 @@ ExitCode showkey_loop(unsigned int terminal_query_level)
     term_output_flush(obuf);
 
     char buf[KEYCODE_STR_BUFSIZE + STRLEN("  \r\n")];
-    for (bool loop = true; loop; ) {
-        KeyCode key = term_read_input(&term, 100);
-        switch (key) {
-        case KEY_NONE:
-        case KEY_IGNORE:
+    size_t prefix_len = copyliteral(buf, "  ");
+
+    for (KeyCode key = KEY_NONE; key != (MOD_CTRL | 'd'); ) {
+        key = term_read_input(&term, 100);
+        if (is_ignored_key(key, ibuf)) {
             continue;
-        case KEYCODE_BRACKETED_PASTE:
-        case KEYCODE_DETECTED_PASTE:
-            term_discard_paste(ibuf, key == KEYCODE_BRACKETED_PASTE);
-            continue;
-        case MOD_CTRL | 'd':
-            loop = false;
         }
-        size_t n = copyliteral(buf, "  ");
+
+        size_t n = prefix_len;
         n += keycode_to_str(key, buf + n);
         n += copyliteral(buf + n, "\r\n");
         (void)!xwrite_all(STDOUT_FILENO, buf, n);
