@@ -6,14 +6,16 @@
 
 // These are initialized during early startup and then never changed,
 // so they're deemed an acceptable use of non-const globals:
-// NOLINTBEGIN(*-avoid-non-const-global-variables)
-static bool initialized;
-static struct termios cooked, raw, raw_isig;
-// NOLINTEND(*-avoid-non-const-global-variables)
+static struct termios cooked, raw, raw_isig; // NOLINT(*-non-const-global-variables)
+
+UNITTEST {
+    // Static zero-initialization is relied upon below
+    BUG_ON(raw.c_cc[VMIN] != 0);
+}
 
 bool term_mode_init(void)
 {
-    BUG_ON(initialized);
+    BUG_ON(raw.c_cc[VMIN] != 0); // Avoid double-init
     if (unlikely(tcgetattr(STDIN_FILENO, &cooked) != 0)) {
         return false;
     }
@@ -37,13 +39,12 @@ bool term_mode_init(void)
     raw_isig.c_lflag |= ISIG;
     raw_isig.c_cc[VSUSP] = _POSIX_VDISABLE;
 
-    initialized = true;
     return true;
 }
 
 static bool xtcsetattr(const struct termios *t)
 {
-    if (unlikely(!initialized)) {
+    if (unlikely(raw.c_cc[VMIN] != 1)) {
         return true;
     }
 
