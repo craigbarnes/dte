@@ -13,7 +13,7 @@ gen-unidata: $(UCD_FILES)
 
 $(UCD_FILES): $(GEN_MK) | .cache/
 	$(E) FETCH $@
-	$(Q) $(FETCH) https://unicode.org/Public/16.0.0/ucd/$(@F)
+	$(Q) $(FETCH) https://unicode.org/Public/17.0.0/ucd/$(@F)
 
 .cache/:
 	@mkdir -p $@

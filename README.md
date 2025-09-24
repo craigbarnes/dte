@@ -16,7 +16,7 @@ Features
 * Customizable [key bindings]
 * [Command language] with [command-line] auto-completion
 * [Macro] recording
-* Unicode 16 compatible text rendering
+* Unicode 17 compatible text rendering
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to [compiler error]
