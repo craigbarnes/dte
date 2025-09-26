@@ -86,13 +86,18 @@ static const struct {
 };
 
 /*
- For a list of typedef'd struct names, see:
+For a list of typedef'd struct names, see:
 
     make tags && readtags -lF '(if
         (and (eq? $kind "t") (prefix? $typeref "struct"))
         (list $name #t)
         #f
     )'
+
+See also:
+ • make print-struct-sizes
+ • build/test/test -h
+ • build/test/test -s
 */
 
 static inline ExitCode print_struct_sizes(void)

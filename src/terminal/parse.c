@@ -290,7 +290,7 @@ static Ecma48ByteType get_byte_type(unsigned char byte)
 
 #define UNHANDLED(var, ...) unhandled(var, __LINE__, __VA_ARGS__)
 
-PRINTF(3)
+COLD PRINTF(3)
 static void unhandled(bool *var, int line, const char *fmt, ...)
 {
     if (*var) {
