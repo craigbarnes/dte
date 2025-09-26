@@ -868,12 +868,15 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
     size_t strs_len = a->nr_args - 1;
     TermStyle style;
     ssize_t n = parse_term_style(&style, strs, strs_len);
+
     if (unlikely(n != strs_len)) {
+        bool quiet = has_flag(a, 'q');
+        ErrorBuffer *ebuf = &e->err;
         if (n < 0) {
-            return error_msg(&e->err, "too many colors");
+            return quiet || error_msg(ebuf, "too many colors");
         }
         BUG_ON(n > strs_len);
-        return error_msg(&e->err, "invalid color or attribute: '%s'", strs[n]);
+        return quiet || error_msg(ebuf, "invalid color or attribute: '%s'", strs[n]);
     }
 
     TermFeatureFlags features = e->terminal.features;
@@ -2630,7 +2633,7 @@ static const Command cmds[] = {
     {"errorfmt", "ci", RC, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
     {"exec", "e=i=o=lmnpst", NFAA, 1, -1, cmd_exec},
     {"ft", "bcfi", RC | NFAA, 2, -1, cmd_ft},
-    {"hi", "c", RC | NFAA, 0, -1, cmd_hi},
+    {"hi", "cq", RC | NFAA, 0, -1, cmd_hi},
     {"include", "bq", RC, 1, 1, cmd_include},
     {"insert", "km", NA, 1, 1, cmd_insert},
     {"join", "", NA, 0, 1, cmd_join},
