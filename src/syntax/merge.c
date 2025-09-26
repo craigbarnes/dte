@@ -38,6 +38,7 @@ static void fix_conditions (
     StringView prefix,
     char *buf
 ) {
+    BUG_ON(!s); // Silence spurious `-Wnull-dereference` warning in GCC 9
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
         fix_action(syn, &c->a, prefix, buf);
