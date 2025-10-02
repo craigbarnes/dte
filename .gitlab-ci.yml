@@ -129,13 +129,8 @@ android:
     script:
         - make docs htmlgz-aux
         - make gcovr-html
-        - make vvars check CC=musl-gcc LDFLAGS=-static DEBUG=0 SANE_WCTYPE=1
-        - strip dte
-        - tools/objsize.sh dte
-        - ldd dte || true
-        - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
-        - tar -czf "public/$TARNAME.tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5
-        - ln -s "$TARNAME.tar.gz" public/dte-master-linux-$(uname -m).tar.gz
+        - make portable
+        - ls -l public/dte-*.tar.gz
         - tree public/
 
 pages:
