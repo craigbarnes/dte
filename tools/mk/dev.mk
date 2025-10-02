@@ -30,7 +30,7 @@ tags:
 # For conveniently inspecting generated makefiles and their associated logs,
 # if something goes wrong
 dump-generated-makefiles: $(GEN_MKFILES)
-	$(Q) $(AWK) -f tools/cat.awk $^
+	$(Q) $(AWK) -f mk/cat.awk $^
 
 
 DEVMK := loaded

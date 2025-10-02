@@ -87,7 +87,8 @@ detect_cflags_for_var() {
 printf '' >"$LOGFILE"
 
 if ! cc_option; then
-    echo "$0:$LINENO: ERROR: Basic sanity test for \$CC ($CC) failed" | tee -a "$LOGFILE" >&2
+    echo "$0:$LINENO: ERROR: Basic sanity test for \$CC ($CC) failed" >>"$LOGFILE"
+    awk -f mk/cat.awk "$LOGFILE" >&2
     exit 1
 fi
 

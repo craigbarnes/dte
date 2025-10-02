@@ -27,12 +27,13 @@ iwyu_targets = $(addprefix iwyu-, $(all_sources))
 AWK_FILES = \
     config/script/longest-line.awk \
     mk/config2c.awk \
+    mk/cat.awk \
     tools/git-hooks/commit-msg \
-    $(foreach f, cat gcovr-txt hdrcheck iwyu-filter mkcheck wscheck, tools/$(f).awk)
+    $(foreach f, gcovr-txt hdrcheck iwyu-filter mkcheck wscheck, tools/$(f).awk)
 
 check-awk-config/script/longest-line.awk: src/msg.c
 check-awk-mk/config2c.awk: config/rc
-check-awk-tools/cat.awk: src/msg.c src/msg.h
+check-awk-mk/cat.awk: src/msg.c src/msg.h
 check-awk-tools/gcovr-txt.awk: tools/test/gcovr-report.txt
 check-awk-tools/git-hooks/commit-msg: tools/test/COMMIT_EDITMSG
 check-awk-tools/hdrcheck.awk: src/msg.c src/msg.h
