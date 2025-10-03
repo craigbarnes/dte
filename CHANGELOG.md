@@ -593,13 +593,17 @@ Portable Builds for Linux
 
 Some pre-built, portable binaries are available for Linux. They're
 statically-linked with [musl] libc and require nothing of the host
-system except a somewhat recent kernel.
+system except a somewhat recent kernel and a compatible CPU architecture
+(`x86_64` or `aarch64`).
 
-* [`dte-master-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dte/dte-master-linux-x86_64.tar.gz)
-* [`dte-1.11.1-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1-linux-x86_64.tar.gz)
+* [`dte-1.11.1-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1-linux-x86_64.tar.gz) (latest release, `x86_64`)
+* [`dte-1.11.1-linux-aarch64.tar.gz`](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.1-linux-aarch64.tar.gz) (latest release, `aarch64`)
+* [`dte-master-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dte/dte-master-linux-x86_64.tar.gz) (latest commit, `x86_64`)
+* [`dte-master-linux-aarch64.tar.gz`](https://craigbarnes.gitlab.io/dte/dte-master-linux-aarch64.tar.gz) (latest commit, `aarch64`)
 
-*Note*: only `x86_64` builds are available for now. Feel free to open an
-[issue] if you need builds for other architectures.
+*Note*: builds for `riscv64` may be added at some point in the future,
+but no other architectures or platforms will be hosted here. These
+builds are maintained on a "best effort" basis only.
 
 
 [website]: https://craigbarnes.gitlab.io/dte/
