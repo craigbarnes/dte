@@ -15,8 +15,8 @@ PORTABLE_MAKEFLAGS = \
     DEBUG=0
 
 define PORTABLE_SYMLINK
-	$(E) SYMLINK 'public/dte-master-linux-$(1).tar.gz'
-	$(Q) ln -sf 'dte-$(VERSION)-linux-$(1).tar.gz' 'public/dte-master-linux-$(1).tar.gz'
+  $(E) SYMLINK 'public/dte-master-linux-$(1).tar.gz'
+  $(Q) ln -sf 'dte-$(VERSION)-linux-$(1).tar.gz' 'public/dte-master-linux-$(1).tar.gz'
 endef
 
 portable: portable-x86_64 portable-aarch64
@@ -28,14 +28,13 @@ portable-x86_64: $(man) | public/
 	$(Q) test "`uname -sm`" = 'Linux x86_64'
 	$(Q) $(MAKE) vvars all $(PORTABLE_MAKEFLAGS) CC='$(MUSLGCC)'
 	$(E) ARCHIVE '$(TARBALL)'
-	$(Q) tar -czf '$(TARBALL)' $(dte) $^
+	$(Q) tar -czf '$(TARBALL)' dte $^
 
 portable-aarch64: private TARBALL = public/dte-$(VERSION)-linux-aarch64.tar.gz
 portable-aarch64: $(man) | public/
-	$(Q) test "`uname -s`" = Linux
 	$(Q) $(MAKE) vvars all $(PORTABLE_MAKEFLAGS) CC='$(MUSLGCC_AARCH64)'
 	$(E) ARCHIVE '$(TARBALL)'
-	$(Q) tar -czf '$(TARBALL)' $(dte) $^
+	$(Q) tar -czf '$(TARBALL)' dte $^
 
 
 NON_PARALLEL_TARGETS += portable portable-x86_64 portable-aarch64
