@@ -5,7 +5,6 @@
 #include "util/macros.h"
 
 typedef struct ErrorBuffer {
-    char buf[512];
     const char *command_name;
     const char *config_filename;
     unsigned int config_line;
@@ -13,6 +12,7 @@ typedef struct ErrorBuffer {
     bool is_error;
     bool print_to_stderr;
     bool stderr_errors_printed;
+    char buf[512];
 } ErrorBuffer;
 
 bool error_msg(ErrorBuffer *eb, const char *format, ...) COLD PRINTF(2) NONNULL_ARGS;
