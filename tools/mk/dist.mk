@@ -1,3 +1,6 @@
+TAR = tar
+TAR_EXTRACT = $(TAR) -xzf
+
 RELEASE_VERSIONS = \
     1.11.1 1.11 \
     1.10 \
@@ -16,7 +19,7 @@ distcheck: private TARDIR = build/dte-$(DISTVER)/
 distcheck: private DIST = dte-$(DISTVER).tar.gz
 distcheck: dist | build/
 	cp -f $(DIST) build/
-	cd build/ && tar -xzf $(DIST)
+	cd build/ && $(TAR_EXTRACT) $(DIST)
 	$(MAKE) -C$(TARDIR) -B check
 	$(MAKE) -C$(TARDIR) installcheck prefix=/usr DESTDIR=pkg
 	$(RM) -r '$(TARDIR)'

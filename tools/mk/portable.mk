@@ -6,6 +6,8 @@
 MUSLGCC ?= ccache musl-gcc
 MUSLGCC_AARCH64 ?= ccache aarch64-linux-musl-gcc
 
+TAR_CREATE = $(TAR) --owner=0 --group=0 --sort=name --numeric-owner -czf
+
 PORTABLE_MAKEFLAGS = \
     --no-print-directory \
     CFLAGS='-O2 -pipe -flto' \
@@ -28,13 +30,13 @@ portable-x86_64: $(man) | public/
 	$(Q) test "`uname -sm`" = 'Linux x86_64'
 	$(Q) $(MAKE) vvars all $(PORTABLE_MAKEFLAGS) CC='$(MUSLGCC)'
 	$(E) ARCHIVE '$(TARBALL)'
-	$(Q) tar -czf '$(TARBALL)' dte $^
+	$(Q) $(TAR_CREATE) '$(TARBALL)' dte $^
 
 portable-aarch64: private TARBALL = public/dte-$(VERSION)-linux-aarch64.tar.gz
 portable-aarch64: $(man) | public/
 	$(Q) $(MAKE) vvars all $(PORTABLE_MAKEFLAGS) CC='$(MUSLGCC_AARCH64)'
 	$(E) ARCHIVE '$(TARBALL)'
-	$(Q) tar -czf '$(TARBALL)' dte $^
+	$(Q) $(TAR_CREATE) '$(TARBALL)' dte $^
 
 
 NON_PARALLEL_TARGETS += portable portable-x86_64 portable-aarch64
