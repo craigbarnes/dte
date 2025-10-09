@@ -90,24 +90,25 @@ static bool cmd_alias(EditorState *e, const CommandArgs *a)
 {
     const char *const name = a->args[0];
     const char *const cmd = a->args[1];
+    ErrorBuffer *ebuf = &e->err;
 
     if (unlikely(name[0] == '\0')) {
-        return error_msg(&e->err, "Empty alias name not allowed");
+        return error_msg(ebuf, "Empty alias name not allowed");
     }
     if (unlikely(name[0] == '-')) {
         // Disallowing this simplifies auto-completion for "alias "
-        return error_msg(&e->err, "Alias name cannot begin with '-'");
+        return error_msg(ebuf, "Alias name cannot begin with '-'");
     }
 
     for (size_t i = 0; name[i]; i++) {
         unsigned char c = name[i];
         if (unlikely(!(is_word_byte(c) || c == '-' || c == '?' || c == '!'))) {
-            return error_msg(&e->err, "Invalid byte in alias name: %c (0x%02hhX)", c, c);
+            return error_msg(ebuf, "Invalid byte in alias name: %c (0x%02hhX)", c, c);
         }
     }
 
     if (unlikely(find_normal_command(name))) {
-        return error_msg(&e->err, "Can't replace existing command %s with an alias", name);
+        return error_msg(ebuf, "Can't replace existing command %s with an alias", name);
     }
 
     if (likely(cmd)) {
@@ -553,14 +554,15 @@ static bool cmd_cut(EditorState *e, const CommandArgs *a)
 
 static bool cmd_def_mode(EditorState *e, const CommandArgs *a)
 {
+    ErrorBuffer *ebuf = &e->err;
     const char *name = a->args[0];
     if (name[0] == '\0' || name[0] == '-' ) {
-        return error_msg(&e->err, "mode name can't be empty or start with '-'");
+        return error_msg(ebuf, "mode name can't be empty or start with '-'");
     }
 
     HashMap *modes = &e->modes;
     if (hashmap_get(modes, name)) {
-        return error_msg(&e->err, "mode '%s' already exists", name);
+        return error_msg(ebuf, "mode '%s' already exists", name);
     }
 
     PointerArray ftmodes = PTR_ARRAY_INIT;
@@ -569,14 +571,14 @@ static bool cmd_def_mode(EditorState *e, const CommandArgs *a)
         ModeHandler *mode = get_mode_handler(modes, ftname);
         if (unlikely(!mode)) {
             ptr_array_free_array(&ftmodes);
-            return error_msg(&e->err, "unknown fallthrough mode '%s'", ftname);
+            return error_msg(ebuf, "unknown fallthrough mode '%s'", ftname);
         }
         if (unlikely(mode->cmds != &normal_commands)) {
             // TODO: Support "command" and "search" as fallback modes?
             // If implemented, all involved modes need to use the same
             // `CommandSet`.
             ptr_array_free_array(&ftmodes);
-            return error_msg(&e->err, "unable to use '%s' as fall-through mode", ftname);
+            return error_msg(ebuf, "unable to use '%s' as fall-through mode", ftname);
         }
         ptr_array_append(&ftmodes, mode);
     }
@@ -1187,9 +1189,10 @@ static bool xglob(ErrorBuffer *ebuf, char **args, glob_t *globbuf)
 
 static bool cmd_open(EditorState *e, const CommandArgs *a)
 {
+    ErrorBuffer *ebuf = &e->err;
     bool temporary = has_flag(a, 't');
     if (unlikely(temporary && a->nr_args > 0)) {
-        return error_msg(&e->err, "'open -t' can't be used with filename arguments");
+        return error_msg(ebuf, "'open -t' can't be used with filename arguments");
     }
 
     const char *requested_encoding = NULL;
@@ -1211,10 +1214,10 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
             encoding = encoding_normalize(requested_encoding);
         } else {
             if (errno == EINVAL) {
-                return error_msg(&e->err, "Unsupported encoding '%s'", requested_encoding);
+                return error_msg(ebuf, "Unsupported encoding '%s'", requested_encoding);
             }
             return error_msg (
-                &e->err,
+                ebuf,
                 "iconv conversion from '%s' failed: %s",
                 requested_encoding,
                 strerror(errno)
@@ -1236,7 +1239,7 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
     glob_t globbuf;
     bool use_glob = has_flag(a, 'g');
     if (use_glob) {
-        if (!xglob(&e->err, args, &globbuf)) {
+        if (!xglob(ebuf, args, &globbuf)) {
             return false;
         }
         paths = globbuf.gl_pathv;
@@ -1257,19 +1260,20 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
     const char *arg0 = a->args[0];
     char **strs = a->args + 1;
     size_t nstrs = a->nr_args - 1;
+    ErrorBuffer *ebuf = &e->err;
     if (unlikely(arg0[0] == '\0')) {
-        return error_msg(&e->err, "first argument cannot be empty");
+        return error_msg(ebuf, "first argument cannot be empty");
     }
     if (unlikely(nstrs & 1)) {
-        return error_msg(&e->err, "missing option value");
+        return error_msg(ebuf, "missing option value");
     }
-    if (unlikely(!validate_local_options(&e->err, strs))) {
+    if (unlikely(!validate_local_options(ebuf, strs))) {
         return false;
     }
 
     PointerArray *opts = &e->file_options;
     if (has_flag(a, 'r')) {
-        FileTypeOrFileName u = {.filename = regexp_intern(&e->err, arg0)};
+        FileTypeOrFileName u = {.filename = regexp_intern(ebuf, arg0)};
         if (unlikely(!u.filename)) {
             return false;
         }
@@ -1281,7 +1285,7 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
     for (size_t pos = 0, len = strlen(arg0); pos < len; ) {
         const StringView ft = get_delim(arg0, &pos, len, ',');
         if (unlikely(!is_valid_filetype_name_sv(ft))) {
-            error_msg(&e->err, "invalid filetype name: '%.*s'", (int)ft.length, ft.data);
+            error_msg(ebuf, "invalid filetype name: '%.*s'", (int)ft.length, ft.data);
             errors++;
             continue;
         }
@@ -1466,14 +1470,15 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
         {'H', EFLAG_ALL_HIST},
     };
 
+    ErrorBuffer *ebuf = &e->err;
     int exit_code = EDITOR_EXIT_OK;
     if (a->nr_args) {
         if (!str_to_int(a->args[0], &exit_code)) {
-            return error_msg(&e->err, "Not a valid integer argument: '%s'", a->args[0]);
+            return error_msg(ebuf, "Not a valid integer argument: '%s'", a->args[0]);
         }
         int max = EDITOR_EXIT_MAX;
         if (exit_code < 0 || exit_code > max) {
-            return error_msg(&e->err, "Exit code should be between 0 and %d", max);
+            return error_msg(ebuf, "Exit code should be between 0 and %d", max);
         }
     }
 
@@ -1496,11 +1501,11 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
     set_view(view ? view : first_modified);
 
     if (!has_flag(a, 'p')) {
-        return error_msg(&e->err, "Save modified files or run 'quit -f' to quit without saving");
+        return error_msg(ebuf, "Save modified files or run 'quit -f' to quit without saving");
     }
 
     if (unlikely(e->flags & EFLAG_HEADLESS)) {
-        return error_msg(&e->err, "-p flag unavailable in headless mode");
+        return error_msg(ebuf, "-p flag unavailable in headless mode");
     }
 
     char question[128];
@@ -1545,13 +1550,18 @@ static bool cmd_refresh(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static bool repeat_insert(EditorState *e, const char *str, unsigned int count, bool move_after)
-{
+static bool repeat_insert (
+    View *view,
+    ErrorBuffer *ebuf,
+    const char *str,
+    unsigned int count,
+    bool move_after
+) {
     BUG_ON(count < 2);
     size_t str_len = strlen(str);
     size_t bufsize;
     if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
-        return error_msg(&e->err, "Repeated insert would overflow");
+        return error_msg(ebuf, "Repeated insert would overflow");
     }
     if (unlikely(bufsize == 0)) {
         return true;
@@ -1559,7 +1569,7 @@ static bool repeat_insert(EditorState *e, const char *str, unsigned int count, b
 
     char *buf = malloc(bufsize);
     if (unlikely(!buf)) {
-        return error_msg_errno(&e->err, "malloc");
+        return error_msg_errno(ebuf, "malloc");
     }
 
     char tmp[4096];
@@ -1601,7 +1611,7 @@ static bool repeat_insert(EditorState *e, const char *str, unsigned int count, b
     );
 
 insert:
-    insert_text(e->view, buf, bufsize, move_after);
+    insert_text(view, buf, bufsize, move_after);
     free(buf);
     return true;
 }
@@ -1649,7 +1659,8 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 
     if (count > 1 && cmd->cmd == cmd_insert && !has_flag(&a2, 'k')) {
         // Use optimized implementation for repeated "insert"
-        return repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
+        bool move_after = has_flag(&a2, 'm');
+        return repeat_insert(e->view, ebuf, a2.args[0], count, move_after);
     }
 
     while (count--) {
@@ -1734,9 +1745,10 @@ static SystemErrno save_unmodified_buffer(Buffer *buffer, const char *filename)
 static bool cmd_save(EditorState *e, const CommandArgs *a)
 {
     Buffer *buffer = e->buffer;
+    ErrorBuffer *ebuf = &e->err;
     if (unlikely(buffer->stdout_buffer)) {
         const char *f = buffer_filename(buffer);
-        return info_msg(&e->err, "%s can't be saved; it will be piped to stdout on exit", f);
+        return info_msg(ebuf, "%s can't be saved; it will be piped to stdout on exit", f);
     }
 
     char du_flag = cmdargs_pick_winning_flag(a, "du");
@@ -1768,10 +1780,10 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
             }
         } else {
             if (errno == EINVAL) {
-                return error_msg(&e->err, "Unsupported encoding '%s'", requested_encoding);
+                return error_msg(ebuf, "Unsupported encoding '%s'", requested_encoding);
             }
             return error_msg (
-                &e->err,
+                ebuf,
                 "iconv conversion to '%s' failed: %s",
                 requested_encoding,
                 strerror(errno)
@@ -1787,11 +1799,11 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     bool new_locked = false;
     if (a->nr_args > 0) {
         if (args[0][0] == '\0') {
-            return error_msg(&e->err, "Empty filename not allowed");
+            return error_msg(ebuf, "Empty filename not allowed");
         }
         char *tmp = path_absolute(args[0]);
         if (!tmp) {
-            return error_msg_errno(&e->err, "Failed to make absolute path");
+            return error_msg_errno(ebuf, "Failed to make absolute path");
         }
         if (absolute && streq(tmp, absolute)) {
             free(tmp);
@@ -1801,14 +1813,14 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     } else {
         if (!absolute) {
             if (!has_flag(a, 'p')) {
-                return error_msg(&e->err, "No filename");
+                return error_msg(ebuf, "No filename");
             }
             push_input_mode(e, e->command_mode);
             cmdline_set_text(&e->cmdline, "save ");
             return true;
         }
         if (buffer->readonly && !force) {
-            return error_msg(&e->err, "Use -f to force saving read-only file");
+            return error_msg(ebuf, "Use -f to force saving read-only file");
         }
     }
 
@@ -1818,7 +1830,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     bool stat_ok = !stat(absolute, &st);
     if (!stat_ok) {
         if (errno != ENOENT) {
-            error_msg(&e->err, "stat failed for %s: %s", absolute, strerror(errno));
+            error_msg(ebuf, "stat failed for %s: %s", absolute, strerror(errno));
             goto error;
         }
     } else {
@@ -1828,14 +1840,14 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
             && stat_changed(&buffer->file, &st)
         ) {
             error_msg (
-                &e->err,
+                ebuf,
                 "File has been modified by another process; "
                 "use 'save -f' to force overwrite"
             );
             goto error;
         }
         if (S_ISDIR(st.st_mode)) {
-            error_msg(&e->err, "Will not overwrite directory %s", absolute);
+            error_msg(ebuf, "Will not overwrite directory %s", absolute);
             goto error;
         }
         hardlinks = (st.st_nlink >= 2);
@@ -1844,9 +1856,9 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     if (e->options.lock_files) {
         if (absolute == buffer->abs_filename) {
             if (!buffer->locked) {
-                if (!lock_file(&e->locks_ctx, &e->err, absolute)) {
+                if (!lock_file(&e->locks_ctx, ebuf, absolute)) {
                     if (!force) {
-                        error_msg(&e->err, "Can't lock file %s", absolute);
+                        error_msg(ebuf, "Can't lock file %s", absolute);
                         goto error;
                     }
                 } else {
@@ -1854,9 +1866,9 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
                 }
             }
         } else {
-            if (!lock_file(&e->locks_ctx, &e->err, absolute)) {
+            if (!lock_file(&e->locks_ctx, ebuf, absolute)) {
                 if (!force) {
-                    error_msg(&e->err, "Can't lock file %s", absolute);
+                    error_msg(ebuf, "Can't lock file %s", absolute);
                     goto error;
                 }
             } else {
@@ -1867,7 +1879,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
 
     if (stat_ok) {
         if (absolute != buffer->abs_filename && !force) {
-            error_msg(&e->err, "Use -f to overwrite %s", absolute);
+            error_msg(ebuf, "Use -f to overwrite %s", absolute);
             goto error;
         }
         // Allow chmod 755 etc.
@@ -1892,7 +1904,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     }
 
     FileSaveContext ctx = {
-        .ebuf = &e->err,
+        .ebuf = ebuf,
         .encoding = encoding,
         .new_file_mode = e->new_file_mode,
         .crlf = crlf,
@@ -1916,7 +1928,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     if (absolute != buffer->abs_filename) {
         if (buffer->locked) {
             // Filename changes, release old file lock
-            unlock_file(&e->locks_ctx, &e->err, buffer->abs_filename);
+            unlock_file(&e->locks_ctx, ebuf, buffer->abs_filename);
         }
         buffer->locked = new_locked;
 
@@ -1941,7 +1953,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
 
 error:
     if (new_locked) {
-        unlock_file(&e->locks_ctx, &e->err, absolute);
+        unlock_file(&e->locks_ctx, ebuf, absolute);
     }
     if (absolute != buffer->abs_filename) {
         free(absolute);
