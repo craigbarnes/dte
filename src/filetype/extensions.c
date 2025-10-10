@@ -21,8 +21,10 @@ static const struct FileExtensionMap {
     {"btm", BATCH},
     {"bzl", PYTHON}, // https://bazel.build/rules/language
     {"c++", CPLUSPLUS},
+    {"c++m", CPLUSPLUS},
     {"cbl", COBOL},
     {"cc", CPLUSPLUS},
+    {"ccm", CPLUSPLUS},
     {"cjs", JAVASCRIPT},
     {"cl", LISP},
     {"clj", CLOJURE},
@@ -35,6 +37,7 @@ static const struct FileExtensionMap {
     {"cocci", COCCINELLE},
     {"coffee", COFFEESCRIPT},
     {"cpp", CPLUSPLUS},
+    {"cppm", CPLUSPLUS}, // https://clang.llvm.org/docs/StandardCPlusPlusModules.html#file-name-requirements
     {"cr", RUBY},
     {"cs", CSHARP},
     {"csh", CSH},
@@ -43,6 +46,7 @@ static const struct FileExtensionMap {
     {"css", CSS},
     {"csv", CSV},
     {"cxx", CPLUSPLUS},
+    {"cxxm", CPLUSPLUS},
     {"d2", D2},
     {"dart", DART},
     {"desktop", INI},
