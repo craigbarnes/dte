@@ -299,7 +299,7 @@
 #endif
 
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-// https://clang.llvm.org/docs/AttributeReference.html#counted-by
+// https://clang.llvm.org/docs/AttributeReference.html#counted-by-counted-by-or-null-sized-by-sized-by-or-null
 #if HAS_ATTRIBUTE(counted_by)
     // NOTE: DO NOT use this unless the array it's attached to is STRICTLY
     // bounded by the length `member`. A common counter-example of this
