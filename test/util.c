@@ -721,31 +721,27 @@ static void test_string(TestContext *ctx)
     EXPECT_NULL(s.buffer);
 
     EXPECT_EQ(string_insert_codepoint(&s, 0, 0x1F4AF), 4);
-    EXPECT_EQ(s.len, 4);
+    EXPECT_STRING_EQ_CSTRING(&s, "\xF0\x9F\x92\xAF");
     EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAF");
 
     string_append_cstring(&s, "test");
-    EXPECT_EQ(s.len, 8);
-    EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAFtest");
+    EXPECT_STRING_EQ_CSTRING(&s, "\xF0\x9F\x92\xAFtest");
 
     string_remove(&s, 0, 5);
     EXPECT_EQ(s.len, 3);
-    EXPECT_STREQ(string_borrow_cstring(&s), "est");
+    EXPECT_STRING_EQ_CSTRING(&s, "est");
 
     EXPECT_EQ(string_insert_codepoint(&s, 0, 't'), 1);
-    EXPECT_EQ(s.len, 4);
-    EXPECT_STREQ(string_borrow_cstring(&s), "test");
+    EXPECT_STRING_EQ_CSTRING(&s, "test");
 
     EXPECT_EQ(string_clear(&s), 4);
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(string_insert_codepoint(&s, 0, 0x0E01), 3);
-    EXPECT_EQ(s.len, 3);
-    EXPECT_STREQ(string_borrow_cstring(&s), "\xE0\xB8\x81");
+    EXPECT_STRING_EQ_CSTRING(&s, "\xE0\xB8\x81");
 
     EXPECT_EQ(string_clear(&s), 3);
     string_sprintf(&s, "%d %s\n", 88, "test");
-    EXPECT_EQ(s.len, 8);
-    EXPECT_STREQ(string_borrow_cstring(&s), "88 test\n");
+    EXPECT_STRING_EQ_CSTRING(&s, "88 test\n");
 
     string_free(&s);
     EXPECT_EQ(s.len, 0);
@@ -766,34 +762,30 @@ static void test_string(TestContext *ctx)
 
     s = string_new(12);
     EXPECT_EQ(s.len, 0);
-    EXPECT_EQ(s.alloc, 16);
+    EXPECT_EQ3(s.alloc, 16, STRING_ALLOC_MULTIPLE);
     ASSERT_NONNULL(s.buffer);
 
     string_append_cstring(&s, "123");
-    EXPECT_STREQ(string_borrow_cstring(&s), "123");
-    EXPECT_EQ(s.len, 3);
+    EXPECT_STRING_EQ_CSTRING(&s, "123");
 
     string_append_string(&s, &s);
-    EXPECT_STREQ(string_borrow_cstring(&s), "123123");
-    EXPECT_EQ(s.len, 6);
+    EXPECT_STRING_EQ_CSTRING(&s, "123123");
 
     string_insert_buf(&s, 2, STRN("foo"));
-    EXPECT_STREQ(string_borrow_cstring(&s), "12foo3123");
-    EXPECT_EQ(s.len, 9);
+    EXPECT_STRING_EQ_CSTRING(&s, "12foo3123");
 
     cstr = string_clone_cstring(&s);
     EXPECT_STREQ(cstr, "12foo3123");
 
     EXPECT_EQ(string_insert_codepoint(&s, 0, '>'), 1);
-    EXPECT_STREQ(string_borrow_cstring(&s), ">12foo3123");
-    EXPECT_EQ(s.len, 10);
+    EXPECT_STRING_EQ_CSTRING(&s, ">12foo3123");
 
     string_replace_byte(&s, '1', '_');
-    EXPECT_STREQ(string_borrow_cstring(&s), ">_2foo3_23");
+    EXPECT_STRING_EQ_CSTRING(&s, ">_2foo3_23");
     string_replace_byte(&s, '_', '.');
     string_replace_byte(&s, '2', '+');
     string_replace_byte(&s, '3', '$');
-    EXPECT_STREQ(string_borrow_cstring(&s), ">.+foo$.+$");
+    EXPECT_STRING_EQ_CSTRING(&s, ">.+foo$.+$");
 
     string_free(&s);
     EXPECT_NULL(s.buffer);
@@ -801,6 +793,12 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.alloc, 0);
     EXPECT_STREQ(cstr, "12foo3123");
     free(cstr);
+
+    EXPECT_STREQ(string_borrow_cstring(&s), "");
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ3(s.alloc, 16, STRING_ALLOC_MULTIPLE);
+    EXPECT_NONNULL(s.buffer);
+    string_free(&s);
 
     // This is mostly for UBSan coverage
     // See also: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3322.pdf
@@ -818,11 +816,20 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.alloc, 0);
     string_free(&s);
 
-    s = string_new_from_buf(STRN("1234567"));
-    EXPECT_EQ(s.len, 7);
-    EXPECT_EQ(s.alloc, 16);
-    EXPECT_STREQ(string_borrow_cstring(&s), "1234567");
+    // string_sprintf() always reserves and writes at least 1 byte,
+    // for null-termination. This isn't strictly necessary and is only
+    // tested here for completeness.
+    string_sprintf(&s, "%s", "");
+    EXPECT_EQ3(s.alloc, 16, STRING_ALLOC_MULTIPLE);
     string_free(&s);
+
+    s = string_new_from_buf(STRN("1234567"));
+    EXPECT_STRING_EQ_CSTRING(&s, "1234567");
+    EXPECT_EQ3(s.alloc, 16, STRING_ALLOC_MULTIPLE);
+    string_free(&s);
+    EXPECT_NULL(s.buffer);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
 }
 
 static void test_string_view(TestContext *ctx)

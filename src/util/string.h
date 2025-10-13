@@ -10,6 +10,10 @@
 #include "unicode.h"
 #include "xmalloc.h"
 
+enum {
+    STRING_ALLOC_MULTIPLE = 16,
+};
+
 typedef struct {
     char NONSTRING *buffer;
     size_t alloc;
@@ -28,7 +32,7 @@ void string_append_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1) NO
 
 static inline String string_new(size_t size)
 {
-    size = next_multiple(size, 16);
+    size = next_multiple(size, STRING_ALLOC_MULTIPLE);
     return (String) {
         .buffer = size ? xmalloc(size) : NULL,
         .alloc = size,
@@ -38,7 +42,7 @@ static inline String string_new(size_t size)
 
 static inline String string_new_from_buf(const char *buf, size_t len)
 {
-    size_t alloc = next_multiple(len, 16);
+    size_t alloc = next_multiple(len, STRING_ALLOC_MULTIPLE);
     return (String) {
         .buffer = len ? memcpy(xmalloc(alloc), buf, len) : NULL,
         .alloc = alloc,

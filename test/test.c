@@ -81,6 +81,11 @@ void expect_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_
     expect(a == b, ctx, file, line, "Values not equal: %jd, %jd", a, b);
 }
 
+void expect_eq3(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b, intmax_t c)
+{
+    expect(a == b && a == c, ctx, file, line, "Values not equal: %jd, %jd, %jd", a, b, c);
+}
+
 void expect_ne(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b)
 {
     expect(a != b, ctx, file, line, "Unexpected equal values: %jd, %jd", a, b);
