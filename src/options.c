@@ -219,12 +219,6 @@ static const char *str_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
     return s ? s : "";
 }
 
-static bool str_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
-{
-    const char **strp = ptr;
-    return xstreq(*strp, v.str_val);
-}
-
 static OptionValue re_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     const InternedRegexp *const *irp = ptr;
@@ -249,12 +243,6 @@ static bool re_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, const c
     bool valid = regexp_is_interned(str) || regexp_is_valid(ebuf, str, REG_NEWLINE);
     v->str_val = valid ? str : NULL;
     return valid;
-}
-
-static bool re_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
-{
-    const InternedRegexp **irp = ptr;
-    return *irp ? xstreq((*irp)->str, v.str_val) : !v.str_val;
 }
 
 static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
@@ -291,12 +279,6 @@ static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue v
     return uint_to_str(value.uint_val);
 }
 
-static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
-{
-    const unsigned int *valp = ptr;
-    return *valp == value.uint_val;
-}
-
 static OptionValue uint8_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     const uint8_t *valp = ptr;
@@ -307,12 +289,6 @@ static void uint8_set(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue
 {
     uint8_t *valp = ptr;
     *valp = (uint8_t)value.uint_val;
-}
-
-static bool uint8_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
-{
-    const uint8_t *valp = ptr;
-    return (unsigned int)(*valp) == value.uint_val;
 }
 
 static OptionValue bool_get(const OptionDesc* UNUSED_ARG(d), void *ptr)
@@ -340,12 +316,6 @@ static bool bool_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
 static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
 {
     return v.bool_val ? "true" : "false";
-}
-
-static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
-{
-    const bool *valp = ptr;
-    return *valp == v.bool_val;
 }
 
 static bool enum_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, OptionValue *v)
@@ -470,16 +440,15 @@ static const struct {
     void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
     bool (*parse)(const OptionDesc *desc, ErrorBuffer *ebuf, const char *str, OptionValue *value);
     const char *(*string)(const OptionDesc *desc, OptionValue value);
-    bool (*equals)(const OptionDesc *desc, void *ptr, OptionValue value);
 } option_ops[] = {
-    [OPT_STR] = {str_get, str_set, str_parse, str_string, str_equals},
-    [OPT_UINT] = {uint_get, uint_set, uint_parse, uint_string, uint_equals},
-    [OPT_UINT8] = {uint8_get, uint8_set, uint_parse, uint_string, uint8_equals},
-    [OPT_ENUM] = {uint8_get, uint8_set, enum_parse, enum_string, uint8_equals},
-    [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals},
-    [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals},
-    [OPT_REGEX] = {re_get, re_set, re_parse, str_string, re_equals},
-    [OPT_FILESIZE] = {uint_get, uint_set, fsize_parse, fsize_string, uint_equals},
+    [OPT_STR] = {str_get, str_set, str_parse, str_string},
+    [OPT_UINT] = {uint_get, uint_set, uint_parse, uint_string},
+    [OPT_UINT8] = {uint8_get, uint8_set, uint_parse, uint_string},
+    [OPT_ENUM] = {uint8_get, uint8_set, enum_parse, enum_string},
+    [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string},
+    [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string},
+    [OPT_REGEX] = {re_get, re_set, re_parse, str_string},
+    [OPT_FILESIZE] = {uint_get, uint_set, fsize_parse, fsize_string},
 };
 
 static const char *const bool_enum[] = {"false", "true", NULL};
@@ -658,14 +627,29 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(option_desc, name);
 }
 
-static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue value)
-{
-    return option_ops[desc->type].equals(desc, ptr, value);
-}
-
 static OptionValue desc_get(const OptionDesc *desc, void *ptr)
 {
     return option_ops[desc->type].get(desc, ptr);
+}
+
+static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue ref)
+{
+    OptionValue current = desc_get(desc, ptr);
+    switch (desc->type) {
+    case OPT_STR:
+    case OPT_REGEX:
+        return xstreq(current.str_val, ref.str_val);
+    case OPT_BOOL:
+        return current.bool_val == ref.bool_val;
+    case OPT_UINT:
+    case OPT_UINT8:
+    case OPT_ENUM:
+    case OPT_FLAG:
+    case OPT_FILESIZE:
+        return current.uint_val == ref.uint_val;
+    }
+
+    BUG("unhandled option type");
 }
 
 static void desc_set(EditorState *e, const OptionDesc *desc, void *ptr, bool global, OptionValue value)
