@@ -194,13 +194,13 @@ static bool validate_filetype(ErrorBuffer *ebuf, const char *value)
     return true;
 }
 
-static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
+static OptionValue str_get(void *ptr)
 {
     const char *const *strp = ptr;
     return (OptionValue){.str_val = *strp};
 }
 
-static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+static void str_set(void *ptr, OptionValue v)
 {
     const char **strp = ptr;
     *strp = str_intern(v.str_val);
@@ -219,13 +219,13 @@ static const char *str_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
     return s ? s : "";
 }
 
-static OptionValue re_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
+static OptionValue re_get(void *ptr)
 {
     const InternedRegexp *const *irp = ptr;
     return (OptionValue){.str_val = *irp ? (*irp)->str : NULL};
 }
 
-static void re_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+static void re_set(void *ptr, OptionValue v)
 {
     // Note that this function is only ever called if re_parse() has already
     // validated the pattern
@@ -245,13 +245,13 @@ static bool re_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, const c
     return valid;
 }
 
-static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
+static OptionValue uint_get(void *ptr)
 {
     const unsigned int *valp = ptr;
     return (OptionValue){.uint_val = *valp};
 }
 
-static void uint_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+static void uint_set(void *ptr, OptionValue v)
 {
     unsigned int *valp = ptr;
     *valp = v.uint_val;
@@ -279,25 +279,25 @@ static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue v
     return uint_to_str(value.uint_val);
 }
 
-static OptionValue uint8_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
+static OptionValue uint8_get(void *ptr)
 {
     const uint8_t *valp = ptr;
     return (OptionValue){.uint_val = (unsigned int)(*valp)};
 }
 
-static void uint8_set(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
+static void uint8_set(void *ptr, OptionValue value)
 {
     uint8_t *valp = ptr;
     *valp = (uint8_t)value.uint_val;
 }
 
-static OptionValue bool_get(const OptionDesc* UNUSED_ARG(d), void *ptr)
+static OptionValue bool_get(void *ptr)
 {
     const bool *valp = ptr;
     return (OptionValue){.bool_val = *valp};
 }
 
-static void bool_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+static void bool_set(void *ptr, OptionValue v)
 {
     bool *valp = ptr;
     *valp = v.bool_val;
@@ -436,8 +436,8 @@ static const char *fsize_string(const OptionDesc* UNUSED_ARG(d), OptionValue val
 }
 
 static const struct {
-    OptionValue (*get)(const OptionDesc *desc, void *ptr);
-    void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
+    OptionValue (*get)(void *ptr);
+    void (*set)(void *ptr, OptionValue value);
     bool (*parse)(const OptionDesc *desc, ErrorBuffer *ebuf, const char *str, OptionValue *value);
     const char *(*string)(const OptionDesc *desc, OptionValue value);
 } option_ops[] = {
@@ -629,7 +629,7 @@ UNITTEST {
 
 static OptionValue desc_get(const OptionDesc *desc, void *ptr)
 {
-    return option_ops[desc->type].get(desc, ptr);
+    return option_ops[desc->type].get(ptr);
 }
 
 static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue ref)
@@ -658,7 +658,7 @@ static void desc_set(EditorState *e, const OptionDesc *desc, void *ptr, bool glo
         return;
     }
 
-    option_ops[desc->type].set(desc, ptr, value);
+    option_ops[desc->type].set(ptr, value);
     if (desc->on_change) {
         desc->on_change(e, global);
     }
