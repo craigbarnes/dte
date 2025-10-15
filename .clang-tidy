@@ -109,20 +109,37 @@ CheckOptions:
     bugprone-unused-return-value.CheckedReturnTypes: ^(ExitCode|String|SystemErrno)$
     bugprone-unused-return-value.AllowCastToVoid: true
     bugprone-unused-return-value.CheckedFunctions: >
+        ^([fl]?chown|fchownat)$;
         ^(fd)?opendir$;
         ^(f|fd|fre)open$;
         ^(m|c|re)alloc$;
+        ^(sym)?link(at)?$;
         ^clock_gettime$;
+        ^dup[23]?$;
+        ^f?chdir$;
+        ^f?truncate$;
+        ^getcwd$;
         ^m(un)?map$;
         ^mkdir(at)?$;
         ^open(at)?$;
         ^p?(read|write)v?$;
+        ^pipe2?$;
+        ^readlink(at)?$;
         ^reg(comp|exec)$;
         ^remove$;
-        ^rename$;
+        ^rename(at)?$;
+        ^rmdir$;
+        ^set(e|re)?(gid|uid)$;
+        ^setenv$;
         ^setlocale$;
+        ^setpgid$;
+        ^setpgrp$;
+        ^setsid$;
         ^sigprocmask$;
         ^strftime$;
+        ^tc(get|set)attr$;
+        ^tcsetpgrp$;
+        ^unlink(at)?$;
 
     # https://clang.llvm.org/extra/clang-tidy/checks/bugprone/unsafe-functions.html#custom-functions
     bugprone-unsafe-functions.ReportDefaultFunctions: false
@@ -151,6 +168,8 @@ CheckOptions:
         ^reallocarray$,xreallocarray,needs explicit ENOMEM handling and is a recent POSIX addition (issue 8, 2024);
         ^asprintf$,xasprintf,needs explicit ENOMEM/EOVERFLOW/EILSEQ handling and isn't specified by POSIX;
         ^vasprintf$,xvasprintf,needs explicit ENOMEM/EOVERFLOW/EILSEQ handling and isn't specified by POSIX;
+        ^vsprintf$,vsnprintf;
+        ^sprintf$,snprintf;
         ^strdup$,xstrdup,needs explicit ENOMEM handling;
         ^strndup$,a different function,is a code smell;
         ^mempcpy$,xmempcpy,is non-portable (non-POSIX);
@@ -161,6 +180,7 @@ CheckOptions:
         ^fsync$,xfsync,is optional in POSIX;
         ^posix_madvise$,advise_sequential,is optional in POSIX;
         ^signal$,sigaction,is obsolete;
+        ^getwd$,getcwd,is obsolete;
         ^tow?(lower|upper)$,,is locale-dependant;
         ^isw?(alnum|alpha|blank|cntrl|x?digit|graph|lower|print|punct|space|upper)$,,is locale-dependant;
 

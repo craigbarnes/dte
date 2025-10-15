@@ -61,10 +61,10 @@ static noreturn void child_process_exec (
     }
 
     if (lines) {
-        setenv("LINES", uint_to_str(lines), 1);
+        (void)!setenv("LINES", uint_to_str(lines), 1);
     }
     if (columns) {
-        setenv("COLUMNS", uint_to_str(columns), 1);
+        (void)!setenv("COLUMNS", uint_to_str(columns), 1);
     }
 
     if (unlikely(!reset_ignored_signals())) {

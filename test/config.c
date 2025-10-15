@@ -12,6 +12,7 @@
 #include "mode.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
@@ -115,11 +116,13 @@ static void test_exec_config(TestContext *ctx)
     };
 
     // Delete output files left over from previous runs
-    unlink("build/test/thai-tis620.txt");
+    int r = unlink("build/test/thai-tis620.txt");
+    LOG_ERRNO_ON(r && errno != ENOENT, "unlink")
     FOR_EACH_I(i, outfiles) {
         char out[64];
         xsnprintf(out, sizeof out, "build/test/%s", outfiles[i]);
-        unlink(out);
+        r = unlink(out);
+        LOG_ERRNO_ON(r && errno != ENOENT, "unlink")
     }
 
     // Execute *.dterc files

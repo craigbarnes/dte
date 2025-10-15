@@ -459,7 +459,8 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
 error:
     xclose(fd);
     if (tmp[0]) {
-        unlink(tmp);
+        int r = unlink(tmp);
+        LOG_ERRNO_ON(r, "unlink");
     } else {
         // Not using temporary file, therefore mtime may have changed.
         // Update stat to avoid "File has been modified by someone else"
