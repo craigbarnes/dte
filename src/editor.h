@@ -81,8 +81,8 @@ typedef struct EditorState {
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;
-    StringView home_dir;
-    const char *user_config_dir;
+    StringView home_dir; // $HOME (interned)
+    const char *user_config_dir; // $DTE_HOME or equivalent (interned)
     mode_t new_file_mode;
     EditorFlags flags;
     ScreenUpdateFlags screen_update;

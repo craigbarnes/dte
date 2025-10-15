@@ -12,6 +12,7 @@
 #include "terminal/terminal.h"
 #include "trace.h"
 #include "util/fd.h"
+#include "util/intern.h"
 #include "util/log.h"
 #include "util/path.h"
 #include "util/xreadwrite.h"
@@ -166,6 +167,8 @@ static void test_init(TestContext *ctx)
     ASSERT_NONNULL(e->home_dir.data);
     EXPECT_STREQ(e->user_config_dir, dte_home);
     EXPECT_STRVIEW_EQ_CSTRING(e->home_dir, home);
+    EXPECT_PTREQ(e->user_config_dir, str_intern(dte_home));
+    EXPECT_PTREQ(e->home_dir.data, str_intern(home));
     free(home);
     free(dte_home);
     e->options.lock_files = false;

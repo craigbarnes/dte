@@ -27,6 +27,7 @@
 #include "util/log.h"
 #include "util/time-util.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 #include "util/xstdio.h"
 #include "version.h"
 
@@ -66,6 +67,20 @@ static mode_t get_umask(void)
     return old;
 }
 
+static const char *get_user_config_dir(const char *home, const char *dte_home)
+{
+    if (dte_home) {
+        return str_intern(dte_home);
+    }
+
+    // TODO: Use "${XDG_CONFIG_HOME:-$HOME/.config}/dte", either if it
+    // exists or (as a default) if "$HOME/.dte" *doesn't* exist. The
+    // latter case may also require one or more calls to mkdir(3).
+
+    char buf[8192];
+    return mem_intern(buf, xsnprintf(buf, sizeof buf, "%s/.dte", home));
+}
+
 EditorState *init_editor_state(const char *home, const char *dte_home)
 {
     set_and_check_locale();
@@ -75,7 +90,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
         .home_dir = strview_intern(home),
-        .user_config_dir = dte_home ? xstrdup(dte_home) : xstrjoin(home, "/.dte"),
+        .user_config_dir = get_user_config_dir(home, dte_home),
         .flags = EFLAG_HEADLESS,
         .command_history = {
             .max_entries = 512,
@@ -229,10 +244,6 @@ void free_editor_state(EditorState *e)
 
     free_interned_strings();
     free_interned_regexps();
-
-    // TODO: intern this (so that it's freed by free_interned_strings())
-    free((void*)e->user_config_dir);
-
     free(e);
 }
 
