@@ -1302,7 +1302,7 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
     handle_selection_flags(view, a);
 
     // If current line is blank, skip past consecutive blank lines
-    StringView line = get_current_line(&view->cursor);
+    StringView line = get_current_line(view->cursor);
     if (strview_isblank(line)) {
         while (block_iter_next_line(&view->cursor)) {
             line = block_iter_get_line(&view->cursor);
@@ -1343,7 +1343,7 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
     }
 
     // If current line is blank, skip past consecutive blank lines
-    StringView line = get_current_line(&view->cursor);
+    StringView line = get_current_line(view->cursor);
     if (strview_isblank(line)) {
         while (block_iter_prev_line(&view->cursor)) {
             line = block_iter_get_line(&view->cursor);

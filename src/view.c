@@ -28,14 +28,14 @@ void view_update_cursor_y(View *view)
 
 void view_update_cursor_x(View *view)
 {
-    StringView line;
     const unsigned int tw = view->buffer->options.tab_width;
-    const size_t cx = get_current_line_and_offset(&view->cursor, &line);
+    const CurrentLineRef lr = get_current_line_and_offset(view->cursor);
+    const size_t cx = lr.cursor_offset;
     long cx_char = 0;
     long w = 0;
 
     for (size_t idx = 0; idx < cx; cx_char++) {
-        unsigned char ch = line.data[idx];
+        unsigned char ch = lr.line.data[idx];
         if (likely(ch < 0x80)) {
             idx++;
             if (likely(!ascii_iscntrl(ch))) {
@@ -46,7 +46,7 @@ void view_update_cursor_x(View *view)
                 w += 2;
             }
         } else {
-            CodePoint u = u_get_nonascii(line.data, line.length, &idx);
+            CodePoint u = u_get_nonascii(lr.line.data, lr.line.length, &idx);
             w += u_char_width(u);
         }
     }
@@ -148,37 +148,41 @@ size_t view_remove(View *view)
     return view_idx;
 }
 
-size_t get_bounds_for_word_under_cursor(StringView line, size_t *cursor_offset)
+WordBounds get_bounds_for_word_under_cursor(CurrentLineRef lr)
 {
+    const char *const line = lr.line.data;
+    const size_t linelen = lr.line.length;
+    size_t si = lr.cursor_offset;
+    BUG_ON(si > linelen);
+
     // Move right, until over a word char (if not already)
-    size_t si = *cursor_offset;
-    while (si < line.length) {
+    while (si < linelen) {
         size_t i = si;
-        if (u_is_word_char(u_get_char(line.data, line.length, &i))) {
+        if (u_is_word_char(u_get_char(line, linelen, &i))) {
             break;
         }
         si = i;
     }
 
-    if (si == line.length) {
+    if (si == linelen) {
         // No word char between cursor and EOL; no word
-        return 0;
+        return (WordBounds){0};
     }
 
     // Move left, to start of word (if cursor is already within one)
     size_t ei = si;
     while (si > 0) {
         size_t i = si;
-        if (!u_is_word_char(u_prev_char(line.data, &i))) {
+        if (!u_is_word_char(u_prev_char(line, &i))) {
             break;
         }
         si = i;
     }
 
     // Move right, to end of word
-    while (ei < line.length) {
+    while (ei < linelen) {
         size_t i = ei;
-        if (!u_is_word_char(u_get_char(line.data, line.length, &i))) {
+        if (!u_is_word_char(u_get_char(line, linelen, &i))) {
             break;
         }
         ei = i;
@@ -186,22 +190,21 @@ size_t get_bounds_for_word_under_cursor(StringView line, size_t *cursor_offset)
 
     if (si == ei) {
         // Zero length; no word
-        return 0;
+        return (WordBounds){0};
     }
 
-    // Update `cursor_offset` with start offset and return end offset
     BUG_ON(ei == 0 || si >= ei);
-    *cursor_offset = si;
-    return ei;
+    return (WordBounds) {
+        .start = si,
+        .end = ei,
+    };
 }
 
 StringView view_get_word_under_cursor(const View *view)
 {
-    StringView line;
-    size_t cursor_offset_in_line = get_current_line_and_offset(&view->cursor, &line);
-    size_t start = cursor_offset_in_line;
-    size_t end = get_bounds_for_word_under_cursor(line, &start);
-    return string_view(line.data + start, end ? end - start : 0);
+    CurrentLineRef lr = get_current_line_and_offset(view->cursor);
+    WordBounds wb = get_bounds_for_word_under_cursor(lr);
+    return string_view(lr.line.data + wb.start, wb.end ? wb.end - wb.start : 0);
 }
 
 String dump_buffer(const View *view)

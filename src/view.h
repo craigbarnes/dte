@@ -46,6 +46,11 @@ typedef struct View {
     size_t saved_cursor_offset;
 } View;
 
+typedef struct {
+    size_t start;
+    size_t end;
+} WordBounds;
+
 // If View::sel_eo is set to this value it means the offset must
 // be calculated from the cursor iterator. Otherwise the offset
 // is precalculated and may not be the same as the cursor position
@@ -64,7 +69,7 @@ long view_get_preferred_x(View *view) NONNULL_ARGS;
 bool view_can_close(const View *view) NONNULL_ARGS;
 size_t view_remove(View *view) NONNULL_ARGS;
 StringView view_get_word_under_cursor(const View *view) NONNULL_ARGS;
-size_t get_bounds_for_word_under_cursor(StringView line, size_t *cursor_offset) NONNULL_ARGS READWRITE(2);
+WordBounds get_bounds_for_word_under_cursor(CurrentLineRef lr);
 String dump_buffer(const View *view) NONNULL_ARGS;
 
 #endif

@@ -18,6 +18,11 @@ typedef struct {
     size_t offset; // The current position within `blk->data`
 } BlockIter;
 
+typedef struct {
+    StringView line;
+    size_t cursor_offset;
+} CurrentLineRef;
+
 static inline void block_iter_bof(BlockIter *bi)
 {
     bi->blk = BLOCK(bi->head->next);
@@ -96,21 +101,21 @@ static inline StringView block_iter_get_line(BlockIter *bi)
 }
 
 // Like block_iter_get_line(), but always returning whole lines
-static inline StringView get_current_line(const BlockIter *bi)
+static inline StringView get_current_line(BlockIter tmp)
 {
-    BlockIter tmp = *bi;
     block_iter_bol(&tmp);
     return block_iter_get_line(&tmp);
 }
 
-// Like get_current_line(), but returning the cursor offset (relative to BOL)
-// and setting `line` via an out-param
-static inline size_t get_current_line_and_offset(const BlockIter *bi, StringView *line)
+// Like get_current_line(), but returning a struct that also includes the
+// cursor offset (relative to BOL)
+static inline CurrentLineRef get_current_line_and_offset(BlockIter tmp)
 {
-    BlockIter tmp = *bi;
-    size_t count = block_iter_bol(&tmp);
-    *line = block_iter_get_line(&tmp);
-    return count;
+    size_t offset = block_iter_bol(&tmp);
+    return (CurrentLineRef) {
+        .line = block_iter_get_line(&tmp),
+        .cursor_offset = offset,
+    };
 }
 
 #endif

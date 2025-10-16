@@ -156,7 +156,7 @@ void insert_ch(View *view, CodePoint ch)
         BlockIter bi = view->cursor;
         del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
     } else if (ch == '}' && options->auto_indent && options->brace_indent) {
-        StringView line = get_current_line(&view->cursor);
+        StringView line = get_current_line(view->cursor);
         if (strview_isblank(line)) {
             int width = get_indent_of_matching_brace(view);
             if (width >= 0) {

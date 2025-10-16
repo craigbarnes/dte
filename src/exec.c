@@ -309,19 +309,18 @@ ssize_t handle_exec (
     case EXEC_WORD:
         input_from_buffer = true;
         if (!view->selection) {
-            StringView line;
-            size_t offset = get_current_line_and_offset(&view->cursor, &line);
-            size_t start = offset;
-            size_t end = get_bounds_for_word_under_cursor(line, &start);
-            if (end == 0) {
+            CurrentLineRef lr = get_current_line_and_offset(view->cursor);
+            WordBounds wb = get_bounds_for_word_under_cursor(lr);
+            if (wb.end == 0) {
                 break;
             }
 
-            // If `start` is less than `offset` here, the subtraction wraps
-            // but nevertheless works as intended
-            view->cursor.offset += start - offset; // == view->cursor.offset -= (offset - start)
+            // If `wb.start` is less than `lr.cursor_offset` here, the
+            // subtraction wraps but nevertheless works as intended.
+            // view->cursor.offset -= (lr.cursor_offset - wb.start) ==
+            view->cursor.offset += wb.start - lr.cursor_offset;
 
-            ctx.input.length = end - start;
+            ctx.input.length = wb.end - wb.start;
             BUG_ON(view->cursor.offset >= view->cursor.blk->size);
             replace_unselected_input = true;
         }

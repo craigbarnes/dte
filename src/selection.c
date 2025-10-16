@@ -121,7 +121,7 @@ bool line_has_closing_brace(StringView line)
 void select_block(View *view)
 {
     BlockIter bi = view->cursor;
-    StringView line = get_current_line(&bi);
+    StringView line = get_current_line(bi);
 
     // If current line does not match \{\s*$ but matches ^\s*\} then
     // cursor is likely at end of the block you want to select
@@ -132,7 +132,7 @@ void select_block(View *view)
     BlockIter sbi;
     int level = 0;
     while (1) {
-        line = get_current_line(&bi);
+        line = get_current_line(bi);
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
                 sbi = bi;
@@ -151,7 +151,7 @@ void select_block(View *view)
 
     BlockIter ebi;
     while (1) {
-        line = get_current_line(&bi);
+        line = get_current_line(bi);
         if (line_has_closing_brace(line)) {
             if (--level == 0) {
                 ebi = bi;

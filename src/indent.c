@@ -169,16 +169,15 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter
 {
     unsigned int iw = options->indent_width;
     unsigned int tw = options->tab_width;
-    StringView line;
-    size_t cursor_offset = get_current_line_and_offset(cursor, &line);
-    ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset, iw, tw);
+    CurrentLineRef lr = get_current_line_and_offset(*cursor);
+    ssize_t ibytes = get_current_indent_bytes(lr.line.data, lr.cursor_offset, iw, tw);
     if (ibytes < 0) {
         return 0;
     }
 
     size_t width = 0;
-    for (size_t i = cursor_offset, n = line.length; i < n; i++) {
-        switch (line.data[i]) {
+    for (size_t i = lr.cursor_offset, n = lr.line.length; i < n; i++) {
+        switch (lr.line.data[i]) {
         case '\t':
             width = next_indent_width(width, tw);
             break;
@@ -190,7 +189,7 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter
             return 0;
         }
         if (indent_remainder(width, iw) == 0) {
-            return i - cursor_offset + 1;
+            return i - lr.cursor_offset + 1;
         }
     }
 
