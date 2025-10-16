@@ -29,13 +29,13 @@ portable-x86_64: private TARBALL = public/dte-$(VERSION)-linux-x86_64.tar.gz
 portable-x86_64: $(man) | public/
 	$(Q) test "`uname -sm`" = 'Linux x86_64'
 	$(Q) $(MAKE) vvars all $(PORTABLE_MAKEFLAGS) CC='$(MUSLGCC)'
-	$(E) ARCHIVE '$(TARBALL)'
+	$(E) TAR '$(TARBALL)'
 	$(Q) $(TAR_CREATE) '$(TARBALL)' dte $^
 
 portable-aarch64: private TARBALL = public/dte-$(VERSION)-linux-aarch64.tar.gz
 portable-aarch64: $(man) | public/
 	$(Q) $(MAKE) vvars all $(PORTABLE_MAKEFLAGS) CC='$(MUSLGCC_AARCH64)'
-	$(E) ARCHIVE '$(TARBALL)'
+	$(E) TAR '$(TARBALL)'
 	$(Q) $(TAR_CREATE) '$(TARBALL)' dte $^
 
 
