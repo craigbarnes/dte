@@ -216,6 +216,7 @@ static CharTypeEnum get_char_type(CodePoint u)
 }
 
 UNITTEST {
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     BUG_ON(get_char_type('\n') != CT_NEWLINE);
     BUG_ON(get_char_type('\t') != CT_SPACE);
     BUG_ON(get_char_type(' ') != CT_SPACE);
@@ -227,6 +228,7 @@ UNITTEST {
     BUG_ON(get_char_type(0xE1) != CT_WORD); // á
     BUG_ON(get_char_type(',') != CT_OTHER);
     BUG_ON(get_char_type('~') != CT_OTHER);
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 static size_t skip_fwd_char_type(BlockIter *bi, CharTypeEnum type)
