@@ -150,53 +150,49 @@ size_t view_remove(View *view)
 
 WordBounds get_bounds_for_word_under_cursor(CurrentLineRef lr)
 {
-    const char *const line = lr.line.data;
-    const size_t linelen = lr.line.length;
+    const size_t len = lr.line.length;
     size_t si = lr.cursor_offset;
-    BUG_ON(si > linelen);
+    BUG_ON(si > len);
 
     // Move right, until over a word char (if not already)
-    while (si < linelen) {
+    while (si < len) {
         size_t i = si;
-        if (u_is_word_char(u_get_char(line, linelen, &i))) {
+        if (u_is_word_char(u_get_char(lr.line.data, len, &i))) {
             break;
         }
         si = i;
     }
 
-    if (si == linelen) {
+    if (si == len) {
         // No word char between cursor and EOL; no word
         return (WordBounds){0};
     }
 
     // Move left, to start of word (if cursor is already within one)
     size_t ei = si;
-    while (si > 0) {
+    while (si) {
         size_t i = si;
-        if (!u_is_word_char(u_prev_char(line, &i))) {
+        if (!u_is_word_char(u_prev_char(lr.line.data, &i))) {
             break;
         }
         si = i;
     }
 
     // Move right, to end of word
-    while (ei < linelen) {
+    while (ei < len) {
         size_t i = ei;
-        if (!u_is_word_char(u_get_char(line, linelen, &i))) {
+        if (!u_is_word_char(u_get_char(lr.line.data, len, &i))) {
             break;
         }
         ei = i;
     }
 
-    if (si == ei) {
-        // Zero length; no word
-        return (WordBounds){0};
-    }
+    bool empty = (si == ei);
+    BUG_ON(si > ei);
 
-    BUG_ON(ei == 0 || si >= ei);
     return (WordBounds) {
-        .start = si,
-        .end = ei,
+        .start = empty ? 0 : si,
+        .end = empty ? 0 : ei,
     };
 }
 
