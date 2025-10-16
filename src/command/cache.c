@@ -16,7 +16,7 @@
 CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_str)
 {
     const size_t cmd_str_len = strlen(cmd_str);
-    CachedCommand *cached = xmalloc(sizeof(*cached) + cmd_str_len + 1);
+    CachedCommand *cached = xmalloc(xadd3(sizeof(*cached), cmd_str_len, 1));
     memcpy(cached->cmd_str, cmd_str, cmd_str_len + 1);
 
     const char *reason;

@@ -91,14 +91,14 @@ bool add_filetype (
     }
 
     size_t name_len = strlen(name);
-    UserFileTypeEntry *ft = xmalloc(sizeof(*ft) + name_len + 1);
+    UserFileTypeEntry *ft = xmalloc(xadd3(sizeof(*ft), name_len, 1));
     ft->type = type;
 
     if (ir) {
         ft->u.regexp = ir;
     } else {
         size_t str_len = strlen(str);
-        FlexArrayStr *s = xmalloc(sizeof(*s) + str_len + 1);
+        FlexArrayStr *s = xmalloc(xadd3(sizeof(*s), str_len, 1));
         s->str_len = str_len;
         ft->u.str = s;
         memcpy(s->str, str, str_len + 1);

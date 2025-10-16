@@ -19,7 +19,7 @@ static void free_message(Message *m)
 
 Message *new_message(const char *msg, size_t len)
 {
-    Message *m = xmalloc(sizeof(*m) + len + 1);
+    Message *m = xmalloc(xadd3(sizeof(*m), len, 1));
     m->loc = NULL;
     if (len) {
         memcpy(m->msg, msg, len);

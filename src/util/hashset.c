@@ -100,7 +100,7 @@ HashSetEntry *hashset_insert(HashSet *set, const char *str, size_t str_len)
     }
 
     const size_t slot = get_slot(set, str, str_len);
-    h = xmalloc(sizeof(*h) + str_len + 1);
+    h = xmalloc(xadd3(sizeof(*h), str_len, 1));
     h->next = set->table[slot];
     h->str_len = str_len;
     memcpy(h->str, str, str_len);

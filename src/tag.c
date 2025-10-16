@@ -267,7 +267,7 @@ void add_message_for_tag(MessageList *messages, Tag *tag, StringView dir)
     static const char prefix[] = "Tag ";
     StringView name = tag->name;
     size_t prefix_len = sizeof(prefix) - 1;
-    Message *m = xmalloc(sizeof(*m) + prefix_len + name.length + 1);
+    Message *m = xmalloc(xadd3(sizeof(*m), prefix_len, name.length + 1));
     xmempcpy3(m->msg, prefix, prefix_len, name.data, name.length, "", 1);
 
     char *filename = path_join_sv(dir, tag->filename, false);
