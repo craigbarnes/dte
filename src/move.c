@@ -209,27 +209,24 @@ void move_to_filepos(View *view, size_t line, size_t column)
 
 static CharTypeEnum get_char_type(CodePoint u)
 {
-    if (u == '\n') {
-        return CT_NEWLINE;
-    }
-    if (u_is_breakable_whitespace(u)) {
-        return CT_SPACE;
-    }
-    if (u_is_word_char(u)) {
-        return CT_WORD;
-    }
-    return CT_OTHER;
+    return (u == '\n') ? CT_NEWLINE
+        : u_is_breakable_whitespace(u) ? CT_SPACE
+        : u_is_word_char(u) ? CT_WORD
+        : CT_OTHER;
 }
 
-static bool get_current_char_type(BlockIter *bi, CharTypeEnum *type)
-{
-    CodePoint u;
-    if (!block_iter_get_char(bi, &u)) {
-        return false;
-    }
-
-    *type = get_char_type(u);
-    return true;
+UNITTEST {
+    BUG_ON(get_char_type('\n') != CT_NEWLINE);
+    BUG_ON(get_char_type('\t') != CT_SPACE);
+    BUG_ON(get_char_type(' ') != CT_SPACE);
+    BUG_ON(get_char_type(0x3000) != CT_SPACE); // Ideographic space
+    BUG_ON(get_char_type('A') != CT_WORD);
+    BUG_ON(get_char_type('z') != CT_WORD);
+    BUG_ON(get_char_type('9') != CT_WORD);
+    BUG_ON(get_char_type('_') != CT_WORD);
+    BUG_ON(get_char_type(0xE1) != CT_WORD); // á
+    BUG_ON(get_char_type(',') != CT_OTHER);
+    BUG_ON(get_char_type('~') != CT_OTHER);
 }
 
 static size_t skip_fwd_char_type(BlockIter *bi, CharTypeEnum type)
@@ -262,15 +259,15 @@ static size_t skip_bwd_char_type(BlockIter *bi, CharTypeEnum type)
 
 size_t word_fwd(BlockIter *bi, bool skip_non_word)
 {
-    size_t count = 0;
-    CharTypeEnum type;
-
-    while (1) {
+    for (size_t count = 0; true; ) {
         count += skip_fwd_char_type(bi, CT_SPACE);
-        if (!get_current_char_type(bi, &type)) {
+
+        CodePoint u;
+        if (!block_iter_get_char(bi, &u)) {
             return count;
         }
 
+        CharTypeEnum type = get_char_type(u);
         if (
             count
             && (!skip_non_word || (type == CT_WORD || type == CT_NEWLINE))
