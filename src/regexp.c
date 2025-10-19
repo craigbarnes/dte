@@ -61,7 +61,7 @@ bool regexp_exec (
 
 // Check which word boundary tokens are supported by regcomp(3)
 // (if any) and initialize `rwbt` with them for later use
-bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
+RegexpWordBoundaryTokens regexp_get_word_boundary_tokens(void)
 {
     static const char text[] = "SSfooEE SSfoo fooEE foo SSfooEE";
     const regoff_t match_start = 20, match_end = 23;
@@ -74,10 +74,11 @@ bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
     BUG_ON(ARRAYLEN(text) <= match_end);
     BUG_ON(!mem_equal(text + match_start - 1, " foo ", 5));
 
+    UNROLL_LOOP(ARRAYLEN(pairs))
     for (size_t i = 0; i < ARRAYLEN(pairs); i++) {
         const RegexpWordBoundaryTokens *p = &pairs[i];
         char patt[32];
-        xmempcpy3(patt, p->start, p->len, STRN("(foo)"), p->end, p->len + 1);
+        xmempcpy4(patt, p->start, p->len, STRN("(foo)"), p->end, p->len, "", 1);
         regex_t re;
         if (regcomp(&re, patt, DEFAULT_REGEX_FLAGS) != 0) {
             continue;
@@ -86,12 +87,11 @@ bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
         bool match = !regexec(&re, text, ARRAYLEN(m), m, 0);
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
-            *rwbt = pairs[i];
-            return true;
+            return pairs[i];
         }
     }
 
-    return false;
+    return (RegexpWordBoundaryTokens){.len = 0};
 }
 
 size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen)

@@ -30,7 +30,7 @@ typedef struct {
 } InternedRegexp;
 
 // Platform-specific patterns for matching word boundaries, as detected
-// and initialized by regexp_init_word_boundary_tokens()
+// and initialized by regexp_get_word_boundary_tokens()
 typedef struct {
     char start[8];
     char end[8];
@@ -38,7 +38,7 @@ typedef struct {
 } RegexpWordBoundaryTokens;
 
 const regex_t *regexp_compile_or_fatal_error(const char *pattern) NONNULL_ARGS_AND_RETURN;
-bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt) NONNULL_ARGS;
+RegexpWordBoundaryTokens regexp_get_word_boundary_tokens(void);
 bool regexp_error_msg(ErrorBuffer *ebuf, const regex_t *re, const char *pattern, int err) NONNULL_ARG(2, 3);
 char *regexp_escape(const char *pattern, size_t len) NONNULL_ARGS WARN_UNUSED_RESULT;
 size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(3, 4);

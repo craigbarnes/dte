@@ -92,6 +92,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
         .home_dir = strview_intern(home),
         .user_config_dir = get_user_config_dir(home, dte_home),
         .flags = EFLAG_HEADLESS,
+        .regexp_word_tokens = regexp_get_word_boundary_tokens(),
         .command_history = {
             .max_entries = 512,
         },
@@ -168,8 +169,8 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
         fatal_error("setenv", errno);
     }
 
-    RegexpWordBoundaryTokens *wb = &e->regexp_word_tokens;
-    if (regexp_init_word_boundary_tokens(wb)) {
+    const RegexpWordBoundaryTokens *wb = &e->regexp_word_tokens;
+    if (wb->len) {
         LOG_INFO("regex word boundary tokens detected: %s %s", wb->start, wb->end);
     } else {
         LOG_WARNING("no regex word boundary tokens detected");
