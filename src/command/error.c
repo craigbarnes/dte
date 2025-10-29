@@ -11,7 +11,7 @@ static void error_msgv(ErrorBuffer *eb, const char *cmd, const char *format, va_
 {
     const size_t size = sizeof(eb->buf);
     const char *file = eb->config_filename;
-    unsigned int line  = eb->config_line;
+    unsigned int line = eb->config_line;
     int pos = 0;
 
     if (file && cmd) {

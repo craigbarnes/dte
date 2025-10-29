@@ -556,7 +556,7 @@ static bool cmd_def_mode(EditorState *e, const CommandArgs *a)
 {
     ErrorBuffer *ebuf = &e->err;
     const char *name = a->args[0];
-    if (name[0] == '\0' || name[0] == '-' ) {
+    if (name[0] == '\0' || name[0] == '-') {
         return error_msg(ebuf, "mode name can't be empty or start with '-'");
     }
 

@@ -189,6 +189,11 @@ Features
   as another tab bar, an option for auto-hiding when there's only 1 tab
   would also be useful.
 
+* Add flags to `copy` and `cut` commands to allow appending/prepending
+  text, instead of just replacing it. These flags should be mutually
+  exclusive with `-b` and `-p`, due to the inability (in most terminals)
+  to query the contents of the system clipboard.
+
 Documentation
 -------------
 
