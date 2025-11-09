@@ -80,24 +80,26 @@ static void record_delete(View *view, char *buf, size_t len, bool move_after)
 {
     BUG_ON(!len);
     BUG_ON(!buf);
+    bool del = (cs.merge == CHANGE_MERGE_DELETE);
+    bool erase = (cs.merge == CHANGE_MERGE_ERASE);
 
-    if (cs.merge == cs.prev_merge) {
+    // Consecutive DELETE or ERASE operations of the same type can be merged
+    // into the same Change entry. For matching DELETE operations, reallocate
+    // `change->buf`, then append and free `buf`. For ERASE, do likewise but
+    // with the arguments reversed.
+    if (cs.merge == cs.prev_merge && (del || erase)) {
         Change *change = view->buffer->cur_change;
-        if (cs.merge == CHANGE_MERGE_DELETE) {
-            change->buf = xrealloc(change->buf, change->del_count + len);
-            memcpy(change->buf + change->del_count, buf, len);
-            change->del_count += len;
-            free(buf);
-            return;
-        } else if (cs.merge == CHANGE_MERGE_ERASE) {
-            buf = xrealloc(buf, len + change->del_count);
-            memcpy(buf + len, change->buf, change->del_count);
-            change->del_count += len;
-            free(change->buf);
-            change->buf = buf;
-            change->offset -= len;
-            return;
-        }
+        char *left = del ? change->buf : buf; // Reallocated
+        char *right = del ? buf : change->buf; // Appended and freed
+        size_t left_len = del ? change->del_count : len;
+        size_t right_len = del ? len : change->del_count;
+        change->offset -= del ? 0 : len;
+
+        change->del_count += len;
+        change->buf = xrealloc(left, change->del_count);
+        memcpy(change->buf + left_len, right, right_len);
+        free(right);
+        return;
     }
 
     Change *change = new_change(view->buffer);
