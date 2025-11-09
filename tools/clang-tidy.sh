@@ -6,6 +6,7 @@ test "$#" -gt 0 || {
     exit 64
 }
 
+# See also: -Wno-unterminated-string-initialization comment in mk/compiler.sh
 CFLAGS='
     -std=gnu11
     -O2
@@ -13,6 +14,7 @@ CFLAGS='
     -Wextra
     -Wundef
     -Wcomma
+    -Wno-unterminated-string-initialization
     -DDEBUG=3
     -D_FILE_OFFSET_BITS=64
     -Isrc

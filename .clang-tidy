@@ -39,6 +39,7 @@ Checks: >
     -readability-isolate-declaration,
     -readability-magic-numbers,
     -readability-uppercase-literal-suffix,
+    -readability-use-concise-preprocessor-directives,
     -performance-no-int-to-ptr,
     -misc-include-cleaner,
 

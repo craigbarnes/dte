@@ -1390,7 +1390,7 @@ static bool cmd_pgdown(EditorState *e, const CommandArgs *a)
     if (view->cy < bottom) {
         count = bottom - view->cy;
     } else {
-        count = window->edit_h - 1 - margin * 2;
+        count = window->edit_h - 1 - (margin * 2);
     }
 
     move_down(view, count);
@@ -1410,7 +1410,7 @@ static bool cmd_pgup(EditorState *e, const CommandArgs *a)
     if (view->cy > top) {
         count = view->cy - top;
     } else {
-        count = window->edit_h - 1 - margin * 2;
+        count = window->edit_h - 1 - (margin * 2);
     }
 
     move_up(view, count);
