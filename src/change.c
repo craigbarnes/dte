@@ -9,12 +9,12 @@
 #include "util/xmalloc.h"
 #include "window.h"
 
-// NOLINTBEGIN(*-avoid-non-const-global-variables)
-static ChangeMergeEnum change_merge;
-static ChangeMergeEnum prev_change_merge;
-// This doesn't need to be local to buffer because commands are atomic
-static Change *change_barrier;
-// NOLINTEND(*-avoid-non-const-global-variables)
+static struct {
+    ChangeMergeEnum merge;
+    ChangeMergeEnum prev_merge;
+    // This doesn't need to be local to Buffer, because commands are atomic
+    Change *barrier;
+} cs; // NOLINT(*-avoid-non-const-global-variables)
 
 static Change *alloc_change(void)
 {
@@ -37,7 +37,7 @@ static bool is_change_chain_barrier(const Change *change)
 
 static Change *new_change(Buffer *buffer)
 {
-    if (change_barrier) {
+    if (cs.barrier) {
         /*
          * We are recording series of changes (:replace for example)
          * and now we have just made the first change so we have to
@@ -47,8 +47,8 @@ static Change *new_change(Buffer *buffer)
          * chain but then we may have ended up with an empty chain.
          * We don't want to record empty changes ever.
          */
-        add_change(buffer, change_barrier);
-        change_barrier = NULL;
+        add_change(buffer, cs.barrier);
+        cs.barrier = NULL;
     }
 
     Change *change = alloc_change();
@@ -63,18 +63,15 @@ static size_t buffer_offset(const View *view)
 
 static void record_insert(View *view, size_t len)
 {
-    Change *change = view->buffer->cur_change;
     BUG_ON(!len);
-    if (
-        change_merge == prev_change_merge
-        && change_merge == CHANGE_MERGE_INSERT
-    ) {
+    if (cs.merge == cs.prev_merge && cs.merge == CHANGE_MERGE_INSERT) {
+        Change *change = view->buffer->cur_change;
         BUG_ON(change->del_count);
         change->ins_count += len;
         return;
     }
 
-    change = new_change(view->buffer);
+    Change *change = new_change(view->buffer);
     change->offset = buffer_offset(view);
     change->ins_count = len;
 }
@@ -84,16 +81,15 @@ static void record_delete(View *view, char *buf, size_t len, bool move_after)
     BUG_ON(!len);
     BUG_ON(!buf);
 
-    Change *change = view->buffer->cur_change;
-    if (change_merge == prev_change_merge) {
-        if (change_merge == CHANGE_MERGE_DELETE) {
+    if (cs.merge == cs.prev_merge) {
+        Change *change = view->buffer->cur_change;
+        if (cs.merge == CHANGE_MERGE_DELETE) {
             change->buf = xrealloc(change->buf, change->del_count + len);
             memcpy(change->buf + change->del_count, buf, len);
             change->del_count += len;
             free(buf);
             return;
-        }
-        if (change_merge == CHANGE_MERGE_ERASE) {
+        } else if (cs.merge == CHANGE_MERGE_ERASE) {
             buf = xrealloc(buf, len + change->del_count);
             memcpy(buf + len, change->buf, change->del_count);
             change->del_count += len;
@@ -104,7 +100,7 @@ static void record_delete(View *view, char *buf, size_t len, bool move_after)
         }
     }
 
-    change = new_change(view->buffer);
+    Change *change = new_change(view->buffer);
     change->offset = buffer_offset(view);
     change->del_count = len;
     change->move_after = move_after;
@@ -126,30 +122,30 @@ static void record_replace(View *view, char *deleted, size_t del_count, size_t i
 
 void begin_change(ChangeMergeEnum m)
 {
-    change_merge = m;
+    cs.merge = m;
 }
 
 void end_change(void)
 {
-    prev_change_merge = change_merge;
+    cs.prev_merge = cs.merge;
 }
 
 void begin_change_chain(void)
 {
-    BUG_ON(change_barrier);
+    BUG_ON(cs.barrier);
 
     // Allocate change chain barrier but add it to the change tree only if
     // there will be any real changes
-    change_barrier = alloc_change();
-    change_merge = CHANGE_MERGE_NONE;
+    cs.barrier = alloc_change();
+    cs.merge = CHANGE_MERGE_NONE;
 }
 
 void end_change_chain(View *view)
 {
-    if (change_barrier) {
+    if (cs.barrier) {
         // There were no changes in this change chain
-        free(change_barrier);
-        change_barrier = NULL;
+        free(cs.barrier);
+        cs.barrier = NULL;
     } else {
         // There were some changes; add end of chain marker
         add_change(view->buffer, alloc_change());
