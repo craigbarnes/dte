@@ -9,6 +9,7 @@
 #include "trace.h"
 #include "util/ascii.h"
 #include "util/bit.h"
+#include "util/debug.h"
 #include "util/log.h"
 #include "util/time-util.h"
 #include "util/unicode.h"
@@ -271,18 +272,16 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         detected &= ~TFLAG_QUERY_L3;
     }
 
+    const TermFeatureFlags newly_detected = ~existing & detected;
     TermOutputBuffer *obuf = &term->obuf;
-    bool flush = false;
-    if (is_newly_detected_feature(existing, detected, TFLAG_QUERY_L2)) {
+    if (newly_detected & TFLAG_QUERY_L2) {
         term_put_level_2_queries(term, false);
-        flush = true;
     }
-    if (is_newly_detected_feature(existing, detected, TFLAG_QUERY_L3)) {
+    if (newly_detected & TFLAG_QUERY_L3) {
         term_put_level_3_queries(term, false);
-        flush = true;
     }
 
-    if (is_newly_detected_feature(existing, detected, TFLAG_KITTY_KEYBOARD)) {
+    if (newly_detected & TFLAG_KITTY_KEYBOARD) {
         if (existing & TFLAG_MODIFY_OTHER_KEYS) {
             // Disable modifyOtherKeys mode, if previously enabled by
             // main() → ui_first_start() → term_enable_private_modes()
@@ -293,33 +292,34 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=CSI%20%3E%20Pp%20m
         // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
         term_put_literal(obuf, "\033[>5u");
-        flush = true;
     }
 
-    if (
-        is_newly_detected_feature(existing, detected, TFLAG_MODIFY_OTHER_KEYS)
-        && !((existing | detected) & TFLAG_KITTY_KEYBOARD)
-    ) {
+    bool using_kittykbd = (existing | detected) & TFLAG_KITTY_KEYBOARD;
+    bool enable_mokeys = (newly_detected & TFLAG_MODIFY_OTHER_KEYS) && !using_kittykbd;
+    if (enable_mokeys) {
         term_put_literal(obuf, "\033[>4;1m\033[>4;2m"); // modifyOtherKeys=1/2
-        flush = true;
     }
 
-    if (is_newly_detected_feature(existing, detected, TFLAG_META_ESC)) {
+    if (newly_detected & TFLAG_META_ESC) {
         term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
-        flush = true;
     }
-    if (is_newly_detected_feature(existing, detected, TFLAG_ALT_ESC)) {
+    if (newly_detected & TFLAG_ALT_ESC) {
         term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
-        flush = true;
     }
 
-    if (is_newly_detected_feature(existing, detected, TFLAG_SET_WINDOW_TITLE)) {
+    if (newly_detected & TFLAG_SET_WINDOW_TITLE) {
         BUG_ON(!(term->features & TFLAG_SET_WINDOW_TITLE));
         term_save_title(term);
-        flush = true;
     }
 
-    if (flush) {
+    // This is the list of features that cause output to be emitted above
+    // (and thus require a flush of the output buffer)
+    const TermFeatureFlags features_producing_output =
+        TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | TFLAG_KITTY_KEYBOARD
+        | TFLAG_META_ESC | TFLAG_ALT_ESC | TFLAG_SET_WINDOW_TITLE
+    ;
+
+    if ((newly_detected & features_producing_output) || enable_mokeys) {
         term_output_flush(obuf);
     }
 

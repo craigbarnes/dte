@@ -94,7 +94,6 @@ CheckOptions:
         cursor_color_is_valid;
         cursor_type_is_valid;
         has_flag;
-        is_newly_detected_feature;
         is_root_frame;
         is_valid_filetype_name;
         list_empty;

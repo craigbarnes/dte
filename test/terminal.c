@@ -1830,18 +1830,6 @@ static void test_update_term_title(TestContext *ctx)
     EXPECT_MEMEQ(obuf.buf + plen + tlen, slen, suffix, slen);
 }
 
-static void test_is_newly_detected_feature(TestContext *ctx)
-{
-    EXPECT_FALSE(is_newly_detected_feature(1, 1, 1));
-    EXPECT_FALSE(is_newly_detected_feature(1, 2, 1));
-    EXPECT_FALSE(is_newly_detected_feature(3, 1, 1));
-    EXPECT_FALSE(is_newly_detected_feature(1, 3, 1));
-    EXPECT_FALSE(is_newly_detected_feature(0, 6, 1));
-    EXPECT_TRUE(is_newly_detected_feature(0, 1, 1));
-    EXPECT_TRUE(is_newly_detected_feature(2, 1, 1));
-    EXPECT_TRUE(is_newly_detected_feature(3, 4, 4));
-}
-
 static const TestEntry tests[] = {
     TEST(test_parse_rgb),
     TEST(test_parse_term_style),
@@ -1873,7 +1861,6 @@ static const TestEntry tests[] = {
     TEST(test_term_begin_sync_update),
     TEST(test_term_put_level_1_queries),
     TEST(test_update_term_title),
-    TEST(test_is_newly_detected_feature),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);
