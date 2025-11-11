@@ -23,7 +23,7 @@
 #define HEX_STR_MAX(T) ((sizeof(T) * 2) + 2)
 
 // Like strlen(3), but suitable for use in constant expressions
-// (and only for string literal arguments)
+// and only for string literal arguments
 #define STRLEN(x) (sizeof("" x "") - 1)
 
 // Automatically follow a string literal with a comma and its length,
@@ -46,10 +46,11 @@
     #define CLANG_AT_LEAST(x, y) 0
 #endif
 
+// https://gcc.gnu.org/gcc-5/changes.html#:~:text=__has_attribute,-%2C%20has%20been%20added
 // https://gcc.gnu.org/onlinedocs/gcc-9.5.0/cpp/_005f_005fhas_005fattribute.html
 // https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
 #ifdef __has_attribute
-    // Supported by GCC 9+ and Clang
+    // Supported by GCC 5+ (seemingly undocumented until GCC 9) and Clang
     #define HAS_ATTRIBUTE(x) __has_attribute(x)
 #else
     #define HAS_ATTRIBUTE(x) 0
@@ -155,12 +156,18 @@
     #define MALLOC WARN_UNUSED_RESULT
 #endif
 
+// The standard [[__reproducible__]] attribute could be used here, for the
+// benefit of generic C23 compilers, but the rules for where it may appear
+// are much more strict (and ugly) than GCC attributes and would require
+// hundreds of lines of uglification.
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(pure)
     #define PURE WARN_UNUSED_RESULT __attribute__((__pure__))
 #else
     #define PURE WARN_UNUSED_RESULT
 #endif
 
+// The standard [[__unsequenced__]] attribute could be used here, if not
+// for the issues noted above `PURE`.
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(const)
     #define CONST_FN WARN_UNUSED_RESULT __attribute__((__const__))
 #else
@@ -235,6 +242,8 @@
     #define NONNULL_ARG(...)
 #endif
 
+// The standard [[__nodiscard__]] attribute could be used here, if not
+// for the issues noted above `PURE`.
 #if GNUC_AT_LEAST(3, 4) || HAS_ATTRIBUTE(warn_unused_result)
     #define WARN_UNUSED_RESULT __attribute__((__warn_unused_result__))
 #else
