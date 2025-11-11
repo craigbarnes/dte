@@ -250,10 +250,10 @@ static COLD void log_detected_features (
     }
 }
 
-static KeyCode handle_query_reply(Terminal *term, KeyCode key)
+static KeyCode handle_query_reply(Terminal *term, KeyCode reply)
 {
     const TermFeatureFlags existing = term->features;
-    TermFeatureFlags detected = key & ~KEYCODE_QUERY_REPLY_BIT;
+    TermFeatureFlags detected = reply & ~KEYCODE_QUERY_REPLY_BIT;
     term->features |= detected;
     if (unlikely(log_level_enabled(LOG_LEVEL_INFO))) {
         log_detected_features(existing, detected);
@@ -272,7 +272,11 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode key)
         detected &= ~TFLAG_QUERY_L3;
     }
 
+    // The subset of flags present in this query reply (`detected`) that
+    // weren't already present in the set of known features (`existing`)
+    // and/or overridden by the conditions above
     const TermFeatureFlags newly_detected = ~existing & detected;
+
     TermOutputBuffer *obuf = &term->obuf;
     if (newly_detected & TFLAG_QUERY_L2) {
         term_put_level_2_queries(term, false);
