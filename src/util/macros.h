@@ -286,6 +286,15 @@
     #define RETURNS_NONNULL
 #endif
 
+// Indicates that objects of a given struct type must use designated
+// initializers (i.e. never positional initializers).
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Type-Attributes.html#index-designated_005finit-type-attribute
+#if HAS_ATTRIBUTE(designated_init)
+    #define DESIGNATED_INIT __attribute__((__designated_init__))
+#else
+    #define DESIGNATED_INIT
+#endif
+
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-nonstring-variable-attribute
 #if GNUC_AT_LEAST(8, 0) || HAS_ATTRIBUTE(nonstring)
     #define NONSTRING __attribute__((__nonstring__))

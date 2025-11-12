@@ -23,7 +23,7 @@ enum {
     ATTR_STRIKETHROUGH = 0x100,
 };
 
-typedef struct {
+typedef struct DESIGNATED_INIT {
     int32_t fg;
     int32_t bg;
     unsigned int attr;
