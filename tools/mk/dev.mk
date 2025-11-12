@@ -11,6 +11,7 @@ include tools/mk/portable.mk
 include tools/mk/show-sizes.mk
 
 CTAGS ?= ctags
+CTAGSFLAGS = -I DESIGNATED_INIT # Prevent this macro being confused for a struct tag
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 GEN_MKFILES = $(foreach f, platform compiler, build/gen/$(f).mk build/gen/$(f).log)
 
@@ -25,7 +26,7 @@ print-struct-sizes: $(test)
 	$(Q) $(test) -s
 
 tags:
-	$(CTAGS) src/*.[ch] src/*/*.[ch] test/*.[ch]
+	$(CTAGS) $(CTAGSFLAGS) src/*.[ch] src/*/*.[ch] test/*.[ch]
 
 # For conveniently inspecting generated makefiles and their associated logs,
 # if something goes wrong
