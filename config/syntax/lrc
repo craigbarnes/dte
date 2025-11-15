@@ -1,0 +1,41 @@
+syntax lrc
+
+# https://en.wikipedia.org/wiki/LRC_(file_format)
+state bol text
+    char [ tag
+    char # comment
+    char " \t\n" this
+    noeat lyrics
+
+# Time code or metadata tags at beginning of lines
+# e.g. [01:59.67] or [ti: Song Title]
+state tag
+    char ] tag-end
+    char [ this error
+    char "\n" bol
+    eat this
+
+state tag-end tag
+    char [ tag
+    char " \t" this
+    noeat lyrics
+
+state comment
+    char "\n" bol
+    eat this
+
+state lyrics
+    char < timecode
+    char "\n" bol
+    eat this
+
+# Per-word time codes embedded in lyrics
+# e.g. "<00:43.67> Never <00:43.96> gonna <00:44.35> give"
+state timecode
+    char > lyrics timecode
+    char < this error
+    char "\n" bol
+    eat this
+
+default string tag
+default special timecode
