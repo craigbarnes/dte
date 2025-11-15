@@ -126,6 +126,7 @@ static const struct FileExtensionMap {
     {"kt", KOTLIN},
     {"kts", KOTLIN},
     {"latex", TEX},
+    {"lrc", LRC},
     {"lsp", LISP},
     {"ltx", TEX},
     {"lua", LUA},

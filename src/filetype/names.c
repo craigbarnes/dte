@@ -48,7 +48,7 @@ typedef enum {
     GROOVY,
     HARE,
     HASKELL,
-    HCL,
+    HCL, // https://github.com/hashicorp/hcl
     HTML,
     INDENT,
     INI,
@@ -62,6 +62,7 @@ typedef enum {
     KOTLIN,
     LEX,
     LISP,
+    LRC, // Lyrics
     LUA,
     M4,
     MAIL,
@@ -177,7 +178,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [GROOVY] = "groovy",
     [HARE] = "hare",
     [HASKELL] = "haskell",
-    [HCL] = "hcl", // https://github.com/hashicorp/hcl
+    [HCL] = "hcl",
     [HTML] = "html",
     [INDENT] = "indent",
     [INI] = "ini",
@@ -191,6 +192,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [KOTLIN] = "kotlin",
     [LEX] = "lex",
     [LISP] = "lisp",
+    [LRC] = "lrc",
     [LUA] = "lua",
     [M4] = "m4",
     [MAIL] = "mail",
