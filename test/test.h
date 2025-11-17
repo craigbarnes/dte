@@ -67,6 +67,7 @@ typedef struct {
 #define EXPECT_TRUE(x) EXPECT(true, x)
 #define EXPECT_FALSE(x) EXPECT(false, x)
 #define IEXPECT_EQ(a, b) IEXPECT(eq, a, b)
+#define IEXPECT_NE(a, b) IEXPECT(ne, a, b)
 #define IEXPECT_STREQ(s1, s2) IEXPECT(streq, s1, s2)
 #define IEXPECT_TRUE(x) IEXPECT(true, x)
 #define ASSERT_PTREQ(p1, p2) ASSERT(ptreq, p1, p2)
@@ -94,6 +95,7 @@ void expect_null(TestContext *ctx, const char *file, int line, const void *p);
 void expect_nonnull(TestContext *ctx, const char *file, int line, const void *p);
 void iexpect_streq(TestContext *ctx, const char *file, int line, size_t i, const char *s1, const char *s2);
 void iexpect_eq(TestContext *ctx, const char *file, int line, size_t i, intmax_t a, intmax_t b);
+void iexpect_ne(TestContext *ctx, const char *file, int line, size_t i, intmax_t a, intmax_t b);
 void iexpect_true(TestContext *ctx, const char *file, int line, size_t i, bool x);
 void assert_ptreq(TestContext *ctx, const char *file, int line, const void *p1, const void *p2);
 void assert_eq(TestContext *ctx, const char *file, int line, intmax_t a, intmax_t b);

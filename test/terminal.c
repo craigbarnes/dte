@@ -132,73 +132,90 @@ static void test_parse_rgb(TestContext *ctx)
 static void test_parse_term_style(TestContext *ctx)
 {
     static const struct {
-        ssize_t expected_return;
         const char *const strs[4];
         TermStyle expected_style;
     } tests[] = {
-        {3, {"bold", "red", "yellow"}, {.fg = COLOR_RED, .bg = COLOR_YELLOW, .attr = ATTR_BOLD}},
-        {1, {"#ff0000"}, {.fg = COLOR_RGB(0xff0000), .bg = -1, .attr = 0}},
-        {2, {"#f00a9c", "reverse"}, {.fg = COLOR_RGB(0xf00a9c), .bg = -1, .attr = ATTR_REVERSE}},
-        {2, {"black", "#00ffff"}, {.fg = COLOR_BLACK, .bg = COLOR_RGB(0x00ffff), .attr = 0}},
-        {2, {"#123456", "#abcdef"}, {.fg = COLOR_RGB(0x123456), .bg = COLOR_RGB(0xabcdef), .attr = 0}},
-        {2, {"#123", "#fa0"}, {.fg = COLOR_RGB(0x112233), .bg = COLOR_RGB(0xffaa00), .attr = 0}},
-        {2, {"#A1B2C3", "gray"}, {.fg = COLOR_RGB(0xa1b2c3), .bg = COLOR_GRAY, .attr = 0}},
-        {2, {"red", "strikethrough"}, {.fg = COLOR_RED, .bg = -1, .attr = ATTR_STRIKETHROUGH}},
-        {1, {"5/5/5"}, {.fg = 231, .bg = COLOR_DEFAULT, .attr = 0}},
-        {3, {"1/3/0", "0/5/2", "italic"}, {.fg = 70, .bg = 48, .attr = ATTR_ITALIC}},
-        {2, {"-1", "-2"}, {.fg = COLOR_DEFAULT, .bg = COLOR_KEEP, .attr = 0}},
-        {3, {"keep", "red", "keep"}, {.fg = -2, .bg = COLOR_RED, .attr = ATTR_KEEP}},
-        {2, {"bold", "blink"}, {.fg = -1, .bg = -1, .attr = ATTR_BOLD | ATTR_BLINK}},
-        {3, {"0", "255", "underline"}, {.fg = COLOR_BLACK, .bg = 255, .attr = ATTR_UNDERLINE}},
-        {3, {"white", "green", "dim"}, {.fg = COLOR_WHITE, .bg = COLOR_GREEN, .attr = ATTR_DIM}},
-        {3, {"white", "green", "lowintensity"}, {.fg = COLOR_WHITE, .bg = COLOR_GREEN, .attr = ATTR_DIM}},
-        {2, {"lightred", "lightyellow"}, {.fg = COLOR_LIGHTRED, .bg = COLOR_LIGHTYELLOW, .attr = 0}},
-        {2, {"darkgray", "lightgreen"}, {.fg = COLOR_DARKGRAY, .bg = COLOR_LIGHTGREEN, .attr = 0}},
-        {2, {"lightblue", "lightcyan"}, {.fg = COLOR_LIGHTBLUE, .bg = COLOR_LIGHTCYAN, .attr = 0}},
-        {1, {"lightmagenta"}, {.fg = COLOR_LIGHTMAGENTA, .bg = COLOR_DEFAULT, .attr = 0}},
-        {3, {"keep", "254", "keep"}, {.fg = COLOR_KEEP, .bg = 254, .attr = ATTR_KEEP}},
-        {2, {"keep", "keep"}, {.fg = COLOR_KEEP, .bg = COLOR_KEEP, .attr = 0}},
-        {3, {"red", "green", "keep"}, {.fg = COLOR_RED, .bg = COLOR_GREEN, .attr = ATTR_KEEP}},
-        {3, {"1", "2", "invisible"}, {.fg = COLOR_RED, .bg = COLOR_GREEN, .attr = ATTR_INVIS}},
-        {2, {"default", "0/0/0"}, {.fg = COLOR_DEFAULT, .bg = 16, .attr = 0}},
-        {2, {"2/3/4", "5/5/5"}, {.fg = 110, .bg = 231, .attr = 0}},
-        {0, {NULL}, {.fg = COLOR_DEFAULT, .bg = COLOR_DEFAULT, .attr = 0}},
+        {{"bold", "red", "yellow"}, {.fg = COLOR_RED, .bg = COLOR_YELLOW, .attr = ATTR_BOLD}},
+        {{"#ff0000"}, {.fg = COLOR_RGB(0xff0000), .bg = -1}},
+        {{"#f00a9c", "reverse"}, {.fg = COLOR_RGB(0xf00a9c), .bg = -1, .attr = ATTR_REVERSE}},
+        {{"black", "#00ffff"}, {.fg = COLOR_BLACK, .bg = COLOR_RGB(0x00ffff)}},
+        {{"#123456", "#abcdef"}, {.fg = COLOR_RGB(0x123456), .bg = COLOR_RGB(0xabcdef)}},
+        {{"#123", "#fa0"}, {.fg = COLOR_RGB(0x112233), .bg = COLOR_RGB(0xffaa00)}},
+        {{"#A1B2C3", "gray"}, {.fg = COLOR_RGB(0xa1b2c3), .bg = COLOR_GRAY}},
+        {{"red", "strikethrough"}, {.fg = COLOR_RED, .bg = -1, .attr = ATTR_STRIKETHROUGH}},
+        {{"5/5/5"}, {.fg = 231, .bg = COLOR_DEFAULT}},
+        {{"1/3/0", "0/5/2", "italic"}, {.fg = 70, .bg = 48, .attr = ATTR_ITALIC}},
+        {{"-1", "-2"}, {.fg = COLOR_DEFAULT, .bg = COLOR_KEEP}},
+        {{"keep", "red", "keep"}, {.fg = -2, .bg = COLOR_RED, .attr = ATTR_KEEP}},
+        {{"bold", "blink"}, {.fg = -1, .bg = -1, .attr = ATTR_BOLD | ATTR_BLINK}},
+        {{"0", "255", "underline"}, {.fg = COLOR_BLACK, .bg = 255, .attr = ATTR_UNDERLINE}},
+        {{"white", "green", "dim"}, {.fg = COLOR_WHITE, .bg = COLOR_GREEN, .attr = ATTR_DIM}},
+        {{"white", "green", "lowintensity"}, {.fg = COLOR_WHITE, .bg = COLOR_GREEN, .attr = ATTR_DIM}},
+        {{"lightred", "lightyellow"}, {.fg = COLOR_LIGHTRED, .bg = COLOR_LIGHTYELLOW}},
+        {{"darkgray", "lightgreen"}, {.fg = COLOR_DARKGRAY, .bg = COLOR_LIGHTGREEN}},
+        {{"lightblue", "lightcyan"}, {.fg = COLOR_LIGHTBLUE, .bg = COLOR_LIGHTCYAN}},
+        {{"lightmagenta"}, {.fg = COLOR_LIGHTMAGENTA, .bg = COLOR_DEFAULT}},
+        {{"keep", "254", "keep"}, {.fg = COLOR_KEEP, .bg = 254, .attr = ATTR_KEEP}},
+        {{"keep", "keep"}, {.fg = COLOR_KEEP, .bg = COLOR_KEEP}},
+        {{"red", "green", "keep"}, {.fg = COLOR_RED, .bg = COLOR_GREEN, .attr = ATTR_KEEP}},
+        {{"1", "2", "invisible"}, {.fg = COLOR_RED, .bg = COLOR_GREEN, .attr = ATTR_INVIS}},
+        {{"default", "0/0/0"}, {.fg = COLOR_DEFAULT, .bg = 16}},
+        {{"2/3/4", "5/5/5"}, {.fg = 110, .bg = 231}},
+        {{NULL}, {.fg = COLOR_DEFAULT, .bg = COLOR_DEFAULT}},
+    };
 
-        #define INVALID {.fg = COLOR_INVALID, .bg = COLOR_INVALID}
-        {2, {"red", "blue", "invalid"}, INVALID},
-        {-1, {"cyan", "magenta", "yellow"}, INVALID},
-        {0, {"invalid", "default", "bold"}, INVALID},
-        {1, {"italic", "invalid"}, INVALID},
-        {2, {"red", "blue", ""}, INVALID},
-        {2, {"24", "#abc", "dims"}, INVALID},
-        {0, {""}, INVALID},
-        {0, {"."}, INVALID},
-        {0, {"#"}, INVALID},
-        {0, {"-3"}, INVALID},
-        {0, {"256"}, INVALID},
-        {0, {"brightred"}, INVALID},
-        {0, {"lighttblack"}, INVALID},
-        {0, {"lightwhite"}, INVALID},
-        {0, {"#fffffg"}, INVALID},
-        {0, {"#12345"}, INVALID},
-        {0, {"123456"}, INVALID},
-        {0, {"//0/0"}, INVALID},
-        {0, {"0/0/:"}, INVALID},
-        {0, {"light_"}, INVALID},
-        {0, {"\xFF/0/0"}, INVALID},
-        {0, {"1/2/\x9E"}, INVALID},
-        #undef INVALID
+    static const struct {
+        ssize_t expected_return;
+        const char *const strs[4];
+    } invalid_tests[] = {
+        {2, {"red", "blue", "invalid"}},
+        {-1, {"cyan", "magenta", "yellow"}},
+        {0, {"invalid", "default", "bold"}},
+        {1, {"italic", "invalid"}},
+        {2, {"red", "blue", ""}},
+        {2, {"24", "#abc", "dims"}},
+        {0, {""}},
+        {0, {"."}},
+        {0, {"#"}},
+        {0, {"-3"}},
+        {0, {"256"}},
+        {0, {"brightred"}},
+        {0, {"lighttblack"}},
+        {0, {"lightwhite"}},
+        {0, {"#fffffg"}},
+        {0, {"#12345"}},
+        {0, {"123456"}},
+        {0, {"//0/0"}},
+        {0, {"0/0/:"}},
+        {0, {"light_"}},
+        {0, {"\xFF/0/0"}},
+        {0, {"1/2/\x9E"}},
     };
 
     FOR_EACH_I(i, tests) {
         const TermStyle expected = tests[i].expected_style;
         TermStyle parsed = {.fg = COLOR_INVALID, .bg = COLOR_INVALID};
         char **strs = (char**)tests[i].strs;
-        ssize_t n = parse_term_style(&parsed, strs, string_array_length(strs));
-        IEXPECT_EQ(n, tests[i].expected_return);
+        size_t nstrs = string_array_length(strs);
+        ssize_t ret = parse_term_style(&parsed, strs, nstrs);
+        IEXPECT_EQ(ret, nstrs);
         IEXPECT_EQ(parsed.fg, expected.fg);
         IEXPECT_EQ(parsed.bg, expected.bg);
         IEXPECT_EQ(parsed.attr, expected.attr);
+        IEXPECT_TRUE(same_style(&parsed, &expected));
+    }
+
+    FOR_EACH_I(i, invalid_tests) {
+        const TermStyle expected = {.fg = COLOR_INVALID, .bg = COLOR_INVALID};
+        TermStyle parsed = expected;
+        char **strs = (char**)invalid_tests[i].strs;
+        size_t nstrs = string_array_length(strs);
+        ssize_t ret = parse_term_style(&parsed, strs, nstrs);
+        IEXPECT_EQ(ret, invalid_tests[i].expected_return);
+        IEXPECT_NE(ret, nstrs);
+        IEXPECT_EQ(parsed.fg, COLOR_INVALID);
+        IEXPECT_EQ(parsed.bg, COLOR_INVALID);
+        IEXPECT_EQ(parsed.attr, 0);
         IEXPECT_TRUE(same_style(&parsed, &expected));
     }
 }

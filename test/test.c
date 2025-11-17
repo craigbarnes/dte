@@ -127,6 +127,11 @@ void iexpect_eq(TestContext *ctx, const char *file, int line, size_t i, intmax_t
     expect(a == b, ctx, file, line, "Test #%zu: values not equal: %jd, %jd", ++i, a, b);
 }
 
+void iexpect_ne(TestContext *ctx, const char *file, int line, size_t i, intmax_t a, intmax_t b)
+{
+    expect(a != b, ctx, file, line, "Test #%zu: unexpected equal values: %jd, %jd", ++i, a, b);
+}
+
 void iexpect_true(TestContext *ctx, const char *file, int line, size_t i, bool x)
 {
     expect(x, ctx, file, line, "Test #%zu: unexpected false value", ++i);
