@@ -21,6 +21,7 @@ enum {
     ATTR_INVIS = 0x40,
     ATTR_ITALIC = 0x80,
     ATTR_STRIKETHROUGH = 0x100,
+    ATTR_ALL = (ATTR_STRIKETHROUGH << 1) - 1,
 };
 
 typedef struct DESIGNATED_INIT {

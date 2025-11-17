@@ -396,7 +396,7 @@ static void test_term_style_to_string(TestContext *ctx)
     const TermStyle style = {
         .fg = COLOR_LIGHTMAGENTA,
         .bg = COLOR_LIGHTMAGENTA,
-        .attr = ~0U
+        .attr = ATTR_ALL,
     };
 
     static const char expected[] =
@@ -1625,7 +1625,7 @@ static void test_term_set_style(TestContext *ctx)
     ASSERT_EQ(n, 54);
     style.fg = COLOR_RGB(0x6465C7);
     style.bg = COLOR_RGB(0xC8CAFF);
-    style.attr = ~0u;
+    style.attr = ATTR_ALL;
     term_set_style(&term, style);
     EXPECT_MEMEQ(obuf->buf, obuf->count, longest, n);
     EXPECT_EQ(obuf->x, 0);
