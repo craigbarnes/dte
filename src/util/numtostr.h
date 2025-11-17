@@ -10,6 +10,7 @@ enum {
     HRSIZE_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN(".99 GiB"),
     FILESIZE_STR_MAX = HRSIZE_MAX + DECIMAL_STR_MAX(uintmax_t) + STRLEN(" ()"),
     PRECISE_FILESIZE_STR_MAX = DECIMAL_STR_MAX(uintmax_t) + STRLEN("GiB"),
+    FILE_PERMISSIONS_BUFSIZE = sizeof("rwxrwxr--"),
 };
 
 extern const char hextable[32];
@@ -42,7 +43,7 @@ size_t buf_uint_to_str(unsigned int x, char *buf) NONNULL_ARGS;
 const char *umax_to_str(uintmax_t x) RETURNS_NONNULL;
 const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
 const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;
-char *file_permissions_to_str(mode_t mode, char buf[static 10]) NONNULL_ARGS_AND_RETURN;
+char *file_permissions_to_str(mode_t mode, char buf[static FILE_PERMISSIONS_BUFSIZE]) NONNULL_ARGS_AND_RETURN;
 char *human_readable_size(uintmax_t bytes, char buf[static HRSIZE_MAX]) NONNULL_ARGS_AND_RETURN;
 char *filesize_to_str(uintmax_t bytes, char buf[static FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;
 char *filesize_to_str_precise(uintmax_t bytes, char buf[static PRECISE_FILESIZE_STR_MAX]) NONNULL_ARGS_AND_RETURN;

@@ -1561,7 +1561,7 @@ static void test_buf_u8_to_str(TestContext *ctx)
 
 static void test_file_permissions_to_str(TestContext *ctx)
 {
-    char buf[12];
+    char buf[FILE_PERMISSIONS_BUFSIZE];
     EXPECT_STREQ("---------", file_permissions_to_str(0, buf));
     EXPECT_STREQ("--------x", file_permissions_to_str(01, buf));
     EXPECT_STREQ("--x--x--x", file_permissions_to_str(0111, buf));

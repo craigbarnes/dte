@@ -247,16 +247,15 @@ String dump_buffer(const View *view)
 
     if (buffer->abs_filename) {
         const FileInfo *file = &buffer->file;
-        const struct timespec *mtime = &file->mtime;
         unsigned int perms = file->mode & 07777;
         char tstr[TIME_STR_BUFSIZE];
-        char modestr[12];
+        char modestr[FILE_PERMISSIONS_BUFSIZE];
         string_sprintf (
             &buf,
             "\nLast stat:\n----------\n\n"
             "%s %s\n%s %s\n%s -%s (%04o)\n%s %jd\n%s %jd\n%s %s\n%s %jd\n%s %ju\n",
             "     Path:", buffer->abs_filename,
-            " Modified:", timespec_to_str(mtime, tstr) ? tstr : "-",
+            " Modified:", timespec_to_str(&file->mtime, tstr) ? tstr : "-",
             "     Mode:", file_permissions_to_str(file->mode, modestr), perms,
             "     User:", (intmax_t)file->uid,
             "    Group:", (intmax_t)file->gid,
