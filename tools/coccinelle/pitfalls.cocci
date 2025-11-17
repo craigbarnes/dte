@@ -2,6 +2,7 @@
 identifier func = {
     memcmp,
     memcpy,
+    memmem,
     memmove,
     mempcpy,
     strncasecmp,
