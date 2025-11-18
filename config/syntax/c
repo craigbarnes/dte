@@ -142,7 +142,6 @@ state preproc-error error
     char "\n" start
     eat this
 
-# TODO: C23 [[attribute]] syntax
 # TODO: C23 digit separators (e.g. 125'000'000, 0xAB'CD'00'FF, 1.765'203'490)
 state c code
     char -b a-z_ ident
@@ -156,6 +155,15 @@ state c code
     char ';' semicolon
     str '/*' .c-comment:this
     str '//' .cpp-comment:start
+    str '[[' attr
+    eat this
+
+# See: C23 [[attribute]] syntax (§6.7.12.1)
+# TODO: Allow more granular highlighting of e.g. `attribute-argument-clause`
+# `attribute-prefix :: identifier`, etc.
+state attr
+    str ']]' c attr
+    char "\n" start
     eat this
 
 state semicolon code
@@ -373,3 +381,4 @@ default ident class-name
 default keyword c11-keyword c23-keyword cpp-keyword
 default preproc preproccond
 default type posix-type
+default special attr

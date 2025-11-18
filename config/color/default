@@ -44,3 +44,5 @@ hi html.attr magenta
 hi xml.tag bold magenta
 hi xml.attr magenta
 hi zig.builtin cyan
+hi c.attr magenta bold
+hi -c c.attr lightmagenta bold
