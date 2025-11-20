@@ -165,22 +165,34 @@ static const char *lookup_other_key(KeyCode key)
     return NULL;
 }
 
+static size_t modifiers_to_str(KeyCode k, char *buf)
+{
+    static const struct {
+        char str[2];
+        KeyCode code;
+    } mods[] = {
+        {"C-", MOD_CTRL},
+        {"M-", MOD_META},
+        {"S-", MOD_SHIFT},
+        {"s-", MOD_SUPER},
+        {"H-", MOD_HYPER},
+    };
+
+    size_t pos = 0;
+    for (size_t i = 0; i < ARRAYLEN(mods); i++) {
+        if (k & mods[i].code) {
+            pos += copystrn(buf + pos, mods[i].str, sizeof(mods[0].str));
+        }
+    }
+
+    return pos;
+}
+
 // Writes the string representation of `k` into `buf` (which must
 // have at least `KEYCODE_STR_BUFSIZE` bytes available) and returns
 // the length of the written string.
 size_t keycode_to_str(KeyCode k, char buf[static KEYCODE_STR_BUFSIZE])
 {
-    static const struct {
-        char prefix;
-        KeyCode code;
-    } mods[] = {
-        {'C', MOD_CTRL},
-        {'M', MOD_META},
-        {'S', MOD_SHIFT},
-        {'s', MOD_SUPER},
-        {'H', MOD_HYPER},
-    };
-
     KeyCode key = keycode_get_key(k);
     KeyCode mask = MOD_MASK | KEY_MASK;
     bool is_key_combo = (k & mask) == k && key <= KEY_SPECIAL_MAX;
@@ -193,15 +205,9 @@ size_t keycode_to_str(KeyCode k, char buf[static KEYCODE_STR_BUFSIZE])
         return n + buf_umax_to_hex_str(k, buf + n, 8);
     }
 
-    size_t pos = 0;
-    for (size_t i = 0; i < ARRAYLEN(mods); i++) {
-        if (k & mods[i].code) {
-            buf[pos++] = mods[i].prefix;
-            buf[pos++] = '-';
-        }
-    }
-
     const char *name;
+    size_t pos = modifiers_to_str(k, buf);
+
     if (key >= KEY_SPECIAL_MIN) {
         name = special_names[key - KEY_SPECIAL_MIN];
     } else {
