@@ -79,6 +79,19 @@ UNITTEST {
     static_assert((KEY_MASK & KEYCODE_BRACKETED_PASTE) == KEYCODE_BRACKETED_PASTE);
 }
 
+// https://www.gnu.org/software/emacs/manual/html_node/efaq/Binding-combinations-of-modifiers-and-function-keys.html
+static KeyCode modifier_from_char(char c)
+{
+    switch (c) {
+        case 'C': return MOD_CTRL;
+        case 'M': return MOD_META;
+        case 'S': return MOD_SHIFT;
+        case 's': return MOD_SUPER;
+        case 'H': return MOD_HYPER;
+    }
+    return 0;
+}
+
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
 {
     if (str[0] == '^' && str[1] != '\0') {
@@ -89,36 +102,15 @@ static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
     KeyCode modifiers = 0;
     size_t i = 0;
 
-    // https://www.gnu.org/software/emacs/manual/html_node/efaq/Binding-combinations-of-modifiers-and-function-keys.html
     while (1) {
-        KeyCode tmp;
-        switch (str[i]) {
-        case 'C':
-            tmp = MOD_CTRL;
+        KeyCode tmp = modifier_from_char(str[i]);
+        if (tmp == 0 || str[i + 1] != '-' || modifiers & tmp) {
             break;
-        case 'M':
-            tmp = MOD_META;
-            break;
-        case 'S':
-            tmp = MOD_SHIFT;
-            break;
-        case 's':
-            tmp = MOD_SUPER;
-            break;
-        case 'H':
-            tmp = MOD_HYPER;
-            break;
-        default:
-            goto end;
-        }
-        if (str[i + 1] != '-' || modifiers & tmp) {
-            goto end;
         }
         modifiers |= tmp;
         i += 2;
     }
 
-end:
     *modifiersp = modifiers;
     return i;
 }
