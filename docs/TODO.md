@@ -25,10 +25,6 @@ Features
 * Remove `ARGERR_OPTION_ARGUMENT_NOT_SEPARATE` and make `do_parse_args()`
   handle e.g. `exec -oeval ...` like `getopt(3)` [would][Utility Syntax Guideline 6]
 
-* Persist the most recently recorded [`macro`], by saving `EditorState::macro`
-  on exit and restoring it at startup (see also: `read_history_files()` →
-  `search_set_regexp()`)
-
 * Retain a configurable number of previously copied strings and allow
   them to be:
   * Pasted (`paste 7`)
@@ -39,12 +35,13 @@ Features
     in a similar way to `exec -i msg -o msg`)
   * Automatically saved to a history file?
 
-* Retain a configurable number of previously recorded macros and allow
-  them to be:
+* Retain a configurable number of previously recorded [macros][`macro`]
+  and allow them to be:
   * Played (`macro play 7`)
   * Viewed (`show macro 7`)
   * Saved/Loaded/Renamed/etc.
-  * Automatically saved to a history file?
+  * Automatically saved and restored to/from a history file (in a similar
+    fashion to `read_history_files()` → `search_set_regexp()`)
 
 * Add option to [`wrap-paragraph`] to allow finding and removing a common
   prefix string from every line and then re-inserting it afterwards
