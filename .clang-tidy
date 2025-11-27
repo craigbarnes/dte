@@ -3,8 +3,10 @@
 # whereas CheckOptions settings override parent config settings of the
 # same name.
 
+# Check all included, non-system headers
 HeaderFilterRegex: .*
 
+# https://clang.llvm.org/extra/clang-tidy/checks/list.html
 Checks: >
     clang-diagnostic-*,
     clang-analyzer-*,

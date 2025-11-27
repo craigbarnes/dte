@@ -23,7 +23,7 @@ static char *alloc_indent(const LocalOptions *options, size_t count, size_t *siz
 
 static void shift_right(View *view, size_t nr_lines, size_t count)
 {
-    BUG_ON(!block_iter_is_bol(&view->cursor))
+    BUG_ON(!block_iter_is_bol(&view->cursor));
     const LocalOptions *options = &view->buffer->options;
     size_t indent_size;
     char *indent = alloc_indent(options, count, &indent_size);
@@ -57,7 +57,7 @@ static void shift_right(View *view, size_t nr_lines, size_t count)
 
 static void shift_left(View *view, size_t nr_lines, size_t count)
 {
-    BUG_ON(!block_iter_is_bol(&view->cursor))
+    BUG_ON(!block_iter_is_bol(&view->cursor));
     const LocalOptions *options = &view->buffer->options;
     const size_t indent_width = options->indent_width;
     const bool space_indent = use_spaces_for_indent(options);
