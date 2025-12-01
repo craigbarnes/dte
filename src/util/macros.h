@@ -280,7 +280,7 @@
     #define COLD
 #endif
 
-#if GNUC_AT_LEAST(5, 0) || HAS_ATTRIBUTE(returns_nonnull)
+#if HAS_ATTRIBUTE(returns_nonnull)
     #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else
     #define RETURNS_NONNULL
@@ -296,7 +296,7 @@
 #endif
 
 // https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-nonstring-variable-attribute
-#if GNUC_AT_LEAST(8, 0) || HAS_ATTRIBUTE(nonstring)
+#if HAS_ATTRIBUTE(nonstring)
     #define NONSTRING __attribute__((__nonstring__))
 #else
     #define NONSTRING
