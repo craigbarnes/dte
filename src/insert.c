@@ -50,7 +50,7 @@ void new_line(View *view, bool auto_indent, bool above_cursor)
 {
     if (above_cursor && block_iter_prev_line(&view->cursor) == 0) {
         // Already on first line; insert newline at bof
-        block_iter_bol(&view->cursor);
+        block_iter_bof(&view->cursor);
         buffer_insert_bytes(view, "\n", 1);
         return;
     }
