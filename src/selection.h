@@ -32,9 +32,9 @@ static inline void view_set_selection_type(View *view, SelectionType sel)
 
 static inline bool unselect(View *view)
 {
-    view->select_mode = SELECT_NONE;
     if (view->selection) {
         view->selection = SELECT_NONE;
+        view->select_mode = SELECT_NONE;
         mark_all_lines_changed(view->buffer);
     }
     return true; // To allow tail-calling from command handlers

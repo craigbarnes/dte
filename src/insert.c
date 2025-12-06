@@ -11,15 +11,10 @@
 
 void insert_text(View *view, const char *text, size_t size, bool move_after)
 {
-    size_t del_count = 0;
-    if (view->selection) {
-        del_count = prepare_selection(view);
-        unselect(view);
-    }
+    size_t del_count = view->selection ? prepare_selection(view) : 0;
+    unselect(view);
     buffer_replace_bytes(view, del_count, text, size);
-    if (move_after) {
-        block_iter_skip_bytes(&view->cursor, size);
-    }
+    block_iter_skip_bytes(&view->cursor, move_after ? size : 0);
 }
 
 static size_t insert_nl_and_autoindent (
