@@ -341,21 +341,22 @@ void buffer_insert_bytes(View *view, const char *buf, const size_t len)
     }
 }
 
-static bool would_delete_last_bytes(const View *view, size_t count)
+static bool would_delete_last_bytes(const BlockIter *bi, size_t del_count)
 {
-    const Block *blk = view->cursor.blk;
-    size_t offset = view->cursor.offset;
+    const Block *blk = bi->blk;
+    size_t offset = bi->offset;
+
     while (1) {
         size_t avail = blk->size - offset;
-        if (avail > count) {
+        if (avail > del_count) {
             return false;
         }
 
-        if (blk->node.next == view->cursor.head) {
+        if (blk->node.next == bi->head) {
             return true;
         }
 
-        count -= avail;
+        del_count -= avail;
         blk = BLOCK(blk->node.next);
         offset = 0;
     }
@@ -369,7 +370,7 @@ static void buffer_delete_bytes_internal(View *view, size_t len, bool move_after
     }
 
     // Check if all newlines from EOF would be deleted
-    if (would_delete_last_bytes(view, len)) {
+    if (would_delete_last_bytes(&view->cursor, len)) {
         BlockIter bi = view->cursor;
         CodePoint u;
         if (block_iter_prev_char(&bi, &u) && u != '\n') {
@@ -412,7 +413,7 @@ void buffer_replace_bytes(View *view, size_t del_count, const char *ins, size_t 
     view_reset_preferred_x(view);
 
     // Check if all newlines from EOF would be deleted
-    if (would_delete_last_bytes(view, del_count)) {
+    if (would_delete_last_bytes(&view->cursor, del_count)) {
         if (ins[ins_count - 1] != '\n') {
             // Don't replace last newline
             if (--del_count == 0) {
