@@ -151,15 +151,14 @@ void insert_ch(View *view, CodePoint ch)
         if (strview_isblank(line)) {
             int width = get_indent_of_matching_brace(view);
             if (width >= 0) {
-                // Replace current (ws only) line with some indent + '}'
+                // Replace current (whitespace only) line with some indent + '}'
                 block_iter_bol(&view->cursor);
                 del_count = line.length;
                 if (width) {
                     String indent = make_indent(options, width);
-                    BUG_ON(indent.len == 0 && indent.alloc > 0);
+                    BUG_ON(!indent.len); // `width > 0` never produces `indent.len == 0`
                     ins_count = indent.len;
-                    alloc = ins_count ? string_steal_cstring(&indent) : NULL;
-                    ins = alloc;
+                    ins = alloc = string_steal_cstring(&indent);
                     // '}' will be replace the terminating NUL
                 }
             }
