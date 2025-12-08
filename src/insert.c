@@ -46,13 +46,10 @@ void new_line(View *view, bool auto_indent, bool above_cursor)
         return;
     }
 
-    block_iter_eol(&view->cursor);
     BlockIter tmp = view->cursor;
-    StringView line = STRING_VIEW_INIT;
-
-    if (auto_indent && block_iter_find_non_empty_line_bwd(&tmp)) {
-        line = block_iter_get_line(&tmp);
-    }
+    bool use_ref_line = auto_indent && block_iter_find_non_empty_line_bwd(&tmp);
+    StringView line = use_ref_line ? block_iter_get_line(&tmp) : strview(NULL);
+    block_iter_eol(&view->cursor);
 
     size_t ins_count = insert_nl_and_autoindent(view, line, 0);
     block_iter_skip_bytes(&view->cursor, ins_count);
