@@ -4,26 +4,24 @@
 #include "regexp.h"
 #include "util/xmalloc.h"
 
-char *make_indent(const LocalOptions *options, size_t width)
+String make_indent(const LocalOptions *options, size_t width)
 {
     if (width == 0) {
-        return NULL;
+        return string_new(0);
     }
 
-    if (use_spaces_for_indent(options)) {
-        char *str = xmalloc(width + 1);
-        str[width] = '\0';
-        return memset(str, ' ', width);
-    }
-
+    bool use_spaces = use_spaces_for_indent(options);
     size_t tw = options->tab_width;
-    size_t ntabs = indent_level(width, tw);
-    size_t nspaces = indent_remainder(width, tw);
-    size_t n = ntabs + nspaces;
-    char *str = xmalloc(n + 1);
-    memset(str + ntabs, ' ', nspaces);
-    str[n] = '\0';
-    return memset(str, '\t', ntabs);
+    size_t ntabs = use_spaces ? 0 : indent_level(width, tw);
+    size_t nspaces = use_spaces ? width : indent_remainder(width, tw);
+    size_t nbytes = ntabs + nspaces;
+    BUG_ON(nbytes == 0);
+
+    String str = string_new(nbytes + 1); // +1 for efficiency in several callers
+    memset(str.buffer, '\t', ntabs);
+    memset(str.buffer + ntabs, ' ', nspaces);
+    str.len = nbytes;
+    return str;
 }
 
 // Return true if the contents of `line` triggers an additional level
@@ -32,6 +30,10 @@ static bool line_contents_increases_indent (
     const LocalOptions *options,
     StringView line
 ) {
+    if (!line.length) {
+        return false;
+    }
+
     static const regex_t *re1, *re2;
     if (!re1) {
         // TODO: Make these patterns configurable via a local option
@@ -57,7 +59,7 @@ static bool line_contents_increases_indent (
     return regexp_exec(&ir->re, line.data, line.length, 0, NULL, 0);
 }
 
-char *get_indent_for_next_line(const LocalOptions *options, StringView line)
+String get_indent_for_next_line(const LocalOptions *options, StringView line)
 {
     size_t curr_width = get_indent_width(line, options->tab_width);
     size_t next_width = next_indent_width(curr_width, options->indent_width);

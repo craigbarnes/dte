@@ -64,31 +64,39 @@ static void test_make_indent(TestContext *ctx)
         .tab_width = 8,
     };
 
-    char *indent = make_indent(&options, 16);
-    EXPECT_STREQ(indent, "\t\t");
-    free(indent);
+    String indent = make_indent(&options, 16);
+    EXPECT_STRING_EQ_CSTRING(&indent, "\t\t");
+    string_free(&indent);
 
     indent = make_indent(&options, 17);
-    EXPECT_STREQ(indent, "\t\t ");
-    free(indent);
+    EXPECT_STRING_EQ_CSTRING(&indent, "\t\t ");
+    string_free(&indent);
 
     indent = make_indent(&options, 20);
-    EXPECT_STREQ(indent, "\t\t    ");
-    free(indent);
+    EXPECT_STRING_EQ_CSTRING(&indent, "\t\t    ");
+    string_free(&indent);
 
     indent = make_indent(&options, 24);
-    EXPECT_STREQ(indent, "\t\t\t");
-    free(indent);
+    EXPECT_STRING_EQ_CSTRING(&indent, "\t\t\t");
+    string_free(&indent);
+
+    indent = make_indent(&options, 0);
+    EXPECT_STRING_EQ_CSTRING(&indent, "");
+    string_free(&indent);
 
     options.expand_tab = true;
 
     indent = make_indent(&options, 8);
-    EXPECT_STREQ(indent, "        ");
-    free(indent);
+    EXPECT_STRING_EQ_CSTRING(&indent, "        ");
+    string_free(&indent);
 
     indent = make_indent(&options, 7);
-    EXPECT_STREQ(indent, "       ");
-    free(indent);
+    EXPECT_STRING_EQ_CSTRING(&indent, "       ");
+    string_free(&indent);
+
+    indent = make_indent(&options, 0);
+    EXPECT_STRING_EQ_CSTRING(&indent, "");
+    string_free(&indent);
 }
 
 static void test_get_indent_for_next_line(TestContext *ctx)
@@ -105,15 +113,17 @@ static void test_get_indent_for_next_line(TestContext *ctx)
         .tab_width = 8
     };
 
-    const StringView line1 = STRING_VIEW("foo {");
-    char *indent = get_indent_for_next_line(&options, line1);
-    EXPECT_STREQ(indent, "    ");
-    free(indent);
+    String indent = get_indent_for_next_line(&options, strview("foo {"));
+    EXPECT_STRING_EQ_CSTRING(&indent, "    ");
+    string_free(&indent);
 
-    const StringView line2 = STRING_VIEW("foo");
-    indent = get_indent_for_next_line(&options, line2);
-    EXPECT_STREQ(indent, NULL);
-    free(indent);
+    indent = get_indent_for_next_line(&options, strview("foo"));
+    EXPECT_STRING_EQ_CSTRING(&indent, "");
+    string_free(&indent);
+
+    indent = get_indent_for_next_line(&options, strview(NULL));
+    EXPECT_STRING_EQ_CSTRING(&indent, "");
+    string_free(&indent);
 }
 
 static void test_buffer_insert_bytes(TestContext *ctx)

@@ -7,6 +7,7 @@
 #include "indent.h"
 #include "options.h"
 #include "selection.h"
+#include "util/string.h"
 #include "util/utf8.h"
 
 void insert_text(View *view, const char *text, size_t size, bool move_after)
@@ -22,22 +23,17 @@ static size_t insert_nl_and_autoindent (
     StringView prev_line,
     size_t del_count
 ) {
-    const char *ins = "\n";
-    size_t ins_count = 1;
-    char *indent = NULL;
-
-    if (prev_line.length) {
-        indent = get_indent_for_next_line(&view->buffer->options, prev_line);
-        if (indent) {
-            ins_count = strlen(indent);
-            memmove(indent + 1, indent, ins_count++);
-            indent[0] = '\n';
-            ins = indent;
-        }
+    String indent = get_indent_for_next_line(&view->buffer->options, prev_line);
+    if (indent.len == 0) {
+        BUG_ON(indent.alloc > 0); // Should be nothing to free
+        buffer_replace_bytes(view, del_count, "\n", 1);
+        return 1;
     }
 
-    buffer_replace_bytes(view, del_count, ins, ins_count);
-    free(indent);
+    string_insert_buf(&indent, 0, "\n", 1); // Prepend newline to indent
+    size_t ins_count = indent.len; // Get length, before string_free() clears it
+    buffer_replace_bytes(view, del_count, indent.buffer, ins_count);
+    string_free(&indent);
     return ins_count;
 }
 
@@ -159,9 +155,11 @@ void insert_ch(View *view, CodePoint ch)
                 block_iter_bol(&view->cursor);
                 del_count = line.length;
                 if (width) {
-                    alloc = make_indent(options, width);
+                    String indent = make_indent(options, width);
+                    BUG_ON(indent.len == 0 && indent.alloc > 0);
+                    ins_count = indent.len;
+                    alloc = ins_count ? string_steal_cstring(&indent) : NULL;
                     ins = alloc;
-                    ins_count = strlen(ins);
                     // '}' will be replace the terminating NUL
                 }
             }

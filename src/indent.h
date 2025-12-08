@@ -9,6 +9,7 @@
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/string-view.h"
+#include "util/string.h"
 
 typedef struct {
     size_t bytes; // Size in bytes
@@ -43,11 +44,11 @@ static inline size_t next_indent_width(size_t x, size_t m)
     return likely(IS_POWER_OF_2(m)) ? next_multiple(x + 1, m) : ((x + m) / m) * m;
 }
 
-char *make_indent(const LocalOptions *options, size_t width);
-char *get_indent_for_next_line(const LocalOptions *options, StringView line);
-IndentInfo get_indent_info(const LocalOptions *options, StringView line);
+String make_indent(const LocalOptions *options, size_t width) WARN_UNUSED_RESULT NONNULL_ARGS;
+String get_indent_for_next_line(const LocalOptions *options, StringView line) WARN_UNUSED_RESULT NONNULL_ARGS;
+IndentInfo get_indent_info(const LocalOptions *options, StringView line) WARN_UNUSED_RESULT NONNULL_ARGS;
 size_t get_indent_width(StringView line, unsigned int tab_width);
-size_t get_indent_level_bytes_left(const LocalOptions *options, const BlockIter *cursor);
-size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter *cursor);
+size_t get_indent_level_bytes_left(const LocalOptions *options, const BlockIter *cursor) NONNULL_ARGS;
+size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter *cursor) NONNULL_ARGS;
 
 #endif

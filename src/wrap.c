@@ -12,8 +12,7 @@
 
 typedef struct {
     String buf;
-    char *indent;
-    size_t indent_len;
+    String indent;
     size_t indent_width;
     size_t cur_width;
     size_t text_width;
@@ -33,9 +32,7 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     }
 
     if (pf->cur_width == 0) {
-        if (pf->indent_len) {
-            string_append_buf(&pf->buf, pf->indent, pf->indent_len);
-        }
+        string_append_string(&pf->buf, &pf->indent);
         pf->cur_width = pf->indent_width;
     } else {
         string_append_byte(&pf->buf, ' ');
@@ -120,12 +117,10 @@ void wrap_paragraph(View *view, size_t text_width)
     char *sel = block_iter_get_bytes(&view->cursor, len);
     StringView sv = string_view(sel, len);
     size_t indent_width = get_indent_width(sv, options->tab_width);
-    char *indent = make_indent(options, indent_width);
 
     ParagraphFormatter pf = {
-        .buf = STRING_INIT,
-        .indent = indent,
-        .indent_len = indent ? strlen(indent) : 0,
+        .buf = STRING_INIT, // TODO: Pre-allocate (based on len), to minimize reallocs
+        .indent = make_indent(options, indent_width),
         .indent_width = indent_width,
         .cur_width = 0,
         .text_width = text_width
@@ -164,7 +159,7 @@ void wrap_paragraph(View *view, size_t text_width)
     }
 
     string_free(&pf.buf);
-    free(pf.indent);
+    string_free(&pf.indent);
     free(sel);
     unselect(view);
 }

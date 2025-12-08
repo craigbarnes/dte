@@ -51,7 +51,7 @@ void erase(View *view)
 
 void clear_lines(View *view, bool auto_indent)
 {
-    char *indent = NULL;
+    String indent = STRING_INIT;
     if (auto_indent) {
         BlockIter bi = view->cursor;
         if (block_iter_prev_line(&bi) && block_iter_find_non_empty_line_bwd(&bi)) {
@@ -74,12 +74,11 @@ void clear_lines(View *view, bool auto_indent)
         del_count = block_iter_bol(&view->cursor);
     }
 
-    if (!indent && !del_count) {
+    if (!indent.len && !del_count) {
         return;
     }
 
-    size_t ins_count = indent ? strlen(indent) : 0;
-    buffer_replace_bytes(view, del_count, indent, ins_count);
-    free(indent);
-    block_iter_skip_bytes(&view->cursor, ins_count);
+    buffer_replace_bytes(view, del_count, indent.buffer, indent.len);
+    block_iter_skip_bytes(&view->cursor, indent.len);
+    string_free(&indent);
 }
