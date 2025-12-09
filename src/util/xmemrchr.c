@@ -5,7 +5,8 @@
 void *xmemrchr(const void *ptr, int c, size_t n)
 {
 #if HAVE_MEMRCHR
-    return memrchr(ptr, c, n);
+    // See also: the comment at the top of src/util/xstring.h
+    return likely(n) ? memrchr(ptr, c, n) : NULL;
 #endif
 
     for (const unsigned char *s = ptr; n--; ) {

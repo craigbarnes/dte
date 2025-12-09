@@ -3772,6 +3772,7 @@ static void test_xmemmem(TestContext *ctx)
 static void test_xmemrchr(TestContext *ctx)
 {
     static const char str[] = "123456789 abcdefedcba 987654321";
+    EXPECT_PTREQ(xmemrchr(NULL, '1', 0), NULL);
     EXPECT_PTREQ(xmemrchr(str, '9', sizeof(str) - 1), str + 22);
     EXPECT_PTREQ(xmemrchr(str, '1', sizeof(str) - 1), str + sizeof(str) - 2);
     EXPECT_PTREQ(xmemrchr(str, '1', sizeof(str) - 2), str);

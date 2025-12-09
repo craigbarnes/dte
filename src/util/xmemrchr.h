@@ -4,6 +4,6 @@
 #include <stddef.h>
 #include "macros.h"
 
-void *xmemrchr(const void *ptr, int c, size_t n) PURE NONNULL_ARGS;
+void *xmemrchr(const void *ptr, int c, size_t n) PURE NONNULL_ARG_IF_NONZERO_LENGTH(1, 3);
 
 #endif
