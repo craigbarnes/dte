@@ -101,7 +101,7 @@ bool line_has_opening_brace(StringView line)
         re = regexp_compile_or_fatal_error("\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$");
     }
 
-    return regexp_exec(re, line.data, line.length, 0, NULL, 0);
+    return line.length && regexp_exec(re, line.data, line.length, 0, NULL, 0);
 }
 
 bool line_has_closing_brace(StringView line)
