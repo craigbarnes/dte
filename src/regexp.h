@@ -8,21 +8,33 @@
 #include "command/error.h"
 #include "util/macros.h"
 
-enum {
-#ifdef REG_ENHANCED
+#if defined(REG_ENHANCED)
     // The REG_ENHANCED flag enables various extensions on macOS
     // (see "enhanced features" in re_format(7)). Most of these
     // extensions are enabled by default on Linux (in both glibc
     // and musl) without the need for any extra flags.
-    DEFAULT_REGEX_FLAGS = REG_EXTENDED | REG_ENHANCED,
+    #define DEFAULT_REGEX_FLAGS ((REG_EXTENDED) | (REG_ENHANCED))
 #else
     // POSIX Extended Regular Expressions (ERE) are used almost
     // everywhere in this codebase, except where Basic Regular
     // Expressions (BRE) are explicitly called for (most notably
     // in search_tag(), which is used for ctags patterns).
-    DEFAULT_REGEX_FLAGS = REG_EXTENDED,
+    #define DEFAULT_REGEX_FLAGS (REG_EXTENDED)
 #endif
-};
+
+// The REG_STARTEND flag is supported by glibc and BSDs, but ASan's
+// __interceptor_regexec() still produces a "heap-buffer-overflow"
+// error if the buffer isn't null-terminated. This is contrary to the
+// entire point of the flag, so we simply use the portable fallback
+// implementation when the flag is defined (and ostensibly supported)
+// but known to cause problems.
+#if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
+    #define REGEXP_STARTEND_FLAG (REG_STARTEND)
+    #define HAVE_REG_STARTEND 1 // Always suitable for #if conditions
+#else
+    #define REGEXP_STARTEND_FLAG 0
+    #define HAVE_REG_STARTEND 0
+#endif
 
 typedef struct {
     const char *str; // Pattern string, interned by str_intern()

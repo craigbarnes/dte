@@ -39,18 +39,17 @@ bool regexp_exec (
 ) {
     BUG_ON(nmatch && !pmatch);
 
-// ASan's __interceptor_regexec() doesn't support REG_STARTEND
-#if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
-    // "If REG_STARTEND is specified, pmatch must point to at least
-    // one regmatch_t (even if nmatch is 0 or REG_NOSUB was specified),
-    // to hold the input offsets for REG_STARTEND."
-    // -- https://man.openbsd.org/regex.3
-    regmatch_t tmp_startend;
-    pmatch = nmatch ? pmatch : &tmp_startend;
-    pmatch[0].rm_so = 0;
-    pmatch[0].rm_eo = text_len;
-    return !regexec(re, text, nmatch, pmatch, flags | REG_STARTEND);
-#endif
+    if (HAVE_REG_STARTEND) {
+        // "If REG_STARTEND is specified, pmatch must point to at least
+        // one regmatch_t (even if nmatch is 0 or REG_NOSUB was specified),
+        // to hold the input offsets for REG_STARTEND."
+        // -- https://man.openbsd.org/regexec#:~:text=If-,REG_STARTEND,-is%20specified
+        regmatch_t tmp_startend;
+        pmatch = nmatch ? pmatch : &tmp_startend;
+        pmatch[0].rm_so = 0;
+        pmatch[0].rm_eo = text_len;
+        return !regexec(re, text, nmatch, pmatch, flags | REGEXP_STARTEND_FLAG);
+    }
 
     // Buffer must be null-terminated if REG_STARTEND isn't supported
     char *cstr = xstrcut(text, text_len);

@@ -1,8 +1,8 @@
 #include "build-defs.h" // HAVE_*
-#include <regex.h> // REG_STARTEND, REG_ENHANCED (macOS)
 #include <sys/stat.h> // S_ISVTX
 #include "buildvar-iconv.h" // ICONV_DISABLE
 #include "compat.h"
+#include "regexp.h" // HAVE_REG_STARTEND, REG_ENHANCED (macOS)
 #include "util/debug.h" // DEBUG
 #include "util/macros.h" // ASAN_ENABLED, MSAN_ENABLED
 #include "util/unicode.h" // SANE_WCTYPE
@@ -48,7 +48,7 @@ const char buildvar_string[] =
 #endif
 
 // Features detected via cpp(1) macros
-#if defined(REG_STARTEND) && ASAN_ENABLED == 0 && MSAN_ENABLED == 0
+#if HAVE_REG_STARTEND
     " REG_STARTEND"
 #endif
 #ifdef REG_ENHANCED
