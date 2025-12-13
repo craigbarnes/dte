@@ -8,7 +8,7 @@ alias make 'compile gcc make'
 alias man 'run man'
 alias read 'pipe-from cat'
 alias reverse-lines 'filter tac'
-alias sort-lines 'filter sh -c "LC_COLLATE=C sort"'
+alias sort-lines 'filter env LC_COLLATE=C sort'
 alias split-words 'replace -g "[ \t]+" "\n"'
 alias trim-lines 'replace "[ \t]+$" ""'
 alias color hi
