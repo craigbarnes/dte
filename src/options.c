@@ -1037,12 +1037,16 @@ void collect_option_values (
     }
 
     switch (desc->type) {
-    case OPT_STR:
     case OPT_UINT:
     case OPT_UINT8:
     case OPT_REGEX:
     case OPT_FILESIZE:
         // Not enumerated; nothing to collect
+        return;
+    case OPT_STR:
+        if (desc->on_change == filetype_changed) {
+            collect_ft(&e->filetypes, a, prefix);
+        }
         return;
     case OPT_ENUM:
     case OPT_BOOL:

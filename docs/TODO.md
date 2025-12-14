@@ -60,8 +60,6 @@ Features
 * Allow [`dte -s`] option to take multiple file arguments (e.g.
   `dte -s config/syntax/*`)
 
-* Implement auto-completion for e.g. `set filetype j<Tab>`
-
 * Suggest programs found in `$PATH` (or a cached list thereof) when
   auto-completing e.g. `exec <Tab>`
 
