@@ -189,6 +189,9 @@ Features
   exclusive with `-b` and `-p`, due to the inability (in most terminals)
   to query the contents of the system clipboard.
 
+* Make the `cd` command (optionally) update the terminal's working
+  directory via `OSC 7`
+
 Documentation
 -------------
 
@@ -343,14 +346,6 @@ Testing/Debugging
 * Set up continuous testing on OpenBSD, FreeBSD and NetBSD
   (see https://hub.docker.com/r/madworx/netbsd/ for one possible
   approach to this)
-
-* Remove `#if` guards in `test/*.c`, so that "passed" count stays the same
-  regardless of compiler/platform
-  (see: https://lists.nongnu.org/archive/html/tinycc-devel/2023-09/msg00033.html)
-
-* Add test runner option for generating JUnit XML report for GitLab CI
-  * https://docs.gitlab.com/ci/testing/unit_test_reports/
-  * https://gitlab.com/craigbarnes/dte/-/pipelines/1404353439/test_report
 
 * Write a `LOG_*()` message every time a new file is opened, including the
   `Buffer::id`, and then mention the `id` in other log messages relating
