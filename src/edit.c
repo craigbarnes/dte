@@ -18,37 +18,34 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
     }
 
     const Buffer *buffer = view->buffer;
-    BUG_ON(list_empty(&buffer->blocks));
-    BUG_ON(view->cursor.offset > view->cursor.blk->size);
-
     const Block *blk = BLOCK(buffer->blocks.next);
+    const Block *cursor_blk = view->cursor.blk;
+    BUG_ON(list_empty(&buffer->blocks));
+    BUG_ON(view->cursor.offset > cursor_blk->size);
+
     if (blk->size == 0) {
         // The only time a zero-sized block is valid is when it's the
         // first and only block
         BUG_ON(buffer->blocks.next->next != &buffer->blocks);
-        BUG_ON(view->cursor.blk != blk);
+        BUG_ON(cursor_blk != blk);
+        block_sanity_check(blk);
         return;
     }
 
-    bool cursor_seen = false;
+    unsigned int cursor_seen = 0;
     block_for_each(blk, &buffer->blocks) {
-        const size_t size = blk->size;
-        BUG_ON(size == 0);
-        BUG_ON(size > blk->alloc);
-        if (blk == view->cursor.blk) {
-            cursor_seen = true;
-        }
-        if (check_newlines) {
-            // Non-empty blocks must ALWAYS end with a newline, since
-            // lines MAY NOT straddle multiple blocks
-            BUG_ON(blk->data[size - 1] != '\n');
-        }
-        if (DEBUG > 2) {
-            BUG_ON(count_nl(blk->data, size) != blk->nl);
-        }
+        block_sanity_check(blk);
+        cursor_seen += (blk == cursor_blk);
+        BUG_ON(blk->size == 0);
+
+        // Non-empty blocks must ALWAYS end with a newline, since
+        // lines MAY NOT straddle multiple blocks
+        BUG_ON(check_newlines && blk->data[blk->size - 1] != '\n');
+        BUG_ON(blk->nl < 1);
+        BUG_ON(DEBUG > 2 && count_nl(blk->data, blk->size) != blk->nl);
     }
 
-    BUG_ON(!cursor_seen);
+    BUG_ON(cursor_seen != 1);
 }
 
 static size_t copy_count_nl(char *dst, const char *src, size_t len)

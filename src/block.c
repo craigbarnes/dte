@@ -3,10 +3,6 @@
 #include "util/bit.h"
 #include "util/xmalloc.h"
 
-enum {
-    BLOCK_ALLOC_MULTIPLE = 64
-};
-
 Block *block_new(size_t alloc)
 {
     Block *blk = xcalloc1(sizeof(*blk));
