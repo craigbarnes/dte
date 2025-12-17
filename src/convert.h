@@ -7,7 +7,7 @@
 #include "util/macros.h"
 
 typedef struct {
-    struct cconv *cconv;
+    struct CharsetConverter *cconv;
     char *nbuf;
     size_t nsize;
     bool crlf;

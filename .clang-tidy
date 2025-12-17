@@ -71,7 +71,7 @@ CheckOptions:
     readability-identifier-naming.ParameterCase: lower_case
     readability-identifier-naming.ParameterIgnoredRegexp: '[A-Z]'
     readability-identifier-naming.StructCase: CamelCase
-    readability-identifier-naming.StructIgnoredRegexp: '^(cconv|llmap)$'
+    readability-identifier-naming.StructIgnoredRegexp: '^llmap$'
     readability-identifier-naming.TypedefCase: CamelCase
     readability-identifier-naming.UnionCase: CamelCase
     readability-identifier-naming.VariableCase: lower_case

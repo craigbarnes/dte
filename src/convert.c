@@ -25,7 +25,7 @@ typedef struct {
     const char *ibuf;
     ssize_t ipos;
     ssize_t isize;
-    struct cconv *cconv;
+    struct CharsetConverter *cconv;
 } FileDecoder;
 
 static void add_block(Buffer *buffer, Block *blk)
@@ -216,7 +216,7 @@ bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
 // UTF-8 encoding of U+00BF (inverted question mark; "¿")
 #define REPLACEMENT "\xc2\xbf"
 
-struct cconv {
+typedef struct CharsetConverter {
     iconv_t cd;
     char *obuf;
     size_t osize;
@@ -234,11 +234,11 @@ struct cconv {
 
     // Input character size in bytes, or zero for UTF-8
     size_t char_size;
-};
+} CharsetConverter;
 
-static struct cconv *create(iconv_t cd)
+static CharsetConverter *create(iconv_t cd)
 {
-    struct cconv *c = xcalloc1(sizeof(*c));
+    CharsetConverter *c = xcalloc1(sizeof(*c));
     c->cd = cd;
     c->osize = 8192;
     c->obuf = xmalloc(c->osize);
@@ -263,13 +263,13 @@ static size_t iconv_wrapper (
     return iconv(cd, in, inbytesleft, outbuf, outbytesleft);
 }
 
-static void resize_obuf(struct cconv *c)
+static void resize_obuf(CharsetConverter *c)
 {
     c->osize = xmul(2, c->osize);
     c->obuf = xrealloc(c->obuf, c->osize);
 }
 
-static void add_replacement(struct cconv *c)
+static void add_replacement(CharsetConverter *c)
 {
     if (c->osize - c->opos < 4) {
         resize_obuf(c);
@@ -279,7 +279,7 @@ static void add_replacement(struct cconv *c)
     c->opos += c->rcount;
 }
 
-static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
+static size_t handle_invalid(CharsetConverter *c, const char *buf, size_t count)
 {
     LOG_DEBUG("%zu %zu", c->char_size, count);
     add_replacement(c);
@@ -297,7 +297,7 @@ static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
     return c->char_size;
 }
 
-static int xiconv(struct cconv *c, const char **ib, size_t *ic)
+static int xiconv(CharsetConverter *c, const char **ib, size_t *ic)
 {
     while (1) {
         char *ob = c->obuf + c->opos;
@@ -326,7 +326,7 @@ static int xiconv(struct cconv *c, const char **ib, size_t *ic)
     }
 }
 
-static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
+static size_t convert_incomplete(CharsetConverter *c, const char *input, size_t len)
 {
     size_t ipos = 0;
     while (c->tcount < sizeof(c->tbuf) && ipos < len) {
@@ -361,7 +361,7 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
     return ipos;
 }
 
-static void cconv_process(struct cconv *c, const char *input, size_t len)
+static void cconv_process(CharsetConverter *c, const char *input, size_t len)
 {
     if (c->consumed > 0) {
         size_t fill = c->opos - c->consumed;
@@ -400,14 +400,14 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
     }
 }
 
-static struct cconv *cconv_to_utf8(const char *encoding)
+static CharsetConverter *cconv_to_utf8(const char *encoding)
 {
     iconv_t cd = iconv_open("UTF-8", encoding);
     if (cd == (iconv_t)-1) {
         return NULL;
     }
 
-    struct cconv *c = create(cd);
+    CharsetConverter *c = create(cd);
     c->rcount = copyliteral(c->rbuf, REPLACEMENT);
 
     if (str_has_prefix(encoding, "UTF-16")) {
@@ -421,7 +421,7 @@ static struct cconv *cconv_to_utf8(const char *encoding)
     return c;
 }
 
-static void encode_replacement(struct cconv *c)
+static void encode_replacement(CharsetConverter *c)
 {
     static const char rep[] = REPLACEMENT;
     const char *ib = rep;
@@ -438,18 +438,18 @@ static void encode_replacement(struct cconv *c)
     }
 }
 
-static struct cconv *cconv_from_utf8(const char *encoding)
+static CharsetConverter *cconv_from_utf8(const char *encoding)
 {
     iconv_t cd = iconv_open(encoding, "UTF-8");
     if (cd == (iconv_t)-1) {
         return NULL;
     }
-    struct cconv *c = create(cd);
+    CharsetConverter *c = create(cd);
     encode_replacement(c);
     return c;
 }
 
-static void cconv_flush(struct cconv *c)
+static void cconv_flush(CharsetConverter *c)
 {
     if (c->tcount > 0) {
         // Replace incomplete character at end of input buffer
@@ -459,7 +459,7 @@ static void cconv_flush(struct cconv *c)
     }
 }
 
-static char *cconv_consume_line(struct cconv *c, size_t *len)
+static char *cconv_consume_line(CharsetConverter *c, size_t *len)
 {
     char *line = c->obuf + c->consumed;
     char *nl = memchr(line, '\n', c->opos - c->consumed);
@@ -474,7 +474,7 @@ static char *cconv_consume_line(struct cconv *c, size_t *len)
     return line;
 }
 
-static char *cconv_consume_all(struct cconv *c, size_t *len)
+static char *cconv_consume_all(CharsetConverter *c, size_t *len)
 {
     char *buf = c->obuf + c->consumed;
     *len = c->opos - c->consumed;
@@ -482,7 +482,7 @@ static char *cconv_consume_all(struct cconv *c, size_t *len)
     return buf;
 }
 
-static void cconv_free(struct cconv *c)
+static void cconv_free(CharsetConverter *c)
 {
     BUG_ON(!c);
     iconv_close(c->cd);
@@ -508,7 +508,7 @@ bool conversion_supported_by_iconv(const char *from, const char *to)
 
 FileEncoder file_encoder(const char *encoding, bool crlf, int fd)
 {
-    struct cconv *cconv = NULL;
+    CharsetConverter *cconv = NULL;
     if (unlikely(!encoding_is_utf8(encoding))) {
         cconv = cconv_from_utf8(encoding);
         if (!cconv) {
@@ -605,7 +605,7 @@ bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
         return file_decoder_read_utf8(buffer, buf, size);
     }
 
-    struct cconv *cconv = cconv_to_utf8(buffer->encoding);
+    CharsetConverter *cconv = cconv_to_utf8(buffer->encoding);
     if (!cconv) {
         return false;
     }
