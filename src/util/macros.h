@@ -406,7 +406,22 @@
 
 // ARRAYLEN() calculates the number of elements in an array and also
 // performs some sanity checks to prevent accidental pointer arguments
-#if defined(HAS_STATIC_ASSERT) && defined(HAS_BUILTIN_TYPES_COMPATIBLE_P)
+#if HAS_EXTENSION(c_countof)
+    // The _Countof() operator is part of the C2Y draft specification
+    // and is also available in Clang 21+ (as an extension, available
+    // in all standards modes).
+    // See also:
+    // • §6.5.4.5p5 of https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3685.pdf
+    // • https://clang.llvm.org/docs/LanguageExtensions.html#c2y-countof
+    // • https://releases.llvm.org/21.1.0/tools/clang/docs/LanguageExtensions.html#c2y-countof
+    // • https://releases.llvm.org/21.1.0/tools/clang/docs/ReleaseNotes.html#c2y-feature-support
+    // • https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3469.htm#:~:text=_Countof
+    // • https://github.com/llvm/llvm-project/commit/00c43ae23524d72707701620da89ad248393a8e4
+    // • https://github.com/llvm/llvm-project/issues/102836#issuecomment-2681819243
+    // • https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117025#c6
+    // • https://gcc.gnu.org/cgit/gcc/commit/?id=517c9487f8fdc4e4e90252a9365e5823259dc783
+    #define ARRAYLEN(a) _Countof(a)
+#elif defined(HAS_STATIC_ASSERT) && defined(HAS_BUILTIN_TYPES_COMPATIBLE_P)
     // https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3369.pdf
     #define SAME_TYPE(a, b) __builtin_types_compatible_p(__typeof__(a), __typeof__(b))
     #define DECAY(a) (&*(a))
@@ -414,16 +429,6 @@
     #define MUST_BE(e) (0 * sizeof(struct {_Static_assert(e, #e); int see_n3369;}))
     #define SIZEOF_ARRAY(a) (sizeof(a) + MUST_BE(IS_ARRAY(a)))
     #define ARRAYLEN(a) (SIZEOF_ARRAY(a) / sizeof((a)[0]))
-//#elif HAS_EXTENSION(c_countof)
-    // https://clang.llvm.org/docs/LanguageExtensions.html#c2y-countof
-    // https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3469.htm#:~:text=_Countof
-    // https://github.com/llvm/llvm-project/commit/00c43ae23524d72707701620da89ad248393a8e4
-    // https://github.com/llvm/llvm-project/issues/102836#issuecomment-2681819243
-    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117025#c6
-    // https://gcc.gnu.org/cgit/gcc/commit/?id=517c9487f8fdc4e4e90252a9365e5823259dc783
-    // TODO: Enable this if/when _Countof() becomes more certain and/or available
-    // in a Clang release:
-    //#define ARRAYLEN(a) _Countof(a)
 #else
     // The extra division on the third line produces a `div-by-zero`
     // warning if `a` is a pointer (instead of an array). The GCC/Clang
