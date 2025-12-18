@@ -45,7 +45,6 @@ Installing
 | [Ubuntu]                  | `apt-get install dte`         |
 | Arch Linux ([AUR])        | `yay -S dte`                  |
 | [Void Linux]              | `xbps-install -S dte`         |
-| Slackware ([SlackBuilds]) | See: [SlackBuild Usage HOWTO] |
 | [FreeBSD]                 | `pkg install dte`             |
 | DragonFly BSD ([DPorts])  | `pkg install dte`             |
 | [OpenBSD]                 | `pkg_add dte`                 |
@@ -182,8 +181,6 @@ Public License version 2 for more details.
 [Ubuntu]: https://launchpad.net/ubuntu/+source/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
-[SlackBuilds]: https://slackbuilds.org/repository/15.0/development/dte/
-[SlackBuild Usage HOWTO]: https://slackbuilds.org/howto/
 [FreeBSD]: https://cgit.freebsd.org/ports/tree/editors/dte
 [DPorts]: https://github.com/DragonFlyBSD/DPorts/tree/master/editors/dte
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
