@@ -43,7 +43,7 @@ Installing
 |---------------------------|-------------------------------|
 | [Debian]                  | `apt-get install dte`         |
 | [Ubuntu]                  | `apt-get install dte`         |
-| Arch Linux ([AUR])        | `$AUR_HELPER -S dte`          |
+| Arch Linux ([AUR])        | `yay -S dte`                  |
 | [Void Linux]              | `xbps-install -S dte`         |
 | Slackware ([SlackBuilds]) | See: [SlackBuild Usage HOWTO] |
 | [FreeBSD]                 | `pkg install dte`             |
