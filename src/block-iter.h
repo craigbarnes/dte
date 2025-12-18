@@ -55,10 +55,12 @@ static inline bool block_iter_is_eol(const BlockIter *bi)
             // EOF
             return true;
         }
+
         // Normalize
         blk = BLOCK(blk->node.next);
         offset = 0;
     }
+
     return blk->data[offset] == '\n';
 }
 
@@ -74,6 +76,7 @@ static inline void block_iter_normalize(BlockIter *bi)
 size_t block_iter_eat_line(BlockIter *bi) NONNULL_ARGS;
 size_t block_iter_next_line(BlockIter *bi) NONNULL_ARGS;
 size_t block_iter_prev_line(BlockIter *bi) NONNULL_ARGS;
+size_t block_iter_prev_line_eol(BlockIter *bi) NONNULL_ARGS;
 size_t block_iter_next_char(BlockIter *bi, CodePoint *up) NONNULL_ARGS READWRITE(1) WRITEONLY(2);
 size_t block_iter_prev_char(BlockIter *bi, CodePoint *up) NONNULL_ARGS READWRITE(1) WRITEONLY(2);
 size_t block_iter_next_column(BlockIter *bi) NONNULL_ARGS;

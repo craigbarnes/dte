@@ -62,8 +62,8 @@ size_t block_iter_next_line(BlockIter *bi)
     return bi->offset - offset;
 }
 
-// Move to beginning of previous line (if any) and return number of bytes moved
-size_t block_iter_prev_line(BlockIter *bi)
+// Move to end of previous line (if any) and return number of bytes moved
+size_t block_iter_prev_line_eol(BlockIter *bi)
 {
     CodePoint u;
     BlockIter tmp = *bi;
@@ -75,15 +75,20 @@ size_t block_iter_prev_line(BlockIter *bi)
         return 0;
     }
 
-    // Otherwise, block_iter_prev_char() moved to the previous line's EOL
+    // Otherwise, block_iter_prev_char() moved to the previous line's
+    // EOL, so we set the in-out parameter to reflect the temporary
+    // iterator and and return the sum of the 2 movements
     BUG_ON(n2 != 1);
     BUG_ON(u != '\n');
-
-    // So we move to BOL again, set the in-out parameter to reflect the
-    // temporary iterator and return the sum of the 3 movements
-    size_t n3 = block_iter_bol(&tmp);
     *bi = tmp;
-    return n1 + n2 + n3;
+    return n1 + n2;
+}
+
+// Move to beginning of previous line (if any) and return number of bytes moved
+size_t block_iter_prev_line(BlockIter *bi)
+{
+    size_t n = block_iter_prev_line_eol(bi);
+    return n ? n + block_iter_bol(bi) : 0;
 }
 
 size_t block_iter_get_char(const BlockIter *bi, CodePoint *up)
