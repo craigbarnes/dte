@@ -219,6 +219,17 @@ static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
     return cmdline_soft_reset(c);
 }
 
+static bool cmd_insert(EditorState *e, const CommandArgs *a)
+{
+    const char *str = a->args[0];
+    size_t len = strlen(str);
+    CommandLine *c = &e->cmdline;
+    string_insert_buf(&c->buf, c->pos, str, len);
+    c->pos += cmdargs_has_flag(a, 'm') ? len : 0;
+    c->search_pos = NULL;
+    return true;
+}
+
 static bool do_history_prev(const History *hist, CommandLine *c, bool prefix_search)
 {
     if (!c->search_pos) {
@@ -482,6 +493,7 @@ static const Command common_cmds[] = {
     CMD("erase", "", 0, 0, cmd_erase),
     CMD("erase-bol", "", 0, 0, cmd_erase_bol),
     CMD("erase-word", "s", 0, 0, cmd_erase_word), // Ignored flag: s
+    CMD("insert", "km", 1, 1, cmd_insert), // Ignored flag: k
     CMD("left", "", 0, 0, cmd_left),
     CMD("paste", "acmn", 0, 0, cmd_paste), // Ignored flags: a, c
     CMD("right", "", 0, 0, cmd_right),
