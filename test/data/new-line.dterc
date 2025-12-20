@@ -1,0 +1,17 @@
+open
+
+insert "\t#1\n\t\t#2\n"
+new-line -am
+insert A1
+down
+new-line -m
+insert B1
+down
+new-line -am
+insert A2
+down
+new-line -m
+insert B2
+
+save -f build/test/new-line.txt
+close

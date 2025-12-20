@@ -1149,10 +1149,16 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
 {
-    char iflag = cmdargs_pick_winning_flag(a, "iI");
-    bool auto_indent = iflag ? (iflag == 'i') : e->buffer->options.auto_indent;
+    bool autoindent = e->buffer->options.auto_indent;
+    NewlineIndentType type = autoindent ? NLI_AUTO_INDENT : NLI_NO_INDENT;
+    switch (cmdargs_pick_winning_flag(a, "iIm")) {
+        case 'I': type = NLI_NO_INDENT; break;
+        case 'i': type = NLI_AUTO_INDENT; break;
+        case 'm': type = NLI_COPY_INDENT; break;
+    }
+
     bool above_cursor = has_flag(a, 'a');
-    new_line(e->view, auto_indent, above_cursor);
+    new_line(e->view, above_cursor, type);
     return true;
 }
 
@@ -2656,7 +2662,7 @@ static const Command cmds[] = {
     {"mode", "", RC, 1, 1, cmd_mode},
     {"move-tab", "", NA, 1, 1, cmd_move_tab},
     {"msg", "ABCnpw", NA, 0, 1, cmd_msg},
-    {"new-line", "Iai", NA, 0, 0, cmd_new_line},
+    {"new-line", "Iaim", NA, 0, 0, cmd_new_line},
     {"next", "", NA, 0, 0, cmd_next},
     {"open", "e=gt", NA, 0, -1, cmd_open},
     {"option", "r", RC | NFAA, 3, -1, cmd_option},

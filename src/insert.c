@@ -37,22 +37,49 @@ static size_t insert_nl_and_autoindent (
     return ins_count;
 }
 
-void new_line(View *view, bool auto_indent, bool above_cursor)
+void new_line(View *view, bool above_cursor, NewlineIndentType indent_type)
 {
-    if (above_cursor && block_iter_prev_line(&view->cursor) == 0) {
-        // Already on first line; insert newline at bof
-        block_iter_bof(&view->cursor);
+    BlockIter *cursor = &view->cursor;
+    if (indent_type == NLI_COPY_INDENT) {
+        const LocalOptions *options = &view->buffer->options;
+        StringView line = get_current_line(*cursor);
+        size_t width = get_indent_width(line, options->tab_width);
+        String indent_and_nl = make_indent(options, width);
+        string_append_byte(&indent_and_nl, '\n');
+
+        if (above_cursor) {
+            block_iter_bol(cursor);
+        } else {
+            block_iter_eat_line(cursor);
+        }
+
+        buffer_insert_bytes(view, indent_and_nl.buffer, indent_and_nl.len);
+        block_iter_skip_bytes(cursor, indent_and_nl.len - 1);
+        string_free(&indent_and_nl);
+        return;
+    }
+
+    if (above_cursor && !block_iter_prev_line(cursor)) {
+        // The NLI_AUTO_INDENT and NLI_NO_INDENT types are handled
+        // by simulating a newline insertion (with or without an
+        // auto-indent). Inserting above the cursor when already
+        // on the first line is a special case, both because the
+        // positioning attempted by block_iter_prev_line() failed
+        // and because an auto-indent is never needed. Thus, we
+        // simply insert a newline at BOF/BOL instead.
+        block_iter_bof(cursor);
         buffer_insert_bytes(view, "\n", 1);
         return;
     }
 
-    BlockIter tmp = view->cursor;
+    BlockIter tmp = *cursor;
+    bool auto_indent = (indent_type == NLI_AUTO_INDENT);
     bool use_ref_line = auto_indent && block_iter_find_non_empty_line_bwd(&tmp);
     StringView line = use_ref_line ? block_iter_get_line(&tmp) : strview(NULL);
-    block_iter_eol(&view->cursor);
+    block_iter_eol(cursor);
 
     size_t ins_count = insert_nl_and_autoindent(view, line, 0);
-    block_iter_skip_bytes(&view->cursor, ins_count);
+    block_iter_skip_bytes(cursor, ins_count);
 }
 
 // Go to beginning of whitespace (tabs and spaces) under cursor and

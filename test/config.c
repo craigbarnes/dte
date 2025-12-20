@@ -112,6 +112,7 @@ static void test_exec_config(TestContext *ctx)
         "exec.txt",
         "move.txt",
         "delete.txt",
+        "new-line.txt",
         "tag.txt",
     };
 
