@@ -140,7 +140,14 @@ void update_screen_size(Terminal *term, Frame *root_frame)
 {
     BUG_ON(!is_root_frame(root_frame));
     unsigned int w, h;
-    if (term_get_size(&w, &h) != 0 || (w == term->width && h == term->height)) {
+    SystemErrno err = term_get_size(&w, &h);
+    if (unlikely(err)) {
+        LOG_ERROR("term_get_size: %s", strerror(err));
+        return;
+    }
+
+    if (w == term->width && h == term->height) {
+        LOG_INFO("terminal size unchanged (%ux%u)", w, h);
         return;
     }
 

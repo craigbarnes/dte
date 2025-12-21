@@ -2,7 +2,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include "ioctl.h"
-#include "util/log.h"
 
 #if HAVE_TIOCGWINSZ || HAVE_TIOCNOTTY
 # include <sys/ioctl.h>
@@ -30,7 +29,7 @@ SystemErrno term_get_size(unsigned int *w, unsigned int *h)
         int r = tcgetwinsize(STDIN_FILENO, &ws);
     #endif
     if (unlikely(r == -1)) {
-        return LOG_ERRNO("term_get_size");
+        return errno;
     }
     *w = ws.ws_col;
     *h = ws.ws_row;
