@@ -30,11 +30,13 @@ ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|/tmp/mutt(ng)?-'
 option gitcommit,gitnote,gitrebase file-history false
 option -r '/\.git/.*\.diff$' file-history false
 
-# Try to detect indent settings based on existing file contents
-option c,css,d,java,javascript,lua,nginx,php,sh,vala detect-indent 2,4,8
+# Try to detect indent settings based on existing file contents and
+# use braces to determine next auto-ident size
+option c,css,d,java,javascript,lua,nginx,php,sh,vala \
+    detect-indent 2,4,8 \
+    brace-indent true
 
-# Scan for braces to determine next auto-ident size
-option c,css,d,go,java,javascript,lua,nginx,php,sh,vala brace-indent true
+option go brace-indent true
 
 # Override indent options for Makefiles, since they almost always require tabs
 option make indent-width 8 expand-tab false emulate-tab false
