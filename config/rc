@@ -32,7 +32,7 @@ option -r '/\.git/.*\.diff$' file-history false
 
 # Try to detect indent settings based on existing file contents and
 # use braces to determine next auto-ident size
-option c,css,d,java,javascript,lua,nginx,php,sh,vala \
+option c,css,d,java,javascript,json,jsonc,lua,nginx,php,sh,vala \
     detect-indent 2,4,8 \
     brace-indent true
 
