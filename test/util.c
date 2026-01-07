@@ -292,6 +292,9 @@ static void test_hex_decode(TestContext *ctx)
     EXPECT_EQ(hex_decode('F'), 15);
     EXPECT_EQ(hex_decode('g'), HEX_INVALID);
     EXPECT_EQ(hex_decode('G'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('o'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('p'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('q'), HEX_INVALID);
     EXPECT_EQ(hex_decode('`'), HEX_INVALID);
     EXPECT_EQ(hex_decode('@'), HEX_INVALID);
     EXPECT_EQ(hex_decode('/'), HEX_INVALID);

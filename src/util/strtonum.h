@@ -19,7 +19,7 @@ enum {
 static inline unsigned int hex_decode(unsigned char c)
 {
     c -= '0'; // Lookup table starts at '0'
-    return hex_decode_table[(c < sizeof(hex_decode_table)) ? c : 63];
+    return hex_decode_table[MIN(c, 63)];
 }
 
 static inline bool ascii_isxdigit(unsigned char c)
