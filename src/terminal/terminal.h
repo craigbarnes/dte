@@ -2,8 +2,8 @@
 #define TERMINAL_TERMINAL_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <sys/types.h>
 #include "feature.h"
 #include "key.h"
 #include "style.h"
@@ -64,7 +64,7 @@ typedef struct {
     unsigned int width; // Terminal width (in columns)
     unsigned int height; // Terminal height (in rows)
     unsigned int ncv_attributes; // See "no_color_video" terminfo(5) capability
-    ssize_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
+    size_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;
 } Terminal;

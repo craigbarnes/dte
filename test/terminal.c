@@ -57,22 +57,22 @@ static void expect_parse_seq (
     const char *file,
     int line,
     const char *seq,
-    ssize_t expected_length,
+    size_t expected_length,
     KeyCode expected_key
 ) {
     KeyCode key = 0x18;
-    ssize_t parsed_length = term_parse_sequence(seq, strlen(seq), &key);
+    size_t parsed_length = term_parse_sequence(seq, strlen(seq), &key);
     if (unlikely(parsed_length != expected_length)) {
         test_fail (
             ctx, file, line,
-            "term_parse_sequence() returned %zd; expected %zd",
+            "term_parse_sequence() returned %zu; expected %zu",
             parsed_length, expected_length
         );
         return;
     }
 
-    static_assert(TPARSE_PARTIAL_MATCH == -1);
-    if (expected_length <= 0) {
+    static_assert(TPARSE_PARTIAL_MATCH == 0);
+    if (expected_length == TPARSE_PARTIAL_MATCH) {
         test_pass(ctx);
         return;
     }
@@ -91,14 +91,16 @@ static void expect_parse_seq (
 
     for (size_t n = expected_length - 1; n != 0; n--) {
         parsed_length = term_parse_sequence(seq, n, &key);
-        if (parsed_length == TPARSE_PARTIAL_MATCH) {
+        if (likely(parsed_length == TPARSE_PARTIAL_MATCH)) {
             continue;
         }
+
         test_fail (
             ctx, file, line,
-            "Parsing truncated sequence of %zu bytes returned %zd; expected -1",
-            n, parsed_length
+            "Parsing truncated sequence of %zu bytes returned %zu; expected %zu",
+            n, parsed_length, (size_t)TPARSE_PARTIAL_MATCH
         );
+
         return;
     }
 
@@ -613,8 +615,8 @@ static void test_term_parse_csi_params(TestContext *ctx)
 static void test_term_parse_sequence(TestContext *ctx)
 {
     EXPECT_PARSE_SEQ("", 0);
-    EXPECT_PARSE_SEQN("x", 0, 0);
-    EXPECT_PARSE_SEQN("\033q", 0, 0);
+    EXPECT_PARSE_SEQN("x", 1, KEY_IGNORE);
+    EXPECT_PARSE_SEQN("\033q", 2, KEY_IGNORE);
     EXPECT_PARSE_SEQ("\033\\", KEY_IGNORE);
 
     EXPECT_PARSE_SEQ("\033[Z", MOD_SHIFT | KEY_TAB);
@@ -1032,7 +1034,7 @@ static void test_term_parse_sequence2(TestContext *ctx)
                 templates[i].final_byte
             );
             KeyCode key = 24;
-            ssize_t parsed_length = term_parse_sequence(seq, seq_length, &key);
+            size_t parsed_length = term_parse_sequence(seq, seq_length, &key);
             KeyCode mods = modifiers[j].mask;
             KeyCode expected_key = mods | (mods == KEY_IGNORE ? 0 : templates[i].key);
             IEXPECT_EQ(parsed_length, seq_length);
@@ -1090,7 +1092,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
             KeyCode key;
 
             // Double ESC
-            ssize_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
+            size_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
             EXPECT_EQ(parsed_length, seq_length);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key | MOD_META);
 
@@ -1145,7 +1147,7 @@ static void test_rxvt_parse_key(TestContext *ctx)
         const char *seq = tests[i].seq;
         const size_t seq_length = tests[i].seq_length;
         KeyCode key = 0x18;
-        ssize_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
+        size_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
         KeyCode expected_key = (parsed_length > 0) ? tests[i].expected_key : 0x18;
         IEXPECT_EQ(parsed_length, tests[i].expected_length);
         IEXPECT_KEYCODE_EQ(key, expected_key, seq, seq_length);
@@ -1176,7 +1178,7 @@ static void test_linux_parse_key(TestContext *ctx)
         const char *seq = tests[i].seq;
         const size_t seq_length = tests[i].seq_length;
         KeyCode key = 0x18;
-        ssize_t parsed_length = linux_parse_key(seq, seq_length, &key);
+        size_t parsed_length = linux_parse_key(seq, seq_length, &key);
         KeyCode expected_key = (parsed_length > 0) ? tests[i].expected_key : 0x18;
         IEXPECT_EQ(parsed_length, tests[i].expected_length);
         IEXPECT_KEYCODE_EQ(key, expected_key, seq, seq_length);

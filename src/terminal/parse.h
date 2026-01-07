@@ -2,8 +2,8 @@
 #define TERMINAL_PARSE_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <sys/types.h>
 #include "key.h"
 #include "util/macros.h"
 
@@ -28,10 +28,10 @@ enum {
     // Returned by term_parse_sequence() if buf contains a valid prefix
     // for a known sequence but isn't terminated within the length bound
     // (e.g. because another read(3) call is required to fill the buffer)
-    TPARSE_PARTIAL_MATCH = -1,
+    TPARSE_PARTIAL_MATCH = 0,
 };
 
-ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k) WARN_UNUSED_RESULT;
-size_t term_parse_csi_params(const char *buf, size_t len, size_t i, TermControlParams *csi) WARN_UNUSED_RESULT;
+size_t term_parse_sequence(const char *buf, size_t length, KeyCode *k) WARN_UNUSED_RESULT NONNULL_ARGS WRITEONLY(3);
+size_t term_parse_csi_params(const char *buf, size_t len, size_t i, TermControlParams *csi) WARN_UNUSED_RESULT NONNULL_ARGS;
 
 #endif

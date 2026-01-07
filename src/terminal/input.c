@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "input.h"
 #include "output.h"
+#include "parse.h"
 #include "trace.h"
 #include "util/ascii.h"
 #include "util/bit.h"
@@ -102,20 +103,15 @@ static KeyCode read_special(Terminal *term)
 {
     TermInputBuffer *input = &term->ibuf;
     KeyCode key;
-    ssize_t len = term->parse_input(input->buf, input->len, &key);
-    if (likely(len > 0)) {
-        // Match
-        consume_input(input, len);
-        return key;
+    size_t len = term->parse_input(input->buf, input->len, &key);
+
+    if (unlikely(len == TPARSE_PARTIAL_MATCH)) {
+        bool retry = input->can_be_truncated && fill_buffer(input);
+        return retry ? read_special(term) : KEY_NONE;
     }
 
-    if (len < 0 && input->can_be_truncated && fill_buffer(input)) {
-        // Possibly truncated
-        return read_special(term);
-    }
-
-    // No match
-    return KEY_NONE;
+    consume_input(input, len);
+    return key;
 }
 
 /*
