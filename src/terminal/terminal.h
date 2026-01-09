@@ -64,7 +64,7 @@ typedef struct {
     unsigned int width; // Terminal width (in columns)
     unsigned int height; // Terminal height (in rows)
     unsigned int ncv_attributes; // See "no_color_video" terminfo(5) capability
-    size_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
+    size_t (*parse_input)(const char *buf, size_t length, KeyCode *key); // See term_parse_sequence()
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;
 } Terminal;

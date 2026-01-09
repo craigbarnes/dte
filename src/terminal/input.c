@@ -44,7 +44,7 @@ static void consume_input(TermInputBuffer *input, size_t len)
 
 static bool fill_buffer(TermInputBuffer *input)
 {
-    if (input->len == TERM_INBUF_SIZE) {
+    if (unlikely(input->len == TERM_INBUF_SIZE)) {
         return false;
     }
 
@@ -326,7 +326,7 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode reply)
     return KEY_NONE;
 }
 
-KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
+static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_ms)
 {
     TermInputBuffer *input = &term->ibuf;
     if (!input->len && !fill_buffer(input)) {
@@ -400,4 +400,66 @@ KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
     }
 
     return read_simple(term);
+}
+
+/*
+ This is similar to term_read_input_legacy(), but suitable only for
+ terminals that support the Kitty keyboard protocol and with the
+ following notable differences:
+ • No function pointer indirection for parsing input from quirky
+   terminals (term_parse_sequence() is always used)
+ • No timing hacks to disambiguate the meaning of ESC bytes (since
+   there is no ambiguity when using the Kitty protocol)
+ • No additional code for parsing legacy encodings of Alt-modified
+   key combos (i.e. those prefixed with extra ESC bytes)
+ • No additional (timing dependant) code for treating ESC bytes as
+   the Esc key (always encoded as `CSI 27 u` in the Kitty protocol)
+ • No support for handling legacy style (undelimited) clipboard
+   pastes (Kitty keyboard support is assumed to also imply bracketed
+   paste support)
+*/
+static KeyCode term_read_input_modern(Terminal *term)
+{
+    TermInputBuffer *input = &term->ibuf;
+    if (!input->len && !fill_buffer(input)) {
+        return KEY_NONE;
+    }
+
+    if (input->buf[0] != '\033') {
+        return read_simple(term);
+    }
+
+    KeyCode key;
+    while (1) {
+        size_t len = term_parse_sequence(input->buf, input->len, &key);
+        if (len != TPARSE_PARTIAL_MATCH) {
+            consume_input(input, len);
+            break;
+        }
+
+        size_t avail = TERM_INBUF_SIZE - input->len;
+        ssize_t rc = read(STDIN_FILENO, input->buf + input->len, avail); // NOLINT(*-unsafe-functions)
+        if (unlikely(rc <= 0)) {
+            LOG_ERRNO_ON(rc < 0, "read");
+            return KEY_NONE;
+        }
+
+        TRACE_INPUT("read %zu bytes into input buffer", (size_t)rc);
+        input->len += (size_t)rc;
+    }
+
+    if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
+        return handle_query_reply(term, key);
+    }
+
+    return (key == KEY_IGNORE) ? KEY_NONE : key;
+}
+
+KeyCode term_read_input(Terminal *term, unsigned int esc_timeout_ms)
+{
+    if (term->features & TFLAG_KITTY_KEYBOARD) {
+        return term_read_input_modern(term);
+    }
+
+    return term_read_input_legacy(term, esc_timeout_ms);
 }

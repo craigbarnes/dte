@@ -54,9 +54,6 @@ Features
 * Make the [`default`] command in [`dte-syntax(5)`] files act recursively
   (for example `default X Y; default Y Z` should work as expected)
 
-* Implement a `KITTYKBD`-specialized version of `term_read_input()` that
-  omits all of the Esc-prefix=Alt and Esc timing stupidity
-
 * Allow [`dte -s`] option to take multiple file arguments (e.g.
   `dte -s config/syntax/*`)
 
