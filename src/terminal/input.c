@@ -201,10 +201,13 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     // bits set should be handled as appropriate, by the caller.
     WARN_ON(!IS_POWER_OF_2(flag));
 
+    // See also: "short aliases for TermFeatureFlags" in `src/terminal/feature.c`
     switch ((unsigned int)flag) {
     case TFLAG_BACK_COLOR_ERASE: return "BCE";
     case TFLAG_ECMA48_REPEAT: return "REP";
     case TFLAG_SET_WINDOW_TITLE: return "TITLE";
+    case TFLAG_RXVT: return "RXVT";
+    case TFLAG_LINUX: return "LINUX";
     case TFLAG_OSC52_COPY: return "OSC52";
     case TFLAG_META_ESC: return "METAESC";
     case TFLAG_ALT_ESC: return "ALTESC";
@@ -219,8 +222,11 @@ static const char *tflag_to_str(TermFeatureFlags flag)
     case TFLAG_256_COLOR: return "C256";
     case TFLAG_TRUE_COLOR: return "TC";
     case TFLAG_MODIFY_OTHER_KEYS: return "MOKEYS";
-    case TFLAG_BS_CTRL_BACKSPACE: return "BSCTRL";
     case TFLAG_DEL_CTRL_BACKSPACE: return "DELCTRL";
+    case TFLAG_BS_CTRL_BACKSPACE: return "BSCTRL";
+    case TFLAG_NCV_UNDERLINE: return "NCVUL";
+    case TFLAG_NCV_DIM: return "NCVDIM";
+    case TFLAG_NCV_REVERSE: return "NCVREV";
     }
 
     return "??";

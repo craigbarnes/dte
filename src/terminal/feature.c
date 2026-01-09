@@ -2,6 +2,7 @@
 #include <string.h>
 #include "feature.h"
 #include "util/array.h"
+#include "util/bit.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/log.h"
@@ -16,28 +17,36 @@ typedef struct {
     TermFeatureFlags features;
 } TermEntry;
 
+// Short aliases for TermFeatureFlags.
+// See also: tflag_to_str() and the UNITTEST{} block below.
 enum {
-    // Short aliases for TermFeatureFlags:
     BCE = TFLAG_BACK_COLOR_ERASE,
     REP = TFLAG_ECMA48_REPEAT,
     TITLE = TFLAG_SET_WINDOW_TITLE,
-    RXVT = TFLAG_RXVT,
-    LINUX = TFLAG_LINUX,
+    RXVT = TFLAG_RXVT, // Mutually exclusive with LINUX and KITTYKBD
+    LINUX = TFLAG_LINUX, // Mutually exclusive with RXVT and KITTYKBD
     OSC52 = TFLAG_OSC52_COPY,
-    KITTYKBD = TFLAG_KITTY_KEYBOARD,
-    MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
+    KITTYKBD = TFLAG_KITTY_KEYBOARD, // Mutually exclusive with RXVT, LINUX, DELCTRL and BSCTRL
     SYNC = TFLAG_SYNC,
-    NOQUERY1 = TFLAG_NO_QUERY_L1,
-    NOQUERY3 = TFLAG_NO_QUERY_L3,
-    BSCTRL = TFLAG_BS_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
-    DELCTRL = TFLAG_DEL_CTRL_BACKSPACE, // Only useful if not superseded by KITTYKBD
+    NOQUERY1 = TFLAG_NO_QUERY_L1, // Mutually exclusive with NOQUERY3
+    NOQUERY3 = TFLAG_NO_QUERY_L3, // Mutually exclusive with NOQUERY1
     C8 = TFLAG_8_COLOR,
     C16 = TFLAG_16_COLOR | C8,
     C256 = TFLAG_256_COLOR | C16,
     TC = TFLAG_TRUE_COLOR | C256,
+    DELCTRL = TFLAG_DEL_CTRL_BACKSPACE, // Mutually exclusive with BSCTRL and KITTYKBD
+    BSCTRL = TFLAG_BS_CTRL_BACKSPACE, // Mutually exclusive with DELCTRL and KITTYKBD
     NCVUL = TFLAG_NCV_UNDERLINE,
-    NCVREV = TFLAG_NCV_REVERSE,
     NCVDIM = TFLAG_NCV_DIM,
+    NCVREV = TFLAG_NCV_REVERSE,
+
+    // Query-only flags (not used in terms[] entries)
+    METAESC = TFLAG_META_ESC,
+    ALTESC = TFLAG_ALT_ESC,
+    QUERY2 = TFLAG_QUERY_L2,
+    QUERY3 = TFLAG_QUERY_L3,
+    MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
+    QUERY_ONLY_FFLAGS = METAESC | ALTESC | QUERY2 | QUERY3 | MOKEYS,
 };
 
 #define t(tname, feat) { \
@@ -138,14 +147,32 @@ UNITTEST {
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
     // NOLINTEND(bugprone-assert-side-effect)
 
+    // Each terms[] entry should have at most 1 flag in any of these sets
+    static const TermFeatureFlags mutually_exclusive_flags[] = {
+        (KITTYKBD | BSCTRL | DELCTRL),
+        (KITTYKBD | LINUX | RXVT),
+        (NOQUERY1 | NOQUERY3),
+    };
+
     for (size_t i = 0; i < ARRAYLEN(terms); i++) {
         const char *name = terms[i].name;
         size_t len = strlen(name);
         BUG_ON(terms[i].name_len != len);
-        TermFeatureFlags imode_flags = KITTYKBD | BSCTRL | DELCTRL;
-        TermFeatureFlags masked = terms[i].features & imode_flags;
-        if (masked && !IS_POWER_OF_2(masked)) {
-            BUG("TermEntry '%s' has multiple mutually exclusive flags", name);
+
+        TermFeatureFlags features = terms[i].features;
+        if (features & QUERY_ONLY_FFLAGS) {
+            BUG("TermEntry '%s' has query-only flags", name);
+        }
+
+        for (size_t j = 0; j < ARRAYLEN(mutually_exclusive_flags); j++) {
+            TermFeatureFlags flag_union = features & mutually_exclusive_flags[j];
+            unsigned int count = u32_popcount(flag_union);
+            if (count > 1) {
+                BUG (
+                    "TermEntry '%s' has %u mutually exclusive flags: 0x%x",
+                    name, count, flag_union
+                );
+            }
         }
     }
 
