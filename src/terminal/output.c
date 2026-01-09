@@ -268,6 +268,11 @@ void term_put_level_3_queries(Terminal *term, bool emit_all)
         "\033[0m" // SGR 0
     ;
 
+    static const char debug_queries[] =
+        "\033P+q71756572792d6f732d6e616d65\033\\" // XTGETTCAP "query-os-name"
+        "\033P$q q\033\\" // DECRQSS DECSCUSR (cursor style)
+    ;
+
     TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = emit_all ? 0 : term->features;
     LOG_INFO("sending level 3 queries to terminal");
@@ -289,8 +294,9 @@ void term_put_level_3_queries(Terminal *term, bool emit_all)
         term_put_literal(obuf, "\033P+q4D73\033\\"); // XTGETTCAP "Ms"
     }
 
+    // Debug query responses are used purely for logging/informational purposes
     if (emit_all || log_level_debug_enabled()) {
-        term_put_literal(obuf, "\033P$q q\033\\"); // DECRQSS DECSCUSR (cursor style)
+        term_put_bytes(obuf, debug_queries, sizeof(debug_queries) - 1);
     }
 }
 

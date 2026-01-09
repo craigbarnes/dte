@@ -1805,6 +1805,7 @@ static void test_term_put_level_1_queries(TestContext *ctx)
         "\033P+q74736C\033\\"
         "\033P+q4D73\033\\"
         // term_put_level_3_queries() debug
+        "\033P+q71756572792d6f732d6e616d65\033\\"
         "\033P$q q\033\\"
     ;
 

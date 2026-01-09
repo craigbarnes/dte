@@ -220,7 +220,7 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     StringView cap_hex = (pos < len) ? get_delim(data, &pos, len, '=') : empty;
     StringView val_hex = (pos < len) ? string_view(data + pos, len - pos) : empty;
 
-    char cbuf[8], vbuf[64];
+    char cbuf[16], vbuf[64];
     StringView cap = hex_decode_str(cap_hex, cbuf, sizeof(cbuf));
     StringView val = hex_decode_str(val_hex, vbuf, sizeof(vbuf));
 
@@ -240,6 +240,15 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
             // there's really no reason to check the value.
             // Source: https://gitlab.com/craigbarnes/lua-terminfo-parser/-/blob/master/examples/output/cap-values-Ms.txt#:~:text=Totals,-%2D
             return tflag(TFLAG_OSC52_COPY);
+        }
+        if (strview_equal_cstring(cap, "query-os-name")) {
+            // Terminal-side operating system query; see:
+            // • https://codeberg.org/dnkl/foot/issues/2209
+            // • https://codeberg.org/dnkl/foot/pulls/2217/
+            // • https://github.com/kovidgoyal/kitty/issues/9217
+            // • https://github.com/fish-shell/fish-shell/blob/7a05ea0f938a8483/doc_src/terminal-compatibility.rst#:~:text=query%2Dos%2Dname
+            LOG_DEBUG("XTGETTCAP \"query-os-name\" reply: %.*s", (int)val.length, val.data);
+            return KEY_IGNORE;
         }
     }
 
