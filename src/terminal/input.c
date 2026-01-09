@@ -418,7 +418,7 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
    there is no ambiguity when using the Kitty protocol)
  • No additional code for parsing legacy encodings of Alt-modified
    key combos (i.e. those prefixed with extra ESC bytes)
- • No additional (timing dependant) code for treating ESC bytes as
+ • No additional (timing dependent) code for treating ESC bytes as
    the Esc key (always encoded as `CSI 27 u` in the Kitty protocol)
  • No support for handling legacy style (undelimited) clipboard
    pastes (Kitty keyboard support is assumed to also imply bracketed

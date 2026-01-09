@@ -168,7 +168,7 @@ static void test_normal_command_errors(TestContext *ctx)
 
         // These are tested last, since some of the commands succeed and
         // affect the state of the Buffer (i.e. the undo history) and some
-        // are dependant on it (and cannot be reordered)
+        // are dependent on it (and cannot be reordered)
         {"insert 1; undo; redo 900", "there is only 1 possible change to redo"},
         {"insert 2; undo; redo 900", "there are only 2 possible changes to redo"},
         {"insert x; close; undo", "close without saving"},

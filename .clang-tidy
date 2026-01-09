@@ -150,7 +150,7 @@ CheckOptions:
         ^strl(cpy|cat)$,memccpy,is flawed (see https://nullprogram.com/blog/2023/02/11/#strings:~:text=functions%20like%20strlcpy);
         scanf$,src/util/strtonum.h,is flawed (see https://nullprogram.com/blog/2023/02/11/#stdio:~:text=don%E2%80%99t%20ever%20bother%20with%20scanf);
         ^(atoi|atol|atoll)$,src/util/strtonum.h,is broken (see "BUGS" in atoi(3));
-        ^strto(u?ll?|[iu](max)?)$,src/util/strtonum.h,is locale-dependant;
+        ^strto(u?ll?|[iu](max)?)$,src/util/strtonum.h,is locale-dependent;
         ^(atof|strto(f|d|ld))$,integers,returns a floating-point type;
         ^mktemp$,xmkstemp_cloexec,is broken (see "BUGS" in mktemp(3));
         ^(tmpfile|tempnam|tmpnam)$,xmkstemp_cloexec,is flawed;
@@ -183,8 +183,8 @@ CheckOptions:
         ^posix_madvise$,advise_sequential,is optional in POSIX;
         ^signal$,sigaction,is obsolete;
         ^getwd$,getcwd,is obsolete;
-        ^tow?(lower|upper)$,,is locale-dependant;
-        ^isw?(alnum|alpha|blank|cntrl|x?digit|graph|lower|print|punct|space|upper)$,,is locale-dependant;
+        ^tow?(lower|upper)$,,is locale-dependent;
+        ^isw?(alnum|alpha|blank|cntrl|x?digit|graph|lower|print|punct|space|upper)$,,is locale-dependent;
 
     # https://clang.llvm.org/extra/clang-tidy/checks/llvmlibc/restrict-system-libc-headers.html#cmdoption-arg-Includes
     portability-restrict-system-includes.Includes: >
