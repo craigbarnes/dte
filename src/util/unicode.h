@@ -11,12 +11,12 @@
 # include <stdc-predef.h> // NOLINT(portability-restrict-system-includes)
 #endif
 
-#if defined(WINT_MAX) && (WINT_MAX >= 0x10FFFF) && defined(__STDC_ISO_10646__)
+#if defined(WINT_MAX) && (WINT_MAX >= 0x10FFFFUL) && defined(__STDC_ISO_10646__)
 # define SANE_WCTYPE 1
 #endif
 
 // The maximum Unicode codepoint allowed by RFC 3629
-#define UNICODE_MAX_VALID_CODEPOINT UINT32_C(0x10FFFF)
+#define UNICODE_MAX_VALID_CODEPOINT (0x10FFFFUL)
 
 typedef uint32_t CodePoint;
 

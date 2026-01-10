@@ -23,9 +23,6 @@
     #define USE_STDBIT(fn, arg)
 #endif
 
-#define U64(x) (UINT64_C(x))
-#define U32(x) (UINT32_C(x))
-
 #ifdef HAS_BUILTIN_TYPES_COMPATIBLE_P
     #define HAS_COMPATIBLE_BUILTIN(arg, type, fn) \
         (GNUC_AT_LEAST(3, 4) || HAS_BUILTIN(__builtin_ ## fn)) \
@@ -50,20 +47,20 @@ static inline unsigned int u64_popcount(uint64_t n)
 {
     USE_STDBIT(stdc_count_ones, n);
     USE_BUILTIN(popcount, n);
-    n -= ((n >> 1) & U64(0x5555555555555555));
-    n = (n & U64(0x3333333333333333)) + ((n >> 2) & U64(0x3333333333333333));
-    n = (n + (n >> 4)) & U64(0x0F0F0F0F0F0F0F0F);
-    return (n * U64(0x0101010101010101)) >> 56;
+    n -= ((n >> 1) & 0x5555555555555555ULL);
+    n = (n & 0x3333333333333333ULL) + ((n >> 2) & 0x3333333333333333ULL);
+    n = (n + (n >> 4)) & 0x0F0F0F0F0F0F0F0FULL;
+    return (n * 0x0101010101010101ULL) >> 56;
 }
 
 static inline unsigned int u32_popcount(uint32_t n)
 {
     USE_STDBIT(stdc_count_ones, n);
     USE_BUILTIN(popcount, n);
-    n -= ((n >> 1) & U32(0x55555555));
-    n = (n & U32(0x33333333)) + ((n >> 2) & U32(0x33333333));
-    n = (n + (n >> 4)) & U32(0x0F0F0F0F);
-    return (n * U32(0x01010101)) >> 24;
+    n -= ((n >> 1) & 0x55555555UL);
+    n = (n & 0x33333333UL) + ((n >> 2) & 0x33333333UL);
+    n = (n + (n >> 4)) & 0x0F0F0F0FUL;
+    return (n * 0x01010101UL) >> 24;
 }
 
 // Count trailing zeros

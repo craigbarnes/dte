@@ -3027,27 +3027,27 @@ static void test_popcount(TestContext *ctx)
     EXPECT_EQ(u32_popcount(255), 8);
     EXPECT_EQ(u32_popcount(UINT32_MAX), 32);
     EXPECT_EQ(u32_popcount(UINT32_MAX - 1), 31);
-    EXPECT_EQ(u32_popcount(U32(0xE10F02C9)), 13);
+    EXPECT_EQ(u32_popcount(0xE10F02C9u), 13);
 
     EXPECT_EQ(u64_popcount(0), 0);
     EXPECT_EQ(u64_popcount(1), 1);
     EXPECT_EQ(u64_popcount(255), 8);
     EXPECT_EQ(u64_popcount(UINT64_MAX), 64);
     EXPECT_EQ(u64_popcount(UINT64_MAX - 1), 63);
-    EXPECT_EQ(u64_popcount(U64(0xFFFFFFFFFF)), 40);
-    EXPECT_EQ(u64_popcount(U64(0x10000000000)), 1);
-    EXPECT_EQ(u64_popcount(U64(0x9010F0EEC2003B70)), 24);
+    EXPECT_EQ(u64_popcount(0xFFFFFFFFFFull), 40);
+    EXPECT_EQ(u64_popcount(0x10000000000ull), 1);
+    EXPECT_EQ(u64_popcount(0x9010F0EEC2003B70ull), 24);
 
     for (unsigned int i = 0; i < 32; i++) {
         IEXPECT_EQ(u32_popcount(UINT32_MAX << i), 32 - i);
         IEXPECT_EQ(u32_popcount(UINT32_MAX >> i), 32 - i);
-        IEXPECT_EQ(u32_popcount(U32(1) << i), 1);
+        IEXPECT_EQ(u32_popcount(1u << i), 1);
     }
 
     for (unsigned int i = 0; i < 64; i++) {
         IEXPECT_EQ(u64_popcount(UINT64_MAX << i), 64 - i);
         IEXPECT_EQ(u64_popcount(UINT64_MAX >> i), 64 - i);
-        IEXPECT_EQ(u64_popcount(U64(1) << i), 1);
+        IEXPECT_EQ(u64_popcount(1ull << i), 1);
     }
 }
 
@@ -3088,12 +3088,12 @@ static void test_ffs(TestContext *ctx)
     EXPECT_EQ(u32_ffs(8), 4);
     EXPECT_EQ(u32_ffs(255), 1);
     EXPECT_EQ(u32_ffs(256), 9);
-    EXPECT_EQ(u32_ffs(~U32(255)), 9);
     EXPECT_EQ(u32_ffs(UINT32_MAX), 1);
     EXPECT_EQ(u32_ffs(UINT32_MAX - 1), 2);
-    EXPECT_EQ(u32_ffs(U32(1) << 31), 32);
-    EXPECT_EQ(u32_ffs(U32(1) << 30), 31);
-    EXPECT_EQ(u32_ffs(U32(1) << 18), 19);
+    EXPECT_EQ(u32_ffs(UINT32_MAX << 8), 9);
+    EXPECT_EQ(u32_ffs(1u << 31), 32);
+    EXPECT_EQ(u32_ffs(1u << 30), 31);
+    EXPECT_EQ(u32_ffs(1u << 18), 19);
 }
 
 static void test_lsbit(TestContext *ctx)
