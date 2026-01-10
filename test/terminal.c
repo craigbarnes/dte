@@ -1396,21 +1396,18 @@ static void test_term_init(TestContext *ctx)
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, 0);
-    EXPECT_PTREQ(term.parse_input, term_parse_sequence);
     EXPECT_EQ(term.features, expected_xterm_flags);
 
     term_init(&term, "ansi", NULL);
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, ATTR_UNDERLINE);
-    EXPECT_PTREQ(term.parse_input, term_parse_sequence);
     EXPECT_EQ(term.features, TFLAG_8_COLOR | TFLAG_NCV_UNDERLINE);
 
     term_init(&term, "ansi-m", NULL);
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, 0);
-    EXPECT_PTREQ(term.parse_input, term_parse_sequence);
     EXPECT_EQ(term.features, 0);
 }
 

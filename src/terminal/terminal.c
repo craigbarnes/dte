@@ -1,9 +1,7 @@
 #include "terminal.h"
 #include "color.h"
-#include "linux.h"
 #include "output.h"
 #include "parse.h"
-#include "rxvt.h"
 
 void term_init(Terminal *term, const char *name, const char *colorterm)
 {
@@ -17,14 +15,6 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
         | (features & TFLAG_NCV_DIM) ? ATTR_DIM : 0
         | (features & TFLAG_NCV_REVERSE) ? ATTR_REVERSE : 0
     ;
-
-    if (features & TFLAG_RXVT) {
-        term->parse_input = rxvt_parse_key;
-    } else if (features & TFLAG_LINUX) {
-        term->parse_input = linux_parse_key;
-    } else {
-        term->parse_input = term_parse_sequence;
-    }
 }
 
 void term_enable_private_modes(Terminal *term)

@@ -5,8 +5,10 @@
 #include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
 #include "input.h"
+#include "linux.h"
 #include "output.h"
 #include "parse.h"
+#include "rxvt.h"
 #include "trace.h"
 #include "util/ascii.h"
 #include "util/bit.h"
@@ -99,15 +101,22 @@ static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
 
 // Recursion via tail call; no overflow possible
 // NOLINTNEXTLINE(misc-no-recursion)
-static KeyCode read_special(Terminal *term)
+static KeyCode read_special(TermInputBuffer *input, TermFeatureFlags features)
 {
-    TermInputBuffer *input = &term->ibuf;
     KeyCode key;
-    size_t len = term->parse_input(input->buf, input->len, &key);
+    size_t len;
+
+    if (unlikely(features & TFLAG_LINUX)) {
+        len = linux_parse_key(input->buf, input->len, &key);
+    } else if (unlikely(features & TFLAG_RXVT)) {
+        len = rxvt_parse_key(input->buf, input->len, &key);
+    } else {
+        len = term_parse_sequence(input->buf, input->len, &key);
+    }
 
     if (unlikely(len == TPARSE_PARTIAL_MATCH)) {
         bool retry = input->can_be_truncated && fill_buffer(input);
-        return retry ? read_special(term) : KEY_NONE;
+        return retry ? read_special(input, features) : KEY_NONE;
     }
 
     consume_input(input, len);
@@ -348,7 +357,7 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
     }
 
     if (input->len > 1 || input->can_be_truncated) {
-        KeyCode key = read_special(term);
+        KeyCode key = read_special(input, term->features);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
             return handle_query_reply(term, key);
         }
