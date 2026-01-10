@@ -170,7 +170,7 @@ UNITTEST {
             if (count > 1) {
                 BUG (
                     "TermEntry '%s' has %u mutually exclusive flags: 0x%x",
-                    name, count, flag_union
+                    name, count, (unsigned int)flag_union
                 );
             }
         }
