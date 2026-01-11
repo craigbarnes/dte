@@ -55,7 +55,6 @@ typedef struct {
 
 typedef struct {
     unsigned int len;
-    bool can_be_truncated;
     char buf[TERM_INBUF_SIZE];
 } TermInputBuffer;
 

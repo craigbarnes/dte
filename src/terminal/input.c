@@ -40,7 +40,6 @@ static void consume_input(TermInputBuffer *input, size_t len)
     input->len -= len;
     if (input->len) {
         memmove(input->buf, input->buf + len, input->len);
-        input->can_be_truncated = true; // Keys sent faster than we can read
     }
 }
 
@@ -48,10 +47,6 @@ static bool fill_buffer(TermInputBuffer *input)
 {
     if (unlikely(input->len == TERM_INBUF_SIZE)) {
         return false;
-    }
-
-    if (!input->len) {
-        input->can_be_truncated = false;
     }
 
     size_t avail = TERM_INBUF_SIZE - input->len;
@@ -115,8 +110,7 @@ static KeyCode read_special(TermInputBuffer *input, TermFeatureFlags features)
     }
 
     if (unlikely(len == TPARSE_PARTIAL_MATCH)) {
-        bool retry = input->can_be_truncated && fill_buffer(input);
-        return retry ? read_special(input, features) : KEY_NONE;
+        return fill_buffer(input) ? read_special(input, features) : KEY_NONE;
     }
 
     consume_input(input, len);
@@ -356,7 +350,7 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
         return read_simple(term);
     }
 
-    if (input->len > 1 || input->can_be_truncated) {
+    if (input->len > 1) {
         KeyCode key = read_special(input, term->features);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
             return handle_query_reply(term, key);
