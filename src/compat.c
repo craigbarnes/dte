@@ -34,6 +34,9 @@ const char buildvar_string[] =
 #if HAVE_MKOSTEMP
     " mkostemp"
 #endif
+#if HAVE_SIGISEMPTYSET
+    " sigisemptyset"
+#endif
 #if HAVE_TIOCGWINSZ
     " TIOCGWINSZ"
 #endif
