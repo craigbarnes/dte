@@ -1168,10 +1168,11 @@ static void test_linux_parse_key(TestContext *ctx)
         {STRN("\033[[C"), 4, KEY_F3},
         {STRN("\033[[D"), 4, KEY_F4},
         {STRN("\033[[E"), 4, KEY_F5},
-        {STRN("\033[[F"), 0, 0},
+        {STRN("\033[[F"), 3, KEY_IGNORE},
         {STRN("\033[["), TPARSE_PARTIAL_MATCH, 0},
         {STRN("\033["), TPARSE_PARTIAL_MATCH, 0},
         {STRN("\033"), TPARSE_PARTIAL_MATCH, 0},
+        {STRN(""), TPARSE_PARTIAL_MATCH, 0},
     };
 
     FOR_EACH_I(i, tests) {
