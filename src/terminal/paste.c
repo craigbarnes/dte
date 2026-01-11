@@ -26,8 +26,6 @@ static String term_read_detected_paste(TermInputBuffer *input)
 
         fd_set set;
         FD_ZERO(&set);
-
-        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
         FD_SET(STDIN_FILENO, &set);
 
         int rc = select(1, &set, NULL, NULL, &tv);

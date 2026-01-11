@@ -69,19 +69,10 @@ static bool fill_buffer_timeout(TermInputBuffer *input, unsigned int esc_timeout
 
     fd_set set;
     FD_ZERO(&set);
-
-    // The Clang static analyzer can't always determine that the
-    // FD_ZERO() call above has initialized the fd_set -- in glibc
-    // it's implemented via "__asm__ __volatile__".
-    //
-    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
     FD_SET(STDIN_FILENO, &set);
 
     int rc = select(1, &set, NULL, NULL, &tv);
-    if (rc > 0 && fill_buffer(input)) {
-        return true;
-    }
-    return false;
+    return (rc > 0) && fill_buffer(input);
 }
 
 static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
