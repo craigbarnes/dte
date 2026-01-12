@@ -5,6 +5,7 @@
 #include <sys/time.h> // NOLINT(portability-restrict-system-includes)
 #include <unistd.h>
 #include "input.h"
+#include "feature.h"
 #include "linux.h"
 #include "output.h"
 #include "parse.h"
@@ -189,47 +190,14 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-static const char *tflag_to_str(TermFeatureFlags flag)
-{
-    // This function only handles single flags. Values with multiple
-    // bits set should be handled as appropriate, by the caller.
-    WARN_ON(!IS_POWER_OF_2(flag));
-
-    // See also: "short aliases for TermFeatureFlags" in `src/terminal/feature.c`
-    switch ((unsigned int)flag) {
-    case TFLAG_BACK_COLOR_ERASE: return "BCE";
-    case TFLAG_ECMA48_REPEAT: return "REP";
-    case TFLAG_SET_WINDOW_TITLE: return "TITLE";
-    case TFLAG_RXVT: return "RXVT";
-    case TFLAG_LINUX: return "LINUX";
-    case TFLAG_OSC52_COPY: return "OSC52";
-    case TFLAG_META_ESC: return "METAESC";
-    case TFLAG_ALT_ESC: return "ALTESC";
-    case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
-    case TFLAG_SYNC: return "SYNC";
-    case TFLAG_QUERY_L2: return "QUERY2";
-    case TFLAG_QUERY_L3: return "QUERY3";
-    case TFLAG_NO_QUERY_L1: return "NOQUERY1";
-    case TFLAG_NO_QUERY_L3: return "NOQUERY3";
-    case TFLAG_8_COLOR: return "C8";
-    case TFLAG_16_COLOR: return "C16";
-    case TFLAG_256_COLOR: return "C256";
-    case TFLAG_TRUE_COLOR: return "TC";
-    case TFLAG_MODIFY_OTHER_KEYS: return "MOKEYS";
-    case TFLAG_DEL_CTRL_BACKSPACE: return "DELCTRL";
-    case TFLAG_BS_CTRL_BACKSPACE: return "BSCTRL";
-    case TFLAG_NCV_UNDERLINE: return "NCVUL";
-    case TFLAG_NCV_DIM: return "NCVDIM";
-    case TFLAG_NCV_REVERSE: return "NCVREV";
-    }
-
-    return "??";
-}
-
 static COLD void log_detected_features (
     TermFeatureFlags existing,
     TermFeatureFlags detected
 ) {
+    if (likely(!log_level_enabled(LOG_LEVEL_INFO))) {
+        return;
+    }
+
     // Don't log QUERY flags more than once
     const TermFeatureFlags query_flags = TFLAG_QUERY_L2 | TFLAG_QUERY_L3;
     const TermFeatureFlags repeat_query_flags = query_flags & detected & existing;
@@ -239,7 +207,7 @@ static COLD void log_detected_features (
         // Iterate through detected features, by finding the least
         // significant set bit and then logging and unsetting it
         TermFeatureFlags flag = u32_lsbit(detected);
-        const char *name = tflag_to_str(flag);
+        const char *name = term_feature_to_str(flag);
         const char *extra = (existing & flag) ? " (was already set)" : "";
         LOG_INFO("terminal feature %s detected via query%s", name, extra);
         detected &= ~flag;
@@ -251,14 +219,12 @@ static KeyCode handle_query_reply(Terminal *term, KeyCode reply)
     const TermFeatureFlags existing = term->features;
     TermFeatureFlags detected = reply & ~KEYCODE_QUERY_REPLY_BIT;
     term->features |= detected;
-    if (unlikely(log_level_enabled(LOG_LEVEL_INFO))) {
-        log_detected_features(existing, detected);
-    }
+    log_detected_features(existing, detected);
 
     TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
     if ((detected & escflags) && (existing & TFLAG_KITTY_KEYBOARD)) {
-        const char *name = tflag_to_str(detected);
-        const char *ovr = tflag_to_str(TFLAG_KITTY_KEYBOARD);
+        const char *name = term_feature_to_str(detected);
+        const char *ovr = term_feature_to_str(TFLAG_KITTY_KEYBOARD);
         LOG_INFO("terminal feature %s overridden by %s", name, ovr);
         detected &= ~escflags;
     }

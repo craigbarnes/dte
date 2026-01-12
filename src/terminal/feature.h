@@ -1,6 +1,8 @@
 #ifndef TERMINAL_FEATURE_H
 #define TERMINAL_FEATURE_H
 
+#include "util/macros.h"
+
 // Bit flags representing supported terminal features
 // See also: KEYCODE_QUERY_REPLY_BIT
 typedef enum {
@@ -31,5 +33,6 @@ typedef enum {
 } TermFeatureFlags;
 
 TermFeatureFlags term_get_features(const char *name, const char *colorterm);
+const char *term_feature_to_str(TermFeatureFlags flag) RETURNS_NONNULL;
 
 #endif

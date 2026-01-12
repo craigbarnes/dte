@@ -6,7 +6,6 @@
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/log.h"
-#include "util/macros.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/xstring.h"
@@ -48,6 +47,42 @@ enum {
     MOKEYS = TFLAG_MODIFY_OTHER_KEYS,
     QUERY_ONLY_FFLAGS = METAESC | ALTESC | QUERY2 | QUERY3 | MOKEYS,
 };
+
+const char *term_feature_to_str(TermFeatureFlags flag)
+{
+    // This function only handles single flags. Values with multiple
+    // bits set should be handled as appropriate, by the caller.
+    WARN_ON(!IS_POWER_OF_2(flag));
+
+    switch ((unsigned int)flag) {
+    case TFLAG_BACK_COLOR_ERASE: return "BCE";
+    case TFLAG_ECMA48_REPEAT: return "REP";
+    case TFLAG_SET_WINDOW_TITLE: return "TITLE";
+    case TFLAG_RXVT: return "RXVT";
+    case TFLAG_LINUX: return "LINUX";
+    case TFLAG_OSC52_COPY: return "OSC52";
+    case TFLAG_META_ESC: return "METAESC";
+    case TFLAG_ALT_ESC: return "ALTESC";
+    case TFLAG_KITTY_KEYBOARD: return "KITTYKBD";
+    case TFLAG_SYNC: return "SYNC";
+    case TFLAG_QUERY_L2: return "QUERY2";
+    case TFLAG_QUERY_L3: return "QUERY3";
+    case TFLAG_NO_QUERY_L1: return "NOQUERY1";
+    case TFLAG_NO_QUERY_L3: return "NOQUERY3";
+    case TFLAG_8_COLOR: return "C8";
+    case TFLAG_16_COLOR: return "C16";
+    case TFLAG_256_COLOR: return "C256";
+    case TFLAG_TRUE_COLOR: return "TC";
+    case TFLAG_MODIFY_OTHER_KEYS: return "MOKEYS";
+    case TFLAG_DEL_CTRL_BACKSPACE: return "DELCTRL";
+    case TFLAG_BS_CTRL_BACKSPACE: return "BSCTRL";
+    case TFLAG_NCV_UNDERLINE: return "NCVUL";
+    case TFLAG_NCV_DIM: return "NCVDIM";
+    case TFLAG_NCV_REVERSE: return "NCVREV";
+    }
+
+    return "??";
+}
 
 #define t(tname, feat) { \
     .name = tname, \
