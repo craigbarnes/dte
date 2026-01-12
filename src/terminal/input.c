@@ -12,7 +12,6 @@
 #include "rxvt.h"
 #include "trace.h"
 #include "util/ascii.h"
-#include "util/bit.h"
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/time-util.h"
@@ -190,108 +189,6 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-static COLD void log_detected_features (
-    TermFeatureFlags existing,
-    TermFeatureFlags detected
-) {
-    if (likely(!log_level_enabled(LOG_LEVEL_INFO))) {
-        return;
-    }
-
-    // Don't log QUERY flags more than once
-    const TermFeatureFlags query_flags = TFLAG_QUERY_L2 | TFLAG_QUERY_L3;
-    const TermFeatureFlags repeat_query_flags = query_flags & detected & existing;
-    detected &= ~repeat_query_flags;
-
-    while (detected) {
-        // Iterate through detected features, by finding the least
-        // significant set bit and then logging and unsetting it
-        TermFeatureFlags flag = u32_lsbit(detected);
-        const char *name = term_feature_to_str(flag);
-        const char *extra = (existing & flag) ? " (was already set)" : "";
-        LOG_INFO("terminal feature %s detected via query%s", name, extra);
-        detected &= ~flag;
-    }
-}
-
-static KeyCode handle_query_reply(Terminal *term, KeyCode reply)
-{
-    const TermFeatureFlags existing = term->features;
-    TermFeatureFlags detected = reply & ~KEYCODE_QUERY_REPLY_BIT;
-    term->features |= detected;
-    log_detected_features(existing, detected);
-
-    TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
-    if ((detected & escflags) && (existing & TFLAG_KITTY_KEYBOARD)) {
-        const char *name = term_feature_to_str(detected);
-        const char *ovr = term_feature_to_str(TFLAG_KITTY_KEYBOARD);
-        LOG_INFO("terminal feature %s overridden by %s", name, ovr);
-        detected &= ~escflags;
-    }
-
-    if ((detected & TFLAG_QUERY_L3) && (existing & TFLAG_NO_QUERY_L3)) {
-        LOG_INFO("terminal feature QUERY3 overridden by NOQUERY3");
-        detected &= ~TFLAG_QUERY_L3;
-    }
-
-    // The subset of flags present in this query reply (`detected`) that
-    // weren't already present in the set of known features (`existing`)
-    // and/or overridden by the conditions above
-    const TermFeatureFlags newly_detected = ~existing & detected;
-
-    TermOutputBuffer *obuf = &term->obuf;
-    if (newly_detected & TFLAG_QUERY_L2) {
-        term_put_level_2_queries(term, false);
-    }
-    if (newly_detected & TFLAG_QUERY_L3) {
-        term_put_level_3_queries(term, false);
-    }
-
-    if (newly_detected & TFLAG_KITTY_KEYBOARD) {
-        if (existing & TFLAG_MODIFY_OTHER_KEYS) {
-            // Disable modifyOtherKeys mode, if previously enabled by
-            // main() → ui_first_start() → term_enable_private_modes()
-            // (i.e. due to feature flags set by term_init())
-            term_put_literal(obuf, "\033[>4m");
-        }
-        // Enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5). See also:
-        // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=CSI%20%3E%20Pp%20m
-        // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
-        term_put_literal(obuf, "\033[>5u");
-    }
-
-    bool using_kittykbd = (existing | detected) & TFLAG_KITTY_KEYBOARD;
-    bool enable_mokeys = (newly_detected & TFLAG_MODIFY_OTHER_KEYS) && !using_kittykbd;
-    if (enable_mokeys) {
-        term_put_literal(obuf, "\033[>4;1m\033[>4;2m"); // modifyOtherKeys=1/2
-    }
-
-    if (newly_detected & TFLAG_META_ESC) {
-        term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
-    }
-    if (newly_detected & TFLAG_ALT_ESC) {
-        term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
-    }
-
-    if (newly_detected & TFLAG_SET_WINDOW_TITLE) {
-        BUG_ON(!(term->features & TFLAG_SET_WINDOW_TITLE));
-        term_save_title(term);
-    }
-
-    // This is the list of features that cause output to be emitted above
-    // (and thus require a flush of the output buffer)
-    const TermFeatureFlags features_producing_output =
-        TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | TFLAG_KITTY_KEYBOARD
-        | TFLAG_META_ESC | TFLAG_ALT_ESC | TFLAG_SET_WINDOW_TITLE
-    ;
-
-    if ((newly_detected & features_producing_output) || enable_mokeys) {
-        term_output_flush(obuf);
-    }
-
-    return KEY_NONE;
-}
-
 static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_ms)
 {
     TermInputBuffer *input = &term->ibuf;
@@ -310,7 +207,8 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
     if (input->len > 1) {
         KeyCode key = read_special(input, term->features);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
-            return handle_query_reply(term, key);
+            TermFeatureFlags features = key & ~KEYCODE_QUERY_REPLY_BIT;
+            return term_handle_query_reply(term, features);
         }
         if (key == KEY_IGNORE) {
             return KEY_NONE;
@@ -415,7 +313,8 @@ static KeyCode term_read_input_modern(Terminal *term)
     }
 
     if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
-        return handle_query_reply(term, key);
+        TermFeatureFlags features = key & ~KEYCODE_QUERY_REPLY_BIT;
+        return term_handle_query_reply(term, features);
     }
 
     return (key == KEY_IGNORE) ? KEY_NONE : key;

@@ -22,6 +22,7 @@
 #include "indent.h"
 #include "options.h"
 #include "util/ascii.h"
+#include "util/bit.h"
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/numtostr.h"
@@ -164,51 +165,12 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
 /*
  * See also:
  * • handle_query_reply()
- * • parse_csi_query_reply()
- * • https://vt100.net/docs/vt510-rm/DA1.html
- * • ECMA-48 §8.3.24
- */
-void term_put_initial_queries(Terminal *term, unsigned int level)
-{
-    if (level < 1 || (term->features & TFLAG_NO_QUERY_L1)) {
-        return;
-    }
-
-    LOG_INFO("sending level 1 queries to terminal");
-    term_put_literal(&term->obuf, "\033[c"); // ECMA-48 DA (AKA "DA1")
-
-    if (level < 2) {
-        return;
-    }
-
-    // Level 6 or greater means emit all query levels and also emit even
-    // conditional queries, i.e. those that are usually omitted when the
-    // corresponding feature flag was already set by term_init()
-    bool emit_all = (level >= 6);
-    if (emit_all) {
-        LOG_INFO("query level set to %u; unconditionally sending all queries", level);
-    }
-
-    term_put_level_2_queries(term, emit_all);
-    term->features |= TFLAG_QUERY_L2;
-
-    if (level < 3) {
-        return;
-    }
-
-    term_put_level_3_queries(term, emit_all);
-    term->features |= TFLAG_QUERY_L3;
-}
-
-/*
- * See also:
- * • handle_query_reply()
  * • TFLAG_QUERY_L2
  * • parse_csi_query_reply()
  * • parse_dcs_query_reply()
  * • parse_xtwinops_query_reply()
  */
-void term_put_level_2_queries(Terminal *term, bool emit_all)
+static void term_put_level_2_queries(Terminal *term, bool emit_all)
 {
     static const char queries[] =
         "\033[>0q" // XTVERSION (terminal name and version)
@@ -256,7 +218,7 @@ void term_put_level_2_queries(Terminal *term, bool emit_all)
  * • parse_xtgettcap_reply()
  * • handle_decrqss_sgr_reply()
  */
-void term_put_level_3_queries(Terminal *term, bool emit_all)
+static void term_put_level_3_queries(Terminal *term, bool emit_all)
 {
     // Note: the correct (according to ISO 8613-6) format for the SGR
     // sequence here would be "\033[0;38:2::60:70:80;48:5:255m", but we
@@ -298,6 +260,45 @@ void term_put_level_3_queries(Terminal *term, bool emit_all)
     if (emit_all || log_level_debug_enabled()) {
         term_put_bytes(obuf, debug_queries, sizeof(debug_queries) - 1);
     }
+}
+
+/*
+ * See also:
+ * • handle_query_reply()
+ * • parse_csi_query_reply()
+ * • https://vt100.net/docs/vt510-rm/DA1.html
+ * • ECMA-48 §8.3.24
+ */
+void term_put_initial_queries(Terminal *term, unsigned int level)
+{
+    if (level < 1 || (term->features & TFLAG_NO_QUERY_L1)) {
+        return;
+    }
+
+    LOG_INFO("sending level 1 queries to terminal");
+    term_put_literal(&term->obuf, "\033[c"); // ECMA-48 DA (AKA "DA1")
+
+    if (level < 2) {
+        return;
+    }
+
+    // Level 6 or greater means emit all query levels and also emit even
+    // conditional queries, i.e. those that are usually omitted when the
+    // corresponding feature flag was already set by term_init()
+    bool emit_all = (level >= 6);
+    if (emit_all) {
+        LOG_INFO("query level set to %u; unconditionally sending all queries", level);
+    }
+
+    term_put_level_2_queries(term, emit_all);
+    term->features |= TFLAG_QUERY_L2;
+
+    if (level < 3) {
+        return;
+    }
+
+    term_put_level_3_queries(term, emit_all);
+    term->features |= TFLAG_QUERY_L3;
 }
 
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer
@@ -720,4 +721,106 @@ void term_set_cursor_style(Terminal *term, TermCursorStyle s)
     i += copyliteral(buf + i, "\033\\"); // String Terminator (ST)
     BUG_ON(i > maxlen);
     obuf->count += i;
+}
+
+static COLD void log_detected_features (
+    TermFeatureFlags existing,
+    TermFeatureFlags detected
+) {
+    if (likely(!log_level_enabled(LOG_LEVEL_INFO))) {
+        return;
+    }
+
+    // Don't log QUERY flags more than once
+    const TermFeatureFlags query_flags = TFLAG_QUERY_L2 | TFLAG_QUERY_L3;
+    const TermFeatureFlags repeat_query_flags = query_flags & detected & existing;
+    detected &= ~repeat_query_flags;
+
+    while (detected) {
+        // Iterate through detected features, by finding the least
+        // significant set bit and then logging and unsetting it
+        TermFeatureFlags flag = u32_lsbit(detected);
+        const char *name = term_feature_to_str(flag);
+        const char *extra = (existing & flag) ? " (was already set)" : "";
+        LOG_INFO("terminal feature %s detected via query%s", name, extra);
+        detected &= ~flag;
+    }
+}
+
+KeyCode term_handle_query_reply(Terminal *term, TermFeatureFlags detected)
+{
+    const TermFeatureFlags existing = term->features;
+    BUG_ON(detected & existing & KEYCODE_QUERY_REPLY_BIT);
+    term->features |= detected;
+    log_detected_features(existing, detected);
+
+    TermFeatureFlags escflags = TFLAG_META_ESC | TFLAG_ALT_ESC;
+    if ((detected & escflags) && (existing & TFLAG_KITTY_KEYBOARD)) {
+        const char *name = term_feature_to_str(detected);
+        const char *ovr = term_feature_to_str(TFLAG_KITTY_KEYBOARD);
+        LOG_INFO("terminal feature %s overridden by %s", name, ovr);
+        detected &= ~escflags;
+    }
+
+    if ((detected & TFLAG_QUERY_L3) && (existing & TFLAG_NO_QUERY_L3)) {
+        LOG_INFO("terminal feature QUERY3 overridden by NOQUERY3");
+        detected &= ~TFLAG_QUERY_L3;
+    }
+
+    // The subset of flags present in this query reply (`detected`) that
+    // weren't already present in the set of known features (`existing`)
+    // and/or overridden by the conditions above
+    const TermFeatureFlags newly_detected = ~existing & detected;
+
+    TermOutputBuffer *obuf = &term->obuf;
+    if (newly_detected & TFLAG_QUERY_L2) {
+        term_put_level_2_queries(term, false);
+    }
+    if (newly_detected & TFLAG_QUERY_L3) {
+        term_put_level_3_queries(term, false);
+    }
+
+    if (newly_detected & TFLAG_KITTY_KEYBOARD) {
+        if (existing & TFLAG_MODIFY_OTHER_KEYS) {
+            // Disable modifyOtherKeys mode, if previously enabled by
+            // main() → ui_first_start() → term_enable_private_modes()
+            // (i.e. due to feature flags set by term_init())
+            term_put_literal(obuf, "\033[>4m");
+        }
+        // Enable Kitty Keyboard Protocol bits 1 and 4 (1|4 == 5). See also:
+        // • https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=CSI%20%3E%20Pp%20m
+        // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+        term_put_literal(obuf, "\033[>5u");
+    }
+
+    bool using_kittykbd = (existing | detected) & TFLAG_KITTY_KEYBOARD;
+    bool enable_mokeys = (newly_detected & TFLAG_MODIFY_OTHER_KEYS) && !using_kittykbd;
+    if (enable_mokeys) {
+        term_put_literal(obuf, "\033[>4;1m\033[>4;2m"); // modifyOtherKeys=1/2
+    }
+
+    if (newly_detected & TFLAG_META_ESC) {
+        term_put_literal(obuf, "\033[?1036h"); // DECSET 1036 (metaSendsEscape)
+    }
+    if (newly_detected & TFLAG_ALT_ESC) {
+        term_put_literal(obuf, "\033[?1039h"); // DECSET 1039 (altSendsEscape)
+    }
+
+    if (newly_detected & TFLAG_SET_WINDOW_TITLE) {
+        BUG_ON(!(term->features & TFLAG_SET_WINDOW_TITLE));
+        term_save_title(term);
+    }
+
+    // This is the list of features that cause output to be emitted above
+    // (and thus require a flush of the output buffer)
+    const TermFeatureFlags features_producing_output =
+        TFLAG_QUERY_L2 | TFLAG_QUERY_L3 | TFLAG_KITTY_KEYBOARD
+        | TFLAG_META_ESC | TFLAG_ALT_ESC | TFLAG_SET_WINDOW_TITLE
+    ;
+
+    if ((newly_detected & features_producing_output) || enable_mokeys) {
+        term_output_flush(obuf);
+    }
+
+    return KEY_NONE;
 }

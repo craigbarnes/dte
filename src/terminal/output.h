@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "color.h"
+#include "feature.h"
+#include "key.h"
 #include "style.h"
 #include "terminal.h"
 #include "util/macros.h"
@@ -61,8 +63,6 @@ void term_put_bytes(TermOutputBuffer *obuf, const char *str, size_t count) NONNU
 TermSetBytesMethod term_set_bytes(Terminal *term, char ch, size_t count) NONNULL_ARGS;
 void term_put_str(TermOutputBuffer *obuf, const char *str) NONNULL_ARGS;
 void term_put_initial_queries(Terminal *term, unsigned int level) NONNULL_ARGS;
-void term_put_level_2_queries(Terminal *term, bool emit_all) NONNULL_ARGS;
-void term_put_level_3_queries(Terminal *term, bool emit_all) NONNULL_ARGS;
 void term_use_alt_screen_buffer(Terminal *term) NONNULL_ARGS;
 void term_use_normal_screen_buffer(Terminal *term) NONNULL_ARGS;
 void term_hide_cursor(Terminal *term) NONNULL_ARGS;
@@ -80,5 +80,6 @@ void term_output_flush(TermOutputBuffer *obuf) NOINLINE NONNULL_ARGS;
 bool term_put_char(TermOutputBuffer *obuf, CodePoint u) NONNULL_ARGS;
 void term_set_style(Terminal *term, TermStyle style) NONNULL_ARGS;
 void term_set_cursor_style(Terminal *term, TermCursorStyle style) NONNULL_ARGS;
+KeyCode term_handle_query_reply(Terminal *term, TermFeatureFlags detected) NONNULL_ARGS;
 
 #endif
