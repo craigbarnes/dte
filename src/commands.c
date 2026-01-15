@@ -1477,14 +1477,16 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
     };
 
     ErrorBuffer *ebuf = &e->err;
-    int exit_code = EDITOR_EXIT_OK;
+    unsigned int exit_code = EDITOR_EXIT_OK;
     if (a->nr_args) {
-        if (!str_to_int(a->args[0], &exit_code)) {
-            return error_msg(ebuf, "Not a valid integer argument: '%s'", a->args[0]);
-        }
-        int max = EDITOR_EXIT_MAX;
-        if (exit_code < 0 || exit_code > max) {
-            return error_msg(ebuf, "Exit code should be between 0 and %d", max);
+        const char *arg = a->args[0];
+        const unsigned int max = EDITOR_EXIT_MAX;
+        if (!str_to_uint(arg, &exit_code) || exit_code > EDITOR_EXIT_MAX) {
+            return error_msg (
+                ebuf,
+                "exit code should be an integer between 0 and %u; got '%s'",
+                max, arg
+            );
         }
     }
 
