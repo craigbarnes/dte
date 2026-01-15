@@ -25,25 +25,13 @@ static inline unsigned int base64_decode(unsigned char c)
 // constant propagation when `c` is known at compile-time
 static inline unsigned int base64_decode_branchy(unsigned char c)
 {
-    if (c >= 'A' && c <= 'Z') {
-        return c - 'A';
-    }
-    if (c >= 'a' && c <= 'z') {
-        return (c - 'a') + 26;
-    }
-    if (c >= '0' && c <= '9') {
-        return (c - '0') + 52;
-    }
-    if (c == '+') {
-        return 62;
-    }
-    if (c == '/') {
-        return 63;
-    }
-    if (c == '=') {
-        return BASE64_PADDING;
-    }
-    return BASE64_INVALID;
+    return (c >= 'A' && c <= 'Z') ? c - 'A'
+        : (c >= 'a' && c <= 'z') ? (c - 'a') + 26
+        : (c >= '0' && c <= '9') ? (c - '0') + 52
+        : (c == '+') ? 62
+        : (c == '/') ? 63
+        : (c == '=') ? BASE64_PADDING
+        : BASE64_INVALID;
 }
 
 size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen) NONNULL_ARGS;
