@@ -108,10 +108,12 @@ static void do_shift_lines(View *view, int count, size_t nr_lines)
 
 void shift_lines(View *view, int count)
 {
-    int width = view->buffer->options.indent_width;
-    BUG_ON(width > INDENT_WIDTH_MAX || width < 1);
-    BUG_ON(count == 0);
+    if (unlikely(count == 0)) {
+        return;
+    }
 
+    int width = view->buffer->options.indent_width;
+    BUG_ON(width < 1 || width > INDENT_WIDTH_MAX);
     long x = view_get_preferred_x(view) + (count * width);
     x = MAX(x, 0);
 

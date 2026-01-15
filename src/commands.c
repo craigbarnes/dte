@@ -2215,14 +2215,12 @@ static bool cmd_setenv(EditorState *e, const CommandArgs *a)
 static bool cmd_shift(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
-    int count;
-    if (!str_to_int(arg, &count)) {
+    int count = 1;
+    if (arg && !str_to_int(arg, &count)) {
         return error_msg(&e->err, "Invalid number: %s", arg);
     }
-    if (count == 0) {
-        return error_msg(&e->err, "Count must be non-zero");
-    }
-    shift_lines(e->view, count);
+
+    shift_lines(e->view, (count && has_flag(a, 'r')) ? -count : count);
     return true;
 }
 
@@ -2689,7 +2687,7 @@ static const Command cmds[] = {
     {"select-block", "", NA, 0, 0, cmd_select_block},
     {"set", "gl", RC, 1, -1, cmd_set},
     {"setenv", "", RC, 1, 2, cmd_setenv},
-    {"shift", "", NA, 1, 1, cmd_shift},
+    {"shift", "r", NA, 0, 1, cmd_shift},
     {"show", "c", NA, 0, 2, cmd_show},
     {"suspend", "", NA, 0, 0, cmd_suspend},
     {"tag", "ABCr", NA, 0, -1, cmd_tag},

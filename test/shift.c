@@ -27,6 +27,8 @@ static void test_shift_lines(TestContext *ctx)
     EXPECT_EQ(block_iter_get_char(cursor, &u), 1);
     EXPECT_EQ(u, 'l');
 
+    shift_lines(view, 0);
+    EXPECT_EQ(block_iter_get_offset(cursor), 4);
     shift_lines(view, 1);
     EXPECT_EQ(block_iter_get_offset(cursor), 8);
     shift_lines(view, 1);
