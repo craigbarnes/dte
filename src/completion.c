@@ -94,17 +94,8 @@ static bool do_collect_files (
             continue;
         }
 
-        struct stat st;
-        if (fstatat(dir_fd, name, &st, AT_SYMLINK_NOFOLLOW)) {
-            continue;
-        }
-
-        bool is_dir = S_ISDIR(st.st_mode);
-        if (S_ISLNK(st.st_mode)) {
-            if (!fstatat(dir_fd, name, &st, 0)) {
-                is_dir = S_ISDIR(st.st_mode);
-            }
-        }
+        MaybeBool maybe_dir = is_dir_or_symlink_to_dir(de, dir_fd);
+        bool is_dir = (maybe_dir == MB_TRUE);
 
         if (!is_dir) {
             switch (type) {

@@ -37,6 +37,9 @@ const char buildvar_string[] =
 #if HAVE_SIGISEMPTYSET
     " sigisemptyset"
 #endif
+#if HAVE_DT_DIR
+    " DT_DIR"
+#endif
 #if HAVE_TIOCGWINSZ
     " TIOCGWINSZ"
 #endif

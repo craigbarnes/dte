@@ -36,8 +36,8 @@ CC_VERSION = $(or \
 util_objects := $(call prefix-obj, build/util/, \
     arith array ascii base64 debug exitcode fd fork-exec hashmap hashset \
     intern intmap log numtostr path ptr-array readfile string strtonum \
-    time-util unicode utf8 xadvise xmalloc xmemmem xmemrchr xreadwrite \
-    xsnprintf xstdio )
+    time-util unicode utf8 xadvise xdirent xmalloc xmemmem xmemrchr \
+    xreadwrite xsnprintf xstdio )
 
 command_objects := $(call prefix-obj, build/command/, \
     alias args cache error macro parse run serialize )
@@ -75,7 +75,7 @@ bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
     dup3 embed pipe2 fsync memmem memrchr mkostemp sigisemptyset \
-    TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise qsort_r ))
+    DT_DIR TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise qsort_r ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/ build/gen/
@@ -164,6 +164,7 @@ build/terminal/ioctl.o: build/gen/build-defs.h
 build/util/fd.o: build/gen/build-defs.h
 build/util/fork-exec.o: build/gen/build-defs.h
 build/util/xadvise.o: build/gen/build-defs.h
+build/util/xdirent.o: build/gen/build-defs.h
 build/util/xmemmem.o: build/gen/build-defs.h
 build/util/xmemrchr.o: build/gen/build-defs.h
 

@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include "macros.h"
+#include "maybebool.h"
 
 NONNULL_ARGS WARN_UNUSED_RESULT
 static inline DIR *xopendir(const char *path)
@@ -34,5 +35,7 @@ static inline int xclosedir(DIR *dir)
     // closedir() frees `dir` and it's typically unnecessary anyway.
     return closedir(dir); // NOLINT(*-unsafe-functions)
 }
+
+MaybeBool is_dir_or_symlink_to_dir(const struct dirent *ent, int dir_fd) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif
