@@ -16,6 +16,19 @@ char *path_absolute(const char *path)
         return abs;
     }
 
+    char target[8192];
+    ssize_t tlen = readlink(path, target, sizeof(target) - 1);
+    if (tlen >= 0) {
+        // Dangling symlink. Use the link target instead of the original
+        // `path` for the special case below. This avoids the path of the
+        // link itself being returned and other functions then opening
+        // (and potentially replacing) it, as if nonexistent.
+        target[tlen] = '\0';
+        path = target;
+    } else if (errno != ENOENT) {
+        return NULL;
+    }
+
     const char *base = path_basename(path);
     char *dir_relative = path_dirname(path);
     char *dir = realpath(dir_relative, NULL);
