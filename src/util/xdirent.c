@@ -11,7 +11,7 @@ MaybeBool is_dir_or_symlink_to_dir(const struct dirent *ent, int dir_fd)
     // is lacking or symbolic link resolution is needed, an extra call
     // to fstatat(3) is used as a fallback.
 
-#if HAVE_DT_DIR
+#if HAVE_DIRENT_D_TYPE
     switch (ent->d_type) {
         case DT_UNKNOWN: break; // Extra syscall needed for type info
         case DT_LNK: break; // Symlink (extra syscall needed to follow)
