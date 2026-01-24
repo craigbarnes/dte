@@ -96,8 +96,9 @@ static int tag_cmp_r(const void *ap, const void *bp, void *userdata)
     return r ? r : kind_cmp(*a, *b);
 }
 
-// Find "tags" file from directory path and its parent directories
-static int open_tag_file(ErrorBuffer *ebuf, char *path)
+// Find a "tags" file in the directory `path` or any of its parent directories
+// and return either a successfully opened FD or a negated <errno.h> value
+static int open_tag_file(char *path)
 {
     static const char tags[] = "tags";
     while (*path) {
@@ -112,14 +113,12 @@ static int open_tag_file(ErrorBuffer *ebuf, char *path)
             return fd;
         }
         if (errno != ENOENT) {
-            error_msg(ebuf, "failed to open '%s': %s", path, strerror(errno));
-            return -1;
+            return -errno;
         }
         *slash = '\0';
     }
 
-    error_msg(ebuf, "no tags file");
-    return -1;
+    return -ENOENT;
 }
 
 static bool tag_file_changed (
@@ -145,9 +144,14 @@ bool load_tag_file(TagFile *tf, ErrorBuffer *ebuf)
         return error_msg_errno(ebuf, "getcwd");
     }
 
-    int fd = open_tag_file(ebuf, path);
+    int fd = open_tag_file(path);
     if (fd < 0) {
-        return false;
+        int err = -fd;
+        if (err == ENOENT) {
+            return error_msg(ebuf, "no tags file");
+        } else {
+            return error_msg(ebuf, "failed to open '%s': %s", path, strerror(err));
+        }
     }
 
     struct stat st;
