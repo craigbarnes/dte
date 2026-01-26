@@ -240,7 +240,7 @@ static KeyCode normalize_csi_27_tilde_keycode(KeyCode mods, KeyCode key)
     return mods | key;
 }
 
-static size_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
+static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
 {
     if (unlikely(i >= length)) {
         return TPARSE_PARTIAL_MATCH;
@@ -413,7 +413,7 @@ exit_loop:
     return i;
 }
 
-static size_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
+static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     TermControlParams csi = {.nparams = 0};
     bool maybe_query_reply = (i < len && buf[i] >= '<' && buf[i] <= '?');
@@ -548,7 +548,7 @@ ignore:
     return i;
 }
 
-static size_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
+static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     char data[4096];
     for (size_t pos = 0; i < len; ) {
@@ -578,7 +578,7 @@ static size_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
     return TPARSE_PARTIAL_MATCH;
 }
 
-static size_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
+static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     char data[4096];
     for (size_t pos = 0; i < len; ) {
@@ -617,12 +617,11 @@ static size_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
  *
  * See also: rxvt.c and linux.c
  */
-size_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
+ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
 {
     if (unlikely(length >= 1 && buf[0] != '\033')) {
         // Unreachable, except via edge case tests in test_term_parse_sequence()
-        *k = KEY_IGNORE;
-        return 1;
+        return TPARSE_NO_MATCH;
     }
 
     if (unlikely(length <= 1)) {
@@ -634,11 +633,11 @@ size_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
     case 'P': return parse_dcs(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
     case ']': return parse_osc(buf, length, 2, k);
-    // String Terminator (no-op; see: https://vt100.net/emu/dec_ansi_parser#STESC)
-    case '\\': break;
+    case '\\': // String Terminator
+        // No-op; see: https://vt100.net/emu/dec_ansi_parser#STESC
+        *k = KEY_IGNORE;
+        return 2;
     }
 
-    // ESC followed by unhandled byte; consume and ignore
-    *k = KEY_IGNORE;
-    return 2;
+    return TPARSE_NO_MATCH;
 }

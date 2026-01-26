@@ -8,7 +8,7 @@
  the ECMA-48 spec (notably, the ones ending with '$', which isn't a
  valid final byte).
 */
-size_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
+ssize_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     KeyCode extra_mods = 0;
     size_t extra_bytes = 0;
@@ -49,7 +49,7 @@ size_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
     }
 
     KeyCode key;
-    size_t n;
+    ssize_t n;
     switch (buf[3]) {
     case '~': key = 0; break;
     case '^': key = MOD_CTRL; break;
@@ -73,7 +73,7 @@ size_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
 
 generic:
     n = term_parse_sequence(buf, length, &key);
-    if (n == TPARSE_PARTIAL_MATCH) {
+    if (n <= TPARSE_NO_MATCH) {
         return n;
     }
     if (unlikely(key == KEY_IGNORE && extra_mods)) {

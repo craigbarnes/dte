@@ -2,8 +2,8 @@
 #define TERMINAL_TERMINAL_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include "feature.h"
 #include "key.h"
 #include "style.h"
@@ -55,6 +55,7 @@ typedef struct {
 
 typedef struct {
     unsigned int len;
+    bool can_be_truncated;
     char buf[TERM_INBUF_SIZE];
 } TermInputBuffer;
 

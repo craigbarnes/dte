@@ -40,6 +40,7 @@ static void consume_input(TermInputBuffer *input, size_t len)
     input->len -= len;
     if (input->len) {
         memmove(input->buf, input->buf + len, input->len);
+        input->can_be_truncated = true; // Keys sent faster than we can read
     }
 }
 
@@ -47,6 +48,10 @@ static bool fill_buffer(TermInputBuffer *input)
 {
     if (unlikely(input->len == TERM_INBUF_SIZE)) {
         return false;
+    }
+
+    if (!input->len) {
+        input->can_be_truncated = false;
     }
 
     size_t avail = TERM_INBUF_SIZE - input->len;
@@ -90,8 +95,7 @@ static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
 static KeyCode read_special(TermInputBuffer *input, TermFeatureFlags features)
 {
     KeyCode key;
-    size_t len;
-
+    ssize_t len;
     if (unlikely(features & TFLAG_LINUX)) {
         len = linux_parse_key(input->buf, input->len, &key);
     } else if (unlikely(features & TFLAG_RXVT)) {
@@ -100,10 +104,17 @@ static KeyCode read_special(TermInputBuffer *input, TermFeatureFlags features)
         len = term_parse_sequence(input->buf, input->len, &key);
     }
 
-    if (unlikely(len == TPARSE_PARTIAL_MATCH)) {
-        return fill_buffer(input) ? read_special(input, features) : KEY_NONE;
+    switch (len) {
+    case TPARSE_PARTIAL_MATCH:
+        if (input->can_be_truncated && fill_buffer(input)) {
+            return read_special(input, features);
+        }
+        return KEY_NONE;
+    case TPARSE_NO_MATCH:
+        return KEY_NONE;
     }
 
+    BUG_ON(len < 1);
     consume_input(input, len);
     return key;
 }
@@ -204,7 +215,7 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
         return read_simple(term);
     }
 
-    if (input->len > 1) {
+    if (input->len > 1 || input->can_be_truncated) {
         KeyCode key = read_special(input, term->features);
         if (unlikely(key & KEYCODE_QUERY_REPLY_BIT)) {
             TermFeatureFlags features = key & ~KEYCODE_QUERY_REPLY_BIT;
@@ -295,8 +306,18 @@ static KeyCode term_read_input_modern(Terminal *term)
 
     KeyCode key;
     while (1) {
-        size_t len = term_parse_sequence(input->buf, input->len, &key);
+        ssize_t len = term_parse_sequence(input->buf, input->len, &key);
         if (len != TPARSE_PARTIAL_MATCH) {
+            if (unlikely(len == TPARSE_NO_MATCH)) {
+                // This return code only exists for term_read_input_legacy().
+                // When using the Kitty protocol, this branch shouldn't ever
+                // be taken (in practice), so we handle it as an edge case
+                // by simply consuming (and ignoring) the ESC byte and the
+                // byte that follows it.
+                BUG_ON(input->len < 2); // Implied by the conditions above
+                len = 2;
+                key = KEY_IGNORE;
+            }
             consume_input(input, len);
             break;
         }

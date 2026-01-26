@@ -11,7 +11,7 @@
  $TERM is set to "linux", input is first passed through this function to
  handle this special case.
 */
-size_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
+ssize_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     if (length < 3 || !mem_equal(buf, "\033[[", 3)) {
         return term_parse_sequence(buf, length, k);
