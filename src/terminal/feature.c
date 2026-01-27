@@ -17,7 +17,7 @@ typedef struct {
 } TermEntry;
 
 // Short aliases for TermFeatureFlags.
-// See also: tflag_to_str() and the UNITTEST{} block below.
+// See also: term_feature_to_str() and the UNITTEST{} block below.
 enum {
     BCE = TFLAG_BACK_COLOR_ERASE,
     REP = TFLAG_ECMA48_REPEAT,
@@ -137,9 +137,9 @@ static const TermEntry terms[] = {
     t("teken", C8 | BCE | NCVDIM | NCVREV),
     t("terminator", C256 | BCE | TITLE | BSCTRL),
     t("termite", C8 | TITLE),
-    t("tmux", C8 | TITLE | OSC52 | NOQUERY3 | BSCTRL), // See also: parse_dcs_query_reply()
+    t("tmux", C8 | TITLE | OSC52 | NOQUERY3 | BSCTRL), // See also: parse_xtversion_reply()
     t("vt220", NOQUERY1), // Used by cu(1) and picocom(1), which wrongly handle queries
-    t("wezterm", TC | BCE | REP | TITLE | OSC52 | SYNC | BSCTRL),
+    t("wezterm", TC | BCE | REP | TITLE | OSC52 | SYNC | BSCTRL), // See also: parse_xtversion_reply()
     t("xfce", C8 | BCE | TITLE),
     // The real xterm supports ECMA-48 REP, but TERM=xterm* is used by too
     // many other terminals to safely add it here.
