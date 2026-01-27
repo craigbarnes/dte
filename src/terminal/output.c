@@ -164,10 +164,10 @@ void term_put_str(TermOutputBuffer *obuf, const char *str)
 
 /*
  * See also:
- * • handle_query_reply()
+ * • term_handle_query_reply()
  * • TFLAG_QUERY_L2
  * • parse_csi_query_reply()
- * • parse_dcs_query_reply()
+ * • parse_xtversion_reply()
  * • parse_xtwinops_query_reply()
  */
 static void term_put_level_2_queries(Terminal *term, bool emit_all)
@@ -212,7 +212,7 @@ static void term_put_level_2_queries(Terminal *term, bool emit_all)
  * known problem cases (e.g. PuTTY).
  *
  * See also:
- * • handle_query_reply()
+ * • term_handle_query_reply()
  * • TFLAG_QUERY_L3
  * • parse_dcs_query_reply()
  * • parse_xtgettcap_reply()
@@ -264,7 +264,7 @@ static void term_put_level_3_queries(Terminal *term, bool emit_all)
 
 /*
  * See also:
- * • handle_query_reply()
+ * • term_handle_query_reply()
  * • parse_csi_query_reply()
  * • https://vt100.net/docs/vt510-rm/DA1.html
  * • ECMA-48 §8.3.24
