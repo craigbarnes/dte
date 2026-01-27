@@ -321,8 +321,15 @@ static KeyCode parse_xtversion_reply(StringView reply)
         return tflag(TFLAG_BS_CTRL_BACKSPACE);
     }
 
+    // WezTerm sets TERM=xterm-256color by default, so it makes sense
+    // to set these flags here, in addition to the (typically not used)
+    // terms[] entry
     if (strview_has_prefix(reply, "WezTerm ")) {
-        return tflag(TFLAG_BS_CTRL_BACKSPACE);
+        return tflag (
+            TFLAG_TRUE_COLOR | TFLAG_BACK_COLOR_ERASE | TFLAG_ECMA48_REPEAT
+            | TFLAG_SET_WINDOW_TITLE | TFLAG_OSC52_COPY | TFLAG_SYNC
+            | TFLAG_BS_CTRL_BACKSPACE
+        );
     }
 
     if (strview_has_prefix(reply, "tmux ")) {
