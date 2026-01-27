@@ -317,6 +317,10 @@ static KeyCode parse_xtversion_reply(StringView reply)
         );
     }
 
+    if (strview_has_prefix(reply, "Konsole ")) {
+        return tflag(TFLAG_BS_CTRL_BACKSPACE);
+    }
+
     if (strview_has_prefix(reply, "tmux ")) {
         // tmux gained support for XTVERSION in release 3.2, so any response
         // starting with "tmux " implies support for all tmux 3.2 features.
