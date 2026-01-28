@@ -261,7 +261,7 @@ static void init_trace_logging(LogLevel level)
     set_trace_logging_flags(flags);
 }
 
-static ExitCode init_logging(void)
+static ExitCode init_logging(LogOpenFlags logflags)
 {
     const char *filename = xgetenv("DTE_LOG");
     if (!filename) {
@@ -278,7 +278,8 @@ static ExitCode init_logging(void)
     }
 
     const char *no_color = xgetenv("NO_COLOR"); // https://no-color.org/
-    LogLevel got_level = log_open(filename, req_level, !no_color);
+    logflags |= no_color ? 0 : LOGOPEN_USE_COLOR;
+    LogLevel got_level = log_open(filename, req_level, logflags);
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
         fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", filename, err);
@@ -506,7 +507,7 @@ int main(int argc, char *argv[])
     // logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
     ExitCode r = headless ? init_std_fds_headless(std_fds) : init_std_fds(std_fds);
-    r = r ? r : init_logging();
+    r = r ? r : init_logging(headless ? LOGOPEN_ALLOW_CTTY : 0);
     if (unlikely(r)) {
         return r;
     }

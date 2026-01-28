@@ -60,7 +60,7 @@ const char *log_level_to_str(LogLevel level)
     return log_level_map[level].name;
 }
 
-LogLevel log_open(const char *filename, LogLevel level, bool use_color)
+LogLevel log_open(const char *filename, LogLevel level, LogOpenFlags logflags)
 {
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
@@ -78,13 +78,14 @@ LogLevel log_open(const char *filename, LogLevel level, bool use_color)
         return LOG_LEVEL_NONE;
     }
 
-    bool ctty = is_controlling_tty(fd);
-    if (unlikely(ctty || xwrite_all(fd, "\n", 1) != 1)) {
-        errno = ctty ? EINVAL : errno;
+    bool ctty_err = !(logflags & LOGOPEN_ALLOW_CTTY) && is_controlling_tty(fd);
+    if (unlikely(ctty_err || xwrite_all(fd, "\n", 1) != 1)) {
+        errno = ctty_err ? EINVAL : errno;
         xclose(fd);
         return LOG_LEVEL_NONE;
     }
 
+    bool use_color = (logflags & LOGOPEN_USE_COLOR);
     if (!use_color || !isatty(fd)) {
         dim[0] = '\0';
         sgr0[0] = '\0';

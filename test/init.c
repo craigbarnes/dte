@@ -68,14 +68,14 @@ static void test_log_open_errors(TestContext *ctx)
     const LogLevel none = LOG_LEVEL_NONE;
     const LogLevel info = LOG_LEVEL_INFO;
     errno = 0;
-    ASSERT_EQ(log_open("/dev/null", none, false), none);
+    ASSERT_EQ(log_open("/dev/null", none, 0), none);
     EXPECT_EQ(errno, 0);
-    ASSERT_EQ(log_open("build/test/non-existent-dir/x", info, false), none);
+    ASSERT_EQ(log_open("build/test/non-existent-dir/x", info, 0), none);
     EXPECT_EQ(errno, ENOENT);
 
     if (access("/dev/full", W_OK) == 0) {
         errno = 0;
-        ASSERT_EQ(log_open("/dev/full", info, false), none);
+        ASSERT_EQ(log_open("/dev/full", info, 0), none);
         EXPECT_EQ(errno, ENOSPC);
     }
 
@@ -85,7 +85,7 @@ static void test_log_open_errors(TestContext *ctx)
         ASSERT_TRUE(is_controlling_tty(tty));
         EXPECT_EQ(xclose(tty), 0);
         errno = 0;
-        ASSERT_EQ(log_open("/dev/tty", info, false), none);
+        ASSERT_EQ(log_open("/dev/tty", info, 0), none);
         EXPECT_EQ(errno, EINVAL);
     }
 }
@@ -133,7 +133,7 @@ static void test_init(TestContext *ctx)
 
     const LogLevel max_lvl = log_level_max();
     const LogLevel req_lvl = LOG_LEVEL_TRACE;
-    ASSERT_EQ(log_open("build/test/log.txt", req_lvl, false), max_lvl);
+    ASSERT_EQ(log_open("build/test/log.txt", req_lvl, 0), max_lvl);
     EXPECT_TRUE(log_level_enabled(LOG_LEVEL_CRITICAL));
     EXPECT_TRUE(log_level_enabled(LOG_LEVEL_ERROR));
     EXPECT_TRUE(log_level_enabled(LOG_LEVEL_WARNING));

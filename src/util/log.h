@@ -21,6 +21,11 @@ typedef enum {
     LOG_LEVEL_TRACE,
 } LogLevel;
 
+typedef enum {
+    LOGOPEN_USE_COLOR = 1 << 0, // Use SGR color sequences in log output
+    LOGOPEN_ALLOW_CTTY = 1 << 1, // Allow logging to the controlling tty(4) (/dev/tty)
+} LogOpenFlags;
+
 #define LOG(level, ...) log_msg(level, __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_CRITICAL(...) LOG(LOG_LEVEL_CRITICAL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
@@ -54,7 +59,7 @@ static inline LogLevel log_level_max(void)
     return TRACE_LOGGING_ENABLED ? LOG_LEVEL_TRACE : log_level_default();
 }
 
-LogLevel log_open(const char *filename, LogLevel level, bool use_color);
+LogLevel log_open(const char *filename, LogLevel level, LogOpenFlags logflags);
 bool log_close(void);
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap) VPRINTF(4);
