@@ -16,7 +16,7 @@ static char dim[] = "\033[2m";
 static char sgr0[] = "\033[0m";
 // NOLINTEND(*-avoid-non-const-global-variables)
 
-static const struct llmap {
+static const struct LogLevelMap {
     char name[8];
     char prefix[5];
     char color[8];
@@ -34,7 +34,7 @@ static const struct llmap {
 UNITTEST {
     CHECK_STRUCT_ARRAY(log_level_map, name);
     for (size_t i = 0; i < ARRAYLEN(log_level_map); i++) {
-        const struct llmap *m = &log_level_map[i];
+        const struct LogLevelMap *m = &log_level_map[i];
         BUG_ON(m->prefix[sizeof(m->prefix) - 1] != '\0');
         BUG_ON(m->color[sizeof(m->color) - 1] != '\0');
     }
