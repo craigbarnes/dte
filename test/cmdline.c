@@ -525,7 +525,7 @@ static void test_complete_command_extra(TestContext *ctx)
     complete_command_next(e);
     EXPECT_STRING_EQ_CSTRING(&c->buf, "alias reverse-lines ");
     complete_command_next(e);
-    EXPECT_STRING_EQ_CSTRING(&c->buf, "alias reverse-lines 'filter tac' ");
+    EXPECT_STRING_EQ_CSTRING(&c->buf, "alias reverse-lines \"filter awk '{a[i++] = $0} END {for (j = i - 1; j >= 0;) print a[j--]}'\" ");
     reset_completion(c);
 
     cmdline_set_text(c, "bind C-z");
