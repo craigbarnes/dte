@@ -278,8 +278,8 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
  This is similar to term_read_input_legacy(), but suitable only for
  terminals that support the Kitty keyboard protocol and with the
  following notable differences:
- • No function pointer indirection for parsing input from quirky
-   terminals (term_parse_sequence() is always used)
+ • No special handling for quirky terminals that send malformed
+   escape sequences (term_parse_sequence() is always used)
  • No timing hacks to disambiguate the meaning of ESC bytes (since
    there is no ambiguity when using the Kitty protocol)
  • No additional code for parsing legacy encodings of Alt-modified
