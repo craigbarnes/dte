@@ -221,11 +221,8 @@ static KeyCode term_read_input_legacy(Terminal *term, unsigned int esc_timeout_m
             TermFeatureFlags features = key & ~KEYCODE_QUERY_REPLY_BIT;
             return term_handle_query_reply(term, features);
         }
-        if (key == KEY_IGNORE) {
-            return KEY_NONE;
-        }
         if (key != KEY_NONE) {
-            return key;
+            return (key == KEY_IGNORE) ? KEY_NONE : key;
         }
     }
 
