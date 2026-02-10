@@ -10,8 +10,15 @@ include tools/mk/doclint.mk
 include tools/mk/portable.mk
 include tools/mk/show-sizes.mk
 
+# • Treat *.[ch] files as C (not C++ or ObjectiveC)
+# • Prevent DESIGNATED_INIT macro being confused for a struct tag
+# • Disable generation of pointless __anon* tags (e.g. for anonymous enums)
+CTAGSFLAGS = \
+    --langmap=C:.c.h \
+    -I DESIGNATED_INIT \
+    --extras='-{anonymous}'
+
 CTAGS ?= ctags
-CTAGSFLAGS = -I DESIGNATED_INIT # Prevent this macro being confused for a struct tag
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 GEN_MKFILES = $(foreach f, platform compiler, build/gen/$(f).mk build/gen/$(f).log)
 
