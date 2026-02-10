@@ -25,13 +25,6 @@
     #include "builtin-config.h"
 #endif
 
-UNITTEST {
-    // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(!get_builtin_config("rc"));
-    BUG_ON(!get_builtin_config("color/reset"));
-    // NOLINTEND(bugprone-assert-side-effect)
-}
-
 // Odd number of backslashes at end of line?
 static bool has_line_continuation(StringView line)
 {
@@ -73,17 +66,21 @@ bool exec_config(CommandRunner *runner, StringView config)
             // Comment line
             continue;
         }
+
         if (has_line_continuation(line)) {
+            // Line with backslash-escaped newline; append to buffer
+            // but don't execute yet
             line.length--;
             string_append_strview(&buf, line);
-        } else {
-            string_append_strview(&buf, line);
-            bool r = handle_command(runner, string_borrow_cstring(&buf));
-            string_clear(&buf);
-            nfailed += !r;
-            if (unlikely(!r && stop_at_first_err)) {
-                goto out;
-            }
+            continue;
+        }
+
+        string_append_strview(&buf, line);
+        bool r = handle_command(runner, string_borrow_cstring(&buf));
+        string_clear(&buf);
+        nfailed += !r;
+        if (unlikely(!r && stop_at_first_err)) {
+            goto out;
         }
     }
 

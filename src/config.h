@@ -10,7 +10,7 @@
 #include "util/string-view.h"
 #include "util/string.h"
 
-// Used in the generated headers included by `{src,test}/config.c`
+// Used in the generated headers included by src/config.c and test/config.c
 #define CFG(n, t) {.name = n, .text = {.data = t, .length = sizeof(t) - 1}}
 
 #ifdef __linux__
@@ -21,8 +21,8 @@
 
 typedef enum {
     CFG_NOFLAGS = 0,
-    CFG_MUST_EXIST = 1 << 0,
-    CFG_BUILTIN = 1 << 1,
+    CFG_MUST_EXIST = 1 << 0, // Show an error when attempting to read non-existent configs
+    CFG_BUILTIN = 1 << 1, // Look up filenames in builtin_configs[], instead of in the filesystem
 } ConfigFlags;
 
 typedef struct {
