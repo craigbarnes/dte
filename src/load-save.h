@@ -19,6 +19,6 @@ typedef struct {
 
 bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, ErrorBuffer *ebuf, bool must_exist) NONNULL_ARGS WARN_UNUSED_RESULT;
 bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool read_blocks(Buffer *buffer, int fd, bool utf8_bom) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool read_blocks(Buffer *buffer, ErrorBuffer *ebuf, int fd, bool utf8_bom) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

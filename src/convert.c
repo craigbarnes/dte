@@ -36,6 +36,7 @@ static void add_block(Buffer *buffer, Block *blk)
 
 static Block *add_utf8_line (
     Buffer *buffer,
+    ErrorBuffer *errbuf,
     Block *blk,
     const char *line,
     size_t len
@@ -53,9 +54,9 @@ static Block *add_utf8_line (
 
 copy:
     if (unlikely(len > SYN_HIGHLIGHT_MAX_LINE_LEN && buffer->options.syntax)) {
-        // TODO: Make the limit configurable and add documentation
-        // TODO: Pass in an ErrorBuffer* and use error_msg() instead of LOG_NOTICE()
-        LOG_NOTICE (
+        // TODO: Make this limit configurable and add documentation
+        error_msg (
+            errbuf,
             "line length (%zu) exceeded limit (%ju); disabling syntax highlighting",
             len, (uintmax_t)SYN_HIGHLIGHT_MAX_LINE_LEN
         );
@@ -91,7 +92,7 @@ static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
     return true;
 }
 
-static bool file_decoder_read_utf8(Buffer *buffer, const char *buf, size_t size)
+static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, const char *text, size_t text_len)
 {
     if (unlikely(!encoding_is_utf8(buffer->encoding))) {
         errno = EINVAL;
@@ -99,8 +100,8 @@ static bool file_decoder_read_utf8(Buffer *buffer, const char *buf, size_t size)
     }
 
     FileDecoder dec = {
-        .ibuf = buf,
-        .isize = size,
+        .ibuf = text,
+        .isize = text_len,
     };
 
     const char *line;
@@ -115,18 +116,18 @@ static bool file_decoder_read_utf8(Buffer *buffer, const char *buf, size_t size)
         len--;
     }
 
-    Block *blk = add_utf8_line(buffer, NULL, line, len);
+    Block *blk = add_utf8_line(buffer, errbuf, NULL, line, len);
 
     if (unlikely(buffer->crlf_newlines)) {
         while (read_utf8_line(&dec, &line, &len)) {
             if (len && line[len - 1] == '\r') {
                 len--;
             }
-            blk = add_utf8_line(buffer, blk, line, len);
+            blk = add_utf8_line(buffer, errbuf, blk, line, len);
         }
     } else {
         while (read_utf8_line(&dec, &line, &len)) {
-            blk = add_utf8_line(buffer, blk, line, len);
+            blk = add_utf8_line(buffer, errbuf, blk, line, len);
         }
     }
 
@@ -137,23 +138,20 @@ static bool file_decoder_read_utf8(Buffer *buffer, const char *buf, size_t size)
     return true;
 }
 
-static size_t unix_to_dos (
-    FileEncoder *enc,
-    const char *buf,
-    size_t size
-) {
+static size_t unix_to_dos(FileEncoder *enc, const char *text, size_t text_len)
+{
     // TODO: Pass in Buffer::nl and make this size adjustment more conservative
     // (it's resized to handle the worst possible case, despite the fact that we
     // already have the number of newlines pre-computed)
-    if (enc->nsize < size * 2) {
-        enc->nsize = size * 2;
+    if (enc->nsize < text_len * 2) {
+        enc->nsize = text_len * 2;
         enc->nbuf = xrealloc(enc->nbuf, enc->nsize);
     }
 
     // TODO: Optimize this loop, by making use of memccpy(3)
     size_t d = 0;
-    for (size_t s = 0; s < size; s++) {
-        unsigned char ch = buf[s];
+    for (size_t s = 0; s < text_len; s++) {
+        unsigned char ch = text[s];
         if (ch == '\n') {
             enc->nbuf[d++] = '\r';
         }
@@ -204,9 +202,9 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
     return 0;
 }
 
-bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
+bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, const char *text, size_t text_len)
 {
-    return file_decoder_read_utf8(buffer, buf, size);
+    return file_decoder_read_utf8(buffer, errbuf, text, text_len);
 }
 
 #else // ICONV_DISABLE != 1; use full iconv implementation:
@@ -599,10 +597,10 @@ static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *l
     return true;
 }
 
-bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
+bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, const char *text, size_t text_len)
 {
     if (encoding_is_utf8(buffer->encoding)) {
-        return file_decoder_read_utf8(buffer, buf, size);
+        return file_decoder_read_utf8(buffer, errbuf, text, text_len);
     }
 
     CharsetConverter *cconv = cconv_to_utf8(buffer->encoding);
@@ -611,8 +609,8 @@ bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
     }
 
     FileDecoder dec = {
-        .ibuf = buf,
-        .isize = size,
+        .ibuf = text,
+        .isize = text_len,
         .cconv = cconv,
     };
 
@@ -624,12 +622,12 @@ bool file_decoder_read(Buffer *buffer, const char *buf, size_t size)
             buffer->crlf_newlines = true;
             len--;
         }
-        Block *blk = add_utf8_line(buffer, NULL, line, len);
+        Block *blk = add_utf8_line(buffer, errbuf, NULL, line, len);
         while (decode_and_read_line(&dec, &line, &len)) {
             if (buffer->crlf_newlines && len && line[len - 1] == '\r') {
                 len--;
             }
-            blk = add_utf8_line(buffer, blk, line, len);
+            blk = add_utf8_line(buffer, errbuf, blk, line, len);
         }
         if (blk) {
             add_block(buffer, blk);

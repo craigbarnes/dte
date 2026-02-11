@@ -187,13 +187,14 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     Buffer *buffer = NULL;
 
     if (fds[STDIN_FILENO] >= 3) {
+        ErrorBuffer *ebuf = &e->err;
         buffer = buffer_new(&e->buffers, &e->options, encoding_from_type(UTF8));
-        if (read_blocks(buffer, fds[STDIN_FILENO], false)) {
+        if (read_blocks(buffer, ebuf, fds[STDIN_FILENO], false)) {
             name = "(stdin)";
             buffer->temporary = true;
         } else {
-            error_msg(&e->err, "Unable to read redirected stdin");
-            buffer_remove_unlock_and_free(&e->buffers, buffer, &e->err, &e->locks_ctx);
+            error_msg(ebuf, "Unable to read redirected stdin");
+            buffer_remove_unlock_and_free(&e->buffers, buffer, ebuf, &e->locks_ctx);
             buffer = NULL;
         }
     }

@@ -23,9 +23,14 @@
 #include "util/xreadwrite.h"
 #include "util/xstring.h"
 
-static bool decode_and_add_blocks(Buffer *buffer, const char *buf, size_t size, bool utf8_bom)
-{
-    EncodingType bom_type = detect_encoding_from_bom(buf, size);
+static bool decode_and_add_blocks (
+    Buffer *buffer,
+    ErrorBuffer *errbuf,
+    const char *text,
+    size_t text_len,
+    bool utf8_bom
+) {
+    EncodingType bom_type = detect_encoding_from_bom(text, text_len);
     if (!buffer->encoding && bom_type != UNKNOWN_ENCODING) {
         const char *enc = encoding_from_type(bom_type);
         if (!conversion_supported_by_iconv(enc, "UTF-8")) {
@@ -41,8 +46,8 @@ static bool decode_and_add_blocks(Buffer *buffer, const char *buf, size_t size, 
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
             const size_t bom_len = bom->len;
-            buf += bom_len;
-            size -= bom_len;
+            text += bom_len;
+            text_len -= bom_len;
             buffer->bom = true;
         }
     }
@@ -52,7 +57,7 @@ static bool decode_and_add_blocks(Buffer *buffer, const char *buf, size_t size, 
         buffer->bom = utf8_bom;
     }
 
-    return file_decoder_read(buffer, buf, size);
+    return file_decoder_read(buffer, errbuf, text, text_len);
 }
 
 static void fixup_blocks(Buffer *buffer)
@@ -103,32 +108,32 @@ static bool buffer_fstat(FileInfo *info, int fd)
     return !fstat(fd, &st) && update_file_info(info, &st);
 }
 
-bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
+bool read_blocks(Buffer *buffer, ErrorBuffer *ebuf, int fd, bool utf8_bom)
 {
     const size_t map_size = 64 * 1024;
     size_t size = buffer->file.size;
-    char *buf = NULL;
+    char *text = NULL;
     bool mapped = false;
     bool ret = false;
 
     if (size >= map_size) {
         // NOTE: size must be greater than 0
-        buf = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
-        if (buf != MAP_FAILED) {
-            advise_sequential(buf, size);
+        text = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+        if (text != MAP_FAILED) {
+            advise_sequential(text, size);
             mapped = true;
             goto decode;
         }
         LOG_ERRNO("mmap() failed");
-        buf = NULL;
+        text = NULL;
     }
 
     if (likely(size > 0)) {
-        buf = malloc(size);
-        if (unlikely(!buf)) {
+        text = malloc(size);
+        if (unlikely(!text)) {
             goto error;
         }
-        ssize_t rc = xread_all(fd, buf, size);
+        ssize_t rc = xread_all(fd, text, size);
         if (unlikely(rc < 0)) {
             goto error;
         }
@@ -137,13 +142,13 @@ bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
         // st_size is zero for some files in /proc
         size_t alloc = map_size;
         BUG_ON(!IS_POWER_OF_2(alloc));
-        buf = malloc(alloc);
-        if (unlikely(!buf)) {
+        text = malloc(alloc);
+        if (unlikely(!text)) {
             goto error;
         }
         size_t pos = 0;
         while (1) {
-            ssize_t rc = xread_all(fd, buf + pos, alloc - pos);
+            ssize_t rc = xread_all(fd, text + pos, alloc - pos);
             if (rc < 0) {
                 goto error;
             }
@@ -158,25 +163,25 @@ bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
                     goto error;
                 }
                 alloc = new_alloc;
-                char *new_buf = realloc(buf, alloc);
-                if (unlikely(!new_buf)) {
+                char *new_text = realloc(text, alloc);
+                if (unlikely(!new_text)) {
                     goto error;
                 }
-                buf = new_buf;
+                text = new_text;
             }
         }
         size = pos;
     }
 
 decode:
-    ret = decode_and_add_blocks(buffer, buf, size, utf8_bom);
+    ret = decode_and_add_blocks(buffer, ebuf, text, size, utf8_bom);
 
 error:
     if (mapped) {
-        int r = munmap(buf, size); // Can only fail due to usage error
+        int r = munmap(text, size); // Can only fail due to usage error
         LOG_ERRNO_ON(r, "munmap");
     } else {
-        free(buf);
+        free(text);
     }
 
     if (ret) {
@@ -257,7 +262,7 @@ bool load_buffer (
         }
     }
 
-    if (!read_blocks(buffer, fd, gopts->utf8_bom)) {
+    if (!read_blocks(buffer, ebuf, fd, gopts->utf8_bom)) {
         error_msg(ebuf, "Error reading %s: %s", filename, strerror(errno));
         goto error;
     }
