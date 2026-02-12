@@ -22,11 +22,13 @@ void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen
     const char *start = haystack;
     int first_char = ((const unsigned char*)needle)[0];
     if (nlen == 1) {
-        return memchr(start, first_char, hlen);
+        // NOLINTNEXTLINE(readability-redundant-casting)
+        return (void*)memchr(start, first_char, hlen);
     }
 
     while (1) {
-        char *ptr = memchr(start, first_char, hlen);
+        // NOLINTNEXTLINE(readability-redundant-casting)
+        char *ptr = (void*)memchr(start, first_char, hlen);
         if (!ptr) {
             return NULL;
         }
