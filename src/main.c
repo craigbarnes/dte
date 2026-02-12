@@ -356,7 +356,9 @@ static void lookup_tags (
     size_t nr_tags,
     View *closeable_default_view
 ) {
-    if (nr_tags == 0 || !load_tag_file(&e->tagfile, &e->err)) {
+    TagFile *tagfile = &e->tagfile;
+    ErrorBuffer *ebuf = &e->err;
+    if (nr_tags == 0 || !load_tag_file(tagfile, ebuf)) {
         return;
     }
 
@@ -365,11 +367,11 @@ static void lookup_tags (
 
     for (size_t i = 0; i < nr_tags; i++) {
         StringView tagname = strview(tags[i]);
-        tag_lookup(&e->tagfile, msgs, &e->err, tagname, NULL);
+        tag_lookup(tagfile, msgs, ebuf, tagname, NULL);
     }
 
     if (
-        activate_current_message(msgs, e->window)
+        activate_current_message(msgs, e->window, ebuf)
         && closeable_default_view
         && e->window->views.count >= 2
     ) {

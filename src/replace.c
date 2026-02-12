@@ -55,6 +55,7 @@ static void build_replacement (
  * "foo x bar abc baz"   " bar abc baz"
  */
 static unsigned int replace_on_line (
+    EditorState *e,
     View *view,
     StringView line,
     regex_t *re,
@@ -64,7 +65,6 @@ static unsigned int replace_on_line (
 ) {
     const char *buf = line.data;
     char *alloc = NULL;
-    EditorState *e = view->window->editor;
     ReplaceFlags flags = *flagsp;
     regmatch_t matches[32];
     size_t pos = 0;
@@ -156,9 +156,9 @@ out:
     return nr;
 }
 
-bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
+bool reg_replace(EditorState *e, View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
-    ErrorBuffer *ebuf = &view->window->editor->err;
+    ErrorBuffer *ebuf = &e->err;
     if (unlikely(pattern[0] == '\0')) {
         return error_msg(ebuf, "Search pattern must contain at least 1 character");
     }
@@ -210,7 +210,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
             line.length = nr_bytes;
         }
 
-        unsigned int nr = replace_on_line(view, line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(e, view, line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;

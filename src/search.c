@@ -2,7 +2,6 @@
 #include "search.h"
 #include "block-iter.h"
 #include "buffer.h"
-#include "command/error.h"
 #include "editor.h"
 #include "regexp.h"
 #include "util/ascii.h"
@@ -108,14 +107,14 @@ static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx,
     return false;
 }
 
-bool search_tag(View *view, const char *pattern)
+bool search_tag(View *view, ErrorBuffer *ebuf, const char *pattern)
 {
     // DEFAULT_REGEX_FLAGS is not used here because pattern has been
     // escaped by parse_ex_pattern() for use as a POSIX BRE
     regex_t regex;
     int err = regcomp(&regex, pattern, REG_NEWLINE);
     if (unlikely(err)) {
-        regexp_error_msg(&view->window->editor->err, &regex, pattern, err);
+        regexp_error_msg(ebuf, &regex, pattern, err);
     }
 
     BlockIter bi = block_iter(view->buffer);
@@ -125,7 +124,7 @@ bool search_tag(View *view, const char *pattern)
     if (!found) {
         // Don't center view to cursor unnecessarily
         view->force_center = false;
-        return error_msg(&view->window->editor->err, "Tag not found");
+        return error_msg(ebuf, "Tag not found");
     }
 
     view->center_on_scroll = true;
@@ -175,9 +174,8 @@ void search_set_regexp(SearchState *search, const char *pattern)
     search->pattern = xstrdup(pattern);
 }
 
-bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
+bool do_search_next(View *view, SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs, bool skip)
 {
-    ErrorBuffer *ebuf = &view->window->editor->err;
     if (!search->pattern) {
         return error_msg(ebuf, "No previous search pattern");
     }

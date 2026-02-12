@@ -2,7 +2,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "msg.h"
-#include "command/error.h"
 #include "editor.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -34,7 +33,7 @@ void add_message(MessageList *msgs, Message *m)
 }
 
 // Jump to the FileLocation of the current Message
-bool activate_current_message(const MessageList *msgs, Window *window)
+bool activate_current_message(const MessageList *msgs, Window *window, ErrorBuffer *ebuf)
 {
     size_t count = msgs->array.count;
     if (count == 0) {
@@ -45,12 +44,11 @@ bool activate_current_message(const MessageList *msgs, Window *window)
     BUG_ON(pos >= count);
     const Message *m = msgs->array.ptrs[pos];
     const FileLocation *loc = m->loc;
-    if (loc && loc->filename && !file_location_go(window, loc)) {
+    if (loc && loc->filename && !file_location_go(window, ebuf, loc)) {
         // Failed to jump to location; error message is visible
         return false;
     }
 
-    ErrorBuffer *ebuf = &window->editor->err;
     if (count == 1) {
         return info_msg(ebuf, "%s", m->msg);
     }
@@ -63,7 +61,8 @@ bool activate_current_message(const MessageList *msgs, Window *window)
 void activate_current_message_save (
     const MessageList *msgs,
     PointerArray *bookmarks,
-    const View *view
+    const View *view,
+    ErrorBuffer *ebuf
 ) {
     size_t nmsgs = msgs->array.count;
     if (nmsgs == 0) {
@@ -73,7 +72,7 @@ void activate_current_message_save (
     const BlockIter save = view->cursor;
     const unsigned long line = view->cy + 1;
     const unsigned long col = view->cx_char + 1;
-    activate_current_message(msgs, view->window);
+    activate_current_message(msgs, view->window, ebuf);
 
     const BlockIter *cursor = &view->window->editor->view->cursor;
     if (nmsgs == 1 && cursor->blk == save.blk && cursor->offset == save.offset) {

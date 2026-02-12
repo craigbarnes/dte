@@ -13,6 +13,8 @@ typedef enum {
     REPLACE_CANCEL = 1 << 4, // Used internally by reg_replace()
 } ReplaceFlags;
 
-bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
+struct EditorState;
+
+bool reg_replace(struct EditorState *e, View *view, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
 
 #endif

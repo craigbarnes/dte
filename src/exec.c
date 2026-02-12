@@ -129,7 +129,7 @@ static void parse_and_activate_message(EditorState *e, const String *str, ExecAc
     }
 
     msgs->pos = MIN(x - 1, count - 1);
-    activate_current_message(msgs, e->window);
+    activate_current_message(msgs, e->window, &e->err);
 }
 
 static void parse_and_activate_tags(EditorState *e, const String *str, ExecAction action)
@@ -186,7 +186,7 @@ static void parse_and_activate_tags(EditorState *e, const String *str, ExecActio
         }
     }
 
-    activate_current_message_save(msgs, &e->bookmarks, e->view);
+    activate_current_message_save(msgs, &e->bookmarks, e->view, ebuf);
 }
 
 static void insert_to_selection (

@@ -15,7 +15,7 @@ FileLocation *get_current_file_location(const View *v)
     return new_file_location(filename, b->id, v->cy + 1, v->cx_char + 1);
 }
 
-bool file_location_go(Window *window, const FileLocation *loc)
+bool file_location_go(Window *window, ErrorBuffer *ebuf, const FileLocation *loc)
 {
     View *view = window_open_buffer(window, loc->filename, true, NULL);
     if (!view) {
@@ -30,7 +30,7 @@ bool file_location_go(Window *window, const FileLocation *loc)
     }
 
     if (loc->pattern) {
-        if (!search_tag(view, loc->pattern)) {
+        if (!search_tag(view, ebuf, loc->pattern)) {
             return false;
         }
     } else if (loc->line > 0) {
@@ -40,9 +40,9 @@ bool file_location_go(Window *window, const FileLocation *loc)
     return unselect(view);
 }
 
-static bool file_location_return(Window *window, const FileLocation *loc)
+static bool file_location_return(Window *window, const FileLocation *loc, const PointerArray *buffers)
 {
-    Buffer *buffer = find_buffer_by_id(&window->editor->buffers, loc->buffer_id);
+    Buffer *buffer = find_buffer_by_id(buffers, loc->buffer_id);
     View *view;
     if (buffer) {
         view = window_find_or_create_view(window, buffer);
@@ -83,7 +83,7 @@ size_t bookmark_push(PointerArray *bookmarks, FileLocation *loc)
     return bookmarks->count;
 }
 
-size_t bookmark_pop(PointerArray *bookmarks, Window *window)
+size_t bookmark_pop(PointerArray *bookmarks, Window *window, const PointerArray *buffers)
 {
     void **ptrs = bookmarks->ptrs;
     size_t count = bookmarks->count;
@@ -91,7 +91,7 @@ size_t bookmark_pop(PointerArray *bookmarks, Window *window)
 
     for (bool go = true; count > 0 && go; popped++) {
         FileLocation *loc = ptrs[--count];
-        go = !file_location_return(window, loc);
+        go = !file_location_return(window, loc, buffers);
         file_location_free(loc);
     }
 

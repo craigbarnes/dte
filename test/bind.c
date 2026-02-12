@@ -73,15 +73,16 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_EQ(block->nl, 1);
 
     View *view = e->view;
+    ErrorBuffer *ebuf = &e->err;
     ASSERT_NONNULL(view);
-    EXPECT_TRUE(undo(view));
+    EXPECT_TRUE(undo(view, ebuf));
     ASSERT_EQ(block->size, 3);
-    EXPECT_TRUE(undo(view));
+    EXPECT_TRUE(undo(view, ebuf));
     ASSERT_EQ(block->size, 4);
-    EXPECT_TRUE(undo(view));
+    EXPECT_TRUE(undo(view, ebuf));
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
-    EXPECT_FALSE(undo(view));
+    EXPECT_FALSE(undo(view, ebuf));
     EXPECT_TRUE(handle_normal_command(e, "close", false));
 }
 

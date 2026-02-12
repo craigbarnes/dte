@@ -464,8 +464,9 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     // Unselect, unless selection mode is active
     view_set_selection_type(e->view, e->view->select_mode);
 
+    SearchCaseSensitivity cs = e->options.case_sensitive_search;
     e->err.command_name = NULL;
-    bool found = search_next(e->view, &e->search, e->options.case_sensitive_search);
+    bool found = search_next(e->view, &e->search, &e->err, cs);
     cmdline_clear(c);
     pop_input_mode(e);
     return found;

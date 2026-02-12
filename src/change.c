@@ -213,7 +213,7 @@ static void reverse_change(View *view, Change *change)
     change->del_count = ins_count;
 }
 
-bool undo(View *view)
+bool undo(View *view, ErrorBuffer *ebuf)
 {
     Change *change = view->buffer->cur_change;
     view_reset_preferred_x(view);
@@ -232,7 +232,6 @@ bool undo(View *view)
             count++;
         }
         if (count > 1) {
-            ErrorBuffer *ebuf = &view->window->editor->err;
             info_msg(ebuf, "Undid %lu changes", count);
         }
     } else {
@@ -243,9 +242,8 @@ bool undo(View *view)
     return true;
 }
 
-bool redo(View *view, unsigned long change_id)
+bool redo(View *view, ErrorBuffer *ebuf, unsigned long change_id)
 {
-    ErrorBuffer *ebuf = &view->window->editor->err;
     Change *change = view->buffer->cur_change;
     view_reset_preferred_x(view);
     if (!change->prev) {

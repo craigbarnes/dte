@@ -235,7 +235,7 @@ static bool cmd_bookmark(EditorState *e, const CommandArgs *a)
     bool verbose = has_flag(a, 'v');
 
     if (has_flag(a, 'r')) {
-        size_t popped = bookmark_pop(bookmarks, e->window);
+        size_t popped = bookmark_pop(bookmarks, e->window, &e->buffers);
         if (!verbose || popped == 0) {
             return verbose ? info_msg(ebuf, "no bookmarks to pop") : true;
         }
@@ -414,7 +414,7 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
     bool spawned = spawn_compiler(&ctx, compiler, messages, read_stdout);
     resume_terminal(e, quiet, spawned && prompt);
 
-    activate_current_message_save(messages, &e->bookmarks, e->view);
+    activate_current_message_save(messages, &e->bookmarks, e->view, &e->err);
     return spawned;
 }
 
@@ -1144,7 +1144,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     msgs->pos = p;
-    return activate_current_message(msgs, e->window);
+    return activate_current_message(msgs, e->window, &e->err);
 }
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
@@ -1539,16 +1539,11 @@ static bool cmd_redo(EditorState *e, const CommandArgs *a)
 {
     char *arg = a->args[0];
     unsigned long change_id = 0;
-    if (arg) {
-        if (!str_to_ulong(arg, &change_id) || change_id == 0) {
-            return error_msg(&e->err, "Invalid change id: %s", arg);
-        }
-    }
-    if (!redo(e->view, change_id)) {
-        return false;
+    if (arg && (!str_to_ulong(arg, &change_id) || change_id == 0)) {
+        return error_msg(&e->err, "Invalid change id: %s", arg);
     }
 
-    return unselect(e->view);
+    return redo(e->view, &e->err, change_id) && unselect(e->view);
 }
 
 static bool cmd_refresh(EditorState *e, const CommandArgs *a)
@@ -1705,7 +1700,7 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
     }
 
     const char *replacement = a->args[1] ? a->args[1] : "";
-    bool r = reg_replace(e->view, pattern, replacement, flags);
+    bool r = reg_replace(e, e->view, pattern, replacement, flags);
     free(alloc);
     return r;
 }
@@ -2063,10 +2058,11 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     const char *pattern = a->args[0];
     char npflag = cmdargs_pick_winning_flag(a, "np");
     bool use_word_under_cursor = has_flag(a, 'w');
+    ErrorBuffer *ebuf = &e->err;
 
     if (!!npflag + use_word_under_cursor + !!pattern > 1) {
         return error_msg (
-            &e->err,
+            ebuf,
             "flags [-n|-p|-w] and [pattern] argument are mutually exclusive"
         );
     }
@@ -2082,7 +2078,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         const RegexpWordBoundaryTokens *rwbt = &e->regexp_word_tokens;
         const size_t n = rwbt->len;
         if (unlikely(word.length >= sizeof(pattbuf) - (n * 2))) {
-            return error_msg(&e->err, "word under cursor too long");
+            return error_msg(ebuf, "word under cursor too long");
         }
         xmempcpy3(pattbuf, rwbt->start, n, word.data, word.length, rwbt->end, n + 1);
         pattern = pattbuf;
@@ -2109,8 +2105,8 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     }
 
     switch (npflag) {
-        case 'n': return search_next(view, search, cs);
-        case 'p': return search_prev(view, search, cs);
+        case 'n': return search_next(view, search, ebuf, cs);
+        case 'p': return search_prev(view, search, ebuf, cs);
     }
 
     BUG_ON(!pattern);
@@ -2129,7 +2125,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
 
     search_set_regexp(search, pattern);
     free(alloc);
-    return has_flag(a, 'x') || do_search_next(view, search, cs, use_word_under_cursor);
+    return has_flag(a, 'x') || do_search_next(view, search, ebuf, cs, use_word_under_cursor);
 }
 
 static bool cmd_select_block(EditorState *e, const CommandArgs *a)
@@ -2272,7 +2268,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
 static bool cmd_tag(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
-        bookmark_pop(&e->bookmarks, e->window);
+        bookmark_pop(&e->bookmarks, e->window, &e->buffers);
         return true;
     }
 
@@ -2289,21 +2285,24 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
     size_t idx = abc ? abc - 'A' : e->options.msg_tag;
     MessageList *msgs = &e->messages[idx];
     clear_messages(msgs);
-    if (!load_tag_file(&e->tagfile, &e->err)) {
+
+    TagFile *tagfile = &e->tagfile;
+    ErrorBuffer *ebuf = &e->err;
+    if (!load_tag_file(tagfile, ebuf)) {
         return false;
     }
 
     const char *filename = e->buffer->abs_filename;
     if (nargs == 0) {
-        tag_lookup(&e->tagfile, msgs, &e->err, word_under_cursor, filename);
+        tag_lookup(tagfile, msgs, ebuf, word_under_cursor, filename);
     }
 
     for (size_t i = 0; i < nargs; i++) {
         StringView tagname = strview(a->args[i]);
-        tag_lookup(&e->tagfile, msgs, &e->err, tagname, filename);
+        tag_lookup(tagfile, msgs, ebuf, tagname, filename);
     }
 
-    activate_current_message_save(msgs, &e->bookmarks, e->view);
+    activate_current_message_save(msgs, &e->bookmarks, e->view, ebuf);
     return (msgs->array.count > 0);
 }
 
@@ -2349,7 +2348,7 @@ static bool cmd_undo(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    return undo(view) && unselect(view);
+    return undo(view, &e->err) && unselect(view);
 }
 
 static bool cmd_unselect(EditorState *e, const CommandArgs *a)
