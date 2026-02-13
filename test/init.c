@@ -143,23 +143,27 @@ static void test_init(TestContext *ctx)
     EXPECT_EQ(log_level_enabled(LOG_LEVEL_TRACE), TRACE_LOGGING_ENABLED);
     EXPECT_EQ(log_level_debug_enabled(), DEBUG_LOGGING_ENABLED);
     EXPECT_FALSE(log_trace_enabled(TRACEFLAGS_ALL));
-    LOG_CRITICAL("%s: testing LOG_CRITICAL()", __func__);
-    LOG_ERROR("%s: testing LOG_ERROR()", __func__);
-    LOG_WARNING("%s: testing LOG_WARNING()", __func__);
-    LOG_NOTICE("%s: testing LOG_NOTICE()", __func__);
-    LOG_INFO("%s: testing LOG_INFO()", __func__);
-    LOG_DEBUG("%s: testing LOG_DEBUG()", __func__);
+
+    const char *fn = __func__;
+    LOG_CRITICAL("%s: testing LOG_CRITICAL()", fn);
+    LOG_ERROR("%s: testing LOG_ERROR()", fn);
+    LOG_WARNING("%s: testing LOG_WARNING()", fn);
+    LOG_NOTICE("%s: testing LOG_NOTICE()", fn);
+    LOG_INFO("%s: testing LOG_INFO()", fn);
+    LOG_DEBUG("%s: testing LOG_DEBUG()", fn);
     LOG_TRACE(TRACEFLAGS_ALL, "should always fail; trace flags not yet set");
     log_write(LOG_LEVEL_TRACE, STRN("as above"));
     log_write(LOG_LEVEL_INFO, STRN("testing log_write()"));
+    errno = EINVAL;
+    EXPECT_EQ(LOG_ERRNO("testing LOG_ERRNO()"), EINVAL);
 
     const TraceLoggingFlags all = TRACEFLAGS_ALL;
     set_trace_logging_flags(all);
     EXPECT_EQ(log_trace_enabled(all), TRACE_LOGGING_ENABLED);
-    LOG_TRACE(all, "%s: testing LOG_TRACE()", __func__);
-    TRACE_CMD("%s: testing TRACE_CMD()", __func__);
-    TRACE_INPUT("%s: testing TRACE_INPUT()", __func__);
-    TRACE_OUTPUT("%s: testing TRACE_OUTPUT()", __func__);
+    LOG_TRACE(all, "%s: testing LOG_TRACE()", fn);
+    TRACE_CMD("%s: testing TRACE_CMD()", fn);
+    TRACE_INPUT("%s: testing TRACE_INPUT()", fn);
+    TRACE_OUTPUT("%s: testing TRACE_OUTPUT()", fn);
 
     EditorState *e = init_editor_state(home, dte_home);
     ASSERT_NONNULL(e);
