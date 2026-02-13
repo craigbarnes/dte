@@ -251,10 +251,12 @@ static void test_macro_record(TestContext *ctx)
     insert_text(e->view, t2.data, t2.length, true);
     macro_insert_text_hook(m, t2.data, t2.length);
 
+    macro_search_hook(m, "[12]", true, false);
+
     EXPECT_TRUE(macro_is_recording(m));
     EXPECT_TRUE(macro_stop(m));
     EXPECT_FALSE(macro_is_recording(m));
-    EXPECT_EQ(m->macro.count, 9);
+    EXPECT_EQ(m->macro.count, 10);
     EXPECT_EQ(m->prev_macro.count, 0);
 
     static const char expected_macro[] =
@@ -267,6 +269,7 @@ static void test_macro_record(TestContext *ctx)
         "new-line\n"
         "insert -m \"test 1\\n\"\n"
         "insert -m -- '-- test 2'\n"
+        "search -r -H [12]\n"
     ;
 
     String s = dump_macro(m);
@@ -294,7 +297,7 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_TRUE(handle_input(e, 'x'));
     EXPECT_TRUE(macro_cancel(m));
     EXPECT_FALSE(macro_is_recording(m));
-    EXPECT_EQ(m->macro.count, 9);
+    EXPECT_EQ(m->macro.count, 10);
     EXPECT_EQ(m->prev_macro.count, 0);
 }
 
