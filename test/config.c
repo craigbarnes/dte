@@ -257,6 +257,23 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_EQ(m->macro.count, 9);
     EXPECT_EQ(m->prev_macro.count, 0);
 
+    static const char expected_macro[] =
+        "insert -k xy\n"
+        "bol\n"
+        "insert -k -- -z\n"
+        "eol\n"
+        "right\n"
+        "insert -m .\n"
+        "new-line\n"
+        "insert -m \"test 1\\n\"\n"
+        "insert -m -- '-- test 2'\n"
+    ;
+
+    String s = dump_macro(m);
+    EXPECT_MEMEQ(s.buffer, s.len, expected_macro, sizeof(expected_macro) - 1);
+    string_free(&s);
+
+    // Check that the replayed macro produces the same buffer as the commands above
     static const char cmds[] =
         "save -f build/test/macro-rec.txt;"
         "close -f;"
@@ -270,6 +287,7 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_TRUE(handle_normal_command(e, cmds, false));
     expect_files_equal(ctx, "build/test/macro-rec.txt", "build/test/macro-out.txt");
 
+    // Ensure macro_cancel() keeps the previously recorded macro
     EXPECT_FALSE(macro_is_recording(m));
     EXPECT_TRUE(macro_record(m));
     EXPECT_TRUE(macro_is_recording(m));
