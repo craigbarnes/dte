@@ -1,6 +1,7 @@
 #ifndef UTIL_DEBUG_H
 #define UTIL_DEBUG_H
 
+#include <signal.h> // sig_atomic_t
 #include <stddef.h> // unreachable()
 #include "errorcode.h"
 #include "macros.h"
@@ -66,10 +67,9 @@ static inline const char *ld_preload_env_var(void)
 #endif
 }
 
-typedef void (*CleanupHandler)(void);
+extern volatile sig_atomic_t need_term_reset_on_fatal_error; // NOLINT(*non-const-global*)
 
 noreturn void fatal_error(const char *msg, SystemErrno err) COLD NONNULL_ARGS;
-void set_fatal_error_cleanup_handler(CleanupHandler handler);
 void fatal_error_cleanup(void);
 
 #endif

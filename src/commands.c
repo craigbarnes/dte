@@ -2251,6 +2251,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
 
     ui_end(&e->terminal, false);
     term_cooked();
+    need_term_reset_on_fatal_error = 0;
     LOG_INFO("suspending");
 
     bool suspended = !kill(0, SIGSTOP);
@@ -2260,6 +2261,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
         error_msg_errno(&e->err, "kill");
     }
 
+    need_term_reset_on_fatal_error = 1;
     term_raw();
     ui_start(e);
     return suspended;

@@ -11,6 +11,7 @@
 #include "terminal/color.h"
 #include "terminal/terminal.h"
 #include "trace.h"
+#include "util/debug.h"
 #include "util/fd.h"
 #include "util/intern.h"
 #include "util/log.h"
@@ -190,6 +191,8 @@ static void test_init(TestContext *ctx)
     const char *ver = getenv("DTE_VERSION");
     EXPECT_NONNULL(ver);
     EXPECT_STREQ(ver, VERSION);
+
+    EXPECT_EQ(need_term_reset_on_fatal_error, 0);
 }
 
 static void test_deinit(TestContext *ctx)
@@ -234,7 +237,7 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(e->buffers.count, 0);
 
     free_editor_state(e);
-    EXPECT_EQ(child_controls_terminal, 0);
+    EXPECT_EQ(need_term_reset_on_fatal_error, 0);
     EXPECT_TRUE(log_close());
 }
 

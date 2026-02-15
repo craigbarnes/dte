@@ -1,47 +1,36 @@
 #include <errno.h>
-#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "debug.h"
 #include "log.h"
+#include "terminal/mode.h"
+#include "xreadwrite.h"
 
-// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
-static CleanupHandler cleanup_handler = NULL;
+// Set to 1 when the terminal needs to be reset before terminating abnormally,
+// e.g. via bug(), fatal_error(), handle_fatal_signal(), etc.
+volatile sig_atomic_t need_term_reset_on_fatal_error = 0; // NOLINT(*non-const-global*)
 
-void set_fatal_error_cleanup_handler(CleanupHandler handler)
+// This serves a similar purpose to ui_end(), but using only minimal
+// program state, so as to be suitable for use in handle_fatal_signal()
+// and as an AddressSanitizer callback
+static void cleanup(void)
 {
-    cleanup_handler = handler;
+    if (!need_term_reset_on_fatal_error) {
+        return;
+    }
+
+    static const char reset[] = "\033c"; // ECMA-48 RIS (reset to initial state)
+    (void)!xwrite_all(STDOUT_FILENO, reset, sizeof(reset) - 1);
+    term_cooked();
+    need_term_reset_on_fatal_error = 0;
 }
 
 void fatal_error_cleanup(void)
 {
-    if (cleanup_handler) {
-        cleanup_handler();
-    }
-}
-
-static void cleanup(void)
-{
-    // Blocking signals here prevents the following call chain from leaving
-    // the above globals in an undefined state for signal handlers:
-    //
-    //  cleanup() -> cleanup_handler() -> set_fatal_error_cleanup_handler()
-    //
-    // Without this, one of the other functions below might call cleanup()
-    // and then get interrupted in the middle of a sequence of instructions
-    // that aren't async-signal-safe (see: signal-safety(7)).
-    sigset_t mask, oldmask;
-    if (
-        cleanup_handler
-        && sigfillset(&mask) == 0
-        && sigprocmask(SIG_SETMASK, &mask, &oldmask) == 0
-    ) {
-        cleanup_handler();
-        set_fatal_error_cleanup_handler(NULL);
-        (void)!sigprocmask(SIG_SETMASK, &oldmask, NULL);
-    }
+    cleanup();
 }
 
 #if ASAN_ENABLED == 1

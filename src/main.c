@@ -15,7 +15,6 @@
 #include "config.h"
 #include "editor.h"
 #include "encoding.h"
-#include "exec.h"
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
@@ -50,20 +49,6 @@
 #include "version.h"
 #include "view.h"
 #include "window.h"
-
-// This serves a similar purpose to ui_end(), but using only minimal program
-// state, so as to be more suitable for use in handle_fatal_signal() and/or
-// as a sanitizer callback
-static void cleanup_handler(void)
-{
-    if (child_controls_terminal) {
-        return;
-    }
-
-    static const char reset[] = "\033c"; // ECMA-48 RIS (reset to initial state)
-    (void)!xwrite_all(STDOUT_FILENO, reset, sizeof(reset) - 1);
-    term_cooked();
-}
 
 static ExitCode list_builtin_configs(void)
 {
@@ -605,7 +590,6 @@ int main(int argc, char *argv[])
     e->err.print_to_stderr = false;
     lookup_tags(e, tags, nr_tags, nr_commands ? NULL : dview);
 
-    set_fatal_error_cleanup_handler(cleanup_handler);
     set_fatal_signal_handlers();
     set_sigwinch_handler();
 
@@ -615,6 +599,8 @@ int main(int argc, char *argv[])
         fast_exit = true;
         goto exit;
     }
+
+    need_term_reset_on_fatal_error = 1;
 
     if (e->err.stderr_errors_printed) {
         // Display "press any key to continue" prompt for stderr errors
@@ -658,6 +644,7 @@ exit:
         // translation and std_fds[STDOUT_FILENO] may be a pipe to the
         // terminal
         term_cooked();
+        need_term_reset_on_fatal_error = 0;
     }
 
     if (have_stdout_buffer) {
