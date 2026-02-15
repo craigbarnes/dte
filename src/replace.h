@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include "util/macros.h"
-#include "view.h"
 
 typedef enum {
     REPLACE_CONFIRM = 1 << 0, // Show confirmation prompt for each replacement
@@ -15,6 +14,6 @@ typedef enum {
 
 struct EditorState;
 
-bool reg_replace(struct EditorState *e, View *view, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
+bool reg_replace(struct EditorState *e, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
 
 #endif

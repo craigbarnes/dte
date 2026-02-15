@@ -56,7 +56,6 @@ static void build_replacement (
  */
 static unsigned int replace_on_line (
     EditorState *e,
-    View *view,
     StringView line,
     regex_t *re,
     const char *format,
@@ -64,6 +63,7 @@ static unsigned int replace_on_line (
     ReplaceFlags *flagsp
 ) {
     const char *buf = line.data;
+    View *view = e->view;
     char *alloc = NULL;
     ReplaceFlags flags = *flagsp;
     regmatch_t matches[32];
@@ -156,7 +156,7 @@ out:
     return nr;
 }
 
-bool reg_replace(EditorState *e, View *view, const char *pattern, const char *format, ReplaceFlags flags)
+bool reg_replace(EditorState *e, const char *pattern, const char *format, ReplaceFlags flags)
 {
     ErrorBuffer *ebuf = &e->err;
     if (unlikely(pattern[0] == '\0')) {
@@ -173,9 +173,10 @@ bool reg_replace(EditorState *e, View *view, const char *pattern, const char *fo
         return regexp_error_msg(ebuf, &re, pattern, err);
     }
 
+    View *view = e->view;
+    size_t nr_bytes = 0;
     BlockIter bi;
     bool swapped;
-    size_t nr_bytes = 0;
     if (view->selection) {
         SelectionInfo info = init_selection(view);
         bi = info.si;
@@ -210,7 +211,7 @@ bool reg_replace(EditorState *e, View *view, const char *pattern, const char *fo
             line.length = nr_bytes;
         }
 
-        unsigned int nr = replace_on_line(e, view, line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(e, line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;

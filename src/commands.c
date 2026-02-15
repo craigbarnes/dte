@@ -1700,7 +1700,7 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
     }
 
     const char *replacement = a->args[1] ? a->args[1] : "";
-    bool r = reg_replace(e, e->view, pattern, replacement, flags);
+    bool r = reg_replace(e, pattern, replacement, flags);
     free(alloc);
     return r;
 }
