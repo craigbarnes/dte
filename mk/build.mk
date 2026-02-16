@@ -8,12 +8,12 @@ AWK = awk
 VERSION = $(shell mk/version.sh 1.11.1)
 
 BUILTIN_SYNTAX_FILES ?= \
-    awk c coccinelle config css ctags d diff docker dte gcode gitblame \
-    gitcommit gitignore gitlog gitnote gitrebase gitstash go gomod hare \
-    haskell html ini java javascript json jsonc lisp lrc lua mail make man \
-    markdown meson nftables nginx ninja php python robotstxt roff ruby scheme \
-    sed sh sql tex texmfcnf tmux vala weechatlog xml xresources zig \
-    inc/c-comment inc/c-uchar inc/diff inc/json-num
+    awk c coccinelle config config-ntc css ctags d diff docker dte gcode \
+    gitblame gitcommit gitignore gitlog gitnote gitrebase gitstash go \
+    gomod hare haskell html ini java javascript json jsonc lisp lrc lua \
+    mail make man markdown meson nftables nginx ninja php python robotstxt \
+    roff ruby scheme sed sh sql tex texmfcnf tmux vala weechatlog xml \
+    xresources zig inc/c-comment inc/c-uchar inc/diff inc/json-num
 
 BUILTIN_SCRIPTS ?= \
     fzf.sh git-changes.sh help.sh lf-wrapper.sh longest-line.awk \

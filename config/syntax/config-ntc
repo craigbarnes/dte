@@ -1,0 +1,18 @@
+# Similar to the `config` syntax, but only recognizing e.g. `# xyz` style
+# comments at the start of lines and never e.g. `TEXT # trailing comment`.
+
+# "ntc" = no trailing comments
+syntax config-ntc
+
+state start code
+    char " \t\n" this
+    char # comment
+    noeat code
+
+state code
+    char "\n" start
+    eat this
+
+state comment
+    char "\n" start
+    eat this

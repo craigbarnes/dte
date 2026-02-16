@@ -88,6 +88,7 @@ static const struct FileBasenameMap {
     {"ip6tables.rules", CONFIG, false},
     {"iptables.rules", CONFIG, false},
     {"jshintrc", JSON, true},
+    {"kitty.conf", CONFIG_NTC, false},
     {"krb5.conf", INI, false},
     {"lcovrc", CONFIG, true},
     {"lesskey", CONFIG, true},
