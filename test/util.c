@@ -197,6 +197,17 @@ static void test_xmalloc(TestContext *ctx)
     EXPECT_STREQ(str, "123::456");
     free(str);
 
+    str = xmemjoin4(STRN("AA"), STRN("BB"), STRN("CC"), STRN("DD") + 1);
+    EXPECT_STREQ(str, "AABBCCDD");
+    free(str);
+
+    // All xmemjoin*() functions allow NULL pointers when the corresponding
+    // length argument is 0, but the sum of all lengths must be at least 1,
+    // otherwise the BUG_ON() assertion in xmalloc() will fail
+    str = xmemjoin4(NULL, 0, NULL, 0, NULL, 0, "", 1);
+    EXPECT_STREQ(str, "");
+    free(str);
+
     str = xcalloc(4, sizeof(str[0]));
     ASSERT_NONNULL(str);
     EXPECT_EQ(str[3], 0);

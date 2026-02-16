@@ -40,7 +40,7 @@ static inline void *xmemdup(const void *ptr, size_t size)
     return memcpy(xmalloc(size), ptr, size);
 }
 
-NONNULL_ARGS_AND_RETURN
+RETURNS_NONNULL
 static inline void *xmemjoin(const void *p1, size_t n1, const void *p2, size_t n2)
 {
     char *joined = xmalloc(xadd(n1, n2));
@@ -48,7 +48,7 @@ static inline void *xmemjoin(const void *p1, size_t n1, const void *p2, size_t n
     return joined;
 }
 
-NONNULL_ARGS_AND_RETURN
+RETURNS_NONNULL
 static inline void *xmemjoin3 (
     const void *p1, size_t n1,
     const void *p2, size_t n2,
@@ -56,6 +56,18 @@ static inline void *xmemjoin3 (
 ) {
     char *joined = xmalloc(xadd3(n1, n2, n3));
     xmempcpy3(joined, p1, n1, p2, n2, p3, n3);
+    return joined;
+}
+
+RETURNS_NONNULL
+static inline void *xmemjoin4 ( // NOLINT(readability-function-size)
+    const void *p1, size_t n1,
+    const void *p2, size_t n2,
+    const void *p3, size_t n3,
+    const void *p4, size_t n4
+) {
+    char *joined = xmalloc(xadd(n1, xadd3(n2, n3, n4)));
+    xmempcpy4(joined, p1, n1, p2, n2, p3, n3, p4, n4);
     return joined;
 }
 

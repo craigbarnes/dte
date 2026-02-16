@@ -48,9 +48,7 @@ static inline char *path_join_sv(StringView s1, StringView s2, bool trailing_sla
     size_t n2 = s2.length;
     size_t sep = n1 && n2 && s1.data[n1 - 1] != '/'; // Separating slash length (1 or 0)
     size_t ts = trailing_slash && n2 && s2.data[n2 - 1] != '/'; // Trailing slash length (1 or 0)
-    char *path = xmalloc(xadd3(n1, n2, sep + ts + 1));
-    xmempcpy4(path, s1.data, n1, slash, sep, s2.data, n2, slash + !ts, 2 - !ts);
-    return path;
+    return xmemjoin4(s1.data, n1, slash, sep, s2.data, n2, slash + !ts, ts + 1);
 }
 
 static inline char *path_join(const char *s1, const char *s2)
