@@ -39,6 +39,7 @@ static const struct FileBasenameMap {
     {"XCompose", CONFIG, true},
     {"Xresources", XRESOURCES, true},
     {"ackrc", CONFIG, true},
+    {"alsoftrc", INI, true}, // https://github.com/kcat/openal-soft/blob/master/alsoftrc.sample
     {"bash_aliases", SH, true},
     {"bash_functions", SH, true},
     {"bash_logout", SH, true},
