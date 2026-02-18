@@ -27,7 +27,8 @@ Checklist
 
 3. Create post-release commit
    1. Reset `VERSION` and `CFLAGS`
-   2. `git commit -m 'Post-release updates'`
+   2. Update `distinfo_describe_ver` and `VPREFIX` in [`mk/version.sh`]
+   3. `git commit -m 'Post-release updates'`
 
 4. Create [GitLab release] and [GitHub release]
 5. Update [AUR package]
@@ -65,3 +66,4 @@ See Also
 [`tools/mk/dist.mk`]: ../tools/mk/dist.mk
 [`share/dte.appdata.xml`]: ../share/dte.appdata.xml
 [`CFLAGS`]: ../mk/build.mk
+[`mk/version.sh`]: ../mk/version.sh

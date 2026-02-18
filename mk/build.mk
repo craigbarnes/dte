@@ -5,7 +5,7 @@ CC ?= gcc
 CFLAGS ?= -g -O2
 LDFLAGS ?=
 AWK = awk
-VERSION = $(shell mk/version.sh 1.11.1)
+VERSION = $(shell mk/version.sh)
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c coccinelle config config-ntc css ctags d diff docker dte gcode \
