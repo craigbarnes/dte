@@ -617,7 +617,6 @@ int main(int argc, char *argv[])
     e->flags &= ~EFLAG_HEADLESS; // See comment for init_editor_state() call above
     ui_first_start(e, terminal_query_level);
     main_loop(e, timing);
-    term_restore_title(term);
 
     /*
      * This is normally followed immediately by term_cooked() in other
