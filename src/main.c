@@ -615,8 +615,7 @@ int main(int argc, char *argv[])
     bool timing = log_level_enabled(LOG_LEVEL_INFO) && xgetenv("DTE_LOG_TIMING");
 
     e->flags &= ~EFLAG_HEADLESS; // See comment for init_editor_state() call above
-    ui_first_start(e, terminal_query_level);
-    main_loop(e, timing);
+    main_loop(e, terminal_query_level, timing);
 
     /*
      * This is normally followed immediately by term_cooked() in other

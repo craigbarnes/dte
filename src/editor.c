@@ -313,7 +313,7 @@ void ui_start(EditorState *e)
 // Terminal queries are buffered before ui_resize() is called, so that only
 // a single term_output_flush() is needed (i.e. as opposed to calling
 // ui_start() + term_put_initial_queries() + term_output_flush()).
-void ui_first_start(EditorState *e, unsigned int terminal_query_level)
+static void ui_first_start(EditorState *e, unsigned int terminal_query_level)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
     Terminal *term = &e->terminal;
@@ -370,9 +370,10 @@ static void log_timing_info(const struct timespec *start, bool enabled)
     LOG_INFO("main loop time: %.3f ms", ms);
 }
 
-void main_loop(EditorState *e, bool timing)
+void main_loop(EditorState *e, unsigned int terminal_query_level, bool timing)
 {
     BUG_ON(e->flags & EFLAG_HEADLESS);
+    ui_first_start(e, terminal_query_level);
 
     while (e->status == EDITOR_RUNNING) {
         if (unlikely(resized)) {
