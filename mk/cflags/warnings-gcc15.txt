@@ -1,0 +1,2 @@
+-Wleading-whitespace=spaces
+-Wtrailing-whitespace=any

@@ -78,6 +78,9 @@ feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
     dirent_d_type TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise \
     qsort_r ))
 
+cflags_names := $(addprefix warnings-, clang18 gcc14 gcc15 gcc4.8) sanitizer
+cflags_configs := $(foreach c, $(cflags_names), mk/cflags/$(c).txt)
+
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/ build/gen/
 
@@ -233,9 +236,9 @@ build/gen/platform.mk: mk/platform.sh mk/nproc.sh | build/gen/
 	$(E) GEN $@
 	$(Q) mk/platform.sh '$(logfile)' >$@
 
-build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt
+build/gen/compiler.mk: mk/compiler.sh build/gen/cc-version.txt $(cflags_configs)
 	$(E) GEN $@
-	$(Q) mk/compiler.sh '$(logfile)' '$(CC)' >$@
+	$(Q) mk/compiler.sh '$(CC)' '$(logfile)' >$@
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature.sh | build/feature/
 	$(E) DETECT $@

@@ -1,0 +1,5 @@
+-Walloca
+-Wnull-dereference
+-Wcomma
+-Wmissing-noreturn
+-Wdate-time

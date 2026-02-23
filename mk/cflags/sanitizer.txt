@@ -1,0 +1,5 @@
+-fsanitize=address,undefined
+-fsanitize-address-use-after-scope
+-fno-sanitize-recover=all
+-fno-omit-frame-pointer
+-fno-common

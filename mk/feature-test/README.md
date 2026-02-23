@@ -8,6 +8,9 @@ The files in this directory are used to detect support for extended
 single feature to be detected and successful compilation is taken to
 mean the feature is supported by the target platform.
 
+Unlike with [Autoconf, CMake, Meson, etc.], these tests are handled as
+separate Make targets and so are performed in parallel.
+
 ## Adding New Tests
 
 The following points should be observed when adding new feature tests:
@@ -45,6 +48,7 @@ The following points should be observed when adding new feature tests:
   [`src/util/fd.c`] for an example of how to handle this.
 
 
+[Autoconf, CMake, Meson, etc.]: https://tavianator.com/2025/configure.html#:~:text=Autoconf%20can%27t%20parallelize%20it%2C%20and%20neither%20can%20CMake%2C%20neither%20can%20Meson
 [`feature_test_macros(7)`]: https://man7.org/linux/man-pages/man7/feature_test_macros.7.html
 [`a91a15760`]: https://gitlab.com/craigbarnes/dte/-/commit/a91a15760d145a1408d475d7ddb4044a733b6720
 [`38d9e95da`]: https://gitlab.com/craigbarnes/dte/-/commit/38d9e95daa41484640c5cfe7d2080d9329c5789a

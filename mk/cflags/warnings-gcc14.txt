@@ -1,0 +1,15 @@
+-Walloca
+-Walloc-zero
+-Wnull-dereference
+-Wformat-signedness
+-Wstringop-truncation
+-Wstringop-overflow
+-Wshift-overflow=2
+-Wcast-align=strict
+-Wduplicated-branches
+-Wduplicated-cond
+-Wlogical-op
+-Wmissing-noreturn
+-Wdate-time
+-Wtrampolines
+-Wstrict-flex-arrays
