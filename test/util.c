@@ -2981,6 +2981,13 @@ static void test_next_multiple(TestContext *ctx)
     EXPECT_EQ(next_multiple(257, 256), 512);
     EXPECT_EQ(next_multiple(8000, 256), 8192);
 
+    for (size_t i = 0; i < 70; i++) {
+        for (size_t p2 = 64; p2; p2 >>= 1) {
+            size_t remainder_complement = (-i & (p2 - 1));
+            IEXPECT_EQ(next_multiple(i, p2), i + remainder_complement);
+        }
+    }
+
     const size_t size_max = (size_t)-1;
     const size_t pow2_max = size_max & ~(size_max >> 1);
     EXPECT_TRUE(IS_POWER_OF_2(pow2_max));
