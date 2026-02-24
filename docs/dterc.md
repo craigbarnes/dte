@@ -744,7 +744,7 @@ Move backward one word.
 `-s`
 :   Skip special characters
 
-### **bol** [**-c**|**-l**] [**-s**|**-t**]
+### **bol** [**-c**|**-l**] [**-r**|**-s**|**-t**]
 
 Move to beginning of current line.
 
@@ -755,6 +755,9 @@ Move to beginning of current line.
 `-t`
 :   Like `-s`, but with the additional behavior of moving back and forth
     between the two positions
+
+`-r`
+:   Like `-t`, but always moving to column 1 first, unless already there
 
 ### **eol** [**-c**|**-l**]
 
@@ -779,31 +782,39 @@ Incrementally move to end of line, then end of screen, then end of file.
 
 ### **scroll-up** [**-M**]
 
-Scroll view up one line. Keeps cursor position unchanged if possible.
+Scroll the view up by one line and keep the cursor position unchanged,
+if possible.
 
 `-M`
-:   Never move cursor (even at [scroll margins])
+:   Never move the cursor, even at [scroll margins]
 
 ### **scroll-down** [**-M**]
 
-Scroll view down one line. Keeps cursor position unchanged if possible.
+Scroll the view down by one line and keep the cursor position unchanged,
+if possible.
 
 `-M`
-:   Never move cursor (even at [scroll margins])
+:   Never move the cursor, even at [scroll margins]
 
-### **scroll-pgup**
+### **scroll-pgup** [**-h**]
 
-Scroll one page up. Cursor position relative to top of screen is
-maintained. See also [`pgup`].
+Scroll one page up, while maintaining the cursor position relative to
+the top of the screen.
 
-### **scroll-pgdown**
+`-h`
+:   Scroll half a page, instead of a full page
 
-Scroll one page down. Cursor position relative to top of screen is
-maintained. See also [`pgdown`].
+### **scroll-pgdown** [**-h**]
+
+Scroll one page down, while maintaining the cursor position relative to
+the top of the screen.
+
+`-h`
+:   Scroll half a page, instead of a full page
 
 ### **center-view**
 
-Center view to cursor.
+Center the view on the cursor.
 
 ### **match-bracket** [**-c**|**-l**]
 
@@ -1337,7 +1348,7 @@ Examples:
 
 See also: [`set`] command.
 
-### **show** [**-c**] _type_ [_key_]
+### **show** [**-c**] [_type_] [_key_]
 
 Display current values for various configurable types.
 
@@ -1379,6 +1390,9 @@ The _type_ argument can be one of:
 `option`
 :   Show [option values](#options) and automatic [`option`] entries
 
+`paste`
+:   Show internal [`paste`] buffer (as created with e.g. [`copy -i`][`copy`])
+
 `search`
 :   Show [search history][`search`]
 
@@ -1387,6 +1401,9 @@ The _type_ argument can be one of:
 
 `setenv`
 :   Show environment variables, in terms of the [`setenv`] command
+
+`show`
+:   Show available [`show`] sub-commands (i.e. this list)
 
 `wsplit`
 :   Show [window dimensions][`wsplit`]
@@ -1398,6 +1415,7 @@ as if by [`open -t`]).
 
 Note that the majority of _type_ arguments correspond to a [command] of
 the same name and some _type_ arguments don't take any _key_ argument.
+If the _type_ argument is omitted, it defaults to `show`.
 
 `-c`
 :   write output to the command line (for most _type_ arguments) or to
@@ -1751,13 +1769,12 @@ errors should be highlighted. Set to `""` to disable.
 [`open`]: #open
 [`open -t`]: #open
 [`option`]: #option
-[`pgdown`]: #pgdown
-[`pgup`]: #pgup
 [`right`]: #right
 [`save`]: #save
 [`search`]: #search
 [`set`]: #set
 [`setenv`]: #setenv
+[`show`]: #show
 [`show bind`]: #show
 [`show include`]: #show
 [`show macro`]: #show

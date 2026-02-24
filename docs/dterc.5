@@ -99,7 +99,7 @@ Movement Commands:
 .br
    \fBword\-bwd\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR]
 .br
-   \fBbol\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR|\fB\-t\fR]
+   \fBbol\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-r\fR|\fB\-s\fR|\fB\-t\fR]
 .br
    \fBeol\fR [\fB\-c\fR|\fB\-l\fR]
 .br
@@ -115,9 +115,9 @@ Movement Commands:
 .br
    \fBscroll\-down\fR [\fB\-M\fR]
 .br
-   \fBscroll\-pgup\fR
+   \fBscroll\-pgup\fR [\fB\-h\fR]
 .br
-   \fBscroll\-pgdown\fR
+   \fBscroll\-pgdown\fR [\fB\-h\fR]
 .br
    \fBcenter\-view\fR
 .br
@@ -196,7 +196,7 @@ Other Commands:
 .br
    \fBtoggle\fR [\fB\-gv\fR] \fIoption\fR [\fIvalues\fR]...
 .br
-   \fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
+   \fBshow\fR [\fB\-c\fR] [\fItype\fR] [\fIkey\fR]
 .br
 .P
 Options:
@@ -1239,7 +1239,7 @@ Move backward one word.
 Skip special characters
 .PP
 .RE
-\fBbol\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-s\fR|\fB\-t\fR]
+\fBbol\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-r\fR|\fB\-s\fR|\fB\-t\fR]
 .RS
 Move to beginning of current line.
 .P
@@ -1252,6 +1252,10 @@ on current cursor position
 \fB\-t\fR
 Like \fB\-s\fR, but with the additional behavior of moving back and forth
 between the two positions
+.PP
+.TP
+\fB\-r\fR
+Like \fB\-t\fR, but always moving to column 1 first, unless already there
 .PP
 .RE
 \fBeol\fR [\fB\-c\fR|\fB\-l\fR]
@@ -1282,37 +1286,47 @@ Incrementally move to end of line, then end of screen, then end of file.
 .RE
 \fBscroll\-up\fR [\fB\-M\fR]
 .RS
-Scroll view up one line. Keeps cursor position unchanged if possible.
+Scroll the view up by one line and keep the cursor position unchanged,
+if possible.
 .P
 .TP
 \fB\-M\fR
-Never move cursor (even at scroll margins)
+Never move the cursor, even at scroll margins
 .PP
 .RE
 \fBscroll\-down\fR [\fB\-M\fR]
 .RS
-Scroll view down one line. Keeps cursor position unchanged if possible.
+Scroll the view down by one line and keep the cursor position unchanged,
+if possible.
 .P
 .TP
 \fB\-M\fR
-Never move cursor (even at scroll margins)
+Never move the cursor, even at scroll margins
 .PP
 .RE
-\fBscroll\-pgup\fR
+\fBscroll\-pgup\fR [\fB\-h\fR]
 .RS
-Scroll one page up. Cursor position relative to top of screen is
-maintained. See also \fBpgup\fR.
+Scroll one page up, while maintaining the cursor position relative to
+the top of the screen.
 .P
+.TP
+\fB\-h\fR
+Scroll half a page, instead of a full page
+.PP
 .RE
-\fBscroll\-pgdown\fR
+\fBscroll\-pgdown\fR [\fB\-h\fR]
 .RS
-Scroll one page down. Cursor position relative to top of screen is
-maintained. See also \fBpgdown\fR.
+Scroll one page down, while maintaining the cursor position relative to
+the top of the screen.
 .P
+.TP
+\fB\-h\fR
+Scroll half a page, instead of a full page
+.PP
 .RE
 \fBcenter\-view\fR
 .RS
-Center view to cursor.
+Center the view on the cursor.
 .P
 .RE
 \fBmatch\-bracket\fR [\fB\-c\fR|\fB\-l\fR]
@@ -1993,7 +2007,7 @@ toggle\ \-v\ text\-width\ 60\ 70\ 80
 See also: \fBset\fR command.
 .P
 .RE
-\fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
+\fBshow\fR [\fB\-c\fR] [\fItype\fR] [\fIkey\fR]
 .RS
 Display current values for various configurable types.
 .P
@@ -2048,6 +2062,10 @@ Show messages
 Show option values and automatic \fBoption\fR entries
 .PP
 .TP
+\fBpaste\fR
+Show internal [\fBpaste\fR] buffer (as created with e.g. \fBcopy \-i\fR)
+.PP
+.TP
 \fBsearch\fR
 Show search history
 .PP
@@ -2060,6 +2078,10 @@ Show option values
 Show environment variables, in terms of the \fBsetenv\fR command
 .PP
 .TP
+\fBshow\fR
+Show available \fBshow\fR sub\-commands (i.e. this list)
+.PP
+.TP
 \fBwsplit\fR
 Show window dimensions
 .PP
@@ -2070,6 +2092,7 @@ as if by \fBopen \-t\fR).
 .P
 Note that the majority of \fItype\fR arguments correspond to a command of
 the same name and some \fItype\fR arguments don't take any \fIkey\fR argument.
+If the \fItype\fR argument is omitted, it defaults to \fBshow\fR.
 .P
 .TP
 \fB\-c\fR
