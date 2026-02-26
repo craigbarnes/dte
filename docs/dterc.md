@@ -1769,6 +1769,7 @@ errors should be highlighted. Set to `""` to disable.
 [`open`]: #open
 [`open -t`]: #open
 [`option`]: #option
+[`paste`]: #paste
 [`right`]: #right
 [`save`]: #save
 [`search`]: #search
