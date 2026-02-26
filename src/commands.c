@@ -1968,7 +1968,6 @@ static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    handle_selection_flags(view, a);
     view->vy++;
 
     if (has_flag(a, 'M')) {
@@ -2037,7 +2036,6 @@ static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    handle_selection_flags(view, a);
     view->vy -= (view->vy > 0);
 
     if (has_flag(a, 'M')) {
@@ -2679,10 +2677,10 @@ static const Command cmds[] = {
     {"replace", "bcegi", NA, 1, 2, cmd_replace},
     {"right", "cl", NA, 0, 0, cmd_right},
     {"save", "Bbde=fpu", NA, 0, 1, cmd_save},
-    {"scroll-down", "Mcl", NA, 0, 0, cmd_scroll_down},
+    {"scroll-down", "M", NA, 0, 0, cmd_scroll_down},
     {"scroll-pgdown", "chl", NA, 0, 0, cmd_scroll_pgdown},
     {"scroll-pgup", "chl", NA, 0, 0, cmd_scroll_pgup},
-    {"scroll-up", "Mcl", NA, 0, 0, cmd_scroll_up},
+    {"scroll-up", "M", NA, 0, 0, cmd_scroll_up},
     {"search", "Haceilnprswx", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
