@@ -354,16 +354,21 @@ String dump_tags(TagFile *tf, ErrorBuffer *ebuf)
     string_sprintf (
         &buf,
         "Tags file\n---------\n\n"
-        "%s %s\n%s %s\n%s %s\n\n"
-        "Tag entries\n-----------\n\n",
+        "%s %s\n%s %s\n%s %s",
         "     Path:", tf->filename,
         " Modified:", timespec_to_str(&ts, tstr) ? tstr : "-",
         "     Size:", filesize_to_str(tf->size, sizestr)
     );
 
+    if (DEBUG < 1) {
+        // Only show basic metadata in non-debug builds
+        return buf;
+    }
+
     const StringView prefix = STRING_VIEW_INIT;
     size_t pos = 0;
     Tag tag;
+    string_append_literal(&buf, "\n\nTag entries\n-----------\n\n");
 
     while (next_tag(tf->buf, tf->size, &pos, prefix, false, &tag)) {
         string_append_buf(&buf, tag.name.data, tag.name.length);
