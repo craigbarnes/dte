@@ -7,15 +7,25 @@ state char special
 
 syntax .markdown-fenced-code-block
 
+# "The closing code fence may be preceded by up to three spaces of
+# indentation, and may be followed only by spaces or tabs, which are
+# ignored."
+# -- https://spec.commonmark.org/0.31.2/#fenced-code-blocks:~:text=The%20closing%20code%20fence,-may%20be%20preceded
+
 state body code-block
     char "\n" line-start
     eat this
 
 state line-start code-block
+    # This is somewhat inefficient, but it's tested at most 4 times
+    # per line (and typically just once in most cases)
+    str '    ' body
+    char ' ' this
     heredocend end
     noeat body
 
 state end code-block
+    char " \t" this
     char "\n" END
     noeat body
 
@@ -35,6 +45,9 @@ state yaml
 
 state line-start
     char "\n" block-start
+    # TODO: "A fenced code block begins with a code fence, preceded by
+    # UP TO three spaces of indentation"
+    # (https://spec.commonmark.org/0.31.2/#fenced-code-blocks)
     char " " this
     char # hash-heading
     char > block-quote
