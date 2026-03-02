@@ -22,7 +22,7 @@ typedef struct {
     StringView config_file_dir;
     EditorConfigOptions options;
     bool match;
-} UserData;
+} EditorConfigContext;
 
 typedef enum {
     ECONF_CHARSET,
@@ -165,7 +165,7 @@ static EditorConfigOptions editorconfig_options_init(void)
     return (EditorConfigOptions){.indent_style = INDENT_STYLE_UNSPECIFIED};
 }
 
-static void editorconfig_parse(StringView input, UserData *data)
+static void editorconfig_parse(StringView input, EditorConfigContext *ctx)
 {
     static const StringView utf8_bom = STRING_VIEW("\xEF\xBB\xBF");
     bool has_utf8_bom = strview_has_sv_prefix(input, utf8_bom);
@@ -179,7 +179,7 @@ static void editorconfig_parse(StringView input, UserData *data)
         if (ini.section.length == 0) {
             if (is_root_key(&ini)) {
                 // root=true, clear all previous values
-                data->options = editorconfig_options_init();
+                ctx->options = editorconfig_options_init();
             }
             continue;
         }
@@ -188,16 +188,16 @@ static void editorconfig_parse(StringView input, UserData *data)
             // If name_count is 1, it indicates that the name/value pair is
             // the first in the section and therefore requires a new pattern
             // to be built and tested for a match
-            StringView dir = data->config_file_dir;
-            data->match = section_matches_path(ini.section, dir, data->pathname);
+            StringView dir = ctx->config_file_dir;
+            ctx->match = section_matches_path(ini.section, dir, ctx->pathname);
         } else {
             // Otherwise, the section is the same as was passed for the first
-            // name/value pair in the section and the value of data->match
+            // name/value pair in the section and the value of ctx->match
             // can just be reused
         }
 
-        if (data->match) {
-            editorconfig_option_set(&data->options, ini.name, ini.value);
+        if (ctx->match) {
+            editorconfig_option_set(&ctx->options, ini.name, ini.value);
         }
     }
 }
@@ -205,7 +205,7 @@ static void editorconfig_parse(StringView input, UserData *data)
 EditorConfigOptions get_editorconfig_options(const char *pathname)
 {
     BUG_ON(!path_is_absolute(pathname));
-    UserData data = {
+    EditorConfigContext ctx = {
         .pathname = pathname,
         .config_file_dir = STRING_VIEW_INIT,
         .options = editorconfig_options_init(),
@@ -224,8 +224,8 @@ EditorConfigOptions get_editorconfig_options(const char *pathname)
         char *text;
         ssize_t len = read_file(buf, &text, MAX_FILESIZE);
         if (len >= 0) {
-            data.config_file_dir = string_view(buf, dir_len);
-            editorconfig_parse(string_view(text, len), &data);
+            ctx.config_file_dir = string_view(buf, dir_len);
+            editorconfig_parse(string_view(text, len), &ctx);
             free(text);
         }
 
@@ -241,7 +241,7 @@ EditorConfigOptions get_editorconfig_options(const char *pathname)
 
     // Set indent_size to "tab" if indent_size is not specified and
     // indent_style is set to "tab"
-    EditorConfigOptions *o = &data.options;
+    EditorConfigOptions *o = &ctx.options;
     if (o->indent_size == 0 && o->indent_style == INDENT_STYLE_TAB) {
         o->indent_size_is_tab = true;
     }
@@ -258,5 +258,5 @@ EditorConfigOptions get_editorconfig_options(const char *pathname)
         o->tab_width = o->indent_size;
     }
 
-    return data.options;
+    return ctx.options;
 }
