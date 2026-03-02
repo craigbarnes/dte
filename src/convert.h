@@ -20,7 +20,7 @@ bool file_decoder_read(Buffer *buffer, ErrorBuffer *ebuf, const char *text, size
 
 FileEncoder file_encoder(const char *encoding, bool crlf, int fd) NONNULL_ARGS WARN_UNUSED_RESULT;
 void file_encoder_free(FileEncoder *enc) NONNULL_ARGS;
-ssize_t file_encoder_write(FileEncoder *enc, const char *buf, size_t size) NONNULL_ARGS WARN_UNUSED_RESULT;
+ssize_t file_encoder_write(FileEncoder *enc, const char *buf, size_t size, size_t nr_newlines) NONNULL_ARGS WARN_UNUSED_RESULT;
 size_t file_encoder_get_nr_errors(const FileEncoder *enc) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

@@ -294,7 +294,7 @@ static bool write_buffer(const Buffer *buffer, const FileSaveContext *ctx, int f
 
     const Block *blk;
     block_for_each(blk, &buffer->blocks) {
-        ssize_t rc = file_encoder_write(&enc, blk->data, blk->size);
+        ssize_t rc = file_encoder_write(&enc, blk->data, blk->size, blk->nl);
         if (rc < 0) {
             file_encoder_free(&enc);
             return error_msg_errno(ebuf, "write");

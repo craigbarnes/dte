@@ -138,27 +138,43 @@ static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, const ch
     return true;
 }
 
-static size_t unix_to_dos(FileEncoder *enc, const char *text, size_t text_len)
-{
-    // TODO: Pass in Buffer::nl and make this size adjustment more conservative
-    // (it's resized to handle the worst possible case, despite the fact that we
-    // already have the number of newlines pre-computed)
-    if (enc->nsize < text_len * 2) {
-        enc->nsize = text_len * 2;
+static size_t unix_to_dos (
+    FileEncoder *enc,
+    const char *text,
+    size_t text_len,
+    size_t nr_newlines
+) {
+    BUG_ON(text_len && text[text_len - 1] != '\n'); // See sanity_check_blocks()
+    BUG_ON(nr_newlines > text_len);
+
+    const size_t new_len = text_len + nr_newlines;
+    if (enc->nsize < new_len) {
+        enc->nsize = xmul(text_len, 2);
         enc->nbuf = xrealloc(enc->nbuf, enc->nsize);
     }
 
-    // TODO: Optimize this loop, by making use of memccpy(3)
-    size_t d = 0;
-    for (size_t s = 0; s < text_len; s++) {
-        unsigned char ch = text[s];
-        if (ch == '\n') {
-            enc->nbuf[d++] = '\r';
-        }
-        enc->nbuf[d++] = ch;
+    size_t seen_nl = 0;
+    size_t dest_pos = 0;
+
+    for (size_t src_pos = 0; src_pos < text_len; ) {
+        const char *src = text + src_pos;
+        char *dest = enc->nbuf + dest_pos;
+        char *end = memccpy(dest, src, '\n', text_len - src_pos);
+        BUG_ON(!end); // Loop condition prevents this
+
+        size_t line_len = (size_t)(end - dest);
+        src_pos += line_len;
+        BUG_ON(src_pos > text_len);
+
+        end[-1] = '\r';
+        end[0] = '\n';
+        dest_pos += line_len + 1;
+        seen_nl++;
     }
 
-    return d;
+    BUG_ON(seen_nl != nr_newlines);
+    BUG_ON(dest_pos != new_len);
+    return dest_pos;
 }
 
 #if ICONV_DISABLE == 1 // iconv not available; use basic, UTF-8 implementation:
@@ -188,13 +204,17 @@ void file_encoder_free(FileEncoder *enc)
     free(enc->nbuf);
 }
 
-ssize_t file_encoder_write(FileEncoder *enc, const char *buf, size_t n)
-{
+ssize_t file_encoder_write (
+    FileEncoder *enc,
+    const char *buf,
+    size_t size,
+    size_t nr_newlines
+) {
     if (unlikely(enc->crlf)) {
-        n = unix_to_dos(enc, buf, n);
+        size = unix_to_dos(enc, buf, size, nr_newlines);
         buf = enc->nbuf;
     }
-    return xwrite_all(enc->fd, buf, n);
+    return xwrite_all(enc->fd, buf, size);
 }
 
 size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
@@ -533,10 +553,11 @@ void file_encoder_free(FileEncoder *enc)
 ssize_t file_encoder_write (
     FileEncoder *enc,
     const char *buf,
-    size_t size
+    size_t size,
+    size_t nr_newlines
 ) {
     if (unlikely(enc->crlf)) {
-        size = unix_to_dos(enc, buf, size);
+        size = unix_to_dos(enc, buf, size, nr_newlines);
         buf = enc->nbuf;
     }
     if (unlikely(enc->cconv)) {
