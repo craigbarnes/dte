@@ -47,6 +47,10 @@ option yaml \
     emulate-tab true \
     ws-error tab-indent,tab-after-indent,trailing,special
 
+# Use PEP 8 indent style (4 spaces) in Python files
+# https://peps.python.org/pep-0008/#indentation:~:text=Use%204%20spaces,-per
+option python indent-width 4 expand-tab true emulate-tab true
+
 # Patterns used to detect indent size when "auto-indent" option is enabled
 option c,java indent-regex '^[ \t]*((case|do|else|for|if|while)[ (]|default:)'
 option lua indent-regex '(then|do|repeat|else) *$|function *[A-Za-z0-9_.:]* *\([A-Za-z0-9_, ]*\) *$'
