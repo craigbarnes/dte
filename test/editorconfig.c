@@ -62,76 +62,100 @@ static void test_ini_parse(TestContext *ctx)
     EXPECT_FALSE(ini_parse(&ini));
 }
 
+static void test_ec_pattern_to_regex(TestContext *ctx)
+{
+    const StringView dir = STRING_VIEW("/dir");
+
+    String str = ec_pattern_to_regex(strview("\\[ab]"), dir);
+    EXPECT_STRING_EQ_CSTRING(&str, "^/dir/(.*/)?\\[ab]$");
+    string_free(&str);
+
+    str = ec_pattern_to_regex(strview("**.c"), dir);
+    EXPECT_STRING_EQ_CSTRING(&str, "^/dir/(.*/)?.*\\.c$");
+    string_free(&str);
+
+    str = ec_pattern_to_regex(strview("\\*\\*.c"), dir);
+    EXPECT_STRING_EQ_CSTRING(&str, "^/dir/(.*/)?\\*\\*\\.c$");
+    string_free(&str);
+
+    str = ec_pattern_to_regex(strview("/xyz/\\[test-dir]/\\**.conf"), dir);
+    EXPECT_STRING_EQ_CSTRING(&str, "^/dir/xyz/\\[test-dir]/\\*[^/]*\\.conf$");
+    string_free(&str);
+}
+
 static void test_ec_pattern_match(TestContext *ctx)
 {
-    #define patmatch(s, f) (ec_pattern_match(s, STRLEN(s), f))
+    const StringView dir = STRING_VIEW("/dir");
 
-    EXPECT_TRUE(patmatch("*", "file.c"));
-    EXPECT_TRUE(patmatch("*.{c,h}", "file.c"));
-    EXPECT_TRUE(patmatch("*.{foo}", "file.foo"));
+    EXPECT_TRUE(ec_pattern_match(strview("*"), dir, "/dir/file.c"));
+    EXPECT_FALSE(ec_pattern_match(strview("*"), dir, "/other-dir/file.c"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.{c,h}"), dir, "/dir/file.c"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.{foo}"), dir, "/dir/file.foo"));
 
-    EXPECT_TRUE(patmatch("*.{foo{bar,baz}}", "file.foobaz"));
-    EXPECT_FALSE(patmatch("*.{foo{bar,baz}}", "file.foo"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.{foo{bar,baz}}"), dir, "/dir/file.foobaz"));
+    EXPECT_FALSE(ec_pattern_match(strview("*.{foo{bar,baz}}"), dir, "/dir/file.foo"));
 
-    EXPECT_TRUE(patmatch("a/**/b/c/*.[ch]", "a/zzz/yyy/foo/b/c/file.h"));
-    EXPECT_FALSE(patmatch("a/*/b/c/*.[ch]", "a/zzz/yyy/foo/b/c/file.h"));
+    EXPECT_TRUE(ec_pattern_match(strview("a/**/b/c/*.[ch]"), dir, "/dir/a/zzz/yyy/foo/b/c/file.h"));
+    EXPECT_FALSE(ec_pattern_match(strview("a/*/b/c/*.[ch]"), dir, "/dir/a/zzz/yyy/foo/b/c/file.h"));
 
-    EXPECT_TRUE(patmatch("}*.{x,y}", "}foo.y"));
-    EXPECT_FALSE(patmatch("}*.{x,y}", "foo.y"));
-    EXPECT_TRUE(patmatch("{}*.{x,y}", "foo.y"));
+    EXPECT_TRUE(ec_pattern_match(strview("}*.{x,y}"), dir, "/dir/}foo.y"));
+    EXPECT_FALSE(ec_pattern_match(strview("}*.{x,y}"), dir, "/dir/foo.y"));
+    EXPECT_TRUE(ec_pattern_match(strview("{}*.{x,y}"), dir, "/dir/foo.y"));
 
-    EXPECT_TRUE(patmatch("*.[xyz]", "foo.z"));
-    EXPECT_FALSE(patmatch("*.[xyz", "foo.z"));
-    EXPECT_TRUE(patmatch("*.[xyz", "foo.[xyz"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.[xyz]"), dir, "/dir/foo.z"));
+    EXPECT_FALSE(ec_pattern_match(strview("*.[xyz"), dir, "/dir/foo.z"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.[xyz"), dir, "/dir/foo.[xyz"));
 
-    EXPECT_TRUE(patmatch("*.[!xyz]", "foo.a"));
-    EXPECT_FALSE(patmatch("*.[!xyz]", "foo.z"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.[!xyz]"), dir, "/dir/foo.a"));
+    EXPECT_FALSE(ec_pattern_match(strview("*.[!xyz]"), dir, "/dir/foo.z"));
 
-    EXPECT_TRUE(patmatch("*.[", "foo.["));
-    EXPECT_TRUE(patmatch("*.[a", "foo.[a"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.["), dir, "/dir/foo.["));
+    EXPECT_TRUE(ec_pattern_match(strview("*.[a"), dir, "/dir/foo.[a"));
 
-    EXPECT_TRUE(patmatch("*.[abc]def", "foo.bdef"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.[abc]def"), dir, "/dir/foo.bdef"));
 
-    EXPECT_TRUE(patmatch("x{{foo,},}", "x"));
-    EXPECT_TRUE(patmatch("x{{foo,},}", "xfoo"));
+    EXPECT_TRUE(ec_pattern_match(strview("x{{foo,},}"), dir, "/dir/x"));
+    EXPECT_TRUE(ec_pattern_match(strview("x{{foo,},}"), dir, "/dir/xfoo"));
 
-    EXPECT_TRUE(patmatch("file.{,,x,,y,,}", "file.x"));
-    EXPECT_TRUE(patmatch("file.{,,x,,y,,}", "file."));
-    EXPECT_FALSE(patmatch("file.{,,x,,y,,}", "file.z"));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{,,x,,y,,}"), dir, "/dir/file.x"));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{,,x,,y,,}"), dir, "/dir/file."));
+    EXPECT_FALSE(ec_pattern_match(strview("file.{,,x,,y,,}"), dir, "/dir/file.z"));
 
-    EXPECT_TRUE(patmatch("*.x,y,z", "file.x,y,z"));
-    EXPECT_TRUE(patmatch("*.{x,y,z}", "file.y"));
-    EXPECT_FALSE(patmatch("*.{x,y,z}", "file.x,y,z"));
-    EXPECT_FALSE(patmatch("*.{x,y,z}", "file.{x,y,z}"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.x,y,z"), dir, "/dir/file.x,y,z"));
+    EXPECT_TRUE(ec_pattern_match(strview("*.{x,y,z}"), dir, "/dir/file.y"));
+    EXPECT_FALSE(ec_pattern_match(strview("*.{x,y,z}"), dir, "/dir/file.x,y,z"));
+    EXPECT_FALSE(ec_pattern_match(strview("*.{x,y,z}"), dir, "/dir/file.{x,y,z}"));
 
-    EXPECT_TRUE(patmatch("file.{{{a,b,{c,,d}}}}", "file.d"));
-    EXPECT_TRUE(patmatch("file.{{{a,b,{c,,d}}}}", "file."));
-    EXPECT_FALSE(patmatch("file.{{{a,b,{c,d}}}}", "file."));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{{{a,b,{c,,d}}}}"), dir, "/dir/file.d"));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{{{a,b,{c,,d}}}}"), dir, "/dir/file."));
+    EXPECT_FALSE(ec_pattern_match(strview("file.{{{a,b,{c,d}}}}"), dir, "/dir/file."));
 
-    EXPECT_TRUE(patmatch("file.{c[vl]d,inc}", "file.cvd"));
-    EXPECT_TRUE(patmatch("file.{c[vl]d,inc}", "file.cld"));
-    EXPECT_TRUE(patmatch("file.{c[vl]d,inc}", "file.inc"));
-    EXPECT_FALSE(patmatch("file.{c[vl]d,inc}", "file.cd"));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{c[vl]d,inc}"), dir, "/dir/file.cvd"));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{c[vl]d,inc}"), dir, "/dir/file.cld"));
+    EXPECT_TRUE(ec_pattern_match(strview("file.{c[vl]d,inc}"), dir, "/dir/file.inc"));
+    EXPECT_FALSE(ec_pattern_match(strview("file.{c[vl]d,inc}"), dir, "/dir/file.cd"));
 
-    EXPECT_TRUE(patmatch("a?b.c", "a_b.c"));
-    EXPECT_FALSE(patmatch("a?b.c", "a/b.c"));
+    EXPECT_TRUE(ec_pattern_match(strview("a?b.c"), dir, "/dir/a_b.c"));
+    EXPECT_FALSE(ec_pattern_match(strview("a?b.c"), dir, "/dir/a/b.c"));
 
-    EXPECT_TRUE(patmatch("a\\[.abc", "a[.abc"));
-    EXPECT_TRUE(patmatch("a\\{.abc", "a{.abc"));
-    EXPECT_TRUE(patmatch("a\\*.abc", "a*.abc"));
-    EXPECT_TRUE(patmatch("a\\?.abc", "a?.abc"));
-    EXPECT_FALSE(patmatch("a\\*.abc", "az.abc"));
-    EXPECT_FALSE(patmatch("a\\?.abc", "az.abc"));
+    EXPECT_TRUE(ec_pattern_match(strview("a\\[.abc"), dir, "/dir/a[.abc"));
+    EXPECT_TRUE(ec_pattern_match(strview("a\\{.abc"), dir, "/dir/a{.abc"));
+    EXPECT_TRUE(ec_pattern_match(strview("a\\*.abc"), dir, "/dir/a*.abc"));
+    EXPECT_TRUE(ec_pattern_match(strview("a\\?.abc"), dir, "/dir/a?.abc"));
+    EXPECT_FALSE(ec_pattern_match(strview("a\\*.abc"), dir, "/dir/az.abc"));
+    EXPECT_FALSE(ec_pattern_match(strview("a\\?.abc"), dir, "/dir/az.abc"));
 
-    EXPECT_TRUE(patmatch("{{{a}}}", "a"));
-    EXPECT_FALSE(patmatch("{{{a}}", "a"));
+    EXPECT_TRUE(ec_pattern_match(strview("{{{a}}}"), dir, "/dir/a"));
+    EXPECT_FALSE(ec_pattern_match(strview("{{{a}}"), dir, "/dir/a"));
+
+    EXPECT_TRUE(ec_pattern_match(strview("/dir2/**.ext"), dir, "/dir/dir2/file.ext"));
+    EXPECT_TRUE(ec_pattern_match(strview("/dir2/**.ext"), dir, "/dir/dir2/dir3/file.ext"));
+    EXPECT_FALSE(ec_pattern_match(strview("/dir2/**.ext"), dir, "/x/dir2/dir3/file.ext"));
 
     // It's debatable whether this edge case behavior is sensible,
     // but it's tested here anyway for the sake of UBSan coverage
-    EXPECT_TRUE(patmatch("*.xyz\\", "file.xyz\\"));
-    EXPECT_FALSE(patmatch("*.xyz\\", "file.xyz"));
-
-    #undef patmatch
+    EXPECT_TRUE(ec_pattern_match(strview("*.xyz\\"), dir, "/dir/file.xyz\\"));
+    EXPECT_FALSE(ec_pattern_match(strview("*.xyz\\"), dir, "/dir/file.xyz"));
 }
 
 static void test_ec_options_struct(TestContext *ctx)
@@ -181,6 +205,7 @@ static void test_get_editorconfig_options(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_ini_parse),
+    TEST(test_ec_pattern_to_regex),
     TEST(test_ec_pattern_match),
     TEST(test_ec_options_struct),
     TEST(test_get_editorconfig_options),

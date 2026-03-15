@@ -116,6 +116,16 @@ char *regexp_escape(const char *pattern, size_t len)
     return buf;
 }
 
+size_t string_append_escaped_regex(String *s, StringView pattern)
+{
+    size_t bufsize = xmul(2, pattern.length) + 1;
+    char *buf = string_reserve_space(s, bufsize);
+    size_t esc_len = regexp_escapeb(buf, bufsize, pattern.data, pattern.length);
+    BUG_ON(esc_len < pattern.length);
+    s->len += esc_len;
+    return esc_len;
+}
+
 const InternedRegexp *regexp_intern(ErrorBuffer *ebuf, const char *pattern)
 {
     if (pattern[0] == '\0') {

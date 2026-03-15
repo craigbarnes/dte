@@ -2,9 +2,11 @@
 #define EDITORCONFIG_MATCH_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include "util/macros.h"
+#include "util/string-view.h"
+#include "util/string.h"
 
-bool ec_pattern_match(const char *pattern, size_t pat_len, const char *path) NONNULL_ARGS WARN_UNUSED_RESULT;
+String ec_pattern_to_regex(StringView section, StringView dir) WARN_UNUSED_RESULT;
+bool ec_pattern_match(StringView section, StringView dir, const char *path) WARN_UNUSED_RESULT NONNULL_ARGS;
 
 #endif

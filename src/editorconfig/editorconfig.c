@@ -115,45 +115,6 @@ static void editorconfig_option_set (
     }
 }
 
-// See: https://editorconfig.org/#wildcards and ec_pattern_match()
-static bool is_ec_special_char(char c)
-{
-    return c == '*' || c == ',' || c == '-' || c == '?' || c == '['
-        || c == ']' || c == '{' || c == '}' || c == '\\';
-}
-
-static bool section_matches_path(StringView section, StringView dir, const char *path)
-{
-    BUG_ON(section.length == 0);
-    String pattern = string_new(dir.length + section.length + 16);
-
-    // Add `dir` prefix to `pattern`, escaping any special characters
-    for (size_t i = 0, n = dir.length; i < n; i++) {
-        const char c = dir.data[i];
-        if (is_ec_special_char(c)) {
-            string_append_byte(&pattern, '\\');
-        }
-        string_append_byte(&pattern, c);
-    }
-
-    if (!strview_memchr(section, '/')) {
-        // Section contains no slashes; insert "**/" between `dir` and `section`
-        string_append_literal(&pattern, "**/");
-    } else if (section.data[0] != '/') {
-        // Section contains slashes, but not at the start; insert '/' between
-        // `dir` and `section`
-        string_append_byte(&pattern, '/');
-    }
-
-    // Append the section heading (from the .editorconfig file) to the
-    // prefix constructed above and test whether the resulting `pattern`
-    // matches against `path`
-    string_append_strview(&pattern, section);
-    bool r = ec_pattern_match(pattern.buffer, pattern.len, path);
-    string_free(&pattern);
-    return r;
-}
-
 static bool is_root_key(const IniParser *ini)
 {
     return strview_equal_icase(ini->name, strview("root"))
@@ -189,7 +150,7 @@ static void editorconfig_parse(StringView input, EditorConfigContext *ctx)
             // the first in the section and therefore requires a new pattern
             // to be built and tested for a match
             StringView dir = ctx->config_file_dir;
-            ctx->match = section_matches_path(ini.section, dir, ctx->pathname);
+            ctx->match = ec_pattern_match(ini.section, dir, ctx->pathname);
         } else {
             // Otherwise, the section is the same as was passed for the first
             // name/value pair in the section and the value of ctx->match

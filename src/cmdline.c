@@ -443,10 +443,7 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
             // Escape the regex; to match as plain text
             char *original = string_clone_cstring(s);
             size_t origlen = string_clear(s);
-            size_t bufsize = xmul(2, origlen) + 1;
-            char *buf = string_reserve_space(s, bufsize);
-            s->len = regexp_escapeb(buf, bufsize, original, origlen);
-            BUG_ON(s->len < origlen);
+            string_append_escaped_regex(s, string_view(original, origlen));
             free(original);
         }
 

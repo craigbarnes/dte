@@ -1,9 +1,9 @@
 #include <regex.h>
 #include <stdlib.h>
 #include "match.h"
+#include "regexp.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/string.h"
 #include "util/xstring.h"
 
 static size_t get_last_paired_brace_index(const char *str, size_t len)
@@ -86,9 +86,10 @@ static size_t skip_empty_alternates(const char *str, size_t len)
     return i - 1;
 }
 
-bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
+static void section_to_regex(String *buf, StringView section)
 {
-    String buf = string_new(pattern_len * 2);
+    const char *pattern = section.data;
+    size_t pattern_len = section.length;
     size_t brace_level = 0;
     size_t last_paired_brace_index = get_last_paired_brace_index(pattern, pattern_len);
     bool brace_group_has_empty_alternate[32] = {false};
@@ -100,33 +101,33 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             if (i + 1 < pattern_len) {
                 ch = pattern[++i];
                 if (is_regex_special_char(ch)) {
-                    string_append_byte(&buf, '\\');
+                    string_append_byte(buf, '\\');
                 }
-                string_append_byte(&buf, ch);
+                string_append_byte(buf, ch);
             } else {
-                string_append_literal(&buf, "\\\\");
+                string_append_literal(buf, "\\\\");
             }
             break;
         case '?':
-            string_append_literal(&buf, "[^/]");
+            string_append_literal(buf, "[^/]");
             break;
         case '*':
             if (i + 1 < pattern_len && pattern[i + 1] == '*') {
-                string_append_literal(&buf, ".*");
+                string_append_literal(buf, ".*");
                 i++;
             } else {
-                string_append_literal(&buf, "[^/]*");
+                string_append_literal(buf, "[^/]*");
             }
             break;
         case '[':
             // The entire bracket expression is handled in a separate
             // loop because the POSIX regex escaping rules are different
             // in that context
-            i += handle_bracket_expression(pattern + i, pattern_len - i, &buf);
+            i += handle_bracket_expression(pattern + i, pattern_len - i, buf);
             break;
         case '{': {
             if (i >= last_paired_brace_index) {
-                string_append_literal(&buf, "\\{");
+                string_append_literal(buf, "\\{");
                 break;
             }
             brace_level++;
@@ -141,7 +142,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
                 i++;
                 brace_level--;
             } else {
-                string_append_byte(&buf, '(');
+                string_append_byte(buf, '(');
             }
             break;
         }
@@ -149,9 +150,9 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             if (i > last_paired_brace_index || brace_level == 0) {
                 goto append_byte;
             }
-            string_append_byte(&buf, ')');
+            string_append_byte(buf, ')');
             if (brace_group_has_empty_alternate[brace_level]) {
-                string_append_byte(&buf, '?');
+                string_append_byte(buf, '?');
             }
             brace_group_has_empty_alternate[brace_level] = false;
             brace_level--;
@@ -168,13 +169,13 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             if (i + 1 < pattern_len && pattern[i + 1] == '}') {
                 brace_group_has_empty_alternate[brace_level] = true;
             } else {
-                string_append_byte(&buf, '|');
+                string_append_byte(buf, '|');
             }
             break;
         }
         case '/':
             if (i + 3 < pattern_len && mem_equal(pattern + i, "/**/", 4)) {
-                string_append_literal(&buf, "(/|/.*/)");
+                string_append_literal(buf, "/(.*/)?");
                 i += 3;
                 break;
             }
@@ -184,25 +185,52 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
         case ')':
         case '|':
         case '+':
-            string_append_byte(&buf, '\\');
+            string_append_byte(buf, '\\');
             // Fallthrough
         default:
         append_byte:
-            string_append_byte(&buf, ch);
+            string_append_byte(buf, ch);
         }
     }
+}
 
-    string_append_byte(&buf, '$');
-    char *regex_pattern = string_steal_cstring(&buf);
+String ec_pattern_to_regex(StringView section, StringView dir)
+{
+    BUG_ON(section.length == 0);
+    BUG_ON(dir.length == 0);
 
+    String s = string_new((2 * dir.length) + section.length + 16);
+    string_append_byte(&s, '^');
+    string_append_escaped_regex(&s, dir);
+
+    if (!strview_memchr(section, '/')) {
+        // Section contains no slashes; insert "/(.*/)?" between `dir`
+        // and `section`, so as to match files in or below `dir`
+        string_append_literal(&s, "/(.*/)?");
+    } else if (section.data[0] != '/') {
+        // Section contains slashes, but not at the start; insert '/'
+        // between `dir` and `section`
+        string_append_byte(&s, '/');
+    }
+
+    section_to_regex(&s, section);
+    string_append_byte(&s, '$');
+    return s;
+}
+
+bool ec_pattern_match(StringView section, StringView dir, const char *path)
+{
+    String re_str = ec_pattern_to_regex(section, dir);
+    int flags = REG_EXTENDED | REG_NOSUB;
     regex_t re;
-    bool compiled = !regcomp(&re, regex_pattern, REG_EXTENDED | REG_NOSUB);
-    free(regex_pattern);
+    bool compiled = !regcomp(&re, string_borrow_cstring(&re_str), flags);
+    string_free(&re_str);
+
     if (!compiled) {
         return false;
     }
 
-    int res = regexec(&re, path, 0, NULL, 0);
+    bool match = !regexec(&re, path, 0, NULL, 0);
     regfree(&re);
-    return res == 0;
+    return match;
 }
