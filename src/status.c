@@ -192,7 +192,7 @@ static void add_status_pos(Formatter *f)
         add_status_literal(f, "Bot");
     } else {
         unsigned int d = lines - (h - 1);
-        unsigned int percent = (pos * 100 + d / 2) / d;
+        unsigned int percent = ((pos * 100) + (d / 2)) / d;
         BUG_ON(percent > 100);
         char buf[4];
         size_t len = buf_uint_to_str(percent, buf);

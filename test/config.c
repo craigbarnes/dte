@@ -312,8 +312,6 @@ static const TestEntry tests[] = {
 
 const TestGroup config_tests = TEST_GROUP(tests);
 
-DISABLE_WARNING("-Wmissing-prototypes")
-
 void init_headless_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;

@@ -8,8 +8,10 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
-#define COLOR_STR_BUFSIZE 16
-#define TERM_STYLE_BUFSIZE 128
+enum {
+    COLOR_STR_BUFSIZE = 16,
+    TERM_STYLE_BUFSIZE = 128,
+};
 
 enum {
     ATTR_KEEP = 0x01,

@@ -10,34 +10,6 @@
 #include "util/string-view.h"
 #include "util/time-util.h"
 
-void init_headless_mode(TestContext *ctx);
-extern const TestGroup bind_tests;
-extern const TestGroup bookmark_tests;
-extern const TestGroup buffer_tests;
-extern const TestGroup cmdline_tests;
-extern const TestGroup cmdline_tests_late;
-extern const TestGroup command_tests;
-extern const TestGroup config_tests;
-extern const TestGroup ctags_tests;
-extern const TestGroup deinit_tests;
-extern const TestGroup dump_tests;
-extern const TestGroup editorconfig_tests;
-extern const TestGroup encoding_tests;
-extern const TestGroup error_tests;
-extern const TestGroup filetype_tests;
-extern const TestGroup frame_tests;
-extern const TestGroup history_tests;
-extern const TestGroup indent_tests;
-extern const TestGroup init_tests;
-extern const TestGroup option_tests;
-extern const TestGroup regexp_tests;
-extern const TestGroup shift_tests;
-extern const TestGroup spawn_tests;
-extern const TestGroup status_tests;
-extern const TestGroup syntax_tests;
-extern const TestGroup terminal_tests;
-extern const TestGroup util_tests;
-
 static void get_time(TestContext *ctx, struct timespec *ts)
 {
     if (unlikely(ctx->timing && clock_gettime(CLOCK_MONOTONIC, ts) != 0)) {

@@ -9,7 +9,7 @@
 #include "log.h"
 #include "macros.h"
 
-#define TIME_STR_BUFSIZE (64) // sizeof("292271025015-12-01 23:59:00.999999999 +0400")
+#define TIME_STR_BUFSIZE (sizeof("292271025015-12-01 23:59:00.999999999 +0400"))
 #define NS_PER_SECOND (1000000000L)
 #define MS_PER_SECOND (1000L)
 #define NS_PER_MS (1000000L)
