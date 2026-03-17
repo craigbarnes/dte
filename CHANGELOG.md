@@ -4,6 +4,55 @@ Releases
 All releases and notable changes will be documented here, using a format
 similar to the one described by [Keep a Changelog].
 
+Unreleased
+----------
+
+**Additions:**
+
+* Added 36 new command flags:
+  * [`bookmark -v`][`bookmark`]
+  * [`delete-line -S`][`delete-line`]
+  * [`left -l`][`left`]
+  * [`right -l`][`right`]
+  * [`bol -l`][`bol`]
+  * [`bol -r`][`bol`]
+  * [`eol -l`][`eol`]
+  * [`word-bwd -l`][`word-bwd`]
+  * [`word-fwd -l`][`word-fwd`]
+  * [`errorfmt -c`][`errorfmt`]
+  * [`msg -w`][`msg`]
+  * [`search -a`][`search`]
+  * [`search -i`][`search`]
+  * [`search -s`][`search`]
+  * [`search -x`][`search`]
+  * [`search -c`][`search`]
+  * [`search -l`][`search`]
+  * [`search -e`][`search`]
+  * [`replace -e`][`replace`]
+  * [`history-next -S`][`history-next`]
+  * [`history-prev -S`][`history-prev`]
+  * [`quit -C`][`quit`]
+  * [`quit -S`][`quit`]
+  * [`quit -F`][`quit`]
+  * [`quit -H`][`quit`]
+  * [`cd -v`][`cd`]
+  * [`scroll-down -M`][`scroll-down`]
+  * [`scroll-up -M`][`scroll-up`]
+  * [`line -c`][`line`]
+  * [`line -l`][`line`]
+  * [`match-bracket -c`][`match-bracket`]
+  * [`match-bracket -l`][`match-bracket`]
+  * [`clear -i`][`clear`] (see the related "Breaking Changes" entry below)
+  * [`clear -I`][`clear`]
+  * [`new-line -i`][`new-line`]
+  * [`new-line -I`][`new-line`]
+
+**Breaking Changes:**
+
+* [Removed][commit 9e570965c52bcd0] `load-syntax` command
+* [`clear -i`][`clear`] now *enables* [`auto-indent`], instead of
+  disabling it (see [commit 66779c83be8d270] for details)
+
 v1.11.1 (latest release)
 ------------------------
 
@@ -618,6 +667,8 @@ builds are maintained on a "best effort" basis only.
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [`REG_ENHANCED`]: https://keith.github.io/xcode-man-pages/re_format.7.html#ENHANCED_FEATURES
+[commit 9e570965c52bcd0]: https://gitlab.com/craigbarnes/dte/-/commit/9e570965c52bcd0ffad817c96751eb770daa4c8d
+[commit 66779c83be8d270]: https://gitlab.com/craigbarnes/dte/-/commit/66779c83be8d270ea260e1723fa4a78fe6e3265e
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
 [commit c4af2b1a15c96e8]: https://gitlab.com/craigbarnes/dte/-/commit/c4af2b1a15c96e820452c183e81e9bd415492778
 [commit 0fe5e5f224e832a]: https://gitlab.com/craigbarnes/dte/-/commit/0fe5e5f224e832a382ce1fb7e6b4e0d6f0da8f55
@@ -652,10 +703,12 @@ builds are maintained on a "best effort" basis only.
 [`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
 [`eof`]: https://craigbarnes.gitlab.io/dte/dterc.html#eof
+[`eol`]: https://craigbarnes.gitlab.io/dte/dterc.html#eol
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
 [`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
+[`left`]: https://craigbarnes.gitlab.io/dte/dterc.html#left
 [`line`]: https://craigbarnes.gitlab.io/dte/dterc.html#line
 [`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
 [`match-bracket`]: https://craigbarnes.gitlab.io/dte/dterc.html#match-bracket
@@ -667,15 +720,24 @@ builds are maintained on a "best effort" basis only.
 [`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
 [`redo`]: https://craigbarnes.gitlab.io/dte/dterc.html#redo
 [`replace`]: https://craigbarnes.gitlab.io/dte/dterc.html#replace
+[`right`]: https://craigbarnes.gitlab.io/dte/dterc.html#right
 [`save`]: https://craigbarnes.gitlab.io/dte/dterc.html#save
+[`scroll-down`]: https://craigbarnes.gitlab.io/dte/dterc.html#scroll-down
+[`scroll-up`]: https://craigbarnes.gitlab.io/dte/dterc.html#scroll-up
 [`search`]: https://craigbarnes.gitlab.io/dte/dterc.html#search
 [`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
 [`tag`]: https://craigbarnes.gitlab.io/dte/dterc.html#tag
 [`undo`]: https://craigbarnes.gitlab.io/dte/dterc.html#undo
 [`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
+[`word-bwd`]: https://craigbarnes.gitlab.io/dte/dterc.html#word-bwd
+[`word-fwd`]: https://craigbarnes.gitlab.io/dte/dterc.html#word-fwd
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
+[`history-next`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=history%2Dnext%20%2DS,-%2D%20Get
+[`history-prev`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=history%2Dprev%20%2DS,-%2D%20Get
+
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
+[`auto-indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#auto-indent
 [`optimize-true-color`]: https://craigbarnes.gitlab.io/dte/dterc.html#optimize-true-color
 [`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
