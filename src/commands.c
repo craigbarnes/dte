@@ -80,8 +80,8 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
 
 static void handle_selection_flags(View *view, const CommandArgs *a)
 {
-    CommandFlagSet c = has_flag(a, 'c');
-    CommandFlagSet l = has_flag(a, 'l');
+    bool c = has_flag(a, 'c');
+    bool l = has_flag(a, 'l');
     SelectionType sel = l ? SELECT_LINES : (c ? SELECT_CHARS : SELECT_NONE);
     view_set_selection_type(view, MAX(sel, view->select_mode));
 }
