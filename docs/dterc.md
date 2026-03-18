@@ -1230,6 +1230,8 @@ Actions for stdin (`-i`):
 Actions for stdout (`-o`):
 
 * `buffer` - [`insert`] output (from _command_) into buffer
+* `echo` - display first line of output as a status (command-line)
+  message
 * `eval` - execute output as dterc commands
 * `msg` - run [`msg`] command with numerical argument parsed from first
   line of output
@@ -1274,6 +1276,7 @@ uses of `exec`:
 
 Examples:
 
+    exec -s -o echo echo 'Hello, World!'
     filter sort -r
     filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
     pipe-to xsel -b

@@ -1852,6 +1852,9 @@ Actions for stdout (\fB\-o\fR):
 .P
 \(bu \fBbuffer\fR \- \fBinsert\fR output (from \fIcommand\fR) into buffer
 .br
+\(bu \fBecho\fR \- display first line of output as a status (command\-line)
+message
+.br
 \(bu \fBeval\fR \- execute output as dterc commands
 .br
 \(bu \fBmsg\fR \- run \fBmsg\fR command with numerical argument parsed from first
@@ -1914,6 +1917,7 @@ Examples:
 .IP
 .nf
 \f[C]
+exec\ \-s\ \-o\ echo\ echo\ \[aq]Hello,\ World!\[aq]
 filter\ sort\ \-r
 filter\ sh\ \-c\ \[aq]tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/\[aq]
 pipe\-to\ xsel\ \-b

@@ -9,7 +9,7 @@ Unreleased
 
 **Additions:**
 
-* Added 37 new command flags:
+* Added 46 new command flags/arguments:
   * [`bookmark -v`][`bookmark`]
   * [`delete-line -S`][`delete-line`]
   * [`left -l`][`left`]
@@ -38,6 +38,8 @@ Unreleased
   * [`cd -v`][`cd`]
   * [`scroll-down -M`][`scroll-down`]
   * [`scroll-up -M`][`scroll-up`]
+  * [`scroll-pgup -h`][`scroll-pgup`]
+  * [`scroll-pgdown -h`][`scroll-pgdown`]
   * [`line -c`][`line`]
   * [`line -l`][`line`]
   * [`match-bracket -c`][`match-bracket`]
@@ -48,6 +50,43 @@ Unreleased
   * [`new-line -I`][`new-line`]
   * [`indent -r`][`indent`] (previously `shift -- -1`; see the related
     "Other Changes" entry below)
+  * [`show paste`][`show`]
+  * [`show show`][`show`] (also available as just `show`)
+  * [`copy text`][`copy`]
+  * [`join delimiter`][`join`]
+  * [`exec -o echo`][`exec`]
+  * [`scroll-pgup -h`][`scroll-pgup`]
+  * [`scroll-pgdown -h`][`scroll-pgdown`]
+* Added support for [binding][`bind`] 8 new keys:
+  * `menu`
+  * `print` ("Print Screen")
+  * `scrlock` ("Scroll Lock")
+  * `pause`
+  * `F21`
+  * `F22`
+  * `F23`
+  * `F24`
+* Added 4 new, default key bindings[^new-binds]
+  * Ctrl+Shift+G → `search -p` (search previous)
+  * Shift+F3 → `search -p`
+  * Shift+Delete → `delete` (see [commit 386e7b79430846f])
+  * Shift+Backspace → `erase` (see [commit 386e7b79430846f])
+* Added a [`dte -P`] flag, for printing the terminal color palette
+  to `stdout`
+* Added an [`$RFILEDIR`] special variable
+* Added auto-completion of known filetypes for e.g. `set filetype m<Tab>`
+* Added [shell completion scripts] for fish and zsh
+
+**Improvements:**
+
+* Updated Unicode support to version 17
+* Various performance optimizations
+* Various improvements to man pages
+* [Changed][commit ab4961e24194b20] the default Alt+F key binding from
+  `search -w` to `search -sw`, so as to always perform a case-insensitive
+  search, regardless of the value of the [`case-sensitive-search`] option
+* Changed the default Alt+Shift+F key binding from `search -wr` to
+  `search -swr`, for the same reason as above
 
 **Breaking Changes:**
 
@@ -679,11 +718,14 @@ builds are maintained on a "best effort" basis only.
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [`REG_ENHANCED`]: https://keith.github.io/xcode-man-pages/re_format.7.html#ENHANCED_FEATURES
+[commit 386e7b79430846f]: https://gitlab.com/craigbarnes/dte/-/commit/386e7b79430846ffedbd5e854d2495c61bb7faea
+[commit ab4961e24194b20]: https://gitlab.com/craigbarnes/dte/-/commit/ab4961e24194b2033da6d838fe02aae9519e40df
 [commit 9e570965c52bcd0]: https://gitlab.com/craigbarnes/dte/-/commit/9e570965c52bcd0ffad817c96751eb770daa4c8d
 [commit 66779c83be8d270]: https://gitlab.com/craigbarnes/dte/-/commit/66779c83be8d270ea260e1723fa4a78fe6e3265e
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
 [commit c4af2b1a15c96e8]: https://gitlab.com/craigbarnes/dte/-/commit/c4af2b1a15c96e820452c183e81e9bd415492778
 [commit 0fe5e5f224e832a]: https://gitlab.com/craigbarnes/dte/-/commit/0fe5e5f224e832a382ce1fb7e6b4e0d6f0da8f55
+[shell completion scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/share
 [exec aliases]: https://craigbarnes.gitlab.io/dte/dterc.html#exec:~:text=built%2Din%20aliases
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
@@ -692,6 +734,7 @@ builds are maintained on a "best effort" basis only.
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
 
 [`dte`]: https://craigbarnes.gitlab.io/dte/dte.html
+[`dte -P`]: https://craigbarnes.gitlab.io/dte/dte.html#:~:text=Print%20the%20terminal%20color%20palette%20to%20stdout
 [environment]: https://craigbarnes.gitlab.io/dte/dte.html#environment
 
 [`dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
@@ -721,6 +764,7 @@ builds are maintained on a "best effort" basis only.
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
 [`indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#indent
+[`join`]: https://craigbarnes.gitlab.io/dte/dterc.html#join
 [`left`]: https://craigbarnes.gitlab.io/dte/dterc.html#left
 [`line`]: https://craigbarnes.gitlab.io/dte/dterc.html#line
 [`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
@@ -736,6 +780,8 @@ builds are maintained on a "best effort" basis only.
 [`right`]: https://craigbarnes.gitlab.io/dte/dterc.html#right
 [`save`]: https://craigbarnes.gitlab.io/dte/dterc.html#save
 [`scroll-down`]: https://craigbarnes.gitlab.io/dte/dterc.html#scroll-down
+[`scroll-pgdown`]: https://craigbarnes.gitlab.io/dte/dterc.html#scroll-pgdown
+[`scroll-pgup`]: https://craigbarnes.gitlab.io/dte/dterc.html#scroll-pgup
 [`scroll-up`]: https://craigbarnes.gitlab.io/dte/dterc.html#scroll-up
 [`search`]: https://craigbarnes.gitlab.io/dte/dterc.html#search
 [`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
@@ -751,6 +797,7 @@ builds are maintained on a "best effort" basis only.
 
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
 [`auto-indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#auto-indent
+[`case-sensitive-search`]: https://craigbarnes.gitlab.io/dte/dterc.html#case-sensitive-search
 [`optimize-true-color`]: https://craigbarnes.gitlab.io/dte/dterc.html#optimize-true-color
 [`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
@@ -759,3 +806,7 @@ builds are maintained on a "best effort" basis only.
 [`$COLNO`]: https://craigbarnes.gitlab.io/dte/dterc.html#COLNO
 [`$RFILE`]: https://craigbarnes.gitlab.io/dte/dterc.html#RFILE
 [`$FILEDIR`]: https://craigbarnes.gitlab.io/dte/dterc.html#FILEDIR
+[`$RFILEDIR`]: https://craigbarnes.gitlab.io/dte/dterc.html#RFILEDIR
+[`$MSGPOS`]: https://craigbarnes.gitlab.io/dte/dterc.html#MSGPOS
+
+[^new-binds]: Some new key bindings may require a modern terminal and/or already be bound by the terminal itself
