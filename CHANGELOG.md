@@ -66,11 +66,25 @@ Unreleased
   * `F22`
   * `F23`
   * `F24`
-* Added 4 new, default key bindings[^new-binds]
+* Added 4 default key bindings[^new-binds]:
   * Ctrl+Shift+G → `search -p` (search previous)
   * Shift+F3 → `search -p`
   * Shift+Delete → `delete` (see [commit 386e7b79430846f])
   * Shift+Backspace → `erase` (see [commit 386e7b79430846f])
+* Added 13 built-in [syntax highlighters]:
+  * `config-ntc` (like `config`, but with no trailing comments)
+  * `ctags`
+  * `gitlog` (`git log -p` format; see [commit f75e62f241d6c27])
+  * `gitblame` (`git blame` format; see [commit 1a666eac6292970])
+  * `gitnote` (`git notes add` format)
+  * `gitstash` (`git stash list -p` format; see [commit 03900b66a9f2609])
+  * `hare`
+  * `haskell`
+  * `jsonc` (JSON with comments)
+  * `lrc` (song lyrics)
+  * `man` (`man(1)` *output* format; not to be confused with `roff`)
+  * `nftables`
+  * `weechatlog` ([WeeChat] log files)
 * Added a [`dte -P`] flag, for printing the terminal color palette
   to `stdout`
 * Added an [`$RFILEDIR`] special variable
@@ -180,7 +194,7 @@ Released on 2023-01-21.
   (e.g. `CSI P`) sent by some terminals.
 * Added support for the [Kitty keyboard protocol][] (which significantly
   increases the number of bindable key combos).
-* Added syntax highlighters for JSON, Go Module (`go.mod`), G-code and
+* Added [syntax highlighters] for JSON, Go Module (`go.mod`), G-code and
   `.gitignore` files.
 * Added support for binary literals and hex float literals to the C syntax
   highlighter.
@@ -708,6 +722,7 @@ builds are maintained on a "best effort" basis only.
 
 [website]: https://craigbarnes.gitlab.io/dte/
 [Keep a Changelog]: https://keepachangelog.com/
+[WeeChat]: https://weechat.org/
 [Contour]: https://github.com/contour-terminal/contour
 [WezTerm]: https://wezfurlong.org/wezterm/
 [Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
@@ -719,6 +734,9 @@ builds are maintained on a "best effort" basis only.
 [Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [`REG_ENHANCED`]: https://keith.github.io/xcode-man-pages/re_format.7.html#ENHANCED_FEATURES
 [commit 386e7b79430846f]: https://gitlab.com/craigbarnes/dte/-/commit/386e7b79430846ffedbd5e854d2495c61bb7faea
+[commit f75e62f241d6c27]: https://gitlab.com/craigbarnes/dte/-/commit/f75e62f241d6c27d562dcda9d62f1f900a5d8ccc
+[commit 1a666eac6292970]: https://gitlab.com/craigbarnes/dte/-/commit/1a666eac629297001578fa91d16420b6f77d5d44
+[commit 03900b66a9f2609]: https://gitlab.com/craigbarnes/dte/-/commit/03900b66a9f2609d4279b271345b7ec27dae44cb
 [commit ab4961e24194b20]: https://gitlab.com/craigbarnes/dte/-/commit/ab4961e24194b2033da6d838fe02aae9519e40df
 [commit 9e570965c52bcd0]: https://gitlab.com/craigbarnes/dte/-/commit/9e570965c52bcd0ffad817c96751eb770daa4c8d
 [commit 66779c83be8d270]: https://gitlab.com/craigbarnes/dte/-/commit/66779c83be8d270ea260e1723fa4a78fe6e3265e
@@ -732,6 +750,7 @@ builds are maintained on a "best effort" basis only.
 [ECMA-48]: https://ecma-international.org/publications-and-standards/standards/ecma-48/
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
+[syntax highlighters]: https://gitlab.com/craigbarnes/dte/-/tree/master/config/syntax
 
 [`dte`]: https://craigbarnes.gitlab.io/dte/dte.html
 [`dte -P`]: https://craigbarnes.gitlab.io/dte/dte.html#:~:text=Print%20the%20terminal%20color%20palette%20to%20stdout
