@@ -172,7 +172,7 @@ Editing Commands:
 .br
    \fBreplace\fR [\fB\-bcegi\fR] \fIpattern\fR [\fIreplacement\fR]
 .br
-   \fBshift\fR \fIcount\fR
+   \fBindent\fR [\-r] [\fIcount\fR]
 .br
    \fBwrap\-paragraph\fR [\fIwidth\fR]
 .br
@@ -1742,14 +1742,15 @@ replace\ \-cg\ \[aq]([\[ha]\ ]+)\ +([\[ha]\ ]+)\[aq]\ \[aq]\e2\ \e1\[aq]
 .fi
 .PP
 .RE
-\fBshift\fR \fIcount\fR
+\fBindent\fR [\-r] [\fIcount\fR]
 .RS
-Shift current or selected lines by \fIcount\fR indentation levels.
-Count is usually \fB\-1\fR (decrease indent) or \fB1\fR (increase indent).
+Indent current or selected lines by \fIcount\fR indentation levels,
+or by 1 level if \fIcount\fR isn't specified.
 .P
-To specify a negative number, it's necessary to first disable
-option parsing with \fB\-\-\fR, e.g. \fBshift \-\- \-1\fR.
-.P
+.TP
+\fB\-r\fR
+Reduce indentation level, instead of increasing it
+.PP
 .RE
 \fBwrap\-paragraph\fR [\fIwidth\fR]
 .RS

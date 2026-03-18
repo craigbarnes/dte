@@ -121,8 +121,8 @@ bind M-0 'view last'
 
 bind M-, prev
 bind M-. next
-bind M-- 'shift -- -1'
-bind M-= 'shift +1'
+bind M-- 'indent -r'
+bind M-= 'indent'
 bind M-\; command
 bind M-/ search
 

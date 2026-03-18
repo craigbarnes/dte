@@ -106,7 +106,7 @@ static void test_exec_config(TestContext *ctx)
         "redo1.txt",
         "redo2.txt",
         "replace.txt",
-        "shift.txt",
+        "indent.txt",
         "repeat.txt",
         "wrap.txt",
         "exec.txt",

@@ -134,7 +134,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"set filesize-limit 1MIB", "invalid filesize"},
         {"set filesize-limit 1Mib", "invalid filesize"},
         {"setenv DTE_VERSION 0.1", "cannot be changed"},
-        {"shift x", "invalid number"},
+        {"indent x", "invalid number"},
         {"show -c alias", "requires 2 arguments"},
         {"show zzz", "invalid argument"},
         {"show bind M-M-M---", "invalid key string"},

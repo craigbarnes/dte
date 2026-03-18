@@ -29,6 +29,7 @@
 #include "filetype.h"
 #include "frame.h"
 #include "history.h"
+#include "indent.h"
 #include "insert.h"
 #include "join.h"
 #include "load-save.h"
@@ -40,7 +41,6 @@
 #include "replace.h"
 #include "search.h"
 #include "selection.h"
-#include "shift.h"
 #include "show.h"
 #include "spawn.h"
 #include "syntax/color.h"
@@ -2206,7 +2206,7 @@ static bool cmd_setenv(EditorState *e, const CommandArgs *a)
     return error_msg_errno(&e->err, nr_args == 2 ? "setenv" : "unsetenv");
 }
 
-static bool cmd_shift(EditorState *e, const CommandArgs *a)
+static bool cmd_indent(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
     int count = 1;
@@ -2214,7 +2214,7 @@ static bool cmd_shift(EditorState *e, const CommandArgs *a)
         return error_msg(&e->err, "Invalid number: %s", arg);
     }
 
-    shift_lines(e->view, (count && has_flag(a, 'r')) ? -count : count);
+    indent_lines(e->view, (count && has_flag(a, 'r')) ? -count : count);
     return true;
 }
 
@@ -2652,6 +2652,7 @@ static const Command cmds[] = {
     {"ft", "bcfi", RC | NFAA, 2, -1, cmd_ft},
     {"hi", "cq", RC | NFAA, 0, -1, cmd_hi},
     {"include", "bq", RC, 1, 1, cmd_include},
+    {"indent", "r", NA, 0, 1, cmd_indent},
     {"insert", "km", NA, 1, 1, cmd_insert},
     {"join", "", NA, 0, 1, cmd_join},
     {"left", "cl", NA, 0, 0, cmd_left},
@@ -2686,7 +2687,6 @@ static const Command cmds[] = {
     {"select-block", "", NA, 0, 0, cmd_select_block},
     {"set", "gl", RC, 1, -1, cmd_set},
     {"setenv", "", RC, 1, 2, cmd_setenv},
-    {"shift", "r", NA, 0, 1, cmd_shift},
     {"show", "c", NA, 0, 2, cmd_show},
     {"suspend", "", NA, 0, 0, cmd_suspend},
     {"tag", "ABCr", NA, 0, -1, cmd_tag},

@@ -8,14 +8,14 @@ up -l
 up -l
 up -l
 up -l
-shift +1
-shift +1
-shift +1
-shift -- -1
-shift -- -1
-shift -- -1
-shift -- -1
-shift +1
-shift +1
-save -f build/test/shift.txt
+indent
+indent 1
+indent +1
+indent -r
+indent -r
+indent -r 1
+indent -- -1
+indent
+indent
+save -f build/test/indent.txt
 close -f

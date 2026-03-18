@@ -1141,13 +1141,13 @@ Examples:
     replace "[ \t]+$" ''
     replace -cg '([^ ]+) +([^ ]+)' '\2 \1'
 
-### **shift** _count_
+### **indent** [-r] [_count_]
 
-Shift current or selected lines by _count_ indentation levels.
-Count is usually `-1` (decrease indent) or `1` (increase indent).
+Indent current or selected lines by _count_ indentation levels,
+or by 1 level if _count_ isn't specified.
 
-To specify a negative number, it's necessary to first disable
-option parsing with `--`, e.g. `shift -- -1`.
+`-r`
+:   Reduce indentation level, instead of increasing it
 
 ### **wrap-paragraph** [_width_]
 

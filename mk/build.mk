@@ -26,7 +26,7 @@ BUILTIN_CONFIGS = $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
-    env thai crlf insert join change pipe redo replace shift repeat \
+    env thai crlf insert join change pipe redo replace indent repeat \
     fuzz1 fuzz2 wrap exec move delete new-line tag ))
 
 CC_VERSION = $(or \
@@ -57,8 +57,8 @@ editor_objects := $(call prefix-obj, build/, \
     compat compiler completion config convert copy ctags delete edit \
     editor encoding exec file-history file-option filetype frame history \
     indent insert join load-save lock main mode move msg options palette \
-    regexp replace search selection shift show showkey signals spawn \
-    status tag trace vars view window wrap \
+    regexp replace search selection show showkey signals spawn status \
+    tag trace vars view window wrap \
     $(addprefix ui-, cmdline prompt status tabbar view window) ui ) \
     $(command_objects) \
     $(editorconfig_objects) \
@@ -69,7 +69,7 @@ editor_objects := $(call prefix-obj, build/, \
 test_objects := $(call prefix-obj, build/test/, \
     bind bookmark buffer cmdline command config ctags dump editorconfig \
     encoding error filetype frame history indent init main options regexp \
-    shift spawn status syntax terminal test util )
+    spawn status syntax terminal test util )
 
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 

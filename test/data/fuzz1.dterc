@@ -55,7 +55,7 @@ cut
 paste -c
 set syntax true
 set set-window-title true
-shift +2
+indent 2
 clear
 toggle set-window-title
 up

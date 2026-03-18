@@ -6,8 +6,8 @@
 #include "command/macro.h"
 #include "completion.h"
 #include "editor.h"
+#include "indent.h"
 #include "insert.h"
-#include "shift.h"
 #include "terminal/paste.h"
 #include "util/debug.h"
 #include "util/unicode.h"
@@ -62,8 +62,8 @@ static bool handle_input_single (
             View *view = e->view;
             KeyCode shift = key & MOD_SHIFT;
             if ((key & ~shift) == KEY_TAB && view->selection == SELECT_LINES) {
-                // In line selections, Tab/S-Tab behave like `shift -- 1/-1`
-                shift_lines(view, shift ? -1 : 1);
+                // In line selections, Tab/S-Tab behave like indent/indent -r
+                indent_lines(view, shift ? -1 : 1);
                 return true;
             }
             if (u_is_unicode(key)) {

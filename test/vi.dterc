@@ -122,8 +122,8 @@ nmap Y copy
 nmap : 'mode command'
 nmap / search
 nmap ? 'search -r'
-nmap > 'shift 1'
-nmap < 'shift -- -1'
+nmap > 'indent'
+nmap < 'indent -r'
 nmap ~ case
 nmap C-] tag
 nmap C-t 'tag -r'

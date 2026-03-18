@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     run_tests(&ctx, &bind_tests);
     run_tests(&ctx, &cmdline_tests_late);
     run_tests(&ctx, &buffer_tests);
-    run_tests(&ctx, &shift_tests);
+    run_tests(&ctx, &indent_tests_late);
     run_tests(&ctx, &bookmark_tests);
     run_tests(&ctx, &syntax_tests);
     run_tests(&ctx, &dump_tests);

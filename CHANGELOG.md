@@ -9,7 +9,7 @@ Unreleased
 
 **Additions:**
 
-* Added 36 new command flags:
+* Added 37 new command flags:
   * [`bookmark -v`][`bookmark`]
   * [`delete-line -S`][`delete-line`]
   * [`left -l`][`left`]
@@ -46,12 +46,24 @@ Unreleased
   * [`clear -I`][`clear`]
   * [`new-line -i`][`new-line`]
   * [`new-line -I`][`new-line`]
+  * [`indent -r`][`indent`] (previously `shift -- -1`; see the related
+    "Other Changes" entry below)
 
 **Breaking Changes:**
 
 * [Removed][commit 9e570965c52bcd0] `load-syntax` command
 * [`clear -i`][`clear`] now *enables* [`auto-indent`], instead of
   disabling it (see [commit 66779c83be8d270] for details)
+
+**Other Changes:**
+
+* The `shift` command was renamed to [`indent`] and the new `-r` flag is
+  now the standard way to reduce (instead of increase) the indentation
+  level. The `count` argument is also now optional and defaults to `1`.
+  What was previously `shift -- -1` can now be done as just `indent -r`.
+  This isn't listed as a "breaking change" since old style negative
+  `count` arguments are still supported and there's a built-in `shift`
+  alias for backwards compatibility.
 
 v1.11.1 (latest release)
 ------------------------
@@ -708,6 +720,7 @@ builds are maintained on a "best effort" basis only.
 [`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
+[`indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#indent
 [`left`]: https://craigbarnes.gitlab.io/dte/dterc.html#left
 [`line`]: https://craigbarnes.gitlab.io/dte/dterc.html#line
 [`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro

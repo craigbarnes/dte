@@ -10,6 +10,7 @@
 #include "util/macros.h"
 #include "util/string-view.h"
 #include "util/string.h"
+#include "view.h"
 
 typedef struct {
     size_t bytes; // Size in bytes
@@ -50,5 +51,6 @@ IndentInfo get_indent_info(const LocalOptions *options, StringView line) WARN_UN
 size_t get_indent_width(StringView line, unsigned int tab_width);
 size_t get_indent_level_bytes_left(const LocalOptions *options, const BlockIter *cursor) NONNULL_ARGS;
 size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter *cursor) NONNULL_ARGS;
+void indent_lines(View *view, int count) NONNULL_ARGS;
 
 #endif

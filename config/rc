@@ -75,3 +75,4 @@ alias format-paragraph wrap-paragraph
 alias pass-through pipe-from
 alias git-open 'exec-open sh -c "git ls-files $(git rev-parse --show-cdup) | fzf -m --reverse"'
 alias insert-builtin 'show include'
+alias shift indent
