@@ -54,7 +54,8 @@ The directory part of `$FILE`.
 
 ### **$RFILEDIR**
 
-The directory part of `$RFILE`, or `.`.
+The directory part of `$RFILE`, or just `.` if the file is in the current
+working directory.
 
 ### **$FILETYPE**
 
