@@ -123,7 +123,7 @@ Unreleased
   to reduce the indent level
 * [Implemented][commit 891d8eb2abc1f8f] a workaround for a POSIX
   conformance issue on macOS that was causing the loading of `tags`
-  files in excess of 4GiB to fail (with a "no tags file" error)
+  files in excess of 2GiB to fail (with a "no tags file" error)
 * [Implemented][commit 476ab3de957d56e] a workaround for a POSIX
   conformance issue on BSDs that was causing the [handling][dte-stdin]
   of redirected `stdio(3)` descriptors (e.g. `ls | dte`) to fail
