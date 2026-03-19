@@ -102,11 +102,43 @@ Unreleased
 * Changed the default Alt+Shift+F key binding from `search -wr` to
   `search -swr`, for the same reason as above
 
+**Fixes:**
+
+* [Fixed][commit d1201494641fbad] [Kitty keyboard protocol] compatibility
+  issues when Num Lock is active
+* [Fixed][commit ad39f88ba7cb10b] a regression (introduced in v1.10) in
+  symlink resolution when opening files, which potentially allowed
+  overwriting (instead of following) dangling symlinks
+* [Fixed][commit 77bec65e5f43ded] a build error when compiling on NetBSD
+  with Stack Smashing Protection (SSP) enabled
+* [Fixed][commit 5e880f7cfa0bb62] a build error when compiling with
+  recent Android NDKs on Termux (due to unnecessary linking with
+  `-liconv`)
+* [Fixed][commit bbc4c91487805be] a crash (assertion failure) when
+  running `exec -i word`
+* [Fixed][commit 93d7ea6661e6a31] a crash (assertion failure) when
+  running `copy -bik`
+* [Fixed][commit 440f92742774f27] a regression in cursor positioning
+  when `indent -r` ([formerly][shift-rename] `shift -- -1`) was used
+  to reduce the indent level
+* [Implemented][commit 891d8eb2abc1f8f] a workaround for a POSIX
+  conformance issue on macOS that was causing the loading of `tags`
+  files in excess of 4GiB to fail (with a "no tags file" error)
+* [Implemented][commit 476ab3de957d56e] a workaround for a POSIX
+  conformance issue on BSDs that was causing the [handling][dte-stdin]
+  of redirected `stdio(3)` descriptors (e.g. `ls | dte`) to fail
+* Adjusted the Markdown syntax highlighter to allow up to 3 leading
+  spaces before fenced code block end delimiters, so as to conform
+  to the [CommonMark specification]
+
 **Breaking Changes:**
 
 * [Removed][commit 9e570965c52bcd0] `load-syntax` command
 * [`clear -i`][`clear`] now *enables* [`auto-indent`], instead of
   disabling it (see [commit 66779c83be8d270] for details)
+* [Changed][commit bbc4c91487805be] the behavior of `exec -i word` to
+  overwrite the input text in the buffer when also outputting to the
+  buffer, e.g. with `exec -s -i word -o buffer tr a-z A-Z`
 
 **Other Changes:**
 
@@ -618,7 +650,7 @@ Released on 2017-08-27.
 * Fixed a bug with the `close -wq` command when using split frames
   (`wsplit`).
 * Fixed a segfault bug in `git-open` mode when not inside a git repo.
-* Fixed a few cases of undefined behaviour and potential buffer overflow
+* Fixed a few cases of undefined behavior and potential buffer overflow
   inherited from [dex].
 * Fixed all compiler warnings when building on OpenBSD 6.
 * Fixed and clarified various details in the man pages.
@@ -723,6 +755,7 @@ builds are maintained on a "best effort" basis only.
 [website]: https://craigbarnes.gitlab.io/dte/
 [Keep a Changelog]: https://keepachangelog.com/
 [WeeChat]: https://weechat.org/
+[CommonMark specification]: https://spec.commonmark.org/current/
 [Contour]: https://github.com/contour-terminal/contour
 [WezTerm]: https://wezfurlong.org/wezterm/
 [Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
@@ -738,6 +771,15 @@ builds are maintained on a "best effort" basis only.
 [commit 1a666eac6292970]: https://gitlab.com/craigbarnes/dte/-/commit/1a666eac629297001578fa91d16420b6f77d5d44
 [commit 03900b66a9f2609]: https://gitlab.com/craigbarnes/dte/-/commit/03900b66a9f2609d4279b271345b7ec27dae44cb
 [commit ab4961e24194b20]: https://gitlab.com/craigbarnes/dte/-/commit/ab4961e24194b2033da6d838fe02aae9519e40df
+[commit d1201494641fbad]: https://gitlab.com/craigbarnes/dte/-/commit/d1201494641fbadd37550f108ab3e299739f5987
+[commit ad39f88ba7cb10b]: https://gitlab.com/craigbarnes/dte/-/commit/ad39f88ba7cb10b209be1b935250186c968565b1
+[commit 77bec65e5f43ded]: https://gitlab.com/craigbarnes/dte/-/commit/77bec65e5f43ded39239a96cf8c26a5a599c31eb
+[commit 5e880f7cfa0bb62]: https://gitlab.com/craigbarnes/dte/-/commit/5e880f7cfa0bb629b0f65842069e2d280d31758e
+[commit bbc4c91487805be]: https://gitlab.com/craigbarnes/dte/-/commit/bbc4c91487805be2d8b3c1b2b599f6db8b12d85e
+[commit 93d7ea6661e6a31]: https://gitlab.com/craigbarnes/dte/-/commit/93d7ea6661e6a315eba7ddbfb1e72b4b1d3ea650
+[commit 440f92742774f27]: https://gitlab.com/craigbarnes/dte/-/commit/440f92742774f279d77f7f122cf299ddac399806
+[commit 891d8eb2abc1f8f]: https://gitlab.com/craigbarnes/dte/-/commit/891d8eb2abc1f8f91338431ec154014d136a2a2c
+[commit 476ab3de957d56e]: https://gitlab.com/craigbarnes/dte/-/commit/476ab3de957d56ef135c058708b894d76935b1db
 [commit 9e570965c52bcd0]: https://gitlab.com/craigbarnes/dte/-/commit/9e570965c52bcd0ffad817c96751eb770daa4c8d
 [commit 66779c83be8d270]: https://gitlab.com/craigbarnes/dte/-/commit/66779c83be8d270ea260e1723fa4a78fe6e3265e
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
@@ -751,9 +793,11 @@ builds are maintained on a "best effort" basis only.
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
 [syntax highlighters]: https://gitlab.com/craigbarnes/dte/-/tree/master/config/syntax
+[shift-rename]: https://craigbarnes.gitlab.io/dte/releases.html#:~:text=The%20shift%20command%20was%20renamed%20to%20indent
 
 [`dte`]: https://craigbarnes.gitlab.io/dte/dte.html
 [`dte -P`]: https://craigbarnes.gitlab.io/dte/dte.html#:~:text=Print%20the%20terminal%20color%20palette%20to%20stdout
+[dte-stdin]: https://craigbarnes.gitlab.io/dte/dte.html#standard-input
 [environment]: https://craigbarnes.gitlab.io/dte/dte.html#environment
 
 [`dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
