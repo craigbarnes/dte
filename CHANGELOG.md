@@ -133,9 +133,9 @@ Unreleased
 
 **Breaking Changes:**
 
-* [Removed][commit 9e570965c52bcd0] `load-syntax` command
-* [`clear -i`][`clear`] now *enables* [`auto-indent`], instead of
-  disabling it (see [commit 66779c83be8d270] for details)
+* [Removed][commit 9e570965c52bcd0] the `load-syntax` command
+* [Changed][commit 66779c83be8d270] the [`clear -i`][`clear`] flag
+  to enable [`auto-indent`], instead of disabling it
 * [Changed][commit bbc4c91487805be] the behavior of `exec -i word` to
   overwrite the input text in the buffer when also outputting to the
   buffer, e.g. with `exec -s -i word -o buffer tr a-z A-Z`
