@@ -22,9 +22,8 @@ enum {
 };
 
 typedef struct {
-    const char *ibuf;
-    const ssize_t isize;
-    ssize_t ipos;
+    StringView text;
+    size_t ipos;
     struct CharsetConverter *cconv;
 } FileDecoder;
 
@@ -74,22 +73,16 @@ copy:
 
 static bool read_utf8_line(FileDecoder *dec, StringView *linep)
 {
-    const char *line = dec->ibuf + dec->ipos;
-    const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
-    size_t len;
-
-    if (nl) {
-        len = nl - line;
-        dec->ipos += len + 1;
-    } else {
-        len = dec->isize - dec->ipos;
-        if (len == 0) {
-            return false;
-        }
-        dec->ipos += len;
+    size_t pos = dec->ipos;
+    size_t len = dec->text.length;
+    BUG_ON(pos > len);
+    if (pos == len) {
+        return false;
     }
 
-    *linep = string_view(line, len);
+    StringView line = get_delim(dec->text.data, &pos, len, '\n');
+    dec->ipos = pos;
+    *linep = line;
     return true;
 }
 
@@ -100,11 +93,7 @@ static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, StringVi
         return false;
     }
 
-    FileDecoder dec = {
-        .ibuf = text.data,
-        .isize = text.length,
-    };
-
+    FileDecoder dec = {.text = text};
     StringView line;
     if (!read_utf8_line(&dec, &line)) {
         return true;
@@ -567,17 +556,18 @@ size_t file_encoder_get_nr_errors(const FileEncoder *enc)
 
 static bool fill(FileDecoder *dec)
 {
-    if (dec->ipos == dec->isize) {
+    StringView text = dec->text;
+    if (dec->ipos == text.length) {
         return false;
     }
 
     // Smaller than cconv.obuf to make realloc less likely
     size_t max = 7 * 1024;
 
-    size_t icount = MIN(dec->isize - dec->ipos, max);
-    cconv_process(dec->cconv, dec->ibuf + dec->ipos, icount);
+    size_t icount = MIN(text.length - dec->ipos, max);
+    cconv_process(dec->cconv, text.data + dec->ipos, icount);
     dec->ipos += icount;
-    if (dec->ipos == dec->isize) {
+    if (dec->ipos == text.length) {
         // Must be flushed after all input has been fed
         cconv_flush(dec->cconv);
     }
@@ -621,8 +611,7 @@ bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
     }
 
     FileDecoder dec = {
-        .ibuf = text.data,
-        .isize = text.length,
+        .text = text,
         .cconv = cconv,
     };
 
