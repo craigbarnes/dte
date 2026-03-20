@@ -38,10 +38,12 @@ static Block *add_utf8_line (
     Buffer *buffer,
     ErrorBuffer *errbuf,
     Block *blk,
-    const char *line,
-    size_t len
+    StringView line
 ) {
-    size_t size = len + 1;
+    // TODO: Make this limit configurable and add documentation
+    size_t syn_line_limit = SYN_HIGHLIGHT_MAX_LINE_LEN;
+
+    size_t size = line.length + 1;
     if (blk) {
         size_t avail = blk->alloc - blk->size;
         if (size <= avail) {
@@ -49,28 +51,28 @@ static Block *add_utf8_line (
         }
         add_block(buffer, blk);
     }
+
     size = MAX(size, 8192);
     blk = block_new(size);
 
 copy:
-    if (unlikely(len > SYN_HIGHLIGHT_MAX_LINE_LEN && buffer->options.syntax)) {
-        // TODO: Make this limit configurable and add documentation
+    if (unlikely(line.length > syn_line_limit && buffer->options.syntax)) {
         error_msg (
             errbuf,
-            "line length (%zu) exceeded limit (%ju); disabling syntax highlighting",
-            len, (uintmax_t)SYN_HIGHLIGHT_MAX_LINE_LEN
+            "line length (%zu) exceeded limit (%zu); disabling syntax highlighting",
+            line.length, syn_line_limit
         );
         buffer->options.syntax = false;
     }
 
-    memcpy(blk->data + blk->size, line, len);
-    blk->size += len;
+    memcpy(blk->data + blk->size, line.data, line.length);
+    blk->size += line.length;
     blk->data[blk->size++] = '\n';
     blk->nl++;
     return blk;
 }
 
-static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
+static bool read_utf8_line(FileDecoder *dec, StringView *linep)
 {
     const char *line = dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
@@ -87,8 +89,7 @@ static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
         dec->ipos += len;
     }
 
-    *linep = line;
-    *lenp = len;
+    *linep = string_view(line, len);
     return true;
 }
 
@@ -104,30 +105,25 @@ static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, StringVi
         .isize = text.length,
     };
 
-    const char *line;
-    size_t len;
-
-    if (!read_utf8_line(&dec, &line, &len)) {
+    StringView line;
+    if (!read_utf8_line(&dec, &line)) {
         return true;
     }
 
-    if (len && line[len - 1] == '\r') {
+    if (strview_remove_matching_suffix(&line, "\r")) {
         buffer->crlf_newlines = true;
-        len--;
     }
 
-    Block *blk = add_utf8_line(buffer, errbuf, NULL, line, len);
+    Block *blk = add_utf8_line(buffer, errbuf, NULL, line);
 
     if (unlikely(buffer->crlf_newlines)) {
-        while (read_utf8_line(&dec, &line, &len)) {
-            if (len && line[len - 1] == '\r') {
-                len--;
-            }
-            blk = add_utf8_line(buffer, errbuf, blk, line, len);
+        while (read_utf8_line(&dec, &line)) {
+            strview_remove_matching_suffix(&line, "\r");
+            blk = add_utf8_line(buffer, errbuf, blk, line);
         }
     } else {
-        while (read_utf8_line(&dec, &line, &len)) {
-            blk = add_utf8_line(buffer, errbuf, blk, line, len);
+        while (read_utf8_line(&dec, &line)) {
+            blk = add_utf8_line(buffer, errbuf, blk, line);
         }
     }
 
@@ -588,7 +584,7 @@ static bool fill(FileDecoder *dec)
     return true;
 }
 
-static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
+static bool decode_and_read_line(FileDecoder *dec, StringView *linep)
 {
     char *line;
     size_t len;
@@ -609,8 +605,7 @@ static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *l
         }
     }
 
-    *linep = line;
-    *lenp = len;
+    *linep = string_view(line, len);
     return true;
 }
 
@@ -631,21 +626,20 @@ bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
         .cconv = cconv,
     };
 
-    const char *line;
-    size_t len;
-
-    if (decode_and_read_line(&dec, &line, &len)) {
-        if (len && line[len - 1] == '\r') {
+    StringView line;
+    if (decode_and_read_line(&dec, &line)) {
+        if (strview_remove_matching_suffix(&line, "\r")) {
             buffer->crlf_newlines = true;
-            len--;
         }
-        Block *blk = add_utf8_line(buffer, errbuf, NULL, line, len);
-        while (decode_and_read_line(&dec, &line, &len)) {
-            if (buffer->crlf_newlines && len && line[len - 1] == '\r') {
-                len--;
+
+        Block *blk = add_utf8_line(buffer, errbuf, NULL, line);
+        while (decode_and_read_line(&dec, &line)) {
+            if (buffer->crlf_newlines) {
+                strview_remove_matching_suffix(&line, "\r");
             }
-            blk = add_utf8_line(buffer, errbuf, blk, line, len);
+            blk = add_utf8_line(buffer, errbuf, blk, line);
         }
+
         if (blk) {
             add_block(buffer, blk);
         }
