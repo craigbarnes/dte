@@ -138,33 +138,29 @@ static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, StringVi
     return true;
 }
 
-static size_t unix_to_dos (
-    FileEncoder *enc,
-    const char *text,
-    size_t text_len,
-    size_t nr_newlines
-) {
-    BUG_ON(text_len && text[text_len - 1] != '\n'); // See sanity_check_blocks()
-    BUG_ON(nr_newlines > text_len);
+static size_t unix_to_dos(FileEncoder *enc, StringView text, size_t nr_newlines)
+{
+    BUG_ON(text.length && !strview_has_suffix(text, "\n")); // See sanity_check_blocks()
+    BUG_ON(nr_newlines > text.length);
 
-    const size_t new_len = text_len + nr_newlines;
+    const size_t new_len = text.length + nr_newlines;
     if (enc->nsize < new_len) {
-        enc->nsize = xmul(text_len, 2);
+        enc->nsize = xmul(text.length, 2);
         enc->nbuf = xrealloc(enc->nbuf, enc->nsize);
     }
 
     size_t seen_nl = 0;
     size_t dest_pos = 0;
 
-    for (size_t src_pos = 0; src_pos < text_len; ) {
-        const char *src = text + src_pos;
+    for (size_t src_pos = 0; src_pos < text.length; ) {
+        const char *src = text.data + src_pos;
         char *dest = enc->nbuf + dest_pos;
-        char *end = memccpy(dest, src, '\n', text_len - src_pos);
+        char *end = memccpy(dest, src, '\n', text.length - src_pos);
         BUG_ON(!end); // Loop condition prevents this
 
         size_t line_len = (size_t)(end - dest);
         src_pos += line_len;
-        BUG_ON(src_pos > text_len);
+        BUG_ON(src_pos > text.length);
 
         end[-1] = '\r';
         end[0] = '\n';
@@ -211,7 +207,7 @@ ssize_t file_encoder_write (
     size_t nr_newlines
 ) {
     if (unlikely(enc->crlf)) {
-        size = unix_to_dos(enc, buf, size, nr_newlines);
+        size = unix_to_dos(enc, string_view(buf, size), nr_newlines);
         buf = enc->nbuf;
     }
     return xwrite_all(enc->fd, buf, size);
@@ -557,7 +553,7 @@ ssize_t file_encoder_write (
     size_t nr_newlines
 ) {
     if (unlikely(enc->crlf)) {
-        size = unix_to_dos(enc, buf, size, nr_newlines);
+        size = unix_to_dos(enc, string_view(buf, size), nr_newlines);
         buf = enc->nbuf;
     }
     if (unlikely(enc->cconv)) {
