@@ -92,7 +92,7 @@ static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
     return true;
 }
 
-static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, const char *text, size_t text_len)
+static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
 {
     if (unlikely(!encoding_is_utf8(buffer->encoding))) {
         errno = EINVAL;
@@ -100,8 +100,8 @@ static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, const ch
     }
 
     FileDecoder dec = {
-        .ibuf = text,
-        .isize = text_len,
+        .ibuf = text.data,
+        .isize = text.length,
     };
 
     const char *line;
@@ -222,9 +222,9 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
     return 0;
 }
 
-bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, const char *text, size_t text_len)
+bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
 {
-    return file_decoder_read_utf8(buffer, errbuf, text, text_len);
+    return file_decoder_read_utf8(buffer, errbuf, text);
 }
 
 #else // ICONV_DISABLE != 1; use full iconv implementation:
@@ -618,10 +618,10 @@ static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *l
     return true;
 }
 
-bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, const char *text, size_t text_len)
+bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
 {
     if (encoding_is_utf8(buffer->encoding)) {
-        return file_decoder_read_utf8(buffer, errbuf, text, text_len);
+        return file_decoder_read_utf8(buffer, errbuf, text);
     }
 
     CharsetConverter *cconv = cconv_to_utf8(buffer->encoding);
@@ -630,8 +630,8 @@ bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, const char *text, si
     }
 
     FileDecoder dec = {
-        .ibuf = text,
-        .isize = text_len,
+        .ibuf = text.data,
+        .isize = text.length,
         .cconv = cconv,
     };
 

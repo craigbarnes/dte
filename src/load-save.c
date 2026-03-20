@@ -26,11 +26,10 @@
 static bool decode_and_add_blocks (
     Buffer *buffer,
     ErrorBuffer *errbuf,
-    const char *text,
-    size_t text_len,
+    StringView text,
     bool utf8_bom
 ) {
-    EncodingType bom_type = detect_encoding_from_bom(text, text_len);
+    EncodingType bom_type = detect_encoding_from_bom(text);
     if (!buffer->encoding && bom_type != UNKNOWN_ENCODING) {
         const char *enc = encoding_from_type(bom_type);
         if (!conversion_supported_by_iconv(enc, "UTF-8")) {
@@ -45,9 +44,7 @@ static bool decode_and_add_blocks (
     if (bom_type != UNKNOWN_ENCODING && bom_type == lookup_encoding(buffer->encoding)) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
-            const size_t bom_len = bom->len;
-            text += bom_len;
-            text_len -= bom_len;
+            strview_remove_prefix(&text, bom->len);
             buffer->bom = true;
         }
     }
@@ -57,7 +54,7 @@ static bool decode_and_add_blocks (
         buffer->bom = utf8_bom;
     }
 
-    return file_decoder_read(buffer, errbuf, text, text_len);
+    return file_decoder_read(buffer, errbuf, text);
 }
 
 static void fixup_blocks(Buffer *buffer)
@@ -174,7 +171,7 @@ bool read_blocks(Buffer *buffer, ErrorBuffer *ebuf, int fd, bool utf8_bom)
     }
 
 decode:
-    ret = decode_and_add_blocks(buffer, ebuf, text, size, utf8_bom);
+    ret = decode_and_add_blocks(buffer, ebuf, string_view(text, size), utf8_bom);
 
 error:
     if (mapped) {

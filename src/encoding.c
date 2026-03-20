@@ -101,18 +101,21 @@ const char *encoding_normalize(const char *name)
     return mem_intern(upper, n);
 }
 
-EncodingType detect_encoding_from_bom(const char *buf, size_t size)
+EncodingType detect_encoding_from_bom(StringView text)
 {
     // Skip exhaustive checks if there's clearly no BOM
-    if (size < 2 || ((unsigned int)(unsigned char)buf[0]) - 1 < 0xEE) {
+    if (
+        text.length < 2
+        || ((unsigned int)(unsigned char)text.data[0]) - 1 < 0xEE
+    ) {
         return UNKNOWN_ENCODING;
     }
 
     // Iterate array backwards to ensure UTF32LE is checked before UTF16LE
     for (size_t n = ARRAYLEN(boms), i = n - 1; i < n; i--) {
-        const unsigned int bom_len = boms[i].len;
-        BUG_ON(bom_len == 0);
-        if (size >= bom_len && mem_equal(buf, boms[i].bytes, bom_len)) {
+        StringView bom = string_view((const char*)boms[i].bytes, boms[i].len);
+        BUG_ON(bom.length == 0);
+        if (strview_has_sv_prefix(text, bom)) {
             return (EncodingType)i;
         }
     }

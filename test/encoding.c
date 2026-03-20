@@ -5,30 +5,29 @@ static void test_detect_encoding_from_bom(TestContext *ctx)
 {
     static const struct bom_test {
         EncodingType encoding;
-        const char *text;
-        size_t size;
+        StringView text;
     } tests[] = {
-        {UTF8, STRN("\xef\xbb\xbfHello")},
-        {UTF32BE, STRN("\x00\x00\xfe\xffHello")},
-        {UTF32LE, STRN("\xff\xfe\x00\x00Hello")},
-        {UTF16BE, STRN("\xfe\xffHello")},
-        {UTF16LE, STRN("\xff\xfeHello")},
-        {UTF16LE, STRN("\xff\xfe")},
-        {UNKNOWN_ENCODING, STRN("\xff\xff\x00\x00Hello")},
-        {UNKNOWN_ENCODING, STRN("\x00\xef\xbb\xbfHello")},
-        {UNKNOWN_ENCODING, STRN("\xef\xbb")},
-        {UNKNOWN_ENCODING, STRN("\xef\xbb#")},
-        {UNKNOWN_ENCODING, STRN("\xee\xbb\xbf")},
-        {UNKNOWN_ENCODING, STRN("\xff\xbb\xbf")},
-        {UNKNOWN_ENCODING, STRN("\xbf\xbb\xef")},
-        {UNKNOWN_ENCODING, STRN("\x00\x00\xfe")},
-        {UNKNOWN_ENCODING, STRN("\x00")},
-        {UNKNOWN_ENCODING, "", 0},
-        {UNKNOWN_ENCODING, NULL, 0},
+        {UTF8, STRING_VIEW("\xef\xbb\xbfHello")},
+        {UTF32BE, STRING_VIEW("\x00\x00\xfe\xffHello")},
+        {UTF32LE, STRING_VIEW("\xff\xfe\x00\x00Hello")},
+        {UTF16BE, STRING_VIEW("\xfe\xffHello")},
+        {UTF16LE, STRING_VIEW("\xff\xfeHello")},
+        {UTF16LE, STRING_VIEW("\xff\xfe")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\xff\xff\x00\x00Hello")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\x00\xef\xbb\xbfHello")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\xef\xbb")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\xef\xbb#")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\xee\xbb\xbf")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\xff\xbb\xbf")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\xbf\xbb\xef")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\x00\x00\xfe")},
+        {UNKNOWN_ENCODING, STRING_VIEW("\x00")},
+        {UNKNOWN_ENCODING, STRING_VIEW("")},
+        {UNKNOWN_ENCODING, STRING_VIEW_INIT},
     };
     FOR_EACH_I(i, tests) {
         const struct bom_test *t = &tests[i];
-        EncodingType result = detect_encoding_from_bom(t->text, t->size);
+        EncodingType result = detect_encoding_from_bom(t->text);
         IEXPECT_EQ(result, t->encoding);
     }
 }
