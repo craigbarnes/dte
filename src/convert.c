@@ -23,8 +23,8 @@ enum {
 
 typedef struct {
     const char *ibuf;
+    const ssize_t isize;
     ssize_t ipos;
-    ssize_t isize;
     struct CharsetConverter *cconv;
 } FileDecoder;
 
