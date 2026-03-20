@@ -263,8 +263,6 @@ static ExitCode init_logging(LogOpenFlags logflags)
         return ec_usage_error("invalid $DTE_LOG_LEVEL value: '%s'", req_level_str);
     }
 
-    const char *no_color = xgetenv("NO_COLOR"); // https://no-color.org/
-    logflags |= no_color ? 0 : LOGOPEN_USE_COLOR;
     LogLevel got_level = log_open(filename, req_level, logflags);
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
@@ -281,7 +279,7 @@ static ExitCode init_logging(LogOpenFlags logflags)
 
     LOG_INFO("logging to '%s' (level: %s)", filename, got_level_str);
 
-    if (no_color) {
+    if (!(logflags & LOGOPEN_USE_COLOR)) {
         LOG_INFO("log colors disabled ($NO_COLOR)");
     }
 
@@ -495,7 +493,11 @@ int main(int argc, char *argv[])
     // logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
     ExitCode r = headless ? init_std_fds_headless(std_fds) : init_std_fds(std_fds);
-    r = r ? r : init_logging(headless ? LOGOPEN_ALLOW_CTTY : 0);
+
+    bool no_color = !!xgetenv("NO_COLOR"); // https://no-color.org/
+    LogOpenFlags logflags = headless ? LOGOPEN_ALLOW_CTTY : 0;
+    logflags |= no_color ? 0 : LOGOPEN_USE_COLOR;
+    r = r ? r : init_logging(logflags);
     if (unlikely(r)) {
         return r;
     }
@@ -534,6 +536,13 @@ int main(int argc, char *argv[])
     // properly initialized yet and we don't want commands running via
     // -c or -C -interacting with it
     EditorState *e = init_editor_state(getenv("HOME"), getenv("DTE_HOME"));
+
+    if (no_color) {
+        // TODO: Also use a minimal color scheme when $NO_COLOR is set, to
+        // eliminate other colors like e.g. the `quit -p` dialog, etc.
+        e->options.syntax = false;
+        LOG_INFO("$NO_COLOR set; using 'set -g syntax false' by default");
+    }
 
     Terminal *term = &e->terminal;
     if (!headless) {
