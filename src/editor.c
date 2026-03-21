@@ -128,7 +128,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
             .crlf_newlines = false,
             .display_special = false,
             .esc_timeout = 100,
-            .filesize_limit = 250,
+            .filesize_limit = 250ULL << 20, // 250MiB
             .lock_files = true,
             .optimize_true_color = true,
             .scroll_margin = 0,

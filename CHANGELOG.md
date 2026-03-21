@@ -139,6 +139,9 @@ Unreleased
 * [Changed][commit bbc4c91487805be] the behavior of `exec -i word` to
   overwrite the input text in the buffer when also outputting to the
   buffer, e.g. with `exec -s -i word -o buffer tr a-z A-Z`
+* The [`filesize-limit`] option now accepts `KiB`, `MiB`, `GiB`, etc.
+  suffixes and unsuffixed values are now interpreted as bytes instead
+  of `MiB`
 
 **Other Changes:**
 
@@ -861,6 +864,7 @@ builds are maintained on a "best effort" basis only.
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
 [`auto-indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#auto-indent
 [`case-sensitive-search`]: https://craigbarnes.gitlab.io/dte/dterc.html#case-sensitive-search
+[`filesize-limit`]: https://craigbarnes.gitlab.io/dte/dterc.html#filesize-limit
 [`optimize-true-color`]: https://craigbarnes.gitlab.io/dte/dterc.html#optimize-true-color
 [`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char

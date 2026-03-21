@@ -130,7 +130,7 @@ bool str_to_int(const char *str, int *valp)
     return true;
 }
 
-static bool str_to_uintmax(const char *str, uintmax_t *valp)
+bool str_to_uintmax(const char *str, uintmax_t *valp)
 {
     const size_t len = strlen(str);
     if (unlikely(len == 0)) {

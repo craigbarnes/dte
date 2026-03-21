@@ -1460,11 +1460,14 @@ Too long timeout makes escape key feel slow and too small
 timeout can cause escape sequences of for example arrow keys to
 be split and treated as multiple key presses.
 
-### **filesize-limit** [250]
+### **filesize-limit** [250MiB]
 
-Refuse to open any file with a size larger than this value (in
-mebibytes). Useful to prevent accidentally opening very large
-files, which can take a long time on some systems.
+Refuse to open any file with a size larger than this value, unless set
+to `0` (unlimited). The value must be an integer and may be followed
+by a suffix of `KiB`, `MiB`, `GiB`, etc.
+
+This can be useful to prevent accidentally opening large files, which
+may take a long time on some systems.
 
 ### **lock-files** [true]
 

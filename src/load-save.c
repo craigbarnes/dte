@@ -16,6 +16,7 @@
 #include "util/fd.h"
 #include "util/list.h"
 #include "util/log.h"
+#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/time-util.h"
@@ -188,21 +189,6 @@ error:
     return ret;
 }
 
-// Convert size in bytes to size in MiB (rounded up, for any remainder)
-static uintmax_t filesize_in_mib(uintmax_t nbytes)
-{
-    return (nbytes >> 20) + !!(nbytes & 0xFFFFF);
-}
-
-UNITTEST {
-    const uintmax_t seven_mib = 7UL << 20;
-    // NOLINTBEGIN(bugprone-assert-side-effect)
-    BUG_ON(filesize_in_mib(seven_mib) != 7);
-    BUG_ON(filesize_in_mib(seven_mib - 1) != 7);
-    BUG_ON(filesize_in_mib(seven_mib + 1) != 8);
-    // NOLINTEND(bugprone-assert-side-effect)
-}
-
 bool load_buffer (
     Buffer *buffer,
     const char *filename,
@@ -246,14 +232,16 @@ bool load_buffer (
         goto error;
     }
 
-    unsigned int limit_mib = gopts->filesize_limit;
-    if (limit_mib > 0) {
-        uintmax_t size_mib = filesize_in_mib(size);
-        if (unlikely(size_mib > limit_mib)) {
+    uintmax_t size_limit = gopts->filesize_limit;
+    if (size_limit > 0) {
+        if (unlikely((uintmax_t)size > size_limit)) {
+            static char buf[2][PRECISE_FILESIZE_STR_MAX];
+            filesize_to_str_precise(size, buf[0]);
+            filesize_to_str_precise(size_limit, buf[1]);
             error_msg (
                 ebuf,
-                "File size (%juMiB) exceeds 'filesize-limit' option (%uMiB): %s",
-                size_mib, limit_mib, filename
+                "File size (%s) exceeds 'filesize-limit' option (%s): %s",
+                buf[0], buf[1], filename
             );
             goto error;
         }

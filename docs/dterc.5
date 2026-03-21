@@ -210,7 +210,7 @@ Global options:
 .br
    \fBesc\-timeout\fR [100] 0...2000
 .br
-   \fBfilesize\-limit\fR [250]
+   \fBfilesize\-limit\fR [250MiB]
 .br
    \fBlock\-files\fR [true]
 .br
@@ -2145,11 +2145,14 @@ timeout can cause escape sequences of for example arrow keys to
 be split and treated as multiple key presses.
 .P
 .RE
-\fBfilesize\-limit\fR [250]
+\fBfilesize\-limit\fR [250MiB]
 .RS
-Refuse to open any file with a size larger than this value (in
-mebibytes). Useful to prevent accidentally opening very large
-files, which can take a long time on some systems.
+Refuse to open any file with a size larger than this value, unless set
+to \fB0\fR (unlimited). The value must be an integer and may be followed
+by a suffix of \fBKiB\fR, \fBMiB\fR, \fBGiB\fR, etc.
+.P
+This can be useful to prevent accidentally opening large files, which
+may take a long time on some systems.
 .P
 .RE
 \fBlock\-files\fR [true]

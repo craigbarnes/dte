@@ -33,7 +33,8 @@ typedef enum {
 
 typedef union {
     const char *str_val; // OPT_STR, OPT_REGEX
-    unsigned int uint_val; // OPT_UINT, OPT_UINT8, OPT_ENUM, OPT_FLAG, OPT_FILESIZE
+    unsigned int uint_val; // OPT_UINT, OPT_UINT8, OPT_ENUM, OPT_FLAG
+    uint_least64_t u64_val; // OPT_FILESIZE
     bool bool_val; // OPT_BOOL
 } OptionValue;
 
@@ -397,42 +398,33 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     return buf;
 }
 
+static OptionValue fsize_get(void *ptr)
+{
+    const uint_least64_t *valp = ptr;
+    return (OptionValue){.u64_val = *valp};
+}
+
+static void fsize_set(void *ptr, OptionValue v)
+{
+    uint_least64_t *valp = ptr;
+    *valp = v.u64_val;
+}
+
 static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, const char *str, OptionValue *value)
 {
-    unsigned int x;
-    if (str_to_uint(str, &x)) {
-        // Values with no suffix are interpreted as MiB
-        value->uint_val = x;
-        return true;
-    }
-
     intmax_t bytes = parse_filesize(str);
-    if (likely(bytes >= 0)) {
-        // Convert bytes to MiB and round up remainder
-        uintmax_t mib = (bytes >> 20) + !!(bytes & 0xFFFFF);
-        if (likely(mib <= UINT_MAX)) {
-            value->uint_val = mib;
-            return true;
-        }
+    if (bytes < 0 || bytes > UINT_LEAST64_MAX) {
+        return error_msg(ebuf, "Invalid filesize: '%s'", str);
     }
 
-    error_msg(ebuf, "Invalid filesize: '%s'", str);
-    return false;
+    value->u64_val = bytes;
+    return true;
 }
 
 static const char *fsize_string(const OptionDesc* UNUSED_ARG(d), OptionValue value)
 {
     static char buf[PRECISE_FILESIZE_STR_MAX];
-    uintmax_t mib = value.uint_val;
-    uintmax_t bytes = mib << 20;
-    if (unlikely(bytes >> 20 != mib)) {
-        // An optimizing compiler will usually drop this code entirely, since
-        // the condition isn't possible when `BITSIZE(int) == 32`
-        size_t i = buf_umax_to_str(mib, buf);
-        copyliteral(buf + i, "MiB\0");
-        return buf;
-    }
-    return filesize_to_str_precise(bytes, buf);
+    return filesize_to_str_precise(value.u64_val, buf);
 }
 
 static const struct {
@@ -448,7 +440,7 @@ static const struct {
     [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string},
     [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string},
     [OPT_REGEX] = {re_get, re_set, re_parse, str_string},
-    [OPT_FILESIZE] = {uint_get, uint_set, fsize_parse, fsize_string},
+    [OPT_FILESIZE] = {fsize_get, fsize_set, fsize_parse, fsize_string},
 };
 
 static const char *const bool_enum[] = {"false", "true", NULL};
@@ -552,7 +544,7 @@ UNITTEST {
         [OPT_BOOL] = {ALIGNOF(bool), sizeof(bool)},
         [OPT_FLAG] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
         [OPT_REGEX] = {ALIGNOF(const InternedRegexp*), sizeof(const InternedRegexp*)},
-        [OPT_FILESIZE] = {ALIGNOF(unsigned int), sizeof(unsigned int)},
+        [OPT_FILESIZE] = {ALIGNOF(uint_least64_t), sizeof(uint_least64_t)},
     };
 
     static_assert(ARRAYLEN(map) == ARRAYLEN(option_ops));
@@ -645,8 +637,9 @@ static bool desc_equals(const OptionDesc *desc, void *ptr, OptionValue ref)
     case OPT_UINT8:
     case OPT_ENUM:
     case OPT_FLAG:
-    case OPT_FILESIZE:
         return current.uint_val == ref.uint_val;
+    case OPT_FILESIZE:
+        return current.u64_val == ref.u64_val;
     }
 
     BUG("unhandled option type");

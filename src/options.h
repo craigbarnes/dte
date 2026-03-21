@@ -82,7 +82,7 @@ typedef struct {
     uint8_t msg_compile; // Default EditorState::messages[] index for `compile`
     uint8_t msg_tag; // Default EditorState::messages[] index for `tag`
     unsigned int esc_timeout; // See term_read_input()
-    unsigned int filesize_limit; // Size limit imposed by load_buffer() (in MiB)
+    uint_least64_t filesize_limit; // Size limit imposed by load_buffer()
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;
