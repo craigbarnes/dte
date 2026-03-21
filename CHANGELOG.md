@@ -57,6 +57,8 @@ Unreleased
   * [`exec -o echo`][`exec`]
   * [`scroll-pgup -h`][`scroll-pgup`]
   * [`scroll-pgdown -h`][`scroll-pgdown`]
+* Added 1 new option:
+  * [`syntax-line-limit`]
 * Added support for [binding][`bind`] 8 new keys:
   * `menu`
   * `print` ("Print Screen")
@@ -868,6 +870,7 @@ builds are maintained on a "best effort" basis only.
 [`optimize-true-color`]: https://craigbarnes.gitlab.io/dte/dterc.html#optimize-true-color
 [`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
+[`syntax-line-limit`]: https://craigbarnes.gitlab.io/dte/dterc.html#syntax-line-limit
 [`utf8-bom`]: https://craigbarnes.gitlab.io/dte/dterc.html#utf8-bom
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left
 [`$COLNO`]: https://craigbarnes.gitlab.io/dte/dterc.html#COLNO

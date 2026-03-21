@@ -11,7 +11,6 @@
 #include "block.h"
 #include "convert.h"
 #include "encoding.h"
-#include "options.h"
 #include "util/debug.h"
 #include "util/fd.h"
 #include "util/list.h"
@@ -26,9 +25,9 @@
 
 static bool decode_and_add_blocks (
     Buffer *buffer,
+    const GlobalOptions *gopts,
     ErrorBuffer *errbuf,
-    StringView text,
-    bool utf8_bom
+    StringView text
 ) {
     EncodingType bom_type = detect_encoding_from_bom(text);
     if (!buffer->encoding && bom_type != UNKNOWN_ENCODING) {
@@ -38,7 +37,7 @@ static bool decode_and_add_blocks (
             LOG_NOTICE("file has %s BOM, but conversion unsupported", enc);
             enc = encoding_from_type(UTF8);
         }
-        buffer_set_encoding(buffer, enc, utf8_bom);
+        buffer_set_encoding(buffer, enc, gopts->utf8_bom);
     }
 
     // Skip BOM only if it matches the specified file encoding
@@ -52,10 +51,10 @@ static bool decode_and_add_blocks (
 
     if (!buffer->encoding) {
         buffer->encoding = encoding_from_type(UTF8);
-        buffer->bom = utf8_bom;
+        buffer->bom = gopts->utf8_bom;
     }
 
-    return file_decoder_read(buffer, errbuf, text);
+    return file_decoder_read(buffer, gopts, errbuf, text);
 }
 
 static void fixup_blocks(Buffer *buffer)
@@ -106,8 +105,12 @@ static bool buffer_fstat(FileInfo *info, int fd)
     return !fstat(fd, &st) && update_file_info(info, &st);
 }
 
-bool read_blocks(Buffer *buffer, ErrorBuffer *ebuf, int fd, bool utf8_bom)
-{
+bool read_blocks (
+    Buffer *buffer,
+    const GlobalOptions *gopts,
+    ErrorBuffer *ebuf,
+    int fd
+) {
     const size_t map_size = 64 * 1024;
     size_t size = buffer->file.size;
     char *text = NULL;
@@ -172,7 +175,7 @@ bool read_blocks(Buffer *buffer, ErrorBuffer *ebuf, int fd, bool utf8_bom)
     }
 
 decode:
-    ret = decode_and_add_blocks(buffer, ebuf, string_view(text, size), utf8_bom);
+    ret = decode_and_add_blocks(buffer, gopts, ebuf, string_view(text, size));
 
 error:
     if (mapped) {
@@ -235,19 +238,18 @@ bool load_buffer (
     uintmax_t size_limit = gopts->filesize_limit;
     if (size_limit > 0) {
         if (unlikely((uintmax_t)size > size_limit)) {
-            static char buf[2][PRECISE_FILESIZE_STR_MAX];
-            filesize_to_str_precise(size, buf[0]);
-            filesize_to_str_precise(size_limit, buf[1]);
+            char limit_str[PRECISE_FILESIZE_STR_MAX];
+            filesize_to_str_precise(size_limit, limit_str);
             error_msg (
                 ebuf,
-                "File size (%s) exceeds 'filesize-limit' option (%s): %s",
-                buf[0], buf[1], filename
+                "File size (%ju) exceeds 'filesize-limit' option (%s): %s",
+                (uintmax_t)size, limit_str, filename
             );
             goto error;
         }
     }
 
-    if (!read_blocks(buffer, ebuf, fd, gopts->utf8_bom)) {
+    if (!read_blocks(buffer, gopts, ebuf, fd)) {
         error_msg(ebuf, "Error reading %s: %s", filename, strerror(errno));
         goto error;
     }

@@ -230,6 +230,8 @@ Global options:
 .br
    \fBstatusline\-right\fR [" %y,%X %u %o %E%s%b%s%n %t %p "]
 .br
+   \fBsyntax\-line\-limit\fR [512KiB]
+.br
    \fBtab\-bar\fR [true]
 .br
    \fButf8\-bom\fR [false]
@@ -2299,6 +2301,16 @@ Literal \fB%\fR
 \fBstatusline\-right\fR [" %y,%X %u %o %E%s%b%s%n %t %p "]
 .RS
 Format string for the right aligned part of status line.
+.P
+.RE
+\fBsyntax\-line\-limit\fR [512KiB]
+.RS
+Automatically disable syntax highlighting when opening files containing
+1 or more lines larger than this value. The value must be an integer and
+may be followed by a suffix of \fBKiB\fR, \fBMiB\fR, \fBGiB\fR, etc.
+.P
+If this option is triggered, an error message will be displayed and the
+\fBsyntax\fR option will be set to \fBfalse\fR (as if by \fBset \-l syntax false\fR).
 .P
 .RE
 \fBtab\-bar\fR [true]

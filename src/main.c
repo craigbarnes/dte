@@ -174,7 +174,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     if (fds[STDIN_FILENO] >= 3) {
         ErrorBuffer *ebuf = &e->err;
         buffer = buffer_new(&e->buffers, &e->options, encoding_from_type(UTF8));
-        if (read_blocks(buffer, ebuf, fds[STDIN_FILENO], false)) {
+        if (read_blocks(buffer, &e->options, ebuf, fds[STDIN_FILENO])) {
             name = "(stdin)";
             buffer->temporary = true;
         } else {

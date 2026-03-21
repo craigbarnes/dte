@@ -1587,6 +1587,15 @@ Format string for the left aligned part of status line.
 
 Format string for the right aligned part of status line.
 
+### **syntax-line-limit** [512KiB]
+
+Automatically disable syntax highlighting when opening files containing
+1 or more lines larger than this value. The value must be an integer and
+may be followed by a suffix of `KiB`, `MiB`, `GiB`, etc.
+
+If this option is triggered, an error message will be displayed and the
+[`syntax`] option will be set to `false` (as if by `set -l syntax false`).
+
 ### **tab-bar** [true]
 
 Whether to show the tab-bar at the top of each window.
@@ -1805,6 +1814,7 @@ errors should be highlighted. Set to `""` to disable.
 [`indent-width`]: #indent-width
 [`newline`]: #newline
 [`overwrite`]: #overwrite
+[`syntax`]: #syntax
 [`tab-width`]: #tab-width
 [`text-width`]: #text-width
 [`utf8-bom`]: #utf8-bom

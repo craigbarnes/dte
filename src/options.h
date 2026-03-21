@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "command/error.h"
 #include "regexp.h"
 #include "util/debug.h"
@@ -83,6 +84,7 @@ typedef struct {
     uint8_t msg_tag; // Default EditorState::messages[] index for `tag`
     unsigned int esc_timeout; // See term_read_input()
     uint_least64_t filesize_limit; // Size limit imposed by load_buffer()
+    uint_least64_t syntax_line_limit; // Line length at which LocalOptions::syntax is disabled
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;

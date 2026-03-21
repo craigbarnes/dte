@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include "buffer.h"
 #include "command/error.h"
+#include "options.h"
 #include "util/macros.h"
 #include "util/string-view.h"
 
@@ -17,7 +18,7 @@ typedef struct {
 } FileEncoder;
 
 bool conversion_supported_by_iconv(const char *from, const char *to) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool file_decoder_read(Buffer *buffer, const GlobalOptions *gopts, ErrorBuffer *errbuf, StringView text) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 FileEncoder file_encoder(const char *encoding, bool crlf, int fd) NONNULL_ARGS WARN_UNUSED_RESULT;
 void file_encoder_free(FileEncoder *enc) NONNULL_ARGS;

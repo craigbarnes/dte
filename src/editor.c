@@ -130,6 +130,8 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
             .esc_timeout = 100,
             .filesize_limit = 250ULL << 20, // 250MiB
             .lock_files = true,
+            .msg_compile = 0,
+            .msg_tag = 0,
             .optimize_true_color = true,
             .scroll_margin = 0,
             .select_cursor_char = true,
@@ -137,11 +139,10 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
             .show_line_numbers = false,
             .statusline_left = str_intern(" %f%s%m%s%r%s%M"),
             .statusline_right = str_intern(" %y,%X  %u  %o  %E%s%b%s%n %t   %p "),
+            .syntax_line_limit = 512ULL << 10, // 512KiB
             .tab_bar = true,
             .utf8_bom = false,
             .window_separator = WINSEP_BAR,
-            .msg_compile = 0,
-            .msg_tag = 0,
         }
     };
 

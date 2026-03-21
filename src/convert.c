@@ -10,16 +10,11 @@
 #include "util/debug.h"
 #include "util/list.h"
 #include "util/log.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
-
-enum {
-    // If any line exceeds this length when reading a file, syntax
-    // highlighting will be automatically disabled
-    SYN_HIGHLIGHT_MAX_LINE_LEN = 512u << 10, // 512KiB
-};
 
 typedef struct {
     StringView text;
@@ -35,14 +30,14 @@ static void add_block(Buffer *buffer, Block *blk)
 
 static Block *add_utf8_line (
     Buffer *buffer,
+    const GlobalOptions *gopts,
     ErrorBuffer *errbuf,
     Block *blk,
     StringView line
 ) {
-    // TODO: Make this limit configurable and add documentation
-    size_t syn_line_limit = SYN_HIGHLIGHT_MAX_LINE_LEN;
-
+    size_t syn_line_limit = gopts->syntax_line_limit;
     size_t size = line.length + 1;
+
     if (blk) {
         size_t avail = blk->alloc - blk->size;
         if (size <= avail) {
@@ -56,10 +51,13 @@ static Block *add_utf8_line (
 
 copy:
     if (unlikely(line.length > syn_line_limit && buffer->options.syntax)) {
+        char limit_str[PRECISE_FILESIZE_STR_MAX];
+        filesize_to_str_precise(syn_line_limit, limit_str);
         error_msg (
             errbuf,
-            "line length (%zu) exceeded limit (%zu); disabling syntax highlighting",
-            line.length, syn_line_limit
+            "line length (%zu) exceeds 'syntax-line-limit' option (%s); "
+            "disabling syntax highlighting",
+            line.length, limit_str
         );
         buffer->options.syntax = false;
     }
@@ -86,8 +84,12 @@ static bool read_utf8_line(FileDecoder *dec, StringView *linep)
     return true;
 }
 
-static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
-{
+static bool file_decoder_read_utf8 (
+    Buffer *buffer,
+    const GlobalOptions *gopts,
+    ErrorBuffer *errbuf,
+    StringView text
+) {
     if (unlikely(!encoding_is_utf8(buffer->encoding))) {
         errno = EINVAL;
         return false;
@@ -103,16 +105,16 @@ static bool file_decoder_read_utf8(Buffer *buffer, ErrorBuffer *errbuf, StringVi
         buffer->crlf_newlines = true;
     }
 
-    Block *blk = add_utf8_line(buffer, errbuf, NULL, line);
+    Block *blk = add_utf8_line(buffer, gopts, errbuf, NULL, line);
 
     if (unlikely(buffer->crlf_newlines)) {
         while (read_utf8_line(&dec, &line)) {
             strview_remove_matching_suffix(&line, "\r");
-            blk = add_utf8_line(buffer, errbuf, blk, line);
+            blk = add_utf8_line(buffer, gopts, errbuf, blk, line);
         }
     } else {
         while (read_utf8_line(&dec, &line)) {
-            blk = add_utf8_line(buffer, errbuf, blk, line);
+            blk = add_utf8_line(buffer, gopts, errbuf, blk, line);
         }
     }
 
@@ -203,9 +205,13 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
     return 0;
 }
 
-bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
-{
-    return file_decoder_read_utf8(buffer, errbuf, text);
+bool file_decoder_read (
+    Buffer *buffer,
+    const GlobalOptions *gopts,
+    ErrorBuffer *errbuf,
+    StringView text
+) {
+    return file_decoder_read_utf8(buffer, gopts, errbuf, text);
 }
 
 #else // ICONV_DISABLE != 1; use full iconv implementation:
@@ -599,10 +605,14 @@ static bool decode_and_read_line(FileDecoder *dec, StringView *linep)
     return true;
 }
 
-bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
-{
+bool file_decoder_read (
+    Buffer *buffer,
+    const GlobalOptions *gopts,
+    ErrorBuffer *errbuf,
+    StringView text
+) {
     if (encoding_is_utf8(buffer->encoding)) {
-        return file_decoder_read_utf8(buffer, errbuf, text);
+        return file_decoder_read_utf8(buffer, gopts, errbuf, text);
     }
 
     CharsetConverter *cconv = cconv_to_utf8(buffer->encoding);
@@ -621,12 +631,12 @@ bool file_decoder_read(Buffer *buffer, ErrorBuffer *errbuf, StringView text)
             buffer->crlf_newlines = true;
         }
 
-        Block *blk = add_utf8_line(buffer, errbuf, NULL, line);
+        Block *blk = add_utf8_line(buffer, gopts, errbuf, NULL, line);
         while (decode_and_read_line(&dec, &line)) {
             if (buffer->crlf_newlines) {
                 strview_remove_matching_suffix(&line, "\r");
             }
-            blk = add_utf8_line(buffer, errbuf, blk, line);
+            blk = add_utf8_line(buffer, gopts, errbuf, blk, line);
         }
 
         if (blk) {
