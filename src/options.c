@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include "options.h"
@@ -412,8 +413,14 @@ static void fsize_set(void *ptr, OptionValue v)
 static bool fsize_parse(const OptionDesc* UNUSED_ARG(d), ErrorBuffer *ebuf, const char *str, OptionValue *value)
 {
     intmax_t bytes = parse_filesize(str);
-    if (bytes < 0 || bytes > UINT_LEAST64_MAX) {
-        return error_msg(ebuf, "Invalid filesize: '%s'", str);
+    if (bytes < 0 || (uintmax_t)bytes > (uintmax_t)UINT_LEAST64_MAX) {
+        int errnum = (bytes < 0) ? -bytes : EOVERFLOW;
+        if (errnum == EINVAL) {
+            // No need to append `strerror(EINVAL)` ("invalid argument") here
+            return error_msg(ebuf, "invalid filesize '%s'", str);
+        }
+        const char *err = strerror(errnum);
+        return error_msg(ebuf, "invalid filesize '%s': %s", str, err);
     }
 
     value->u64_val = bytes;
