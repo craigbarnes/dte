@@ -35,7 +35,7 @@ static Block *add_utf8_line (
     Block *blk,
     StringView line
 ) {
-    size_t syn_line_limit = gopts->syntax_line_limit;
+    size_t slimit = gopts->syntax_line_limit;
     size_t size = line.length + 1;
 
     if (blk) {
@@ -50,9 +50,9 @@ static Block *add_utf8_line (
     blk = block_new(size);
 
 copy:
-    if (unlikely(line.length > syn_line_limit && buffer->options.syntax)) {
+    if (unlikely(slimit && line.length > slimit && buffer->options.syntax)) {
         char limit_str[PRECISE_FILESIZE_STR_MAX];
-        filesize_to_str_precise(syn_line_limit, limit_str);
+        filesize_to_str_precise(slimit, limit_str);
         error_msg (
             errbuf,
             "line length (%zu) exceeds 'syntax-line-limit' option (%s); "

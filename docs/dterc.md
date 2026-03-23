@@ -1592,7 +1592,8 @@ Format string for the right aligned part of status line.
 
 Automatically disable syntax highlighting when opening files containing
 1 or more lines larger than this value. The value must be an integer and
-may be followed by a suffix of `KiB`, `MiB`, `GiB`, etc.
+may be followed by a suffix of `KiB`, `MiB`, `GiB`, etc. The value `0` is
+interpreted as "unlimited".
 
 If this option is triggered, an error message will be displayed and the
 [`syntax`] option will be set to `false` (as if by `set -l syntax false`).
