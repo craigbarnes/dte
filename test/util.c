@@ -1445,6 +1445,7 @@ static void test_parse_filesize(TestContext *ctx)
     EXPECT_EQ(parse_filesize("1TiB"), 1LL << 40);
     EXPECT_EQ(parse_filesize("1PiB"), 1LL << 50);
     EXPECT_EQ(parse_filesize("1EiB"), 1LL << 60);
+    EXPECT_EQ(parse_filesize("9223372036854775807"), (1ULL << 63) - 1);
 
     EXPECT_EQ(parse_filesize("4i"), -EINVAL);
     EXPECT_EQ(parse_filesize("4B"), -EINVAL);
@@ -1459,9 +1460,16 @@ static void test_parse_filesize(TestContext *ctx)
     EXPECT_EQ(parse_filesize("9Gi"), -EINVAL);
     EXPECT_EQ(parse_filesize("0K"), -EINVAL);
 
+    intmax_t a = parse_filesize("8EiB");
+    intmax_t b = parse_filesize("9223372036854775808");
+    EXPECT_TRUE(a > 0 || a == -EOVERFLOW);
+    EXPECT_EQ(a, b);
+
     char buf[DECIMAL_STR_MAX(uintmax_t) + 4];
     xsnprintf(buf, sizeof buf, "%jd", INTMAX_MAX);
     EXPECT_EQ(parse_filesize(buf), INTMAX_MAX);
+    xsnprintf(buf, sizeof buf, "%ju", (uintmax_t)(INTMAX_MAX) + 1);
+    EXPECT_EQ(parse_filesize(buf), -EOVERFLOW);
     xsnprintf(buf, sizeof buf, "%jdKiB", INTMAX_MAX);
     EXPECT_EQ(parse_filesize(buf), -EOVERFLOW);
     xsnprintf(buf, sizeof buf, "%jdEiB", INTMAX_MAX);

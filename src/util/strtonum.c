@@ -270,10 +270,11 @@ intmax_t parse_filesize(const char *str)
         return -EINVAL;
     }
 
-    uintmax_t val = x << shift;
-    if (unlikely(val >> shift != x || x > INTMAX_MAX)) {
+    BUG_ON(shift >= BITSIZE(x));
+    uintmax_t bytes = x << shift;
+    if (unlikely(bytes >> shift != x || bytes > (uintmax_t)INTMAX_MAX)) {
         return -EOVERFLOW;
     }
 
-    return val;
+    return bytes;
 }
