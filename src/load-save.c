@@ -236,17 +236,15 @@ bool load_buffer (
     }
 
     uintmax_t size_limit = gopts->filesize_limit;
-    if (size_limit > 0) {
-        if (unlikely((uintmax_t)size > size_limit)) {
-            char limit_str[PRECISE_FILESIZE_STR_MAX];
-            filesize_to_str_precise(size_limit, limit_str);
-            error_msg (
-                ebuf,
-                "File size (%ju) exceeds 'filesize-limit' option (%s): %s",
-                (uintmax_t)size, limit_str, filename
-            );
-            goto error;
-        }
+    if (unlikely(size_limit && (uintmax_t)size > size_limit)) {
+        char limit_str[PRECISE_FILESIZE_STR_MAX];
+        filesize_to_str_precise(size_limit, limit_str);
+        error_msg (
+            ebuf,
+            "File size (%ju) exceeds 'filesize-limit' option (%s): %s",
+            (uintmax_t)size, limit_str, filename
+        );
+        goto error;
     }
 
     if (!read_blocks(buffer, gopts, ebuf, fd)) {
