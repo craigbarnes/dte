@@ -1231,8 +1231,8 @@ Actions for stdin (`-i`):
 Actions for stdout (`-o`):
 
 * `buffer` - [`insert`] output (from _command_) into buffer
-* `echo` - display first line of output as a status (command-line)
-  message
+* `echo` - display first line of output as a status message (shown
+  in the command-line)
 * `eval` - execute output as dterc commands
 * `msg` - run [`msg`] command with numerical argument parsed from first
   line of output
@@ -1297,9 +1297,10 @@ wrapping the command with [`bookmark`] and [`bookmark -r`], e.g.:
 
 Note that _command_ is executed directly using [`execvp`]. To use shell
 features like pipes or redirection, use a shell interpreter as the
-_command_ (see second example above). If complex commands become
-difficult to read (e.g. due to nested/escaped quotes), it's recommended
-to create external scripts and execute those instead.
+_command_ (e.g. `sh -c '...'`, as in the examples above). If complex
+commands become difficult to read, due to the need for nested/escaped
+quotes, it's recommended to create external scripts and execute those
+instead (e.g. as `exec $DTE_HOME/scripts/example ...`).
 
 ### **compile** [**-1ps**] _errorfmt_ _command_ [_argument_]...
 

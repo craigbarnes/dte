@@ -1855,8 +1855,8 @@ Actions for stdout (\fB\-o\fR):
 .P
 \(bu \fBbuffer\fR \- \fBinsert\fR output (from \fIcommand\fR) into buffer
 .br
-\(bu \fBecho\fR \- display first line of output as a status (command\-line)
-message
+\(bu \fBecho\fR \- display first line of output as a status message (shown
+in the command\-line)
 .br
 \(bu \fBeval\fR \- execute output as dterc commands
 .br
@@ -1947,9 +1947,10 @@ bookmark;\ filter\ expand\ \-\-tabs=4;\ bookmark\ \-r
 .PP
 Note that \fIcommand\fR is executed directly using \fBexecvp\fR(3). To use shell
 features like pipes or redirection, use a shell interpreter as the
-\fIcommand\fR (see second example above). If complex commands become
-difficult to read (e.g. due to nested/escaped quotes), it's recommended
-to create external scripts and execute those instead.
+\fIcommand\fR (e.g. \fBsh \-c \[aq]...\[aq]\fR, as in the examples above). If complex
+commands become difficult to read, due to the need for nested/escaped
+quotes, it's recommended to create external scripts and execute those
+instead (e.g. as \fBexec $DTE_HOME/scripts/example ...\fR).
 .P
 .RE
 \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIargument\fR]...
