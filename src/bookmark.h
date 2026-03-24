@@ -34,7 +34,7 @@ static inline FileLocation *new_file_location (
 }
 
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
-bool file_location_go(Window *window, ErrorBuffer *ebuf, const FileLocation *loc) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool file_location_go(Window *window, ErrorBuffer *ebuf, const FileLocation *loc) NONNULL_ARG(1, 3) WARN_UNUSED_RESULT;
 void file_location_free(FileLocation *loc) NONNULL_ARGS;
 
 size_t bookmark_push(PointerArray *bookmarks, FileLocation *loc) NONNULL_ARGS;

@@ -17,8 +17,8 @@ typedef struct {
     bool hardlinks;
 } FileSaveContext;
 
-bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, ErrorBuffer *ebuf, bool must_exist) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopts, ErrorBuffer *ebuf, bool must_exist) NONNULL_ARG(1, 2, 3) WARN_UNUSED_RESULT;
 bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool read_blocks(Buffer *buffer, const GlobalOptions *gopts, ErrorBuffer *ebuf, int fd) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool read_blocks(Buffer *buffer, const GlobalOptions *gopts, ErrorBuffer *ebuf, int fd) NONNULL_ARG(1, 2) WARN_UNUSED_RESULT;
 
 #endif

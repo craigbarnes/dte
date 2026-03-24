@@ -6,7 +6,7 @@
 #include "util/log.h"
 #include "util/xstdio.h"
 
-VPRINTF(3)
+VPRINTF(3) NONNULL_ARG(1, 3)
 static void error_msgv(ErrorBuffer *eb, const char *cmd, const char *format, va_list ap)
 {
     const size_t size = sizeof(eb->buf);
@@ -44,19 +44,23 @@ static void error_msgv(ErrorBuffer *eb, const char *cmd, const char *format, va_
 
 bool error_msg(ErrorBuffer *eb, const char *format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    error_msgv(eb, eb->command_name, format, ap);
-    va_end(ap);
+    if (eb) {
+        va_list ap;
+        va_start(ap, format);
+        error_msgv(eb, eb->command_name, format, ap);
+        va_end(ap);
+    }
     return false; // To allow tail-calling from command handlers
 }
 
 bool error_msg_for_cmd(ErrorBuffer *eb, const char *cmd, const char *format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    error_msgv(eb, cmd, format, ap);
-    va_end(ap);
+    if (eb) {
+        va_list ap;
+        va_start(ap, format);
+        error_msgv(eb, cmd, format, ap);
+        va_end(ap);
+    }
     return false;
 }
 
@@ -67,11 +71,13 @@ bool error_msg_errno(ErrorBuffer *eb, const char *prefix)
 
 bool info_msg(ErrorBuffer *eb, const char *format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    vsnprintf(eb->buf, sizeof(eb->buf), format, ap);
-    va_end(ap);
-    eb->is_error = false;
+    if (eb) {
+        va_list ap;
+        va_start(ap, format);
+        vsnprintf(eb->buf, sizeof(eb->buf), format, ap);
+        va_end(ap);
+        eb->is_error = false;
+    }
     return true; // To allow tail-calling from command handlers
 }
 

@@ -322,8 +322,7 @@ size_t tag_lookup (
 
 void collect_tags(TagFile *tf, PointerArray *a, StringView prefix)
 {
-    ErrorBuffer ebuf = {.print_to_stderr = false};
-    if (!load_tag_file(tf, &ebuf)) {
+    if (!load_tag_file(tf, NULL)) {
         return;
     }
 

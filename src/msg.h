@@ -23,8 +23,8 @@ typedef struct {
 
 Message *new_message(const char *msg, size_t len) RETURNS_NONNULL;
 void add_message(MessageList *msgs, Message *m) NONNULL_ARGS;
-bool activate_current_message(const MessageList *msgs, Window *window, ErrorBuffer *ebuf) NONNULL_ARGS;
-void activate_current_message_save(const MessageList *msgs, PointerArray *bookmarks, const View *view, ErrorBuffer *ebuf) NONNULL_ARGS;
+bool activate_current_message(const MessageList *msgs, Window *window, ErrorBuffer *ebuf) NONNULL_ARG(1, 2);
+void activate_current_message_save(const MessageList *msgs, PointerArray *bookmarks, const View *view, ErrorBuffer *ebuf) NONNULL_ARG(1, 2, 3);
 void clear_messages(MessageList *msgs) NONNULL_ARGS;
 String dump_messages(const MessageList *messages) NONNULL_ARGS;
 

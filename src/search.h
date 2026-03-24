@@ -20,20 +20,20 @@ typedef struct {
     bool reverse;
 } SearchState;
 
-bool do_search_next(View *view, SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs, bool skip) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool do_search_next(View *view, SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs, bool skip) NONNULL_ARG(1, 2) WARN_UNUSED_RESULT;
 
 static inline void toggle_search_direction(SearchState *search)
 {
     search->reverse ^= 1;
 }
 
-NONNULL_ARGS WARN_UNUSED_RESULT
+NONNULL_ARG(1, 2) WARN_UNUSED_RESULT
 static inline bool search_next(View *view, SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs)
 {
     return do_search_next(view, search, ebuf, cs, false);
 }
 
-NONNULL_ARGS WARN_UNUSED_RESULT
+NONNULL_ARG(1, 2) WARN_UNUSED_RESULT
 static inline bool search_prev(View *view, SearchState *search, ErrorBuffer *ebuf, SearchCaseSensitivity cs)
 {
     toggle_search_direction(search);
@@ -42,7 +42,7 @@ static inline bool search_prev(View *view, SearchState *search, ErrorBuffer *ebu
     return r;
 }
 
-bool search_tag(View *view, ErrorBuffer *ebuf, const char *pattern) NONNULL_ARGS WARN_UNUSED_RESULT;
+bool search_tag(View *view, ErrorBuffer *ebuf, const char *pattern) NONNULL_ARG(1, 3) WARN_UNUSED_RESULT;
 void search_set_regexp(SearchState *search, const char *pattern) NONNULL_ARGS;
 void search_free_regexp(SearchState *search) NONNULL_ARGS;
 

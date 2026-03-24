@@ -30,8 +30,8 @@ typedef struct {
 void history_append(History *history, const char *text) NONNULL_ARGS;
 bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text) NONNULL_ARG(1, 3) WARN_UNUSED_RESULT;
 bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) NONNULL_ARG(1, 3) WARN_UNUSED_RESULT;
-void history_load(History *history, ErrorBuffer *ebuf, char *filename, size_t size_limit) NONNULL_ARGS;
-void history_save(const History *history, ErrorBuffer *ebuf) NONNULL_ARGS;
+void history_load(History *history, ErrorBuffer *ebuf, char *filename, size_t size_limit) NONNULL_ARG(1, 3);
+void history_save(const History *history, ErrorBuffer *ebuf) NONNULL_ARG(1);
 void history_free(History *history) NONNULL_ARGS;
 String history_dump(const History *history) NONNULL_ARGS;
 

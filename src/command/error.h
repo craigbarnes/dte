@@ -15,10 +15,10 @@ typedef struct ErrorBuffer {
     char buf[512];
 } ErrorBuffer;
 
-bool error_msg(ErrorBuffer *eb, const char *format, ...) COLD PRINTF(2) NONNULL_ARGS;
-bool error_msg_errno(ErrorBuffer *eb, const char *prefix) COLD NONNULL_ARGS;
-bool error_msg_for_cmd(ErrorBuffer *eb, const char *cmd, const char *format, ...) COLD PRINTF(3) NONNULL_ARG(1, 3);
-bool info_msg(ErrorBuffer *eb, const char *format, ...) PRINTF(2) NONNULL_ARGS;
+bool error_msg(ErrorBuffer *eb, const char *format, ...) COLD PRINTF(2) NONNULL_ARG(2);
+bool error_msg_errno(ErrorBuffer *eb, const char *prefix) COLD NONNULL_ARG(2);
+bool error_msg_for_cmd(ErrorBuffer *eb, const char *cmd, const char *format, ...) COLD PRINTF(3) NONNULL_ARG(3);
+bool info_msg(ErrorBuffer *eb, const char *format, ...) PRINTF(2) NONNULL_ARG(2);
 void clear_error(ErrorBuffer *eb) NONNULL_ARGS;
 
 #endif
