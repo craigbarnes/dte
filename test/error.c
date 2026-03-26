@@ -231,15 +231,15 @@ static void test_command_errors(TestContext *ctx)
     EXPECT_TRUE(str_has_prefix(ebuf->buf, "Parsing alias _abc:"));
     EXPECT_TRUE(ebuf->is_error);
 
-    EXPECT_NULL(ebuf->config_filename);
-    ebuf->config_filename = "example";
-    ebuf->config_line = 1;
+    EXPECT_NULL(ebuf->sourcepos.filename);
+    ebuf->sourcepos.filename = "example";
+    ebuf->sourcepos.line = 1;
     runner.lookup_alias = NULL;
     clear_error(ebuf);
     EXPECT_FALSE(handle_command(&runner, "quit"));
     EXPECT_STREQ(ebuf->buf, "example:1: Command quit not allowed in config file");
     EXPECT_TRUE(ebuf->is_error);
-    ebuf->config_filename = NULL;
+    ebuf->sourcepos.filename = NULL;
 
     // Special case errors produced by exec_config():
     // ----------------------------------------------

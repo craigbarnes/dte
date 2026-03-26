@@ -697,12 +697,11 @@ Syntax *load_syntax (
     };
 
     ErrorBuffer *ebuf = &e->err;
-    const char *saved_file = ebuf->config_filename;
-    const unsigned int saved_line = ebuf->config_line;
+    ConfigLocation save = ebuf->sourcepos;
     CommandRunner runner = cmdrunner_for_syntaxes(e);
 
-    ebuf->config_filename = config_filename;
-    ebuf->config_line = 1;
+    ebuf->sourcepos.filename = config_filename;
+    ebuf->sourcepos.line = 1;
     bool r = exec_config(&runner, config_text);
 
     if (syn->current_syntax) {
@@ -717,8 +716,7 @@ Syntax *load_syntax (
         }
     }
 
-    ebuf->config_filename = saved_file;
-    ebuf->config_line = saved_line;
+    ebuf->sourcepos = save;
 
     if (!r) {
         return NULL;

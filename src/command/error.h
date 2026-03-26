@@ -4,10 +4,14 @@
 #include <stdbool.h>
 #include "util/macros.h"
 
+typedef struct {
+    const char *filename;
+    unsigned int line;
+} ConfigLocation;
+
 typedef struct ErrorBuffer {
     const char *command_name;
-    const char *config_filename;
-    unsigned int config_line;
+    ConfigLocation sourcepos;
     unsigned int nr_errors;
     bool is_error;
     bool print_to_stderr;

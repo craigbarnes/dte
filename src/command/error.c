@@ -10,8 +10,8 @@ VPRINTF(3) NONNULL_ARG(1, 3)
 static void error_msgv(ErrorBuffer *eb, const char *cmd, const char *format, va_list ap)
 {
     const size_t size = sizeof(eb->buf);
-    const char *file = eb->config_filename;
-    unsigned int line = eb->config_line;
+    const char *file = eb->sourcepos.filename;
+    unsigned int line = eb->sourcepos.line;
     int pos = 0;
 
     if (file && cmd) {

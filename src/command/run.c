@@ -53,7 +53,7 @@ static bool run_command(CommandRunner *runner, char **av)
         return r;
     }
 
-    if (unlikely(ebuf->config_filename && !(cmd->cmdopts & CMDOPT_ALLOW_IN_RC))) {
+    if (unlikely(ebuf->sourcepos.filename && !(cmd->cmdopts & CMDOPT_ALLOW_IN_RC))) {
         return error_msg_for_cmd(ebuf, NULL, "Command %s not allowed in config file", cmd->name);
     }
 

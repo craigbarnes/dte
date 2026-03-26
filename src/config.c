@@ -59,7 +59,7 @@ bool exec_config(CommandRunner *runner, StringView config)
     String buf = string_new(1024);
     e->include_recursion_count++;
 
-    for (size_t i = 0, n = config.length; i < n; ebuf->config_line++) {
+    for (size_t i = 0, n = config.length; i < n; ebuf->sourcepos.line++) {
         StringView line = buf_slice_next_line(config.data, &i, n);
         strview_trim_left(&line);
         if (buf.len == 0 && strview_has_prefix(line, "#")) {
@@ -134,8 +134,8 @@ static SystemErrno do_read_config (
     if (flags & CFG_BUILTIN) {
         const BuiltinConfig *cfg = get_builtin_config(filename);
         if (cfg) {
-            ebuf->config_filename = filename;
-            ebuf->config_line = 1;
+            ebuf->sourcepos.filename = filename;
+            ebuf->sourcepos.line = 1;
             bool r = exec_config(runner, cfg->text);
             return (r || !stop_at_first_err) ? 0 : EINVAL;
         }
@@ -155,8 +155,8 @@ static SystemErrno do_read_config (
         return err;
     }
 
-    ebuf->config_filename = filename;
-    ebuf->config_line = 1;
+    ebuf->sourcepos.filename = filename;
+    ebuf->sourcepos.line = 1;
     bool r = exec_config(runner, string_view(buf, size));
     free(buf);
     return (r || !stop_at_first_err) ? 0 : EINVAL;
@@ -165,24 +165,20 @@ static SystemErrno do_read_config (
 SystemErrno read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
     ErrorBuffer *ebuf = runner->ebuf;
-    const char *saved_file = ebuf->config_filename;
-    const unsigned int saved_line = ebuf->config_line;
+    ConfigLocation save = ebuf->sourcepos;
     SystemErrno ret = do_read_config(runner, filename, flags);
-    ebuf->config_filename = saved_file;
-    ebuf->config_line = saved_line;
+    ebuf->sourcepos = save;
     return ret;
 }
 
 static void exec_builtin_config(EditorState *e, StringView cfg, const char *name)
 {
     ErrorBuffer *ebuf = &e->err;
-    const char *saved_file = ebuf->config_filename;
-    const unsigned int saved_line = ebuf->config_line;
-    ebuf->config_filename = name;
-    ebuf->config_line = 1;
+    ConfigLocation save = ebuf->sourcepos;
+    ebuf->sourcepos.filename = name;
+    ebuf->sourcepos.line = 1;
     exec_normal_config(e, cfg);
-    ebuf->config_filename = saved_file;
-    ebuf->config_line = saved_line;
+    ebuf->sourcepos = save;
 }
 
 void exec_builtin_color_reset(EditorState *e)
