@@ -23,7 +23,7 @@ typedef struct {
 static void set_options(EditorState *e, char **args)
 {
     for (size_t i = 0; args[i]; i += 2) {
-        set_option(e, args[i], args[i + 1], true, false);
+        set_option(e, args[i], args[i + 1], true, false, false);
     }
 }
 

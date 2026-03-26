@@ -13,7 +13,7 @@ static const char *dummy_lookup_alias(const EditorState *e, const char *name)
     return "insert \"...";
 }
 
-static void test_normal_command_errors(TestContext *ctx)
+static void test_command_errors(TestContext *ctx)
 {
     static const struct {
         const char *cmd_str;
@@ -253,8 +253,61 @@ static void test_normal_command_errors(TestContext *ctx)
     EXPECT_TRUE(ebuf->is_error);
 }
 
+static void test_ignored_command_errors(TestContext *ctx)
+{
+    // These should also be tested without -q, in test_command_errors()
+    static const char *tests[] = {
+        "set -q filetype",
+        "set -q filetype ' '",
+        "set -q tab-width s",
+        "set -q indent-width 9",
+        "set -q emulate-tab x",
+        "set -q msg-compile xyz",
+        "set -q msg-tag xyz",
+        "set -q newline xyz",
+        "set -q case-sensitive-search z",
+        "set -q save-unmodified xyz",
+        "set -q window-separator xyz",
+        "set -q ws-error A",
+        "set -q non-existent 1",
+        "set -q -g filetype c",
+        "set -q -l statusline-right _",
+        "set -q 1 2 3",
+        "set -q statusline-left %",
+        "set -q statusline-left %!",
+        "set -q filesize-limit 1M",
+    };
+
+    EditorState *e = ctx->userdata;
+    ErrorBuffer *ebuf = &e->err;
+    static_assert_compatible_types(ebuf->buf[0], char);
+    const char *msg = ebuf->buf;
+    ASSERT_NONNULL(window_open_empty_buffer(e->window));
+
+    FOR_EACH_I(i, tests) {
+        clear_error(ebuf);
+        const char *cmd = tests[i];
+        bool ret = handle_normal_command(e, cmd, false);
+        bool err = (msg[0] != '\0');
+        EXPECT_NE(ret, err);
+
+        if (err) {
+            TEST_FAIL (
+                "Test #%zu: Unexpected error for command \"%s\": \"%s\"",
+                i + 1, cmd, msg
+            );
+        } else {
+            test_pass(ctx);
+        }
+    }
+
+    window_close_current_view(e->window);
+    set_view(e->window->view);
+}
+
 static const TestEntry tests[] = {
-    TEST(test_normal_command_errors),
+    TEST(test_command_errors),
+    TEST(test_ignored_command_errors),
 };
 
 const TestGroup error_tests = TEST_GROUP(tests);

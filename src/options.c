@@ -180,6 +180,7 @@ static bool validate_statusline_format(ErrorBuffer *ebuf, const char *value)
     if (likely(errpos == 0)) {
         return true;
     }
+
     char ch = value[errpos];
     if (ch == '\0') {
         return error_msg(ebuf, "Format character expected after '%%'");
@@ -710,20 +711,23 @@ static bool do_set_option (
     const OptionDesc *desc,
     const char *value,
     bool local,
-    bool global
+    bool global,
+    bool quiet
 ) {
-    ErrorBuffer *ebuf = &e->err;
-    if (local && !desc->local) {
+    ErrorBuffer *ebuf = quiet ? NULL : &e->err;
+    if (local && !desc->local && !quiet) {
         return error_msg(ebuf, "Option %s is not local", desc->name);
     }
-    if (global && !desc->global) {
+    if (global && !desc->global && !quiet) {
         return error_msg(ebuf, "Option %s is not global", desc->name);
     }
 
     OptionValue val;
     if (!desc_parse(desc, ebuf, value, &val)) {
-        return false;
+        return quiet;
     }
+
+    BUG_ON(!desc->local && !desc->global);
 
     if (!local && !global) {
         // Set both by default
@@ -731,35 +735,40 @@ static bool do_set_option (
         global = desc->global;
     }
 
-    if (local) {
+    if (local && desc->local) {
         desc_set(e, desc, local_ptr(desc, &e->buffer->options), false, val);
     }
-    if (global) {
+    if (global && desc->global) {
         desc_set(e, desc, global_ptr(desc, &e->options), true, val);
     }
 
     return true;
 }
 
-bool set_option(EditorState *e, const char *name, const char *value, bool local, bool global)
+bool set_option(EditorState *e, const char *name, const char *value, bool local, bool global, bool quiet)
 {
-    const OptionDesc *desc = must_find_option(&e->err, name);
+    ErrorBuffer *ebuf = quiet ? NULL : &e->err;
+    const OptionDesc *desc = must_find_option(ebuf, name);
     if (!desc) {
-        return false;
+        return quiet;
     }
-    return do_set_option(e, desc, value, local, global);
+
+    return do_set_option(e, desc, value, local, global, quiet);
 }
 
-bool set_bool_option(EditorState *e, const char *name, bool local, bool global)
+bool set_bool_option(EditorState *e, const char *name, bool local, bool global, bool quiet)
 {
-    const OptionDesc *desc = must_find_option(&e->err, name);
+    ErrorBuffer *ebuf = quiet ? NULL : &e->err;
+    const OptionDesc *desc = must_find_option(ebuf, name);
     if (!desc) {
-        return false;
+        return quiet;
     }
+
     if (desc->type != OPT_BOOL) {
-        return error_msg(&e->err, "Option %s is not boolean", desc->name);
+        return quiet || error_msg(ebuf, "Option %s is not boolean", desc->name);
     }
-    return do_set_option(e, desc, "true", local, global);
+
+    return do_set_option(e, desc, "true", local, global, quiet);
 }
 
 static const OptionDesc *find_toggle_option(ErrorBuffer *ebuf, const char *name, bool *global)

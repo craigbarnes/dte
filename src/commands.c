@@ -2153,9 +2153,11 @@ static bool cmd_set(EditorState *e, const CommandArgs *a)
 {
     bool global = has_flag(a, 'g');
     bool local = has_flag(a, 'l');
+    bool quiet = has_flag(a, 'q');
+
     if (!e->buffer) {
         if (unlikely(local)) {
-            return error_msg(&e->err, "Flag -l makes no sense in config file");
+            return quiet || error_msg(&e->err, "Flag -l makes no sense in config files");
         }
         global = true;
     }
@@ -2163,19 +2165,22 @@ static bool cmd_set(EditorState *e, const CommandArgs *a)
     char **args = a->args;
     size_t count = a->nr_args;
     if (count == 1) {
-        return set_bool_option(e, args[0], local, global);
+        bool ok = set_bool_option(e, args[0], local, global, quiet);
+        WARN_ON(quiet && !ok);
+        return ok;
     }
     if (count & 1) {
-        return error_msg(&e->err, "One or even number of arguments expected");
+        return quiet || error_msg(&e->err, "One or even number of arguments expected");
     }
 
     size_t errors = 0;
     for (size_t i = 0; i < count; i += 2) {
-        if (!set_option(e, args[i], args[i + 1], local, global)) {
+        if (!set_option(e, args[i], args[i + 1], local, global, quiet)) {
             errors++;
         }
     }
 
+    WARN_ON(quiet && errors);
     return !errors;
 }
 
@@ -2685,7 +2690,7 @@ static const Command cmds[] = {
     {"search", "Haceilnprswx", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},
     {"select-block", "", NA, 0, 0, cmd_select_block},
-    {"set", "gl", RC, 1, -1, cmd_set},
+    {"set", "glq", RC, 1, -1, cmd_set},
     {"setenv", "", RC, 1, 2, cmd_setenv},
     {"show", "c", NA, 0, 2, cmd_show},
     {"suspend", "", NA, 0, 0, cmd_suspend},
