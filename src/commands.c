@@ -2812,10 +2812,10 @@ bool handle_normal_command(EditorState *e, const char *cmd, bool allow_recording
     return handle_command(&runner, cmd);
 }
 
-void exec_normal_config(EditorState *e, StringView config)
+bool exec_normal_config(EditorState *e, StringView config)
 {
     CommandRunner runner = normal_mode_cmdrunner(e);
-    exec_config(&runner, config);
+    return exec_config(&runner, config);
 }
 
 SystemErrno read_normal_config(EditorState *e, const char *filename, ConfigFlags flags)

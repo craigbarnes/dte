@@ -70,6 +70,7 @@ static inline int command_cmp(const void *key, const void *elem)
     return strcmp(name, cmd->name);
 }
 
+NONNULL_ARGS
 static inline bool command_func_call (
     struct EditorState *e,
     ErrorBuffer *ebuf,
