@@ -560,7 +560,6 @@ UNITTEST {
     static_assert(offsetof(CommonOptions, syntax) == offsetof(LocalOptions, syntax));
     GlobalOptions gopts = {.tab_bar = true};
     LocalOptions lopts = {.filetype = NULL};
-    ErrorBuffer ebuf = {.print_to_stderr = false};
 
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
@@ -608,7 +607,7 @@ UNITTEST {
             const char *str = flag_string(desc, val);
             BUG_ON(!str);
             BUG_ON(str[0] == '\0');
-            if (!flag_parse(desc, &ebuf, str, &val)) {
+            if (!flag_parse(desc, NULL, str, &val)) {
                 BUG("flag_parse() failed for string: %s", str);
             }
             unsigned int mask = (1u << nvals) - 1;
@@ -886,7 +885,7 @@ bool validate_local_options(ErrorBuffer *ebuf, char **strs)
 }
 
 #if DEBUG_ASSERTIONS_ENABLED
-static void sanity_check_option_value(const OptionDesc *desc, ErrorBuffer *ebuf, OptionValue val)
+static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
 {
     // NOLINTBEGIN(bugprone-assert-side-effect)
     switch (desc->type) {
@@ -894,7 +893,7 @@ static void sanity_check_option_value(const OptionDesc *desc, ErrorBuffer *ebuf,
         BUG_ON(!val.str_val);
         BUG_ON(val.str_val != str_intern(val.str_val));
         if (desc->u.str_opt.validate) {
-            BUG_ON(!desc->u.str_opt.validate(ebuf, val.str_val));
+            BUG_ON(!desc->u.str_opt.validate(NULL, val.str_val));
         }
         return;
     case OPT_UINT:
@@ -926,26 +925,26 @@ static void sanity_check_option_value(const OptionDesc *desc, ErrorBuffer *ebuf,
     BUG("unhandled option type");
 }
 
-static void sanity_check_options(ErrorBuffer *ebuf, const void *opts, bool global)
+static void sanity_check_options(const void *opts, bool global)
 {
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         BUG_ON(desc->type >= ARRAYLEN(option_ops));
         if ((desc->global && desc->local) || global == desc->global) {
             OptionValue val = desc_get(desc, (char*)opts + desc->offset);
-            sanity_check_option_value(desc, ebuf, val);
+            sanity_check_option_value(desc, val);
         }
     }
 }
 
-void sanity_check_global_options(ErrorBuffer *ebuf, const GlobalOptions *gopts)
+void sanity_check_global_options(const GlobalOptions *gopts)
 {
-    sanity_check_options(ebuf, gopts, true);
+    sanity_check_options(gopts, true);
 }
 
-void sanity_check_local_options(ErrorBuffer *ebuf, const LocalOptions *lopts)
+void sanity_check_local_options(const LocalOptions *lopts)
 {
-    sanity_check_options(ebuf, lopts, false);
+    sanity_check_options(lopts, false);
 }
 #endif
 

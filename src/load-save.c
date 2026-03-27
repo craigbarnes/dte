@@ -395,7 +395,6 @@ static int tmp_file (
 bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ctx)
 {
     ErrorBuffer *ebuf = ctx->ebuf;
-    BUG_ON(!ebuf);
     BUG_ON(!ctx->encoding);
     char tmp[8192];
     tmp[0] = '\0';

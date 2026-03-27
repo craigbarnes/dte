@@ -146,7 +146,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
         }
     };
 
-    sanity_check_global_options(&e->err, &e->options);
+    sanity_check_global_options(&e->options);
 
     pid_t pid = getpid();
     bool leader = pid == getsid(0);

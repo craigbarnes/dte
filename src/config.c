@@ -50,6 +50,9 @@ bool exec_config(CommandRunner *runner, StringView config)
 {
     EditorState *e = runner->e;
     ErrorBuffer *ebuf = runner->ebuf;
+    BUG_ON(!e);
+    BUG_ON(!ebuf);
+
     if (unlikely(e->include_recursion_count > 64)) {
         return error_msg_for_cmd(ebuf, NULL, "config recursion limit reached");
     }
@@ -130,6 +133,7 @@ static SystemErrno do_read_config (
     ErrorBuffer *ebuf = runner->ebuf;
     bool must_exist = flags & CFG_MUST_EXIST;
     bool stop_at_first_err = runner->flags & CMDRUNNER_STOP_AT_FIRST_ERROR;
+    BUG_ON(!ebuf);
 
     if (flags & CFG_BUILTIN) {
         const BuiltinConfig *cfg = get_builtin_config(filename);

@@ -111,11 +111,11 @@ String dump_options(GlobalOptions *gopts, LocalOptions *lopts);
 const char *get_option_value_string(struct EditorState *e, const char *name);
 
 #if DEBUG_ASSERTIONS_ENABLED
-    void sanity_check_global_options(ErrorBuffer *ebuf, const GlobalOptions *opts);
-    void sanity_check_local_options(ErrorBuffer *ebuf, const LocalOptions *lopts);
+    void sanity_check_global_options(const GlobalOptions *opts);
+    void sanity_check_local_options(const LocalOptions *lopts);
 #else
-    static inline void sanity_check_global_options(ErrorBuffer* UNUSED_ARG(ebuf), const GlobalOptions* UNUSED_ARG(gopts)) {}
-    static inline void sanity_check_local_options(ErrorBuffer* UNUSED_ARG(ebuf), const LocalOptions* UNUSED_ARG(lopts)) {}
+    static inline void sanity_check_global_options(const GlobalOptions* UNUSED_ARG(gopts)) {}
+    static inline void sanity_check_local_options(const LocalOptions* UNUSED_ARG(lopts)) {}
 #endif
 
 #endif

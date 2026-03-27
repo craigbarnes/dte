@@ -240,7 +240,6 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageList *msgs, boo
 {
     BUG_ON(!ctx->argv);
     BUG_ON(!ctx->argv[0]);
-    BUG_ON(!ctx->ebuf);
 
     int fd[3];
     fd[IN] = open_dev_null(ctx->ebuf, O_RDONLY);
@@ -315,7 +314,6 @@ int spawn(SpawnContext *ctx)
 {
     BUG_ON(!ctx->argv);
     BUG_ON(!ctx->argv[0]);
-    BUG_ON(!ctx->ebuf);
 
     int child_fds[3] = {-1, -1, -1};
     int parent_fds[3] = {-1, -1, -1};

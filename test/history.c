@@ -109,10 +109,9 @@ static void test_history_append(TestContext *ctx)
 
 static void test_history_search(TestContext *ctx)
 {
-    ErrorBuffer ebuf = {.print_to_stderr = false};
     const char *filename = "test/data/history";
     History h = {.max_entries = 64};
-    history_load(&h, &ebuf, xstrdup(filename), 4096);
+    history_load(&h, NULL, xstrdup(filename), 4096);
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.filename, filename);
     ASSERT_NONNULL(h.first);
@@ -150,7 +149,7 @@ static void test_history_search(TestContext *ctx)
     free(h.filename);
     filename = "build/test/saved_history";
     h.filename = xstrdup(filename);
-    history_save(&h, &ebuf);
+    history_save(&h, NULL);
     history_free(&h);
     char *buf = NULL;
     ssize_t n = read_file(filename, &buf, 4096);
@@ -177,10 +176,9 @@ static void test_history_tombstones(TestContext *ctx)
 
 static void test_file_history_find(TestContext *ctx)
 {
-    ErrorBuffer ebuf = {.print_to_stderr = false};
     const char fh_filename[] = "test/data/file-history";
     FileHistory h = {.filename = NULL};
-    file_history_load(&h, &ebuf, xstrdup(fh_filename), 4096);
+    file_history_load(&h, NULL, xstrdup(fh_filename), 4096);
     EXPECT_STREQ(h.filename, fh_filename);
     EXPECT_EQ(h.entries.count, 3);
 

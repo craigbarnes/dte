@@ -17,10 +17,13 @@ static bool run_commands(CommandRunner *runner, const PointerArray *array);
 static bool run_command(CommandRunner *runner, char **av)
 {
     const CommandSet *cmds = runner->cmds;
-    const Command *cmd = cmds->lookup(av[0]);
     struct EditorState *e = runner->e;
     ErrorBuffer *ebuf = runner->ebuf;
+    BUG_ON(!cmds);
+    BUG_ON(!e);
+    BUG_ON(!ebuf);
 
+    const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
         const char *name = av[0];
         if (!runner->lookup_alias) {
