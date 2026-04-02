@@ -99,7 +99,7 @@ page, unless you're prepared to deal with future checksum failures.
 
 [`GNUmakefile`]: ../GNUmakefile
 [syntax highlighters]: ../config/syntax
-[desktop entry]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
+[desktop entry]: https://specifications.freedesktop.org/desktop-entry/latest/
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [bash]: https://www.gnu.org/software/bash/
 [fish]: https://fishshell.com

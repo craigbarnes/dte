@@ -183,14 +183,14 @@ Public License version 2 for more details.
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
 [FreeBSD]: https://cgit.freebsd.org/ports/tree/editors/dte
 [DPorts]: https://github.com/DragonFlyBSD/DPorts/tree/master/editors/dte
-[OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
+[OpenBSD]: https://cvsweb.openbsd.org/ports/editors/dte
 [pkgsrc]: https://cdn.netbsd.org/pub/pkgsrc/current/pkgsrc/editors/dte/index.html
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
 
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [release]: https://craigbarnes.gitlab.io/dte/releases.html
-[desktop entry]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
+[desktop entry]: https://specifications.freedesktop.org/desktop-entry/latest/
 [`make install-full`]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/packaging.md#installation-targets
 [`brew`]: https://brew.sh/
 [Contributor guidelines]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md

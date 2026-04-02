@@ -151,7 +151,7 @@ Unreleased
   now the standard way to reduce (instead of increase) the indentation
   level. The `count` argument is also now optional and defaults to `1`.
   What was previously `shift -- -1` can now be done as just `indent -r`.
-  This isn't listed as a "breaking change" since old style negative
+  This isn't listed as a "breaking change" since old style, negative
   `count` arguments are still supported and there's a built-in `shift`
   alias for backwards compatibility.
 
