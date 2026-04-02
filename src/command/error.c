@@ -66,7 +66,7 @@ bool error_msg_for_cmd(ErrorBuffer *eb, const char *cmd, const char *format, ...
 
 bool error_msg_errno(ErrorBuffer *eb, const char *prefix)
 {
-    return error_msg(eb, "%s: %s", prefix, strerror(errno));
+    return eb ? error_msg(eb, "%s: %s", prefix, strerror(errno)) : false;
 }
 
 bool info_msg(ErrorBuffer *eb, const char *format, ...)

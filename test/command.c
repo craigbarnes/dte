@@ -2,6 +2,7 @@
 #include "command/alias.h"
 #include "command/args.h"
 #include "command/cache.h"
+#include "command/error.h"
 #include "command/parse.h"
 #include "command/run.h"
 #include "command/serialize.h"
@@ -12,6 +13,38 @@
 #include "util/path.h"
 #include "util/str-util.h"
 #include "version.h"
+
+static void test_error_msg(TestContext *ctx)
+{
+    // Ensure NULL ErrorBuffer parameters are tolerated.
+    // See commits:
+    // • eb930a48d3bce4dc31dec864f61f75bf5e208d95
+    // • 430c91a99ea84ff215210ada45258234c8c21bb1
+    EXPECT_FALSE(error_msg(NULL, "%d", 1));
+    EXPECT_FALSE(error_msg_errno(NULL, "fn"));
+    EXPECT_FALSE(error_msg_for_cmd(NULL, "example", "%d", 2));
+    EXPECT_TRUE(info_msg(NULL, "%d", 3));
+
+    ErrorBuffer eb = {.print_to_stderr = false};
+    EXPECT_FALSE(error_msg(&eb, "test #%d", 1));
+    EXPECT_STREQ(eb.buf, "test #1");
+    EXPECT_TRUE(eb.is_error);
+    EXPECT_EQ(eb.nr_errors, 1);
+
+    clear_error(&eb);
+    EXPECT_STREQ(eb.buf, "");
+    EXPECT_FALSE(error_msg_for_cmd(&eb, "CMD", "test #%d", 2));
+    EXPECT_STREQ(eb.buf, "CMD: test #2");
+    EXPECT_TRUE(eb.is_error);
+    EXPECT_EQ(eb.nr_errors, 2);
+
+    clear_error(&eb);
+    EXPECT_STREQ(eb.buf, "");
+    EXPECT_TRUE(info_msg(&eb, "test #%d", 3));
+    EXPECT_STREQ(eb.buf, "test #3");
+    EXPECT_FALSE(eb.is_error);
+    EXPECT_EQ(eb.nr_errors, 2);
+}
 
 static void test_parse_command_arg(TestContext *ctx)
 {
@@ -610,6 +643,7 @@ static void test_add_alias(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
+    TEST(test_error_msg),
     TEST(test_parse_command_arg),
     TEST(test_parse_commands),
     TEST(test_find_normal_command),
