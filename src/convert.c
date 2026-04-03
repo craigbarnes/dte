@@ -71,16 +71,13 @@ copy:
 
 static bool read_utf8_line(FileDecoder *dec, StringView *linep)
 {
-    size_t pos = dec->ipos;
     size_t len = dec->text.length;
-    BUG_ON(pos > len);
-    if (pos == len) {
+    if (dec->ipos >= len) {
+        BUG_ON(dec->ipos > len);
         return false;
     }
 
-    StringView line = get_delim(dec->text.data, &pos, len, '\n');
-    dec->ipos = pos;
-    *linep = line;
+    *linep = get_delim(dec->text.data, &dec->ipos, len, '\n');
     return true;
 }
 
