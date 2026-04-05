@@ -381,7 +381,7 @@ static void test_parse_args(TestContext *ctx)
     ASSERT_NONNULL(cmd);
     EXPECT_STREQ(cmd->name, "bind");
     EXPECT_EQ(cmd->max_args, 2);
-    EXPECT_EQ(cmd->flags[0], 'c');
+    EXPECT_EQ(cmd->flags[0], 'T');
 
     a = cmdargs_new((char**)array.ptrs + 1);
     a.flags[0] = 'X';

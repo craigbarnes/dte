@@ -2623,7 +2623,7 @@ enum {
 
 static const Command cmds[] = {
     {"alias", "", RC | NFAA, 1, 2, cmd_alias},
-    {"bind", "cnqsT=", RC | NFAA, 1, 2, cmd_bind},
+    {"bind", "T=cnqs", RC | NFAA, 1, 2, cmd_bind},
     {"blkdown", "cl", NA, 0, 0, cmd_blkdown},
     {"blkup", "cl", NA, 0, 0, cmd_blkup},
     {"bof", "cl", NA, 0, 0, cmd_bof},
