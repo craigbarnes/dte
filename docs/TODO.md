@@ -95,6 +95,8 @@ Features
     the "scissors" line, but treating the subject and message body as
     Markdown (perhaps a restricted subset for the subject line)
 
+* Highlight text in command mode, using the [`dte` syntax highlighter]
+
 * Extend the [`dte-syntax(5)`] command set, so as to provide a proper
   solution for handling e.g. [ambiguous regexp literals in Ruby][]
   (most likely some form of backtracking)
@@ -314,6 +316,10 @@ Code Quality/Efficiency Improvements
 * Compress large undo history (`Change`) entries, e.g. those created
   when an [`exec`] command rewrites the entire buffer (see also: [#142])
 
+* Allow resetting undo history for a `Buffer`, so that the `undo` command
+  in e.g. `open -t; pipe-from git blame $FILE; clear-undo-history; undo`
+  does nothing instead of blanking the buffer
+
 * Cache EditorConfig properties in memory, so that each `.editorconfig`
   file is read only once per session (see also: [#105])
 
@@ -423,6 +429,7 @@ Testing/Debugging
 [fish]: https://fishshell.com/
 [Slint]: https://docs.slint.dev/latest/docs/slint/guide/language/concepts/slint-language/
 [ambiguous regexp literals in Ruby]: https://stackoverflow.com/questions/38333687/what-is-ambiguous-regexp-literal-in-rubocop
+[`dte` syntax highlighter]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/syntax/dte
 [Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
