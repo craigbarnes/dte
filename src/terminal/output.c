@@ -568,7 +568,7 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
     return true;
 }
 
-static size_t set_color_suffix(char *buf, int32_t color)
+static size_t color_to_sgr_param_suffix(char *buf, int32_t color)
 {
     BUG_ON(color < 0);
     if (likely(color < 16)) {
@@ -591,7 +591,7 @@ static size_t set_color_suffix(char *buf, int32_t color)
     return i;
 }
 
-static size_t set_fg_color(char *buf, int32_t color)
+static size_t fg_color_to_sgr_param(char *buf, int32_t color)
 {
     if (color < 0) {
         return 0;
@@ -600,10 +600,10 @@ static size_t set_fg_color(char *buf, int32_t color)
     bool light = (color >= 8 && color <= 15);
     buf[0] = ';';
     buf[1] = light ? '9' : '3';
-    return 2 + set_color_suffix(buf + 2, color);
+    return 2 + color_to_sgr_param_suffix(buf + 2, color);
 }
 
-static size_t set_bg_color(char *buf, int32_t color)
+static size_t bg_color_to_sgr_param(char *buf, int32_t color)
 {
     if (color < 0) {
         return 0;
@@ -614,7 +614,7 @@ static size_t set_bg_color(char *buf, int32_t color)
     buf[1] = light ? '1' : '4';
     buf[2] = '0';
     size_t i = light ? 3 : 2;
-    return i + set_color_suffix(buf + i, color);
+    return i + color_to_sgr_param_suffix(buf + i, color);
 }
 
 static int32_t color_normalize(int32_t color)
@@ -675,8 +675,8 @@ void term_set_style(Terminal *term, TermStyle style)
         }
     }
 
-    pos += set_fg_color(buf + pos, style.fg);
-    pos += set_bg_color(buf + pos, style.bg);
+    pos += fg_color_to_sgr_param(buf + pos, style.fg);
+    pos += bg_color_to_sgr_param(buf + pos, style.bg);
     buf[pos++] = 'm';
     BUG_ON(pos > maxlen);
     term->obuf.count += pos;
