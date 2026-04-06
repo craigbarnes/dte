@@ -11,8 +11,9 @@ static COLD void string_grow(String *s, size_t min_alloc)
 {
     size_t alloc = s->alloc;
     while (alloc < min_alloc) {
-        alloc = ((alloc * 3) + 2) / 2;
+        alloc = xadd(2, xmul(3, alloc)) / 2;
     }
+
     alloc = next_multiple(alloc, 16);
     s->alloc = alloc;
     s->buffer = xrealloc(s->buffer, alloc);

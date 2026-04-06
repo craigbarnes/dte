@@ -145,7 +145,8 @@ static inline unsigned int u64_clz(uint64_t x)
     return u64_popcount(~x);
 }
 
-// Round x up to a multiple of r (which *must* be a power of 2)
+// Round x up to a multiple of r (which *must* be a power of 2),
+// or return 0 if `x + r` overflows
 static inline size_t next_multiple(size_t x, size_t r)
 DIAGNOSE_IF(!IS_POWER_OF_2(r))
 {
