@@ -3615,20 +3615,37 @@ static void test_mem_intern(TestContext *ctx)
 {
     const char *ptrs[256];
     char str[8];
+
     for (unsigned int i = 0; i < ARRAYLEN(ptrs); i++) {
         size_t len = buf_uint_to_str(i, str);
         ptrs[i] = mem_intern(str, len);
     }
 
+    // Note that hashset_insert() (and thus also mem_intern()) always
+    // null-terminates, even if there was no '\0' within the length bound
     EXPECT_STREQ(ptrs[0], "0");
     EXPECT_STREQ(ptrs[1], "1");
     EXPECT_STREQ(ptrs[101], "101");
     EXPECT_STREQ(ptrs[255], "255");
 
+    EXPECT_FALSE(mem_is_intern(NULL, 0));
+    EXPECT_FALSE(str_is_intern(NULL));
+    EXPECT_FALSE(str_is_intern("1"));
+    EXPECT_TRUE(str_is_intern(ptrs[1]));
+
     for (unsigned int i = 0; i < ARRAYLEN(ptrs); i++) {
         size_t len = buf_uint_to_str(i, str);
-        const char *ptr = mem_intern(str, len);
-        EXPECT_PTREQ(ptr, ptrs[i]);
+        const char *intern = mem_intern(str, len);
+        ASSERT_NONNULL(intern);
+        EXPECT_PTREQ(intern, ptrs[i]);
+        EXPECT_PTREQ(intern, mem_intern(intern, len));
+        EXPECT_PTREQ(intern, str_intern(intern));
+        EXPECT_TRUE(interned_strings_equal(intern, ptrs[i]));
+
+        EXPECT_TRUE(mem_is_intern(intern, len));
+        EXPECT_TRUE(str_is_intern(intern));
+        EXPECT_FALSE(mem_is_intern(str, len));
+        EXPECT_FALSE(str_is_intern(str));
     }
 }
 

@@ -7,7 +7,8 @@
 #include "macros.h"
 #include "string-view.h"
 
-const void *mem_intern(const void *data, size_t len) NONNULL_ARGS_AND_RETURN;
+const void *mem_intern(const void *data, size_t len) NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT;
+bool mem_is_intern(const void *data, size_t len) WARN_UNUSED_RESULT;
 void free_interned_strings(void);
 
 static inline const char *str_intern(const char *str)
@@ -19,6 +20,11 @@ static inline StringView strview_intern(const char *str)
 {
     size_t len = strlen(str);
     return string_view(mem_intern(str, len), len);
+}
+
+static inline bool str_is_intern(const char *str)
+{
+    return str && mem_is_intern(str, strlen(str));
 }
 
 // Test 2 interned strings for equality, via pointer equality. This

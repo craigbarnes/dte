@@ -14,6 +14,12 @@ const void *mem_intern(const void *data, size_t len)
     return e->str;
 }
 
+bool mem_is_intern(const void *data, size_t len)
+{
+    const HashSetEntry *entry = hashset_get(&interned_strings, data, len);
+    return entry && entry->str == data;
+}
+
 void free_interned_strings(void)
 {
     hashset_free(&interned_strings);
