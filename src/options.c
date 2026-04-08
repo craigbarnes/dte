@@ -913,8 +913,11 @@ static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
         }
         return;
     case OPT_REGEX:
-        BUG_ON(val.str_val && val.str_val[0] == '\0');
-        BUG_ON(val.str_val && !regexp_is_interned(val.str_val));
+        if (val.str_val) {
+            const InternedRegexp *ir = regexp_intern(NULL, val.str_val);
+            BUG_ON(!ir);
+            BUG_ON(ir->str != val.str_val);
+        }
         return;
     case OPT_BOOL:
     case OPT_FILESIZE:

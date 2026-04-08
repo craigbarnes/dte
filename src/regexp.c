@@ -153,6 +153,9 @@ const InternedRegexp *regexp_intern(ErrorBuffer *ebuf, const char *pattern)
 
 bool regexp_is_interned(const char *pattern)
 {
+    // Note that this only checks that an entry matching `pattern`
+    // exists and NOT for pointer equality between `pattern` and
+    // the corresponding `InternedRegexp::str`
     return !!hashmap_find(&interned_regexps, pattern);
 }
 
