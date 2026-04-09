@@ -480,6 +480,7 @@
 
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html (since GCC 4.3)
 // https://clang.llvm.org/docs/LanguageExtensions.html#builtin-macros
+// https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3457.htm (C2Y proposal)
 #ifdef __COUNTER__
     #define COUNTER __COUNTER__
 #else
