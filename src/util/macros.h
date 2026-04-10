@@ -288,35 +288,35 @@
 
 // Indicates that objects of a given struct type must use designated
 // initializers (i.e. never positional initializers).
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Type-Attributes.html#index-designated_005finit-type-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-designated_005finit
 #if HAS_ATTRIBUTE(designated_init)
     #define DESIGNATED_INIT __attribute__((__designated_init__))
 #else
     #define DESIGNATED_INIT
 #endif
 
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-nonstring-variable-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-nonstring
 #if HAS_ATTRIBUTE(nonstring)
     #define NONSTRING __attribute__((__nonstring__))
 #else
     #define NONSTRING
 #endif
 
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-nonnull_005fif_005fnonzero-function-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-nonnull_005fif_005fnonzero
 #if HAS_ATTRIBUTE(nonnull_if_nonzero)
     #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx) __attribute__((__nonnull_if_nonzero__(arg_idx, len_idx)))
 #else
     #define NONNULL_ARG_IF_NONZERO_LENGTH(arg_idx, len_idx)
 #endif
 
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-null_005fterminated_005fstring_005farg-function-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-null_005fterminated_005fstring_005farg
 #if HAS_ATTRIBUTE(null_terminated_string_arg)
     #define CSTR_ARG(idx) __attribute__((__null_terminated_string_arg__(idx)))
 #else
     #define CSTR_ARG(idx)
 #endif
 
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-counted_005fby
 // https://clang.llvm.org/docs/AttributeReference.html#counted-by-counted-by-or-null-sized-by-sized-by-or-null
 #if HAS_ATTRIBUTE(counted_by)
     // NOTE: DO NOT use this unless the array it's attached to is STRICTLY
@@ -329,7 +329,7 @@
     #define COUNTED_BY(member)
 #endif
 
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-no_005fsanitize-function-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-no_005fsanitize-function-attribute
 // https://clang.llvm.org/docs/AttributeReference.html#no-sanitize
 #if HAS_ATTRIBUTE(no_sanitize)
     #define NO_SANITIZE(...) __attribute__((no_sanitize(__VA_ARGS__)))
@@ -345,7 +345,7 @@
     #define DIAGNOSE_IF(x)
 #endif
 
-// https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-access-function-attribute
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-access
 #if HAS_ATTRIBUTE(access)
     #define READONLY(...) __attribute__((__access__(read_only, __VA_ARGS__))) // in param
     #define WRITEONLY(...) __attribute__((__access__(write_only, __VA_ARGS__))) // out param
