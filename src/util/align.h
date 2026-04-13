@@ -16,10 +16,9 @@ union MaxAlign {
 #if __STDC_VERSION__ >= 201112L
     // ISO C11 §6.7.5, §7.19
     #define MAXALIGN ALIGNAS(max_align_t)
-#elif GNUC_AT_LEAST(4, 4) || (HAS_ATTRIBUTE(aligned) && defined(__BIGGEST_ALIGNMENT__))
-    // https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-aligned
-    // https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Variable-Attributes.html
-    #define MAXALIGN __attribute__((__aligned__(__BIGGEST_ALIGNMENT__)))
+#elif defined(HAS_ATTR_ALIGNED) && defined(__BIGGEST_ALIGNMENT__)
+    // https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Variable-Attributes.html#:~:text=__BIGGEST_ALIGNMENT__
+    #define MAXALIGN ALIGNED(__BIGGEST_ALIGNMENT__)
 #else
     #define MAXALIGN ALIGNAS(union MaxAlign)
 #endif

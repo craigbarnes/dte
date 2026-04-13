@@ -140,14 +140,23 @@
     #define UNUSED
 #endif
 
+// https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-aligned
+// https://gcc.gnu.org/onlinedocs/gcc-3.0.4/gcc_5.html#SEC101
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned) || defined(__TINYC__)
+    #define ALIGNED(alignment) __attribute__((__aligned__(alignment)))
+    #define HAS_ATTR_ALIGNED 1
+#else
+    // Since this falls back to a no-op, it should only be used for
+    // optimization purposes (not relied upon as a hard requirement)
+    #define ALIGNED(alignment)
+#endif
+
 #if __STDC_VERSION__ >= 202311L
     #define ALIGNAS(type) alignas(type)
 #elif __STDC_VERSION__ >= 201112L
     #define ALIGNAS(type) _Alignas(type)
-#elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned) || defined(__TINYC__)
-    #define ALIGNAS(type) __attribute__((__aligned__(ALIGNOF(type))))
-#else
-    #define ALIGNAS(type)
+#else // See the comment above ALIGNED()
+    #define ALIGNAS(type) ALIGNED(ALIGNOF(type))
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(malloc)
