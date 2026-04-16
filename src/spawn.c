@@ -89,6 +89,7 @@ static void read_errors(const Compiler *c, MessageList *msgs, int fd, bool quiet
     if (unlikely(!f)) {
         return;
     }
+
     char line[4096];
     while (xfgets(line, sizeof(line), f)) {
         if (!quiet) {
@@ -96,6 +97,7 @@ static void read_errors(const Compiler *c, MessageList *msgs, int fd, bool quiet
         }
         handle_error_msg(c, msgs, line);
     }
+
     fclose(f);
 }
 

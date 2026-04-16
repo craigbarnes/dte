@@ -205,8 +205,7 @@ void collect_hl_styles(EditorState *e, PointerArray *a, const char *prefix)
     // Copy and null-terminate the filetype part of `prefix` (before the dot)
     char filetype[FILETYPE_NAME_MAX + 1];
     size_t ftlen = dot - prefix;
-    memcpy(filetype, prefix, ftlen);
-    filetype[ftlen] = '\0';
+    xmempcpy2(filetype, prefix, ftlen, "", 1);
 
     // Find or load the Syntax for `filetype`
     const Syntax *syn = find_syntax(&e->syntaxes, filetype);

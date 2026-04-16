@@ -7,6 +7,7 @@
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/xmalloc.h"
+#include "util/xstring.h"
 
 static void free_message(Message *m)
 {
@@ -20,10 +21,7 @@ Message *new_message(const char *msg, size_t len)
 {
     Message *m = xmalloc(xadd3(sizeof(*m), len, 1));
     m->loc = NULL;
-    if (len) {
-        memcpy(m->msg, msg, len);
-    }
-    m->msg[len] = '\0';
+    xmempcpy2(m->msg, msg, len, "", 1);
     return m;
 }
 
