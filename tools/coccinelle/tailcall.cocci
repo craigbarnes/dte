@@ -20,7 +20,7 @@ func(...)
 }
 
 @@
-identifier func;
+identifier func != exec_builtin_config;
 identifier tail != {string_reserve_space, obuf_reserve_space};
 expression lhs, rhs, a1, a2;
 @@
