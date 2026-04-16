@@ -2653,7 +2653,7 @@ static const Command cmds[] = {
     {"erase-bol", "", NA, 0, 0, cmd_erase_bol},
     {"erase-word", "s", NA, 0, 0, cmd_erase_word},
     {"errorfmt", "ci", RC, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
-    {"exec", "e=i=o=lmnpst", NFAA, 1, -1, cmd_exec},
+    {"exec", "e=i=lmno=pst", NFAA, 1, -1, cmd_exec},
     {"ft", "bcfi", RC | NFAA, 2, -1, cmd_ft},
     {"hi", "cq", RC | NFAA, 0, -1, cmd_hi},
     {"include", "bq", RC, 1, 1, cmd_include},
@@ -2832,24 +2832,48 @@ void collect_normal_commands(PointerArray *a, const char *prefix)
 UNITTEST {
     CHECK_BSEARCH_ARRAY(cmds, name);
 
+    if (!DEBUG_ASSERTIONS_ENABLED) {
+        return;
+    }
+
     for (size_t i = 0, n = ARRAYLEN(cmds); i < n; i++) {
         // Check that flags array is null-terminated within bounds
-        const char *const flags = cmds[i].flags;
+        const char *name = cmds[i].name;
+        const char *flags = cmds[i].flags;
+        BUG_ON(name[0] == '\0');
+        BUG_ON(name[ARRAYLEN(cmds[0].name) - 1] != '\0');
         BUG_ON(flags[ARRAYLEN(cmds[0].flags) - 1] != '\0');
 
-        // Count number of real flags (i.e. not including '=')
+        unsigned char prev_flag = 0;
         size_t nr_real_flags = 0;
+
         for (size_t j = 0; flags[j]; j++) {
             unsigned char flag = flags[j];
-            if (ascii_isalnum(flag)) {
-                nr_real_flags++;
-            } else if (flag != '=') {
+            if (flag == '=') {
+                if (j && flags[j - 1] != '=') {
+                    continue;
+                }
+                BUG("invalid = in cmds[%zu].flags (%s): %s", i, name, flags);
+            }
+
+            if (!ascii_isalnum(flag)) {
                 BUG("invalid command flag: 0x%02hhX", flag);
             }
+
+            if (prev_flag >= flag) { // Using >= here also catches duplicate flags
+                BUG (
+                    "flags -%c and -%c not in sorted order for cmds[%zu] (%s): %s",
+                    flag, prev_flag, i, name, flags
+                );
+            }
+
+            nr_real_flags++;
+            prev_flag = flag;
         }
 
-        // Check that max. number of real flags fits in CommandArgs::flags
-        // array (and also leaves 1 byte for null-terminator)
+        // Check that the number of real flags (not including '=') fits
+        // in the CommandArgs::flags array and leaves 1 byte for the
+        // null terminator
         CommandArgs a;
         BUG_ON(nr_real_flags >= ARRAYLEN(a.flags));
     }
