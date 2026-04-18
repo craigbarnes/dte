@@ -1031,13 +1031,6 @@ static void test_get_delim_str(TestContext *ctx)
     EXPECT_EQ(iters, 9);
 }
 
-static void test_str_replace_byte(TestContext *ctx)
-{
-    char str[] = " a b c  d e  f g ";
-    EXPECT_EQ(str_replace_byte(str, ' ', '-'), strlen(str));
-    EXPECT_STREQ(str, "-a-b-c--d-e--f-g-");
-}
-
 static void test_strn_replace_byte(TestContext *ctx)
 {
     static const char expected[] = "||a|b|c||\n\0\0|d|e|f|||\0g|h||\0\0";
@@ -3949,7 +3942,6 @@ static const TestEntry tests[] = {
     TEST(test_strview_remove_matching),
     TEST(test_get_delim),
     TEST(test_get_delim_str),
-    TEST(test_str_replace_byte),
     TEST(test_strn_replace_byte),
     TEST(test_string_array_concat),
     TEST(test_size_str_width),

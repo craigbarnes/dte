@@ -10,6 +10,7 @@
 #include "util/debug.h"
 #include "util/fd.h"
 #include "util/fork-exec.h"
+#include "util/log.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -22,13 +23,17 @@ enum {
     ERR = STDERR_FILENO,
 };
 
-static void handle_error_msg(const Compiler *c, MessageList *msgs, char *str)
-{
-    if (str[0] == '\0' || str[0] == '\n') {
+static void handle_error_msg (
+    const Compiler *c,
+    MessageList *msgs,
+    char *str,
+    size_t str_len
+) {
+    if (str_len == 0 || str[0] == '\n') {
         return;
     }
 
-    size_t str_len = str_replace_byte(str, '\t', ' ');
+    strn_replace_byte(str, str_len, '\t', ' ');
     if (str[str_len - 1] == '\n') {
         str[--str_len] = '\0';
     }
@@ -90,12 +95,20 @@ static void read_errors(const Compiler *c, MessageList *msgs, int fd, bool quiet
         return;
     }
 
+    // TODO: Use POSIX 2008 getline(3) instead of xfgets()
     char line[4096];
     while (xfgets(line, sizeof(line), f)) {
+        size_t line_len = strlen(line);
         if (!quiet) {
-            xfputs(line, stderr);
+            size_t bytes_written = xfwrite_all(line, line_len, stderr);
+            if (unlikely(bytes_written != line_len)) {
+                // This can happen even when just interrupting the child,
+                // e.g. with `compile gcc make` followed by Ctrl+C
+                LOG_ERRNO("fwrite() failed; setting quiet=true");
+                quiet = true; // Don't try to write any more lines
+            }
         }
-        handle_error_msg(c, msgs, line);
+        handle_error_msg(c, msgs, line, line_len);
     }
 
     fclose(f);

@@ -67,9 +67,7 @@ static inline void string_append_strview(String *s, StringView sv)
 
 static inline void string_replace_byte(String *s, char byte, char rep)
 {
-    if (s->len) {
-        strn_replace_byte(s->buffer, s->len, byte, rep);
-    }
+    strn_replace_byte(s->buffer, s->len, byte, rep);
 }
 
 static inline StringView strview_from_string(const String *s)
