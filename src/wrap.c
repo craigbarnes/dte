@@ -102,13 +102,11 @@ static size_t paragraph_size(View *view)
 
 void wrap_paragraph(View *view, size_t text_width)
 {
-    size_t len;
     if (view->selection) {
         view->selection = SELECT_LINES;
-        len = prepare_selection(view);
-    } else {
-        len = paragraph_size(view);
     }
+
+    size_t len = view->selection ? prepare_selection(view) : paragraph_size(view);
     if (!len) {
         return;
     }
@@ -119,7 +117,7 @@ void wrap_paragraph(View *view, size_t text_width)
     size_t indent_width = get_indent_width(sv, options->tab_width);
 
     ParagraphFormatter pf = {
-        .buf = STRING_INIT, // TODO: Pre-allocate (based on len), to minimize reallocs
+        .buf = string_new(len + 64),
         .indent = make_indent(options, indent_width),
         .indent_width = indent_width,
         .cur_width = 0,
@@ -153,7 +151,9 @@ void wrap_paragraph(View *view, size_t text_width)
     if (pf.buf.len) {
         string_append_byte(&pf.buf, '\n');
     }
+
     buffer_replace_bytes(view, len, pf.buf.buffer, pf.buf.len);
+
     if (pf.buf.len) {
         block_iter_skip_bytes(&view->cursor, pf.buf.len - 1);
     }
