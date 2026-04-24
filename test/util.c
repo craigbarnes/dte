@@ -846,6 +846,27 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.alloc, 0);
 }
 
+static void test_string_next_alloc_size(TestContext *ctx)
+{
+    static const size_t expected_alloc_sizes[] = {
+        0, 16, 32, 64,
+        112, 176, 272, 416,
+        640, 976, 1472, 2224,
+        3344, 5024, 7552, 11344,
+        17024, 25552, 38336, 57520,
+    };
+
+    EXPECT_TRUE(IS_POWER_OF_2(STRING_ALLOC_MULTIPLE));
+    size_t remainder_mask = STRING_ALLOC_MULTIPLE - 1;
+
+    for (size_t i = 1, size = 0; i < ARRAYLEN(expected_alloc_sizes); i++) {
+        size_t expected = expected_alloc_sizes[i];
+        EXPECT_EQ(expected & remainder_mask, 0);
+        size = string_next_alloc_size(size, size + 1);
+        EXPECT_EQ(size, expected);
+    }
+}
+
 static void test_string_view(TestContext *ctx)
 {
     StringView sv = STRING_VIEW("testing");
@@ -3937,6 +3958,7 @@ static const TestEntry tests[] = {
     TEST(test_base64_encode_block),
     TEST(test_base64_encode_final),
     TEST(test_string),
+    TEST(test_string_next_alloc_size),
     TEST(test_string_view),
     TEST(test_strview_has_suffix),
     TEST(test_strview_remove_matching),

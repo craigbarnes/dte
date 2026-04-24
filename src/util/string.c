@@ -2,22 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
-#include "arith.h"
 #include "debug.h"
 #include "utf8.h"
 #include "xmalloc.h"
-
-static COLD void string_grow(String *s, size_t min_alloc)
-{
-    size_t alloc = s->alloc;
-    while (alloc < min_alloc) {
-        alloc = xadd(2, xmul(3, alloc)) / 2;
-    }
-
-    alloc = next_multiple(alloc, 16);
-    s->alloc = alloc;
-    s->buffer = xrealloc(s->buffer, alloc);
-}
 
 // Reserve `more` bytes of additional space and return a pointer to the
 // start of it, to allow writing directly to the buffer. Updating `s->len`
@@ -27,7 +14,8 @@ char *string_reserve_space(String *s, size_t more)
     BUG_ON(more == 0);
     size_t min_alloc = xadd(s->len, more);
     if (unlikely(s->alloc < min_alloc)) {
-        string_grow(s, min_alloc);
+        s->alloc = string_next_alloc_size(s->alloc, min_alloc);
+        s->buffer = xrealloc(s->buffer, s->alloc);
     }
     return s->buffer + s->len;
 }

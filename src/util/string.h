@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "arith.h"
 #include "bit.h"
 #include "macros.h"
 #include "str-util.h"
@@ -30,9 +31,23 @@ typedef struct {
 
 void string_append_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3);
 
-static inline String string_new(size_t size)
+static inline size_t string_size_round_up(size_t min_size)
 {
-    size = next_multiple(size, STRING_ALLOC_MULTIPLE);
+    size_t size = next_multiple(min_size, STRING_ALLOC_MULTIPLE);
+    return MAX(size, min_size); // See comment above next_multiple()
+}
+
+static inline size_t string_next_alloc_size(size_t alloc, size_t min_alloc)
+{
+    while (alloc < min_alloc) {
+        alloc = string_size_round_up(xadd3(alloc, alloc / 2, 1));
+    }
+    return alloc;
+}
+
+static inline String string_new(size_t min_size)
+{
+    size_t size = string_size_round_up(min_size);
     return (String) {
         .buffer = size ? xmalloc(size) : NULL,
         .alloc = size,
@@ -42,7 +57,7 @@ static inline String string_new(size_t size)
 
 static inline String string_new_from_buf(const char *buf, size_t len)
 {
-    size_t alloc = next_multiple(len, STRING_ALLOC_MULTIPLE);
+    size_t alloc = string_size_round_up(len);
     return (String) {
         .buffer = len ? memcpy(xmalloc(alloc), buf, len) : NULL,
         .alloc = alloc,
