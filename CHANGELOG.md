@@ -143,7 +143,7 @@ Unreleased
   buffer, e.g. with `exec -s -i word -o buffer tr a-z A-Z`
 * The [`filesize-limit`] option now accepts `KiB`, `MiB`, `GiB`, etc.
   suffixes and unsuffixed values are now interpreted as bytes instead
-  of `MiB`
+  of `MiB` (`0` is interpreted as "no limit")
 
 **Other Changes:**
 

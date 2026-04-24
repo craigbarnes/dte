@@ -97,6 +97,10 @@ Features
 
 * Highlight text in command mode, using the [`dte` syntax highlighter]
 
+* Add a command-line option for syntax highlighting a stream of text
+  from `stdin`, for use with tools like e.g. [`fzf --preview`][]
+  (see also: [#225])
+
 * Extend the [`dte-syntax(5)`] command set, so as to provide a proper
   solution for handling e.g. [ambiguous regexp literals in Ruby][]
   (most likely some form of backtracking)
@@ -419,6 +423,7 @@ Testing/Debugging
 [#202]: https://gitlab.com/craigbarnes/dte/-/issues/202
 [#203]: https://gitlab.com/craigbarnes/dte/-/issues/203
 [#220]: https://gitlab.com/craigbarnes/dte/-/issues/220
+[#225]: https://gitlab.com/craigbarnes/dte/-/issues/225
 [Utility Syntax Guideline 6]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02:~:text=Guideline%C2%A06
 [AtomicUndo]: https://github.com/vigna/ne/blob/7afc7f875a37fd475384393964f0d63837889a3d/doc/ne.texinfo#L3571-L3595
 [Typst]: https://typst.app/docs/reference/syntax/
@@ -430,6 +435,7 @@ Testing/Debugging
 [Slint]: https://docs.slint.dev/latest/docs/slint/guide/language/concepts/slint-language/
 [ambiguous regexp literals in Ruby]: https://stackoverflow.com/questions/38333687/what-is-ambiguous-regexp-literal-in-rubocop
 [`dte` syntax highlighter]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/syntax/dte
+[`fzf --preview`]: https://junegunn.github.io/fzf/getting-started/#real-time-preview-of-the-content
 [Unicode categories]: https://www.unicode.org/reports/tr44/#GC_Values_Table
 [EU's list of quotation marks]: https://op.europa.eu/en/web/eu-vocabularies/formex/physical-specifications/character-encoding/quotation-marks
 [`BidiBrackets.txt`]: https://www.unicode.org/reports/tr44/#BidiBrackets.txt
