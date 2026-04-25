@@ -137,6 +137,7 @@ static void test_find_ft_filename(TestContext *ctx)
         {".1234", NULL},
         {".12345", NULL},
         {".123456", NULL},
+        {".dot_zshrc", NULL},
         {".doa_", NULL},
         {"dot_", NULL},
         {"dot_z", NULL},

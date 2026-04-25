@@ -140,27 +140,21 @@ static const struct FileBasenameMap {
 
 static FileTypeEnum filetype_from_basename(StringView name)
 {
-    size_t dotprefix = 0;
-    if (strview_has_prefix(name, ".")) {
-        dotprefix = 1;
-    } else if (strview_has_prefix(name, "dot_")) {
-        dotprefix = 4;
-    }
-
-    strview_remove_prefix(&name, dotprefix);
+    bool dot = strview_remove_matching_prefix(&name, ".");
+    dot = dot || strview_remove_matching_prefix(&name, "dot_");
     if (name.length < 4) {
         return NONE;
     }
 
     if (name.length >= ARRAYLEN(basenames[0].name)) {
         if (strview_equal_cstring(name, "meson_options.txt")) {
-            return dotprefix ? NONE : MESON;
+            return dot ? NONE : MESON;
         } else if (strview_equal_cstring(name, "git-blame-ignore-revs")) {
-            return dotprefix ? CONFIG : NONE;
+            return dot ? CONFIG : NONE;
         }
         return NONE;
     }
 
     const struct FileBasenameMap *e = BSEARCH(&name, basenames, ft_compare);
-    return (e && (dotprefix == 0 || e->dotfile)) ? e->filetype : NONE;
+    return (e && (!dot || e->dotfile)) ? e->filetype : NONE;
 }
