@@ -101,7 +101,7 @@ size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
     if (unlikely(offset == bi->blk->size)) {
-        if (unlikely(bi->blk->node.next == bi->head)) {
+        if (unlikely(block_iter_is_last_block(bi))) {
             return 0;
         }
         bi->blk = BLOCK(bi->blk->node.next);
@@ -124,7 +124,7 @@ size_t block_iter_prev_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
     if (unlikely(offset == 0)) {
-        if (unlikely(bi->blk->node.prev == bi->head)) {
+        if (unlikely(block_iter_is_first_block(bi))) {
             return 0;
         }
         bi->blk = BLOCK(bi->blk->node.prev);

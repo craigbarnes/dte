@@ -35,9 +35,19 @@ static inline void block_iter_eof(BlockIter *bi)
     bi->offset = bi->blk->size;
 }
 
+static inline size_t block_iter_is_last_block(const BlockIter *bi)
+{
+    return bi->blk->node.next == bi->head;
+}
+
+static inline size_t block_iter_is_first_block(const BlockIter *bi)
+{
+    return bi->blk->node.prev == bi->head;
+}
+
 static inline bool block_iter_is_eof(const BlockIter *bi)
 {
-    return bi->offset == bi->blk->size && bi->blk->node.next == bi->head;
+    return bi->offset == bi->blk->size && block_iter_is_last_block(bi);
 }
 
 static inline bool block_iter_is_bol(const BlockIter *bi)
@@ -49,26 +59,19 @@ static inline bool block_iter_is_bol(const BlockIter *bi)
 static inline bool block_iter_is_eol(const BlockIter *bi)
 {
     const Block *blk = bi->blk;
-    size_t offset = bi->offset;
-    if (offset == blk->size) {
-        if (blk->node.next == bi->head) {
-            // EOF
-            return true;
-        }
-
-        // Normalize
-        blk = BLOCK(blk->node.next);
-        offset = 0;
+    if (bi->offset == blk->size) {
+        bool last = block_iter_is_last_block(bi);
+        return last || BLOCK(blk->node.next)->data[0] == '\n';
     }
 
-    return blk->data[offset] == '\n';
+    return blk->data[bi->offset] == '\n';
 }
 
 static inline void block_iter_normalize(BlockIter *bi)
 {
-    const Block *blk = bi->blk;
-    if (bi->offset == blk->size && blk->node.next != bi->head) {
-        bi->blk = BLOCK(blk->node.next);
+    BUG_ON(bi->offset > bi->blk->size);
+    if (bi->offset == bi->blk->size && !block_iter_is_last_block(bi)) {
+        bi->blk = BLOCK(bi->blk->node.next);
         bi->offset = 0;
     }
 }
