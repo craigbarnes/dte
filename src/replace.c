@@ -62,6 +62,11 @@ static unsigned int replace_on_line (
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
+    if (!line.data) {
+        BUG_ON(line.length);
+        line.data = "";
+    }
+
     const char *buf = line.data;
     View *view = e->view;
     char *alloc = NULL;
