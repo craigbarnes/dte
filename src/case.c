@@ -30,7 +30,7 @@ void change_case(View *view, char mode)
     }
 
     String dst = string_new(text_len);
-    char *src = block_iter_get_bytes(&view->cursor, text_len);
+    char *src = block_iter_get_bytes(view->cursor, text_len);
     size_t i = 0;
     switch (mode) {
     case 'l':

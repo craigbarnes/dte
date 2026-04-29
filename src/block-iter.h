@@ -114,7 +114,7 @@ void block_iter_goto_offset(BlockIter *bi, size_t offset) NONNULL_ARGS;
 void block_iter_goto_line(BlockIter *bi, size_t line) NONNULL_ARGS;
 size_t block_iter_get_offset(const BlockIter *bi) WARN_UNUSED_RESULT NONNULL_ARGS;
 size_t block_iter_get_char(const BlockIter *bi, CodePoint *up) WARN_UNUSED_RESULT NONNULL_ARGS READONLY(1) WRITEONLY(2);
-char *block_iter_get_bytes(const BlockIter *bi, size_t len) WARN_UNUSED_RESULT NONNULL_ARGS;
+char *block_iter_get_bytes(BlockIter bi, size_t len) WARN_UNUSED_RESULT;
 StringView block_iter_get_line_with_nl(BlockIter *bi) NONNULL_ARGS;
 
 // Like block_iter_get_line_with_nl(), but excluding the newline

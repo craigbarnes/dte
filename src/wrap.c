@@ -112,7 +112,7 @@ void wrap_paragraph(View *view, size_t text_width)
     }
 
     const LocalOptions *options = &view->buffer->options;
-    char *sel = block_iter_get_bytes(&view->cursor, len);
+    char *sel = block_iter_get_bytes(view->cursor, len);
     StringView sv = string_view(sel, len);
     size_t indent_width = get_indent_width(sv, options->tab_width);
 

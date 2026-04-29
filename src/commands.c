@@ -465,7 +465,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    char *buf = block_iter_get_bytes(&bi, size);
+    char *buf = block_iter_get_bytes(bi, size);
     if (osc52) {
         if (!term_osc52_copy(&term->obuf, string_view(buf, size), flags)) {
             error_msg_errno(&e->err, "OSC 52 copy failed");
@@ -541,7 +541,7 @@ static bool cmd_cut(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    char *buf = block_iter_get_bytes(&view->cursor, size);
+    char *buf = block_iter_get_bytes(view->cursor, size);
     record_copy(&e->clipboard, buf, size, line_copy);
     buffer_delete_bytes(view, size);
 

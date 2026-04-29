@@ -389,7 +389,7 @@ ssize_t handle_exec (
     }
 
     if (input_from_buffer) {
-        alloc = block_iter_get_bytes(&view->cursor, ctx.input.length);
+        alloc = block_iter_get_bytes(view->cursor, ctx.input.length);
         ctx.input.data = alloc;
     }
 

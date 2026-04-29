@@ -275,8 +275,8 @@ void block_iter_back_bytes(BlockIter *bi, size_t count)
 {
     while (count > bi->offset) {
         count -= bi->offset;
-        bi->blk = BLOCK(bi->blk->node.prev);
-        bi->offset = bi->blk->size;
+        bool have_prev_block = block_iter_end_of_prev_block(bi);
+        BUG_ON(!have_prev_block);
     }
     bi->offset -= count;
 }
@@ -338,25 +338,22 @@ size_t block_iter_get_offset(const BlockIter *bi)
     return offset + bi->offset;
 }
 
-char *block_iter_get_bytes(const BlockIter *bi, size_t len)
+char *block_iter_get_bytes(BlockIter bi, size_t len)
 {
     if (len == 0) {
         return NULL;
     }
 
-    const Block *blk = bi->blk;
-    size_t offset = bi->offset;
     size_t pos = 0;
     char *buf = xmalloc(len + 1); // +1 byte; so expand_word() can append '\0'
 
     while (pos < len) {
-        const size_t avail = blk->size - offset;
+        const size_t avail = bi.blk->size - bi.offset;
         size_t count = MIN(len - pos, avail);
-        memcpy(buf + pos, blk->data + offset, count);
+        memcpy(buf + pos, bi.blk->data + bi.offset, count);
         pos += count;
-        BUG_ON(pos < len && blk->node.next == bi->head);
-        blk = BLOCK(blk->node.next);
-        offset = 0;
+        bool have_next_block = block_iter_next_block(&bi);
+        BUG_ON(pos < len && !have_next_block);
     }
 
     return buf;
