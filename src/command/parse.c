@@ -5,6 +5,7 @@
 #include "trace.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/str-util.h"
 #include "util/string.h"
 #include "util/strtonum.h"
 #include "util/unicode.h"
@@ -13,10 +14,10 @@
 
 static size_t parse_sq(const char *cmd, size_t len, String *buf)
 {
-    const char *end = memchr(cmd, '\'', len);
-    size_t pos = end ? (size_t)(end - cmd) : len;
-    string_append_buf(buf, cmd, pos);
-    return pos + (end ? 1 : 0);
+    size_t pos = 0;
+    StringView inner = get_delim(cmd, &pos, len, '\'');
+    string_append_buf(buf, inner.data, inner.length);
+    return pos;
 }
 
 static size_t unicode_escape(const char *str, size_t count, String *buf)
