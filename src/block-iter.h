@@ -67,13 +67,32 @@ static inline bool block_iter_is_eol(const BlockIter *bi)
     return blk->data[bi->offset] == '\n';
 }
 
-static inline void block_iter_normalize(BlockIter *bi)
+static inline bool block_iter_next_block(BlockIter *bi)
+{
+    if (block_iter_is_last_block(bi)) {
+        return false;
+    }
+
+    bi->blk = BLOCK(bi->blk->node.next);
+    bi->offset = 0; // Beginning of next Block
+    return true;
+}
+
+static inline bool block_iter_end_of_prev_block(BlockIter *bi)
+{
+    if (block_iter_is_first_block(bi)) {
+        return false;
+    }
+
+    bi->blk = BLOCK(bi->blk->node.prev);
+    bi->offset = bi->blk->size; // End of previous Block
+    return true;
+}
+
+static inline bool block_iter_normalize(BlockIter *bi)
 {
     BUG_ON(bi->offset > bi->blk->size);
-    if (bi->offset == bi->blk->size && !block_iter_is_last_block(bi)) {
-        bi->blk = BLOCK(bi->blk->node.next);
-        bi->offset = 0;
-    }
+    return (bi->offset == bi->blk->size) && block_iter_next_block(bi);
 }
 
 size_t block_iter_eat_line(BlockIter *bi) NONNULL_ARGS;

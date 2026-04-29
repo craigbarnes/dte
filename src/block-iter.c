@@ -101,14 +101,15 @@ size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
     if (unlikely(offset == bi->blk->size)) {
-        if (unlikely(block_iter_is_last_block(bi))) {
-            return 0;
+        if (unlikely(!block_iter_next_block(bi))) {
+            return 0; // EOF
         }
-        bi->blk = BLOCK(bi->blk->node.next);
-        bi->offset = offset = 0;
+        offset = bi->offset;
     }
 
-    // Note: this block can't be empty
+    // This block can't be empty; see comment in sanity_check_blocks()
+    BUG_ON(bi->blk->size == 0);
+
     unsigned char byte = bi->blk->data[offset];
     if (likely(byte < 0x80)) {
         *up = byte;
@@ -124,14 +125,16 @@ size_t block_iter_prev_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
     if (unlikely(offset == 0)) {
-        if (unlikely(block_iter_is_first_block(bi))) {
-            return 0;
+        if (unlikely(!block_iter_end_of_prev_block(bi))) {
+            return 0; // BOF
         }
-        bi->blk = BLOCK(bi->blk->node.prev);
-        bi->offset = offset = bi->blk->size;
+        offset = bi->offset;
     }
 
-    // Note: this block can't be empty
+    // This block can't be empty; see comment in sanity_check_blocks()
+    BUG_ON(bi->blk->size == 0);
+    BUG_ON(offset == 0);
+
     unsigned char byte = bi->blk->data[offset - 1];
     if (likely(byte < 0x80)) {
         *up = byte;
@@ -238,7 +241,6 @@ size_t block_iter_skip_blanks_fwd(BlockIter *bi)
 
 // Count spaces and tabs before iterator (and move to beginning of them)
 size_t block_iter_skip_blanks_bwd(BlockIter *bi)
-
 {
     block_iter_normalize(bi);
     size_t count = 0;
@@ -284,8 +286,8 @@ void block_iter_skip_bytes(BlockIter *bi, size_t count)
     size_t avail = bi->blk->size - bi->offset;
     while (count > avail) {
         count -= avail;
-        bi->blk = BLOCK(bi->blk->node.next);
-        bi->offset = 0;
+        bool have_next_block = block_iter_next_block(bi);
+        BUG_ON(!have_next_block);
         avail = bi->blk->size;
     }
     bi->offset += count;
