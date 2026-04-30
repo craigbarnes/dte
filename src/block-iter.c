@@ -40,26 +40,16 @@ size_t block_iter_eat_line(BlockIter *bi)
 size_t block_iter_next_line(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    const size_t offset = bi->offset;
-    if (unlikely(offset == bi->blk->size)) {
+    size_t orig_offset = bi->offset;
+    size_t move = block_iter_eat_line(bi);
+
+    if (unlikely(bi->offset != orig_offset && block_iter_is_eof(bi))) {
+        // Undo what block_iter_eat_line() did, if it moved to EOF
+        bi->offset = orig_offset;
         return 0;
     }
 
-    // There must be at least one newline
-    size_t new_offset;
-    if (bi->blk->nl == 1) {
-        new_offset = bi->blk->size;
-    } else {
-        const char *end = block_memchr_eol(bi->blk, offset);
-        new_offset = (size_t)(end + 1 - bi->blk->data);
-    }
-
-    if (new_offset == bi->blk->size && bi->blk->node.next == bi->head) {
-        return 0;
-    }
-
-    bi->offset = new_offset;
-    return bi->offset - offset;
+    return move;
 }
 
 // Move to end of previous line (if any) and return number of bytes moved
