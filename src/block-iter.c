@@ -2,55 +2,10 @@
 #include "block-iter.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xmemrchr.h"
-
-NONNULL_ARGS_AND_RETURN
-static const char *block_memchr_eol(const Block *blk, size_t offset)
-{
-    BUG_ON(offset > blk->size);
-    const char *eol = memchr(blk->data + offset, '\n', blk->size - offset);
-    BUG_ON(!eol);
-    return eol;
-}
-
-// Move after next newline (beginning of next line or end of file)
-// and return number of bytes moved
-size_t block_iter_eat_line(BlockIter *bi)
-{
-    block_iter_normalize(bi);
-    const size_t offset = bi->offset;
-    if (unlikely(offset == bi->blk->size)) {
-        return 0;
-    }
-
-    // There must be at least one newline
-    if (bi->blk->nl == 1) {
-        bi->offset = bi->blk->size;
-    } else {
-        const char *end = block_memchr_eol(bi->blk, offset);
-        bi->offset = (size_t)(end + 1 - bi->blk->data);
-    }
-
-    return bi->offset - offset;
-}
-
-// Move to beginning of next line (if any) and return number of bytes moved
-size_t block_iter_next_line(BlockIter *bi)
-{
-    block_iter_normalize(bi);
-    size_t orig_offset = bi->offset;
-    size_t move = block_iter_eat_line(bi);
-
-    if (unlikely(bi->offset != orig_offset && block_iter_is_eof(bi))) {
-        // Undo what block_iter_eat_line() did, if it moved to EOF
-        bi->offset = orig_offset;
-        return 0;
-    }
-
-    return move;
-}
 
 // Move to end of previous line (if any) and return number of bytes moved
 size_t block_iter_prev_line_eol(BlockIter *bi)
@@ -89,51 +44,43 @@ size_t block_iter_get_char(const BlockIter *bi, CodePoint *up)
 
 size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 {
-    size_t offset = bi->offset;
-    if (unlikely(offset == bi->blk->size)) {
-        if (unlikely(!block_iter_next_block(bi))) {
-            return 0; // EOF
-        }
-        offset = bi->offset;
+    if (unlikely(bi->offset == bi->blk->size && !block_iter_next_block(bi))) {
+        return 0; // Already at EOF
     }
 
-    // This block can't be empty; see comment in sanity_check_blocks()
-    BUG_ON(bi->blk->size == 0);
+    BUG_ON(bi->blk->size == 0); // This block can't be empty
 
-    unsigned char byte = bi->blk->data[offset];
+    unsigned char byte = bi->blk->data[bi->offset];
     if (likely(byte < 0x80)) {
         *up = byte;
         bi->offset++;
         return 1;
     }
 
+    size_t prev_offset = bi->offset;
     *up = u_get_nonascii(bi->blk->data, bi->blk->size, &bi->offset);
-    return bi->offset - offset;
+    return bi->offset - prev_offset;
 }
 
 size_t block_iter_prev_char(BlockIter *bi, CodePoint *up)
 {
-    size_t offset = bi->offset;
-    if (unlikely(offset == 0)) {
-        if (unlikely(!block_iter_end_of_prev_block(bi))) {
-            return 0; // BOF
-        }
-        offset = bi->offset;
+    if (unlikely(bi->offset == 0 && !block_iter_end_of_prev_block(bi))) {
+        return 0; // Already at BOF
     }
 
-    // This block can't be empty; see comment in sanity_check_blocks()
-    BUG_ON(bi->blk->size == 0);
-    BUG_ON(offset == 0);
+    BUG_ON(bi->blk->size == 0); // This block can't be empty
+    BUG_ON(bi->offset == 0);
 
-    unsigned char byte = bi->blk->data[offset - 1];
+    unsigned char byte = bi->blk->data[bi->offset - 1];
     if (likely(byte < 0x80)) {
         *up = byte;
         bi->offset--;
         return 1;
     }
 
+    size_t prev_offset = bi->offset;
     *up = u_prev_char(bi->blk->data, &bi->offset);
-    return offset - bi->offset;
+    return prev_offset - bi->offset;
 }
 
 size_t block_iter_next_column(BlockIter *bi)
@@ -160,18 +107,18 @@ size_t block_iter_prev_column(BlockIter *bi)
 size_t block_iter_bol(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    size_t offset = bi->offset;
     if (block_iter_is_bol(bi)) {
         return 0;
     }
 
     // These cases are handled by the condition above
     const Block *blk = bi->blk;
+    size_t offset = bi->offset;
     BUG_ON(offset == 0);
     BUG_ON(offset >= blk->size);
 
     if (blk->nl == 1) {
-        bi->offset = 0; // Only 1 line in `blk`; bol is at offset 0
+        bi->offset = 0; // Only 1 line in Block; bol is at offset 0
         return offset;
     }
 
@@ -191,21 +138,46 @@ size_t block_iter_eol(BlockIter *bi)
 {
     block_iter_normalize(bi);
     const Block *blk = bi->blk;
-    const size_t offset = bi->offset;
-
+    size_t offset = bi->offset;
     if (unlikely(offset == blk->size)) {
-        // Cursor at end of last block
-        return 0;
+        return 0; // Already at EOF
     }
+
+    BUG_ON(blk->size == 0); // This block can't be empty
+    BUG_ON(blk->nl == 0);
 
     if (blk->nl == 1) {
         bi->offset = blk->size - 1;
         return bi->offset - offset;
     }
 
-    const char *end = block_memchr_eol(blk, offset);
-    bi->offset = (size_t)(end - blk->data);
-    return bi->offset - offset;
+    StringView line = buf_slice_next_line(blk->data, &offset, blk->size);
+    bi->offset += line.length;
+    return line.length;
+}
+
+// Move after next newline (beginning of next line or end of file) and
+// return number of bytes moved
+size_t block_iter_eat_line(BlockIter *bi)
+{
+    CodePoint u;
+    size_t n = block_iter_eol(bi);
+    size_t m = block_iter_next_char(bi, &u);
+    BUG_ON(m && (m != 1 || u != '\n'));
+    return n + m;
+}
+
+// Move to beginning of next line (if any) and return number of bytes moved
+size_t block_iter_next_line(BlockIter *bi)
+{
+    BlockIter tmp = *bi;
+    size_t move = block_iter_eat_line(&tmp);
+    if (unlikely(block_iter_is_eof(&tmp))) {
+        return 0;
+    }
+
+    *bi = tmp;
+    return move;
 }
 
 // Count spaces and tabs at or after iterator (and move beyond them)
@@ -339,24 +311,22 @@ char *block_iter_get_bytes(BlockIter bi, size_t len)
 StringView block_iter_get_line_with_nl(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    const char *start = bi->blk->data + bi->offset;
-    StringView line = {.data = start, .length = 0};
-    size_t max = bi->blk->size - bi->offset;
-
-    if (unlikely(max == 0)) {
+    if (unlikely(bi->offset == bi->blk->size)) {
         // Cursor at end of last block
-        return line;
+        return strview("");
     }
 
+    StringView line;
     if (bi->blk->nl == 1) {
         // Block contains only 1 line; end-of-line is end-of-block
-        BUG_ON(line.data[max - 1] != '\n');
-        line.length = max;
-        return line;
+        line = string_view(bi->blk->data, bi->blk->size);
+        strview_remove_prefix(&line, bi->offset);
+    } else {
+        size_t pos = bi->offset;
+        line = buf_slice_next_line(bi->blk->data, &pos, bi->blk->size);
+        line.length += 1; // Include the newline
     }
 
-    const char *nl = block_memchr_eol(bi->blk, bi->offset);
-    line.length = (size_t)(nl - start + 1);
-    BUG_ON(line.length == 0);
+    BUG_ON(!strview_has_suffix(line, "\n"));
     return line;
 }
