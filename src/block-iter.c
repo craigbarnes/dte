@@ -212,20 +212,14 @@ size_t block_iter_eol(BlockIter *bi)
 size_t block_iter_skip_blanks_fwd(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    const char *data = bi->blk->data;
-    size_t count = 0;
-    size_t i = bi->offset;
+    StringView sv = string_view(bi->blk->data, bi->blk->size);
+    strview_remove_prefix(&sv, bi->offset);
 
     // We're only operating on one line and checking for ASCII characters,
     // so Block traversal and Unicode-aware decoding are both unnecessary
-    for (size_t n = bi->blk->size; i < n; count++) {
-        unsigned char c = data[i++];
-        if (!ascii_isblank(c)) {
-            break;
-        }
-    }
+    size_t count = ascii_blank_prefix_length(sv.data, sv.length);
 
-    bi->offset = i;
+    bi->offset += count + 1;
     return count;
 }
 
