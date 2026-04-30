@@ -898,7 +898,7 @@ static void test_string_view(TestContext *ctx)
     EXPECT_FALSE(strview_isblank(sv));
 
     sv = strview("  \t\t \ttrim test \t\t");
-    strview_trim(&sv);
+    EXPECT_EQ(strview_trim(&sv), 9);
     EXPECT_TRUE(strview_equal_cstring(sv, "trim test"));
 
     sv = strview(NULL);
@@ -909,16 +909,15 @@ static void test_string_view(TestContext *ctx)
     EXPECT_FALSE(strview_contains_char_type(sv, ASCII_DIGIT));
     EXPECT_TRUE(strview_isblank(sv));
     EXPECT_EQ(strview_trim_left(&sv), 0);
+    EXPECT_EQ(strview_trim_right(&sv), 0);
+    EXPECT_EQ(strview_trim(&sv), 0);
     EXPECT_TRUE(strview_equal_cstring(sv, ""));
     EXPECT_TRUE(strview_equal_icase(sv, strview("")));
     EXPECT_TRUE(strview_has_prefix(sv, ""));
     EXPECT_TRUE(strview_has_suffix(sv, ""));
     EXPECT_TRUE(strview_has_prefix_icase(sv, ""));
-
-    // Call these 3 for ASan/UBSan coverage:
-    strview_trim_right(&sv);
-    strview_trim(&sv);
-    strview_remove_prefix(&sv, 0);
+    EXPECT_EQ(strview_remove_prefix(&sv, 0), 0);
+    EXPECT_EQ(strview_remove_suffix(&sv, 0), 0);
     EXPECT_NULL(sv.data);
     EXPECT_EQ(sv.length, 0);
 

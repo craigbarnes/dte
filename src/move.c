@@ -114,7 +114,7 @@ void move_bol(View *view, SmartBolType type)
     }
 
     StringView line = block_iter_get_line(&bol);
-    size_t indent = ascii_blank_prefix_length(line.data, line.length);
+    size_t indent = strview_blank_prefix_length(line);
     if (at_bol) {
         // At BOL and using toggle; move right to first non-blank char
         block_iter_skip_bytes(&view->cursor, indent);

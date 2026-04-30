@@ -106,9 +106,27 @@ static inline bool strview_has_prefix_and_suffix (
     return strview_has_prefix(sv, prefix) && strview_has_suffix(sv, suffix);
 }
 
+static inline size_t strview_blank_prefix_length(StringView sv)
+{
+    size_t i = 0;
+    while (i < sv.length && ascii_isblank(sv.data[i])) {
+        i++;
+    }
+    return i;
+}
+
+static inline size_t strview_blank_suffix_length(StringView sv)
+{
+    size_t n = sv.length;
+    while (n && ascii_isblank(sv.data[n - 1])) {
+        n--;
+    }
+    return sv.length - n;
+}
+
 static inline bool strview_isblank(StringView sv)
 {
-    return ascii_blank_prefix_length(sv.data, sv.length) == sv.length;
+    return strview_blank_prefix_length(sv) == sv.length;
 }
 
 static inline bool strview_contains_char_type(StringView sv, AsciiCharType mask)
@@ -137,19 +155,19 @@ static inline ssize_t strview_memrchr_idx(StringView sv, int c)
     return ptr ? (ssize_t)(ptr - sv.data) : -1;
 }
 
-static inline void strview_remove_prefix(StringView *sv, size_t len)
+static inline size_t strview_remove_prefix(StringView *sv, size_t len)
 {
     BUG_ON(len > sv->length);
-    if (len > 0) {
-        sv->data += len;
-        sv->length -= len;
-    }
+    sv->data = len ? sv->data + len : sv->data;
+    sv->length -= len;
+    return len;
 }
 
-static inline void strview_remove_suffix(StringView *sv, size_t len)
+static inline size_t strview_remove_suffix(StringView *sv, size_t len)
 {
     BUG_ON(len > sv->length);
     sv->length -= len;
+    return len;
 }
 
 static inline bool strview_remove_matching_sv_prefix (
@@ -201,27 +219,20 @@ static inline bool strview_remove_matching_affixes (
 NONNULL_ARGS
 static inline size_t strview_trim_left(StringView *sv)
 {
-    size_t blank_len = ascii_blank_prefix_length(sv->data, sv->length);
-    strview_remove_prefix(sv, blank_len);
-    return blank_len;
+    return strview_remove_prefix(sv, strview_blank_prefix_length(*sv));
 }
 
 NONNULL_ARGS
-static inline void strview_trim_right(StringView *sv)
+static inline size_t strview_trim_right(StringView *sv)
 {
-    const char *data = sv->data;
-    size_t n = sv->length;
-    while (n && ascii_isblank(data[n - 1])) {
-        n--;
-    }
-    sv->length = n;
+    return strview_remove_suffix(sv, strview_blank_suffix_length(*sv));
 }
 
 NONNULL_ARGS
-static inline void strview_trim(StringView *sv)
+static inline size_t strview_trim(StringView *sv)
 {
-    strview_trim_left(sv);
-    strview_trim_right(sv);
+    size_t r = strview_trim_right(sv);
+    return r + strview_trim_left(sv);
 }
 
 #endif

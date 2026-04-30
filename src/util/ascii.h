@@ -107,13 +107,4 @@ static inline size_t ascii_type_prefix_length (
     return i;
 }
 
-static inline size_t ascii_blank_prefix_length(const char *str, size_t len)
-{
-    size_t i = 0;
-    while (i < len && ascii_isblank(str[i])) {
-        i++;
-    }
-    return i;
-}
-
 #endif
