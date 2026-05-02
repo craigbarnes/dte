@@ -1485,19 +1485,18 @@ created files.
 Note: buffers opened from existing files will have their newline
 type detected automatically.
 
-### **optimize-true-color** [true]
+### **optimize-true-color** [false]
 
-If set to `true`, this option will cause the [`hi`] command to
-automatically replace 24-bit #RRGGBB colors with palette colors 16-255,
-but only if there's an exact color match among the default, extended
-palette colors.
+If set to `true`, this option will make the [`hi`] command automatically
+replace 24-bit #RRGGBB colors with palette colors 16-255, if there's an
+exact match in the default palette. The intended purpose of this is to
+allow defining color schemes in #RRGGBB notation while still sending the
+shortest escape sequence to the terminal.
 
-This allows defining color schemes in #RRGGBB notation while still
-sending the shortest possible escape sequence to the terminal.
+This option is `false` by default, because it only works as intended if
+the terminal hasn't been configured with custom palette colors 16-255.
 
-Note: this optimization only works if the terminal has not been
-configured with custom values for colors 16-255. If you have changed
-these extended palette colors, you should set this option to `false`.
+See also: the [`dte -P`] option in the [`dte`] man page.
 
 ### **select-cursor-char** [true]
 

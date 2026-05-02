@@ -132,7 +132,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
             .lock_files = true,
             .msg_compile = 0,
             .msg_tag = 0,
-            .optimize_true_color = true,
+            .optimize_true_color = false,
             .scroll_margin = 0,
             .select_cursor_char = true,
             .set_window_title = false,

@@ -154,6 +154,8 @@ Unreleased
   This isn't listed as a "breaking change" since old style, negative
   `count` arguments are still supported and there's a built-in `shift`
   alias for backwards compatibility.
+* The [`optimize-true-color`] option now defaults to `false` and the
+  documentation was updated to explain why.
 
 v1.11.1 (latest release)
 ------------------------

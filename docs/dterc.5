@@ -216,7 +216,7 @@ Global options:
 .br
    \fBnewline\fR [unix]
 .br
-   \fBoptimize\-true\-color\fR [true]
+   \fBoptimize\-true\-color\fR [false]
 .br
    \fBselect\-cursor\-char\fR [true]
 .br
@@ -2175,19 +2175,18 @@ Note: buffers opened from existing files will have their newline
 type detected automatically.
 .P
 .RE
-\fBoptimize\-true\-color\fR [true]
+\fBoptimize\-true\-color\fR [false]
 .RS
-If set to \fBtrue\fR, this option will cause the \fBhi\fR command to
-automatically replace 24\-bit #RRGGBB colors with palette colors 16\-255,
-but only if there's an exact color match among the default, extended
-palette colors.
+If set to \fBtrue\fR, this option will make the \fBhi\fR command automatically
+replace 24\-bit #RRGGBB colors with palette colors 16\-255, if there's an
+exact match in the default palette. The intended purpose of this is to
+allow defining color schemes in #RRGGBB notation while still sending the
+shortest escape sequence to the terminal.
 .P
-This allows defining color schemes in #RRGGBB notation while still
-sending the shortest possible escape sequence to the terminal.
+This option is \fBfalse\fR by default, because it only works as intended if
+the terminal hasn't been configured with custom palette colors 16\-255.
 .P
-Note: this optimization only works if the terminal has not been
-configured with custom values for colors 16\-255. If you have changed
-these extended palette colors, you should set this option to \fBfalse\fR.
+See also: the \fBdte \-P\fR option in the \fBdte\fR(1) man page.
 .P
 .RE
 \fBselect\-cursor\-char\fR [true]
