@@ -6,6 +6,7 @@
 #include "block.h"
 #include "buildvar-iconv.h"
 #include "encoding.h"
+#include "load-save.h"
 #include "util/arith.h"
 #include "util/debug.h"
 #include "util/list.h"
@@ -31,13 +32,23 @@ static void add_block(Buffer *buffer, Block *blk)
 static Block *add_utf8_line (
     Buffer *buffer,
     const GlobalOptions *gopts,
-    ErrorBuffer *errbuf,
+    ErrorBuffer *ebuf,
     Block *blk,
     StringView line
 ) {
-    size_t slimit = gopts->syntax_line_limit;
-    size_t size = line.length + 1;
+    static const char optname[] = "syntax-line-limit";
+    static const char msg[] = ", setting syntax=false";
+    const size_t limit = gopts->syntax_line_limit;
+    const size_t len = line.length;
 
+    if (
+        buffer->options.syntax
+        && size_exceeds_limit(ebuf, NULL, "Line", optname, msg, len, limit)
+    ) {
+        buffer->options.syntax = false;
+    }
+
+    size_t size = len + 1;
     if (blk) {
         size_t avail = blk->alloc - blk->size;
         if (size <= avail) {
@@ -50,20 +61,8 @@ static Block *add_utf8_line (
     blk = block_new(size);
 
 copy:
-    if (unlikely(slimit && line.length > slimit && buffer->options.syntax)) {
-        char limit_str[PRECISE_FILESIZE_STR_MAX];
-        filesize_to_str_precise(slimit, limit_str);
-        error_msg (
-            errbuf,
-            "line length (%zu) exceeds 'syntax-line-limit' option (%s); "
-            "disabling syntax highlighting",
-            line.length, limit_str
-        );
-        buffer->options.syntax = false;
-    }
-
-    memcpy(blk->data + blk->size, line.data, line.length);
-    blk->size += line.length;
+    memcpy(blk->data + blk->size, line.data, len);
+    blk->size += len;
     blk->data[blk->size++] = '\n';
     blk->nl++;
     return blk;

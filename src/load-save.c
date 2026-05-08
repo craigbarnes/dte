@@ -1,6 +1,5 @@
 #include "build-defs.h"
 #include <errno.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +14,6 @@
 #include "util/fd.h"
 #include "util/list.h"
 #include "util/log.h"
-#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/time-util.h"
@@ -229,21 +227,14 @@ bool load_buffer (
         goto error;
     }
 
-    off_t size = info->size;
-    if (unlikely(size < 0)) {
-        error_msg(ebuf, "Invalid file size: %jd", (intmax_t)size);
+    if (unlikely(info->size < 0)) {
+        error_msg(ebuf, "Invalid file size: %jd", (intmax_t)info->size);
         goto error;
     }
 
-    uintmax_t size_limit = gopts->filesize_limit;
-    if (unlikely(size_limit && (uintmax_t)size > size_limit)) {
-        char limit_str[PRECISE_FILESIZE_STR_MAX];
-        filesize_to_str_precise(size_limit, limit_str);
-        error_msg (
-            ebuf,
-            "File size (%ju) exceeds 'filesize-limit' option (%s): %s",
-            (uintmax_t)size, limit_str, filename
-        );
+    uintmax_t size = info->size;
+    uintmax_t lim = gopts->filesize_limit;
+    if (size_exceeds_limit(ebuf, filename, "File", "filesize-limit", "", size, lim)) {
         goto error;
     }
 
