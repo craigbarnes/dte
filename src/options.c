@@ -506,6 +506,7 @@ static const OptionDesc option_desc[] = {
     STR_OPT("statusline-right", G(statusline_right), validate_statusline_format, NULL),
     BOOL_OPT("syntax", C(syntax), syntax_changed),
     FSIZE_OPT("syntax-line-limit", G(syntax_line_limit), NULL),
+    FSIZE_OPT("syntax-size-limit", G(syntax_size_limit), NULL),
     BOOL_OPT("tab-bar", G(tab_bar), redraw_screen),
     UINT8_OPT("tab-width", C(tab_width), 1, TAB_WIDTH_MAX, redraw_buffer),
     UINT_OPT("text-width", C(text_width), 1, TEXT_WIDTH_MAX, NULL),

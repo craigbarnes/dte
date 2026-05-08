@@ -24,7 +24,7 @@ bool save_buffer(Buffer *buffer, const char *filename, const FileSaveContext *ct
 bool read_blocks(Buffer *buffer, const GlobalOptions *gopts, ErrorBuffer *ebuf, int fd) NONNULL_ARG(1, 2) WARN_UNUSED_RESULT;
 
 WARN_UNUSED_RESULT NONNULL_ARG(1, 3, 4, 5)
-static inline bool size_exceeds_limit (
+static inline bool size_exceeds_limit ( // NOLINT(readability-function-size)
     ErrorBuffer *ebuf,
     const char *filename,
     const char *size_name,

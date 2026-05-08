@@ -233,9 +233,18 @@ bool load_buffer (
     }
 
     uintmax_t size = info->size;
-    uintmax_t lim = gopts->filesize_limit;
-    if (size_exceeds_limit(ebuf, filename, "File", "filesize-limit", "", size, lim)) {
+    uintmax_t limit = gopts->filesize_limit;
+    if (size_exceeds_limit(ebuf, filename, "File", "filesize-limit", "", size, limit)) {
         goto error;
+    }
+
+    static const char extramsg[] = ", setting syntax=false";
+    limit = gopts->syntax_size_limit;
+    if (
+        buffer->options.syntax
+        && size_exceeds_limit(ebuf, filename, "File", "syntax-size-limit", extramsg, size, limit)
+    ) {
+        buffer->options.syntax = false;
     }
 
     if (!read_blocks(buffer, gopts, ebuf, fd)) {

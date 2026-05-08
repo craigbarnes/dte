@@ -140,6 +140,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
             .statusline_left = str_intern(" %f%s%m%s%r%s%M"),
             .statusline_right = str_intern(" %y,%X  %u  %o  %E%s%b%s%n %t   %p "),
             .syntax_line_limit = 512ULL << 10, // 512KiB
+            .syntax_size_limit = 100ULL << 20, // 100MiB
             .tab_bar = true,
             .utf8_bom = false,
             .window_separator = WINSEP_BAR,
