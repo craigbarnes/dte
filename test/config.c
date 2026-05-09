@@ -207,6 +207,8 @@ static void test_editor_state(TestContext *ctx)
     ASSERT_PTREQ(buffer->cur_change, &buffer->change_head);
     ASSERT_PTREQ(buffer->saved_change, buffer->cur_change);
     EXPECT_NULL(buffer->display_filename);
+    EXPECT_STREQ(buffer->options.filetype, "none");
+    EXPECT_TRUE(buffer_filetype_is_none(buffer));
 
     // Note: this isn't necessarily equal to 1 because some UNITTEST
     // blocks may have already called window_open_empty_buffer()

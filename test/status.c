@@ -4,13 +4,14 @@
 #include "encoding.h"
 #include "search.h"
 #include "status.h"
+#include "util/intern.h"
 #include "util/utf8.h"
 
 static void test_sf_format(TestContext *ctx)
 {
     Buffer buffer = {
         .encoding = encoding_from_type(UTF8),
-        .options = {.filetype = "none"},
+        .options = {.filetype = str_intern("none")},
     };
 
     Block *block = block_new(1);

@@ -433,3 +433,13 @@ void buffer_count_blocks_and_bytes(const Buffer *buffer, uintmax_t counts[static
     counts[0] = blocks;
     counts[1] = bytes;
 }
+
+bool buffer_filetype_is_none(const Buffer *buffer)
+{
+    static const char *none;
+    if (unlikely(!none)) {
+        none = str_intern("none");
+    }
+
+    return interned_strings_equal(buffer->options.filetype, none);
+}

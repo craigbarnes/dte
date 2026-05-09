@@ -1943,7 +1943,8 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         // Filename change is not detected (only buffer_modified() change)
         buffer_mark_tabbars_changed(buffer);
     }
-    if (!old_mode && streq(buffer->options.filetype, "none")) {
+
+    if (!old_mode && buffer_filetype_is_none(buffer)) {
         // New file and most likely user has not changed the filetype
         if (buffer_detect_filetype(buffer, &e->filetypes)) {
             set_file_options(e, buffer);
