@@ -29,25 +29,9 @@ static void add_block(Buffer *buffer, Block *blk)
     list_insert_before(&blk->node, &buffer->blocks);
 }
 
-static Block *add_utf8_line (
-    Buffer *buffer,
-    const GlobalOptions *gopts,
-    ErrorBuffer *ebuf,
-    Block *blk,
-    StringView line
-) {
-    static const char optname[] = "syntax-line-limit";
-    static const char msg[] = ", setting syntax=false";
-    const size_t limit = gopts->syntax_line_limit;
+static Block *add_utf8_line(Buffer *buffer, Block *blk, StringView line)
+{
     const size_t len = line.length;
-
-    if (
-        buffer->options.syntax
-        && size_exceeds_limit(ebuf, NULL, "Line", optname, msg, len, limit)
-    ) {
-        buffer->options.syntax = false;
-    }
-
     size_t size = len + 1;
     if (blk) {
         size_t avail = blk->alloc - blk->size;
@@ -80,12 +64,8 @@ static bool read_utf8_line(FileDecoder *dec, StringView *linep)
     return true;
 }
 
-static bool file_decoder_read_utf8 (
-    Buffer *buffer,
-    const GlobalOptions *gopts,
-    ErrorBuffer *errbuf,
-    StringView text
-) {
+static bool file_decoder_read_utf8(Buffer *buffer, StringView text, size_t *longest_line)
+{
     if (unlikely(!encoding_is_utf8(buffer->encoding))) {
         errno = EINVAL;
         return false;
@@ -94,6 +74,7 @@ static bool file_decoder_read_utf8 (
     FileDecoder dec = {.text = text};
     StringView line;
     if (!read_utf8_line(&dec, &line)) {
+        *longest_line = 0;
         return true;
     }
 
@@ -101,16 +82,19 @@ static bool file_decoder_read_utf8 (
         buffer->crlf_newlines = true;
     }
 
-    Block *blk = add_utf8_line(buffer, gopts, errbuf, NULL, line);
+    Block *blk = add_utf8_line(buffer, NULL, line);
+    size_t maxline = line.length;
 
     if (unlikely(buffer->crlf_newlines)) {
         while (read_utf8_line(&dec, &line)) {
             strview_remove_matching_suffix(&line, "\r");
-            blk = add_utf8_line(buffer, gopts, errbuf, blk, line);
+            blk = add_utf8_line(buffer, blk, line);
+            maxline = MAX(maxline, line.length);
         }
     } else {
         while (read_utf8_line(&dec, &line)) {
-            blk = add_utf8_line(buffer, gopts, errbuf, blk, line);
+            blk = add_utf8_line(buffer, blk, line);
+            maxline = MAX(maxline, line.length);
         }
     }
 
@@ -118,6 +102,7 @@ static bool file_decoder_read_utf8 (
         add_block(buffer, blk);
     }
 
+    *longest_line = maxline;
     return true;
 }
 
@@ -201,13 +186,9 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
     return 0;
 }
 
-bool file_decoder_read (
-    Buffer *buffer,
-    const GlobalOptions *gopts,
-    ErrorBuffer *errbuf,
-    StringView text
-) {
-    return file_decoder_read_utf8(buffer, gopts, errbuf, text);
+bool file_decoder_read(Buffer *buffer, StringView text, size_t *longest_line)
+{
+    return file_decoder_read_utf8(buffer, text, longest_line);
 }
 
 #else // ICONV_DISABLE != 1; use full iconv implementation:
@@ -601,14 +582,10 @@ static bool decode_and_read_line(FileDecoder *dec, StringView *linep)
     return true;
 }
 
-bool file_decoder_read (
-    Buffer *buffer,
-    const GlobalOptions *gopts,
-    ErrorBuffer *errbuf,
-    StringView text
-) {
+bool file_decoder_read(Buffer *buffer, StringView text, size_t *longest_line)
+{
     if (encoding_is_utf8(buffer->encoding)) {
-        return file_decoder_read_utf8(buffer, gopts, errbuf, text);
+        return file_decoder_read_utf8(buffer, text, longest_line);
     }
 
     CharsetConverter *cconv = cconv_to_utf8(buffer->encoding);
@@ -616,30 +593,33 @@ bool file_decoder_read (
         return false;
     }
 
-    FileDecoder dec = {
-        .text = text,
-        .cconv = cconv,
-    };
-
+    FileDecoder dec = {.text = text, .cconv = cconv};
     StringView line;
-    if (decode_and_read_line(&dec, &line)) {
-        if (strview_remove_matching_suffix(&line, "\r")) {
-            buffer->crlf_newlines = true;
-        }
-
-        Block *blk = add_utf8_line(buffer, gopts, errbuf, NULL, line);
-        while (decode_and_read_line(&dec, &line)) {
-            if (buffer->crlf_newlines) {
-                strview_remove_matching_suffix(&line, "\r");
-            }
-            blk = add_utf8_line(buffer, gopts, errbuf, blk, line);
-        }
-
-        if (blk) {
-            add_block(buffer, blk);
-        }
+    if (!decode_and_read_line(&dec, &line)) {
+        *longest_line = 0;
+        cconv_free(cconv);
+        return true;
     }
 
+    if (strview_remove_matching_suffix(&line, "\r")) {
+        buffer->crlf_newlines = true;
+    }
+
+    Block *blk = add_utf8_line(buffer, NULL, line);
+    size_t maxline = line.length;
+    while (decode_and_read_line(&dec, &line)) {
+        if (buffer->crlf_newlines) {
+            strview_remove_matching_suffix(&line, "\r");
+        }
+        blk = add_utf8_line(buffer, blk, line);
+        maxline = MAX(maxline, line.length);
+    }
+
+    if (blk) {
+        add_block(buffer, blk);
+    }
+
+    *longest_line = maxline;
     cconv_free(cconv);
     return true;
 }

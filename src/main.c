@@ -173,8 +173,9 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 
     if (fds[STDIN_FILENO] >= 3) {
         ErrorBuffer *ebuf = &e->err;
+        size_t unused; // Set but unused out-param for longest line
         buffer = buffer_new(&e->buffers, &e->options, encoding_from_type(UTF8));
-        if (read_blocks(buffer, &e->options, ebuf, fds[STDIN_FILENO])) {
+        if (read_blocks(buffer, &e->options, fds[STDIN_FILENO], &unused)) {
             name = "(stdin)";
             buffer->temporary = true;
         } else {

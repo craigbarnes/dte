@@ -1,5 +1,6 @@
 #include "build-defs.h"
 #include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +15,7 @@
 #include "util/fd.h"
 #include "util/list.h"
 #include "util/log.h"
+#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/time-util.h"
@@ -24,8 +26,8 @@
 static bool decode_and_add_blocks (
     Buffer *buffer,
     const GlobalOptions *gopts,
-    ErrorBuffer *errbuf,
-    StringView text
+    StringView text,
+    size_t *longest_line
 ) {
     EncodingType bom_type = detect_encoding_from_bom(text);
     if (!buffer->encoding && bom_type != UNKNOWN_ENCODING) {
@@ -52,7 +54,7 @@ static bool decode_and_add_blocks (
         buffer->bom = gopts->utf8_bom;
     }
 
-    return file_decoder_read(buffer, gopts, errbuf, text);
+    return file_decoder_read(buffer, text, longest_line);
 }
 
 static void fixup_blocks(Buffer *buffer)
@@ -106,8 +108,8 @@ static bool buffer_fstat(FileInfo *info, int fd)
 bool read_blocks (
     Buffer *buffer,
     const GlobalOptions *gopts,
-    ErrorBuffer *ebuf,
-    int fd
+    int fd,
+    size_t *longest_line
 ) {
     const size_t map_size = 64 * 1024;
     size_t size = buffer->file.size;
@@ -173,7 +175,7 @@ bool read_blocks (
     }
 
 decode:
-    ret = decode_and_add_blocks(buffer, gopts, ebuf, string_view(text, size));
+    ret = decode_and_add_blocks(buffer, gopts, string_view(text, size), longest_line);
 
 error:
     if (mapped) {
@@ -188,6 +190,33 @@ error:
     }
 
     return ret;
+}
+
+static bool size_exceeds_limit ( // NOLINT(readability-function-size)
+    ErrorBuffer *ebuf,
+    const char *filename,
+    const char *size_name,
+    const char *limit_name,
+    const char *extra_msg,
+    uintmax_t size,
+    uintmax_t limit
+) {
+    if (likely(!limit || size <= limit)) {
+        return false;
+    }
+
+    char limit_str[PRECISE_FILESIZE_STR_MAX];
+    char size_str[HRSIZE_MAX];
+    filesize_to_str_precise(limit, limit_str);
+    human_readable_size(size, size_str);
+
+    error_msg (
+        ebuf,
+        "%s size (%s) exceeds '%s' option (%s)%s: %s",
+        size_name, size_str, limit_name, limit_str, extra_msg, filename
+    );
+
+    return true;
 }
 
 bool load_buffer (
@@ -233,23 +262,28 @@ bool load_buffer (
     }
 
     uintmax_t size = info->size;
-    uintmax_t limit = gopts->filesize_limit;
-    if (size_exceeds_limit(ebuf, filename, "File", "filesize-limit", "", size, limit)) {
+    uintmax_t fslimit = gopts->filesize_limit;
+    if (size_exceeds_limit(ebuf, filename, "File", "filesize-limit", "", size, fslimit)) {
         goto error;
     }
 
-    static const char extramsg[] = ", setting syntax=false";
-    limit = gopts->syntax_size_limit;
-    if (
-        buffer->options.syntax
-        && size_exceeds_limit(ebuf, filename, "File", "syntax-size-limit", extramsg, size, limit)
-    ) {
-        buffer->options.syntax = false;
-    }
-
-    if (!read_blocks(buffer, gopts, ebuf, fd)) {
+    size_t longest_line;
+    if (!read_blocks(buffer, gopts, fd, &longest_line)) {
         error_msg(ebuf, "Error reading %s: %s", filename, strerror(errno));
         goto error;
+    }
+
+    static const char msg[] = ", setting syntax=false";
+    uintmax_t sslimit = gopts->syntax_size_limit;
+    uintmax_t sllimit = gopts->syntax_line_limit;
+    if (
+        buffer->options.syntax
+        && (
+            size_exceeds_limit(ebuf, filename, "File", "syntax-size-limit", msg, size, sslimit)
+            || size_exceeds_limit(ebuf, filename, "Longest line", "syntax-line-limit", msg, longest_line, sllimit)
+        )
+    ) {
+        buffer->options.syntax = false;
     }
 
     BUG_ON(!buffer->encoding);
