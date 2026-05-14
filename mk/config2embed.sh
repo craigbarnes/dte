@@ -20,7 +20,7 @@ echo 'CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {'
 for file in "$@"; do
     name="${file#config/}"
     ident=$(filename_to_ident "$file")
-    echo "    CFG(\"$name\", $ident),"
+    echo "    CFG_EMBED(\"$name\", $ident),"
 done
 
 echo '};'
