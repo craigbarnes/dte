@@ -7,14 +7,22 @@
 #include "xreadwrite.h"
 #include "xstring.h"
 
-// These are initialized during early startup and then never changed,
-// so they're deemed an acceptable use of non-const globals:
-// NOLINTBEGIN(*-avoid-non-const-global-variables)
-static LogLevel log_level = LOG_LEVEL_NONE;
-static int logfd = -1;
-static char dim[] = "\033[2m";
-static char sgr0[] = "\033[0m";
-// NOLINTEND(*-avoid-non-const-global-variables)
+typedef struct {
+    LogLevel level; // Maximum level at which to log
+    int fd; // File descriptor to write log messages to, or -1 when disabled
+    char dim[5]; // SGR "low intensity" sequence, or an empty string
+    char sgr0[5]; // SGR 0 (reset) sequence, or an empty string
+} Logger;
+
+// This is initialized during early startup and then never changed,
+// so it's deemed an acceptable use of non-const globals.
+// NOLINTNEXTLINE(*-avoid-non-const-global-variables)
+static Logger logger = {
+    .level = LOG_LEVEL_NONE,
+    .fd = -1,
+    .dim = "\033[2m",
+    .sgr0 = "\033[0m",
+};
 
 static const struct LogLevelMap {
     char name[8];
@@ -65,8 +73,8 @@ LogLevel log_open(const char *filename, LogLevel level, LogOpenFlags logflags)
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_TRACE);
-    BUG_ON(logfd >= 0);
-    BUG_ON(log_level != LOG_LEVEL_NONE);
+    BUG_ON(logger.fd >= 0);
+    BUG_ON(logger.level != LOG_LEVEL_NONE);
 
     if (level == LOG_LEVEL_NONE) {
         return LOG_LEVEL_NONE;
@@ -87,31 +95,31 @@ LogLevel log_open(const char *filename, LogLevel level, LogOpenFlags logflags)
 
     bool use_color = (logflags & LOGOPEN_USE_COLOR);
     if (!use_color || !isatty(fd)) {
-        dim[0] = '\0';
-        sgr0[0] = '\0';
+        logger.dim[0] = '\0';
+        logger.sgr0[0] = '\0';
     }
 
-    logfd = fd;
-    log_level = MIN(level, log_level_max());
-    return log_level;
+    logger.fd = fd;
+    logger.level = MIN(level, log_level_max());
+    return logger.level;
 }
 
 bool log_close(void)
 {
-    return log_level == LOG_LEVEL_NONE || xclose(logfd) == 0;
+    return logger.level == LOG_LEVEL_NONE || xclose(logger.fd) == 0;
 }
 
 bool log_level_enabled(LogLevel level)
 {
     BUG_ON(level <= LOG_LEVEL_NONE || level > LOG_LEVEL_TRACE);
-    BUG_ON(log_level < LOG_LEVEL_NONE || log_level > log_level_max());
-    return level <= log_level;
+    BUG_ON(logger.level < LOG_LEVEL_NONE || logger.level > log_level_max());
+    return level <= logger.level;
 }
 
 // This function should be kept async signal safe
 void log_write(LogLevel level, const char *str, size_t len)
 {
-    // log_level is a non-const global, but as noted above, it's never
+    // logger.level is a non-const global, but as noted above, it's never
     // modified after early startup and so poses no signal safety issues
     // (see https://austingroupbugs.net/view.php?id=728#c6430)
     if (!log_level_enabled(level)) {
@@ -120,9 +128,9 @@ void log_write(LogLevel level, const char *str, size_t len)
 
     // xwrite_all() only calls write(3), which is async signal safe
     // (see signal-safety(7))
-    BUG_ON(logfd < 0);
-    (void)!xwrite_all(logfd, str, len);
-    (void)!xwrite_all(logfd, "\n", 1);
+    BUG_ON(logger.fd < 0);
+    (void)!xwrite_all(logger.fd, str, len);
+    (void)!xwrite_all(logger.fd, "\n", 1);
 }
 
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
@@ -131,19 +139,19 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
         return;
     }
 
-    BUG_ON(logfd < 0);
+    BUG_ON(logger.fd < 0);
     char buf[2048];
     const int saved_errno = errno;
     const size_t buf_size = sizeof(buf) - 1;
     const char *prefix = log_level_map[level].prefix;
-    const char *color = sgr0[0] ? log_level_map[level].color : "";
-    const char *reset = color[0] ? sgr0 : "";
+    const char *color = logger.sgr0[0] ? log_level_map[level].color : "";
+    const char *reset = color[0] ? logger.sgr0 : "";
 
     int len1 = snprintf (
         buf, buf_size,
         "%s%s%s: %s%s:%d:%s ",
         color, prefix, reset,
-        dim, file, line, sgr0
+        logger.dim, file, line, logger.sgr0
     );
 
     if (unlikely(len1 < 0 || len1 >= buf_size)) {
@@ -153,7 +161,7 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
     int len2 = vsnprintf(buf + len1, buf_size - len1, fmt, ap);
     size_t n = MIN(len1 + MAX(len2, 0), buf_size);
     buf[n++] = '\n';
-    (void)!xwrite_all(logfd, buf, n);
+    (void)!xwrite_all(logger.fd, buf, n);
     errno = saved_errno;
 }
 
