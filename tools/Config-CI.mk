@@ -1,5 +1,10 @@
-# These variables are used by all CI test runners.
-# See also: `mk/prelude.mk` and `docs/packaging.md`
+# These variables are used by all CI test runners, except when running
+# Makefile targets that explicitly set `NO_CONFIG_MK=1`.
+# See also:
+# • mk/prelude.mk
+# • docs/packaging.md
+# • tools/mk/coverage.mk (`make gcovr-*`)
+# • tools/mk/portable.mk (`make portable*`)
 
 # Group build output by target, so that it doesn't get get interleaved
 # (by parallel builds) in ways that make it hard to read.
