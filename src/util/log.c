@@ -10,8 +10,7 @@
 typedef struct {
     LogLevel level; // Maximum level at which to log
     int fd; // File descriptor to write log messages to, or -1 when disabled
-    char dim[5]; // SGR "low intensity" sequence, or an empty string
-    char sgr0[5]; // SGR 0 (reset) sequence, or an empty string
+    bool use_color;
 } Logger;
 
 // This is initialized during early startup and then never changed,
@@ -20,8 +19,7 @@ typedef struct {
 static Logger logger = {
     .level = LOG_LEVEL_NONE,
     .fd = -1,
-    .dim = "\033[2m",
-    .sgr0 = "\033[0m",
+    .use_color = false,
 };
 
 static const struct LogLevelMap {
@@ -93,13 +91,8 @@ LogLevel log_open(const char *filename, LogLevel level, LogOpenFlags logflags)
         return LOG_LEVEL_NONE;
     }
 
-    bool use_color = (logflags & LOGOPEN_USE_COLOR);
-    if (!use_color || !isatty(fd)) {
-        logger.dim[0] = '\0';
-        logger.sgr0[0] = '\0';
-    }
-
     logger.fd = fd;
+    logger.use_color = (logflags & LOGOPEN_USE_COLOR);
     logger.level = MIN(level, log_level_max());
     return logger.level;
 }
@@ -144,14 +137,15 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
     const int saved_errno = errno;
     const size_t buf_size = sizeof(buf) - 1;
     const char *prefix = log_level_map[level].prefix;
-    const char *color = logger.sgr0[0] ? log_level_map[level].color : "";
-    const char *reset = color[0] ? logger.sgr0 : "";
+    const char *color = logger.use_color ? log_level_map[level].color : "";
+    const char *dim = logger.use_color ? "\033[2m" : "";
+    const char *sgr0 = logger.use_color ? "\033[0m" : "";
 
     int len1 = snprintf (
         buf, buf_size,
         "%s%s%s: %s%s:%d:%s ",
-        color, prefix, reset,
-        logger.dim, file, line, logger.sgr0
+        color, prefix, color[0] ? sgr0 : "",
+        dim, file, line, sgr0
     );
 
     if (unlikely(len1 < 0 || len1 >= buf_size)) {
