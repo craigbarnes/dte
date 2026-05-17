@@ -53,7 +53,7 @@ static inline void mask_style2(TermStyle *style, const TermStyle *over, bool mas
 
 static inline void mask_style(TermStyle *style, const TermStyle *over)
 {
-    return mask_style2(style, over, true);
+    mask_style2(style, over, true);
 }
 
 ssize_t parse_term_style(TermStyle *style, char **strs, size_t nstrs) NONNULL_ARGS WARN_UNUSED_RESULT;
