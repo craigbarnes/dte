@@ -43,7 +43,8 @@ size_t xfwrite_all(const char *restrict buf, size_t nitems, FILE *restrict strea
     return pos;
 }
 
-int xvfprintf(FILE *restrict stream, const char *restrict fmt, va_list ap)
+VPRINTF(2)
+static int xvfprintf(FILE *restrict stream, const char *restrict fmt, va_list ap)
 {
     int r;
     do {

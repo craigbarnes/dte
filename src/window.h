@@ -50,7 +50,6 @@ View *window_add_buffer(Window *window, Buffer *buffer) NONNULL_ARGS_AND_RETURN;
 View *window_open_empty_buffer(Window *window) NONNULL_ARGS_AND_RETURN;
 View *window_open_buffer(Window *window, const char *filename, bool must_exist, const char *encoding) NONNULL_ARG(1, 2);
 View *window_find_or_create_view(Window *window, Buffer *buffer) NONNULL_ARGS_AND_RETURN;
-View *window_find_view(Window *window, Buffer *buffer) NONNULL_ARGS;
 size_t window_count_uncloseable_views(const Window *window, View **first_uncloseable) NONNULL_ARGS WRITEONLY(2);
 void window_remove_view_at_index(Window *window, size_t view_idx) NONNULL_ARGS;
 void window_free(Window *window) NONNULL_ARGS;

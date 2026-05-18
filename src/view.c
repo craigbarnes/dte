@@ -26,7 +26,7 @@ void view_update_cursor_y(View *view)
     BUG("unreachable");
 }
 
-void view_update_cursor_x(View *view)
+static void view_update_cursor_x(View *view)
 {
     const unsigned int tw = view->buffer->options.tab_width;
     const CurrentLineRef lr = get_current_line_and_offset(view->cursor);

@@ -107,18 +107,7 @@ View *window_open_buffer (
     return window_add_buffer(window, buffer);
 }
 
-View *window_find_or_create_view(Window *window, Buffer *buffer)
-{
-    View *view = window_find_view(window, buffer);
-    if (!view) {
-        // Buffer isn't open in this window; create a new view of it
-        view = window_add_buffer(window, buffer);
-        view->cursor = buffer_get_first_view(buffer)->cursor;
-    }
-    return view;
-}
-
-View *window_find_view(Window *window, Buffer *buffer)
+static View *window_find_view(Window *window, Buffer *buffer)
 {
     for (size_t i = 0, n = buffer->views.count; i < n; i++) {
         View *view = buffer->views.ptrs[i];
@@ -126,8 +115,22 @@ View *window_find_view(Window *window, Buffer *buffer)
             return view;
         }
     }
+
     // Buffer isn't open in this window
     return NULL;
+}
+
+View *window_find_or_create_view(Window *window, Buffer *buffer)
+{
+    View *view = window_find_view(window, buffer);
+    if (view) {
+        return view;
+    }
+
+    // `buffer` isn't open in this window; create a new view of it
+    view = window_add_buffer(window, buffer);
+    view->cursor = buffer_get_first_view(buffer)->cursor;
+    return view;
 }
 
 size_t window_count_uncloseable_views(const Window *window, View **first_uncloseable)

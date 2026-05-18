@@ -93,7 +93,8 @@ RegexpWordBoundaryTokens regexp_get_word_boundary_tokens(void)
     return (RegexpWordBoundaryTokens){.len = 0};
 }
 
-size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen)
+NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(3, 4)
+static size_t regexp_escapeb(char *buf, size_t buflen, const char *pat, size_t plen)
 {
     BUG_ON(buflen < (2 * plen) + 1);
     size_t o = 0;

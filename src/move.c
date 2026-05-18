@@ -180,7 +180,7 @@ void move_to_line(View *view, size_t line)
     block_iter_goto_line(&view->cursor, line - 1);
 }
 
-void move_to_column(View *view, size_t column)
+static void move_to_column(View *view, size_t column)
 {
     BUG_ON(column == 0);
     block_iter_bol(&view->cursor);

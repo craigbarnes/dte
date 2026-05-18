@@ -51,7 +51,6 @@ char *xfgets(char *restrict buf, int bufsize, FILE *restrict stream);
 int xfputs(const char *restrict str, FILE *restrict stream);
 int xfputc(int c, FILE *stream);
 size_t xfwrite_all(const char *restrict buf, size_t nitems, FILE *restrict stream);
-int xvfprintf(FILE *restrict stream, const char *restrict fmt, va_list ap) VPRINTF(2);
 int xfprintf(FILE *restrict stream, const char *restrict fmt, ...) PRINTF(2);
 int xfflush(FILE *stream);
 

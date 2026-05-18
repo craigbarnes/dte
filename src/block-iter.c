@@ -8,7 +8,7 @@
 #include "util/xmemrchr.h"
 
 // Move to end of previous line (if any) and return number of bytes moved
-size_t block_iter_prev_line_eol(BlockIter *bi)
+static size_t block_iter_prev_line_eol(BlockIter *bi)
 {
     CodePoint u;
     BlockIter tmp = *bi;
