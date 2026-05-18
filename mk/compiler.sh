@@ -10,36 +10,27 @@ cc_option() {
     $CC "$@" -Werror -c -o /dev/null mk/feature-test/basic.c 2>>"$LOGFILE"
 }
 
-# Print all non-empty lines in "$2", each prefixed with "$1 += "
-fmt_var() {
-    echo "$2" | sed -E "/^\$/d; s/^ */$1 += /"
-}
-
-fmt_cflags() {
-    fmt_var 'BASIC_CFLAGS' "$1"
-}
-
 detect_cflags() {
     if cc_option $1; then
-        fmt_cflags "$1"
+        echo "BASIC_CFLAGS += $1"
     fi
 }
 
 detect_cflags_any() {
     while test "$#" -gt 0; do
         if cc_option $1; then
-            fmt_cflags "$1"
+            echo "BASIC_CFLAGS += $1"
             break
         fi
         shift
     done
 }
 
-# Like detect_cflags, but appending to a specific variable ($1) instead
-# of BASIC_CFLAGS
+# Like detect_cflags, but setting a specific variable ($1) instead of
+# appending to BASIC_CFLAGS
 detect_cflags_for_var() {
     if cc_option $2; then
-        fmt_var "$1" "$2"
+        echo "$1 = $2"
     fi
 }
 
@@ -71,7 +62,7 @@ detect_cflags_for_var CC_SANITIZER_FLAGS '@mk/cflags/sanitizer.txt'
 # suggested in the warning message (use the `nonstring` attribute) isn't
 # easy to make portable, since it produces `-Wattributes` warnings in older
 # GCC ("'nonstring' attribute ignored on objects of type 'const char[][8]'").
-# See also
+# See also:
 # • Commit 9932f4c68b8c7070095fb64e0394bf973d218947
 # • Commit 9cca48c804ba618be3b607d138033194858314e2
 # • https://gitlab.com/craigbarnes/dte/-/jobs/9886035875
