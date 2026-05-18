@@ -45,6 +45,11 @@ static inline size_t block_iter_is_first_block(const BlockIter *bi)
     return bi->blk->node.prev == bi->head;
 }
 
+static inline bool block_iter_is_bof(const BlockIter *bi)
+{
+    return bi->offset == 0 && block_iter_is_first_block(bi);
+}
+
 static inline bool block_iter_is_eof(const BlockIter *bi)
 {
     return bi->offset == bi->blk->size && block_iter_is_last_block(bi);
