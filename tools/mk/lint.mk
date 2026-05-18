@@ -92,9 +92,13 @@ check-appstream:
 	$(E) LINT share/dte.appdata.xml
 	$(Q) appstream-util --nonet validate share/dte.appdata.xml | sed '/OK$$/d' >&2
 
+check-unused-extern: $(all_objects)
+	$(E) UECHECK 'build/**.o'
+	$(Q) tools/unused-extern.sh $^
+
 
 .PHONY: \
     $(check_awk_targets) $(check_coccinelle_targets) $(iwyu_targets) \
     $(addprefix check-, all source aux coccinelle shell awk whitespace) \
     $(addprefix check-, headers makefiles codespell typos desktop-file) \
-    $(addprefix check-, appstream)
+    $(addprefix check-, appstream unused-extern)
