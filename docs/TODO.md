@@ -151,7 +151,7 @@ Features
 * Allow limiting the size of loaded `tags` files (see also: [#202])
 
 * Add support for trimming trailing whitespace on `save` (i.e. the
-  EditorConfig `trim_trailing_whitespace` property)
+  EditorConfig [`trim_trailing_whitespace`] property)
 
 * Add support for interactive spell checking
 
@@ -198,9 +198,9 @@ Features
 Documentation
 -------------
 
-* Briefly describe formatting conventions used in "COMMANDS" section of
-  `dterc(5)` man page (and also cross-reference `man(1)`, where similar
-  conventions are mentioned):
+* Briefly describe the formatting conventions used in the "COMMANDS"
+  section of [`dterc(5)`][] (and also cross-reference `man(1)`, where
+  similar conventions are mentioned):
   * **Bold**: Type exactly as shown
   * _Italic_ (or underline, in `roff(7)`): Replace with appropriate argument
   * `[-abc]`: Any or all arguments within `[ ]` are optional
@@ -384,6 +384,7 @@ Testing/Debugging
 [`dte-syntax(5)`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [`default`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#default
 
+[`dterc(5)`]: https://craigbarnes.gitlab.io/dte/dterc.html
 [configuration commands]: https://craigbarnes.gitlab.io/dte/dterc.html#configuration-commands
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
 [`clear`]: https://craigbarnes.gitlab.io/dte/dterc.html#clear
@@ -450,6 +451,7 @@ Testing/Debugging
 [`pbcopy(1)`]: https://keith.github.io/xcode-man-pages/pbcopy.1.html
 [`termux-clipboard-set`]: https://wiki.termux.com/wiki/Termux-clipboard-set
 [`/dev/clipboard`]: https://cygwin.com/cygwin-ug-net/using-specialnames.html#pathnames-posixdevices:~:text=/dev/clipboard
+[`trim_trailing_whitespace`]: https://spec.editorconfig.org/#:~:text=trim_trailing_whitespace
 [`tags(5)`]: https://man.archlinux.org/man/tags.5.en
 [`nano(1)`]: https://man.archlinux.org/man/nano.1.en
 [`micro(1)`]: https://man.archlinux.org/man/micro.1.en
