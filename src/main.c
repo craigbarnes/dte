@@ -146,8 +146,7 @@ static ExitCode init_std_fds(int std_fds[2], bool headless)
         // editor operation, regardless of how they were redirected
         if (unlikely(!freopen("/dev/tty", i ? "w" : "r", streams[i]))) {
             const char *err = strerror(errno);
-            fprintf(stderr, "Failed to open /dev/tty for fd %d: %s\n", i, err);
-            return EC_IO_ERROR;
+            return ec_io_error("Failed to open /dev/tty for fd %d: %s", i, err);
         }
 
         int new_fd = fileno(streams[i]);
@@ -156,8 +155,7 @@ static ExitCode init_std_fds(int std_fds[2], bool headless)
             // freopen() should call fclose() followed by open() and
             // POSIX requires a successful call to open() to return the
             // lowest available file descriptor.
-            fprintf(stderr, "freopen() changed fd from %d to %d\n", i, new_fd);
-            return EC_OS_ERROR;
+            return ec_os_error("freopen() changed fd from %d to %d", i, new_fd);
         }
 
         if (unlikely(!is_controlling_tty(new_fd))) {
@@ -271,8 +269,7 @@ static ExitCode init_logging(LogOpenFlags logflags)
     LogLevel got_level = log_open(filename, req_level, logflags);
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
-        fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", filename, err);
-        return EC_IO_ERROR;
+        return ec_io_error("Failed to open $DTE_LOG (%s): %s", filename, err);
     }
 
     const char *got_level_str = log_level_to_str(got_level);

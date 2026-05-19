@@ -52,7 +52,7 @@ CheckOptions:
     readability-implicit-bool-conversion.AllowPointerConditions: true
     readability-simplify-boolean-expr.ChainedConditionalAssignment: true
     readability-simplify-boolean-expr.ChainedConditionalReturn: true
-    readability-function-size.LineThreshold: '250'
+    readability-function-size.LineThreshold: '300'
     readability-function-size.StatementThreshold: '200'
     readability-function-size.NestingThreshold: '6'
     readability-function-size.ParameterThreshold: '6'

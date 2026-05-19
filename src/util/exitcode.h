@@ -33,6 +33,8 @@ static inline ExitCode ec_write_stdout(const char *str, size_t len)
 }
 
 ExitCode ec_usage_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
+ExitCode ec_io_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
+ExitCode ec_os_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
 ExitCode ec_printf_ok(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
 
 #endif
