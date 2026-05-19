@@ -25,6 +25,7 @@
 #include "util/intern.h"
 #include "util/intmap.h"
 #include "util/log.h"
+#include "util/str-util.h"
 #include "util/time-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -166,10 +167,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
     init_file_locks_context(&e->locks_ctx, e->user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
-    if (unlikely(setenv("DTE_VERSION", VERSION, 1) != 0)) {
-        // errno is almost certainly ENOMEM, if setenv() failed here
-        fatal_error("setenv", errno);
-    }
+    xsetenv("DTE_VERSION", VERSION);
 
     const RegexpWordBoundaryTokens *wb = &e->regexp_word_tokens;
     if (wb->len) {

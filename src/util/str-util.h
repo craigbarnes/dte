@@ -25,6 +25,14 @@ static inline const char *xgetenv(const char *name)
     return (!val || val[0] == '\0') ? NULL : val;
 }
 
+// Like setenv(3), but always using overwrite=1 and aborting on failure
+// (which can only mean errno=ENOMEM, if `name` is known to be valid)
+static inline void xsetenv(const char *name, const char *value)
+{
+    int r = setenv(name, value, 1);
+    FATAL_ERROR_ON(r != 0, errno);
+}
+
 PURE NONNULL_ARGS
 static inline bool str_has_strn_prefix(const char *str, const char *prefix, size_t plen)
 {
