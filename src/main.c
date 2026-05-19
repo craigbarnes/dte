@@ -88,8 +88,44 @@ static ExitCode lint_syntax(const char *filename, SyntaxLoadFlags flags)
     return ok ? EC_OK : EC_DATA_ERROR;
 }
 
-static ExitCode init_std_fds(int std_fds[2])
+static ExitCode init_std_fds_headless(int std_fds[2])
 {
+    FILE *streams[] = {stdin, stdout};
+    for (int i = 0; i < ARRAYLEN(streams); i++) {
+        if (!isatty(i)) {
+            // Try to duplicate redirected stdin/stdout, as described
+            // in init_std_fds()
+            int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
+            if (fd == -1 && errno != EBADF) {
+                return ec_error("fcntl", EC_OS_ERROR);
+            }
+            std_fds[i] = fd;
+        }
+        // Always reopen stdin and stdout as /dev/null, regardless of
+        // whether they were duplicated above
+        if (!freopen("/dev/null", i ? "w" : "r", streams[i])) {
+            return ec_error("freopen", EC_IO_ERROR);
+        }
+    }
+
+    if (!fd_is_valid(STDERR_FILENO)) {
+        // If FD 2 isn't valid (e.g. because it was closed), point it
+        // to /dev/null to ensure open(3) doesn't allocate it to other
+        // opened files
+        if (!freopen("/dev/null", "w", stderr)) {
+            return ec_error("freopen", EC_IO_ERROR);
+        }
+    }
+
+    return EC_OK;
+}
+
+static ExitCode init_std_fds(int std_fds[2], bool headless)
+{
+    if (headless) {
+        return init_std_fds_headless(std_fds);
+    }
+
     FILE *streams[3] = {stdin, stdout, stderr};
     for (int i = 0; i < ARRAYLEN(streams); i++) {
         if (is_controlling_tty(i)) {
@@ -126,38 +162,6 @@ static ExitCode init_std_fds(int std_fds[2])
 
         if (unlikely(!is_controlling_tty(new_fd))) {
             return ec_error("tcgetpgrp", EC_OS_ERROR);
-        }
-    }
-
-    return EC_OK;
-}
-
-static ExitCode init_std_fds_headless(int std_fds[2])
-{
-    FILE *streams[] = {stdin, stdout};
-    for (int i = 0; i < ARRAYLEN(streams); i++) {
-        if (!isatty(i)) {
-            // Try to duplicate redirected stdin/stdout, as described
-            // in init_std_fds()
-            int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
-            if (fd == -1 && errno != EBADF) {
-                return ec_error("fcntl", EC_OS_ERROR);
-            }
-            std_fds[i] = fd;
-        }
-        // Always reopen stdin and stdout as /dev/null, regardless of
-        // whether they were duplicated above
-        if (!freopen("/dev/null", i ? "w" : "r", streams[i])) {
-            return ec_error("freopen", EC_IO_ERROR);
-        }
-    }
-
-    if (!fd_is_valid(STDERR_FILENO)) {
-        // If FD 2 isn't valid (e.g. because it was closed), point it
-        // to /dev/null to ensure open(3) doesn't allocate it to other
-        // opened files
-        if (!freopen("/dev/null", "w", stderr)) {
-            return ec_error("freopen", EC_IO_ERROR);
         }
     }
 
@@ -493,7 +497,7 @@ int main(int argc, char *argv[])
     // an invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could cause the
     // logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
-    ExitCode r = headless ? init_std_fds_headless(std_fds) : init_std_fds(std_fds);
+    ExitCode r = init_std_fds(std_fds, headless);
 
     bool no_color = !!xgetenv("NO_COLOR"); // https://no-color.org/
     LogOpenFlags logflags = headless ? LOGOPEN_ALLOW_CTTY : 0;
