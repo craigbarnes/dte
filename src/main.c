@@ -565,7 +565,7 @@ int main(int argc, char *argv[])
     }
 
     e->flags |= histflags;
-    exec_rc_files(e, rc, read_rc);
+    exec_rc_files(e, rc, read_rc, no_color);
     read_history_files(e, headless);
 
     e->window = new_window(e);

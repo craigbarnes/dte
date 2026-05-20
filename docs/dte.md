@@ -232,6 +232,11 @@ The following environment variables are inspected at startup:
 :   Enables support for 24-bit terminal colors, if set to `truecolor` or
     `24bit`.
 
+`NO_COLOR`
+:   If set to a non-empty value, this disables syntax highlighting by
+    default (by setting the [`syntax`] option to false) and makes the
+    default UI use minimal coloring (see [`dte -b color/nocolor`]).
+
 The following environment variables affect various library routines used
 by dte:
 
@@ -407,6 +412,7 @@ input/output of both.
 [`case-sensitive-search`]: dterc.html#case-sensitive-search
 [default config]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/rc
 [built-in syntax files]: https://gitlab.com/craigbarnes/dte/-/tree/master/config/syntax
+[`dte -b color/nocolor`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/nocolor
 [rc file]: #files
 [exit status]: #exit-status
 [history files]: #files
@@ -445,6 +451,7 @@ input/output of both.
 [`tag`]: dterc.html#tag
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
+[`syntax`]: dterc.html#syntax
 
 [`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04

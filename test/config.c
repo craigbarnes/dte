@@ -318,7 +318,7 @@ void init_headless_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     ASSERT_NONNULL(e);
-    exec_rc_files(e, NULL, false);
+    exec_rc_files(e, NULL, false, false);
     e->window = new_window(e);
     e->root_frame = new_root_frame(e->window);
     set_view(window_open_empty_buffer(e->window));

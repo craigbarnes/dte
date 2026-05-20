@@ -92,6 +92,8 @@ Unreleased
 * Added an [`$RFILEDIR`] special variable
 * Added auto-completion of known filetypes for e.g. `set filetype m<Tab>`
 * Added [shell completion scripts] for fish and zsh
+* Added support for the [`$NO_COLOR`] environment variable, as defined
+  by [no-color.org](https://no-color.org/)
 
 **Improvements:**
 
@@ -806,6 +808,7 @@ builds are maintained on a "best effort" basis only.
 [`dte -P`]: https://craigbarnes.gitlab.io/dte/dte.html#:~:text=Print%20the%20terminal%20color%20palette%20to%20stdout
 [dte-stdin]: https://craigbarnes.gitlab.io/dte/dte.html#standard-input
 [environment]: https://craigbarnes.gitlab.io/dte/dte.html#environment
+[`$NO_COLOR`]: https://craigbarnes.gitlab.io/dte/dte.html#environment:~:text=NO_COLOR
 
 [`dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [`str`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#str

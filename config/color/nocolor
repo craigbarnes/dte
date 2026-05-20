@@ -1,0 +1,13 @@
+# This config is automatically loaded after the built-in `rc` file, if the
+# $NO_COLOR enviroment variable is set (and non-empty) at startup. All of
+# the syntax highlighting styles defined in `color/default` are retained,
+# since $NO_COLOR also makes the `syntax` option default to false (and we
+# want to allow toggling it with e.g. `toggle syntax`). Thus, all we do
+# here is override some previously set UI colors that don't fall into the
+# category of "sparing" usage (as mentioned at https://no-color.org/).
+
+hi noline dim
+hi selection reverse
+hi errormsg bold
+hi infomsg
+hi dialog reverse

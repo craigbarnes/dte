@@ -21,7 +21,7 @@ BUILTIN_SCRIPTS ?= \
 
 BUILTIN_CONFIGS = $(addprefix config/, \
     rc extra binding/default compiler/gcc compiler/go \
-    $(addprefix color/, reset default darkgray) \
+    $(addprefix color/, reset default darkgray nocolor) \
     $(addprefix script/, $(BUILTIN_SCRIPTS)) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 

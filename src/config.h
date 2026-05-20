@@ -42,7 +42,7 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs) NONNULL_ARGS_AN
 bool exec_config(CommandRunner *runner, StringView config) NONNULL_ARGS WARN_UNUSED_RESULT;
 SystemErrno read_config(CommandRunner *runner, const char *filename, ConfigFlags f) NONNULL_ARGS WARN_UNUSED_RESULT;
 void exec_builtin_color_reset(struct EditorState *e) NONNULL_ARGS;
-void exec_rc_files(struct EditorState *e, const char *filename, bool read_user_rc) NONNULL_ARG(1);
+void exec_rc_files(struct EditorState *e, const char *filename, bool read_user_rc, bool no_color) NONNULL_ARG(1);
 void collect_builtin_configs(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_builtin_config_variables(PointerArray *a, StringView prefix) NONNULL_ARGS;
 void collect_builtin_includes(PointerArray *a, const char *prefix) NONNULL_ARGS;

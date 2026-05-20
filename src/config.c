@@ -230,11 +230,21 @@ static void log_config_counts(const EditorState *e)
     );
 }
 
-void exec_rc_files(EditorState *e, const char *filename, bool read_user_rc)
-{
+void exec_rc_files (
+    EditorState *e,
+    const char *filename,
+    bool read_user_rc,
+    bool no_color
+) {
     StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
     exec_builtin_color_reset(e);
     exec_builtin_config(e, rc, "rc");
+
+    if (no_color) {
+        size_t nc_len = sizeof(builtin_color_nocolor) - 1;
+        StringView nc = string_view(builtin_color_nocolor, nc_len);
+        exec_builtin_config(e, nc, "color/nocolor");
+    }
 
     if (read_user_rc) {
         ConfigFlags flags = CFG_NOFLAGS;
