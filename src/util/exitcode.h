@@ -1,10 +1,8 @@
 #ifndef UTIL_EXITCODE_H
 #define UTIL_EXITCODE_H
 
-#include <stdio.h>
-#include <unistd.h>
+#include <stddef.h>
 #include "macros.h"
-#include "xreadwrite.h"
 
 // Semantic exit codes, as defined by BSD sysexits(3)
 enum {
@@ -20,21 +18,11 @@ enum {
 // returning this type should only return one of the above values.
 typedef int ExitCode;
 
-static inline ExitCode ec_error(const char *prefix, ExitCode ec)
-{
-    perror(prefix);
-    return ec;
-}
-
-static inline ExitCode ec_write_stdout(const char *str, size_t len)
-{
-    ssize_t r = xwrite_all(STDOUT_FILENO, str, len);
-    return likely(r >= 0) ? EC_OK : ec_error("write", EC_IO_ERROR);
-}
-
-ExitCode ec_usage_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
-ExitCode ec_io_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
-ExitCode ec_os_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
+ExitCode ec_error(const char *prefix, ExitCode ec) COLD;
+ExitCode ec_write_stdout(const char *str, size_t len);
+ExitCode ec_usage_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS COLD;
+ExitCode ec_io_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS COLD;
+ExitCode ec_os_error(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS COLD;
 ExitCode ec_printf_ok(const char *restrict fmt, ...) PRINTF(1) NONNULL_ARGS;
 
 #endif
