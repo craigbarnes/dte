@@ -95,10 +95,11 @@ SystemErrno xclose(int fd)
     const SystemErrno saved_errno = errno;
     int r = close(fd);
     if (likely(r == 0 || errno != EINTR)) {
-        errno = saved_errno;
         // Treat EINPROGRESS the same as r == 0
         // (https://git.musl-libc.org/cgit/musl/commit/?id=82dc1e2e783815e00a90cd)
-        return (r && errno != EINPROGRESS) ? errno : 0;
+        SystemErrno ret = (r && errno != EINPROGRESS) ? errno : 0;
+        errno = saved_errno;
+        return ret;
     }
 
     // If the first close() call failed with EINTR, retry until it succeeds
@@ -120,8 +121,9 @@ SystemErrno xclose(int fd)
     // • https://ewontfix.com/4/
     // • https://sourceware.org/bugzilla/show_bug.cgi?id=14627
     // • https://austingroupbugs.net/view.php?id=529#c1200
+    SystemErrno ret = (r && errno != EBADF) ? errno : 0;
     errno = saved_errno;
-    return (r && errno != EBADF) ? errno : 0;
+    return ret;
 }
 
 // NOLINTEND(*-unsafe-functions)
