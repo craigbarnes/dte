@@ -20,6 +20,7 @@ static void test_ini_parse(TestContext *ctx)
         "[]\n"
         " \t # comm=ent\n"
         "; comm=ent\n"
+        "k\n"
         "z=."
     );
 
@@ -53,7 +54,7 @@ static void test_ini_parse(TestContext *ctx)
     EXPECT_STRVIEW_EQ_CSTRING(ini.value, "0");
 
     EXPECT_TRUE(ini_parse(&ini));
-    EXPECT_EQ(ini.pos, 126);
+    EXPECT_EQ(ini.pos, 128);
     EXPECT_EQ(ini.name_count, 1);
     EXPECT_STRVIEW_EQ_CSTRING(ini.section, "");
     EXPECT_STRVIEW_EQ_CSTRING(ini.name, "z");

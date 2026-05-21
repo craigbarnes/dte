@@ -187,6 +187,7 @@ static void test_xmalloc(TestContext *ctx)
 
     str = xstrslice("one two three", 4, 7);
     EXPECT_STREQ(str, "two");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice("one two three", 4, 7), str);
     free(str);
 
     str = xstrjoin("foo", "-bar");
@@ -989,6 +990,17 @@ static void test_strview_remove_matching(TestContext *ctx)
     EXPECT_EQ(sv.length, 0);
     EXPECT_NULL(sv.data);
     EXPECT_STRVIEW_EQ_CSTRING(sv, "");
+}
+
+static void test_strview_from_slice(TestContext *ctx)
+{
+    static const char src[] = "01234567890";
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(NULL, 0, 0), "");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 0, 0), "");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 1, 1), "");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 2, 3), "2");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 3, 7), "3456");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 0, sizeof(src) - 1), src);
 }
 
 static void test_get_delim(TestContext *ctx)
@@ -3957,6 +3969,7 @@ static const TestEntry tests[] = {
     TEST(test_string_view),
     TEST(test_strview_has_suffix),
     TEST(test_strview_remove_matching),
+    TEST(test_strview_from_slice),
     TEST(test_get_delim),
     TEST(test_get_delim_str),
     TEST(test_strn_replace_byte),

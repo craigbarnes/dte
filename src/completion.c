@@ -879,8 +879,8 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
         pos = end;
     }
 
-    StringView text = string_view(cmd, cmdline_pos); // Text to be completed
-    strview_remove_prefix(&text, completion_pos);
+    // Text to be completed
+    StringView text = strview_from_slice(cmd, completion_pos, cmdline_pos);
 
     if (strview_has_prefix(text, "$")) {
         completion_pos += collect_vars(&cs->completions, text);

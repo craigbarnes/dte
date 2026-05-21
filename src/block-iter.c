@@ -176,8 +176,7 @@ size_t block_iter_next_line(BlockIter *bi)
 size_t block_iter_skip_blanks_fwd(BlockIter *bi)
 {
     block_iter_normalize(bi);
-    StringView sv = string_view(bi->blk->data, bi->blk->size);
-    strview_remove_prefix(&sv, bi->offset);
+    StringView sv = strview_from_slice(bi->blk->data, bi->offset, bi->blk->size);
 
     // We're only operating on one line and checking for ASCII characters,
     // so Block traversal and Unicode-aware decoding are both unnecessary
@@ -311,8 +310,7 @@ StringView block_iter_get_line_with_nl(BlockIter *bi)
     StringView line;
     if (bi->blk->nl == 1) {
         // Block contains only 1 line; end-of-line is end-of-block
-        line = string_view(bi->blk->data, bi->blk->size);
-        strview_remove_prefix(&line, bi->offset);
+        line = strview_from_slice(bi->blk->data, bi->offset, bi->blk->size);
     } else {
         size_t pos = bi->offset;
         line = buf_slice_next_line(bi->blk->data, &pos, bi->blk->size);

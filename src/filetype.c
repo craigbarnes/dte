@@ -111,10 +111,9 @@ bool add_filetype (
 
 static StringView path_extension(StringView filename)
 {
-    StringView ext = filename;
-    ssize_t pos = strview_memrchr_idx(ext, '.');
-    strview_remove_prefix(&ext, pos > 0 ? pos + 1 : ext.length);
-    return ext;
+    ssize_t last_dot = strview_memrchr_idx(filename, '.');
+    size_t ext_offset = last_dot > 0 ? last_dot + 1 : filename.length;
+    return strview_from_slice(filename.data, ext_offset, filename.length);
 }
 
 static StringView get_filename_extension(StringView filename)

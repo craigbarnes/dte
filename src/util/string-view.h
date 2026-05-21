@@ -43,6 +43,16 @@ static inline StringView strview(const char *str)
     return string_view(str, str ? strlen(str) : 0);
 }
 
+// Return a view of the `str` substring between `start` and `end`.
+// This is similar to xstrslice(), but without the need to allocate,
+// copy or null-terminate.
+static inline StringView strview_from_slice(const char *str, size_t start, size_t end)
+{
+    BUG_ON(start > end);
+    BUG_ON(end && !str);
+    return string_view(start ? str + start : str, end - start);
+}
+
 static inline bool strview_equal(StringView a, StringView b)
 {
     size_t n = a.length;

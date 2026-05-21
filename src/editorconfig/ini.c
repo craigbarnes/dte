@@ -36,9 +36,9 @@ bool ini_parse(IniParser *ctx)
             continue;
         }
 
-        size_t val_offset = 0;
-        StringView name = get_delim(line.data, &val_offset, line.length, '=');
-        if (val_offset >= line.length) {
+        size_t val_pos = 0;
+        StringView name = get_delim(line.data, &val_pos, line.length, '=');
+        if (val_pos >= line.length) {
             continue; // Invalid line (no delimiter)
         }
 
@@ -47,8 +47,7 @@ bool ini_parse(IniParser *ctx)
             continue; // Invalid line (empty name)
         }
 
-        StringView value = line;
-        strview_remove_prefix(&value, val_offset);
+        StringView value = strview_from_slice(line.data, val_pos, line.length);
         strview_trim_left(&value);
 
         ctx->name = name;
