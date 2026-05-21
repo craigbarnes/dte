@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "macros.h"
 #include "str-util.h"
+#include "string-view.h"
 #include "xmalloc.h"
 #include "xstring.h"
 
@@ -60,7 +61,7 @@ WARN_UNUSED_RESULT NONNULL_ARGS
 static inline bool string_array_concat_ (
     char *buf, size_t bufsize,
     const char *const *strs, size_t nstrs,
-    const char *delim, size_t delim_len
+    StringView delim
 ) {
     BUG_ON(bufsize == 0);
     const char *end = buf + bufsize;
@@ -70,11 +71,11 @@ static inline bool string_array_concat_ (
     for (size_t i = 0; i < nstrs; i++) {
         bool last_iter = (i + 1 == nstrs);
         ptr = memccpy(ptr, strs[i], '\0', end - ptr);
-        if (unlikely(!ptr || (!last_iter && ptr + delim_len > end))) {
+        if (unlikely(!ptr || (!last_iter && ptr + delim.length > end))) {
             return false;
         }
         // Append `delim` (over the copied '\0'), if not on the last iteration
-        ptr = last_iter ? ptr : xmempcpy(ptr - 1, delim, delim_len);
+        ptr = last_iter ? ptr : xmempcpy(ptr - 1, delim.data, delim.length);
     }
 
     return true;
@@ -85,9 +86,9 @@ static inline bool string_array_concat_ (
 static inline void string_array_concat (
     char *buf, size_t bufsize,
     const char *const *strs, size_t nstrs,
-    const char *delim, size_t delim_len
+    StringView delim
 ) {
-    bool r = string_array_concat_(buf, bufsize, strs, nstrs, delim, delim_len);
+    bool r = string_array_concat_(buf, bufsize, strs, nstrs, delim);
     BUG_ON(!r);
 }
 

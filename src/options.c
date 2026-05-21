@@ -332,7 +332,7 @@ static bool enum_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
     }
 
     char expected[64];
-    string_array_concat(expected, sizeof(expected), values, n, STRN(", "));
+    string_array_concat(expected, sizeof(expected), values, n, strview(", "));
     return error_msg(ebuf, "Invalid value for %s; expected: %s", d->name, expected);
 }
 
@@ -363,7 +363,7 @@ static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
         }
         if (unlikely(!values[n])) {
             char expected[128];
-            string_array_concat(expected, sizeof(expected), values, n, STRN(", "));
+            string_array_concat(expected, sizeof(expected), values, n, strview(", "));
             return error_msg (
                 ebuf,
                 "Invalid flag '%.*s' for %s; expected: %s",
@@ -395,7 +395,7 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     // ...so that string_array_concat() can be used to concatenate them
     // into a comma-separated list
     static char buf[128];
-    string_array_concat(buf, sizeof(buf), tmp, nstrs, STRN(","));
+    string_array_concat(buf, sizeof(buf), tmp, nstrs, strview(","));
     return buf;
 }
 

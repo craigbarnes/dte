@@ -1065,34 +1065,30 @@ static void test_string_array_concat(TestContext *ctx)
     char buf[64] = "\0";
     size_t nstrs = ARRAYLEN(strs);
 
-    const char *delim = ",";
-    const char *str = "A,B,CC,D,EE";
-    size_t delim_len = strlen(delim);
-    size_t n = strlen(str);
-    ASSERT_TRUE(n + 1 < sizeof(buf));
+    StringView delim = strview(",");
+    StringView expected = strview("A,B,CC,D,EE");
+    ASSERT_TRUE(expected.length + 1 < sizeof(buf));
     memset(buf, '@', sizeof(buf) - 1);
-    EXPECT_FALSE(string_array_concat_(buf, n, strs, nstrs, delim, delim_len));
+    EXPECT_FALSE(string_array_concat_(buf, expected.length, strs, nstrs, delim));
     memset(buf, '@', sizeof(buf) - 1);
-    EXPECT_TRUE(string_array_concat_(buf, n + 1, strs, nstrs, delim, delim_len));
-    EXPECT_STREQ(buf, str);
+    EXPECT_TRUE(string_array_concat_(buf, expected.length + 1, strs, nstrs, delim));
+    EXPECT_STRVIEW_EQ_CSTRING(expected, buf);
 
-    delim = " ... ";
-    delim_len = strlen(delim);
-    str = "A ... B ... CC ... D ... EE";
-    n = strlen(str);
-    ASSERT_TRUE(n + 1 < sizeof(buf));
+    delim = strview(" ... ");
+    expected = strview("A ... B ... CC ... D ... EE");
+    ASSERT_TRUE(expected.length + 1 < sizeof(buf));
     memset(buf, '@', sizeof(buf) - 1);
-    EXPECT_FALSE(string_array_concat_(buf, n, strs, nstrs, delim, delim_len));
+    EXPECT_FALSE(string_array_concat_(buf, expected.length, strs, nstrs, delim));
     memset(buf, '@', sizeof(buf) - 1);
-    EXPECT_TRUE(string_array_concat_(buf, n + 1, strs, nstrs, delim, delim_len));
-    EXPECT_STREQ(buf, str);
+    EXPECT_TRUE(string_array_concat_(buf, expected.length + 1, strs, nstrs, delim));
+    EXPECT_STRVIEW_EQ_CSTRING(expected, buf);
 
-    for (size_t i = 0; i < n; i++) {
-        EXPECT_FALSE(string_array_concat_(buf, n - i, strs, nstrs, delim, delim_len));
+    for (size_t i = 0; i < expected.length; i++) {
+        EXPECT_FALSE(string_array_concat_(buf, expected.length - i, strs, nstrs, delim));
     }
 
     memset(buf, '@', sizeof(buf) - 1);
-    EXPECT_TRUE(string_array_concat_(buf, sizeof(buf), strs, 0, delim, delim_len));
+    EXPECT_TRUE(string_array_concat_(buf, sizeof(buf), strs, 0, delim));
     EXPECT_STREQ(buf, "");
 }
 
