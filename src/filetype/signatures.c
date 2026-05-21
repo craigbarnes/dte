@@ -14,29 +14,29 @@ static const struct EmacsModeEntry {
     {"shell-script", SH},
 };
 
-static ssize_t find_var_delim(const char *start, size_t len)
+static ssize_t find_var_delim(StringView sv)
 {
-    const char *delim = xmemmem(start, len, STRN("-*-"));
-    return delim ? delim - start : -1;
+    const char *delim = xmemmem(sv.data, MIN(sv.length, 128), STRN("-*-"));
+    return delim ? delim - sv.data : -1;
 }
 
 static FileTypeEnum filetype_from_emacs_var(const StringView line)
 {
-    ssize_t delim_offset = find_var_delim(line.data, MIN(line.length, 128));
-    if (delim_offset < 0) {
+    ssize_t pos = find_var_delim(line);
+    if (pos < 0) {
         return NONE;
     }
 
-    StringView vars = line;
-    strview_remove_prefix(&vars, delim_offset + STRLEN("-*-"));
+    size_t dlen = STRLEN("-*-");
+    StringView vars = strview_from_slice(line.data, pos + dlen, line.length);
     strview_trim_left(&vars);
 
-    delim_offset = find_var_delim(vars.data, MIN(vars.length, 128));
-    if (delim_offset <= 0) {
+    pos = find_var_delim(vars);
+    if (pos <= 0) {
         return NONE;
     }
 
-    vars.length = delim_offset;
+    vars.length = pos;
     strview_trim_right(&vars);
     LOG_DEBUG("found emacs file-local vars: '%.*s'", (int)vars.length, vars.data);
 
