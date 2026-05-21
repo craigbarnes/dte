@@ -26,7 +26,8 @@ static void consume_input(TermInputBuffer *input, size_t len)
     if (log_trace_enabled(TRACEFLAG_INPUT)) {
         // Note that this occurs *after* e.g. query responses have been logged
         char buf[256];
-        u_make_printable(input->buf, len, buf, sizeof(buf), MPF_C0_SYMBOLS);
+        StringView src = string_view(input->buf, len);
+        u_make_printable(src, buf, sizeof(buf), MPF_C0_SYMBOLS);
         if (len == input->len) {
             TRACE_INPUT("consumed %zu bytes from input buffer: %s", len, buf);
         } else {

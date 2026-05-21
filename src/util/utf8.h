@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include "debug.h"
 #include "macros.h"
+#include "string-view.h"
 #include "unicode.h"
 
 // Minimum `dest_len` value needed by u_make_printable() to guarantee
@@ -72,8 +73,7 @@ static inline size_t u_char_size(CodePoint u)
  * happen.
  */
 static inline size_t u_make_printable (
-    const char *restrict src,
-    size_t src_len,
+    StringView src,
     char *restrict dest,
     size_t dest_len,
     MakePrintableFlags flags
@@ -81,8 +81,8 @@ static inline size_t u_make_printable (
     BUG_ON(dest_len == 0);
     size_t len = 0;
 
-    for (size_t i = 0; i < src_len && len + U_SET_CHAR_MAXLEN < dest_len; ) {
-        CodePoint u = u_get_char(src, src_len, &i);
+    for (size_t i = 0; i < src.length && len + U_SET_CHAR_MAXLEN < dest_len; ) {
+        CodePoint u = u_get_char(src.data, src.length, &i);
         if (flags & MPF_C0_SYMBOLS) {
             u = (u < 0x20) ? u + 0x2400 : (u == 0x7F ? 0x2421 : u);
         }

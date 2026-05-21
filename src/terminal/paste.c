@@ -49,14 +49,14 @@ static String term_read_detected_paste(TermInputBuffer *input)
     return str;
 }
 
-static void log_bpaste_remainder(const char *remainder, size_t remainder_len)
+static void log_bpaste_remainder(StringView remainder)
 {
     if (!log_level_debug_enabled()) {
         return;
     }
     char buf[32];
-    u_make_printable(remainder, remainder_len, buf, sizeof(buf), MPF_C0_SYMBOLS);
-    LOG_DEBUG("%zu byte remainder after bracketed paste: %s", remainder_len, buf);
+    u_make_printable(remainder, buf, sizeof(buf), MPF_C0_SYMBOLS);
+    LOG_DEBUG("%zu byte remainder after bracketed paste: %s", remainder.length, buf);
 }
 
 static String term_read_bracketed_paste(TermInputBuffer *input)
@@ -76,7 +76,7 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
             input->len -= text_len + dlen;
             if (input->len) {
                 memmove(input->buf, end + dlen, input->len);
-                log_bpaste_remainder(input->buf, input->len);
+                log_bpaste_remainder(string_view(input->buf, input->len));
             }
             goto out;
         }
@@ -86,9 +86,7 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
         input->len = 0;
     }
 
-    const char *remainder;
-    size_t remainder_len;
-
+    StringView remainder;
     while (1) {
         char *start = string_reserve_space(&str, read_max);
         ssize_t read_len = xread(STDIN_FILENO, start, read_max);
@@ -109,17 +107,16 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
 
         size_t total_read_len = str.len + read_len;
         size_t total_text_len = (size_t)(end - str.buffer);
-        remainder_len = total_read_len - total_text_len - dlen;
-        remainder = end + dlen;
+        remainder = strview_from_slice(end, dlen, total_read_len - total_text_len);
         str.len = total_text_len;
         break;
     }
 
-    if (remainder_len) {
-        log_bpaste_remainder(remainder, remainder_len);
-        BUG_ON(remainder_len > TERM_INBUF_SIZE);
-        memcpy(input->buf, remainder, remainder_len);
-        input->len = remainder_len;
+    if (remainder.length) {
+        log_bpaste_remainder(remainder);
+        BUG_ON(remainder.length > TERM_INBUF_SIZE);
+        memcpy(input->buf, remainder.data, remainder.length);
+        input->len = remainder.length;
     }
 
 out:

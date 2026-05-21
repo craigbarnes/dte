@@ -38,17 +38,18 @@ static void iexpect_keycode_eq (
         return;
     }
 
-    char a_str[KEYCODE_STR_BUFSIZE];
-    char b_str[KEYCODE_STR_BUFSIZE];
-    char seq_str[64];
-    keycode_to_str(a, a_str);
-    keycode_to_str(b, b_str);
-    u_make_printable(seq, seq_len, seq_str, sizeof seq_str, 0);
+    StringView seq_sv = string_view(seq, seq_len);
+    char keystr_a[KEYCODE_STR_BUFSIZE];
+    char keystr_b[KEYCODE_STR_BUFSIZE];
+    char printable_seq[64];
+    keycode_to_str(a, keystr_a);
+    keycode_to_str(b, keystr_b);
+    u_make_printable(seq_sv, printable_seq, sizeof(printable_seq), 0);
 
     test_fail(
         ctx, file, line,
         "Test #%zu: key codes not equal: 0x%02x, 0x%02x (%s, %s); input: %s",
-        ++idx, a, b, a_str, b_str, seq_str
+        ++idx, a, b, keystr_a, keystr_b, printable_seq
     );
 }
 
@@ -1825,14 +1826,14 @@ static void test_update_term_title(TestContext *ctx)
     TermOutputBuffer obuf = TERM_OUTPUT_INIT;
 
     static const char expected1[] = "\033]2;example filename - dte\033\\";
-    update_term_title(&obuf, "example filename", false);
+    update_term_title(&obuf, strview("example filename"), false);
     EXPECT_MEMEQ(obuf.buf, obuf.count, expected1, sizeof(expected1) - 1);
     EXPECT_EQ(obuf.x, 0);
     obuf.count = 0;
 
     // Control char escaping
     static const char expected2[] = "\033]2;x^I^H^[y - dte\033\\";
-    update_term_title(&obuf, "x\t\b\033y", false);
+    update_term_title(&obuf, strview("x\t\b\033y"), false);
     EXPECT_MEMEQ(obuf.buf, obuf.count, expected2, sizeof(expected2) - 1);
     EXPECT_EQ(obuf.x, 0);
     obuf.count = 0;
@@ -1841,7 +1842,7 @@ static void test_update_term_title(TestContext *ctx)
     char filename[TERM_OUTBUF_SIZE];
     memset(filename, 'a', sizeof(filename));
     filename[sizeof(filename) - 1] = '\0';
-    update_term_title(&obuf, filename, false);
+    update_term_title(&obuf, strview(filename), false);
 
     size_t tlen = obuf.count - (plen + slen);
     EXPECT_EQ(sizeof(filename), 8192);

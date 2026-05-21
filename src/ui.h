@@ -15,6 +15,7 @@
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/macros.h"
+#include "util/string-view.h"
 #include "util/utf8.h"
 #include "view.h"
 #include "window.h"
@@ -40,7 +41,7 @@ static inline bool term_style_has_default_bg(const TermStyle *s, const StyleMap 
 
 // ui.c
 void update_screen(struct EditorState *e, const ScreenState *s);
-void update_term_title(TermOutputBuffer *obuf, const char *filename, bool is_modified);
+void update_term_title(TermOutputBuffer *obuf, StringView filename, bool is_modified);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
 void set_style(Terminal *term, const StyleMap *styles, const TermStyle *style);

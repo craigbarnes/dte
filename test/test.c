@@ -54,14 +54,16 @@ void expect_memeq (
     const void *p2,
     size_t n2
 ) {
-    if (likely(n1 == n2 && mem_equal(p1, p2, n1))) {
+    const StringView sv1 = string_view(p1, n1);
+    const StringView sv2 = string_view(p2, n2);
+    if (likely(strview_equal(sv1, sv2))) {
         test_pass(ctx);
         return;
     }
 
     char buf[2048];
-    size_t m1 = u_make_printable(p1, n1, buf, sizeof(buf) - 64, 0);
-    size_t m2 = u_make_printable(p2, n2, buf + m1, sizeof(buf) - m1, 0);
+    size_t m1 = u_make_printable(sv1, buf, sizeof(buf) - 64, 0);
+    size_t m2 = u_make_printable(sv2, buf + m1, sizeof(buf) - m1, 0);
     const char *color1 = ctx->cyan;
     const char *color2 = ctx->yellow;
     const char *sgr0 = ctx->sgr0;

@@ -58,15 +58,14 @@ static void update_cursor_style (
     }
 }
 
-void update_term_title(TermOutputBuffer *obuf, const char *filename, bool is_modified)
+void update_term_title(TermOutputBuffer *obuf, StringView filename, bool is_modified)
 {
     // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Miscellaneous:~:text=OSC%202%20ST
     static const char prefix[] = "\033]2;"; // OSC 2
     char suffix[] = " + dte\033\\"; // ST
     suffix[1] = is_modified ? '+' : '-';
 
-    size_t filename_len = strlen(filename);
-    size_t print_max = U_MAKE_PRINTABLE_MAXLEN(filename_len);
+    size_t print_max = U_MAKE_PRINTABLE_MAXLEN(filename.length);
     size_t extra_len = sizeof(prefix) + sizeof(suffix) - 2;
     size_t reserved = MIN(print_max + extra_len, TERM_OUTBUF_SIZE);
     char *buf = term_output_reserve_space(obuf, reserved);
@@ -74,7 +73,7 @@ void update_term_title(TermOutputBuffer *obuf, const char *filename, bool is_mod
     // Using u_make_printable() here ensures that there are no control
     // characters or invalid UTF-8 sequences in the emitted OSC string
     size_t i = copystrn(buf, prefix, sizeof(prefix) - 1);
-    i += u_make_printable(filename, filename_len, buf + i, reserved - extra_len, 0);
+    i += u_make_printable(filename, buf + i, reserved - extra_len, 0);
     i += copystrn(buf + i, suffix, sizeof(suffix) - 1);
     BUG_ON(i >= reserved);
     obuf->count += i;
@@ -207,7 +206,7 @@ void update_screen(EditorState *e, const ScreenState *s)
 
     if ((flags & UPDATE_TERM_TITLE) && (term->features & TFLAG_SET_WINDOW_TITLE)) {
         if (options->set_window_title) {
-            const char *filename = buffer_filename(buffer);
+            StringView filename = strview(buffer_filename(buffer));
             update_term_title(&term->obuf, filename, buffer_modified(buffer));
         } else if (unlikely(s->set_window_title)) {
             // "set-window-title" global option changed from true to false;

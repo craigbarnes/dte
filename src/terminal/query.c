@@ -207,12 +207,6 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
     return string_view(outbuf, n / 2);
 }
 
-static size_t make_printable_ctlseq(StringView seq, char *buf, size_t buflen)
-{
-    MakePrintableFlags flags = MPF_C0_SYMBOLS;
-    return u_make_printable(seq.data, seq.length, buf, buflen, flags);
-}
-
 static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
 {
     size_t pos = 3;
@@ -255,11 +249,12 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     char ebuf[8 + (U_SET_CHAR_MAXLEN * (sizeof(cbuf) + sizeof(vbuf)))];
     size_t i = 0;
     if (cap.length) {
+        MakePrintableFlags mpflags = MPF_C0_SYMBOLS;
         i += copyliteral(ebuf + i, " (");
-        i += make_printable_ctlseq(cap, ebuf + i, sizeof(ebuf) - i);
+        i += u_make_printable(cap, ebuf + i, sizeof(ebuf) - i, mpflags);
         if (val.length) {
             ebuf[i++] = '=';
-            i += make_printable_ctlseq(val, ebuf + i, sizeof(ebuf) - i);
+            i += u_make_printable(val, ebuf + i, sizeof(ebuf) - i, mpflags);
         }
         ebuf[i++] = ')';
     }
