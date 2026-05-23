@@ -620,6 +620,8 @@ static void test_mem_equal_icase(TestContext *ctx)
     static const char s1[8] = "Ctrl+Up";
     static const char s2[8] = "CTRL+U_";
     EXPECT_TRUE(mem_equal_icase(NULL, NULL, 0));
+    EXPECT_TRUE(mem_equal_icase(NULL, s1, 0));
+    EXPECT_TRUE(mem_equal_icase(s1, NULL, 0));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 0));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 1));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 2));

@@ -45,6 +45,19 @@ static inline bool mem_equal(const void *s1, const void *s2, size_t n)
     return n == 0 || memcmp(s1, s2, n) == 0;
 }
 
+NONNULL_ARG_IF_NONZERO_LENGTH(1, 3) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
+static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
+{
+    BUG_ON(n && (!p1 || !p2)); // See N3322 reference above
+    for (const char *s1 = p1, *s2 = p2; n--; ) {
+        if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // Portable version of glibc/FreeBSD mempcpy(3)
 NONNULL_ARG(1) RETURNS_NONNULL NONNULL_ARG_IF_NONZERO_LENGTH(2, 3)
 static inline void *xmempcpy(void *restrict dest, const void *restrict src, size_t n)
@@ -81,25 +94,6 @@ static inline void *xmempcpy4 ( // NOLINT(readability-function-size)
     const void *p4, size_t n4
 ) {
     return xmempcpy(xmempcpy3(dest, p1, n1, p2, n2, p3, n3), p4, n4);
-}
-
-static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
-{
-    if (n == 0) {
-        return true; // See N3322 reference above
-    }
-
-    const char *s1 = p1;
-    const char *s2 = p2;
-    BUG_ON(!s1 || !s2);
-
-    while (n--) {
-        if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 #endif
