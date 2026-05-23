@@ -1326,11 +1326,10 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
         }
     }
 
-    // If we reach the last populated line in the buffer, move down one line
+    // If we've reached the last populated line in the buffer, move
+    // down one line (to EOF)
     BlockIter tmp = view->cursor;
-    block_iter_eol(&tmp);
-    block_iter_skip_bytes(&tmp, 1);
-    if (block_iter_is_eof(&tmp)) {
+    if (block_iter_eat_line(&tmp) && block_iter_is_eof(&tmp)) {
         view->cursor = tmp;
     }
 
