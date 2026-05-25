@@ -199,10 +199,9 @@ static const TermStyle **highlight_line (
             state = dest;
             goto top;
         case COND_HEREDOCEND: {
-            const char *str = u->heredocend.data;
-            size_t slen = u->heredocend.length;
-            size_t end = i + slen;
-            if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
+            StringView hde = u->heredocend;
+            size_t end = i + hde.length;
+            if (len >= end && mem_equal(hde.data, line + i, hde.length)) {
                 i += set_style_range(styles, style, i, end);
                 sidx = -1;
                 state = dest;
