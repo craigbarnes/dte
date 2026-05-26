@@ -71,8 +71,19 @@ enum {
     KEY_F22,
     KEY_F23,
     KEY_F24,
+    KEY_F25,
+    KEY_F26,
+    KEY_F27,
+    KEY_F28,
+    KEY_F29,
+    KEY_F30,
+    KEY_F31,
+    KEY_F32,
+    KEY_F33,
+    KEY_F34,
+    KEY_F35,
 
-    KEY_SPECIAL_MAX = KEY_F24,
+    KEY_SPECIAL_MAX = KEY_F35,
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
 
     // In-band signalling for non-key events

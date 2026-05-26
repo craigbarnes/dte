@@ -59,15 +59,12 @@ Unreleased
   * [`scroll-pgdown -h`][`scroll-pgdown`]
 * Added 1 new option:
   * [`syntax-line-limit`]
-* Added support for [binding][`bind`] 8 new keys:
+* Added support for [binding][`bind`] 19 new keys:
   * `menu`
   * `print` ("Print Screen")
   * `scrlock` ("Scroll Lock")
   * `pause`
-  * `F21`
-  * `F22`
-  * `F23`
-  * `F24`
+  * `F21`..`F35` (15 keys total)
 * Added 4 default key bindings[^new-binds]:
   * Ctrl+Shift+G → `search -p` (search previous)
   * Shift+F3 → `search -p`

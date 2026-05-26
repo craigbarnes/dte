@@ -52,6 +52,17 @@ static const char special_names[][10] = {
     K(KEY_F22) = "F22",
     K(KEY_F23) = "F23",
     K(KEY_F24) = "F24",
+    K(KEY_F25) = "F25",
+    K(KEY_F26) = "F26",
+    K(KEY_F27) = "F27",
+    K(KEY_F28) = "F28",
+    K(KEY_F29) = "F29",
+    K(KEY_F30) = "F30",
+    K(KEY_F31) = "F31",
+    K(KEY_F32) = "F32",
+    K(KEY_F33) = "F33",
+    K(KEY_F34) = "F34",
+    K(KEY_F35) = "F35",
 };
 
 static const struct {

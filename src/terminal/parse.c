@@ -143,6 +143,18 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
         case 57385: return KEY_F22;
         case 57386: return KEY_F23;
         case 57387: return KEY_F24;
+        case 57388: return KEY_F25;
+        case 57389: return KEY_F26;
+        case 57390: return KEY_F27;
+        case 57391: return KEY_F28;
+        case 57392: return KEY_F29;
+        case 57393: return KEY_F30;
+        case 57394: return KEY_F31;
+        case 57395: return KEY_F32;
+        case 57396: return KEY_F33;
+        case 57397: return KEY_F34;
+        case 57398: return KEY_F35;
+
         // Keypad:
         case 57399: return '0';
         case 57400: return '1';
