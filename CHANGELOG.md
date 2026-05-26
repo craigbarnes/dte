@@ -57,8 +57,9 @@ Unreleased
   * [`exec -o echo`][`exec`]
   * [`scroll-pgup -h`][`scroll-pgup`]
   * [`scroll-pgdown -h`][`scroll-pgdown`]
-* Added 1 new option:
+* Added 2 new options:
   * [`syntax-line-limit`]
+  * [`syntax-size-limit`]
 * Added support for [binding][`bind`] 19 new keys:
   * `menu`
   * `print` ("Print Screen")
@@ -95,13 +96,14 @@ Unreleased
 **Improvements:**
 
 * Updated Unicode support to version 17
-* Various performance optimizations
-* Various improvements to man pages
 * [Changed][commit ab4961e24194b20] the default Alt+F key binding from
   `search -w` to `search -sw`, so as to always perform a case-insensitive
   search, regardless of the value of the [`case-sensitive-search`] option
 * Changed the default Alt+Shift+F key binding from `search -wr` to
   `search -swr`, for the same reason as above
+* Clarified and improved the [`dte`], [`dterc`] and [`dte-syntax`] man pages
+* Improved several existing syntax highlighters
+* Many performance optimizations
 
 **Fixes:**
 
@@ -873,6 +875,7 @@ builds are maintained on a "best effort" basis only.
 [`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
 [`syntax-line-limit`]: https://craigbarnes.gitlab.io/dte/dterc.html#syntax-line-limit
+[`syntax-size-limit`]: https://craigbarnes.gitlab.io/dte/dterc.html#syntax-size-limit
 [`utf8-bom`]: https://craigbarnes.gitlab.io/dte/dterc.html#utf8-bom
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left
 [`$COLNO`]: https://craigbarnes.gitlab.io/dte/dterc.html#COLNO

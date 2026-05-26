@@ -1597,6 +1597,11 @@ interpreted as "unlimited".
 If this option is triggered, an error message will be displayed and the
 [`syntax`] option will be set to `false` (as if by `set -l syntax false`).
 
+### **syntax-size-limit** [100MiB]
+
+Like [`syntax-line-limit`], but triggered if the total file size exceeds
+the limit, instead of applying to individual lines.
+
 ### **tab-bar** [true]
 
 Whether to show the tab-bar at the top of each window.
@@ -1816,6 +1821,7 @@ errors should be highlighted. Set to `""` to disable.
 [`newline`]: #newline
 [`overwrite`]: #overwrite
 [`syntax`]: #syntax
+[`syntax-line-limit`]: #syntax-line-limit
 [`tab-width`]: #tab-width
 [`text-width`]: #text-width
 [`utf8-bom`]: #utf8-bom

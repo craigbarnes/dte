@@ -232,6 +232,8 @@ Global options:
 .br
    \fBsyntax\-line\-limit\fR [512KiB]
 .br
+   \fBsyntax\-size\-limit\fR [100MiB]
+.br
    \fBtab\-bar\fR [true]
 .br
    \fButf8\-bom\fR [false]
@@ -2312,6 +2314,12 @@ interpreted as "unlimited".
 .P
 If this option is triggered, an error message will be displayed and the
 \fBsyntax\fR option will be set to \fBfalse\fR (as if by \fBset \-l syntax false\fR).
+.P
+.RE
+\fBsyntax\-size\-limit\fR [100MiB]
+.RS
+Like \fBsyntax\-line\-limit\fR, but triggered if the total file size exceeds
+the limit, instead of applying to individual lines.
 .P
 .RE
 \fBtab\-bar\fR [true]
