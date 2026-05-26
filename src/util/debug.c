@@ -36,9 +36,15 @@ void fatal_error_cleanup(void)
 #if ASAN_ENABLED == 1
 #include <sanitizer/asan_interface.h>
 
+// https://github.com/google/sanitizers/wiki/AddressSanitizerFlags#:~:text=__asan_default_options,-function
+// https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html#index-fsanitize_003dpointer-compare
 const char *__asan_default_options(void)
 {
-    return "detect_leaks=1:detect_stack_use_after_return=1";
+    return
+        "detect_leaks=1"
+        ":detect_stack_use_after_return=1"
+        ":detect_invalid_pointer_pairs=2"
+    ;
 }
 
 void __asan_on_error(void)
