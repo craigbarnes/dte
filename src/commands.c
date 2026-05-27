@@ -1422,6 +1422,19 @@ static bool cmd_pgup(EditorState *e, const CommandArgs *a)
     return true;
 }
 
+static bool cmd_play(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    const MacroRecorder *m = &e->macro;
+    for (size_t i = 0, n = m->macro.count; i < n; i++) {
+        const char *cmd_str = m->macro.ptrs[i];
+        if (!handle_normal_command(e, cmd_str, false)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 static bool cmd_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
@@ -1532,6 +1545,37 @@ exit:;
     e->flags &= ~histflags;
     e->status = exit_code;
     return true;
+}
+
+static bool cmd_record(EditorState *e, const CommandArgs *a)
+{
+    MacroRecorder *m = &e->macro;
+    char action = cmdargs_pick_winning_flag(a, "crs");
+    const char *msg;
+
+    switch (action ? action : (m->recording ? 's' : 'r')) {
+    case 'c':
+        msg = macro_cancel(m) ? "Macro recording cancelled" : "Not recording";
+        break;
+    case 'r':
+        msg = macro_record(m) ? "Recording macro" : "Already recording";
+        break;
+    case 's':
+        if (macro_stop(m)) {
+            size_t count = m->macro.count;
+            return info_msg (
+                &e->err, "Macro recording stopped; %zu command%s saved",
+                count, (count != 1) ? "s" : ""
+            );
+        }
+        msg = "Not recording";
+        break;
+    default:
+        BUG("unexpected flag: %c", action);
+        return false;
+    }
+
+    return info_msg(&e->err, "%s", msg);
 }
 
 static bool cmd_redo(EditorState *e, const CommandArgs *a)
@@ -2674,8 +2718,10 @@ static const Command cmds[] = {
     {"paste", "acm", NA, 0, 0, cmd_paste},
     {"pgdown", "cl", NA, 0, 0, cmd_pgdown},
     {"pgup", "cl", NA, 0, 0, cmd_pgup},
+    {"play", "", NA, 0, 0, cmd_play},
     {"prev", "", NA, 0, 0, cmd_prev},
     {"quit", "CFHSfp", NA, 0, 1, cmd_quit},
+    {"record", "crs", NA, 0, 0, cmd_record},
     {"redo", "", NA, 0, 1, cmd_redo},
     {"refresh", "", NA, 0, 0, cmd_refresh},
     {"reopen", "", NA, 0, 0, cmd_reopen},
