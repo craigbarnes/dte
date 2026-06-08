@@ -2032,8 +2032,9 @@ static bool cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
     View *view = e->view;
     handle_selection_flags(view, a);
 
+    const long nlines = view->buffer->nl;
     const long edit_h = e->window->edit_h;
-    const long max = view->buffer->nl - edit_h + 1;
+    const long max = (nlines - edit_h) + 1;
     long count;
 
     if (view->vy < max && max > 0) {
@@ -2044,8 +2045,8 @@ static bool cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
             count = max - view->vy;
         }
         view->vy += count;
-    } else if (view->cy < view->buffer->nl) {
-        count = view->buffer->nl - view->cy;
+    } else if (view->cy < nlines && !has_flag(a, 'M')) {
+        count = nlines - view->cy;
     } else {
         return true;
     }
@@ -2066,7 +2067,7 @@ static bool cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
         unsigned int shift = half & 1;
         count = MIN((e->window->edit_h - 1) >> shift, view->vy);
         view->vy -= count;
-    } else if (view->cy > 0) {
+    } else if (view->cy > 0 && !has_flag(a, 'M')) {
         count = view->cy;
     } else {
         return true;
@@ -2730,8 +2731,8 @@ static const Command cmds[] = {
     {"right", "cl", NA, 0, 0, cmd_right},
     {"save", "Bbde=fpu", NA, 0, 1, cmd_save},
     {"scroll-down", "M", NA, 0, 0, cmd_scroll_down},
-    {"scroll-pgdown", "chl", NA, 0, 0, cmd_scroll_pgdown},
-    {"scroll-pgup", "chl", NA, 0, 0, cmd_scroll_pgup},
+    {"scroll-pgdown", "Mchl", NA, 0, 0, cmd_scroll_pgdown},
+    {"scroll-pgup", "Mchl", NA, 0, 0, cmd_scroll_pgup},
     {"scroll-up", "M", NA, 0, 0, cmd_scroll_up},
     {"search", "Haceilnprswx", NA, 0, 1, cmd_search},
     {"select", "kl", NA, 0, 0, cmd_select},

@@ -797,18 +797,24 @@ if possible.
 `-M`
 :   Never move the cursor, even at [scroll margins]
 
-### **scroll-pgup** [**-h**]
+### **scroll-pgup** [**-Mh**]
 
 Scroll one page up, while maintaining the cursor position relative to
 the top of the screen.
 
+`-M`
+:   Never move the cursor, even when the first line is already visible
+
 `-h`
 :   Scroll half a page, instead of a full page
 
-### **scroll-pgdown** [**-h**]
+### **scroll-pgdown** [**-Mh**]
 
 Scroll one page down, while maintaining the cursor position relative to
 the top of the screen.
+
+`-M`
+:   Never move the cursor, even when the last line is already visible
 
 `-h`
 :   Scroll half a page, instead of a full page

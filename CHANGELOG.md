@@ -38,7 +38,9 @@ Unreleased
   * [`cd -v`][`cd`]
   * [`scroll-down -M`][`scroll-down`]
   * [`scroll-up -M`][`scroll-up`]
+  * [`scroll-pgup -M`][`scroll-pgup`]
   * [`scroll-pgup -h`][`scroll-pgup`]
+  * [`scroll-pgdown -M`][`scroll-pgdown`]
   * [`scroll-pgdown -h`][`scroll-pgdown`]
   * [`line -c`][`line`]
   * [`line -l`][`line`]
@@ -55,8 +57,6 @@ Unreleased
   * [`copy text`][`copy`]
   * [`join delimiter`][`join`]
   * [`exec -o echo`][`exec`]
-  * [`scroll-pgup -h`][`scroll-pgup`]
-  * [`scroll-pgdown -h`][`scroll-pgdown`]
 * Added 2 new options:
   * [`syntax-line-limit`]
   * [`syntax-size-limit`]

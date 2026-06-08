@@ -115,9 +115,9 @@ Movement Commands:
 .br
    \fBscroll\-down\fR [\fB\-M\fR]
 .br
-   \fBscroll\-pgup\fR [\fB\-h\fR]
+   \fBscroll\-pgup\fR [\fB\-Mh\fR]
 .br
-   \fBscroll\-pgdown\fR [\fB\-h\fR]
+   \fBscroll\-pgdown\fR [\fB\-Mh\fR]
 .br
    \fBcenter\-view\fR
 .br
@@ -1309,21 +1309,29 @@ if possible.
 Never move the cursor, even at scroll margins
 .PP
 .RE
-\fBscroll\-pgup\fR [\fB\-h\fR]
+\fBscroll\-pgup\fR [\fB\-Mh\fR]
 .RS
 Scroll one page up, while maintaining the cursor position relative to
 the top of the screen.
 .P
 .TP
+\fB\-M\fR
+Never move the cursor, even when the first line is already visible
+.PP
+.TP
 \fB\-h\fR
 Scroll half a page, instead of a full page
 .PP
 .RE
-\fBscroll\-pgdown\fR [\fB\-h\fR]
+\fBscroll\-pgdown\fR [\fB\-Mh\fR]
 .RS
 Scroll one page down, while maintaining the cursor position relative to
 the top of the screen.
 .P
+.TP
+\fB\-M\fR
+Never move the cursor, even when the last line is already visible
+.PP
 .TP
 \fB\-h\fR
 Scroll half a page, instead of a full page
