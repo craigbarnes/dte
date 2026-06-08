@@ -1459,13 +1459,18 @@ Display special characters.
 
 ### **esc-timeout** [100] 0...2000
 
-When single escape is read from the terminal dte waits some
-time before treating the escape as a single keypress. The
-timeout value is in milliseconds.
+When a single ESC byte is read from a terminal that doesn't support the
+[Kitty keyboard protocol], dte waits for this timeout (in milliseconds)
+before treating it as an Escape key press.
 
-Too long timeout makes escape key feel slow and too small
-timeout can cause escape sequences of for example arrow keys to
-be split and treated as multiple key presses.
+Longer timeouts can make the Escape key feel slow to respond, but an
+overly short timeout can cause escape sequences (e.g. for arrow keys)
+to be split and treated as multiple key presses.
+
+This option is completely ignored when the terminal supports the Kitty
+keyboard protocol, since the [encoding][kittykbd-esc-encoding] of the
+Escape key is unambiguous in that case and Escape key press events are
+thus processed immediately.
 
 ### **filesize-limit** [250MiB]
 
@@ -1768,7 +1773,9 @@ errors should be highlighted. Set to `""` to disable.
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
 [`tags`]: https://docs.ctags.io/en/stable/man/tags.5.html
+[Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [Kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[kittykbd-esc-encoding]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions:~:text=CSI-,ESCAPE,27%C2%A0u,-ENTER
 [OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands:~:text=5%202%20%20%E2%87%92%C2%A0%20Manipulate%20Selection%20Data
 
 [`alias`]: #alias

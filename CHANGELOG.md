@@ -101,6 +101,9 @@ Unreleased
   search, regardless of the value of the [`case-sensitive-search`] option
 * Changed the default Alt+Shift+F key binding from `search -wr` to
   `search -swr`, for the same reason as above
+* [Optimized][commit f4b88e01f6e5673] input handling for terminals that
+  support the [Kitty keyboard protocol], so as to make the [`esc-timeout`]
+  option redundant
 * Clarified and improved the [`dte`], [`dterc`] and [`dte-syntax`] man pages
 * Improved several existing syntax highlighters
 * Many performance optimizations
@@ -793,6 +796,7 @@ builds are maintained on a "best effort" basis only.
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
 [commit c4af2b1a15c96e8]: https://gitlab.com/craigbarnes/dte/-/commit/c4af2b1a15c96e820452c183e81e9bd415492778
 [commit 0fe5e5f224e832a]: https://gitlab.com/craigbarnes/dte/-/commit/0fe5e5f224e832a382ce1fb7e6b4e0d6f0da8f55
+[commit f4b88e01f6e5673]: https://gitlab.com/craigbarnes/dte/-/commit/f4b88e01f6e56735cb10626312b907e627b37d2e
 [shell completion scripts]: https://gitlab.com/craigbarnes/dte/-/tree/master/share
 [exec aliases]: https://craigbarnes.gitlab.io/dte/dterc.html#exec:~:text=built%2Din%20aliases
 [dex]: https://github.com/tihirvon/dex
@@ -870,6 +874,7 @@ builds are maintained on a "best effort" basis only.
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
 [`auto-indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#auto-indent
 [`case-sensitive-search`]: https://craigbarnes.gitlab.io/dte/dterc.html#case-sensitive-search
+[`esc-timeout`]: https://craigbarnes.gitlab.io/dte/dterc.html#esc-timeout
 [`filesize-limit`]: https://craigbarnes.gitlab.io/dte/dterc.html#filesize-limit
 [`optimize-true-color`]: https://craigbarnes.gitlab.io/dte/dterc.html#optimize-true-color
 [`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
