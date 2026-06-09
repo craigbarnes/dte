@@ -371,13 +371,13 @@ String dump_tags(TagFile *tf, ErrorBuffer *ebuf)
 
     while (next_tag(tf->buf, tf->size, &pos, prefix, false, &tag)) {
         string_append_buf(&buf, tag.name.data, tag.name.length);
-        string_append_cstring(&buf, "   ");
+        string_append_literal(&buf, "   ");
         string_append_buf(&buf, tag.filename.data, tag.filename.length);
         if (tag.kind) {
             string_sprintf(&buf, "   kind:%c", tag.kind);
         }
         if (tag.local) {
-            string_append_cstring(&buf, "   LOCAL");
+            string_append_literal(&buf, "   LOCAL");
         }
         if (tag.pattern) {
             string_sprintf(&buf, "   /%s/", tag.pattern);

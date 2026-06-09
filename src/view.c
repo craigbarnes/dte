@@ -267,7 +267,7 @@ String dump_buffer(const View *view)
 
     if (DEBUG >= 1) {
         const BlockIter *cursor = &view->cursor;
-        string_append_cstring(&buf, "\nBlocks:\n-------\n\n");
+        string_append_literal(&buf, "\nBlocks:\n-------\n\n");
         size_t i = 1;
         const Block *b;
         block_for_each(b, &buffer->blocks) {

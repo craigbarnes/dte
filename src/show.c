@@ -645,7 +645,7 @@ static String dump_show_subcmds(EditorState* UNUSED_ARG(e))
     string_append_literal(&str, "# Available `show` sub-commands:\n");
     for (size_t i = 0; i < ARRAYLEN(show_handlers); i++) {
         const ShowHandler *handler = &show_handlers[i];
-        string_append_cstring(&str, "show ");
+        string_append_literal(&str, "show ");
         string_append_cstring(&str, handler->name);
         string_append_cstring(&str, arg_hint_for_subcmd(handler));
         string_append_byte(&str, '\n');

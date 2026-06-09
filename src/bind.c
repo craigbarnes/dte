@@ -106,7 +106,7 @@ bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
     for (size_t i = 0; i < count; i++) {
         string_append_literal(buf, "bind ");
         if (flag[0] != '\0' && flag[0] != '-') {
-            string_append_cstring(buf, "-T ");
+            string_append_literal(buf, "-T ");
             string_append_escaped_arg(buf, flag, true);
             string_append_byte(buf, ' ');
         } else {
