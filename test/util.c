@@ -3701,12 +3701,14 @@ static void test_read_file(TestContext *ctx)
     const char *line = buf_next_line(buf, &pos, size);
     EXPECT_STREQ(line, "line #1");
     EXPECT_EQ(pos, 8);
+    ASSERT_TRUE(pos < size);
     line = buf_next_line(buf, &pos, size);
     EXPECT_STREQ(line, " line #2");
     EXPECT_EQ(pos, 17);
+    ASSERT_TRUE(pos < size);
     line = buf_next_line(buf, &pos, size);
     EXPECT_STREQ(line, "  line #3");
-    EXPECT_EQ(pos, 26);
+    EXPECT_EQ3(pos, size, 26);
     free(buf);
 }
 

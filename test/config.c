@@ -17,6 +17,7 @@
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
+#include "util/utf8.h"
 #include "util/xsnprintf.h"
 #include "window.h"
 
@@ -82,11 +83,41 @@ static void expect_files_equal(TestContext *ctx, const char *path1, const char *
     }
     test_pass(ctx);
 
-    if (size1 != size2 || !mem_equal(buf1, buf2, size1)) {
-        TEST_FAIL("Files differ: '%s', '%s'", path1, path2);
-    } else {
+    // The code below is similar to expect_memeq(), but with the error
+    // messages made more useful in the context of comparing files
+    // (instead of just arbitrary memory)
+
+    const StringView sv1 = string_view(buf1, size1);
+    const StringView sv2 = string_view(buf2, size2);
+    if (likely(strview_equal(sv1, sv2))) {
+        free(buf1);
+        free(buf2);
         test_pass(ctx);
+        return;
     }
+
+    char buf[4096];
+    size_t m1 = u_make_printable(sv1, buf, sizeof(buf) - 64, 0);
+    size_t m2 = u_make_printable(sv2, buf + m1, sizeof(buf) - m1, 0);
+    const char *color1 = ctx->cyan;
+    const char *color2 = ctx->yellow;
+    const char *sgr0 = ctx->sgr0;
+
+    // Add space padding after the shorter filename, so that both contents
+    // strings are aligned and minor differences are easier to spot
+    int path_len_diff = (int)strlen(path1) - (int)strlen(path2);
+    int pad1 = (path_len_diff < 0) ? -path_len_diff : 0;
+    int pad2 = (path_len_diff > 0) ? path_len_diff : 0;
+
+    TEST_FAIL (
+        "Files %s%s%s and %s%s%s differ:\n"
+        "%s:1: %*s%s%.*s%s\n"
+        "%s:1: %*s%s%.*s%s",
+        color1, path1, sgr0,
+        color2, path2, sgr0,
+        path1, pad1, "", color1, (int)m1, buf, sgr0,
+        path2, pad2, "", color2, (int)m2, buf + m1, sgr0
+    );
 
     free(buf1);
     free(buf2);
