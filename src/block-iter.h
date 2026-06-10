@@ -23,15 +23,25 @@ typedef struct {
     size_t cursor_offset;
 } CurrentLineRef;
 
+static inline Block *block_iter_get_first_block(BlockIter *bi)
+{
+    return BLOCK(bi->head->next);
+}
+
+static inline Block *block_iter_get_last_block(BlockIter *bi)
+{
+    return BLOCK(bi->head->prev);
+}
+
 static inline void block_iter_bof(BlockIter *bi)
 {
-    bi->blk = BLOCK(bi->head->next);
+    bi->blk = block_iter_get_first_block(bi);
     bi->offset = 0;
 }
 
 static inline void block_iter_eof(BlockIter *bi)
 {
-    bi->blk = BLOCK(bi->head->prev);
+    bi->blk = block_iter_get_last_block(bi);
     bi->offset = bi->blk->size;
 }
 
@@ -66,7 +76,7 @@ static inline bool block_iter_is_eol(const BlockIter *bi)
     const Block *blk = bi->blk;
     if (bi->offset == blk->size) {
         bool last = block_iter_is_last_block(bi);
-        return last || BLOCK(blk->node.next)->data[0] == '\n';
+        return last || block_next(blk)->data[0] == '\n';
     }
 
     return blk->data[bi->offset] == '\n';
@@ -78,7 +88,7 @@ static inline bool block_iter_next_block(BlockIter *bi)
         return false;
     }
 
-    bi->blk = BLOCK(bi->blk->node.next);
+    bi->blk = block_next(bi->blk);
     bi->offset = 0; // Beginning of next Block
     return true;
 }
@@ -89,7 +99,7 @@ static inline bool block_iter_end_of_prev_block(BlockIter *bi)
         return false;
     }
 
-    bi->blk = BLOCK(bi->blk->node.prev);
+    bi->blk = block_prev(bi->blk);
     bi->offset = bi->blk->size; // End of previous Block
     return true;
 }

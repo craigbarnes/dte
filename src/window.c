@@ -264,7 +264,7 @@ void set_view(View *view)
 
     // view.cursor can be invalid if same buffer was modified from another view
     if (view->restore_cursor) {
-        view->cursor.blk = BLOCK(view->buffer->blocks.next);
+        view->cursor.blk = buffer_get_first_block(view->buffer);
         block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
         view->restore_cursor = false;
         view->saved_cursor_offset = 0;

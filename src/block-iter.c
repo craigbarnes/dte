@@ -246,11 +246,11 @@ void block_iter_goto_offset(BlockIter *bi, size_t offset)
 
 void block_iter_goto_line(BlockIter *bi, size_t line)
 {
-    Block *blk = BLOCK(bi->head->next);
+    Block *blk = block_iter_get_first_block(bi);
     size_t nl = 0;
     while (blk->node.next != bi->head && nl + blk->nl < line) {
         nl += blk->nl;
-        blk = BLOCK(blk->node.next);
+        blk = block_next(blk);
     }
 
     bi->blk = blk;

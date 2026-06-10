@@ -18,7 +18,7 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
     }
 
     const Buffer *buffer = view->buffer;
-    const Block *blk = BLOCK(buffer->blocks.next);
+    const Block *blk = buffer_get_first_block(buffer);
     const Block *cursor_blk = view->cursor.blk;
     BUG_ON(list_empty(&buffer->blocks));
     BUG_ON(view->cursor.offset > cursor_blk->size);
@@ -190,7 +190,7 @@ static size_t split_and_insert(BlockIter *cursor, const char *buf, size_t len)
     cursor->blk = BLOCK(prev_node->next);
     while (cursor->offset > cursor->blk->size) {
         cursor->offset -= cursor->blk->size;
-        cursor->blk = BLOCK(cursor->blk->node.next);
+        cursor->blk = block_next(cursor->blk);
     }
 
     nl_added -= blk->nl;
@@ -298,7 +298,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
         && blk->data[blk->size - 1] != '\n'
         && blk->node.next != &buffer->blocks
     ) {
-        Block *next = BLOCK(blk->node.next);
+        Block *next = block_next(blk);
         size_t size = blk->size + next->size;
         block_grow(blk, size);
         memcpy(blk->data + blk->size, next->data, next->size);

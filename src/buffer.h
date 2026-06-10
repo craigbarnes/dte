@@ -86,10 +86,20 @@ static inline struct View *buffer_get_first_view(const Buffer *buffer)
     return buffer->views.ptrs[0];
 }
 
+static inline Block *buffer_get_first_block(const Buffer *buffer)
+{
+    return BLOCK(buffer->blocks.next);
+}
+
+static inline Block *buffer_get_last_block(const Buffer *buffer)
+{
+    return BLOCK(buffer->blocks.prev);
+}
+
 static inline BlockIter block_iter(Buffer *buffer)
 {
     return (BlockIter) {
-        .blk = BLOCK(buffer->blocks.next),
+        .blk = buffer_get_first_block(buffer),
         .head = &buffer->blocks,
         .offset = 0
     };

@@ -144,7 +144,7 @@ void update_buffer_windows (
         }
         if (view != current_view) {
             // Restore cursor
-            view->cursor.blk = BLOCK(view->buffer->blocks.next);
+            view->cursor.blk = buffer_get_first_block(view->buffer);
             block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
 
             // This has already been done for the current view

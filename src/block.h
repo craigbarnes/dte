@@ -25,7 +25,7 @@ enum {
     for ( \
         block_ = BLOCK((list_head_)->next); \
         &block_->node != (list_head_); \
-        block_ = BLOCK(block_->node.next) \
+        block_ = block_next(block_) \
     )
 
 // NOLINTNEXTLINE(readability-identifier-naming)
@@ -33,6 +33,18 @@ static inline Block *BLOCK(ListHead *item)
 {
     static_assert(offsetof(Block, node) == 0);
     return (Block*)item;
+}
+
+NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT
+static inline Block *block_next(const Block *blk)
+{
+    return BLOCK(blk->node.next);
+}
+
+NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT
+static inline Block *block_prev(const Block *blk)
+{
+    return BLOCK(blk->node.prev);
 }
 
 static inline void block_sanity_check(const Block *blk)
@@ -47,7 +59,7 @@ static inline void block_sanity_check(const Block *blk)
     BUG_ON(!blk->data);
 }
 
-Block *block_new(size_t alloc) RETURNS_NONNULL;
+Block *block_new(size_t alloc) RETURNS_NONNULL WARN_UNUSED_RESULT;
 void block_grow(Block *blk, size_t alloc) NONNULL_ARGS;
 void block_free(Block *blk) NONNULL_ARGS;
 

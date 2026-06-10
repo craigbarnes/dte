@@ -59,7 +59,7 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_TRUE(cmdargs_has_flag(&binding->a, 'm'));
 
     ASSERT_TRUE(handle_binding(e, mode, key));
-    const Block *block = BLOCK(e->buffer->blocks.next);
+    const Block *block = buffer_get_first_block(e->buffer);
     ASSERT_NONNULL(block);
     EXPECT_MEMEQ(block->data, block->size, "zzz\n", 4);
     EXPECT_EQ(block->nl, 1);

@@ -65,7 +65,7 @@ static void fixup_blocks(Buffer *buffer)
         return;
     }
 
-    Block *lastblk = BLOCK(buffer->blocks.prev);
+    Block *lastblk = buffer_get_last_block(buffer);
     BUG_ON(!lastblk);
     size_t n = lastblk->size;
     if (n && lastblk->data[n - 1] != '\n') {
