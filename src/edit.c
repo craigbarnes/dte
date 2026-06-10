@@ -26,7 +26,8 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
     if (blk->size == 0) {
         // The only time a zero-sized block is valid is when it's the
         // first and only block
-        BUG_ON(buffer->blocks.next->next != &buffer->blocks);
+        BUG_ON(block_has_next(blk, &buffer->blocks));
+        BUG_ON(block_has_prev(blk, &buffer->blocks));
         BUG_ON(cursor_blk != blk);
         block_sanity_check(blk);
         return;
@@ -234,7 +235,8 @@ void do_insert(View *view, const char *buf, size_t len)
 
 static bool only_block(const Buffer *buffer, const Block *blk)
 {
-    return blk->node.prev == &buffer->blocks && blk->node.next == &buffer->blocks;
+    const ListHead *head = &buffer->blocks;
+    return !block_has_next(blk, head) && !block_has_prev(blk, head);
 }
 
 char *do_delete(View *view, size_t len, bool sanity_check_newlines)
@@ -296,7 +298,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
     if (
         blk->size
         && blk->data[blk->size - 1] != '\n'
-        && blk->node.next != &buffer->blocks
+        && block_has_next(blk, &buffer->blocks)
     ) {
         Block *next = block_next(blk);
         size_t size = blk->size + next->size;

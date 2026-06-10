@@ -45,24 +45,14 @@ static inline void block_iter_eof(BlockIter *bi)
     bi->offset = bi->blk->size;
 }
 
-static inline size_t block_iter_is_last_block(const BlockIter *bi)
-{
-    return bi->blk->node.next == bi->head;
-}
-
-static inline size_t block_iter_is_first_block(const BlockIter *bi)
-{
-    return bi->blk->node.prev == bi->head;
-}
-
 static inline bool block_iter_is_bof(const BlockIter *bi)
 {
-    return bi->offset == 0 && block_iter_is_first_block(bi);
+    return bi->offset == 0 && !block_has_prev(bi->blk, bi->head);
 }
 
 static inline bool block_iter_is_eof(const BlockIter *bi)
 {
-    return bi->offset == bi->blk->size && block_iter_is_last_block(bi);
+    return bi->offset == bi->blk->size && !block_has_next(bi->blk, bi->head);
 }
 
 static inline bool block_iter_is_bol(const BlockIter *bi)
@@ -75,8 +65,8 @@ static inline bool block_iter_is_eol(const BlockIter *bi)
 {
     const Block *blk = bi->blk;
     if (bi->offset == blk->size) {
-        bool last = block_iter_is_last_block(bi);
-        return last || block_next(blk)->data[0] == '\n';
+        bool is_last_block = !block_has_next(bi->blk, bi->head);
+        return is_last_block || block_next(blk)->data[0] == '\n';
     }
 
     return blk->data[bi->offset] == '\n';
@@ -84,8 +74,8 @@ static inline bool block_iter_is_eol(const BlockIter *bi)
 
 static inline bool block_iter_next_block(BlockIter *bi)
 {
-    if (block_iter_is_last_block(bi)) {
-        return false;
+    if (!block_has_next(bi->blk, bi->head)) {
+        return false; // Already on last Block
     }
 
     bi->blk = block_next(bi->blk);
@@ -95,8 +85,8 @@ static inline bool block_iter_next_block(BlockIter *bi)
 
 static inline bool block_iter_end_of_prev_block(BlockIter *bi)
 {
-    if (block_iter_is_first_block(bi)) {
-        return false;
+    if (!block_has_prev(bi->blk, bi->head)) {
+        return false; // Already on first Block
     }
 
     bi->blk = block_prev(bi->blk);

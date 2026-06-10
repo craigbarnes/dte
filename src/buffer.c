@@ -97,8 +97,7 @@ Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts)
 
 void free_blocks(Buffer *buffer)
 {
-    ListHead *item = buffer->blocks.next;
-    while (item != &buffer->blocks) {
+    for (ListHead *head = &buffer->blocks, *item = head->next; item != head; ) {
         ListHead *next = item->next;
         Block *blk = BLOCK(item);
         free(blk->data);

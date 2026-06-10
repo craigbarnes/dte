@@ -35,6 +35,18 @@ static inline Block *BLOCK(ListHead *item)
     return (Block*)item;
 }
 
+NONNULL_ARGS WARN_UNUSED_RESULT
+static inline bool block_has_next(const Block *blk, const ListHead *head)
+{
+    return blk->node.next != head;
+}
+
+NONNULL_ARGS WARN_UNUSED_RESULT
+static inline bool block_has_prev(const Block *blk, const ListHead *head)
+{
+    return blk->node.prev != head;
+}
+
 NONNULL_ARGS_AND_RETURN WARN_UNUSED_RESULT
 static inline Block *block_next(const Block *blk)
 {
