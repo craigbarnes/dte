@@ -107,6 +107,7 @@ static const struct FileExtensionMap {
     {"hs", HASKELL},
     {"htm", HTML},
     {"html", HTML},
+    {"hwdb", CONFIG}, // Linux udev hwdb(7) file (/usr/lib/udev/hwdb.d/*.hwdb)
     {"hxx", CPLUSPLUS},
     {"ini", INI},
     {"ino", CPLUSPLUS}, // https://arduino.github.io/arduino-cli/1.0/sketch-build-process/#pre-processing
