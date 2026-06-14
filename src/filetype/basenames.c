@@ -85,6 +85,7 @@ static const struct FileBasenameMap {
     {"hosts", CONFIG, false},
     {"htmlhintrc", JSON, true},
     {"indent.pro", INDENT, true},
+    {"index.theme", INI, false}, // https://specifications.freedesktop.org/icon-theme/latest/#directory_layout:~:text=file%20called-,index.theme
     {"inputrc", CONFIG, true},
     {"ip6tables.rules", CONFIG, false},
     {"iptables.rules", CONFIG, false},
