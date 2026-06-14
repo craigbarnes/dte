@@ -6,13 +6,14 @@ filename_to_ident() {
 
 template='CONFIG_SECTION static const char %s[] = {
     #embed "%s"
+    , %s
 };
 '
 
 for file in "$@"; do
     ident=$(filename_to_ident "$file")
     # shellcheck disable=SC2059
-    printf "$template\n" "$ident" "$file"
+    printf "$template\n" "$ident" "$file" "'\\0'"
 done
 
 echo 'CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {'
@@ -20,7 +21,7 @@ echo 'CONFIG_SECTION static const BuiltinConfig builtin_configs[] = {'
 for file in "$@"; do
     name="${file#config/}"
     ident=$(filename_to_ident "$file")
-    echo "    CFG_EMBED(\"$name\", $ident),"
+    echo "    CFG(\"$name\", $ident),"
 done
 
 echo '};'
