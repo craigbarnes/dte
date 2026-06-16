@@ -184,8 +184,7 @@ typedef FileTypeEnum (*FileTypeLookupFunc)(const StringView sv);
 
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line)
 {
-    const char *b = filename ? path_basename(filename) : NULL;
-    const StringView base = strview(b);
+    const StringView base = strview(filename ? path_basename(filename) : "");
     const StringView ext = get_filename_extension(base);
     const StringView path = strview(filename);
     const StringView interpreter = get_interpreter(line);
@@ -200,7 +199,7 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
         [FT_BASENAME] = filetype_from_basename,
         [FT_CONTENT] = filetype_from_signature,
         [FT_EXTENSION] = filetype_from_extension,
-        [FT_FILENAME] = filetype_from_dir_prefix,
+        [FT_FILENAME] = filetype_from_path,
     };
 
     const StringView params[] = {
@@ -229,30 +228,16 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
         }
     }
 
-    strview_trim_right(&line);
-    if (
-        line.length >= 4
-        && strview_has_prefix(line, "[")
-        && strview_has_suffix(line, "]")
-        && is_word_byte(line.data[1])
-        && !strview_contains_char_type(line, ASCII_CNTRL)
-    ) {
-        // Use "ini" filetype, if first line looks like an INI [section]
-        return builtin_filetype_names[INI];
+    // Search lower precedence file signatures
+    FileTypeEnum ft = filetype_from_signature_late(line);
+    if (ft != NONE) {
+        return builtin_filetype_names[ft];
     }
 
     if (strview_equal_cstring(ext, "conf")) {
-        if (strview_has_prefix(path, "/etc/systemd/")) {
-            return builtin_filetype_names[INI];
-        }
         BUG_ON(!filename);
         const StringView dir = path_slice_dirname(filename);
-        if (
-            strview_has_prefix(path, "/etc/")
-            || strview_has_prefix(path, "/usr/share/")
-            || strview_has_prefix(path, "/usr/local/share/")
-            || strview_has_suffix(dir, "/tmpfiles.d")
-        ) {
+        if (strview_has_suffix(dir, "/tmpfiles.d")) {
             return builtin_filetype_names[CONFIG];
         }
     }

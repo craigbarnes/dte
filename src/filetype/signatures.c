@@ -125,3 +125,21 @@ static FileTypeEnum filetype_from_signature(const StringView line)
 
     return filetype_from_emacs_var(line);
 }
+
+static FileTypeEnum filetype_from_signature_late(StringView line)
+{
+    strview_trim_right(&line);
+
+    if (
+        line.length >= 4
+        && strview_has_prefix(line, "[")
+        && strview_has_suffix(line, "]")
+        && is_word_byte(line.data[1])
+        && !strview_contains_char_type(line, ASCII_CNTRL)
+    ) {
+        // Use "ini" filetype, if first line looks like an INI [section]
+        return INI;
+    }
+
+    return NONE;
+}

@@ -30,6 +30,8 @@ typedef struct {
     .length = STRLEN(s) \
 }
 
+#define SV(s) STRING_VIEW(s)
+
 static inline StringView string_view(const char *str, size_t length)
 {
     return (StringView) {
@@ -108,12 +110,24 @@ static inline bool strview_has_suffix(StringView sv, const char *suffix)
     return strview_has_sv_suffix(sv, strview(suffix));
 }
 
+static inline bool strview_has_sv_prefix_and_suffix (
+    StringView sv,
+    StringView prefix,
+    StringView suffix
+) {
+    return
+        sv.length >= prefix.length + suffix.length
+        && strview_has_sv_prefix(sv, prefix)
+        && strview_has_sv_suffix(sv, suffix)
+    ;
+}
+
 static inline bool strview_has_prefix_and_suffix (
     StringView sv,
     const char *prefix,
     const char *suffix
 ) {
-    return strview_has_prefix(sv, prefix) && strview_has_suffix(sv, suffix);
+    return strview_has_sv_prefix_and_suffix(sv, strview(prefix), strview(suffix));
 }
 
 static inline size_t strview_blank_prefix_length(StringView sv)
