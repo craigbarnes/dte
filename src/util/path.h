@@ -24,29 +24,29 @@ static inline StringView path_slice_basename(StringView path)
     return path;
 }
 
-// filename must not contain trailing slashes (but it can be "/")
+// `path` must not contain trailing slashes (but it can be "/")
 NONNULL_ARGS_AND_RETURN
-static inline const char *path_basename(const char *filename)
+static inline const char *path_basename(const char *path)
 {
-    const char *slash = strrchr(filename, '/');
-    return slash ? slash + 1 : filename;
+    const char *slash = strrchr(path, '/');
+    return slash ? slash + 1 : path;
 }
 
 NONNULL_ARGS
-static inline StringView path_slice_dirname(const char *filename)
+static inline StringView path_slice_dirname(const char *path)
 {
-    const char *slash = strrchr(filename, '/');
+    const char *slash = strrchr(path, '/');
     if (!slash) {
         return strview(".");
     }
-    bool slash_is_root_dir = (slash == filename);
-    return string_view(filename, slash_is_root_dir ? 1 : slash - filename);
+    bool slash_is_root_dir = (slash == path);
+    return string_view(path, slash_is_root_dir ? 1 : slash - path);
 }
 
 XSTRDUP
-static inline char *path_dirname(const char *filename)
+static inline char *path_dirname(const char *path)
 {
-    const StringView dir = path_slice_dirname(filename);
+    const StringView dir = path_slice_dirname(path);
     return xstrcut(dir.data, dir.length);
 }
 
