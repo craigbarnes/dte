@@ -7,24 +7,25 @@ static void test_detect_encoding_from_bom(TestContext *ctx)
         EncodingType encoding;
         StringView text;
     } tests[] = {
-        {UTF8, STRING_VIEW("\xef\xbb\xbfHello")},
-        {UTF32BE, STRING_VIEW("\x00\x00\xfe\xffHello")},
-        {UTF32LE, STRING_VIEW("\xff\xfe\x00\x00Hello")},
-        {UTF16BE, STRING_VIEW("\xfe\xffHello")},
-        {UTF16LE, STRING_VIEW("\xff\xfeHello")},
-        {UTF16LE, STRING_VIEW("\xff\xfe")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\xff\xff\x00\x00Hello")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\x00\xef\xbb\xbfHello")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\xef\xbb")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\xef\xbb#")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\xee\xbb\xbf")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\xff\xbb\xbf")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\xbf\xbb\xef")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\x00\x00\xfe")},
-        {UNKNOWN_ENCODING, STRING_VIEW("\x00")},
-        {UNKNOWN_ENCODING, STRING_VIEW("")},
+        {UTF8, SV("\xef\xbb\xbfHello")},
+        {UTF32BE, SV("\x00\x00\xfe\xffHello")},
+        {UTF32LE, SV("\xff\xfe\x00\x00Hello")},
+        {UTF16BE, SV("\xfe\xffHello")},
+        {UTF16LE, SV("\xff\xfeHello")},
+        {UTF16LE, SV("\xff\xfe")},
+        {UNKNOWN_ENCODING, SV("\xff\xff\x00\x00Hello")},
+        {UNKNOWN_ENCODING, SV("\x00\xef\xbb\xbfHello")},
+        {UNKNOWN_ENCODING, SV("\xef\xbb")},
+        {UNKNOWN_ENCODING, SV("\xef\xbb#")},
+        {UNKNOWN_ENCODING, SV("\xee\xbb\xbf")},
+        {UNKNOWN_ENCODING, SV("\xff\xbb\xbf")},
+        {UNKNOWN_ENCODING, SV("\xbf\xbb\xef")},
+        {UNKNOWN_ENCODING, SV("\x00\x00\xfe")},
+        {UNKNOWN_ENCODING, SV("\x00")},
+        {UNKNOWN_ENCODING, SV("")},
         {UNKNOWN_ENCODING, STRING_VIEW_INIT},
     };
+
     FOR_EACH_I(i, tests) {
         const struct bom_test *t = &tests[i];
         EncodingType result = detect_encoding_from_bom(t->text);
@@ -55,6 +56,7 @@ static void test_lookup_encoding(TestContext *ctx)
         {UNKNOWN_ENCODING, "UTF8_"},
         {UNKNOWN_ENCODING, "UTF"},
     };
+
     FOR_EACH_I(i, tests) {
         EncodingType result = lookup_encoding(tests[i].name);
         IEXPECT_EQ(result, tests[i].encoding);
