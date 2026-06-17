@@ -12,6 +12,7 @@
 #include "options.h"
 #include "terminal/color.h"
 #include "util/arith.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/numtostr.h"
 #include "util/string-view.h"
@@ -216,7 +217,8 @@ static void bench_string_append_escaped_arg(void)
     static_assert(IS_POWER_OF_2(ARRAYLEN(args)));
     unsigned int iterations = 30000;
     size_t accum = 0;
-    String buf = STRING_INIT;
+    String buf = string_new(64);
+    BUG_ON(buf.alloc != 64);
     struct timespec start = get_time();
 
     for (unsigned int i = 0; i < iterations; i++) {
@@ -227,6 +229,7 @@ static void bench_string_append_escaped_arg(void)
 
     CHECK_RESULT(accum, 63);
     report(&start, iterations, "string_append_escaped_arg()");
+    BUG_ON(buf.alloc != 64); // Ensure buffer didn't realloc while timing
     string_free(&buf);
 }
 
