@@ -8,11 +8,20 @@
 #include "macros.h"
 #include "string-view.h"
 #include "xmalloc.h"
+#include "xmemrchr.h"
 
 NONNULL_ARGS
 static inline bool path_is_absolute(const char *path)
 {
     return path[0] == '/';
+}
+
+// `path` must not contain trailing slashes (but it can be "/")
+static inline StringView path_slice_basename(StringView path)
+{
+    ssize_t slash = strview_memrchr_idx(path, '/');
+    strview_remove_prefix(&path, slash + 1); // slash + 1 is 0 if no slash was found
+    return path;
 }
 
 // filename must not contain trailing slashes (but it can be "/")

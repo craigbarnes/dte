@@ -3258,7 +3258,6 @@ static void test_path_dirname_basename(TestContext *ctx)
     } tests[] = {
         {"/home/user/example.txt", "/home/user", "example.txt"},
         {"./../dir/example.txt", "./../dir", "example.txt"},
-        {"/usr/bin/", "/usr/bin", ""},
         {"example.txt", ".", "example.txt"},
         {"/usr/lib", "/usr", "lib"},
         {"/usr", "/", "usr"},
@@ -3267,13 +3266,21 @@ static void test_path_dirname_basename(TestContext *ctx)
         {".", ".", "."},
         {"..", ".", ".."},
         {"", ".", ""},
+        // For edge case coverage only; see comment above path_basename()
+        {"/usr/bin/", "/usr/bin", ""},
     };
+
     FOR_EACH_I(i, tests) {
+        EXPECT_STRVIEW_EQ_CSTRING(path_slice_dirname(tests[i].path), tests[i].dirname);
+        EXPECT_STRVIEW_EQ_CSTRING(path_slice_basename(strview(tests[i].path)), tests[i].basename);
+        IEXPECT_STREQ(path_basename(tests[i].path), tests[i].basename);
+
         char *dir = path_dirname(tests[i].path);
         IEXPECT_STREQ(dir, tests[i].dirname);
         free(dir);
-        IEXPECT_STREQ(path_basename(tests[i].path), tests[i].basename);
     }
+
+    EXPECT_STRVIEW_EQ_CSTRING(path_slice_basename(strview(NULL)), "");
 }
 
 static void test_path_relative(TestContext *ctx)
@@ -3293,6 +3300,7 @@ static void test_path_relative(TestContext *ctx)
         { "/home/user", "/home/user", "."},
         { "/home", "/home/user", "user"},
     };
+
     FOR_EACH_I(i, tests) {
         char *result = path_relative(tests[i].path, tests[i].cwd);
         IEXPECT_STREQ(tests[i].result, result);
