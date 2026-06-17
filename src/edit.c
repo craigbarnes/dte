@@ -17,6 +17,7 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
         return;
     }
 
+    // NOLINTBEGIN(bugprone-assert-side-effect)
     const Buffer *buffer = view->buffer;
     const Block *blk = buffer_get_first_block(buffer);
     const Block *cursor_blk = view->cursor.blk;
@@ -47,6 +48,7 @@ static void sanity_check_blocks(const View *view, bool check_newlines)
     }
 
     BUG_ON(cursor_seen != 1);
+    // NOLINTEND(bugprone-assert-side-effect)
 }
 
 static size_t copy_count_nl(char *dst, const char *src, size_t len)

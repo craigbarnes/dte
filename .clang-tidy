@@ -93,7 +93,6 @@ CheckOptions:
         color_is_rgb;
         color_is_valid;
         cond_type_has_destination;
-        count_nl;
         cursor_color_is_valid;
         cursor_type_is_valid;
         has_flag;
