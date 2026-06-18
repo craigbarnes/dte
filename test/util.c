@@ -2144,14 +2144,13 @@ static void test_u_set_char(TestContext *ctx)
     EXPECT_EQ(u_set_char(buf, 0x20), 1);
     EXPECT_EQ(buf[0], ' ');
 
-    unsigned char c = 0xA5;
-    EXPECT_EQ(u_set_char(buf, 0x110000 + c), 4);
+    CodePoint u = -0x5Bu; // See comment in u_set_hex()
+    EXPECT_UINT_EQ(u, 0xFFFFFFA5u);
+    EXPECT_EQ(u_set_char(buf, u), 4);
     EXPECT_EQ(buf[0], '<');
     EXPECT_EQ(buf[1], '5');
     EXPECT_EQ(buf[2], 'b');
     EXPECT_EQ(buf[3], '>');
-    c = -c;
-    EXPECT_UINT_EQ(c, 0x5b);
 }
 
 static void test_u_make_printable(TestContext *ctx)
