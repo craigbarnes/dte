@@ -82,7 +82,7 @@ static void test_next_tag(TestContext *ctx)
     ssize_t len = read_file("test/data/ctags.txt", &buf, 8192);
     ASSERT_TRUE(len >= 64);
 
-    StringView prefix = STRING_VIEW("");
+    StringView prefix = strview("");
     Tag t;
     for (size_t i = 0, pos = 0; next_tag(buf, len, &pos, prefix, false, &t); i++) {
         EXPECT_STRVIEW_EQ_CSTRING(t.name, expected[i].name);

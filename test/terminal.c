@@ -532,7 +532,7 @@ static void test_mask_style(TestContext *ctx)
 static void test_term_parse_csi_params(TestContext *ctx)
 {
     TermControlParams csi = {.nparams = 0};
-    StringView s = STRING_VIEW("\033[901;0;55mx");
+    StringView s = strview("\033[901;0;55mx");
     size_t n = term_parse_csi_params(s.data, s.length, 2, &csi);
     EXPECT_EQ(n, s.length - 1);
     EXPECT_EQ(csi.nparams, 3);

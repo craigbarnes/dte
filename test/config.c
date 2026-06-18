@@ -176,7 +176,7 @@ static void test_exec_config(TestContext *ctx)
         expect_files_equal(ctx, "build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 
-    const StringView sv = STRING_VIEW("toggle utf8-bom \\");
+    const StringView sv = strview("toggle utf8-bom \\");
     EXPECT_FALSE(e->options.utf8_bom);
     exec_normal_config(e, sv);
     EXPECT_TRUE(e->options.utf8_bom);
@@ -276,11 +276,11 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_TRUE(handle_input(e, 'z'));
     EXPECT_TRUE(handle_normal_command(e, "eol; right; insert -m .; new-line", true));
 
-    const StringView t1 = STRING_VIEW("test 1\n");
+    const StringView t1 = strview("test 1\n");
     insert_text(e->view, t1.data, t1.length, true);
     macro_insert_text_hook(m, t1.data, t1.length);
 
-    const StringView t2 = STRING_VIEW("-- test 2");
+    const StringView t2 = strview("-- test 2");
     insert_text(e->view, t2.data, t2.length, true);
     macro_insert_text_hook(m, t2.data, t2.length);
 

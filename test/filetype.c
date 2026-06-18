@@ -169,8 +169,10 @@ static void test_find_ft_filename(TestContext *ctx)
         {"", NULL},
         {NULL, NULL},
     };
+
     const PointerArray arr = PTR_ARRAY_INIT;
     const StringView empty_line = STRING_VIEW_INIT;
+
     FOR_EACH_I(i, tests) {
         const char *ft = find_ft(&arr, tests[i].filename, empty_line);
         IEXPECT_STREQ(ft, tests[i].expected_filetype);
@@ -317,7 +319,9 @@ static void test_find_ft_firstline(TestContext *ctx)
         {"#!/usr/bin/env/ lua", NULL},
         {"#!/lua/", NULL},
     };
+
     const PointerArray arr = PTR_ARRAY_INIT;
+
     FOR_EACH_I(i, tests) {
         const char *ft = find_ft(&arr, NULL, strview(tests[i].line));
         IEXPECT_STREQ(ft, tests[i].expected_filetype);

@@ -460,7 +460,7 @@ static void test_cached_command_new(TestContext *ctx)
         "insert xyz\\", // CMDERR_UNEXPECTED_EOF
     };
 
-    for (size_t i = 0; i < ARRAYLEN(uncacheable); i++) {
+    FOR_EACH_I(i, uncacheable) {
         cc = cached_command_new(&runner, uncacheable[i]);
         ASSERT_NONNULL(cc);
         EXPECT_NULL(cc->cmd);

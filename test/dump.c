@@ -54,7 +54,7 @@ static void test_dump_handlers(TestContext *ctx)
     ASSERT_NONNULL(cmds->lookup);
     clear_all_messages(e); // Clear messages for previous `tag` tests
 
-    for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
+    FOR_EACH_I(i, handlers) {
         bool check_parse = (handlers[i].flags & CHECK_PARSE);
         bool check_name = (handlers[i].flags & CHECK_NAME);
         bool allow_empty_str = (handlers[i].flags & ALLOW_EMPTY);

@@ -91,7 +91,7 @@ static void test_sf_format(TestContext *ctx)
     EXPECT_EQ(u_str_width(expected['f']), 4);
 
     char fmt[4] = "%_";
-    for (size_t i = 0; i < ARRAYLEN(expected); i++) {
+    FOR_EACH_I(i, expected) {
         fmt[1] = (char)i;
         size_t err = statusline_format_find_error(fmt);
         if (err) {

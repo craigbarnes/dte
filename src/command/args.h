@@ -102,12 +102,14 @@ static inline unsigned int cmdargs_convert_flags (
     size_t map_len
 ) {
     unsigned int val = 0;
+
     UNROLL_LOOP(16)
     for (size_t i = 0; i < map_len; i++, map++) {
         if (cmdargs_has_flag(a, map->ch)) {
             val |= map->val;
         }
     }
+
     return val;
 }
 

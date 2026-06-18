@@ -872,7 +872,7 @@ static void test_string_next_alloc_size(TestContext *ctx)
 
 static void test_string_view(TestContext *ctx)
 {
-    StringView sv = STRING_VIEW("testing");
+    StringView sv = strview("testing");
     EXPECT_TRUE(strview_equal_cstring(sv, "testing"));
     EXPECT_FALSE(strview_equal_cstring(sv, "testin"));
     EXPECT_FALSE(strview_equal_cstring(sv, "TESTING"));
@@ -966,7 +966,7 @@ static void test_strview_has_suffix(TestContext *ctx)
 
 static void test_strview_remove_matching(TestContext *ctx)
 {
-    StringView sv = STRING_VIEW("ABCDEFGHIJKLMN");
+    StringView sv = strview("ABCDEFGHIJKLMN");
     EXPECT_TRUE(strview_remove_matching_prefix(&sv, "ABC"));
     EXPECT_STRVIEW_EQ_CSTRING(sv, "DEFGHIJKLMN");
 
@@ -1388,7 +1388,7 @@ static void test_parse_file_line_col(TestContext *ctx)
         "a:1:1_",
     };
 
-    for (size_t i = 0; i < ARRAYLEN(invalid); i++) {
+    FOR_EACH_I(i, invalid) {
         line = 7;
         col = 8;
         path = parse_file_line_col(invalid[i], &line, &col);
@@ -3322,7 +3322,7 @@ static void test_path_slice_relative(TestContext *ctx)
 
 static void test_short_filename_cwd(TestContext *ctx)
 {
-    const StringView home = STRING_VIEW("/home/user");
+    const StringView home = strview("/home/user");
     char *s = short_filename_cwd("/home/user", "/home/user", home);
     EXPECT_STREQ(s, ".");
     free(s);
@@ -3352,7 +3352,7 @@ static void test_short_filename_cwd(TestContext *ctx)
 
 static void test_short_filename(TestContext *ctx)
 {
-    const StringView home = STRING_VIEW("/home/user");
+    const StringView home = strview("/home/user");
     static const char rel[] = "test/main.c";
     char *abs = path_absolute(rel);
     ASSERT_NONNULL(abs);
@@ -3480,7 +3480,7 @@ static void test_path_join(TestContext *ctx)
 
 static void test_path_parent(TestContext *ctx)
 {
-    StringView sv = STRING_VIEW("/a/foo/bar/etc/file");
+    StringView sv = strview("/a/foo/bar/etc/file");
     EXPECT_EQ(sv.length, 19);
     EXPECT_TRUE(path_parent(&sv));
     EXPECT_EQ(sv.length, 14);
@@ -3495,7 +3495,7 @@ static void test_path_parent(TestContext *ctx)
     EXPECT_FALSE(path_parent(&sv));
     EXPECT_EQ(sv.length, 1);
 
-    StringView sv2 = STRING_VIEW("/etc/foo/x/y/");
+    StringView sv2 = strview("/etc/foo/x/y/");
     EXPECT_EQ(sv2.length, 13);
     EXPECT_TRUE(path_parent(&sv2));
     EXPECT_EQ(sv2.length, 10);
@@ -3646,7 +3646,7 @@ static void test_mem_intern(TestContext *ctx)
     const char *ptrs[256];
     char str[8];
 
-    for (unsigned int i = 0; i < ARRAYLEN(ptrs); i++) {
+    FOR_EACH_I(i, ptrs) {
         size_t len = buf_uint_to_str(i, str);
         ptrs[i] = mem_intern(str, len);
     }
@@ -3663,7 +3663,7 @@ static void test_mem_intern(TestContext *ctx)
     EXPECT_FALSE(str_is_intern("1"));
     EXPECT_TRUE(str_is_intern(ptrs[1]));
 
-    for (unsigned int i = 0; i < ARRAYLEN(ptrs); i++) {
+    FOR_EACH_I(i, ptrs) {
         size_t len = buf_uint_to_str(i, str);
         const char *intern = mem_intern(str, len);
         ASSERT_NONNULL(intern);

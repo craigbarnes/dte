@@ -11,7 +11,7 @@ static void test_spawn(TestContext *ctx)
 
     SpawnContext sc = {
         .argv = args,
-        .input = STRING_VIEW("IN-"),
+        .input = strview("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
         .lines = 32,
         .columns = 120,

@@ -65,7 +65,7 @@ static void test_ini_parse(TestContext *ctx)
 
 static void test_ec_pattern_to_regex(TestContext *ctx)
 {
-    const StringView dir = STRING_VIEW("/dir");
+    const StringView dir = strview("/dir");
 
     String str = ec_pattern_to_regex(strview("\\[ab]"), dir);
     EXPECT_STRING_EQ_CSTRING(&str, "^/dir/(.*/)?\\[ab]$");
@@ -86,7 +86,7 @@ static void test_ec_pattern_to_regex(TestContext *ctx)
 
 static void test_ec_pattern_match(TestContext *ctx)
 {
-    const StringView dir = STRING_VIEW("/dir");
+    const StringView dir = strview("/dir");
 
     EXPECT_TRUE(ec_pattern_match(strview("*"), dir, "/dir/file.c"));
     EXPECT_FALSE(ec_pattern_match(strview("*"), dir, "/other-dir/file.c"));

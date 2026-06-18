@@ -2527,15 +2527,18 @@ static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
     unsigned int width = e->buffer->options.text_width;
+
     if (arg) {
         if (!str_to_uint(arg, &width)) {
             return error_msg(&e->err, "invalid paragraph width: %s", arg);
         }
+
         unsigned int max = TEXT_WIDTH_MAX;
         if (width < 1 || width > max) {
             return error_msg(&e->err, "width must be between 1 and %u", max);
         }
     }
+
     wrap_paragraph(e->view, width);
     return true;
 }
