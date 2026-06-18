@@ -1422,12 +1422,14 @@ static bool cmd_pgup(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static bool cmd_play(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+static bool cmd_play(EditorState *e, const CommandArgs *a)
 {
     const MacroRecorder *m = &e->macro;
+    bool keep_going = has_flag(a, 'k');
+
     for (size_t i = 0, n = m->macro.count; i < n; i++) {
         const char *cmd_str = m->macro.ptrs[i];
-        if (!handle_normal_command(e, cmd_str, false)) {
+        if (!handle_normal_command(e, cmd_str, false) && !keep_going) {
             return false;
         }
     }
@@ -2722,7 +2724,7 @@ static const Command cmds[] = {
     {"paste", "acm", NA, 0, 0, cmd_paste},
     {"pgdown", "cl", NA, 0, 0, cmd_pgdown},
     {"pgup", "cl", NA, 0, 0, cmd_pgup},
-    {"play", "", NA, 0, 0, cmd_play},
+    {"play", "k", NA, 0, 0, cmd_play},
     {"prev", "", NA, 0, 0, cmd_prev},
     {"quit", "CFHSfp", NA, 0, 1, cmd_quit},
     {"record", "crs", NA, 0, 0, cmd_record},
