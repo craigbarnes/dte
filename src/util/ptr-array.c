@@ -49,14 +49,21 @@ void ptr_array_insert(PointerArray *array, void *ptr, size_t idx)
     ptr_array_move(array, last, idx);
 }
 
-// Free and remove and all pointers, without freeing the array itself
-void ptr_array_clear(PointerArray *array, FreeFunction free_ptr)
+// Free and remove `count` pointers from the end of the array
+void ptr_array_pop(PointerArray *array, FreeFunction free_ptr, size_t count)
 {
-    for (size_t i = 0, n = array->count; i < n; i++) {
+    BUG_ON(count > array->count);
+    for (size_t n = array->count, i = n - count; i < n; i++) {
         do_free_value(free_ptr, array->ptrs[i]);
         array->ptrs[i] = NULL;
     }
-    array->count = 0;
+    array->count -= count;
+}
+
+// Free and remove and all pointers, without freeing the array itself
+void ptr_array_clear(PointerArray *array, FreeFunction free_ptr)
+{
+    ptr_array_pop(array, free_ptr, array->count);
 }
 
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)

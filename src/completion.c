@@ -853,30 +853,29 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
             break;
         }
 
+        StringView arg = strview_from_slice(cmd, pos, end);
+        pos = end;
+
         if (semicolon + 1 == array.count) {
-            char *name = xstrslice(cmd, pos, end);
+            // TODO: Make lookup_alias() (and hashmap_find(), etc.) take a
+            // name_len parameter, to do away with the need to allocate
+            // temporary cstring slices like this
+            char *name = xstrcut(arg.data, arg.length);
             const char *value = runner.lookup_alias(runner.e, name);
+            free(name);
+
             if (value) {
                 size_t save = array.count;
-                if (parse_commands(&runner, &array, value) != CMDERR_NONE) {
-                    for (size_t i = save, n = array.count; i < n; i++) {
-                        free(array.ptrs[i]);
-                        array.ptrs[i] = NULL;
-                    }
-                    array.count = save;
-                    ptr_array_append(&array, parse_command_arg(&runner, name, end - pos));
-                } else {
-                    // Remove NULL
-                    array.count--;
+                if (parse_commands(&runner, &array, value) == CMDERR_NONE) {
+                    array.count--; // Remove NULL
+                    continue;
                 }
-            } else {
-                ptr_array_append(&array, parse_command_arg(&runner, name, end - pos));
+                ptr_array_pop(&array, free, array.count - save);
+                BUG_ON(array.count != save);
             }
-            free(name);
-        } else {
-            ptr_array_append(&array, parse_command_arg(&runner, cmd + pos, end - pos));
         }
-        pos = end;
+
+        ptr_array_append(&array, parse_command_arg(&runner, arg.data, arg.length));
     }
 
     // Text to be completed

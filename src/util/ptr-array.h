@@ -27,6 +27,7 @@ void ptr_array_insert(PointerArray *array, void *ptr, size_t idx) NONNULL_ARG(1)
 void ptr_array_move(PointerArray *array, size_t from, size_t to) NONNULL_ARGS;
 void ptr_array_clear(PointerArray *array, FreeFunction free_ptr) NONNULL_ARGS;
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr) NONNULL_ARGS;
+void ptr_array_pop(PointerArray *array, FreeFunction free_ptr, size_t count) NONNULL_ARGS;
 size_t ptr_array_remove(PointerArray *array, void *ptr) NONNULL_ARG(1);
 void *ptr_array_remove_index(PointerArray *array, size_t idx) NONNULL_ARGS WARN_UNUSED_RESULT;
 size_t ptr_array_index(const PointerArray *array, const void *ptr) NONNULL_ARG(1) WARN_UNUSED_RESULT;
