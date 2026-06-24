@@ -29,7 +29,6 @@ char *path_absolute(const char *path)
         return NULL;
     }
 
-    const char *base = path_basename(path);
     char *dir_relative = path_dirname(path);
     char *dir = realpath(dir_relative, NULL);
     free(dir_relative);
@@ -40,7 +39,7 @@ char *path_absolute(const char *path)
 
     // If the full path doesn't exist but the directory part does, return
     // the concatenation of the real directory and the non-existent filename
-    abs = path_join(dir, base);
+    abs = path_join(dir, path_basename(path));
     free(dir);
     return abs;
 }

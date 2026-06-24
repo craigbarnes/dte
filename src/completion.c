@@ -150,10 +150,10 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
         fileprefix = strview(buf + dirprefix.length + 1);
         cs->tilde_expanded = true;
     } else {
-        const char *base = path_basename(cs->parsed);
-        bool has_slash = (base != cs->parsed);
+        size_t len = cs->head_len + cs->escaped.length + cs->tail.length;
+        fileprefix = path_slice_basename(string_view(cs->parsed, len));
+        bool has_slash = (fileprefix.data != cs->parsed);
         dirprefix = strview(has_slash ? dir : "");
-        fileprefix = strview(base);
     }
 
     do_collect_files(&cs->completions, dir, dirprefix, fileprefix, type);
