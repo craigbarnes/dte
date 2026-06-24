@@ -18,7 +18,7 @@ static bool is_ignored_key(KeyCode key, TermInputBuffer *ibuf)
         term_discard_paste(ibuf, bpaste);
         return true;
     }
-    return key == KEY_NONE || key == KEY_IGNORE;
+    return key == KEY_NONE;
 }
 
 ExitCode showkey_loop(unsigned int terminal_query_level)
