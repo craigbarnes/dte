@@ -92,7 +92,7 @@ LogLevel log_open(const char *filename, LogLevel level, LogOpenFlags logflags)
     }
 
     logger.fd = fd;
-    logger.use_color = (logflags & LOGOPEN_USE_COLOR);
+    logger.use_color = (logflags & LOGOPEN_USE_COLOR) && isatty(fd);
     logger.level = MIN(level, log_level_max());
     return logger.level;
 }
