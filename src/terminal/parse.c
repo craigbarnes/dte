@@ -602,7 +602,7 @@ static ssize_t parse_dcs(const char *buf, size_t len, size_t i, KeyCode *k)
                 *k = KEY_IGNORE;
                 return i;
             case 0x1B: // ESC (https://vt100.net/emu/dec_ansi_parser#STESC)
-                *k = parse_dcs_query_reply(data, pos, pos >= sizeof(data));
+                *k = parse_dcs_query_reply(string_view(data, pos), pos >= sizeof(data));
                 return i - 1;
             }
             continue;

@@ -207,18 +207,20 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
     return string_view(outbuf, n / 2);
 }
 
-static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
+// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#:~:text=capabilities.-,xterm%20responds%20with,-DCS%201%20%2B%20r
+static KeyCode parse_xtgettcap_reply(StringView seq, bool valid_request)
 {
-    size_t pos = 3;
+    size_t pos = 0;
+    size_t len = seq.length;
     StringView empty = STRING_VIEW_INIT;
-    StringView cap_hex = (pos < len) ? get_delim(data, &pos, len, '=') : empty;
-    StringView val_hex = (pos < len) ? string_view(data + pos, len - pos) : empty;
+    StringView cap_hex = (pos < len) ? get_delim(seq.data, &pos, len, '=') : empty;
+    StringView val_hex = (pos < len) ? strview_from_slice(seq.data, pos, len) : empty;
 
     char cbuf[16], vbuf[64];
     StringView cap = hex_decode_str(cap_hex, cbuf, sizeof(cbuf));
     StringView val = hex_decode_str(val_hex, vbuf, sizeof(vbuf));
 
-    if (data[0] == '1' && cap.length >= 2) {
+    if (valid_request && cap.length >= 2) {
         if (strview_equal_cstring(cap, "bce") && val.length == 0) {
             return tflag(TFLAG_BACK_COLOR_ERASE);
         }
@@ -246,6 +248,10 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
         }
     }
 
+    if (!log_level_enabled(LOG_LEVEL_INFO)) {
+        return KEY_IGNORE;
+    }
+
     char ebuf[8 + (U_SET_CHAR_MAXLEN * (sizeof(cbuf) + sizeof(vbuf)))];
     size_t i = 0;
     if (cap.length) {
@@ -260,8 +266,9 @@ static KeyCode parse_xtgettcap_reply(const char *data, size_t len)
     }
 
     LOG_INFO (
-        "unhandled XTGETTCAP reply: %.*s%.*s",
-        (int)len, data, // Original, hex-encoded string (no control chars)
+        "unhandled XTGETTCAP reply: %c+r%.*s%.*s",
+        valid_request ? '1' : '0', // For "1+r" or "0+r" prefix (removed by caller)
+        (int)seq.length, seq.data, // Original, hex-encoded string (no control chars)
         (int)i, ebuf // Decoded string (with control chars escaped)
     );
 
@@ -348,15 +355,14 @@ static KeyCode parse_xtversion_reply(StringView reply)
     return tflag(TFLAG_QUERY_L3);
 }
 
-KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
+KeyCode parse_dcs_query_reply(StringView seq, bool truncated)
 {
     const char *note = "";
-    if (unlikely(len == 0 || truncated)) {
+    if (unlikely(seq.length == 0 || truncated)) {
         note = truncated ? " (truncated)" : " (empty)";
         goto unhandled;
     }
 
-    StringView seq = string_view(data, len);
     if (strview_remove_matching_prefix(&seq, ">|")) {
         return parse_xtversion_reply(seq);
     }
@@ -373,8 +379,9 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
         return tflag(TFLAG_QUERY_L3);
     }
 
-    if (strview_has_prefix(seq, "1+r") || strview_has_prefix(seq, "0+r")) {
-        return parse_xtgettcap_reply(data, len);
+    bool one_plus_r = strview_remove_matching_prefix(&seq, "1+r");
+    if (one_plus_r || strview_remove_matching_prefix(&seq, "0+r")) {
+        return parse_xtgettcap_reply(seq, one_plus_r);
     }
 
     if (strview_remove_matching_prefix(&seq, "1$r")) {
@@ -392,7 +399,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
             return handle_decrqss_sgr_reply(seq.data, seq.length);
         }
 
-        LOG_INFO("unhandled DECRQSS reply: %.*s", (int)len, data);
+        LOG_INFO("unhandled DECRQSS reply: %.*s", (int)seq.length, seq.data);
         return KEY_IGNORE;
     }
 
@@ -402,7 +409,7 @@ KeyCode parse_dcs_query_reply(const char *data, size_t len, bool truncated)
     }
 
 unhandled:
-    LOG_INFO("unhandled DCS string%s: %.*s", note, (int)len, data);
+    LOG_INFO("unhandled DCS string%s: %.*s", note, (int)seq.length, seq.data);
     return KEY_IGNORE;
 }
 
