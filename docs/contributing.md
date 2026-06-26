@@ -58,8 +58,8 @@ See Also
 * [Test coverage](https://craigbarnes.gitlab.io/dte/coverage/)
 
 
-[issues]: https://gitlab.com/craigbarnes/dte/-/issues
-[feature request issues]: https://gitlab.com/craigbarnes/dte/-/issues/?sort=updated_desc&state=all&or%5Blabel_name%5D%5B%5D=Type%3A%3AFeature&or%5Blabel_name%5D%5B%5D=Type%3A%3AEnhancement&first_page_size=50
+[issues]: https://gitlab.com/craigbarnes/dte/-/work_items
+[feature request issues]: https://gitlab.com/craigbarnes/dte/-/work_items/?sort=updated_desc&state=all&or%5Blabel_name%5D%5B%5D=Type%3A%3AFeature&or%5Blabel_name%5D%5B%5D=Type%3A%3AEnhancement&first_page_size=50
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [code blocks]: https://docs.gitlab.com/user/markdown/#code-spans-and-blocks
 [`TODO.md`]: TODO.md

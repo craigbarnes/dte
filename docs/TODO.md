@@ -359,8 +359,9 @@ Testing/Debugging
   to that buffer (thus allowing logged actions to be correlated to specific
   files without spamming long filenames repeatedly)
 
-* Enable clang-tidy's [`hicpp-signed-bitwise`] check, once we start making use
-  of [C23 Enhanced Enumerations] to make bitflag enums explicitly `unsigned`
+* Enable clang-tidy's [`bugprone-signed-bitwise`] check, once we start
+  making use of [C23 Enhanced Enumerations] to make bitflag enums
+  explicitly `unsigned`
 
 * Improve error/log messages in `set_and_check_locale()`
 
@@ -402,29 +403,29 @@ Testing/Debugging
 [`search`]: https://craigbarnes.gitlab.io/dte/dterc.html#search
 [`wrap-paragraph`]: https://craigbarnes.gitlab.io/dte/dterc.html#wrap-paragraph
 
-[GitLab issue]: https://gitlab.com/craigbarnes/dte/-/issues
-[#14]: https://gitlab.com/craigbarnes/dte/-/issues/14
-[#70]: https://gitlab.com/craigbarnes/dte/-/issues/70
-[#86]: https://gitlab.com/craigbarnes/dte/-/issues/86
-[#88]: https://gitlab.com/craigbarnes/dte/-/issues/88
-[#105]: https://gitlab.com/craigbarnes/dte/-/issues/105
-[#118]: https://gitlab.com/craigbarnes/dte/-/issues/118
-[#132]: https://gitlab.com/craigbarnes/dte/-/issues/132
-[#141]: https://gitlab.com/craigbarnes/dte/-/issues/141
-[#142]: https://gitlab.com/craigbarnes/dte/-/issues/142
-[#147]: https://gitlab.com/craigbarnes/dte/-/issues/147
-[#151]: https://gitlab.com/craigbarnes/dte/-/issues/151
-[#152]: https://gitlab.com/craigbarnes/dte/-/issues/152
-[#153]: https://gitlab.com/craigbarnes/dte/-/issues/153
-[#161]: https://gitlab.com/craigbarnes/dte/-/issues/161
-[#164]: https://gitlab.com/craigbarnes/dte/-/issues/164
-[#179]: https://gitlab.com/craigbarnes/dte/-/issues/179
-[#180]: https://gitlab.com/craigbarnes/dte/-/issues/180
-[#183]: https://gitlab.com/craigbarnes/dte/-/issues/183
-[#202]: https://gitlab.com/craigbarnes/dte/-/issues/202
-[#203]: https://gitlab.com/craigbarnes/dte/-/issues/203
-[#220]: https://gitlab.com/craigbarnes/dte/-/issues/220
-[#225]: https://gitlab.com/craigbarnes/dte/-/issues/225
+[GitLab issue]: https://gitlab.com/craigbarnes/dte/-/work_items
+[#14]: https://gitlab.com/craigbarnes/dte/-/work_items/14
+[#70]: https://gitlab.com/craigbarnes/dte/-/work_items/70
+[#86]: https://gitlab.com/craigbarnes/dte/-/work_items/86
+[#88]: https://gitlab.com/craigbarnes/dte/-/work_items/88
+[#105]: https://gitlab.com/craigbarnes/dte/-/work_items/105
+[#118]: https://gitlab.com/craigbarnes/dte/-/work_items/118
+[#132]: https://gitlab.com/craigbarnes/dte/-/work_items/132
+[#141]: https://gitlab.com/craigbarnes/dte/-/work_items/141
+[#142]: https://gitlab.com/craigbarnes/dte/-/work_items/142
+[#147]: https://gitlab.com/craigbarnes/dte/-/work_items/147
+[#151]: https://gitlab.com/craigbarnes/dte/-/work_items/151
+[#152]: https://gitlab.com/craigbarnes/dte/-/work_items/152
+[#153]: https://gitlab.com/craigbarnes/dte/-/work_items/153
+[#161]: https://gitlab.com/craigbarnes/dte/-/work_items/161
+[#164]: https://gitlab.com/craigbarnes/dte/-/work_items/164
+[#179]: https://gitlab.com/craigbarnes/dte/-/work_items/179
+[#180]: https://gitlab.com/craigbarnes/dte/-/work_items/180
+[#183]: https://gitlab.com/craigbarnes/dte/-/work_items/183
+[#202]: https://gitlab.com/craigbarnes/dte/-/work_items/202
+[#203]: https://gitlab.com/craigbarnes/dte/-/work_items/203
+[#220]: https://gitlab.com/craigbarnes/dte/-/work_items/220
+[#225]: https://gitlab.com/craigbarnes/dte/-/work_items/225
 [Utility Syntax Guideline 6]: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02:~:text=Guideline%C2%A06
 [AtomicUndo]: https://github.com/vigna/ne/blob/7afc7f875a37fd475384393964f0d63837889a3d/doc/ne.texinfo#L3571-L3595
 [Typst]: https://typst.app/docs/reference/syntax/
@@ -463,5 +464,5 @@ Testing/Debugging
 [`vmsplice(2)`]: https://man7.org/linux/man-pages/man2/vmsplice.2.html
 [extended clipboard protocol]: https://sw.kovidgoyal.net/kitty/clipboard/
 [feature test]: https://gitlab.com/craigbarnes/dte/-/tree/master/mk/feature-test#c-library-feature-tests
-[`hicpp-signed-bitwise`]: https://clang.llvm.org/extra/clang-tidy/checks/hicpp/signed-bitwise.html
+[`bugprone-signed-bitwise`]: https://clang.llvm.org/extra/clang-tidy/checks/bugprone/signed-bitwise.html
 [C23 Enhanced Enumerations]: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3030.htm

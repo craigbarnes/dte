@@ -195,7 +195,7 @@ Public License version 2 for more details.
 [`brew`]: https://brew.sh/
 [Contributor guidelines]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md
 [Packaging information]: https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md
-[issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
+[issue reports]: https://gitlab.com/craigbarnes/dte/-/work_items
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [`#dte` channel]: https://web.libera.chat/?channels=#dte
 [Libera.Chat]: https://libera.chat/

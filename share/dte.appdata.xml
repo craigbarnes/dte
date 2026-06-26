@@ -8,7 +8,7 @@
   <developer_name>Craig Barnes, Timo Hirvonen</developer_name>
   <launchable type="desktop-id">dte.desktop</launchable>
   <url type="homepage">https://craigbarnes.gitlab.io/dte/</url>
-  <url type="bugtracker">https://gitlab.com/craigbarnes/dte/-/issues</url>
+  <url type="bugtracker">https://gitlab.com/craigbarnes/dte/-/work_items</url>
   <url type="help">https://craigbarnes.gitlab.io/dte/dte.html</url>
   <url type="donation">https://liberapay.com/craigbarnes/donate</url>
   <url type="contact">https://gitlab.com/craigbarnes/dte#contact</url>

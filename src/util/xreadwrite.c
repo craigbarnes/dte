@@ -3,7 +3,7 @@
 #include "xreadwrite.h"
 
 #if defined(__APPLE__)
-    // See: https://gitlab.com/craigbarnes/dte/-/issues/201
+    // See: https://gitlab.com/craigbarnes/dte/-/work_items/201
     #define MAX_RW_COUNT ((size_t)INT_MAX)
 #elif defined(__linux__) && 0x7ffff000 <= SSIZE_MAX
     // Unlike macOS, trying to read or write more than 0x7ffff000 bytes

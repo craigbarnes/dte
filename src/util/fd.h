@@ -62,7 +62,7 @@ static inline bool is_controlling_tty(int fd)
      * very unusual set of stdio(3) redirections for it to be a problem
      * in practice (for the use cases in this codebase).
      *
-     * See also: https://gitlab.com/craigbarnes/dte/-/issues/216#note_1939534295
+     * See also: https://gitlab.com/craigbarnes/dte/-/work_items/216#note_1939534295
      */
     return isatty(fd) && tcgetpgrp(fd) != -1;
 }

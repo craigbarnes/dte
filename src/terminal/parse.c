@@ -47,7 +47,7 @@ static KeyCode decode_key_from_final_byte(uint8_t byte)
 
 // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#legacy-functional-keys
 // https://gitlab.com/craigbarnes/dte/-/commit/f540904cfdbb04b4cafdff0d7b15e3fd188395d4
-// https://gitlab.com/craigbarnes/dte/-/issues/121
+// https://gitlab.com/craigbarnes/dte/-/work_items/121
 static KeyCode decode_key_from_param(uint32_t param)
 {
     switch (param) {
@@ -205,12 +205,12 @@ static KeyCode normalize_csi_u_keycode(KeyCode mods, KeyCode key)
         // in less modern terminals and/or improve correctness for exotic
         // keyboard layouts in modern (Kitty protocol supporting) terminals.
         // See also:
-        // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_870592688
-        // • https://gitlab.com/craigbarnes/dte/-/issues/130#note_864512674
-        // • https://gitlab.com/gnachman/iterm2/-/issues/10017
+        // • https://gitlab.com/craigbarnes/dte/-/work_items/130#note_870592688
+        // • https://gitlab.com/craigbarnes/dte/-/work_items/130#note_864512674
+        // • https://gitlab.com/gnachman/iterm2/-/work_items/10017
         // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7
         // • https://gitlab.com/gnachman/iterm2/-/commit/9cd0241afd0655024153c8730d5b3ed1fe41faf7#1d96fc7f79950509a8bc22bc59a1a82a438c890d_0_17
-        // • https://gitlab.com/gnachman/iterm2/-/issues/7440#note_129599012
+        // • https://gitlab.com/gnachman/iterm2/-/work_items/7440#note_129599012
         // • https://sw.kovidgoyal.net/kitty/keyboard-protocol/#bugs-in-fixterms:~:text=Incorrectly%20encoding%20shifted%20keys%20when%20shift%20modifier%20is%20used
         return ascii_tolower(key);
     }

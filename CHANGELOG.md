@@ -803,7 +803,7 @@ builds are maintained on a "best effort" basis only.
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [ECMA-48]: https://ecma-international.org/publications-and-standards/standards/ecma-48/
 [musl]: https://www.musl-libc.org/
-[issue]: https://gitlab.com/craigbarnes/dte/-/issues
+[issue]: https://gitlab.com/craigbarnes/dte/-/work_items
 [syntax highlighters]: https://gitlab.com/craigbarnes/dte/-/tree/master/config/syntax
 [shift-rename]: https://craigbarnes.gitlab.io/dte/releases.html#:~:text=The%20shift%20command%20was%20renamed%20to%20indent
 

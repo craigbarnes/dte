@@ -25,7 +25,7 @@ function check_busybox_bug() {
     # A bug in BusyBox 1.37.0 AWK breaks the escape_*() functions above,
     # so we explicitly detect it and show a clear error message, instead
     # of producing broken output
-    ref = "       See: https://gitlab.com/craigbarnes/dte/-/issues/226"
+    ref = "       See: https://gitlab.com/craigbarnes/dte/-/work_items/226"
     print "ERROR: AWK interpreter doesn't conform to POSIX\n" ref > "/dev/stderr"
     exit(1)
 }
