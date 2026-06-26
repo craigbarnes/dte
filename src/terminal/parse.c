@@ -575,7 +575,7 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
                 i--;
                 // Fallthrough
             case 0x07: // BEL
-                *k = parse_osc_query_reply(data, pos, pos >= sizeof(data));
+                *k = parse_osc_query_reply(string_view(data, pos), pos >= sizeof(data));
                 return i;
             }
             continue;

@@ -413,21 +413,21 @@ unhandled:
     return KEY_IGNORE;
 }
 
-KeyCode parse_osc_query_reply(const char *data, size_t len, bool truncated)
+KeyCode parse_osc_query_reply(StringView seq, bool truncated)
 {
-    if (unlikely(len == 0)) {
+    if (unlikely(seq.length == 0)) {
         return KEY_IGNORE;
     }
 
     const char *note = truncated ? " (truncated)" : "";
-    char prefix = data[0];
-    if (prefix == 'L' || prefix == 'l') {
-        const char *type = (prefix == 'l') ? "title" : "icon";
-        LOG_DEBUG("window %s%s: %.*s", type, note, (int)len - 1, data + 1);
+    bool l_prefix = strview_remove_matching_prefix(&seq, "l");
+    if (l_prefix || strview_remove_matching_prefix(&seq, "L")) {
+        const char *type = l_prefix ? "title" : "icon";
+        LOG_DEBUG("window %s%s: %.*s", type, note, (int)seq.length, seq.data);
         return KEY_IGNORE;
     }
 
-    LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)len, data);
+    LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)seq.length, seq.data);
     return KEY_IGNORE;
 }
 
