@@ -30,6 +30,15 @@ String make_indent(const LocalOptions *options, size_t width)
     return str;
 }
 
+static String make_simple_indent(const LocalOptions *options, size_t level)
+{
+    bool use_spaces = use_spaces_for_indent(options);
+    size_t nbytes = use_spaces ? level * options->indent_width : level;
+    String indent = STRING_INIT;
+    string_append_memset(&indent, use_spaces ? ' ' : '\t', nbytes);
+    return indent;
+}
+
 // Return true if the contents of `line` triggers an additional level
 // of auto-indent on the next line
 static bool line_contents_increases_indent (
@@ -204,22 +213,13 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter
     return 0;
 }
 
-static char *alloc_indent(const LocalOptions *options, size_t count, size_t *sizep)
-{
-    bool use_spaces = use_spaces_for_indent(options);
-    size_t size = use_spaces ? count * options->indent_width : count;
-    *sizep = size;
-    return memset(xmalloc(size), use_spaces ? ' ' : '\t', size);
-}
-
 static void increase_indent(View *view, size_t nr_lines, size_t count)
 {
     BUG_ON(!block_iter_is_bol(&view->cursor));
     const LocalOptions *options = &view->buffer->options;
-    size_t indent_size;
-    char *indent = alloc_indent(options, count, &indent_size);
+    String indent = make_simple_indent(options, count);
 
-    for (size_t i = 0; true; ) {
+    for (size_t i = 0; true; block_iter_eat_line(&view->cursor)) {
         StringView line = block_iter_get_line(&view->cursor);
         IndentInfo info = get_indent_info(options, line);
         if (info.wsonly) {
@@ -229,21 +229,19 @@ static void increase_indent(View *view, size_t nr_lines, size_t count)
             }
         } else if (info.sane) {
             // Insert whitespace
-            buffer_insert_bytes(view, indent, indent_size);
+            buffer_insert_bytes(view, indent.buffer, indent.len);
         } else {
             // Replace whole indentation with sane one
-            size_t size;
-            char *buf = alloc_indent(options, info.level + count, &size);
-            buffer_replace_bytes(view, info.bytes, buf, size);
-            free(buf);
+            String rep = make_simple_indent(options, info.level + count);
+            buffer_replace_bytes(view, info.bytes, rep.buffer, rep.len);
+            string_free(&rep);
         }
         if (++i == nr_lines) {
             break;
         }
-        block_iter_eat_line(&view->cursor);
     }
 
-    free(indent);
+    string_free(&indent);
 }
 
 static void decrease_indent(View *view, size_t nr_lines, size_t count)
@@ -253,7 +251,7 @@ static void decrease_indent(View *view, size_t nr_lines, size_t count)
     const size_t indent_width = options->indent_width;
     const bool space_indent = use_spaces_for_indent(options);
 
-    for (size_t i = 0; true; ) {
+    for (size_t i = 0; true; block_iter_eat_line(&view->cursor)) {
         StringView line = block_iter_get_line(&view->cursor);
         IndentInfo info = get_indent_info(options, line);
         if (info.wsonly) {
@@ -270,10 +268,9 @@ static void decrease_indent(View *view, size_t nr_lines, size_t count)
         } else if (info.bytes) {
             // Replace whole indentation with sane one
             if (info.level > count) {
-                size_t size;
-                char *buf = alloc_indent(options, info.level - count, &size);
-                buffer_replace_bytes(view, info.bytes, buf, size);
-                free(buf);
+                String indent = make_simple_indent(options, info.level - count);
+                buffer_replace_bytes(view, info.bytes, indent.buffer, indent.len);
+                string_free(&indent);
             } else {
                 buffer_delete_bytes(view, info.bytes);
             }
@@ -281,7 +278,6 @@ static void decrease_indent(View *view, size_t nr_lines, size_t count)
         if (++i == nr_lines) {
             break;
         }
-        block_iter_eat_line(&view->cursor);
     }
 }
 
