@@ -8,6 +8,7 @@
 #include "move.h"
 #include "regexp.h"
 #include "selection.h"
+#include "util/log.h"
 #include "util/xmalloc.h"
 
 String make_indent(const LocalOptions *options, size_t width)
@@ -213,13 +214,16 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, const BlockIter
     return 0;
 }
 
-static void increase_indent(View *view, size_t nr_lines, size_t count)
+static void increase_indent(View *view, size_t lines, size_t levels)
 {
+    BUG_ON(lines == 0);
+    BUG_ON(levels == 0);
     BUG_ON(!block_iter_is_bol(&view->cursor));
     const LocalOptions *options = &view->buffer->options;
-    String indent = make_simple_indent(options, count);
+    String indent = make_simple_indent(options, levels);
+    size_t i = 0;
 
-    for (size_t i = 0; true; block_iter_eat_line(&view->cursor)) {
+    do {
         StringView line = block_iter_get_line(&view->cursor);
         IndentInfo info = get_indent_info(options, line);
         if (info.wsonly) {
@@ -232,26 +236,27 @@ static void increase_indent(View *view, size_t nr_lines, size_t count)
             buffer_insert_bytes(view, indent.buffer, indent.len);
         } else {
             // Replace whole indentation with sane one
-            String rep = make_simple_indent(options, info.level + count);
+            String rep = make_simple_indent(options, info.level + levels);
             buffer_replace_bytes(view, info.bytes, rep.buffer, rep.len);
             string_free(&rep);
         }
-        if (++i == nr_lines) {
-            break;
-        }
-    }
+    } while (++i < lines && block_iter_eat_line(&view->cursor));
 
+    WARN_ON(i != lines);
     string_free(&indent);
 }
 
-static void decrease_indent(View *view, size_t nr_lines, size_t count)
+static void decrease_indent(View *view, size_t lines, size_t levels)
 {
+    BUG_ON(lines == 0);
+    BUG_ON(levels == 0);
     BUG_ON(!block_iter_is_bol(&view->cursor));
     const LocalOptions *options = &view->buffer->options;
     const size_t indent_width = options->indent_width;
     const bool space_indent = use_spaces_for_indent(options);
+    size_t i = 0;
 
-    for (size_t i = 0; true; block_iter_eat_line(&view->cursor)) {
+    do {
         StringView line = block_iter_get_line(&view->cursor);
         IndentInfo info = get_indent_info(options, line);
         if (info.wsonly) {
@@ -260,74 +265,73 @@ static void decrease_indent(View *view, size_t nr_lines, size_t count)
                 buffer_delete_bytes(view, info.bytes);
             }
         } else if (info.level && info.sane) {
-            size_t n = MIN(count, info.level);
+            size_t n = MIN(levels, info.level);
             if (space_indent) {
                 n *= indent_width;
             }
             buffer_delete_bytes(view, n);
         } else if (info.bytes) {
             // Replace whole indentation with sane one
-            if (info.level > count) {
-                String indent = make_simple_indent(options, info.level - count);
+            if (info.level > levels) {
+                String indent = make_simple_indent(options, info.level - levels);
                 buffer_replace_bytes(view, info.bytes, indent.buffer, indent.len);
                 string_free(&indent);
             } else {
                 buffer_delete_bytes(view, info.bytes);
             }
         }
-        if (++i == nr_lines) {
-            break;
-        }
-    }
+    } while (++i < lines && block_iter_eat_line(&view->cursor));
+
+    WARN_ON(i != lines);
 }
 
-static void do_indent_lines(View *view, int count, size_t nr_lines)
+static void do_indent_lines(View *view, size_t lines, int levels)
 {
     begin_change_chain();
     block_iter_bol(&view->cursor);
-    if (count > 0) {
-        increase_indent(view, nr_lines, count);
+    if (levels > 0) {
+        increase_indent(view, lines, levels);
     } else {
-        decrease_indent(view, nr_lines, -count);
+        decrease_indent(view, lines, -levels);
     }
     end_change_chain(view);
 }
 
-void indent_lines(View *view, int count)
+void indent_lines(View *view, int levels)
 {
-    if (unlikely(count == 0)) {
+    if (unlikely(levels == 0)) {
         return;
     }
 
     int width = view->buffer->options.indent_width;
     BUG_ON(width < 1 || width > INDENT_WIDTH_MAX);
-    long x = view_get_preferred_x(view) + (count * width);
+    long x = view_get_preferred_x(view) + (levels * width);
     x = MAX(x, 0);
 
     if (view->selection == SELECT_NONE) {
-        do_indent_lines(view, count, 1);
+        do_indent_lines(view, 1, levels);
         goto out;
     }
 
     view->selection = SELECT_LINES;
     SelectionInfo info = init_selection(view);
     view->cursor = info.si;
-    size_t nr_lines = get_nr_selected_lines(&info);
-    if (unlikely(nr_lines == 0)) {
+    size_t lines = get_nr_selected_lines(&info);
+    if (unlikely(lines == 0)) {
         return;
     }
 
-    do_indent_lines(view, count, nr_lines);
+    do_indent_lines(view, lines, levels);
     if (info.swapped) {
         // Cursor should be at beginning of selection
         block_iter_bol(&view->cursor);
         view->sel_so = block_iter_get_offset(&view->cursor);
-        while (--nr_lines) {
+        while (--lines) {
             block_iter_prev_line(&view->cursor);
         }
     } else {
         BlockIter save = view->cursor;
-        while (--nr_lines) {
+        while (--lines) {
             block_iter_prev_line(&view->cursor);
         }
         view->sel_so = block_iter_get_offset(&view->cursor);

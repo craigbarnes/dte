@@ -2261,12 +2261,13 @@ static bool cmd_setenv(EditorState *e, const CommandArgs *a)
 static bool cmd_indent(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
-    int count = 1;
-    if (arg && !str_to_int(arg, &count)) {
+    int levels = 1;
+    if (arg && !str_to_int(arg, &levels)) {
         return error_msg(&e->err, "Invalid number: %s", arg);
     }
 
-    indent_lines(e->view, (count && has_flag(a, 'r')) ? -count : count);
+    bool reduce = has_flag(a, 'r');
+    indent_lines(e->view, (levels && reduce) ? -levels : levels);
     return true;
 }
 
