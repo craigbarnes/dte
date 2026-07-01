@@ -6,12 +6,16 @@
 MUSLGCC ?= ccache musl-gcc
 MUSLGCC_AARCH64 ?= ccache aarch64-linux-musl-gcc
 
+# Work around a bug in the Arch Linux packaging of gcc/musl-gcc
+# See also: https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/-/work_items/39#:~:text=interim%20workaround%20for%20the%20musl%2Dgcc%20problem
+MUSLGCC_LDFLAGS = -fno-link-libatomic
+
 TAR_CREATE = $(TAR) --owner=0 --group=0 --sort=name --numeric-owner -czf
 
 PORTABLE_MAKEFLAGS = \
     --no-print-directory \
     CFLAGS='-O2 -pipe -flto' \
-    LDFLAGS='-static -s' \
+    LDFLAGS='-static -s $(MUSLGCC_LDFLAGS)' \
     NO_CONFIG_MK=1 \
     SANE_WCTYPE=1 \
     DEBUG=0
