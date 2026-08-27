@@ -29,7 +29,7 @@ typedef struct View {
     long cy; // Cursor y
     long cx_display; // Cursor x, in terminal columns (see u_char_width())
     long cx_char; // Cursor x, in Unicode codepoints (invalid UTF-8 byte is counted as 1)
-    long vx, vy; // Top left corner (what cx/cy would be, if cursor was at top left of screen)
+    long vx, vy; // Top left corner (what cx/cy would be, if cursor was at top left of view)
     long preferred_x; // Preferred value for cx_display (after vertical cursor movement)
     unsigned int tt_width; // Tab title width
     unsigned int tt_truncated_width;
