@@ -14,11 +14,18 @@ enum {
 
 static void sanity_check_frame(const Frame *frame)
 {
+    size_t nframes = frame->frames.count;
     bool has_window = !!frame->window;
-    bool has_frames = frame->frames.count > 0;
-    if (has_window == has_frames) {
-        BUG("frames must contain a window or subframe(s), but never both");
+    bool has_frames = !!nframes;
+
+    if (has_window == has_frames || nframes == 1) {
+        BUG (
+            "frames must contain a single window or multiple subframes; got "
+            "frames=%zu, window=%s",
+            nframes, has_window ? "yes" : "no"
+        );
     }
+
     BUG_ON(has_window && frame != frame->window->frame);
 }
 
