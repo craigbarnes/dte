@@ -197,16 +197,18 @@ void collect_normal_vars (
 
 String dump_normal_vars(EditorState *e)
 {
+    static_assert_flat_struct_array(normal_vars, name);
+    const int padded_name_width = sizeof(normal_vars[0].name) - 1;
+
     String buf = string_new(512);
     for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
         const char *name = normal_vars[i].name;
-        char *val = expand_normal_var(e, name);
-        string_append_cstring(&buf, name);
-        string_append_byte(&buf, ' ');
+        string_sprintf(&buf, "%*s  ", padded_name_width, name);
 
         // This isn't a real command argument, but variables like $WORD
         // can contain newlines, which would make the line-based format
         // confusing if not escaped somehow
+        char *val = expand_normal_var(e, name);
         string_append_escaped_arg(&buf, val, true);
 
         string_append_byte(&buf, '\n');
