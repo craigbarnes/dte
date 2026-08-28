@@ -116,6 +116,7 @@ static const TermEntry terms[] = {
     t("iterm2", C256 | BCE | TITLE | OSC52 | SYNC),
     t("jfbterm", C8 | BCE | NCVUL | NCVDIM),
     t("kitty", TC | TITLE | OSC52 | KITTYKBD | SYNC),
+    t("kmscon", TC | BCE),
     t("kon", C8 | BCE | NCVUL | NCVDIM),
     t("kon2", C8 | BCE | NCVUL | NCVDIM),
     t("konsole", C8 | BCE),
