@@ -213,13 +213,15 @@ The commands available in command/search mode are as follows:
 * `copy` [**-bip**]
 * `paste` [**-m**]
 * `toggle` [**-g**] _option_ [_values_]...
-* `accept` [**-eH**] - Execute command or perform search
-* `cancel` - Return to normal mode
 * `history-next` [**-S**] - Find next history item matching current prefix
 * `history-prev` [**-S**] - Find previous history item matching current prefix
-* `complete-next` - Select next auto-completion in command mode
-* `complete-prev` - Select previous auto-completion in command mode
-* `direction` - Toggle search direction in search mode
+* `complete-next` - Select next auto-completion (command mode)
+* `complete-prev` - Select previous auto-completion (command mode)
+* `direction` - Toggle search direction (search mode)
+* `accept` [**-H**] - Execute command (command mode)
+* `accept` [**-Hcel**] - Perform search (search mode; flags correspond to the
+  normal [`search`] command)
+* `cancel` - Return to normal mode
 
 Most of these commands behave in a similar fashion to the normal mode
 commands of the same name. The exceptions to this have been given a
@@ -227,8 +229,6 @@ short description above. Most of the command flags also behave similarly
 to the normal mode equivalents, except for the following:
 
 * `accept -H` - Accept the current text without adding a history entry
-* `accept -e` (search mode only) - Escape all [`regex`] special
-  characters, before performing a (plain-text) search
 * `history-next -S` - Get next history item (without prefix matching)
 * `history-prev -S` - Get previous history item (without prefix matching)
 

@@ -9,7 +9,7 @@ Unreleased
 
 **Additions:**
 
-* Added 46 new command flags/arguments:
+* Added 48 new command flags/arguments:
   * [`bookmark -v`][`bookmark`]
   * [`delete-line -S`][`delete-line`]
   * [`left -l`][`left`]
@@ -29,8 +29,6 @@ Unreleased
   * [`search -l`][`search`]
   * [`search -e`][`search`]
   * [`replace -e`][`replace`]
-  * [`history-next -S`][`history-next`]
-  * [`history-prev -S`][`history-prev`]
   * [`quit -C`][`quit`]
   * [`quit -S`][`quit`]
   * [`quit -F`][`quit`]
@@ -57,6 +55,10 @@ Unreleased
   * [`copy text`][`copy`]
   * [`join delimiter`][`join`]
   * [`exec -o echo`][`exec`]
+  * [`history-next -S`][`history-next`] (command/search mode)
+  * [`history-prev -S`][`history-prev`] (command/search mode)
+  * [`accept -c`][search mode `accept`] (search mode)
+  * [`accept -l`][search mode `accept`] (search mode)
 * Added 2 new options:
   * [`syntax-line-limit`]
   * [`syntax-size-limit`]
@@ -209,8 +211,8 @@ Released on 2023-01-21.
 
 * Added 15 new command flags:
   * [`bind -n`][`bind`]
-  * [`bind -c`][`bind`] (custom key bindings in [`command`] mode)
-  * [`bind -s`][`bind`] (custom key bindings in [`search`] mode)
+  * [`bind -c`][`bind`] (custom key bindings in [command mode])
+  * [`bind -s`][`bind`] (custom key bindings in [search mode])
   * [`bol -t`][`bol`]
   * [`bof -c`][`bof`]
   * [`bof -l`][`bof`]
@@ -352,15 +354,15 @@ Released on 2021-04-03.
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
-* Added an Alt+Enter key binding to search mode, for performing
+* Added an Alt+Enter key binding to [search mode], for performing
   plain-text searches.
-* Added a Shift+Tab key binding to command mode, for iteratating
+* Added a Shift+Tab key binding to [command mode], for iteratating
   auto-completions in reverse order.
 * Added `%b`, `%N` and `%S` [statusline] format specifiers.
 * Added a large confirmation dialog, shown when [`quit -p`][`quit`] is
   run with unsaved changes.
 * Added the ability to exclude individual commands from command history
-  (by prepending a space character when in command mode).
+  (by prepending a space character when in [command mode]).
 
 **Improvements:**
 
@@ -518,7 +520,7 @@ Released on 2019-04-18.
   allow selecting whole lines while moving.
 * Added default bindings for various Shift+key combinations, for doing
   GUI-style text selections.
-* Added key bindings to command mode for deleting/erasing whole words
+* Added key bindings to [command mode] for deleting/erasing whole words
   (Alt+Delete and Alt+Backspace).
 
 **Improvements:**
@@ -539,7 +541,7 @@ Released on 2019-04-18.
   uppercase.
 * Removed support for chained key bindings (e.g. `bind '^X c' ...`).
   Commands that aren't bound to simple key combinations can just be
-  accessed via command mode.
+  accessed via [command mode].
 * Removed support for recognizing some Ctrl/Alt/Shift key combinations
   produced by the `rxvt` terminal emulator. The key codes produced by
   `rxvt` violate the [ECMA-48] specification. Users of such terminals
@@ -579,7 +581,7 @@ Released on 2017-12-20.
 **Changes:**
 
 * Added new, default `dark` color scheme.
-* Added Ctrl+G key binding to exit command mode.
+* Added Ctrl+G key binding to exit [command mode].
 * Added Ctrl+H key binding for `erase` command.
 * Added syntax highlighting for TeX and roff (man page) files.
 * Improved syntax highlighting of Python numeric literals.
@@ -812,6 +814,9 @@ builds are maintained on a "best effort" basis only.
 [dte-stdin]: https://craigbarnes.gitlab.io/dte/dte.html#standard-input
 [environment]: https://craigbarnes.gitlab.io/dte/dte.html#environment
 [`$NO_COLOR`]: https://craigbarnes.gitlab.io/dte/dte.html#environment:~:text=NO_COLOR
+[normal mode]: https://craigbarnes.gitlab.io/dte/dte.html#normal-mode
+[command mode]: https://craigbarnes.gitlab.io/dte/dte.html#command-mode
+[search mode]: https://craigbarnes.gitlab.io/dte/dte.html#search-mode
 
 [`dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [`str`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#str
@@ -870,6 +875,7 @@ builds are maintained on a "best effort" basis only.
 
 [`history-next`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=history%2Dnext%20%2DS,-%2D%20Get
 [`history-prev`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=history%2Dprev%20%2DS,-%2D%20Get
+[search mode `accept`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=accept,-%5B%2DHc
 
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
 [`auto-indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#auto-indent

@@ -76,6 +76,7 @@ void macro_command_hook(MacroRecorder *m, const char *cmd_name, char **args)
 void macro_search_hook (
     MacroRecorder *m,
     StringView pattern,
+    SelectionType sel_type,
     bool reverse,
     bool add_to_history
 ) {
@@ -85,6 +86,9 @@ void macro_search_hook (
 
     String buf = string_new(pattern.length + 32);
     string_append_cstring(&buf, "search ");
+    if (sel_type) {
+        string_append_cstring(&buf, sel_type == SELECT_LINES ? "-l " : "-c ");
+    }
 
     if (pattern.length) {
         string_append_cstring(&buf, reverse ? "-r " : "");

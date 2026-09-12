@@ -307,7 +307,7 @@ static void test_macro_record(TestContext *ctx)
     insert_text(e->view, t2, true);
     macro_insert_text_hook(m, t2);
 
-    macro_search_hook(m, strview("[12]"), true, false);
+    macro_search_hook(m, strview("[12]"), SELECT_NONE, true, false);
 
     EXPECT_TRUE(macro_is_recording(m));
     EXPECT_TRUE(macro_stop(m));

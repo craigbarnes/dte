@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include "block-iter.h"
 #include "buffer.h"
+#include "command/args.h"
+#include "command/run.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/string-view.h"
@@ -28,6 +30,18 @@ static inline void view_set_selection_type(View *view, SelectionType sel)
     }
 
     view_do_set_selection_type(view, sel);
+}
+
+static inline SelectionType handle_selection_flags(View *view, const CommandArgs *a)
+{
+    SelectionType sel = SELECT_NONE;
+    switch (cmdargs_pick_winning_flag(a, "cl")) {
+        case 'c': sel = SELECT_CHARS; break;
+        case 'l': sel = SELECT_LINES; break;
+    }
+
+    view_set_selection_type(view, MAX(sel, view->select_mode));
+    return sel;
 }
 
 static inline bool unselect(View *view)

@@ -77,14 +77,6 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
     return cmdargs_has_flag(a, flag);
 }
 
-static void handle_selection_flags(View *view, const CommandArgs *a)
-{
-    bool c = has_flag(a, 'c');
-    bool l = has_flag(a, 'l');
-    SelectionType sel = l ? SELECT_LINES : (c ? SELECT_CHARS : SELECT_NONE);
-    view_set_selection_type(view, MAX(sel, view->select_mode));
-}
-
 static bool cmd_alias(EditorState *e, const CommandArgs *a)
 {
     const char *const name = a->args[0];
@@ -2138,9 +2130,6 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         return true;
     }
 
-    // TODO: Make [-c|-l] selection flags apply to search mode (as handled above)
-    // and/or add `[-c|-l]` flags to the search mode `accept` command and bind to
-    // Shift+Enter and Ctrl+Shift+Enter
     handle_selection_flags(view, a);
 
     SearchCaseSensitivity cs = e->options.case_sensitive_search;

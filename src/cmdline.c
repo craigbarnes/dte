@@ -450,12 +450,11 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         }
     }
 
+    SelectionType sel = handle_selection_flags(e->view, a);
     if (e->macro.recording) {
-        macro_search_hook(&e->macro, strview(pat), e->search.reverse, add_to_history);
+        bool reverse = e->search.reverse;
+        macro_search_hook(&e->macro, strview(pat), sel, reverse, add_to_history);
     }
-
-    // Unselect, unless selection mode is active
-    view_set_selection_type(e->view, e->view->select_mode);
 
     SearchCaseSensitivity cs = e->options.case_sensitive_search;
     e->err.command_name = NULL;
@@ -497,7 +496,7 @@ static const Command common_cmds[] = {
 };
 
 static const Command search_cmds[] = {
-    CMD("accept", "He", 0, 0, cmd_search_mode_accept),
+    CMD("accept", "Hcel", 0, 0, cmd_search_mode_accept),
     CMD("direction", "", 0, 0, cmd_direction),
     CMD("history-next", "S", 0, 0, cmd_search_history_next),
     CMD("history-prev", "S", 0, 0, cmd_search_history_prev),
