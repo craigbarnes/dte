@@ -10,9 +10,8 @@ state start special
     char x hex0
     char u .c-uchar4:END special
     char U .c-uchar8:END special
-    # Anything but \n
+    # Eat any invalid byte except \n
     char -n "\n" END error
-    # Don't eat \n
     noeat END
 
 state oct1 special
