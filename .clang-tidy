@@ -36,7 +36,6 @@ Checks: >
     -readability-implicit-bool-conversion,
     -readability-isolate-declaration,
     -readability-magic-numbers,
-    -readability-uppercase-literal-suffix,
     -readability-use-concise-preprocessor-directives,
     -performance-no-int-to-ptr,
 
@@ -45,6 +44,7 @@ CheckOptions:
     readability-implicit-bool-conversion.AllowPointerConditions: true
     readability-simplify-boolean-expr.ChainedConditionalAssignment: true
     readability-simplify-boolean-expr.ChainedConditionalReturn: true
+    readability-uppercase-literal-suffix.NewSuffixes: "L;LL;LU;LLU"
     readability-function-size.LineThreshold: '300'
     readability-function-size.StatementThreshold: '200'
     readability-function-size.NestingThreshold: '6'
