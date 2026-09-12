@@ -2771,7 +2771,10 @@ static const Command cmds[] = {
 static bool allow_macro_recording(const Command *cmd, char **args)
 {
     const CommandFunc fn = cmd->cmd;
-    if (fn == cmd_macro || fn == cmd_command || fn == cmd_mode) {
+    if (
+        fn == cmd_macro || fn == cmd_record || fn == cmd_play
+        || fn == cmd_command || fn == cmd_mode
+    ) {
         return false;
     }
 
