@@ -84,6 +84,7 @@ static const struct FileExtensionMap {
     {"gemspec", RUBY},
     {"geojson", JSON},
     {"gitignore", GITIGNORE},
+    {"glif", XML}, // https://unifiedfontobject.org/versions/ufo3/glyphs/glif
     {"glsl", GLSL},
     {"glslf", GLSL},
     {"glslv", GLSL},
