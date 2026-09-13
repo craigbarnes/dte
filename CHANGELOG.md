@@ -875,7 +875,7 @@ builds are maintained on a "best effort" basis only.
 
 [`history-next`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=history%2Dnext%20%2DS,-%2D%20Get
 [`history-prev`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=history%2Dprev%20%2DS,-%2D%20Get
-[search mode `accept`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=accept,-%5B%2DHc
+[search mode `accept`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind:~:text=accept,-%5B%2DHcel%5D%20%2D%20Perform
 
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
 [`auto-indent`]: https://craigbarnes.gitlab.io/dte/dterc.html#auto-indent
