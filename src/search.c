@@ -8,7 +8,7 @@
 
 // Recurses at most once
 // NOLINTNEXTLINE(misc-no-recursion)
-static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
+static bool do_search_fwd(BlockIter *bi, const regex_t *regex, bool skip)
 {
     int flags = block_iter_is_bol(bi) ? 0 : REG_NOTBOL;
 
@@ -27,20 +27,15 @@ static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
         if (regexp_exec(regex, line, 1, &match, flags)) {
             if (skip && match.rm_so == 0) {
                 // Ignore match at current cursor position
-                regoff_t count = match.rm_eo;
-                if (count == 0) {
-                    // It is safe to skip one byte because every line
-                    // has one extra byte (newline) that is not in line.data
-                    count = 1;
-                }
-                block_iter_skip_bytes(bi, (size_t)count);
-                return do_search_fwd(view, regex, bi, false);
+
+                // It's always safe to skip one byte, because every line
+                // has a newline that's not included in line.data
+                block_iter_skip_bytes(bi, MAX(match.rm_eo, 1));
+
+                return do_search_fwd(bi, regex, false);
             }
 
             block_iter_skip_bytes(bi, match.rm_so);
-            view->cursor = *bi;
-            view->center_on_scroll = true;
-            view_reset_preferred_x(view);
             return true;
         }
 
@@ -51,7 +46,7 @@ static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
     return false;
 }
 
-static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx, bool skip)
+static bool do_search_bwd(BlockIter *bi, const regex_t *regex, ssize_t cx, bool skip)
 {
     if (block_iter_is_eof(bi)) {
         goto next;
@@ -91,9 +86,6 @@ static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx,
 
         if (offset >= 0) {
             block_iter_skip_bytes(bi, offset);
-            view->cursor = *bi;
-            view->center_on_scroll = true;
-            view_reset_preferred_x(view);
             return true;
         }
 
@@ -102,6 +94,30 @@ static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx,
     } while (block_iter_prev_line(bi));
 
     return false;
+}
+
+static bool search_fwd(View *view, BlockIter *bi, const regex_t *regex, bool skip)
+{
+    if (!do_search_fwd(bi, regex, skip)) {
+        return false;
+    }
+
+    view->cursor = *bi;
+    view->center_on_scroll = true;
+    view_reset_preferred_x(view);
+    return true;
+}
+
+static bool search_bwd(View *view, BlockIter *bi, const regex_t *regex, ssize_t cx, bool skip)
+{
+    if (!do_search_bwd(bi, regex, cx, skip)) {
+        return false;
+    }
+
+    view->cursor = *bi;
+    view->center_on_scroll = true;
+    view_reset_preferred_x(view);
+    return true;
 }
 
 bool search_tag(View *view, ErrorBuffer *ebuf, const char *pattern)
@@ -115,7 +131,7 @@ bool search_tag(View *view, ErrorBuffer *ebuf, const char *pattern)
     }
 
     BlockIter bi = block_iter(view->buffer);
-    bool found = do_search_fwd(view, &regex, &bi, false);
+    bool found = search_fwd(view, &bi, &regex, false);
     regfree(&regex);
 
     if (!found) {
@@ -183,20 +199,20 @@ bool do_search_next(View *view, SearchState *search, ErrorBuffer *ebuf, SearchCa
     BlockIter bi = view->cursor;
     regex_t *regex = &search->regex;
     if (!search->reverse) {
-        if (do_search_fwd(view, regex, &bi, true)) {
+        if (search_fwd(view, &bi, regex, true)) {
             return true;
         }
         block_iter_bof(&bi);
-        if (do_search_fwd(view, regex, &bi, false)) {
+        if (search_fwd(view, &bi, regex, false)) {
             return info_msg(ebuf, "Continuing at top");
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
-        if (do_search_bwd(view, regex, &bi, cursor_x, skip)) {
+        if (search_bwd(view, &bi, regex, cursor_x, skip)) {
             return true;
         }
         block_iter_eof(&bi);
-        if (do_search_bwd(view, regex, &bi, -1, false)) {
+        if (search_bwd(view, &bi, regex, -1, false)) {
             return info_msg(ebuf, "Continuing at bottom");
         }
     }
