@@ -333,6 +333,13 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ_CSTRING(&c->buf, "set x y tab-bar true ");
     reset_completion(c);
 
+    // This is to ensure that the resulting `parse_sq(strview(""), buf)`
+    // call doesn't trigger the `pos >= size` assertion in get_delim()
+    cmdline_set_text(c, "set scroll-margin '");
+    complete_command_next(e);
+    EXPECT_STRING_EQ_CSTRING(&c->buf, "set scroll-margin 0 ");
+    reset_completion(c);
+
     cmdline_set_text(c, "save -u test/data/");
     complete_command_next(e);
     EXPECT_STRING_EQ_CSTRING(&c->buf, "save -u test/data/3lines.txt");
