@@ -52,13 +52,12 @@ copy:
 
 static bool read_utf8_line(FileDecoder *dec, StringView *linep)
 {
-    size_t len = dec->text.length;
-    if (dec->ipos >= len) {
-        BUG_ON(dec->ipos > len);
+    if (dec->ipos >= dec->text.length) {
+        BUG_ON(dec->ipos > dec->text.length);
         return false;
     }
 
-    *linep = get_delim(dec->text.data, &dec->ipos, len, '\n');
+    *linep = get_delim(dec->text, &dec->ipos, '\n');
     return true;
 }
 

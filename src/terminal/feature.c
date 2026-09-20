@@ -7,8 +7,6 @@
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/str-util.h"
-#include "util/string-view.h"
-#include "util/xstring.h"
 
 typedef struct {
     const char name[11];
@@ -220,16 +218,16 @@ UNITTEST {
 
 // Extract the "root name" from $TERM, as defined by terminfo(5).
 // This is the initial part of the string up to the first hyphen.
-static StringView term_extract_name(const char *name, size_t len, size_t *pos)
+static StringView term_extract_name(StringView name, size_t *pos)
 {
-    StringView root = get_delim(name, pos, len, '-');
-    if (*pos >= len || !strview_equal_cstring(root, "xterm")) {
+    StringView root = get_delim(name, pos, '-');
+    if (*pos >= name.length || !strview_equal_cstring(root, "xterm")) {
         return root;
     }
 
     // Skip past phony "xterm-" prefix used by certain terminals
     size_t tmp = *pos;
-    StringView word2 = get_delim(name, &tmp, len, '-');
+    StringView word2 = get_delim(name, &tmp, '-');
     if (
         strview_equal_cstring(word2, "kitty")
         || strview_equal_cstring(word2, "termite")
@@ -242,19 +240,18 @@ static StringView term_extract_name(const char *name, size_t len, size_t *pos)
     return root;
 }
 
-TermFeatureFlags term_get_features(const char *name, const char *colorterm)
+TermFeatureFlags term_get_features(StringView name, StringView colorterm)
 {
     TermFeatureFlags features = TFLAG_8_COLOR;
-    if (!name || name[0] == '\0') {
+    if (!name.length) {
         LOG_NOTICE("$TERM unset; skipping terminal info lookup");
         return features;
     }
 
-    LOG_INFO("TERM=%s", name);
+    LOG_INFO("TERM=%.*s", SV_FMT(name));
 
     size_t pos = 0;
-    size_t name_len = strlen(name);
-    StringView root_name = term_extract_name(name, name_len, &pos);
+    StringView root_name = term_extract_name(name, &pos);
 
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
@@ -263,21 +260,19 @@ TermFeatureFlags term_get_features(const char *name, const char *colorterm)
         features = entry->features;
     }
 
-    if (colorterm) {
-        if (streq(colorterm, "truecolor") || streq(colorterm, "24bit")) {
-            features |= TC;
-            LOG_INFO("24-bit color support detected (COLORTERM=%s)", colorterm);
-        } else if (colorterm[0] != '\0') {
-            LOG_WARNING("unknown $COLORTERM value: '%s'", colorterm);
-        }
+    if (strview_equal_either_cstring(colorterm, "truecolor", "24bit")) {
+        features |= TC;
+        LOG_INFO("24-bit color support detected (COLORTERM=%.*s)", SV_FMT(colorterm));
+    } else if (colorterm.length) {
+        LOG_WARNING("unknown $COLORTERM value: '%.*s'", SV_FMT(colorterm));
     }
 
     if (features & TFLAG_TRUE_COLOR) {
         return features;
     }
 
-    while (pos < name_len) {
-        const StringView str = get_delim(name, &pos, name_len, '-');
+    while (pos < name.length) {
+        const StringView str = get_delim(name, &pos, '-');
         for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
             const char *suffix = color_suffixes[i].suffix;
             size_t suffix_len = color_suffixes[i].suffix_len;

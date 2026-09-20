@@ -219,7 +219,7 @@ static void test_load_syntax_errors(TestContext *ctx)
 
 static void test_hl_line(TestContext *ctx)
 {
-    if (!get_builtin_config("syntax/c")) {
+    if (!get_builtin_config(strview("syntax/c"))) {
         LOG_INFO("syntax/c not available; skipping %s()", __func__);
         return;
     }

@@ -305,7 +305,7 @@ size_t tag_lookup (
 
     size_t ntags = tags.count;
     if (ntags == 0) {
-        error_msg(ebuf, "Tag '%.*s' not found", (int)name.length, name.data);
+        error_msg(ebuf, "Tag '%.*s' not found", SV_FMT(name));
         return 0;
     }
 

@@ -52,7 +52,7 @@ static FileTypeEnum filetype_from_emacs_var(const StringView line)
 
     vars.length = pos;
     strview_trim_right(&vars);
-    LOG_DEBUG("found emacs file-local vars: '%.*s'", (int)vars.length, vars.data);
+    LOG_DEBUG("found emacs file-local vars: '%.*s'", SV_FMT(vars));
 
     // TODO: Handle multiple local vars like e.g. "mode: example; other: xyz;",
     // in addition to a single major mode string (by searching for "[Mm]ode:")?

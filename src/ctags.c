@@ -71,12 +71,12 @@ static size_t parse_ex_cmd(Tag *tag, StringView cmd)
 bool parse_ctags_line(Tag *tag, StringView line)
 {
     size_t pos = 0;
-    *tag = (Tag){.name = get_delim(line.data, &pos, line.length, '\t')};
+    *tag = (Tag){.name = get_delim(line, &pos, '\t')};
     if (tag->name.length == 0 || pos >= line.length) {
         return false;
     }
 
-    tag->filename = get_delim(line.data, &pos, line.length, '\t');
+    tag->filename = get_delim(line, &pos, '\t');
     if (tag->filename.length == 0 || pos >= line.length) {
         return false;
     }
@@ -108,7 +108,7 @@ bool parse_ctags_line(Tag *tag, StringView line)
     }
 
     while (pos < line.length) {
-        StringView field = get_delim(line.data, &pos, line.length, '\t');
+        StringView field = get_delim(line, &pos, '\t');
         if (field.length == 1 && ascii_isalpha(field.data[0])) {
             tag->kind = field.data[0];
         } else if (strview_equal_cstring(field, "file:")) {

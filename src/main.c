@@ -60,7 +60,7 @@ static ExitCode list_builtin_configs(void)
 
 static ExitCode dump_builtin_config(const char *name)
 {
-    const BuiltinConfig *cfg = get_builtin_config(name);
+    const BuiltinConfig *cfg = get_builtin_config(strview(name));
     if (!cfg) {
         return ec_usage_error("no built-in config with name '%s'", name);
     }

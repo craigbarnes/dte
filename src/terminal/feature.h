@@ -2,6 +2,7 @@
 #define TERMINAL_FEATURE_H
 
 #include "util/macros.h"
+#include "util/string-view.h"
 
 // Bit flags representing supported terminal features
 // See also: KEYCODE_QUERY_REPLY_BIT
@@ -32,7 +33,7 @@ typedef enum {
     TFLAG_NCV_REVERSE = 1 << 23, // Colors can't be used with ATTR_REVERSE
 } TermFeatureFlags;
 
-TermFeatureFlags term_get_features(const char *name, const char *colorterm);
+TermFeatureFlags term_get_features(StringView name, StringView colorterm);
 const char *term_feature_to_str(TermFeatureFlags flag) RETURNS_NONNULL;
 
 #endif

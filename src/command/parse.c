@@ -14,7 +14,7 @@ static size_t parse_sq(StringView cmd, String *buf)
 {
     size_t pos = 0;
     if (likely(cmd.length)) {
-        string_append_strview(buf, get_delim(cmd.data, &pos, cmd.length, '\''));
+        string_append_strview(buf, get_delim(cmd, &pos, '\''));
     }
     return pos;
 }

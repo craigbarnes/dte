@@ -349,10 +349,11 @@ static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
     }
 
     const char *const *values = d->u.enum_opt.values;
+    StringView sv = strview(str);
     unsigned int flags = 0;
 
-    for (size_t pos = 0, len = strlen(str); pos < len; ) {
-        const StringView flag = get_delim(str, &pos, len, ',');
+    for (size_t pos = 0; pos < sv.length; ) {
+        const StringView flag = get_delim(sv, &pos, ',');
         size_t n;
         for (n = 0; values[n]; n++) {
             if (strview_equal_cstring(flag, values[n])) {
@@ -366,7 +367,7 @@ static bool flag_parse(const OptionDesc *d, ErrorBuffer *ebuf, const char *str, 
             return error_msg (
                 ebuf,
                 "Invalid flag '%.*s' for %s; expected: %s",
-                (int)flag.length, flag.data, d->name, expected
+                SV_FMT(flag), d->name, expected
             );
         }
     }

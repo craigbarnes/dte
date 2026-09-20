@@ -429,7 +429,7 @@ ssize_t handle_exec (
         if (output->len) {
             size_t pos = 0;
             StringView line = buf_slice_next_line(output->buffer, &pos, output->len);
-            info_msg(&e->err, "%.*s", (int)line.length, line.data);
+            info_msg(&e->err, "%.*s", SV_FMT(line));
         }
         break;
     case EXEC_MSG:

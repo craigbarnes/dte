@@ -101,12 +101,12 @@ static StringView get_interpreter(StringView line)
     }
 
     size_t pos = 0;
-    sv = get_delim(line.data, &pos, line.length, ' ');
+    sv = get_delim(line, &pos, ' ');
     if (pos < line.length && strview_equal_cstring(sv, "/usr/bin/env")) {
         while (pos + 1 < line.length && line.data[pos] == ' ') {
             pos++;
         }
-        sv = get_delim(line.data, &pos, line.length, ' ');
+        sv = get_delim(line, &pos, ' ');
     }
 
     ssize_t last_slash_idx = strview_memrchr_idx(sv, '/');

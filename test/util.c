@@ -1022,14 +1022,14 @@ static void test_strview_from_slice(TestContext *ctx)
 
 static void test_get_delim(TestContext *ctx)
 {
-    static const char input[] = "-x-y-foo--bar--";
+    static const StringView input = STRING_VIEW("-x-y-foo--bar--");
     static const char parts[][4] = {"", "x", "y", "foo", "", "bar", "", ""};
     const size_t nparts = ARRAYLEN(parts);
     const size_t part_size = ARRAYLEN(parts[0]);
 
     size_t idx = 0;
-    for (size_t pos = 0, len = sizeof(input) - 1; pos < len; idx++) {
-        const StringView sv = get_delim(input, &pos, len, '-');
+    for (size_t pos = 0; pos < input.length; idx++) {
+        const StringView sv = get_delim(input, &pos, '-');
         ASSERT_TRUE(idx < nparts);
         ASSERT_EQ(parts[idx][part_size - 1], '\0');
         EXPECT_STRVIEW_EQ_CSTRING(sv, parts[idx]);
@@ -3909,9 +3909,9 @@ static void test_xmemrchr(TestContext *ctx)
 static void test_str_to_bitflags(TestContext *ctx)
 {
     static const char strs[][8] = {"zero", "one", "two", "three"};
-    EXPECT_UINT_EQ(STR_TO_BITFLAGS("one,three", strs, true), 1 << 1 | 1 << 3);
-    EXPECT_UINT_EQ(STR_TO_BITFLAGS("two,invalid,zero", strs, true), 1 << 2 | 1 << 0);
-    EXPECT_UINT_EQ(STR_TO_BITFLAGS("two,invalid,zero", strs, false), 0);
+    EXPECT_UINT_EQ(STR_TO_BITFLAGS(strview("one,three"), strs, true), 1 << 1 | 1 << 3);
+    EXPECT_UINT_EQ(STR_TO_BITFLAGS(strview("two,invalid,zero"), strs, true), 1 << 2 | 1 << 0);
+    EXPECT_UINT_EQ(STR_TO_BITFLAGS(strview("two,invalid,zero"), strs, false), 0);
 }
 
 static void test_log_level_from_str(TestContext *ctx)

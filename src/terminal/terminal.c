@@ -4,7 +4,7 @@
 
 void term_init(Terminal *term, const char *name, const char *colorterm)
 {
-    TermFeatureFlags features = term_get_features(name, colorterm);
+    TermFeatureFlags features = term_get_features(strview(name), strview(colorterm));
     term->features = features;
     term->width = 80;
     term->height = 24;

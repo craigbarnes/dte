@@ -33,7 +33,7 @@ typedef struct {
 struct EditorState;
 
 String dump_builtin_configs(void) WARN_UNUSED_RESULT;
-const BuiltinConfig *get_builtin_config(const char *name) PURE NONNULL_ARGS WARN_UNUSED_RESULT;
+const BuiltinConfig *get_builtin_config(StringView name) PURE WARN_UNUSED_RESULT;
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs) NONNULL_ARGS_AND_RETURN WRITEONLY(1) WARN_UNUSED_RESULT;
 bool exec_config(CommandRunner *runner, StringView config) NONNULL_ARGS WARN_UNUSED_RESULT;
 SystemErrno read_config(CommandRunner *runner, const char *filename, ConfigFlags f) NONNULL_ARGS WARN_UNUSED_RESULT;

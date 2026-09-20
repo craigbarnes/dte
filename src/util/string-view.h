@@ -21,6 +21,9 @@ typedef struct {
     size_t length;
 } StringView;
 
+// Expands to the 2 values expected for e.g. printf("%.*s", ...)
+#define SV_FMT(sv) (int)(sv).length, (sv).data
+
 #define STRING_VIEW(s) { \
     .data = s, \
     .length = STRLEN(s) \
@@ -66,6 +69,11 @@ static inline bool strview_equal_icase(StringView a, StringView b)
 static inline bool strview_equal_cstring(StringView sv, const char *str)
 {
     return strview_equal(sv, strview(str));
+}
+
+static inline bool strview_equal_either_cstring(StringView sv, const char *s1, const char *s2)
+{
+    return strview_equal_cstring(sv, s1) || strview_equal_cstring(sv, s2);
 }
 
 static inline bool strview_has_sv_prefix(StringView sv, StringView prefix)

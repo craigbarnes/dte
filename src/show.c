@@ -285,7 +285,7 @@ static bool show_mode(EditorState *e, const char *name, bool cflag)
 
 static bool show_builtin(EditorState *e, const char *name, bool cflag)
 {
-    const BuiltinConfig *cfg = get_builtin_config(name);
+    const BuiltinConfig *cfg = get_builtin_config(strview(name));
     if (!cfg) {
         return error_msg(&e->err, "no built-in config with name '%s'", name);
     }

@@ -742,7 +742,7 @@ Syntax *load_syntax (
 
 static Syntax *load_syntax_builtin(EditorState *e, const char *name, SyntaxLoadFlags flags)
 {
-    const BuiltinConfig *cfg = get_builtin_config(name);
+    const BuiltinConfig *cfg = get_builtin_config(strview(name));
     if (!cfg) {
         if (flags & SYN_MUST_EXIST) {
             error_msg(&e->err, "no built-in config with name '%s'", name);

@@ -89,10 +89,10 @@ String dump_builtin_configs(void)
     return str;
 }
 
-const BuiltinConfig *get_builtin_config(const char *name)
+const BuiltinConfig *get_builtin_config(StringView name)
 {
     for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
-        if (streq(name, builtin_configs[i].name)) {
+        if (strview_equal_cstring(name, builtin_configs[i].name)) {
             return &builtin_configs[i];
         }
     }
@@ -116,7 +116,7 @@ static SystemErrno do_read_config (
     BUG_ON(!ebuf);
 
     if (flags & CFG_BUILTIN) {
-        const BuiltinConfig *cfg = get_builtin_config(filename);
+        const BuiltinConfig *cfg = get_builtin_config(strview(filename));
         if (cfg) {
             ebuf->sourcepos.filename = filename;
             ebuf->sourcepos.line = 1;

@@ -234,7 +234,7 @@ void collect_env (
         StringView var = strview(env[i]);
         if (var.length && strview_has_sv_prefix(var, prefix)) {
             size_t pos = 0;
-            StringView name = get_delim(var.data, &pos, var.length, '=');
+            StringView name = get_delim(var, &pos, '=');
             if (likely(name.length)) {
                 ptr_array_append(a, xmemjoin(name.data, name.length, suffix, sfxlen));
             }

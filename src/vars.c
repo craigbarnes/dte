@@ -138,19 +138,19 @@ UNITTEST {
 }
 
 // Handles variables like e.g. ${builtin:color/reset} and ${script:file.sh}
-static char *expand_prefixed_var(const char *name, size_t name_len, StringView prefix)
+static char *expand_prefixed_var(StringView name, StringView prefix)
 {
     char buf[64];
-    bool name_fits_buf = (name_len < sizeof(buf));
+    bool name_fits_buf = (name.length < sizeof(buf));
 
     if (strview_equal_cstring(prefix, "builtin")) {
         // Skip past "builtin:"
-        name += prefix.length + 1;
+        strview_remove_prefix(&name, prefix.length + 1);
     } else if (strview_equal_cstring(prefix, "script") && name_fits_buf) {
         // Copy `name` into `buf` and replace ':' with '/'
-        memcpy(buf, name, name_len + 1);
+        memcpy(buf, name.data, name.length);
         buf[prefix.length] = '/';
-        name = buf;
+        name = string_view(buf, name.length);
     } else {
         return NULL;
     }
@@ -161,15 +161,15 @@ static char *expand_prefixed_var(const char *name, size_t name_len, StringView p
 
 char *expand_normal_var(const EditorState *e, const char *name)
 {
-    size_t name_len = strlen(name);
-    if (unlikely(name_len == 0)) {
+    const StringView name_sv = strview(name);
+    if (unlikely(name_sv.length == 0)) {
         return NULL;
     }
 
     size_t pos = 0;
-    StringView prefix = get_delim(name, &pos, name_len, ':');
-    if (prefix.length < name_len) {
-        return expand_prefixed_var(name, name_len, prefix);
+    StringView prefix = get_delim(name_sv, &pos, ':');
+    if (prefix.length < name_sv.length) {
+        return expand_prefixed_var(name_sv, prefix);
     }
 
     const BuiltinVar *var = BSEARCH(name, normal_vars, vstrcmp);

@@ -37,7 +37,7 @@ bool ini_parse(IniParser *ctx)
         }
 
         size_t val_pos = 0;
-        StringView name = get_delim(line.data, &val_pos, line.length, '=');
+        StringView name = get_delim(line, &val_pos, '=');
         if (val_pos >= line.length) {
             continue; // Invalid line (no delimiter)
         }

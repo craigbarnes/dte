@@ -25,7 +25,7 @@ TraceLoggingFlags trace_flags_from_str(const char *str)
     }
 
     bool all = streq(str, "all");
-    return all ? TRACEFLAGS_ALL : STR_TO_BITFLAGS(str, trace_names, true);
+    return all ? TRACEFLAGS_ALL : STR_TO_BITFLAGS(strview(str), trace_names, true);
 }
 
 void set_trace_logging_flags(TraceLoggingFlags flags)

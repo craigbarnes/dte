@@ -64,18 +64,18 @@ static inline void strn_replace_byte(char *str, size_t n, char byte, char rep)
     }
 }
 
-// Extract a substring between `buf + pos` and either the next `delim`
-// byte (if found) or `buf + size` (the remainder of the string). The
-// substring is returned as a StringView and the `posp` in-out param
-// is set to the offset one byte after the found delimiter (or to the
-// end of the size-bounded string, if no delimiter was found).
-NONNULL_ARGS READONLY(1, 3) READWRITE(2)
-static inline StringView get_delim(const char *buf, size_t *posp, size_t size, int delim)
+// Extract a substring between `sv.data + pos` and either the next `delim`
+// byte (if found) or `sv.data + size` (the remainder of the string). The
+// substring is returned as a StringView and the `posp` in-out param is
+// set to the offset one byte after the found delimiter (or to the end of
+// the size-bounded string, if no delimiter was found).
+NONNULL_ARGS READWRITE(2)
+static inline StringView get_delim(StringView sv, size_t *posp, int delim)
 {
     size_t pos = *posp;
-    BUG_ON(pos >= size);
-    size_t len = size - pos;
-    const char *start = buf + pos;
+    BUG_ON(pos >= sv.length);
+    size_t len = sv.length - pos;
+    const char *start = sv.data + pos;
     const char *found = memchr(start, delim, len);
     len = found ? (size_t)(found - start) : len;
     size_t delim_len = found ? 1 : 0;
@@ -92,7 +92,7 @@ NONNULL_ARGS
 static inline char *get_delim_str(char *buf, size_t *posp, size_t size, int delim)
 {
     char *substr = buf + *posp;
-    StringView sv = get_delim(buf, posp, size, delim);
+    StringView sv = get_delim(string_view(buf, size), posp, delim);
 
     // If no delimiter was found, this writes the null-terminator 1 byte
     // beyond the `size` bound. Callers must ensure this is safe to do.
@@ -106,7 +106,7 @@ static inline char *get_delim_str(char *buf, size_t *posp, size_t size, int deli
 NONNULL_ARGS
 static inline StringView buf_slice_next_line(const char *buf, size_t *posp, size_t size)
 {
-    return get_delim(buf, posp, size, '\n');
+    return get_delim(string_view(buf, size), posp, '\n');
 }
 
 NONNULL_ARGS

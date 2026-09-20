@@ -70,6 +70,21 @@ static inline ssize_t find_str_idx (
     return -1;
 }
 
+static inline ssize_t find_strview_idx (
+    StringView sv,
+    const char *base,
+    size_t nmemb,
+    size_t size
+) {
+    const char *entry = base;
+    for (size_t i = 0; i < nmemb; i++, entry += size) {
+        if (strview_equal_cstring(sv, entry)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 // Attempt to find `str` in a flat array of strings starting at `base`.
 // If found, return the index plus `return_offset`, otherwise return
 // `not_found_val`.
@@ -125,6 +140,6 @@ static inline void check_array (
     }
 }
 
-unsigned int str_to_bitflags(const char *str, const char *base, size_t nstrs, size_t size, bool tolerate_errors);
+unsigned int str_to_bitflags(StringView str, const char *base, size_t nstrs, size_t size, bool tolerate_errors);
 
 #endif

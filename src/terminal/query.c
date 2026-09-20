@@ -213,7 +213,7 @@ static KeyCode parse_xtgettcap_reply(StringView seq, bool valid_request)
     size_t pos = 0;
     size_t len = seq.length;
     StringView empty = strview(NULL);
-    StringView cap_hex = (pos < len) ? get_delim(seq.data, &pos, len, '=') : empty;
+    StringView cap_hex = (pos < len) ? get_delim(seq, &pos, '=') : empty;
     StringView val_hex = (pos < len) ? strview_from_slice(seq.data, pos, len) : empty;
 
     char cbuf[16], vbuf[64];
@@ -243,7 +243,7 @@ static KeyCode parse_xtgettcap_reply(StringView seq, bool valid_request)
             // • https://codeberg.org/dnkl/foot/pulls/2217/
             // • https://github.com/kovidgoyal/kitty/issues/9217
             // • https://github.com/fish-shell/fish-shell/blob/7a05ea0f938a8483/doc_src/terminal-compatibility.rst#:~:text=query%2Dos%2Dname
-            LOG_DEBUG("XTGETTCAP \"query-os-name\" reply: %.*s", (int)val.length, val.data);
+            LOG_DEBUG("XTGETTCAP \"query-os-name\" reply: %.*s", SV_FMT(val));
             return KEY_IGNORE;
         }
     }
@@ -275,14 +275,14 @@ static KeyCode parse_xtgettcap_reply(StringView seq, bool valid_request)
     return KEY_IGNORE;
 }
 
-static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
+static KeyCode handle_decrqss_sgr_reply(StringView reply)
 {
-    LOG_DEBUG("DECRQSS SGR reply: %.*s", (int)len, data);
+    LOG_DEBUG("DECRQSS SGR reply: %.*s", SV_FMT(reply));
 
     TermFeatureFlags flags = 0;
-    for (size_t pos = 0; pos < len; ) {
+    for (size_t pos = 0; pos < reply.length; ) {
         // These SGR params correspond to the ones in term_put_level_3_queries()
-        StringView s = get_delim(data, &pos, len, ';');
+        StringView s = get_delim(reply, &pos, ';');
         if (strview_equal_cstring(s, "48:5:255")) {
             flags |= TFLAG_256_COLOR;
             continue;
@@ -302,7 +302,7 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
 
         LOG_WARNING (
             "unrecognized parameter substring in DECRQSS SGR reply: %.*s",
-            (int)s.length, s.data
+            SV_FMT(s)
         );
     }
 
@@ -311,7 +311,7 @@ static KeyCode handle_decrqss_sgr_reply(const char *data, size_t len)
 
 static KeyCode parse_xtversion_reply(StringView reply)
 {
-    LOG_INFO("XTVERSION reply: %.*s", (int)reply.length, reply.data);
+    LOG_INFO("XTVERSION reply: %.*s", SV_FMT(reply));
 
     if (strview_has_prefix(reply, "XTerm(")) {
         return tflag (
@@ -375,7 +375,7 @@ KeyCode parse_dcs_query_reply(StringView seq, bool truncated)
         // of CSI sequences containing '=', which causes "c" to be rendered
         // (but not inserted into the buffer) at startup.
         // See also: https://github.com/fish-shell/fish-shell/commit/e49dde87cc0f1dcedd424d5ed7a520a3f011ee29
-        LOG_INFO("DA3 reply: %.*s", (int)seq.length, seq.data);
+        LOG_INFO("DA3 reply: %.*s", SV_FMT(seq));
         return tflag(TFLAG_QUERY_L3);
     }
 
@@ -395,16 +395,16 @@ KeyCode parse_dcs_query_reply(StringView seq, bool truncated)
 
             LOG_WARNING (
                 "invalid DECRQSS DECSCUSR (cursor style) reply string: %.*s",
-                (int)seq.length, seq.data
+                SV_FMT(seq)
             );
             return KEY_IGNORE;
         }
 
         if (strview_remove_matching_suffix(&seq, "m")) {
-            return handle_decrqss_sgr_reply(seq.data, seq.length);
+            return handle_decrqss_sgr_reply(seq);
         }
 
-        LOG_INFO("unhandled DECRQSS reply: %.*s", (int)seq.length, seq.data);
+        LOG_INFO("unhandled DECRQSS reply: %.*s", SV_FMT(seq));
         return KEY_IGNORE;
     }
 
@@ -414,7 +414,7 @@ KeyCode parse_dcs_query_reply(StringView seq, bool truncated)
     }
 
 unhandled:
-    LOG_INFO("unhandled DCS string%s: %.*s", note, (int)seq.length, seq.data);
+    LOG_INFO("unhandled DCS string%s: %.*s", note, SV_FMT(seq));
     return KEY_IGNORE;
 }
 
@@ -428,11 +428,11 @@ KeyCode parse_osc_query_reply(StringView seq, bool truncated)
     unsigned int match = strview_remove_either_matching_prefix(&seq, "l", "L");
     if (match) {
         const char *type = (match == 1) ? "title" : "icon";
-        LOG_DEBUG("window %s%s: %.*s", type, note, (int)seq.length, seq.data);
+        LOG_DEBUG("window %s%s: %.*s", type, note, SV_FMT(seq));
         return KEY_IGNORE;
     }
 
-    LOG_WARNING("unhandled OSC string%s: %.*s", note, (int)seq.length, seq.data);
+    LOG_WARNING("unhandled OSC string%s: %.*s", note, SV_FMT(seq));
     return KEY_IGNORE;
 }
 
