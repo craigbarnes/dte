@@ -84,6 +84,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
 {
     set_and_check_locale();
     home = home ? home : "";
+    pid_t pid = getpid();
     EditorState *e = xmalloc(sizeof(*e));
 
     *e = (EditorState) {
@@ -91,6 +92,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
         .home_dir = strview_intern(home),
         .user_config_dir = get_user_config_dir(home, dte_home),
         .flags = EFLAG_HEADLESS,
+        .session_leader = (pid == getsid(0)),
         .regexp_word_tokens = regexp_get_word_boundary_tokens(),
         .modes = hashmap_new(3, HMAP_BORROWED_KEYS),
         .aliases = hashmap_new(32, HMAP_NO_FLAGS),
@@ -152,11 +154,7 @@ EditorState *init_editor_state(const char *home, const char *dte_home)
     };
 
     sanity_check_global_options(&e->options);
-
-    pid_t pid = getpid();
-    bool leader = pid == getsid(0);
-    e->session_leader = leader;
-    LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
+    LOG_INFO("pid: %jd%s", (intmax_t)pid, e->session_leader ? " (session leader)" : "");
 
     pid_t pgid = getpgrp();
     if (pgid != pid) {
