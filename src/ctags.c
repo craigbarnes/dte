@@ -81,7 +81,7 @@ bool parse_ctags_line(Tag *tag, StringView line)
         return false;
     }
 
-    size_t len = parse_ex_cmd(tag, strview_from_slice(line.data, pos, line.length));
+    size_t len = parse_ex_cmd(tag, strview_suffix(line, pos));
     if (len == 0) {
         BUG_ON(tag->pattern);
         return false;

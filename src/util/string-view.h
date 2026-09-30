@@ -54,6 +54,11 @@ static inline StringView strview_from_slice(const char *str, size_t start, size_
     return string_view(start ? str + start : str, end - start);
 }
 
+static inline StringView strview_suffix(StringView sv, size_t start)
+{
+    return strview_from_slice(sv.data, start, sv.length);
+}
+
 static inline bool strview_equal(StringView a, StringView b)
 {
     size_t n = a.length;

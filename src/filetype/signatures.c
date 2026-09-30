@@ -42,7 +42,7 @@ static FileTypeEnum filetype_from_emacs_var(const StringView line)
     }
 
     size_t dlen = STRLEN("-*-");
-    StringView vars = strview_from_slice(line.data, pos + dlen, line.length);
+    StringView vars = strview_suffix(line, pos + dlen);
     strview_trim_left(&vars);
 
     pos = find_var_delim(vars);

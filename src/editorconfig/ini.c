@@ -47,7 +47,7 @@ bool ini_parse(IniParser *ctx)
             continue; // Invalid line (empty name)
         }
 
-        StringView value = strview_from_slice(line.data, val_pos, line.length);
+        StringView value = strview_suffix(line, val_pos);
         strview_trim_left(&value);
 
         ctx->name = name;

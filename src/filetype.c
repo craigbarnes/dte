@@ -70,9 +70,8 @@ bool add_filetype (
 
 static StringView path_extension(StringView filename)
 {
-    ssize_t last_dot = strview_memrchr_idx(filename, '.');
-    size_t ext_offset = last_dot > 0 ? last_dot + 1 : filename.length;
-    return strview_from_slice(filename.data, ext_offset, filename.length);
+    ssize_t dot = strview_memrchr_idx(filename, '.');
+    return strview_suffix(filename, (dot > 0) ? dot + 1 : filename.length);
 }
 
 static StringView get_filename_extension(StringView filename)

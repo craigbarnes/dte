@@ -1018,6 +1018,13 @@ static void test_strview_from_slice(TestContext *ctx)
     EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 2, 3), "2");
     EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 3, 7), "3456");
     EXPECT_STRVIEW_EQ_CSTRING(strview_from_slice(src, 0, sizeof(src) - 1), src);
+
+    static const StringView sv = STRING_VIEW("0123456789");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_suffix(sv, 0), "0123456789");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_suffix(sv, 4), "456789");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_suffix(sv, 7), "789");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_suffix(sv, sv.length), "");
+    EXPECT_STRVIEW_EQ_CSTRING(strview_suffix(strview(NULL), 0), "");
 }
 
 static void test_get_delim(TestContext *ctx)

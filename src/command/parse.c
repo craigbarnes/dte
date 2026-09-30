@@ -171,13 +171,13 @@ String parse_command_arg(const CommandRunner *runner, StringView cmd)
         case ';':
             goto end;
         case '\'':
-            pos += parse_sq(strview_from_slice(cmd.data, pos, cmd.length), &buf);
+            pos += parse_sq(strview_suffix(cmd, pos), &buf);
             break;
         case '"':
-            pos += parse_dq(strview_from_slice(cmd.data, pos, cmd.length), &buf);
+            pos += parse_dq(strview_suffix(cmd, pos), &buf);
             break;
         case '$':
-            pos += parse_var(runner, strview_from_slice(cmd.data, pos, cmd.length), &buf);
+            pos += parse_var(runner, strview_suffix(cmd, pos), &buf);
             break;
         case '\\':
             if (unlikely(pos == cmd.length)) {

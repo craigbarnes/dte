@@ -211,10 +211,9 @@ static StringView hex_decode_str(StringView input, char *outbuf, size_t bufsize)
 static KeyCode parse_xtgettcap_reply(StringView seq, bool valid_request)
 {
     size_t pos = 0;
-    size_t len = seq.length;
     StringView empty = strview(NULL);
-    StringView cap_hex = (pos < len) ? get_delim(seq, &pos, '=') : empty;
-    StringView val_hex = (pos < len) ? strview_from_slice(seq.data, pos, len) : empty;
+    StringView cap_hex = (pos < seq.length) ? get_delim(seq, &pos, '=') : empty;
+    StringView val_hex = (pos < seq.length) ? strview_suffix(seq, pos) : empty;
 
     char cbuf[16], vbuf[64];
     StringView cap = hex_decode_str(cap_hex, cbuf, sizeof(cbuf));

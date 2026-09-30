@@ -76,7 +76,7 @@ static bool do_search_bwd(BlockIter *bi, const regex_t *regex, ssize_t cx, bool 
             // This might be what we want (last match before cursor)
             offset = pos + match.rm_so;
             pos += match.rm_eo;
-            slice = strview_from_slice(line.data, pos, line.length);
+            slice = strview_suffix(line, pos);
 
             if (match.rm_so == match.rm_eo) {
                 // Zero length match

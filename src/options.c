@@ -1019,7 +1019,7 @@ static void collect_flag_option_values (
 ) {
     ssize_t comma_idx = strview_memrchr_idx(prefix, ',');
     size_t tail_idx = (comma_idx < 0) ? 0 : comma_idx + 1;
-    StringView tail = strview_from_slice(prefix.data, tail_idx, prefix.length);
+    StringView tail = strview_suffix(prefix, tail_idx);
 
     for (size_t i = 0; values[i]; i++) {
         StringView val = strview(values[i]);
