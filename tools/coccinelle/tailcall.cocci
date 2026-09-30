@@ -5,6 +5,7 @@ identifier tail != {
     ptr_array_free,
     ptr_array_grow,
     search_free_regexp,
+    string_clear,
     va_end
 };
 expression lhs, rhs, a1;

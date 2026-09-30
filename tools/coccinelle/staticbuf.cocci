@@ -1,7 +1,7 @@
 @disable optional_qualifier@
 identifier func != {
+    flag_string,
     fsize_string,
-    lines_and_columns_env,
     umax_to_str
 };
 identifier buf;
