@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "macros.h"
+#include "string-view.h"
 
 // A container type for holding a set of strings, using hashing for
 // primary lookups and separate chaining for collision resolution.
@@ -12,8 +13,7 @@ typedef struct {
     size_t table_size;
     size_t nr_entries;
     size_t grow_at;
-    size_t (*hash)(const char *str, size_t len);
-    bool (*equal)(const void *s1, const void *s2, size_t n);
+    bool icase; // Whether to use case-insensitive hashing and equality
 } HashSet;
 
 typedef struct HashSetEntry {
@@ -60,7 +60,7 @@ static inline bool hashset_next(HashSetIter *iter)
 
 HashSet hashset_new(size_t size, bool icase) WARN_UNUSED_RESULT;
 void hashset_free(HashSet *set) NONNULL_ARGS;
-HashSetEntry *hashset_get(const HashSet *set, const char *str, size_t str_len) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3);
-HashSetEntry *hashset_insert(HashSet *set, const char *str, size_t str_len) NONNULL_ARG(1) NONNULL_ARG_IF_NONZERO_LENGTH(2, 3);
+HashSetEntry *hashset_get(const HashSet *set, StringView str) NONNULL_ARGS;
+HashSetEntry *hashset_insert(HashSet *set, StringView str) NONNULL_ARGS;
 
 #endif

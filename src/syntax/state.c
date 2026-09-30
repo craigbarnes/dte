@@ -405,8 +405,7 @@ static bool cmd_list(EditorState *e, const CommandArgs *a)
     bool icase = a->flags[0] == 'i';
     list->strings = hashset_new(a->nr_args - 1, icase);
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
-        const char *str = args[i];
-        hashset_insert(&list->strings, str, strlen(str));
+        hashset_insert(&list->strings, strview(args[i]));
     }
     return true;
 }
@@ -489,22 +488,23 @@ static bool cmd_require(EditorState *e, const CommandArgs *a)
 {
     char buf[8192];
     char *path;
-    size_t path_len;
+    StringView path_sv;
     HashSet *set;
     SyntaxLoadFlags flags = SYN_MUST_EXIST;
 
     if (a->flags[0] == 'f') {
-        set = &e->required_syntax_files;
         path = a->args[0];
-        path_len = strlen(path);
+        path_sv = strview(path);
+        set = &e->required_syntax_files;
     } else {
-        set = &e->required_syntax_builtins;
-        path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
+        size_t path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
         path = buf;
+        path_sv = string_view(path, path_len);
+        set = &e->required_syntax_builtins;
         flags |= SYN_BUILTIN;
     }
 
-    if (hashset_get(set, path, path_len)) {
+    if (hashset_get(set, path_sv)) {
         return true;
     }
 
@@ -517,7 +517,7 @@ static bool cmd_require(EditorState *e, const CommandArgs *a)
         return false;
     }
 
-    hashset_insert(set, path, path_len);
+    hashset_insert(set, path_sv);
     return true;
 }
 

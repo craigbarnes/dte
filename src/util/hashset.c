@@ -6,7 +6,6 @@
 #include "debug.h"
 #include "hash.h"
 #include "xmalloc.h"
-#include "xstring.h"
 
 static void alloc_table(HashSet *set, size_t size)
 {
@@ -33,15 +32,7 @@ HashSet hashset_new(size_t size, bool icase)
     HashSet set;
     alloc_table(&set, size);
     set.nr_entries = 0;
-
-    if (icase) {
-        set.hash = fnv_1a_hash_icase;
-        set.equal = mem_equal_icase;
-    } else {
-        set.hash = fnv_1a_hash;
-        set.equal = mem_equal;
-    }
-
+    set.icase = icase;
     return set;
 }
 
@@ -55,25 +46,34 @@ void hashset_free(HashSet *set)
             h = next;
         }
     }
+
     free(set->table);
 }
 
-static size_t get_slot(const HashSet *set, const char *str, size_t str_len)
+static size_t get_slot(const HashSet *set, StringView str)
 {
-    const size_t hash = set->hash(str, str_len);
+    size_t hash = set->icase ? fnv_1a_hash_icase(str) : fnv_1a_hash(str);
     return hash & (set->table_size - 1);
 }
 
-HashSetEntry *hashset_get(const HashSet *set, const char *str, size_t str_len)
+HashSetEntry *hashset_get(const HashSet *set, StringView str)
 {
-    const size_t slot = get_slot(set, str, str_len);
-    HashSetEntry *h = set->table[slot];
-    while (h) {
-        if (str_len == h->str_len && set->equal(str, h->str, str_len)) {
-            return h;
+    if (set->icase) {
+        size_t slot = get_slot(set, str);
+        for (HashSetEntry *h = set->table[slot]; h; h = h->next) {
+            if (strview_equal_icase(str, string_view(h->str, h->str_len))) {
+                return h;
+            }
         }
-        h = h->next;
+    } else {
+        size_t slot = get_slot(set, str);
+        for (HashSetEntry *h = set->table[slot]; h; h = h->next) {
+            if (strview_equal(str, string_view(h->str, h->str_len))) {
+                return h;
+            }
+        }
     }
+
     return NULL;
 }
 
@@ -82,32 +82,34 @@ static void rehash(HashSet *set, size_t newsize)
     size_t oldsize = set->table_size;
     HashSetEntry **oldtable = set->table;
     alloc_table(set, newsize);
+
     for (size_t i = 0; i < oldsize; i++) {
         HashSetEntry *e = oldtable[i];
         while (e) {
             HashSetEntry *next = e->next;
-            const size_t slot = get_slot(set, e->str, e->str_len);
+            const size_t slot = get_slot(set, string_view(e->str, e->str_len));
             e->next = set->table[slot];
             set->table[slot] = e;
             e = next;
         }
     }
+
     free(oldtable);
 }
 
-HashSetEntry *hashset_insert(HashSet *set, const char *str, size_t str_len)
+HashSetEntry *hashset_insert(HashSet *set, StringView str)
 {
-    HashSetEntry *h = hashset_get(set, str, str_len);
+    HashSetEntry *h = hashset_get(set, str);
     if (h) {
         return h;
     }
 
-    const size_t slot = get_slot(set, str, str_len);
-    h = xmalloc(xadd3(sizeof(*h), str_len, 1));
+    const size_t slot = get_slot(set, str);
+    h = xmalloc(xadd3(sizeof(*h), str.length, 1));
     h->next = set->table[slot];
-    h->str_len = str_len;
-    memcpy(h->str, str, str_len);
-    h->str[str_len] = '\0';
+    h->str_len = str.length;
+    memcpy(h->str, str.data, str.length);
+    h->str[str.length] = '\0';
     set->table[slot] = h;
 
     if (++set->nr_entries > set->grow_at) {

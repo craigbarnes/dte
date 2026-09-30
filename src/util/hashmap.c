@@ -96,8 +96,9 @@ HashMapEntry *hashmap_find(const HashMap *map, const char *key)
         return NULL;
     }
 
-    size_t hash = fnv_1a_hash(key, strlen(key));
+    size_t hash = fnv_1a_hash(strview(key));
     HashMapEntry *e;
+
     for (size_t i = hash, j = 1; ; i += j++) {
         e = map->entries + (i & map->mask);
         if (!e->key) {
@@ -147,9 +148,10 @@ static SystemErrno hashmap_do_insert(HashMap *map, char *key, void *value, void 
         }
     }
 
-    size_t hash = fnv_1a_hash(key, strlen(key));
+    size_t hash = fnv_1a_hash(strview(key));
     bool replacing_tombstone_or_existing_value = false;
     HashMapEntry *e;
+
     for (size_t i = hash, j = 1; ; i += j++) {
         e = map->entries + (i & map->mask);
         if (!e->key) {

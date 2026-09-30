@@ -150,13 +150,16 @@ static const TermStyle **highlight_line (
             goto top;
         case COND_INLIST:
         case COND_INLIST_BUFFER:
-            if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
-                break;
+            if (sidx >= 0) {
+                StringView str = string_view(line + sidx, i - sidx);
+                if (hashset_get(&u->str_list->strings, str)) {
+                    set_style_range(styles, style, sidx, i);
+                    sidx = (condtype == COND_INLIST) ? -1 : sidx;
+                    state = dest;
+                    goto top;
+                }
             }
-            set_style_range(styles, style, sidx, i);
-            sidx = (condtype == COND_INLIST) ? -1 : sidx;
-            state = dest;
-            goto top;
+            break;
         case COND_RECOLOR:
             set_style_range(styles, style, saturating_subtract(i, u->recolor_len), i);
             break;

@@ -227,17 +227,17 @@ void collect_ft(const PointerArray *filetypes, PointerArray *a, StringView prefi
     HashSet set = hashset_new(20 + (prefix.length ? 0 : nr_builtin_ft), false);
 
     for (size_t i = 0; i < nr_builtin_ft; i++) {
-        const char *name = builtin_filetype_names[i];
-        if (str_has_sv_prefix(name, prefix)) {
-            hashset_insert(&set, name, strlen(name));
+        StringView name = strview(builtin_filetype_names[i]);
+        if (strview_has_sv_prefix(name, prefix)) {
+            hashset_insert(&set, name);
         }
     }
 
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
-        const char *name = ft->name;
-        if (str_has_sv_prefix(name, prefix)) {
-            hashset_insert(&set, name, strlen(name));
+        StringView name = strview(ft->name);
+        if (strview_has_sv_prefix(name, prefix)) {
+            hashset_insert(&set, name);
         }
     }
 

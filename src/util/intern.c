@@ -10,13 +10,13 @@ const void *mem_intern(const void *data, size_t len)
         interned_strings = hashset_new(32, false);
     }
 
-    HashSetEntry *e = hashset_insert(&interned_strings, data, len);
+    HashSetEntry *e = hashset_insert(&interned_strings, string_view(data, len));
     return e->str;
 }
 
 bool mem_is_intern(const void *data, size_t len)
 {
-    const HashSetEntry *entry = hashset_get(&interned_strings, data, len);
+    const HashSetEntry *entry = hashset_get(&interned_strings, string_view(data, len));
     return entry && entry->str == data;
 }
 

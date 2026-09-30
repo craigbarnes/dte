@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "syntax.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
@@ -227,15 +226,15 @@ void collect_syntax_emit_names (
     // a HashSet (to avoid duplicates)
     for (HashMapIter it = hashmap_iter(&syntax->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;
-        const char *emit = get_effective_emit_name(&s->default_action);
-        if (str_has_sv_prefix(emit, prefix)) {
-            hashset_insert(&set, emit, strlen(emit));
+        StringView emit = strview(get_effective_emit_name(&s->default_action));
+        if (strview_has_sv_prefix(emit, prefix)) {
+            hashset_insert(&set, emit);
         }
         for (size_t i = 0, n = s->conds.count; i < n; i++) {
             const Condition *cond = s->conds.ptrs[i];
-            emit = get_effective_emit_name(&cond->a);
-            if (str_has_sv_prefix(emit, prefix)) {
-                hashset_insert(&set, emit, strlen(emit));
+            emit = strview(get_effective_emit_name(&cond->a));
+            if (strview_has_sv_prefix(emit, prefix)) {
+                hashset_insert(&set, emit);
             }
         }
     }
