@@ -231,15 +231,11 @@ static size_t iconv_wrapper (
     char **restrict outbuf,
     size_t *restrict outbytesleft
 ) {
-    // POSIX defines the second parameter of iconv(3) as "char **restrict"
-    // but NetBSD declares it as "const char **restrict"
-#ifdef __NetBSD__
-    const char **restrict in = inbuf;
-#else
-    char **restrict in = (char **restrict)inbuf;
-#endif
-
-    return iconv(cd, in, inbytesleft, outbuf, outbytesleft);
+    // POSIX defines the second parameter of iconv(3) as `char **restrict` but
+    // NetBSD and Illumos declare it as `const char **restrict`, so we cast to
+    // `void*` here to prevent `-Wincompatible-pointer-types` errors.
+    // https://pubs.opengroup.org/onlinepubs/9799919799/functions/iconv.html#:~:text=char%20**restrict%20inbuf
+    return iconv(cd, (void*)inbuf, inbytesleft, outbuf, outbytesleft);
 }
 
 static void resize_obuf(CharsetConverter *c)
