@@ -13,7 +13,7 @@ jobs:
                 ]
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with: {filter: "tree:0", fetch-depth: 0}
             - run: ln -s tools/Config-CI.mk Config.mk
             - run: brew install make
@@ -36,7 +36,7 @@ jobs:
                 ]
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with: {filter: "tree:0", fetch-depth: 0}
             - run: ln -s tools/Config-CI.mk Config.mk
             - run: make vvars
